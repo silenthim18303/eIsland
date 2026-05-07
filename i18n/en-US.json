@@ -1632,6 +1632,7 @@
       "versionCardTitle": "Version Info",
       "versionCardHint": "View the current version and pick an update source. All patches are downloaded through the selected source.",
       "autoPromptTitle": "Update Prompt",
+      "autoPromptHintStatic": "Control whether to auto-prompt for version updates and announcement display strategy",
       "autoPromptEnabled": "Auto prompt for new versions",
       "announcementShowModeAlways": "Always show announcements",
       "announcementShowModeVersionOnly": "Show announcements only on version updates",
@@ -1657,6 +1658,14 @@
       }
     },
     "pluginMarket": {
+      "search": {
+        "wallpaperTitle": "Wallpaper Market",
+        "wallpaperHint": "Browse and apply community-shared wallpapers, supporting both image and video wallpapers",
+        "contributionTitle": "Wallpaper Contribution",
+        "contributionHint": "Upload your wallpaper creations to share with the community",
+        "editTitle": "Wallpaper Management",
+        "editHint": "View and edit your contributed wallpapers and manage review status"
+      },
       "auth": {
         "entryTitle": "Sign in to access plugin market content",
         "gotoLogin": "Go to Login",

@@ -121,7 +121,7 @@ export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'ind
   shortcut: '隐藏、关闭、截图快捷键',
   user: '登录、资料、注销等账号操作',
   update: '检查与下载软件更新',
-  pluginMarket: '插件市场入口与安装管理（开发中）',
+  pluginMarket: '插件市场入口与安装管理',
   about: '版本信息与项目链接',
 };
 
@@ -140,7 +140,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'music-smtc': SvgIcon.SMTC,
   ai: SvgIcon.AI,
   shortcut: SvgIcon.SHORTCUT_KEY,
-  update: SvgIcon.REVERT,
+  update: SvgIcon.UPDATE_TIME,
   about: SvgIcon.ABOUT,
   user: SvgIcon.USER,
   theme: SvgIcon.THEME,
@@ -151,6 +151,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'clipboard-history': SvgIcon.COPY,
   alarm: SvgIcon.TIMER,
   autostart: SvgIcon.CONTINUE,
+  pluginMarket: SvgIcon.PLUGIN,
 };
 
 export const NETWORK_TIMEOUT_OPTIONS = [
@@ -249,6 +250,8 @@ export const NAV_CARDS: NavCardDef[] = [
   { id: 'weather', label: SETTINGS_TAB_LABELS.weather, desc: SETTINGS_TAB_DESCRIPTIONS.weather, icon: SETTINGS_TAB_ICONS.weather, tab: 'weather' },
   { id: 'ai', label: SETTINGS_TAB_LABELS.ai, desc: SETTINGS_TAB_DESCRIPTIONS.ai, icon: SETTINGS_TAB_ICONS.ai, tab: 'ai' },
   { id: 'shortcut', label: SETTINGS_TAB_LABELS.shortcut, desc: SETTINGS_TAB_DESCRIPTIONS.shortcut, icon: SETTINGS_TAB_ICONS.shortcut, tab: 'shortcut' },
+  { id: 'update', label: SETTINGS_TAB_LABELS.update, desc: SETTINGS_TAB_DESCRIPTIONS.update, icon: SETTINGS_TAB_ICONS.update, tab: 'update' },
+  { id: 'pluginMarket', label: SETTINGS_TAB_LABELS.pluginMarket, desc: SETTINGS_TAB_DESCRIPTIONS.pluginMarket, icon: SETTINGS_TAB_ICONS.pluginMarket, tab: 'pluginMarket' },
   { id: 'guide', label: '使用教程', desc: '查看灵动岛功能引导与操作说明。', icon: SvgIcon.GUIDE, tab: 'index', actionId: 'guide' },
   { id: 'about', label: SETTINGS_TAB_LABELS.about, desc: SETTINGS_TAB_DESCRIPTIONS.about, icon: SETTINGS_TAB_ICONS.about, tab: 'about' },
   { id: 'music-whitelist', label: SETTINGS_TAB_LABELS['music-whitelist'], desc: SETTINGS_TAB_DESCRIPTIONS['music-whitelist'], icon: SETTINGS_TAB_ICONS['music-whitelist'], tab: 'music', musicPage: 'whitelist' },
@@ -369,4 +372,9 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   // ── 更新设置 ──
   { label: '版本信息', desc: '查看当前版本并选择更新源,应用所有补丁包均通过该更新源下载', labelKey: 'settings.update.versionCardTitle', descKey: 'settings.update.versionCardHint', tab: 'update' },
   { label: '检查与安装', desc: '手动触发检查,有新版本时可下载安装;下载完成后点击"安装并重启"应用更新', labelKey: 'settings.update.actionCardTitle', descKey: 'settings.update.actionCardHint', tab: 'update' },
+  { label: '更新提示', desc: '控制是否自动提示版本更新和公告展示策略', labelKey: 'settings.update.autoPromptTitle', descKey: 'settings.update.autoPromptHintStatic', tab: 'update' },
+  // ── 插件市场 ──
+  { label: '壁纸市场', desc: '浏览并应用社区分享的壁纸资源，支持图片和视频壁纸', labelKey: 'settings.pluginMarket.search.wallpaperTitle', descKey: 'settings.pluginMarket.search.wallpaperHint', tab: 'pluginMarket' },
+  { label: '壁纸贡献', desc: '上传你的壁纸作品，分享给社区用户', labelKey: 'settings.pluginMarket.search.contributionTitle', descKey: 'settings.pluginMarket.search.contributionHint', tab: 'pluginMarket' },
+  { label: '壁纸管理', desc: '查看和编辑你已贡献的壁纸作品，管理审核状态', labelKey: 'settings.pluginMarket.search.editTitle', descKey: 'settings.pluginMarket.search.editHint', tab: 'pluginMarket' },
 ];
