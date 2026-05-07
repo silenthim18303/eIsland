@@ -98,6 +98,7 @@ export const SvgIcon = {
   MAIL: './svg/MAIL.svg',
   UPDATE_TIME: './svg/UPDATE_TIME.svg',
   PLUGIN: './svg/PLUGIN.svg',
+  MINIMAX: './svg/MINIMAX.svg',
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;
