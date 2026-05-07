@@ -153,10 +153,10 @@ export function OverviewPreview({ layoutConfig }: { layoutConfig: OverviewLayout
           <div className="ov-dash-widget ov-dash-album-widget">
             <div className="ov-dash-widget-header">
               <span className="ov-dash-widget-title">相册轮播</span>
-              <span className="ov-dash-album-count">3 项</span>
             </div>
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div className="ov-dash-album-card" style={{ cursor: 'default', flex: '0 0 292px', width: '92px', height: '112px' }}>
+                <div className="ov-dash-album-count">3 项</div>
                 <div className="ov-dash-album-fallback">
                   <img src={SvgIcon.MUSIC} alt="" className="ov-dash-album-fallback-icon" />
                   <span className="ov-dash-album-fallback-text">示例预览</span>
