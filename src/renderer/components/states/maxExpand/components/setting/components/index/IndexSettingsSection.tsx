@@ -85,7 +85,7 @@ export function IndexSettingsSection({
   setActiveTab,
   onAction,
 }: IndexSettingsSectionProps): ReactElement {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const getCardOutlineClass = (cardId: string): string => {
     if (cardId === 'user-pro') return ' settings-user-pro-nav-card--outline';
@@ -102,11 +102,17 @@ export function IndexSettingsSection({
     return SETTINGS_TAB_ICONS[item.tab as keyof typeof SETTINGS_TAB_ICONS];
   };
 
-  const searchResults = useMemo((): SearchableSettingItem[] | null => {
+  const searchResults = useMemo((): Array<SearchableSettingItem & { localizedLabel: string; localizedDesc: string }> | null => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return null;
-    return SEARCHABLE_SETTINGS.filter((item) => item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q));
-  }, [searchQuery]);
+    return SEARCHABLE_SETTINGS
+      .map((item) => {
+        const localizedLabel = item.labelKey ? t(item.labelKey, { defaultValue: item.label }) : item.label;
+        const localizedDesc = item.descKey ? t(item.descKey, { defaultValue: item.desc }) : item.desc;
+        return { ...item, localizedLabel, localizedDesc };
+      })
+      .filter((item) => item.localizedLabel.toLowerCase().includes(q) || item.localizedDesc.toLowerCase().includes(q));
+  }, [searchQuery, i18n.language, t]);
 
   return (
     <div className="max-expand-settings-section settings-index-section">
@@ -140,7 +146,7 @@ export function IndexSettingsSection({
               placeholder={t('settings.index.searchPlaceholder', { defaultValue: '搜索配置项...' })}
             />
             {searchQuery && (
-              <button className="settings-index-search-clear" type="button" onClick={() => setSearchQuery('')} aria-label="Clear">
+              <button className="settings-index-search-clear" type="button" onClick={() => setSearchQuery('')} aria-label={t('settings.index.searchClear', { defaultValue: 'Clear search' })}>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             )}
@@ -171,8 +177,8 @@ export function IndexSettingsSection({
                       }}
                     >
                       <div className="settings-index-search-dropdown-text">
-                        <span className="settings-index-search-dropdown-title">{item.label}</span>
-                        <span className="settings-index-search-dropdown-desc">{item.desc}</span>
+                        <span className="settings-index-search-dropdown-title">{item.localizedLabel}</span>
+                        <span className="settings-index-search-dropdown-desc">{item.localizedDesc}</span>
                       </div>
                       {getSearchItemIcon(item) && (
                         <img className="settings-index-search-dropdown-icon" src={getSearchItemIcon(item)} alt="" aria-hidden="true" />

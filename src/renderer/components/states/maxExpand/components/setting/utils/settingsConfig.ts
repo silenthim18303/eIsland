@@ -262,6 +262,8 @@ export const NAV_CARDS_MAP = new Map(NAV_CARDS.map((c) => [c.id, c]));
 export interface SearchableSettingItem {
   label: string;
   desc: string;
+  labelKey?: string;
+  descKey?: string;
   tab: SettingsSidebarTabKey;
   appPage?: AppSettingsPageKey;
   musicPage?: MusicSettingsPageKey;
@@ -270,101 +272,101 @@ export interface SearchableSettingItem {
 
 export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   // ── 软件设置 > 布局预览 ──
-  { label: '总览布局预览', desc: '实时显示左右控件组合后的 Expand 态灵动岛样式，切换下方控件可即时预览。', tab: 'app', appPage: 'layout-preview' },
-  { label: '控件组合', desc: '分别选择左右两侧展示的控件，切换后自动保存。', tab: 'app', appPage: 'layout-preview' },
+  { label: '总览布局预览', desc: '实时显示左右控件组合后的 Expand 态灵动岛样式，切换下方控件可即时预览。', labelKey: 'settings.app.layout.previewTitle', descKey: 'settings.app.layout.previewHint', tab: 'app', appPage: 'layout-preview' },
+  { label: '控件组合', desc: '分别选择左右两侧展示的控件，切换后自动保存。', labelKey: 'settings.app.layout.widgetPickerTitle', descKey: 'settings.app.layout.widgetPickerHint', tab: 'app', appPage: 'layout-preview' },
   // ── 软件设置 > 全展开布局 ──
-  { label: '全展开导航预览', desc: '预览底部导航点的排列顺序，灰色表示已隐藏的页面。', tab: 'app', appPage: 'maxexpand-layout' },
-  { label: '页面排序与可见性', desc: '拖拽调整页面顺序，点击开关控制页面显示或隐藏。', tab: 'app', appPage: 'maxexpand-layout' },
+  { label: '全展开导航预览', desc: '预览底部导航点的排列顺序，灰色表示已隐藏的页面。', labelKey: 'settings.app.maxExpandLayout.previewTitle', descKey: 'settings.app.maxExpandLayout.previewHint', tab: 'app', appPage: 'maxexpand-layout' },
+  { label: '页面排序与可见性', desc: '拖拽调整页面顺序，点击开关控制页面显示或隐藏。', labelKey: 'settings.app.maxExpandLayout.orderTitle', descKey: 'settings.app.maxExpandLayout.orderHintStatic', tab: 'app', appPage: 'maxexpand-layout' },
   // ── 软件设置 > 相册 ──
-  { label: '相册轮播方式', desc: '配置总览相册卡片的轮播顺序、频率、展示内容与点击行为', tab: 'app', appPage: 'album' },
-  { label: '展示资源', desc: '选择总览相册卡片参与轮播的资源类型', tab: 'app', appPage: 'album' },
-  { label: '点击卡片行为', desc: '配置点击总览相册卡片后的行为', tab: 'app', appPage: 'album' },
-  { label: '自动播放与视频行为', desc: '仅影响总览相册轮播卡片，不影响相册主页面。', tab: 'app', appPage: 'album' },
+  { label: '相册轮播方式', desc: '配置总览相册卡片的轮播顺序、频率、展示内容与点击行为', labelKey: 'settings.app.album.carouselTitle', descKey: 'settings.app.album.carouselHint', tab: 'app', appPage: 'album' },
+  { label: '展示资源', desc: '选择总览相册卡片参与轮播的资源类型', labelKey: 'settings.app.album.filterLabel', descKey: 'settings.app.album.filterHint', tab: 'app', appPage: 'album' },
+  { label: '点击卡片行为', desc: '配置点击总览相册卡片后的行为', labelKey: 'settings.app.album.clickBehaviorLabel', descKey: 'settings.app.album.clickBehaviorHint', tab: 'app', appPage: 'album' },
+  { label: '自动播放与视频行为', desc: '仅影响总览相册轮播卡片，不影响相册主页面。', labelKey: 'settings.app.album.playbackTitle', descKey: 'settings.app.album.playbackHint', tab: 'app', appPage: 'album' },
   // ── 软件设置 > 隐藏窗口管理 ──
-  { label: '隐藏窗口管理', desc: '当黑名单进程对应窗口处于焦点状态时，将立即隐藏灵动岛；失去焦点后自动显示。', tab: 'app', appPage: 'hide-process-list' },
-  { label: '当前运行的窗口', desc: '在列表中点击可将窗口加入 / 移出黑名单，支持按进程名搜索。', tab: 'app', appPage: 'hide-process-list' },
+  { label: '隐藏窗口管理', desc: '当黑名单进程对应窗口处于焦点状态时，将立即隐藏灵动岛；失去焦点后自动显示。', labelKey: 'settings.app.hideProcess.title', descKey: 'settings.app.hideProcess.hint', tab: 'app', appPage: 'hide-process-list' },
+  { label: '当前运行的窗口', desc: '在列表中点击可将窗口加入 / 移出黑名单，支持按进程名搜索。', labelKey: 'settings.app.hideProcess.runningTitle', descKey: 'settings.app.hideProcess.runningHint', tab: 'app', appPage: 'hide-process-list' },
   // ── 软件设置 > 位置校准 ──
-  { label: '显示器选择', desc: '多显示器环境可指定灵动岛显示器。', tab: 'app', appPage: 'position' },
-  { label: '快速微调', desc: '每次按钮点击以 10px 步进移动灵动岛位置，并自动保存。', tab: 'app', appPage: 'position' },
-  { label: '精确偏移', desc: '手动输入水平 / 垂直偏移量（单位 px），回车或点击"应用"后生效。', tab: 'app', appPage: 'position' },
+  { label: '显示器选择', desc: '多显示器环境可指定灵动岛显示器。', labelKey: 'settings.app.position.displayTitle', descKey: 'settings.app.position.displayHint', tab: 'app', appPage: 'position' },
+  { label: '快速微调', desc: '每次按钮点击以 10px 步进移动灵动岛位置，并自动保存。', labelKey: 'settings.app.position.quickAdjustTitle', descKey: 'settings.app.position.quickAdjustHint', tab: 'app', appPage: 'position' },
+  { label: '精确偏移', desc: '手动输入水平 / 垂直偏移量（单位 px），回车或点击"应用"后生效。', labelKey: 'settings.app.position.preciseTitle', descKey: 'settings.app.position.preciseHint', tab: 'app', appPage: 'position' },
   // ── 软件设置 > 主题外观 ──
-  { label: '主题模式', desc: '选择深色、浅色或跟随系统主题', tab: 'app', appPage: 'theme' },
-  { label: '独立窗口控制按钮样式', desc: '启用后，独立窗口右上角将显示 macOS 风格三色圆点控制按钮', tab: 'app', appPage: 'theme' },
-  { label: '壁纸背景', desc: '选择内置壁纸，或从本地导入图片 / 视频作为灵动岛背景', tab: 'app', appPage: 'theme' },
-  { label: '背景显示效果', desc: '调整背景的透明度与模糊度', tab: 'app', appPage: 'theme' },
-  { label: '视频播放', desc: '背景视频的填充、声音与播放控制', tab: 'app', appPage: 'theme' },
-  { label: '灵动岛透明度', desc: '数值越低越透明（10% - 100%）', tab: 'app', appPage: 'theme' },
+  { label: '主题模式', desc: '选择深色、浅色或跟随系统主题', labelKey: 'settings.app.theme.title', descKey: 'settings.app.theme.hint', tab: 'app', appPage: 'theme' },
+  { label: '独立窗口控制按钮样式', desc: '启用后，独立窗口右上角将显示 macOS 风格三色圆点控制按钮', labelKey: 'settings.app.theme.windowControlsTitle', descKey: 'settings.app.theme.windowControlsHint', tab: 'app', appPage: 'theme' },
+  { label: '壁纸背景', desc: '选择内置壁纸，或从本地导入图片 / 视频作为灵动岛背景', labelKey: 'settings.app.theme.bgCardTitle', descKey: 'settings.app.theme.bgCardSubtitle', tab: 'app', appPage: 'theme' },
+  { label: '背景显示效果', desc: '调整背景的透明度与模糊度', labelKey: 'settings.app.theme.effectCardTitle', descKey: 'settings.app.theme.effectCardSubtitle', tab: 'app', appPage: 'theme' },
+  { label: '视频播放', desc: '背景视频的填充、声音与播放控制', labelKey: 'settings.app.theme.videoCardTitle', descKey: 'settings.app.theme.videoCardSubtitle', tab: 'app', appPage: 'theme' },
+  { label: '灵动岛透明度', desc: '数值越低越透明（10% - 100%）', labelKey: 'settings.app.theme.islandOpacityTitle', descKey: 'settings.app.theme.islandOpacityHint', tab: 'app', appPage: 'theme' },
   // ── 软件设置 > 语言 ──
-  { label: '显示语言', desc: '切换后将立即应用到支持多语言的界面文案', tab: 'app', appPage: 'language' },
+  { label: '显示语言', desc: '切换后将立即应用到支持多语言的界面文案', labelKey: 'settings.language.title', descKey: 'settings.language.hint', tab: 'app', appPage: 'language' },
   // ── 软件设置 > 交互行为 ──
-  { label: '鼠标移开自动收回', desc: '启用后，鼠标离开灵动岛时将自动回到空闲状态（若正在播放音乐则切到歌词态）', tab: 'app', appPage: 'behavior' },
-  { label: '空闲态点击展开', desc: '启用后，鼠标悬停在灵动岛上不会自动展开，需要点击才能展开，后续交互不受影响', tab: 'app', appPage: 'behavior' },
-  { label: '待办事项 / 倒数日 / 设置 打开方式', desc: '选择点击导航时，在灵动岛内显示还是打开独立窗口', tab: 'app', appPage: 'behavior' },
-  { label: '悬停界面截图按钮模式', desc: '配置 hover 界面的截图按钮触发选区截图或显示器截图', tab: 'app', appPage: 'behavior' },
+  { label: '鼠标移开自动收回', desc: '启用后，鼠标离开灵动岛时将自动回到空闲状态（若正在播放音乐则切到歌词态）', labelKey: 'settings.app.behavior.mouseLeaveTitle', descKey: 'settings.app.behavior.mouseLeaveHint', tab: 'app', appPage: 'behavior' },
+  { label: '空闲态点击展开', desc: '启用后，鼠标悬停在灵动岛上不会自动展开，需要点击才能展开，后续交互不受影响', labelKey: 'settings.app.behavior.idleClickExpandTitle', descKey: 'settings.app.behavior.idleClickExpandHint', tab: 'app', appPage: 'behavior' },
+  { label: '待办事项 / 倒数日 / 设置 打开方式', desc: '选择点击导航时，在灵动岛内显示还是打开独立窗口', labelKey: 'settings.app.behavior.windowModeTitle', descKey: 'settings.app.behavior.windowModeHint', tab: 'app', appPage: 'behavior' },
+  { label: '悬停界面截图按钮模式', desc: '配置 hover 界面的截图按钮触发选区截图或显示器截图', labelKey: 'settings.app.behavior.hoverScreenshotModeTitle', descKey: 'settings.app.behavior.hoverScreenshotModeHint', tab: 'app', appPage: 'behavior' },
   // ── 软件设置 > 动画 ──
-  { label: '灵动岛弹性动画', desc: '关闭后，展开和收起动画将变得更加平滑内敛，消除弹跳感', tab: 'app', appPage: 'animation' },
-  { label: '灵动岛动画速度', desc: '控制灵动岛状态切换时的过渡动画快慢', tab: 'app', appPage: 'animation' },
-  { label: 'Expand 切换动画', desc: '启用后，展开态切换页面时将播放左右滑动过渡动画', tab: 'app', appPage: 'animation' },
-  { label: 'MaxExpand 切换动画', desc: '启用后，最大展开态切换页面时将播放左右滑动过渡动画', tab: 'app', appPage: 'animation' },
+  { label: '灵动岛弹性动画', desc: '关闭后，展开和收起动画将变得更加平滑内敛，消除弹跳感', labelKey: 'settings.app.animation.springTitle', descKey: 'settings.app.animation.springHint', tab: 'app', appPage: 'animation' },
+  { label: '灵动岛动画速度', desc: '控制灵动岛状态切换时的过渡动画快慢', labelKey: 'settings.app.animation.animSpeedTitle', descKey: 'settings.app.animation.animSpeedHint', tab: 'app', appPage: 'animation' },
+  { label: 'Expand 切换动画', desc: '启用后，展开态切换页面时将播放左右滑动过渡动画', labelKey: 'settings.app.animation.expandTabSwitchTitle', descKey: 'settings.app.animation.expandTabSwitchHint', tab: 'app', appPage: 'animation' },
+  { label: 'MaxExpand 切换动画', desc: '启用后，最大展开态切换页面时将播放左右滑动过渡动画', labelKey: 'settings.app.animation.maxExpandTabSwitchTitle', descKey: 'settings.app.animation.maxExpandTabSwitchHint', tab: 'app', appPage: 'animation' },
   // ── 软件设置 > URL 解析 ──
-  { label: '剪贴板 URL 监听', desc: '启用后，检测到剪贴板含链接时会弹出询问通知', tab: 'app', appPage: 'url-parser' },
-  { label: '识别项目', desc: '选择剪贴板中被识别为 URL 的匹配范围，并可在收藏界面临时静音通知。', tab: 'app', appPage: 'url-parser' },
-  { label: 'URL 黑名单（按域名）', desc: '命中黑名单域名时：单个链接不弹窗，多链接自动剔除', tab: 'app', appPage: 'url-parser' },
+  { label: '剪贴板 URL 监听', desc: '启用后，检测到剪贴板含链接时会弹出询问通知', labelKey: 'settings.app.urlParser.title', descKey: 'settings.app.urlParser.hint', tab: 'app', appPage: 'url-parser' },
+  { label: '识别项目', desc: '选择剪贴板中被识别为 URL 的匹配范围，并可在收藏界面临时静音通知。', labelKey: 'settings.app.urlParser.detectModes', descKey: 'settings.app.urlParser.detectModesHint', tab: 'app', appPage: 'url-parser' },
+  { label: 'URL 黑名单（按域名）', desc: '命中黑名单域名时：单个链接不弹窗，多链接自动剔除', labelKey: 'settings.app.urlParser.blacklistTitle', descKey: 'settings.app.urlParser.blacklistHint', tab: 'app', appPage: 'url-parser' },
   // ── 软件设置 > 剪贴板历史 ──
-  { label: '历史记录开关', desc: '关闭后不再追加新的剪贴板记录，已有记录会保留。', tab: 'app', appPage: 'clipboard-history' },
-  { label: '最大保留条数', desc: '新记录会在前端按该条数滚动保存。', tab: 'app', appPage: 'clipboard-history' },
-  { label: '复制后自动退出', desc: '复制历史项后自动退出最大展开；有歌曲时回到歌曲态，无歌曲时回到 idle。', tab: 'app', appPage: 'clipboard-history' },
-  { label: '数据管理', desc: '可一键清空已保存的剪贴板历史记录。', tab: 'app', appPage: 'clipboard-history' },
+  { label: '历史记录开关', desc: '关闭后不再追加新的剪贴板记录，已有记录会保留。', labelKey: 'settings.clipboardHistory.enabled.title', descKey: 'settings.clipboardHistory.enabled.hint', tab: 'app', appPage: 'clipboard-history' },
+  { label: '最大保留条数', desc: '新记录会在前端按该条数滚动保存。', labelKey: 'settings.clipboardHistory.limit.title', descKey: 'settings.clipboardHistory.limit.hint', tab: 'app', appPage: 'clipboard-history' },
+  { label: '复制后自动退出', desc: '复制历史项后自动退出最大展开；有歌曲时回到歌曲态，无歌曲时回到 idle。', labelKey: 'settings.clipboardHistory.exitMaxExpandOnCopy.title', descKey: 'settings.clipboardHistory.exitMaxExpandOnCopy.hint', tab: 'app', appPage: 'clipboard-history' },
+  { label: '数据管理', desc: '可一键清空已保存的剪贴板历史记录。', labelKey: 'settings.clipboardHistory.actions.title', descKey: 'settings.clipboardHistory.actions.hint', tab: 'app', appPage: 'clipboard-history' },
   // ── 软件设置 > 闹钟 ──
-  { label: '提醒音', desc: '闹钟到点时播放提示音效。', tab: 'app', appPage: 'alarm' },
-  { label: '系统通知', desc: '闹钟触发时发送系统通知提醒。', tab: 'app', appPage: 'alarm' },
-  { label: '贪睡时长', desc: '点击贪睡后延迟再次提醒的分钟数。', tab: 'app', appPage: 'alarm' },
-  { label: '自动关闭', desc: '闹钟响铃后自动关闭的分钟数，设为"不自动关闭"则需手动操作。', tab: 'app', appPage: 'alarm' },
+  { label: '提醒音', desc: '闹钟到点时播放提示音效。', labelKey: 'settings.alarm.sound.title', descKey: 'settings.alarm.sound.hint', tab: 'app', appPage: 'alarm' },
+  { label: '系统通知', desc: '闹钟触发时发送系统通知提醒。', labelKey: 'settings.alarm.notification.title', descKey: 'settings.alarm.notification.hint', tab: 'app', appPage: 'alarm' },
+  { label: '贪睡时长', desc: '点击贪睡后延迟再次提醒的分钟数。', labelKey: 'settings.alarm.snooze.title', descKey: 'settings.alarm.snooze.hint', tab: 'app', appPage: 'alarm' },
+  { label: '自动关闭', desc: '闹钟响铃后自动关闭的分钟数，设为"不自动关闭"则需手动操作。', labelKey: 'settings.alarm.autoDismiss.title', descKey: 'settings.alarm.autoDismiss.hint', tab: 'app', appPage: 'alarm' },
   // ── 软件设置 > 实用工具 ──
-  { label: '实用工具', desc: '常用应用操作与日志工具', tab: 'app', appPage: 'autostart' },
-  { label: '开机自启', desc: '设置系统启动时是否自动运行灵动岛', tab: 'app', appPage: 'autostart' },
+  { label: '实用工具', desc: '常用应用操作与日志工具', labelKey: 'settings.labels.autostart', descKey: 'settings.app.autostart.toolsHint', tab: 'app', appPage: 'autostart' },
+  { label: '开机自启', desc: '设置系统启动时是否自动运行灵动岛', labelKey: 'settings.app.autostart.title', descKey: 'settings.app.autostart.hint', tab: 'app', appPage: 'autostart' },
   // ── 网络配置 ──
-  { label: '请求超时时间', desc: '设置网络请求的最长等待时间，网络较差时可适当增大', tab: 'network' },
-  { label: '静态资源节点', desc: '所有用户默认使用 R2，PRO 用户可选择 R2/COS/OSS。', tab: 'network' },
+  { label: '请求超时时间', desc: '设置网络请求的最长等待时间，网络较差时可适当增大', labelKey: 'settings.network.timeout.title', descKey: 'settings.network.timeout.hint', tab: 'network' },
+  { label: '静态资源节点', desc: '所有用户默认使用 R2，PRO 用户可选择 R2/COS/OSS。', labelKey: 'settings.network.staticAssetNode.title', descKey: 'settings.network.staticAssetNode.hint', tab: 'network' },
   // ── 邮箱配置 ──
-  { label: '账户信息', desc: '邮箱地址用于展示与默认发件人信息。', tab: 'mail' },
-  { label: 'IMAP', desc: '用于收信、同步收件箱和文件夹状态。', tab: 'mail' },
-  { label: '收信设置', desc: '控制每次获取邮件的数量和其他收信行为。', tab: 'mail' },
+  { label: '账户信息', desc: '邮箱地址用于展示与默认发件人信息。', labelKey: 'settings.mail.account.title', descKey: 'settings.mail.account.hint', tab: 'mail' },
+  { label: 'IMAP', desc: '用于收信、同步收件箱和文件夹状态。', labelKey: 'settings.mail.imap.title', descKey: 'settings.mail.imap.hint', tab: 'mail' },
+  { label: '收信设置', desc: '控制每次获取邮件的数量和其他收信行为。', labelKey: 'settings.mail.preferences.title', descKey: 'settings.mail.preferences.hint', tab: 'mail' },
   // ── 天气配置 ──
-  { label: '定位来源优先级', desc: '选择天气定位优先使用 IP 自动定位或自定义位置', tab: 'weather' },
-  { label: '自定义城市', desc: '仅在"自定义位置优先"生效，可先测试再保存；支持中文 / 拼音 / 英文。', tab: 'weather' },
-  { label: '天气接口优先级', desc: '可选择优先使用 Open-Meteo 或 UAPI，失败时自动切换到另一源', tab: 'weather' },
-  { label: '启动天气预警提醒', desc: '应用启动自动检查更新前，先请求和风天气预警并提示；确认关闭后再继续检查更新。', tab: 'weather' },
+  { label: '定位来源优先级', desc: '选择天气定位优先使用 IP 自动定位或自定义位置', labelKey: 'settings.weather.locationPriority.title', descKey: 'settings.weather.locationPriority.hint', tab: 'weather' },
+  { label: '自定义城市', desc: '仅在"自定义位置优先"生效，可先测试再保存；支持中文 / 拼音 / 英文。', labelKey: 'settings.weather.customCityTitle', descKey: 'settings.weather.customCityHint', tab: 'weather' },
+  { label: '天气接口优先级', desc: '可选择优先使用 Open-Meteo 或 UAPI，失败时自动切换到另一源', labelKey: 'settings.weather.providerPriority.title', descKey: 'settings.weather.providerPriority.hint', tab: 'weather' },
+  { label: '启动天气预警提醒', desc: '应用启动自动检查更新前，先请求和风天气预警并提示；确认关闭后再继续检查更新。', labelKey: 'settings.weather.alert.title', descKey: 'settings.weather.alert.hint', tab: 'weather' },
   // ── 歌曲设置 > 白名单 ──
-  { label: '播放器白名单', desc: '只有白名单内的播放器才会触发歌曲信息获取', tab: 'music', musicPage: 'whitelist' },
-  { label: '添加播放器', desc: '手动输入播放器进程名，或自动从当前 SMTC 会话中检测', tab: 'music', musicPage: 'whitelist' },
+  { label: '播放器白名单', desc: '只有白名单内的播放器才会触发歌曲信息获取', labelKey: 'settings.music.whitelist.title', descKey: 'settings.music.whitelist.hint', tab: 'music', musicPage: 'whitelist' },
+  { label: '添加播放器', desc: '手动输入播放器进程名，或自动从当前 SMTC 会话中检测', labelKey: 'settings.music.whitelist.addTitle', descKey: 'settings.music.whitelist.addHint', tab: 'music', musicPage: 'whitelist' },
   // ── 歌曲设置 > 歌词源 ──
-  { label: '歌词源', desc: '自动模式根据 SMTC 检测到的播放器进程选择对应源，失败后依次尝试其他源，最后使用 LRCLIB 兜底', tab: 'music', musicPage: 'lyrics' },
-  { label: '歌词显示', desc: '控制歌词界面的展示效果', tab: 'music', musicPage: 'lyrics' },
+  { label: '歌词源', desc: '自动模式根据 SMTC 检测到的播放器进程选择对应源，失败后依次尝试其他源，最后使用 LRCLIB 兜底', labelKey: 'settings.music.lyrics.title', descKey: 'settings.music.lyrics.hint', tab: 'music', musicPage: 'lyrics' },
+  { label: '歌词显示', desc: '控制歌词界面的展示效果', labelKey: 'settings.music.lyrics.displayTitle', descKey: 'settings.music.lyrics.displayHint', tab: 'music', musicPage: 'lyrics' },
   // ── 歌曲设置 > SMTC ──
-  { label: 'SMTC 自动取消订阅', desc: '用于清理长时间无更新的播放会话，默认永不取消订阅', tab: 'music', musicPage: 'smtc' },
+  { label: 'SMTC 自动取消订阅', desc: '用于清理长时间无更新的播放会话，默认永不取消订阅', labelKey: 'settings.music.smtc.title', descKey: 'settings.music.smtc.hint', tab: 'music', musicPage: 'smtc' },
   // ── AI Agent ──
-  { label: '模型凭据', desc: '用于 Agent 中转调用的自定义 API 凭据（可选）', tab: 'ai', aiPage: 'general' },
-  { label: 'Agent 工作区', desc: '配置 Agent 可操作的文件目录,所有文件读写、搜索、命令执行仅限于工作区内', tab: 'ai', aiPage: 'general' },
-  { label: 'r1pxc Agent 头像配置', desc: '支持拖入图片或从文件资源管理器选择，不支持 URL', tab: 'ai', aiPage: 'r1pxc' },
-  { label: 'Ollama 本地模型', desc: '配置本地 Ollama 服务地址与默认模型，在模型下拉中选择 ollama 即可使用', tab: 'ai', aiPage: 'ollama' },
+  { label: '模型凭据', desc: '用于 Agent 中转调用的自定义 API 凭据（可选）', labelKey: 'settings.ai.credentialsTitle', descKey: 'settings.ai.credentialsHint', tab: 'ai', aiPage: 'general' },
+  { label: 'Agent 工作区', desc: '配置 Agent 可操作的文件目录,所有文件读写、搜索、命令执行仅限于工作区内', labelKey: 'settings.ai.workspaceTitle', descKey: 'settings.ai.workspaceHint', tab: 'ai', aiPage: 'general' },
+  { label: 'r1pxc Agent 头像配置', desc: '支持拖入图片或从文件资源管理器选择，不支持 URL', labelKey: 'settings.ai.r1pxcConfigTitle', descKey: 'settings.ai.r1pxcConfigHint', tab: 'ai', aiPage: 'r1pxc' },
+  { label: 'Ollama 本地模型', desc: '配置本地 Ollama 服务地址与默认模型，在模型下拉中选择 ollama 即可使用', labelKey: 'settings.ai.ollamaTitle', descKey: 'settings.ai.ollamaHint', tab: 'ai', aiPage: 'ollama' },
   // ── 快捷键 > 窗口操作 ──
-  { label: '隐藏/显示快捷键', desc: '点击"修改"后按下组合键（如 Alt+X、Ctrl+Shift+H）', tab: 'shortcut' },
-  { label: '关闭灵动岛快捷键', desc: '按下此快捷键将立即关闭灵动岛应用（如 Alt+Q、Ctrl+Shift+Q）', tab: 'shortcut' },
-  { label: '还原默认位置快捷键', desc: '按下此快捷键将把灵动岛恢复到默认顶部居中位置', tab: 'shortcut' },
-  { label: '隐藏/显示托盘图标快捷键', desc: '按下此快捷键将隐藏或显示系统托盘中的灵动岛图标', tab: 'shortcut' },
-  { label: '显示配置窗口快捷键', desc: '仅在独立窗口模式下生效：按下后将打开独立配置窗口并切换到设置页', tab: 'shortcut' },
-  { label: '打开剪贴板历史快捷键', desc: '按下后将打开灵动岛并直接切换到剪贴板历史界面', tab: 'shortcut' },
-  { label: '切换鼠标穿透快捷键', desc: '按下此快捷键将锁定或解锁鼠标穿透状态，锁定后灵动岛不会拦截鼠标事件', tab: 'shortcut' },
-  { label: '切换 UI 状态锁定快捷键', desc: '按下后锁定当前 UI 状态，锁定期间不会因鼠标进入/移出或自动逻辑切换状态，再次按下解锁', tab: 'shortcut' },
+  { label: '隐藏/显示快捷键', desc: '点击"修改"后按下组合键（如 Alt+X、Ctrl+Shift+H）', labelKey: 'settings.shortcut.window.toggleIsland.title', descKey: 'settings.shortcut.window.toggleIsland.hint', tab: 'shortcut' },
+  { label: '关闭灵动岛快捷键', desc: '按下此快捷键将立即关闭灵动岛应用（如 Alt+Q、Ctrl+Shift+Q）', labelKey: 'settings.shortcut.window.quitApp.title', descKey: 'settings.shortcut.window.quitApp.hint', tab: 'shortcut' },
+  { label: '还原默认位置快捷键', desc: '按下此快捷键将把灵动岛恢复到默认顶部居中位置', labelKey: 'settings.shortcut.window.resetPosition.title', descKey: 'settings.shortcut.window.resetPosition.hint', tab: 'shortcut' },
+  { label: '隐藏/显示托盘图标快捷键', desc: '按下此快捷键将隐藏或显示系统托盘中的灵动岛图标', labelKey: 'settings.shortcut.window.toggleTray.title', descKey: 'settings.shortcut.window.toggleTray.hint', tab: 'shortcut' },
+  { label: '显示配置窗口快捷键', desc: '仅在独立窗口模式下生效：按下后将打开独立配置窗口并切换到设置页', labelKey: 'settings.shortcut.window.showConfig.title', descKey: 'settings.shortcut.window.showConfig.hint', tab: 'shortcut' },
+  { label: '打开剪贴板历史快捷键', desc: '按下后将打开灵动岛并直接切换到剪贴板历史界面', labelKey: 'settings.shortcut.window.openClipboardHistory.title', descKey: 'settings.shortcut.window.openClipboardHistory.hint', tab: 'shortcut' },
+  { label: '切换鼠标穿透快捷键', desc: '按下此快捷键将锁定或解锁鼠标穿透状态，锁定后灵动岛不会拦截鼠标事件', labelKey: 'settings.shortcut.window.togglePassthrough.title', descKey: 'settings.shortcut.window.togglePassthrough.hint', tab: 'shortcut' },
+  { label: '切换 UI 状态锁定快捷键', desc: '按下后锁定当前 UI 状态，锁定期间不会因鼠标进入/移出或自动逻辑切换状态，再次按下解锁', labelKey: 'settings.shortcut.window.toggleUiLock.title', descKey: 'settings.shortcut.window.toggleUiLock.hint', tab: 'shortcut' },
   // ── 快捷键 > AI ──
-  { label: 'Agent 语音输入快捷键', desc: '长按此快捷键将触发 Agent 语音输入，释放后自动关闭', tab: 'shortcut' },
+  { label: 'Agent 语音输入快捷键', desc: '长按此快捷键将触发 Agent 语音输入，释放后自动关闭', labelKey: 'settings.shortcut.window.agentVoiceInput.title', descKey: 'settings.shortcut.window.agentVoiceInput.hint', tab: 'shortcut' },
   // ── 快捷键 > 截图 ──
-  { label: '选区截图快捷键', desc: '按下此快捷键将触发截图选区流程（如 Alt+A、Ctrl+Shift+A）', tab: 'shortcut' },
+  { label: '选区截图快捷键', desc: '按下此快捷键将触发截图选区流程（如 Alt+A、Ctrl+Shift+A）', labelKey: 'settings.shortcut.capture.screenshot.title', descKey: 'settings.shortcut.capture.screenshot.hint', tab: 'shortcut' },
   // ── 快捷键 > 媒体 ──
-  { label: '快速切换歌曲快捷键', desc: '按下后触发系统下一曲媒体按键（仅白名单播放器生效）', tab: 'shortcut' },
-  { label: '暂停/播放歌曲快捷键', desc: '按下后触发系统播放/暂停媒体按键（仅白名单播放器生效）', tab: 'shortcut' },
+  { label: '快速切换歌曲快捷键', desc: '按下后触发系统下一曲媒体按键（仅白名单播放器生效）', labelKey: 'settings.shortcut.media.nextSong.title', descKey: 'settings.shortcut.media.nextSong.hint', tab: 'shortcut' },
+  { label: '暂停/播放歌曲快捷键', desc: '按下后触发系统播放/暂停媒体按键（仅白名单播放器生效）', labelKey: 'settings.shortcut.media.playPause.title', descKey: 'settings.shortcut.media.playPause.hint', tab: 'shortcut' },
   // ── 更新设置 ──
-  { label: '版本信息', desc: '查看当前版本并选择更新源,应用所有补丁包均通过该更新源下载', tab: 'update' },
-  { label: '检查与安装', desc: '手动触发检查,有新版本时可下载安装;下载完成后点击"安装并重启"应用更新', tab: 'update' },
+  { label: '版本信息', desc: '查看当前版本并选择更新源,应用所有补丁包均通过该更新源下载', labelKey: 'settings.update.versionCardTitle', descKey: 'settings.update.versionCardHint', tab: 'update' },
+  { label: '检查与安装', desc: '手动触发检查,有新版本时可下载安装;下载完成后点击"安装并重启"应用更新', labelKey: 'settings.update.actionCardTitle', descKey: 'settings.update.actionCardHint', tab: 'update' },
 ];
