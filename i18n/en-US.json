@@ -2352,6 +2352,14 @@
         "label": "Shortcuts",
         "desc": "Hide, quit, and screenshot hotkeys"
       },
+      "update": {
+        "label": "Updates",
+        "desc": "Check for and download app updates"
+      },
+      "pluginMarket": {
+        "label": "Plugin Market",
+        "desc": "Plugin market entry and install management"
+      },
       "user": {
         "label": "Account",
         "desc": "Sign in, profile, and account deletion"
