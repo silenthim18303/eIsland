@@ -48,6 +48,7 @@ function loadAiConfig(): AiConfig {
     ollamaModel: '',
     ollamaBaseUrl: '',
     customApiModel: '',
+    customApiMode: 'relay',
   };
   try {
     const raw = localStorage.getItem(AI_CONFIG_KEY);
@@ -69,6 +70,7 @@ function loadAiConfig(): AiConfig {
       merged.ollamaModel = typeof merged.ollamaModel === 'string' ? merged.ollamaModel.trim() : '';
       merged.ollamaBaseUrl = typeof merged.ollamaBaseUrl === 'string' ? merged.ollamaBaseUrl.trim() : '';
       merged.customApiModel = typeof merged.customApiModel === 'string' ? merged.customApiModel.trim() : '';
+      merged.customApiMode = merged.customApiMode === 'direct' ? 'direct' : 'relay';
       return merged;
     }
   } catch { /* ignore */ }

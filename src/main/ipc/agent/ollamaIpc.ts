@@ -27,6 +27,7 @@
 import { ipcMain } from 'electron';
 import { pingOllama, listOllamaModels, detectOllamaBaseUrl } from './ollamaClient';
 import { orchestrateOllamaChat } from './ollamaOrchestrator';
+import { orchestrateCustomDirectChat } from './customDirectOrchestrator';
 import type { AgentLocalToolRequest, AgentLocalToolResult } from './localToolIpc';
 
 interface OllamaChatIpcRequest {
@@ -35,6 +36,16 @@ interface OllamaChatIpcRequest {
   userMessage: string;
   context?: string;
   baseUrl?: string;
+  temperature?: number;
+}
+
+interface CustomDirectChatIpcRequest {
+  model: string;
+  systemPrompt: string;
+  userMessage: string;
+  context?: string;
+  baseUrl: string;
+  apiKey: string;
   temperature?: number;
 }
 
@@ -124,6 +135,69 @@ export function registerOllamaIpcHandlers(options: RegisterOllamaIpcHandlersOpti
   });
 
   ipcMain.handle('ollama:chat:abort', (_event, sessionId: string) => {
+    const controller = activeAbortControllers.get(sessionId);
+    if (controller) {
+      controller.abort();
+      activeAbortControllers.delete(sessionId);
+      return { aborted: true };
+    }
+    return { aborted: false };
+  });
+
+  // ─── Custom Direct Chat IPC ───────────────────────────────────────────────
+
+  ipcMain.handle('customDirect:chat:start', (event, sessionId: string, request: CustomDirectChatIpcRequest) => {
+    const sender = event.sender;
+    const abortController = new AbortController();
+    activeAbortControllers.set(sessionId, abortController);
+
+    orchestrateCustomDirectChat(
+      {
+        model: request.model,
+        systemPrompt: request.systemPrompt,
+        userMessage: request.userMessage,
+        context: request.context,
+        baseUrl: request.baseUrl,
+        apiKey: request.apiKey,
+        temperature: request.temperature,
+        signal: abortController.signal,
+      },
+      {
+        onEvent: (evt) => {
+          try {
+            if (!sender.isDestroyed()) {
+              sender.send(`customDirect:chat:event:${sessionId}`, evt);
+            }
+          } catch {
+            // sender 可能已销毁
+          }
+        },
+        executeLocalTool: options.executeAgentLocalTool,
+      },
+    )
+      .catch((err) => {
+        try {
+          if (!sender.isDestroyed()) {
+            sender.send(`customDirect:chat:event:${sessionId}`, {
+              type: 'error',
+              payload: {
+                code: 'ORCHESTRATOR_ERROR',
+                message: err instanceof Error ? err.message : String(err),
+              },
+            });
+          }
+        } catch {
+          // ignore
+        }
+      })
+      .finally(() => {
+        activeAbortControllers.delete(sessionId);
+      });
+
+    return { started: true, sessionId };
+  });
+
+  ipcMain.handle('customDirect:chat:abort', (_event, sessionId: string) => {
     const controller = activeAbortControllers.get(sessionId);
     if (controller) {
       controller.abort();

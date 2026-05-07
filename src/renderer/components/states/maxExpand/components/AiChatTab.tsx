@@ -35,6 +35,7 @@ import {
   streamMihtnelisAgent,
 } from '../../../../api/ai/mihtnelisAgentStream';
 import { streamOllamaLocalAgent } from '../../../../api/ai/ollamaLocalAgent';
+import { streamCustomDirectAgent } from '../../../../api/ai/customDirectAgent';
 import {
   fetchWebsiteTitle,
   getWebsiteAuthorizationPolicy,
@@ -1013,6 +1014,163 @@ export function AiChatTab(): React.ReactElement {
           const fallbackMessage = ollamaErrorMessage
             ? `❌ ${ollamaErrorMessage}`
             : t('aiChat.messages.noModelOutputOllama', { defaultValue: '⚠️ 未收到模型输出，请检查 Ollama 服务是否运行中。' });
+          updateTargetMessages(prev => {
+            const copy = [...prev];
+            const last = copy[copy.length - 1];
+            if (last && last.role === 'assistant' && !last.content) {
+              copy[copy.length - 1] = { ...last, content: fallbackMessage };
+            }
+            return copy;
+          });
+        }
+      } else if (isCustomApiModel && aiConfig.customApiMode === 'direct' && hasCustomApiCredentials) {
+        let receivedDirectChunk = false;
+        let directErrorMessage: string | null = null;
+        let directThinkingEnabled = true;
+        const directContext = buildMihtnelisContext(nextMessages);
+        const directEnabledSkills = Array.isArray(aiConfig.skills) ? aiConfig.skills.filter((s) => s.enabled && s.filePath) : [];
+        let directResolvedSkills: Array<{ name: string; content: string }> | undefined;
+        if (directEnabledSkills.length > 0) {
+          const directSkillResults = await Promise.all(
+            directEnabledSkills.map(async (s) => {
+              const content = await window.api.readTextFile(s.filePath);
+              return content ? { name: s.name, content } : null;
+            }),
+          );
+          const directValidSkills = directSkillResults.filter((r): r is { name: string; content: string } => r !== null && r.content.trim().length > 0);
+          if (directValidSkills.length > 0) directResolvedSkills = directValidSkills;
+        }
+        const directModelName = aiConfig.customApiModel || 'gpt-4o-mini';
+        const directTemperature = aiConfig.deepseekReasoningEffort === 'low' ? 0.3 : aiConfig.deepseekReasoningEffort === 'high' ? 1.0 : 0.6;
+        await streamCustomDirectAgent({
+          token: localToken || '',
+          message: text,
+          model: directModelName,
+          agentMode,
+          context: directContext,
+          workspaces: aiConfig.workspaces,
+          skills: directResolvedSkills,
+          baseUrl: aiConfig.endpoint,
+          apiKey: aiConfig.apiKey,
+          temperature: directTemperature,
+          signal: controller.signal,
+          onEvent: (event) => {
+            if (SESSION_ABORT_CONTROLLERS.get(targetSessionId) !== controller) {
+              return;
+            }
+            if (event.type === 'meta') {
+              const payload = event.payload as { thinkingEnabled?: unknown };
+              directThinkingEnabled = Boolean(payload?.thinkingEnabled);
+              return;
+            }
+            if (event.type === 'think') {
+              if (!directThinkingEnabled || !aiConfig.deepseekThinking) return;
+              const payload = event.payload as { text?: unknown; index?: unknown };
+              const thinkText = typeof payload?.text === 'string' ? payload.text : '';
+              const thinkIndex = typeof payload?.index === 'number' ? payload.index : 0;
+              if (!thinkText) return;
+              receivedDirectChunk = true;
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                const blocks = Array.isArray(last.thinkBlocks) ? [...last.thinkBlocks] : [];
+                while (blocks.length <= thinkIndex) blocks.push('');
+                blocks[thinkIndex] = (blocks[thinkIndex] || '') + thinkText;
+                copy[copy.length - 1] = { ...last, thinkBlocks: blocks };
+                return copy;
+              });
+              return;
+            }
+            if ((event.type as string) === 'stream_rollback') {
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                copy[copy.length - 1] = { ...last, content: '' };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'chunk') {
+              const payload = event.payload as { text?: unknown };
+              const chunk = typeof payload?.text === 'string' ? payload.text : '';
+              if (!chunk) return;
+              receivedDirectChunk = true;
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                copy[copy.length - 1] = { ...last, content: `${last.content}${chunk}` };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'tool_call_request') {
+              const payload = event.payload as { turn?: number; tool?: string; purpose?: string; arguments?: Record<string, unknown>; riskLevel?: string };
+              receivedDirectChunk = true;
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                const toolCalls = Array.isArray(last.toolCalls) ? [...last.toolCalls] : [];
+                toolCalls.push({ turn: payload.turn || 0, tool: payload.tool || '', purpose: payload.purpose || '', riskLevel: payload.riskLevel || '', pending: true, arguments: payload.arguments });
+                copy[copy.length - 1] = { ...last, toolCalls };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'tool_call_result') {
+              const payload = event.payload as { turn?: number; tool?: string; success?: boolean; error?: string; result?: unknown; durationMs?: number };
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                const toolCalls = Array.isArray(last.toolCalls) ? [...last.toolCalls] : [];
+                const idx = toolCalls.findIndex((tc) => tc.turn === payload.turn && tc.tool === payload.tool && tc.pending);
+                if (idx >= 0) {
+                  toolCalls[idx] = { ...toolCalls[idx], pending: false, success: payload.success, error: payload.error || '', result: payload.result, durationMs: payload.durationMs || 0 };
+                }
+                copy[copy.length - 1] = { ...last, toolCalls };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'final') {
+              const payload = event.payload as { billedInputTokens?: number; billedOutputTokens?: number; billedTokenTotal?: number; tokenSource?: string };
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                copy[copy.length - 1] = {
+                  ...last,
+                  finalized: true,
+                  model: 'custom-api',
+                  tokenUsage: {
+                    inputTokens: payload.billedInputTokens || 0,
+                    outputTokens: payload.billedOutputTokens || 0,
+                    reasoningTokens: 0,
+                    totalTokens: payload.billedTokenTotal || 0,
+                    source: payload.tokenSource || 'estimate',
+                  },
+                };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'error') {
+              const payload = event.payload as { message?: unknown };
+              directErrorMessage = typeof payload?.message === 'string'
+                ? payload.message
+                : t('aiChat.messages.agentError', { defaultValue: '直连 Agent 返回错误' });
+              return;
+            }
+          },
+        });
+        if (!receivedDirectChunk) {
+          const fallbackMessage = directErrorMessage
+            ? `❌ ${directErrorMessage}`
+            : t('aiChat.messages.noModelOutputCustomDirect', { defaultValue: '⚠️ 未收到模型输出，请检查自定义 API 端点和密钥是否正确。' });
           updateTargetMessages(prev => {
             const copy = [...prev];
             const last = copy[copy.length - 1];
@@ -2588,6 +2746,23 @@ export function AiChatTab(): React.ReactElement {
                     <option value="on">{t('settings.ai.deepseekThinkingOptions.on', { defaultValue: '开启' })}</option>
                   </select>
                 </div>
+                {isCustomApiModel && (
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <span style={{ fontSize: 12, opacity: 0.8 }}>{t('aiChat.modelCard.customApiMode', { defaultValue: '调用模式' })}</span>
+                  <select
+                    className="max-expand-chat-web-access-policy-select"
+                    value={aiConfig.customApiMode || 'relay'}
+                    onChange={(event) => {
+                      setAiConfig({ customApiMode: event.target.value as 'relay' | 'direct' });
+                    }}
+                    title={t('aiChat.modelCard.customApiModeTitle', { defaultValue: '选择自定义 API 调用模式' })}
+                    aria-label={t('aiChat.modelCard.customApiMode', { defaultValue: '调用模式' })}
+                  >
+                    <option value="relay">{t('aiChat.modelCard.customApiModeRelay', { defaultValue: '服务器转发' })}</option>
+                    <option value="direct">{t('aiChat.modelCard.customApiModeDirect', { defaultValue: '直连' })}</option>
+                  </select>
+                </div>
+                )}
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <span style={{ fontSize: 12, opacity: 0.8 }}>{t('aiChat.modelCard.contextLimit', { defaultValue: '上下文' })}</span>
                   <div className="max-expand-chat-model-select-shell" ref={contextDropdownRef}>

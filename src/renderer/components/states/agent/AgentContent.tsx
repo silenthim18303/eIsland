@@ -35,6 +35,7 @@ import {
 } from '../../../api/ai/mihtnelisAgentStream';
 import type { MihtnelisAgentStreamEvent } from '../../../api/ai/mihtnelisAgentStream';
 import { streamOllamaLocalAgent } from '../../../api/ai/ollamaLocalAgent';
+import { streamCustomDirectAgent } from '../../../api/ai/customDirectAgent';
 import { readLocalToken, getRoleFromToken } from '../../../utils/userAccount';
 import { loadLocationFromStorage } from '../../../store/utils/storage';
 import { buildMihtnelisContext } from '../../states/maxExpand/components/agent/utils/chatUtils';
@@ -380,8 +381,27 @@ export function AgentContent(): ReactElement {
             signal: controller.signal,
             onEvent: handleEvent,
           });
+        } else if (useCustomApi && aiConfig.customApiMode === 'direct') {
+          // ── 自定义 API 直连模式分支 ──
+          const directModelName = aiConfig.customApiModel?.trim() || 'gpt-4o-mini';
+          const directTemperature = aiConfig.deepseekReasoningEffort === 'low' ? 0.3 : aiConfig.deepseekReasoningEffort === 'high' ? 1.0 : 0.6;
+          await streamCustomDirectAgent({
+            token: token || '',
+            message,
+            model: directModelName,
+            agentMode,
+            context: context || undefined,
+            workspaces: aiConfig.workspaces,
+            skills: resolvedSkills,
+            snapshotMode: true,
+            baseUrl: aiConfig.endpoint,
+            apiKey: aiConfig.apiKey,
+            temperature: directTemperature,
+            signal: controller.signal,
+            onEvent: handleEvent,
+          });
         } else if (useCustomApi) {
-          // ── 自定义 API 凭据分支（仅 Pro 用户） ──
+          // ── 自定义 API 服务器转发分支（仅 Pro 用户） ──
           const customModelName = aiConfig.customApiModel?.trim() || 'gpt-4o-mini';
           await streamMihtnelisAgent({
             token,

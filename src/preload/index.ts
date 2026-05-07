@@ -298,6 +298,48 @@ const api = {
     };
   },
   /**
+   * 启动自定义 API 直连 ReAct 编排会话
+   */
+  customDirectChatStart: (
+    sessionId: string,
+    request: {
+      model: string;
+      systemPrompt: string;
+      userMessage: string;
+      context?: string;
+      baseUrl: string;
+      apiKey: string;
+      temperature?: number;
+    },
+  ): Promise<{ started: boolean; sessionId: string }> => {
+    return ipcRenderer.invoke('customDirect:chat:start', sessionId, request);
+  },
+  /**
+   * 中止自定义 API 直连编排会话
+   */
+  customDirectChatAbort: (sessionId: string): Promise<{ aborted: boolean }> => {
+    return ipcRenderer.invoke('customDirect:chat:abort', sessionId);
+  },
+  /**
+   * 监听自定义 API 直连编排会话事件
+   */
+  onCustomDirectChatEvent: (
+    sessionId: string,
+    callback: (event: { type: string; payload: Record<string, unknown> }) => void,
+  ): (() => void) => {
+    const channel = `customDirect:chat:event:${sessionId}`;
+    const handler = (
+      _event: Electron.IpcRendererEvent,
+      data: { type: string; payload: Record<string, unknown> },
+    ): void => {
+      callback(data);
+    };
+    ipcRenderer.on(channel, handler);
+    return () => {
+      ipcRenderer.removeListener(channel, handler);
+    };
+  },
+  /**
    * 清理日志缓存
    */
   clearLogsCache: (): Promise<{ success: boolean; freedBytes: number }> => {
