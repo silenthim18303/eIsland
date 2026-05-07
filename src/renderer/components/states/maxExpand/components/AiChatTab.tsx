@@ -227,7 +227,7 @@ const AssistantMarkdown = React.memo(function AssistantMarkdown({ content }: { c
  * @description 包含消息列表和输入栏的聊天界面，调用 OpenAI 兼容 API
  */
 export function AiChatTab(): React.ReactElement {
-  const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'minimax-2.5', 'minimax-2.7', 'ollama', 'custom-api'] as const;
+  const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed', 'ollama', 'custom-api'] as const;
   const { t } = useTranslation();
   const localTokenForRole = readLocalToken();
   const isProUser = useMemo(() => {
@@ -330,20 +330,24 @@ export function AiChatTab(): React.ReactElement {
   const customApiDisplayLabel = aiConfig.customApiModel
     ? `custom-api (${aiConfig.customApiModel})`
     : 'custom-api';
+  const isMinimaxModel = (modelName: string): boolean => {
+    const normalized = modelName.toLowerCase();
+    return normalized.startsWith('minimax-');
+  };
   const selectedProvider = isCustomApiModel
     ? 'custom'
     : (isOllamaModel
       ? 'ollama'
       : (selectedModel.startsWith('mimo-')
         ? 'mimo'
-        : (selectedModel.startsWith('minimax-') ? 'minimax' : 'deepseek')));
+        : (isMinimaxModel(selectedModel) ? 'minimax' : 'deepseek')));
   const modelToggleIcon = isCustomApiModel
     ? SvgIcon.AI
     : (isOllamaModel
       ? SvgIcon.OLLAMA
       : (selectedModel.startsWith('mimo-')
         ? SvgIcon.MIMO
-        : (selectedModel.startsWith('minimax-') ? SvgIcon.AI : (selectedModel.toLowerCase().includes('deepseek') ? SvgIcon.DEEPSEEK : null))));
+        : (isMinimaxModel(selectedModel) ? SvgIcon.MINIMAX : (selectedModel.toLowerCase().includes('deepseek') ? SvgIcon.DEEPSEEK : null))));
   const ollamaDisplayLabel = aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama';
   const VISIBLE_CHAT_WINDOW_SIZE = agentMode === 'r1pxc' ? VISIBLE_CHAT_WINDOW_SIZE_R1PXC : VISIBLE_CHAT_WINDOW_SIZE_DEFAULT;
   const VISIBLE_CHAT_WINDOW_STEP = agentMode === 'r1pxc' ? VISIBLE_CHAT_WINDOW_STEP_R1PXC : VISIBLE_CHAT_WINDOW_STEP_DEFAULT;
@@ -2011,7 +2015,7 @@ export function AiChatTab(): React.ReactElement {
                       ? SvgIcon.OLLAMA
                       : (msg.model?.startsWith('mimo-')
                         ? SvgIcon.MIMO
-                        : (msg.model?.startsWith('minimax-') ? SvgIcon.AI : SvgIcon.DEEPSEEK)));
+                        : (isMinimaxModel(msg.model ?? '') ? SvgIcon.MINIMAX : SvgIcon.DEEPSEEK)));
                   const showFinalTraceMeta = Boolean(msg.finalized);
                   const normalizedMarkdownContent = normalizeMarkdownCodeFences(msg.content);
                   const timelineNodes: React.ReactElement[] = [];
@@ -2502,7 +2506,7 @@ export function AiChatTab(): React.ReactElement {
                           const isOllama = m === 'ollama';
                           const isPro = m === 'deepseek-v4-pro' || m === 'mimo-v2.5-pro' || isOllama;
                           const disabled = isPro && !isProUser;
-                          const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : (m.startsWith('minimax-') ? SvgIcon.AI : SvgIcon.DEEPSEEK));
+                          const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : (isMinimaxModel(m) ? SvgIcon.MINIMAX : SvgIcon.DEEPSEEK));
                           const label = isOllama ? (aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama') : m;
                           return (
                             <button
