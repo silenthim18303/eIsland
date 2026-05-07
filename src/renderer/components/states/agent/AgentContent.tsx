@@ -191,13 +191,13 @@ export function AgentContent(): ReactElement {
       const userRole = getRoleFromToken(token);
       const isProUser = userRole === 'pro' || userRole === 'admin';
       const useCustomApi = isCustomApi && isProUser && Boolean(aiConfig.apiKey?.trim() && aiConfig.endpoint?.trim());
-      const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro'];
+      const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'minimax-2.5', 'minimax-2.7'];
       const selectedModel = isOllama ? 'ollama'
         : useCustomApi ? (aiConfig.customApiModel?.trim() || 'gpt-4o-mini')
         : (availableModels.includes(aiConfig.model) ? aiConfig.model : 'deepseek-v4-flash');
       const selectedProvider = isOllama ? 'ollama'
         : useCustomApi ? 'custom'
-        : (selectedModel.startsWith('mimo-') ? 'mimo' : 'deepseek');
+        : (selectedModel.startsWith('mimo-') ? 'mimo' : (selectedModel.startsWith('minimax-') ? 'minimax' : 'deepseek'));
       const agentMode = loadAgentMode();
 
       const state = useIslandStore.getState();

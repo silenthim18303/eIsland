@@ -227,7 +227,7 @@ const AssistantMarkdown = React.memo(function AssistantMarkdown({ content }: { c
  * @description 包含消息列表和输入栏的聊天界面，调用 OpenAI 兼容 API
  */
 export function AiChatTab(): React.ReactElement {
-  const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'ollama', 'custom-api'] as const;
+  const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'minimax-2.5', 'minimax-2.7', 'ollama', 'custom-api'] as const;
   const { t } = useTranslation();
   const localTokenForRole = readLocalToken();
   const isProUser = useMemo(() => {
@@ -330,12 +330,20 @@ export function AiChatTab(): React.ReactElement {
   const customApiDisplayLabel = aiConfig.customApiModel
     ? `custom-api (${aiConfig.customApiModel})`
     : 'custom-api';
-  const selectedProvider = isCustomApiModel ? 'custom' : (isOllamaModel ? 'ollama' : (selectedModel.startsWith('mimo-') ? 'mimo' : 'deepseek'));
+  const selectedProvider = isCustomApiModel
+    ? 'custom'
+    : (isOllamaModel
+      ? 'ollama'
+      : (selectedModel.startsWith('mimo-')
+        ? 'mimo'
+        : (selectedModel.startsWith('minimax-') ? 'minimax' : 'deepseek')));
   const modelToggleIcon = isCustomApiModel
     ? SvgIcon.AI
     : (isOllamaModel
       ? SvgIcon.OLLAMA
-      : (selectedModel.startsWith('mimo-') ? SvgIcon.MIMO : (selectedModel.toLowerCase().includes('deepseek') ? SvgIcon.DEEPSEEK : null)));
+      : (selectedModel.startsWith('mimo-')
+        ? SvgIcon.MIMO
+        : (selectedModel.startsWith('minimax-') ? SvgIcon.AI : (selectedModel.toLowerCase().includes('deepseek') ? SvgIcon.DEEPSEEK : null))));
   const ollamaDisplayLabel = aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama';
   const VISIBLE_CHAT_WINDOW_SIZE = agentMode === 'r1pxc' ? VISIBLE_CHAT_WINDOW_SIZE_R1PXC : VISIBLE_CHAT_WINDOW_SIZE_DEFAULT;
   const VISIBLE_CHAT_WINDOW_STEP = agentMode === 'r1pxc' ? VISIBLE_CHAT_WINDOW_STEP_R1PXC : VISIBLE_CHAT_WINDOW_STEP_DEFAULT;
@@ -1997,7 +2005,13 @@ export function AiChatTab(): React.ReactElement {
                   const traceId = typeof msg.traceId === 'string' ? msg.traceId.trim() : '';
                   const isMsgOllama = msg.model === 'ollama';
                   const isMsgCustomApi = msg.model === 'custom-api';
-                  const msgModelIcon = isMsgCustomApi ? SvgIcon.AI : (isMsgOllama ? SvgIcon.OLLAMA : (msg.model?.startsWith('mimo-') ? SvgIcon.MIMO : SvgIcon.DEEPSEEK));
+                  const msgModelIcon = isMsgCustomApi
+                    ? SvgIcon.AI
+                    : (isMsgOllama
+                      ? SvgIcon.OLLAMA
+                      : (msg.model?.startsWith('mimo-')
+                        ? SvgIcon.MIMO
+                        : (msg.model?.startsWith('minimax-') ? SvgIcon.AI : SvgIcon.DEEPSEEK)));
                   const showFinalTraceMeta = Boolean(msg.finalized);
                   const normalizedMarkdownContent = normalizeMarkdownCodeFences(msg.content);
                   const timelineNodes: React.ReactElement[] = [];
@@ -2488,7 +2502,7 @@ export function AiChatTab(): React.ReactElement {
                           const isOllama = m === 'ollama';
                           const isPro = m === 'deepseek-v4-pro' || m === 'mimo-v2.5-pro' || isOllama;
                           const disabled = isPro && !isProUser;
-                          const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : SvgIcon.DEEPSEEK);
+                          const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : (m.startsWith('minimax-') ? SvgIcon.AI : SvgIcon.DEEPSEEK));
                           const label = isOllama ? (aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama') : m;
                           return (
                             <button
@@ -2529,7 +2543,7 @@ export function AiChatTab(): React.ReactElement {
                   </div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 12, opacity: 0.8 }}>{selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}</span>
+                  <span style={{ fontSize: 12, opacity: 0.8 }}>{selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : selectedProvider === 'minimax' ? t('settings.ai.minimaxReasoningEffort', { defaultValue: 'MiniMax 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}</span>
                   <select
                     className="max-expand-chat-web-access-policy-select"
                     value={aiConfig.deepseekReasoningEffort}
@@ -2539,8 +2553,8 @@ export function AiChatTab(): React.ReactElement {
                         deepseekReasoningEffort: value === 'low' || value === 'high' ? value : 'medium',
                       });
                     }}
-                    title={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
-                    aria-label={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
+                    title={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : selectedProvider === 'minimax' ? t('settings.ai.minimaxReasoningEffort', { defaultValue: 'MiniMax 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
+                    aria-label={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : selectedProvider === 'minimax' ? t('settings.ai.minimaxReasoningEffort', { defaultValue: 'MiniMax 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
                   >
                     <option value="low">{t('settings.ai.deepseekReasoningEffortOptions.low', { defaultValue: '低 (low)' })}</option>
                     <option value="medium">{t('settings.ai.deepseekReasoningEffortOptions.medium', { defaultValue: '中 (medium)' })}</option>
