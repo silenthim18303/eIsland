@@ -208,6 +208,7 @@ export interface AiConfig {
   ollamaModel: string;
   ollamaBaseUrl: string;
   customApiModel: string;
+  customApiMode: 'relay' | 'direct';
 }
 
 /** AI 工具调用轨迹 */

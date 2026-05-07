@@ -95,6 +95,10 @@ export const SvgIcon = {
   MOVE_UP: './svg/MOVE_UP.svg',
   MOVE_DOWN: './svg/MOVE_DOWN.svg',
   PLUS: './svg/PLUS.svg',
+  MAIL: './svg/MAIL.svg',
+  UPDATE_TIME: './svg/UPDATE_TIME.svg',
+  PLUGIN: './svg/PLUGIN.svg',
+  MINIMAX: './svg/MINIMAX.svg',
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;

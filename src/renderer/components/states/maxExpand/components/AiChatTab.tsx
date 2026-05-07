@@ -35,6 +35,7 @@ import {
   streamMihtnelisAgent,
 } from '../../../../api/ai/mihtnelisAgentStream';
 import { streamOllamaLocalAgent } from '../../../../api/ai/ollamaLocalAgent';
+import { streamCustomDirectAgent } from '../../../../api/ai/customDirectAgent';
 import {
   fetchWebsiteTitle,
   getWebsiteAuthorizationPolicy,
@@ -227,7 +228,7 @@ const AssistantMarkdown = React.memo(function AssistantMarkdown({ content }: { c
  * @description 包含消息列表和输入栏的聊天界面，调用 OpenAI 兼容 API
  */
 export function AiChatTab(): React.ReactElement {
-  const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'ollama', 'custom-api'] as const;
+  const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed', 'ollama', 'custom-api'] as const;
   const { t } = useTranslation();
   const localTokenForRole = readLocalToken();
   const isProUser = useMemo(() => {
@@ -322,7 +323,10 @@ export function AiChatTab(): React.ReactElement {
       ? aiConfig.model
       : 'deepseek-v4-flash';
     if (m === 'custom-api' && (!isProUser || !hasCustomApiCredentials)) return 'deepseek-v4-flash';
-    if (!isProUser && (m === 'deepseek-v4-pro' || m === 'mimo-v2.5-pro')) return 'deepseek-v4-flash';
+    if (!isProUser && (m === 'deepseek-v4-pro'
+      || m === 'mimo-v2.5-pro'
+      || m === 'MiniMax-M2.7-highspeed'
+      || m === 'MiniMax-M2.5-highspeed')) return 'deepseek-v4-flash';
     return m;
   })();
   const isOllamaModel = selectedModel === 'ollama';
@@ -330,12 +334,24 @@ export function AiChatTab(): React.ReactElement {
   const customApiDisplayLabel = aiConfig.customApiModel
     ? `custom-api (${aiConfig.customApiModel})`
     : 'custom-api';
-  const selectedProvider = isCustomApiModel ? 'custom' : (isOllamaModel ? 'ollama' : (selectedModel.startsWith('mimo-') ? 'mimo' : 'deepseek'));
+  const isMinimaxModel = (modelName: string): boolean => {
+    const normalized = modelName.toLowerCase();
+    return normalized.startsWith('minimax-');
+  };
+  const selectedProvider = isCustomApiModel
+    ? 'custom'
+    : (isOllamaModel
+      ? 'ollama'
+      : (selectedModel.startsWith('mimo-')
+        ? 'mimo'
+        : (isMinimaxModel(selectedModel) ? 'minimax' : 'deepseek')));
   const modelToggleIcon = isCustomApiModel
     ? SvgIcon.AI
     : (isOllamaModel
       ? SvgIcon.OLLAMA
-      : (selectedModel.startsWith('mimo-') ? SvgIcon.MIMO : (selectedModel.toLowerCase().includes('deepseek') ? SvgIcon.DEEPSEEK : null)));
+      : (selectedModel.startsWith('mimo-')
+        ? SvgIcon.MIMO
+        : (isMinimaxModel(selectedModel) ? SvgIcon.MINIMAX : (selectedModel.toLowerCase().includes('deepseek') ? SvgIcon.DEEPSEEK : null))));
   const ollamaDisplayLabel = aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama';
   const VISIBLE_CHAT_WINDOW_SIZE = agentMode === 'r1pxc' ? VISIBLE_CHAT_WINDOW_SIZE_R1PXC : VISIBLE_CHAT_WINDOW_SIZE_DEFAULT;
   const VISIBLE_CHAT_WINDOW_STEP = agentMode === 'r1pxc' ? VISIBLE_CHAT_WINDOW_STEP_R1PXC : VISIBLE_CHAT_WINDOW_STEP_DEFAULT;
@@ -998,6 +1014,163 @@ export function AiChatTab(): React.ReactElement {
           const fallbackMessage = ollamaErrorMessage
             ? `❌ ${ollamaErrorMessage}`
             : t('aiChat.messages.noModelOutputOllama', { defaultValue: '⚠️ 未收到模型输出，请检查 Ollama 服务是否运行中。' });
+          updateTargetMessages(prev => {
+            const copy = [...prev];
+            const last = copy[copy.length - 1];
+            if (last && last.role === 'assistant' && !last.content) {
+              copy[copy.length - 1] = { ...last, content: fallbackMessage };
+            }
+            return copy;
+          });
+        }
+      } else if (isCustomApiModel && aiConfig.customApiMode === 'direct' && hasCustomApiCredentials) {
+        let receivedDirectChunk = false;
+        let directErrorMessage: string | null = null;
+        let directThinkingEnabled = true;
+        const directContext = buildMihtnelisContext(nextMessages);
+        const directEnabledSkills = Array.isArray(aiConfig.skills) ? aiConfig.skills.filter((s) => s.enabled && s.filePath) : [];
+        let directResolvedSkills: Array<{ name: string; content: string }> | undefined;
+        if (directEnabledSkills.length > 0) {
+          const directSkillResults = await Promise.all(
+            directEnabledSkills.map(async (s) => {
+              const content = await window.api.readTextFile(s.filePath);
+              return content ? { name: s.name, content } : null;
+            }),
+          );
+          const directValidSkills = directSkillResults.filter((r): r is { name: string; content: string } => r !== null && r.content.trim().length > 0);
+          if (directValidSkills.length > 0) directResolvedSkills = directValidSkills;
+        }
+        const directModelName = aiConfig.customApiModel || 'gpt-4o-mini';
+        const directTemperature = aiConfig.deepseekReasoningEffort === 'low' ? 0.3 : aiConfig.deepseekReasoningEffort === 'high' ? 1.0 : 0.6;
+        await streamCustomDirectAgent({
+          token: localToken || '',
+          message: text,
+          model: directModelName,
+          agentMode,
+          context: directContext,
+          workspaces: aiConfig.workspaces,
+          skills: directResolvedSkills,
+          baseUrl: aiConfig.endpoint,
+          apiKey: aiConfig.apiKey,
+          temperature: directTemperature,
+          signal: controller.signal,
+          onEvent: (event) => {
+            if (SESSION_ABORT_CONTROLLERS.get(targetSessionId) !== controller) {
+              return;
+            }
+            if (event.type === 'meta') {
+              const payload = event.payload as { thinkingEnabled?: unknown };
+              directThinkingEnabled = Boolean(payload?.thinkingEnabled);
+              return;
+            }
+            if (event.type === 'think') {
+              if (!directThinkingEnabled || !aiConfig.deepseekThinking) return;
+              const payload = event.payload as { text?: unknown; index?: unknown };
+              const thinkText = typeof payload?.text === 'string' ? payload.text : '';
+              const thinkIndex = typeof payload?.index === 'number' ? payload.index : 0;
+              if (!thinkText) return;
+              receivedDirectChunk = true;
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                const blocks = Array.isArray(last.thinkBlocks) ? [...last.thinkBlocks] : [];
+                while (blocks.length <= thinkIndex) blocks.push('');
+                blocks[thinkIndex] = (blocks[thinkIndex] || '') + thinkText;
+                copy[copy.length - 1] = { ...last, thinkBlocks: blocks };
+                return copy;
+              });
+              return;
+            }
+            if ((event.type as string) === 'stream_rollback') {
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                copy[copy.length - 1] = { ...last, content: '' };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'chunk') {
+              const payload = event.payload as { text?: unknown };
+              const chunk = typeof payload?.text === 'string' ? payload.text : '';
+              if (!chunk) return;
+              receivedDirectChunk = true;
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                copy[copy.length - 1] = { ...last, content: `${last.content}${chunk}` };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'tool_call_request') {
+              const payload = event.payload as { turn?: number; tool?: string; purpose?: string; arguments?: Record<string, unknown>; riskLevel?: string };
+              receivedDirectChunk = true;
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                const toolCalls = Array.isArray(last.toolCalls) ? [...last.toolCalls] : [];
+                toolCalls.push({ turn: payload.turn || 0, tool: payload.tool || '', purpose: payload.purpose || '', riskLevel: payload.riskLevel || '', pending: true, arguments: payload.arguments });
+                copy[copy.length - 1] = { ...last, toolCalls };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'tool_call_result') {
+              const payload = event.payload as { turn?: number; tool?: string; success?: boolean; error?: string; result?: unknown; durationMs?: number };
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                const toolCalls = Array.isArray(last.toolCalls) ? [...last.toolCalls] : [];
+                const idx = toolCalls.findIndex((tc) => tc.turn === payload.turn && tc.tool === payload.tool && tc.pending);
+                if (idx >= 0) {
+                  toolCalls[idx] = { ...toolCalls[idx], pending: false, success: payload.success, error: payload.error || '', result: payload.result, durationMs: payload.durationMs || 0 };
+                }
+                copy[copy.length - 1] = { ...last, toolCalls };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'final') {
+              const payload = event.payload as { billedInputTokens?: number; billedOutputTokens?: number; billedTokenTotal?: number; tokenSource?: string };
+              updateTargetMessages(prev => {
+                const copy = [...prev];
+                const last = copy[copy.length - 1];
+                if (!last || last.role !== 'assistant') return copy;
+                copy[copy.length - 1] = {
+                  ...last,
+                  finalized: true,
+                  model: 'custom-api',
+                  tokenUsage: {
+                    inputTokens: payload.billedInputTokens || 0,
+                    outputTokens: payload.billedOutputTokens || 0,
+                    reasoningTokens: 0,
+                    totalTokens: payload.billedTokenTotal || 0,
+                    source: payload.tokenSource || 'estimate',
+                  },
+                };
+                return copy;
+              });
+              return;
+            }
+            if (event.type === 'error') {
+              const payload = event.payload as { message?: unknown };
+              directErrorMessage = typeof payload?.message === 'string'
+                ? payload.message
+                : t('aiChat.messages.agentError', { defaultValue: '直连 Agent 返回错误' });
+              return;
+            }
+          },
+        });
+        if (!receivedDirectChunk) {
+          const fallbackMessage = directErrorMessage
+            ? `❌ ${directErrorMessage}`
+            : t('aiChat.messages.noModelOutputCustomDirect', { defaultValue: '⚠️ 未收到模型输出，请检查自定义 API 端点和密钥是否正确。' });
           updateTargetMessages(prev => {
             const copy = [...prev];
             const last = copy[copy.length - 1];
@@ -1997,7 +2170,13 @@ export function AiChatTab(): React.ReactElement {
                   const traceId = typeof msg.traceId === 'string' ? msg.traceId.trim() : '';
                   const isMsgOllama = msg.model === 'ollama';
                   const isMsgCustomApi = msg.model === 'custom-api';
-                  const msgModelIcon = isMsgCustomApi ? SvgIcon.AI : (isMsgOllama ? SvgIcon.OLLAMA : (msg.model?.startsWith('mimo-') ? SvgIcon.MIMO : SvgIcon.DEEPSEEK));
+                  const msgModelIcon = isMsgCustomApi
+                    ? SvgIcon.AI
+                    : (isMsgOllama
+                      ? SvgIcon.OLLAMA
+                      : (msg.model?.startsWith('mimo-')
+                        ? SvgIcon.MIMO
+                        : (isMinimaxModel(msg.model ?? '') ? SvgIcon.MINIMAX : SvgIcon.DEEPSEEK)));
                   const showFinalTraceMeta = Boolean(msg.finalized);
                   const normalizedMarkdownContent = normalizeMarkdownCodeFences(msg.content);
                   const timelineNodes: React.ReactElement[] = [];
@@ -2235,6 +2414,10 @@ export function AiChatTab(): React.ReactElement {
                               {isMsgOllama ? (
                                 <div className="max-expand-chat-trace-id">
                                   <span>{t('aiChat.localModelGenerated', { defaultValue: '本地模型生成' })}</span>
+                                </div>
+                              ) : (isMsgCustomApi && !traceId) ? (
+                                <div className="max-expand-chat-trace-id">
+                                  <span>{t('aiChat.customDirectGenerated', { defaultValue: '本地直连 LLM 提供商' })}</span>
                                 </div>
                               ) : (
                                 <div className="max-expand-chat-trace-id">
@@ -2486,9 +2669,13 @@ export function AiChatTab(): React.ReactElement {
                       <div className="max-expand-chat-model-dropdown-list">
                         {availableModels.filter((m) => m !== 'custom-api').map((m) => {
                           const isOllama = m === 'ollama';
-                          const isPro = m === 'deepseek-v4-pro' || m === 'mimo-v2.5-pro' || isOllama;
+                          const isPro = m === 'deepseek-v4-pro'
+                            || m === 'mimo-v2.5-pro'
+                            || m === 'MiniMax-M2.7-highspeed'
+                            || m === 'MiniMax-M2.5-highspeed'
+                            || isOllama;
                           const disabled = isPro && !isProUser;
-                          const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : SvgIcon.DEEPSEEK);
+                          const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : (isMinimaxModel(m) ? SvgIcon.MINIMAX : SvgIcon.DEEPSEEK));
                           const label = isOllama ? (aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama') : m;
                           return (
                             <button
@@ -2529,7 +2716,7 @@ export function AiChatTab(): React.ReactElement {
                   </div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <span style={{ fontSize: 12, opacity: 0.8 }}>{selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}</span>
+                  <span style={{ fontSize: 12, opacity: 0.8 }}>{selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : selectedProvider === 'minimax' ? t('settings.ai.minimaxReasoningEffort', { defaultValue: 'MiniMax 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}</span>
                   <select
                     className="max-expand-chat-web-access-policy-select"
                     value={aiConfig.deepseekReasoningEffort}
@@ -2539,8 +2726,8 @@ export function AiChatTab(): React.ReactElement {
                         deepseekReasoningEffort: value === 'low' || value === 'high' ? value : 'medium',
                       });
                     }}
-                    title={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
-                    aria-label={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
+                    title={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : selectedProvider === 'minimax' ? t('settings.ai.minimaxReasoningEffort', { defaultValue: 'MiniMax 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
+                    aria-label={selectedProvider === 'custom' ? t('settings.ai.customReasoningEffort', { defaultValue: '推理强度' }) : selectedProvider === 'ollama' ? t('settings.ai.ollamaReasoningEffort', { defaultValue: '思考强度' }) : selectedProvider === 'mimo' ? t('settings.ai.mimoReasoningEffort', { defaultValue: 'Mimo 推理强度' }) : selectedProvider === 'minimax' ? t('settings.ai.minimaxReasoningEffort', { defaultValue: 'MiniMax 推理强度' }) : t('settings.ai.deepseekReasoningEffort', { defaultValue: 'DeepSeek 推理强度' })}
                   >
                     <option value="low">{t('settings.ai.deepseekReasoningEffortOptions.low', { defaultValue: '低 (low)' })}</option>
                     <option value="medium">{t('settings.ai.deepseekReasoningEffortOptions.medium', { defaultValue: '中 (medium)' })}</option>
@@ -2563,6 +2750,23 @@ export function AiChatTab(): React.ReactElement {
                     <option value="on">{t('settings.ai.deepseekThinkingOptions.on', { defaultValue: '开启' })}</option>
                   </select>
                 </div>
+                {isCustomApiModel && (
+                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <span style={{ fontSize: 12, opacity: 0.8 }}>{t('aiChat.modelCard.customApiMode', { defaultValue: '调用模式' })}</span>
+                  <select
+                    className="max-expand-chat-web-access-policy-select"
+                    value={aiConfig.customApiMode || 'relay'}
+                    onChange={(event) => {
+                      setAiConfig({ customApiMode: event.target.value as 'relay' | 'direct' });
+                    }}
+                    title={t('aiChat.modelCard.customApiModeTitle', { defaultValue: '选择自定义 API 调用模式' })}
+                    aria-label={t('aiChat.modelCard.customApiMode', { defaultValue: '调用模式' })}
+                  >
+                    <option value="relay">{t('aiChat.modelCard.customApiModeRelay', { defaultValue: '服务器转发' })}</option>
+                    <option value="direct">{t('aiChat.modelCard.customApiModeDirect', { defaultValue: '直连' })}</option>
+                  </select>
+                </div>
+                )}
                 <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <span style={{ fontSize: 12, opacity: 0.8 }}>{t('aiChat.modelCard.contextLimit', { defaultValue: '上下文' })}</span>
                   <div className="max-expand-chat-model-select-shell" ref={contextDropdownRef}>

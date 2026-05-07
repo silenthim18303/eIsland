@@ -1094,6 +1094,9 @@
       "reset": "恢复默认",
       "done": "完成",
       "edit": "编辑",
+      "searchPlaceholder": "搜索配置项...",
+      "searchEmpty": "没有找到匹配的配置项",
+      "searchClear": "清空搜索",
       "hintEdit": "拖拽卡片可调整排列顺序，点击「完成」保存。",
       "hintView": "点击卡片可快速跳转到对应配置页。",
       "ariaNav": "设置快速导航",
@@ -1150,6 +1153,7 @@
         "settingsLabel": "设置",
         "orderTitle": "页面排序与可见性",
         "orderHint": "拖拽调整页面顺序，点击开关切换是否显示。当前显示 {{count}} / {{total}} 个页面。",
+        "orderHintStatic": "拖拽调整页面顺序，点击开关切换是否显示。",
         "moveUp": "上移",
         "moveDown": "下移",
         "hideTab": "隐藏此页面",
@@ -1628,6 +1632,7 @@
       "versionCardTitle": "版本信息",
       "versionCardHint": "查看当前版本并选择更新源，应用所有补丁包均通过该更新源下载",
       "autoPromptTitle": "更新提示",
+      "autoPromptHintStatic": "控制是否自动提示版本更新和公告展示策略",
       "autoPromptEnabled": "自动提示版本更新",
       "announcementShowModeAlways": "每次都显示公告",
       "announcementShowModeVersionOnly": "仅版本更新时显示公告",
@@ -1653,6 +1658,14 @@
       }
     },
     "pluginMarket": {
+      "search": {
+        "wallpaperTitle": "壁纸市场",
+        "wallpaperHint": "浏览并应用社区分享的壁纸资源，支持图片和视频壁纸",
+        "contributionTitle": "壁纸贡献",
+        "contributionHint": "上传你的壁纸作品，分享给社区用户",
+        "editTitle": "壁纸管理",
+        "editHint": "查看和编辑你已贡献的壁纸作品，管理审核状态"
+      },
       "auth": {
         "entryTitle": "登录后即可访问插件市场内容",
         "gotoLogin": "前往登录",
@@ -2333,6 +2346,14 @@
       "shortcut": {
         "label": "快捷键",
         "desc": "隐藏、关闭、截图快捷键"
+      },
+      "update": {
+        "label": "更新设置",
+        "desc": "检查与下载软件更新"
+      },
+      "pluginMarket": {
+        "label": "插件市场",
+        "desc": "插件市场入口与安装管理"
       },
       "user": {
         "label": "用户中心",

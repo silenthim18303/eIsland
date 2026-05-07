@@ -130,6 +130,23 @@ declare global {
         sessionId: string,
         callback: (event: { type: string; payload: Record<string, unknown> }) => void,
       ) => () => void;
+      customDirectChatStart: (
+        sessionId: string,
+        request: {
+          model: string;
+          systemPrompt: string;
+          userMessage: string;
+          context?: string;
+          baseUrl: string;
+          apiKey: string;
+          temperature?: number;
+        },
+      ) => Promise<{ started: boolean; sessionId: string }>;
+      customDirectChatAbort: (sessionId: string) => Promise<{ aborted: boolean }>;
+      onCustomDirectChatEvent: (
+        sessionId: string,
+        callback: (event: { type: string; payload: Record<string, unknown> }) => void,
+      ) => () => void;
       clearLogsCache: () => Promise<{ success: boolean; freedBytes: number }>;
       windowMinimize: () => void;
       windowMaximize: () => void;

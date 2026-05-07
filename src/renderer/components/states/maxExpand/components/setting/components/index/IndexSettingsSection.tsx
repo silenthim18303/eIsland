@@ -24,9 +24,9 @@
  * @author 鸡哥
  */
 
-import type { MutableRefObject, ReactElement } from 'react';
+import { useState, useMemo, type MutableRefObject, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AppSettingsPageKey, MusicSettingsPageKey, SettingsSidebarTabKey } from '../../utils/settingsConfig';
+import { SEARCHABLE_SETTINGS, SETTINGS_TAB_ICONS, type SearchableSettingItem, type AppSettingsPageKey, type MusicSettingsPageKey, type AiSettingsPageKey, type SettingsSidebarTabKey } from '../../utils/settingsConfig';
 
 interface IndexNavCard {
   id: string;
@@ -55,6 +55,7 @@ interface IndexSettingsSectionProps {
   persistNavConfig: (visible: string[], hidden: string[]) => void;
   setAppSettingsPage: (page: AppSettingsPageKey) => void;
   setMusicSettingsPage: (page: MusicSettingsPageKey) => void;
+  setAiSettingsPage?: (page: AiSettingsPageKey) => void;
   setActiveTab: (tab: SettingsSidebarTabKey) => void;
   onAction?: (actionId: string) => void;
 }
@@ -80,10 +81,12 @@ export function IndexSettingsSection({
   persistNavConfig,
   setAppSettingsPage,
   setMusicSettingsPage,
+  setAiSettingsPage,
   setActiveTab,
   onAction,
 }: IndexSettingsSectionProps): ReactElement {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState('');
   const getCardOutlineClass = (cardId: string): string => {
     if (cardId === 'user-pro') return ' settings-user-pro-nav-card--outline';
     if (cardId === 'user-recharge') return ' settings-user-recharge-nav-card--outline';
@@ -91,6 +94,25 @@ export function IndexSettingsSection({
   };
   const getCardLabel = (card: IndexNavCard): string => t(`settings.nav.${card.id}.label`, { defaultValue: card.label });
   const getCardDesc = (card: IndexNavCard): string => t(`settings.nav.${card.id}.desc`, { defaultValue: card.desc });
+
+  const getSearchItemIcon = (item: SearchableSettingItem): string | undefined => {
+    if (item.appPage) return SETTINGS_TAB_ICONS[item.appPage];
+    if (item.musicPage) return SETTINGS_TAB_ICONS[`music-${item.musicPage}` as keyof typeof SETTINGS_TAB_ICONS] ?? SETTINGS_TAB_ICONS.music;
+    if (item.aiPage) return SETTINGS_TAB_ICONS.ai;
+    return SETTINGS_TAB_ICONS[item.tab as keyof typeof SETTINGS_TAB_ICONS];
+  };
+
+  const searchResults = useMemo((): Array<SearchableSettingItem & { localizedLabel: string; localizedDesc: string }> | null => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return null;
+    return SEARCHABLE_SETTINGS
+      .map((item) => {
+        const localizedLabel = item.labelKey ? t(item.labelKey, { defaultValue: item.label }) : item.label;
+        const localizedDesc = item.descKey ? t(item.descKey, { defaultValue: item.desc }) : item.desc;
+        return { ...item, localizedLabel, localizedDesc };
+      })
+      .filter((item) => item.localizedLabel.toLowerCase().includes(q) || item.localizedDesc.toLowerCase().includes(q));
+  }, [searchQuery, i18n.language, t]);
 
   return (
     <div className="max-expand-settings-section settings-index-section">
@@ -112,6 +134,61 @@ export function IndexSettingsSection({
               ? t('settings.index.done', { defaultValue: '完成' })
               : t('settings.index.edit', { defaultValue: '编辑' })}
           </button>
+          <div className="settings-index-search-wrap">
+            <span className="settings-index-search-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            <input
+              className="settings-index-search-input"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('settings.index.searchPlaceholder', { defaultValue: '搜索配置项...' })}
+            />
+            {searchQuery && (
+              <button className="settings-index-search-clear" type="button" onClick={() => setSearchQuery('')} aria-label={t('settings.index.searchClear', { defaultValue: 'Clear search' })}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            )}
+            {searchResults && (
+              <div className="settings-index-search-dropdown">
+                {searchResults.length === 0 ? (
+                  <div className="settings-index-search-dropdown-empty">{t('settings.index.searchEmpty', { defaultValue: '没有找到匹配的配置项' })}</div>
+                ) : (
+                  searchResults.map((item, idx) => (
+                    <button
+                      key={`${item.tab}-${item.label}-${idx}`}
+                      className="settings-index-search-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        if (item.appPage) {
+                          setAppSettingsPage(item.appPage);
+                          setActiveTab('app');
+                        } else if (item.musicPage) {
+                          setMusicSettingsPage(item.musicPage);
+                          setActiveTab('music');
+                        } else if (item.aiPage && setAiSettingsPage) {
+                          setAiSettingsPage(item.aiPage);
+                          setActiveTab('ai');
+                        } else {
+                          setActiveTab(item.tab);
+                        }
+                        setSearchQuery('');
+                      }}
+                    >
+                      <div className="settings-index-search-dropdown-text">
+                        <span className="settings-index-search-dropdown-title">{item.localizedLabel}</span>
+                        <span className="settings-index-search-dropdown-desc">{item.localizedDesc}</span>
+                      </div>
+                      {getSearchItemIcon(item) && (
+                        <img className="settings-index-search-dropdown-icon" src={getSearchItemIcon(item)} alt="" aria-hidden="true" />
+                      )}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className="settings-music-hint settings-index-hint">
           {navEditMode
@@ -120,79 +197,79 @@ export function IndexSettingsSection({
         </div>
       </div>
       <div className="settings-index-cards" aria-label={t('settings.index.ariaNav', { defaultValue: '设置快速导航' })}>
-        {visibleCards.map((card, idx) => (
-          navEditMode ? (
-            <div
-              key={card.id}
-              className={`settings-index-card editing${getCardOutlineClass(card.id)}${dragOverIdx === idx ? ' drag-over' : ''}`}
-              draggable
-              onDragStart={(e) => {
-                dragIdxRef.current = idx;
-                e.dataTransfer.effectAllowed = 'move';
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragOverIdx(idx);
-              }}
-              onDragLeave={() => setDragOverIdx(null)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragOverIdx(null);
-                const from = dragIdxRef.current;
-                if (from === null || from === idx) return;
-                const newOrder = visibleCards.map((c) => c.id);
-                const [moved] = newOrder.splice(from, 1);
-                newOrder.splice(idx, 0, moved);
-                setNavOrder(newOrder);
-              }}
-              onDragEnd={() => {
-                dragIdxRef.current = null;
-                setDragOverIdx(null);
-              }}
-            >
-              <span className="settings-index-card-drag-handle">⠿</span>
+          {visibleCards.map((card, idx) => (
+            navEditMode ? (
+              <div
+                key={card.id}
+                className={`settings-index-card editing${getCardOutlineClass(card.id)}${dragOverIdx === idx ? ' drag-over' : ''}`}
+                draggable
+                onDragStart={(e) => {
+                  dragIdxRef.current = idx;
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOverIdx(idx);
+                }}
+                onDragLeave={() => setDragOverIdx(null)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOverIdx(null);
+                  const from = dragIdxRef.current;
+                  if (from === null || from === idx) return;
+                  const newOrder = visibleCards.map((c) => c.id);
+                  const [moved] = newOrder.splice(from, 1);
+                  newOrder.splice(idx, 0, moved);
+                  setNavOrder(newOrder);
+                }}
+                onDragEnd={() => {
+                  dragIdxRef.current = null;
+                  setDragOverIdx(null);
+                }}
+              >
+                <span className="settings-index-card-drag-handle">⠿</span>
+                <button
+                  className="settings-index-card-remove"
+                  type="button"
+                  onClick={() => {
+                    const nextVisible = navOrder.filter((id) => id !== card.id);
+                    const nextHidden = hiddenNavOrder.includes(card.id) ? hiddenNavOrder : [...hiddenNavOrder, card.id];
+                    setNavOrder(nextVisible);
+                    setHiddenNavOrder(nextHidden);
+                  }}
+                  aria-label={t('settings.index.removeCard', { defaultValue: '删除 {{label}}', label: getCardLabel(card) })}
+                >
+                  −
+                </button>
+                <span className="settings-index-card-title">{getCardLabel(card)}</span>
+                <span className="settings-index-card-desc">{getCardDesc(card)}</span>
+                {card.icon && <img className="settings-index-card-layout-icon" src={card.icon} alt="" aria-hidden="true" />}
+              </div>
+            ) : (
               <button
-                className="settings-index-card-remove"
+                key={card.id}
+                className={`settings-index-card${getCardOutlineClass(card.id)}`}
                 type="button"
                 onClick={() => {
-                  const nextVisible = navOrder.filter((id) => id !== card.id);
-                  const nextHidden = hiddenNavOrder.includes(card.id) ? hiddenNavOrder : [...hiddenNavOrder, card.id];
-                  setNavOrder(nextVisible);
-                  setHiddenNavOrder(nextHidden);
+                  if (card.actionId && onAction) {
+                    onAction(card.actionId);
+                  } else if (card.appPage) {
+                    setAppSettingsPage(card.appPage);
+                    setActiveTab('app');
+                  } else if (card.musicPage) {
+                    setMusicSettingsPage(card.musicPage);
+                    setActiveTab('music');
+                  } else {
+                    setActiveTab(card.tab);
+                  }
                 }}
-                aria-label={t('settings.index.removeCard', { defaultValue: '删除 {{label}}', label: getCardLabel(card) })}
               >
-                −
+                <span className="settings-index-card-title">{getCardLabel(card)}</span>
+                <span className="settings-index-card-desc">{getCardDesc(card)}</span>
+                {card.icon && <img className="settings-index-card-layout-icon" src={card.icon} alt="" aria-hidden="true" />}
               </button>
-              <span className="settings-index-card-title">{getCardLabel(card)}</span>
-              <span className="settings-index-card-desc">{getCardDesc(card)}</span>
-              {card.icon && <img className="settings-index-card-layout-icon" src={card.icon} alt="" aria-hidden="true" />}
-            </div>
-          ) : (
-            <button
-              key={card.id}
-              className={`settings-index-card${getCardOutlineClass(card.id)}`}
-              type="button"
-              onClick={() => {
-                if (card.actionId && onAction) {
-                  onAction(card.actionId);
-                } else if (card.appPage) {
-                  setAppSettingsPage(card.appPage);
-                  setActiveTab('app');
-                } else if (card.musicPage) {
-                  setMusicSettingsPage(card.musicPage);
-                  setActiveTab('music');
-                } else {
-                  setActiveTab(card.tab);
-                }
-              }}
-            >
-              <span className="settings-index-card-title">{getCardLabel(card)}</span>
-              <span className="settings-index-card-desc">{getCardDesc(card)}</span>
-              {card.icon && <img className="settings-index-card-layout-icon" src={card.icon} alt="" aria-hidden="true" />}
-            </button>
-          )
-        ))}
+            )
+          ))}
       </div>
       {navEditMode && (
         <div className="settings-nav-add-panel" aria-label={t('settings.index.ariaAddPanel', { defaultValue: '可添加导航卡片' })}>
