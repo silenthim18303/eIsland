@@ -192,9 +192,15 @@ export function AgentContent(): ReactElement {
       const isProUser = userRole === 'pro' || userRole === 'admin';
       const useCustomApi = isCustomApi && isProUser && Boolean(aiConfig.apiKey?.trim() && aiConfig.endpoint?.trim());
       const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'];
-      const selectedModel = isOllama ? 'ollama'
+      const selectedModelBase = isOllama ? 'ollama'
         : useCustomApi ? (aiConfig.customApiModel?.trim() || 'gpt-4o-mini')
         : (availableModels.includes(aiConfig.model) ? aiConfig.model : 'deepseek-v4-flash');
+      const selectedModel = (!isProUser && (selectedModelBase === 'deepseek-v4-pro'
+        || selectedModelBase === 'mimo-v2.5-pro'
+        || selectedModelBase === 'MiniMax-M2.7-highspeed'
+        || selectedModelBase === 'MiniMax-M2.5-highspeed'))
+        ? 'deepseek-v4-flash'
+        : selectedModelBase;
       const isMinimaxModel = (modelName: string): boolean => {
         const normalized = modelName.toLowerCase();
         return normalized.startsWith('MiniMax-');

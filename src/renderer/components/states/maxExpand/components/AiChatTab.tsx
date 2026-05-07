@@ -322,7 +322,10 @@ export function AiChatTab(): React.ReactElement {
       ? aiConfig.model
       : 'deepseek-v4-flash';
     if (m === 'custom-api' && (!isProUser || !hasCustomApiCredentials)) return 'deepseek-v4-flash';
-    if (!isProUser && (m === 'deepseek-v4-pro' || m === 'mimo-v2.5-pro')) return 'deepseek-v4-flash';
+    if (!isProUser && (m === 'deepseek-v4-pro'
+      || m === 'mimo-v2.5-pro'
+      || m === 'MiniMax-M2.7-highspeed'
+      || m === 'MiniMax-M2.5-highspeed')) return 'deepseek-v4-flash';
     return m;
   })();
   const isOllamaModel = selectedModel === 'ollama';
@@ -2504,7 +2507,11 @@ export function AiChatTab(): React.ReactElement {
                       <div className="max-expand-chat-model-dropdown-list">
                         {availableModels.filter((m) => m !== 'custom-api').map((m) => {
                           const isOllama = m === 'ollama';
-                          const isPro = m === 'deepseek-v4-pro' || m === 'mimo-v2.5-pro' || isOllama;
+                          const isPro = m === 'deepseek-v4-pro'
+                            || m === 'mimo-v2.5-pro'
+                            || m === 'MiniMax-M2.7-highspeed'
+                            || m === 'MiniMax-M2.5-highspeed'
+                            || isOllama;
                           const disabled = isPro && !isProUser;
                           const icon = isOllama ? SvgIcon.OLLAMA : (m.startsWith('mimo-') ? SvgIcon.MIMO : (isMinimaxModel(m) ? SvgIcon.MINIMAX : SvgIcon.DEEPSEEK));
                           const label = isOllama ? (aiConfig.ollamaModel ? `ollama (${aiConfig.ollamaModel})` : 'ollama') : m;
