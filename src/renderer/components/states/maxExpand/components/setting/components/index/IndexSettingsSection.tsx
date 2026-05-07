@@ -98,7 +98,7 @@ export function IndexSettingsSection({
   const searchResults = useMemo((): SearchableSettingItem[] | null => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return null;
-    return SEARCHABLE_SETTINGS.filter((item) => item.label.toLowerCase().includes(q));
+    return SEARCHABLE_SETTINGS.filter((item) => item.label.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q));
   }, [searchQuery]);
 
   return (
