@@ -26,7 +26,7 @@
 
 import { useState, useMemo, type MutableRefObject, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SEARCHABLE_SETTINGS, type SearchableSettingItem, type AppSettingsPageKey, type MusicSettingsPageKey, type AiSettingsPageKey, type SettingsSidebarTabKey } from '../../utils/settingsConfig';
+import { SEARCHABLE_SETTINGS, SETTINGS_TAB_ICONS, type SearchableSettingItem, type AppSettingsPageKey, type MusicSettingsPageKey, type AiSettingsPageKey, type SettingsSidebarTabKey } from '../../utils/settingsConfig';
 
 interface IndexNavCard {
   id: string;
@@ -94,6 +94,13 @@ export function IndexSettingsSection({
   };
   const getCardLabel = (card: IndexNavCard): string => t(`settings.nav.${card.id}.label`, { defaultValue: card.label });
   const getCardDesc = (card: IndexNavCard): string => t(`settings.nav.${card.id}.desc`, { defaultValue: card.desc });
+
+  const getSearchItemIcon = (item: SearchableSettingItem): string | undefined => {
+    if (item.appPage) return SETTINGS_TAB_ICONS[item.appPage];
+    if (item.musicPage) return SETTINGS_TAB_ICONS[`music-${item.musicPage}` as keyof typeof SETTINGS_TAB_ICONS] ?? SETTINGS_TAB_ICONS.music;
+    if (item.aiPage) return SETTINGS_TAB_ICONS.ai;
+    return SETTINGS_TAB_ICONS[item.tab as keyof typeof SETTINGS_TAB_ICONS];
+  };
 
   const searchResults = useMemo((): SearchableSettingItem[] | null => {
     const q = searchQuery.trim().toLowerCase();
@@ -163,8 +170,13 @@ export function IndexSettingsSection({
                         setSearchQuery('');
                       }}
                     >
-                      <span className="settings-index-search-dropdown-title">{item.label}</span>
-                      <span className="settings-index-search-dropdown-desc">{item.desc}</span>
+                      <div className="settings-index-search-dropdown-text">
+                        <span className="settings-index-search-dropdown-title">{item.label}</span>
+                        <span className="settings-index-search-dropdown-desc">{item.desc}</span>
+                      </div>
+                      {getSearchItemIcon(item) && (
+                        <img className="settings-index-search-dropdown-icon" src={getSearchItemIcon(item)} alt="" aria-hidden="true" />
+                      )}
                     </button>
                   ))
                 )}
