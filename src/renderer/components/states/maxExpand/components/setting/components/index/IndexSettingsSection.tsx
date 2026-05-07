@@ -26,7 +26,7 @@
 
 import { useState, useMemo, type MutableRefObject, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NAV_CARDS, type AppSettingsPageKey, type MusicSettingsPageKey, type SettingsSidebarTabKey } from '../../utils/settingsConfig';
+import { SEARCHABLE_SETTINGS, type SearchableSettingItem, type AppSettingsPageKey, type MusicSettingsPageKey, type AiSettingsPageKey, type SettingsSidebarTabKey } from '../../utils/settingsConfig';
 
 interface IndexNavCard {
   id: string;
@@ -55,6 +55,7 @@ interface IndexSettingsSectionProps {
   persistNavConfig: (visible: string[], hidden: string[]) => void;
   setAppSettingsPage: (page: AppSettingsPageKey) => void;
   setMusicSettingsPage: (page: MusicSettingsPageKey) => void;
+  setAiSettingsPage?: (page: AiSettingsPageKey) => void;
   setActiveTab: (tab: SettingsSidebarTabKey) => void;
   onAction?: (actionId: string) => void;
 }
@@ -80,6 +81,7 @@ export function IndexSettingsSection({
   persistNavConfig,
   setAppSettingsPage,
   setMusicSettingsPage,
+  setAiSettingsPage,
   setActiveTab,
   onAction,
 }: IndexSettingsSectionProps): ReactElement {
@@ -93,15 +95,11 @@ export function IndexSettingsSection({
   const getCardLabel = (card: IndexNavCard): string => t(`settings.nav.${card.id}.label`, { defaultValue: card.label });
   const getCardDesc = (card: IndexNavCard): string => t(`settings.nav.${card.id}.desc`, { defaultValue: card.desc });
 
-  const searchResults = useMemo(() => {
+  const searchResults = useMemo((): SearchableSettingItem[] | null => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return null;
-    return (NAV_CARDS as IndexNavCard[]).filter((card) => {
-      const label = t(`settings.nav.${card.id}.label`, { defaultValue: card.label }).toLowerCase();
-      const desc = t(`settings.nav.${card.id}.desc`, { defaultValue: card.desc }).toLowerCase();
-      return label.includes(q) || desc.includes(q);
-    });
-  }, [searchQuery, t]);
+    return SEARCHABLE_SETTINGS.filter((item) => item.label.toLowerCase().includes(q));
+  }, [searchQuery]);
 
   return (
     <div className="max-expand-settings-section settings-index-section">
@@ -139,6 +137,39 @@ export function IndexSettingsSection({
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             )}
+            {searchResults && (
+              <div className="settings-index-search-dropdown">
+                {searchResults.length === 0 ? (
+                  <div className="settings-index-search-dropdown-empty">{t('settings.index.searchEmpty', { defaultValue: '没有找到匹配的配置项' })}</div>
+                ) : (
+                  searchResults.map((item, idx) => (
+                    <button
+                      key={`${item.tab}-${item.label}-${idx}`}
+                      className="settings-index-search-dropdown-item"
+                      type="button"
+                      onClick={() => {
+                        if (item.appPage) {
+                          setAppSettingsPage(item.appPage);
+                          setActiveTab('app');
+                        } else if (item.musicPage) {
+                          setMusicSettingsPage(item.musicPage);
+                          setActiveTab('music');
+                        } else if (item.aiPage && setAiSettingsPage) {
+                          setAiSettingsPage(item.aiPage);
+                          setActiveTab('ai');
+                        } else {
+                          setActiveTab(item.tab);
+                        }
+                        setSearchQuery('');
+                      }}
+                    >
+                      <span className="settings-index-search-dropdown-title">{item.label}</span>
+                      <span className="settings-index-search-dropdown-desc">{item.desc}</span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="settings-music-hint settings-index-hint">
@@ -147,40 +178,7 @@ export function IndexSettingsSection({
             : t('settings.index.hintView', { defaultValue: '点击卡片可快速跳转到对应配置页。' })}
         </div>
       </div>
-      {searchResults ? (
-        <div className="settings-index-cards" aria-label={t('settings.index.ariaNav', { defaultValue: '设置快速导航' })}>
-          {searchResults.length === 0 ? (
-            <div className="settings-index-search-empty">{t('settings.index.searchEmpty', { defaultValue: '没有找到匹配的配置项' })}</div>
-          ) : (
-            searchResults.map((card) => (
-              <button
-                key={card.id}
-                className={`settings-index-card${getCardOutlineClass(card.id)}`}
-                type="button"
-                onClick={() => {
-                  if (card.actionId && onAction) {
-                    onAction(card.actionId);
-                  } else if (card.appPage) {
-                    setAppSettingsPage(card.appPage);
-                    setActiveTab('app');
-                  } else if (card.musicPage) {
-                    setMusicSettingsPage(card.musicPage);
-                    setActiveTab('music');
-                  } else {
-                    setActiveTab(card.tab);
-                  }
-                  setSearchQuery('');
-                }}
-              >
-                <span className="settings-index-card-title">{getCardLabel(card)}</span>
-                <span className="settings-index-card-desc">{getCardDesc(card)}</span>
-                {card.icon && <img className="settings-index-card-layout-icon" src={card.icon} alt="" aria-hidden="true" />}
-              </button>
-            ))
-          )}
-        </div>
-      ) : (
-        <div className="settings-index-cards" aria-label={t('settings.index.ariaNav', { defaultValue: '设置快速导航' })}>
+      <div className="settings-index-cards" aria-label={t('settings.index.ariaNav', { defaultValue: '设置快速导航' })}>
           {visibleCards.map((card, idx) => (
             navEditMode ? (
               <div
@@ -254,9 +252,8 @@ export function IndexSettingsSection({
               </button>
             )
           ))}
-        </div>
-      )}
-      {!searchResults && navEditMode && (
+      </div>
+      {navEditMode && (
         <div className="settings-nav-add-panel" aria-label={t('settings.index.ariaAddPanel', { defaultValue: '可添加导航卡片' })}>
           <div className="settings-music-label">{t('settings.index.addableTitle', { defaultValue: '可添加卡片' })}</div>
           {hiddenCards.length === 0 ? (

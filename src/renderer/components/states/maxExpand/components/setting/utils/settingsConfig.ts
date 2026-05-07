@@ -258,3 +258,111 @@ export const NAV_CARDS: NavCardDef[] = [
 
 export const DEFAULT_NAV_ORDER: string[] = NAV_CARDS.map((c) => c.id);
 export const NAV_CARDS_MAP = new Map(NAV_CARDS.map((c) => [c.id, c]));
+
+export interface SearchableSettingItem {
+  label: string;
+  desc: string;
+  tab: SettingsSidebarTabKey;
+  appPage?: AppSettingsPageKey;
+  musicPage?: MusicSettingsPageKey;
+  aiPage?: AiSettingsPageKey;
+}
+
+export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
+  // --- 软件设置 > 布局预览 ---
+  { label: '布局预览', desc: '软件设置 > 布局预览', tab: 'app', appPage: 'layout-preview' },
+  { label: '左侧组件选择', desc: '软件设置 > 布局预览', tab: 'app', appPage: 'layout-preview' },
+  { label: '右侧组件选择', desc: '软件设置 > 布局预览', tab: 'app', appPage: 'layout-preview' },
+  // --- 软件设置 > 全展开布局 ---
+  { label: '全展开布局', desc: '软件设置 > 全展开布局', tab: 'app', appPage: 'maxexpand-layout' },
+  { label: '页面排序与可见性', desc: '软件设置 > 全展开布局', tab: 'app', appPage: 'maxexpand-layout' },
+  // --- 软件设置 > 相册 ---
+  { label: '相册配置', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
+  { label: '背景图片', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
+  { label: '背景视频', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
+  { label: '背景透明度', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
+  { label: '背景模糊', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
+  { label: '同步桌面壁纸', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
+  // --- 软件设置 > 隐藏窗口管理 ---
+  { label: '隐藏窗口管理', desc: '软件设置 > 隐藏窗口管理', tab: 'app', appPage: 'hide-process-list' },
+  { label: '添加隐藏进程', desc: '软件设置 > 隐藏窗口管理', tab: 'app', appPage: 'hide-process-list' },
+  // --- 软件设置 > 位置校准 ---
+  { label: '位置校准', desc: '软件设置 > 位置校准', tab: 'app', appPage: 'position' },
+  { label: '显示器选择', desc: '软件设置 > 位置校准', tab: 'app', appPage: 'position' },
+  // --- 软件设置 > 主题外观 ---
+  { label: '主题外观', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
+  { label: '跟随系统主题', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
+  { label: '灵动岛透明度', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
+  { label: '独立窗口标题栏风格', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
+  // --- 软件设置 > 语言 ---
+  { label: '语言切换', desc: '软件设置 > 语言切换', tab: 'app', appPage: 'language' },
+  // --- 软件设置 > 交互行为 ---
+  { label: '交互行为', desc: '软件设置 > 交互行为', tab: 'app', appPage: 'behavior' },
+  { label: '展开后自动收回', desc: '软件设置 > 交互行为', tab: 'app', appPage: 'behavior' },
+  { label: '全展开后自动收回', desc: '软件设置 > 交互行为', tab: 'app', appPage: 'behavior' },
+  // --- 软件设置 > 动画 ---
+  { label: '软件动画', desc: '软件设置 > 软件动画', tab: 'app', appPage: 'animation' },
+  // --- 软件设置 > URL 解析 ---
+  { label: 'URL 解析', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
+  { label: 'URL 监听开关', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
+  { label: 'URL 检测模式', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
+  { label: 'URL 黑名单', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
+  { label: '收藏夹已有时静默', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
+  // --- 软件设置 > 剪贴板历史 ---
+  { label: '剪贴板历史', desc: '软件设置 > 剪贴板历史', tab: 'app', appPage: 'clipboard-history' },
+  // --- 软件设置 > 闹钟 ---
+  { label: '闹钟配置', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
+  { label: '闹钟提醒音', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
+  { label: '闹钟贪睡', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
+  { label: '闹钟通知', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
+  // --- 软件设置 > 实用工具 ---
+  { label: '开机自启动', desc: '软件设置 > 实用工具', tab: 'app', appPage: 'autostart' },
+  { label: '日志管理', desc: '软件设置 > 实用工具', tab: 'app', appPage: 'autostart' },
+  // --- 网络配置 ---
+  { label: '网络配置', desc: '网络配置', tab: 'network' },
+  { label: '请求超时时间', desc: '网络配置', tab: 'network' },
+  { label: '静态资源节点', desc: '网络配置', tab: 'network' },
+  // --- 邮箱配置 ---
+  { label: '邮箱配置', desc: '邮箱配置', tab: 'mail' },
+  { label: '邮箱账户', desc: '邮箱配置 > 账户管理', tab: 'mail' },
+  { label: 'IMAP 配置', desc: '邮箱配置 > IMAP', tab: 'mail' },
+  { label: '收信设置', desc: '邮箱配置 > 偏好', tab: 'mail' },
+  // --- 天气配置 ---
+  { label: '天气配置', desc: '天气配置', tab: 'weather' },
+  { label: '天气定位', desc: '天气配置 > 定位', tab: 'weather' },
+  { label: '天气接口', desc: '天气配置 > 数据源', tab: 'weather' },
+  { label: '天气预警', desc: '天气配置 > 定位', tab: 'weather' },
+  // --- 歌曲设置 > 白名单 ---
+  { label: '播放器白名单', desc: '歌曲设置 > 白名单', tab: 'music', musicPage: 'whitelist' },
+  { label: '添加白名单进程', desc: '歌曲设置 > 白名单', tab: 'music', musicPage: 'whitelist' },
+  // --- 歌曲设置 > 歌词源 ---
+  { label: '歌词源', desc: '歌曲设置 > 歌词源', tab: 'music', musicPage: 'lyrics' },
+  { label: '歌词显示模式', desc: '歌曲设置 > 歌词源', tab: 'music', musicPage: 'lyrics' },
+  // --- 歌曲设置 > SMTC ---
+  { label: 'SMTC 配置', desc: '歌曲设置 > SMTC', tab: 'music', musicPage: 'smtc' },
+  { label: 'SMTC 取消订阅超时', desc: '歌曲设置 > SMTC', tab: 'music', musicPage: 'smtc' },
+  // --- AI Agent ---
+  { label: 'AI 通用配置', desc: 'AI Agent > 通用配置', tab: 'ai', aiPage: 'general' },
+  { label: '自定义 API Key', desc: 'AI Agent > 通用配置', tab: 'ai', aiPage: 'general' },
+  { label: '推理强度', desc: 'AI Agent > 通用配置', tab: 'ai', aiPage: 'general' },
+  { label: 'r1pxc Agent', desc: 'AI Agent > r1pxc', tab: 'ai', aiPage: 'r1pxc' },
+  { label: 'Ollama 本地模型', desc: 'AI Agent > Ollama', tab: 'ai', aiPage: 'ollama' },
+  // --- 快捷键 ---
+  { label: '快捷键设置', desc: '快捷键', tab: 'shortcut' },
+  { label: '隐藏快捷键', desc: '快捷键', tab: 'shortcut' },
+  { label: '退出快捷键', desc: '快捷键', tab: 'shortcut' },
+  { label: '截图快捷键', desc: '快捷键', tab: 'shortcut' },
+  // --- 用户中心 ---
+  { label: '用户中心', desc: '用户中心', tab: 'user' },
+  { label: 'PRO 功能', desc: '用户中心', tab: 'user' },
+  { label: '余额充值', desc: '用户中心', tab: 'user' },
+  // --- 更新设置 ---
+  { label: '更新设置', desc: '更新设置', tab: 'update' },
+  { label: '更新源', desc: '更新设置', tab: 'update' },
+  { label: '自动提示更新', desc: '更新设置', tab: 'update' },
+  { label: '公告显示模式', desc: '更新设置', tab: 'update' },
+  // --- 关于 ---
+  { label: '关于软件', desc: '关于软件', tab: 'about' },
+  { label: '问题反馈', desc: '关于软件', tab: 'about' },
+  { label: 'GitHub 仓库', desc: '关于软件', tab: 'about' },
+];

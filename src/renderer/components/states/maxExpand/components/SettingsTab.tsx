@@ -2631,6 +2631,7 @@ export function SettingsTab(): ReactElement {
               persistNavConfig={persistNavConfig}
               setAppSettingsPage={setAppSettingsPage}
               setMusicSettingsPage={setMusicSettingsPage}
+              setAiSettingsPage={setAiSettingsPage}
               setActiveTab={setActiveTab}
               onAction={(actionId) => {
                 if (actionId === 'guide') {
