@@ -2415,6 +2415,10 @@ export function AiChatTab(): React.ReactElement {
                                 <div className="max-expand-chat-trace-id">
                                   <span>{t('aiChat.localModelGenerated', { defaultValue: '本地模型生成' })}</span>
                                 </div>
+                              ) : (isMsgCustomApi && !traceId) ? (
+                                <div className="max-expand-chat-trace-id">
+                                  <span>{t('aiChat.customDirectGenerated', { defaultValue: '本地直连 LLM 提供商' })}</span>
+                                </div>
                               ) : (
                                 <div className="max-expand-chat-trace-id">
                                   <span>TraceID: {traceId || '-'}</span>
