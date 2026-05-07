@@ -269,100 +269,102 @@ export interface SearchableSettingItem {
 }
 
 export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
-  // --- 软件设置 > 布局预览 ---
-  { label: '布局预览', desc: '软件设置 > 布局预览', tab: 'app', appPage: 'layout-preview' },
-  { label: '左侧组件选择', desc: '软件设置 > 布局预览', tab: 'app', appPage: 'layout-preview' },
-  { label: '右侧组件选择', desc: '软件设置 > 布局预览', tab: 'app', appPage: 'layout-preview' },
-  // --- 软件设置 > 全展开布局 ---
-  { label: '全展开布局', desc: '软件设置 > 全展开布局', tab: 'app', appPage: 'maxexpand-layout' },
-  { label: '页面排序与可见性', desc: '软件设置 > 全展开布局', tab: 'app', appPage: 'maxexpand-layout' },
-  // --- 软件设置 > 相册 ---
-  { label: '相册配置', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
-  { label: '背景图片', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
-  { label: '背景视频', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
-  { label: '背景透明度', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
-  { label: '背景模糊', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
-  { label: '同步桌面壁纸', desc: '软件设置 > 相册配置', tab: 'app', appPage: 'album' },
-  // --- 软件设置 > 隐藏窗口管理 ---
-  { label: '隐藏窗口管理', desc: '软件设置 > 隐藏窗口管理', tab: 'app', appPage: 'hide-process-list' },
-  { label: '添加隐藏进程', desc: '软件设置 > 隐藏窗口管理', tab: 'app', appPage: 'hide-process-list' },
-  // --- 软件设置 > 位置校准 ---
-  { label: '位置校准', desc: '软件设置 > 位置校准', tab: 'app', appPage: 'position' },
-  { label: '显示器选择', desc: '软件设置 > 位置校准', tab: 'app', appPage: 'position' },
-  // --- 软件设置 > 主题外观 ---
-  { label: '主题外观', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
-  { label: '跟随系统主题', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
-  { label: '灵动岛透明度', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
-  { label: '独立窗口标题栏风格', desc: '软件设置 > 主题外观', tab: 'app', appPage: 'theme' },
-  // --- 软件设置 > 语言 ---
-  { label: '语言切换', desc: '软件设置 > 语言切换', tab: 'app', appPage: 'language' },
-  // --- 软件设置 > 交互行为 ---
-  { label: '交互行为', desc: '软件设置 > 交互行为', tab: 'app', appPage: 'behavior' },
-  { label: '展开后自动收回', desc: '软件设置 > 交互行为', tab: 'app', appPage: 'behavior' },
-  { label: '全展开后自动收回', desc: '软件设置 > 交互行为', tab: 'app', appPage: 'behavior' },
-  // --- 软件设置 > 动画 ---
-  { label: '软件动画', desc: '软件设置 > 软件动画', tab: 'app', appPage: 'animation' },
-  // --- 软件设置 > URL 解析 ---
-  { label: 'URL 解析', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
-  { label: 'URL 监听开关', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
-  { label: 'URL 检测模式', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
-  { label: 'URL 黑名单', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
-  { label: '收藏夹已有时静默', desc: '软件设置 > URL解析', tab: 'app', appPage: 'url-parser' },
-  // --- 软件设置 > 剪贴板历史 ---
-  { label: '剪贴板历史', desc: '软件设置 > 剪贴板历史', tab: 'app', appPage: 'clipboard-history' },
-  // --- 软件设置 > 闹钟 ---
-  { label: '闹钟配置', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
-  { label: '闹钟提醒音', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
-  { label: '闹钟贪睡', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
-  { label: '闹钟通知', desc: '软件设置 > 闹钟配置', tab: 'app', appPage: 'alarm' },
-  // --- 软件设置 > 实用工具 ---
-  { label: '开机自启动', desc: '软件设置 > 实用工具', tab: 'app', appPage: 'autostart' },
-  { label: '日志管理', desc: '软件设置 > 实用工具', tab: 'app', appPage: 'autostart' },
-  // --- 网络配置 ---
-  { label: '网络配置', desc: '网络配置', tab: 'network' },
-  { label: '请求超时时间', desc: '网络配置', tab: 'network' },
-  { label: '静态资源节点', desc: '网络配置', tab: 'network' },
-  // --- 邮箱配置 ---
-  { label: '邮箱配置', desc: '邮箱配置', tab: 'mail' },
-  { label: '邮箱账户', desc: '邮箱配置 > 账户管理', tab: 'mail' },
-  { label: 'IMAP 配置', desc: '邮箱配置 > IMAP', tab: 'mail' },
-  { label: '收信设置', desc: '邮箱配置 > 偏好', tab: 'mail' },
-  // --- 天气配置 ---
-  { label: '天气配置', desc: '天气配置', tab: 'weather' },
-  { label: '天气定位', desc: '天气配置 > 定位', tab: 'weather' },
-  { label: '天气接口', desc: '天气配置 > 数据源', tab: 'weather' },
-  { label: '天气预警', desc: '天气配置 > 定位', tab: 'weather' },
-  // --- 歌曲设置 > 白名单 ---
-  { label: '播放器白名单', desc: '歌曲设置 > 白名单', tab: 'music', musicPage: 'whitelist' },
-  { label: '添加白名单进程', desc: '歌曲设置 > 白名单', tab: 'music', musicPage: 'whitelist' },
-  // --- 歌曲设置 > 歌词源 ---
-  { label: '歌词源', desc: '歌曲设置 > 歌词源', tab: 'music', musicPage: 'lyrics' },
-  { label: '歌词显示模式', desc: '歌曲设置 > 歌词源', tab: 'music', musicPage: 'lyrics' },
-  // --- 歌曲设置 > SMTC ---
-  { label: 'SMTC 配置', desc: '歌曲设置 > SMTC', tab: 'music', musicPage: 'smtc' },
-  { label: 'SMTC 取消订阅超时', desc: '歌曲设置 > SMTC', tab: 'music', musicPage: 'smtc' },
-  // --- AI Agent ---
-  { label: 'AI 通用配置', desc: 'AI Agent > 通用配置', tab: 'ai', aiPage: 'general' },
-  { label: '自定义 API Key', desc: 'AI Agent > 通用配置', tab: 'ai', aiPage: 'general' },
-  { label: '推理强度', desc: 'AI Agent > 通用配置', tab: 'ai', aiPage: 'general' },
-  { label: 'r1pxc Agent', desc: 'AI Agent > r1pxc', tab: 'ai', aiPage: 'r1pxc' },
-  { label: 'Ollama 本地模型', desc: 'AI Agent > Ollama', tab: 'ai', aiPage: 'ollama' },
-  // --- 快捷键 ---
-  { label: '快捷键设置', desc: '快捷键', tab: 'shortcut' },
-  { label: '隐藏快捷键', desc: '快捷键', tab: 'shortcut' },
-  { label: '退出快捷键', desc: '快捷键', tab: 'shortcut' },
-  { label: '截图快捷键', desc: '快捷键', tab: 'shortcut' },
-  // --- 用户中心 ---
-  { label: '用户中心', desc: '用户中心', tab: 'user' },
-  { label: 'PRO 功能', desc: '用户中心', tab: 'user' },
-  { label: '余额充值', desc: '用户中心', tab: 'user' },
-  // --- 更新设置 ---
-  { label: '更新设置', desc: '更新设置', tab: 'update' },
-  { label: '更新源', desc: '更新设置', tab: 'update' },
-  { label: '自动提示更新', desc: '更新设置', tab: 'update' },
-  { label: '公告显示模式', desc: '更新设置', tab: 'update' },
-  // --- 关于 ---
-  { label: '关于软件', desc: '关于软件', tab: 'about' },
-  { label: '问题反馈', desc: '关于软件', tab: 'about' },
-  { label: 'GitHub 仓库', desc: '关于软件', tab: 'about' },
+  // ── 软件设置 > 布局预览 ──
+  { label: '总览布局预览', desc: '实时显示左右控件组合后的 Expand 态灵动岛样式，切换下方控件可即时预览。', tab: 'app', appPage: 'layout-preview' },
+  { label: '控件组合', desc: '分别选择左右两侧展示的控件，切换后自动保存。', tab: 'app', appPage: 'layout-preview' },
+  // ── 软件设置 > 全展开布局 ──
+  { label: '全展开导航预览', desc: '预览底部导航点的排列顺序，灰色表示已隐藏的页面。', tab: 'app', appPage: 'maxexpand-layout' },
+  { label: '页面排序与可见性', desc: '拖拽调整页面顺序，点击开关控制页面显示或隐藏。', tab: 'app', appPage: 'maxexpand-layout' },
+  // ── 软件设置 > 相册 ──
+  { label: '相册轮播方式', desc: '配置总览相册卡片的轮播顺序、频率、展示内容与点击行为', tab: 'app', appPage: 'album' },
+  { label: '展示资源', desc: '选择总览相册卡片参与轮播的资源类型', tab: 'app', appPage: 'album' },
+  { label: '点击卡片行为', desc: '配置点击总览相册卡片后的行为', tab: 'app', appPage: 'album' },
+  { label: '自动播放与视频行为', desc: '仅影响总览相册轮播卡片，不影响相册主页面。', tab: 'app', appPage: 'album' },
+  // ── 软件设置 > 隐藏窗口管理 ──
+  { label: '隐藏窗口管理', desc: '当黑名单进程对应窗口处于焦点状态时，将立即隐藏灵动岛；失去焦点后自动显示。', tab: 'app', appPage: 'hide-process-list' },
+  { label: '当前运行的窗口', desc: '在列表中点击可将窗口加入 / 移出黑名单，支持按进程名搜索。', tab: 'app', appPage: 'hide-process-list' },
+  // ── 软件设置 > 位置校准 ──
+  { label: '显示器选择', desc: '多显示器环境可指定灵动岛显示器。', tab: 'app', appPage: 'position' },
+  { label: '快速微调', desc: '每次按钮点击以 10px 步进移动灵动岛位置，并自动保存。', tab: 'app', appPage: 'position' },
+  { label: '精确偏移', desc: '手动输入水平 / 垂直偏移量（单位 px），回车或点击"应用"后生效。', tab: 'app', appPage: 'position' },
+  // ── 软件设置 > 主题外观 ──
+  { label: '主题模式', desc: '选择深色、浅色或跟随系统主题', tab: 'app', appPage: 'theme' },
+  { label: '独立窗口控制按钮样式', desc: '启用后，独立窗口右上角将显示 macOS 风格三色圆点控制按钮', tab: 'app', appPage: 'theme' },
+  { label: '壁纸背景', desc: '选择内置壁纸，或从本地导入图片 / 视频作为灵动岛背景', tab: 'app', appPage: 'theme' },
+  { label: '背景显示效果', desc: '调整背景的透明度与模糊度', tab: 'app', appPage: 'theme' },
+  { label: '视频播放', desc: '背景视频的填充、声音与播放控制', tab: 'app', appPage: 'theme' },
+  { label: '灵动岛透明度', desc: '数值越低越透明（10% - 100%）', tab: 'app', appPage: 'theme' },
+  // ── 软件设置 > 语言 ──
+  { label: '显示语言', desc: '切换后将立即应用到支持多语言的界面文案', tab: 'app', appPage: 'language' },
+  // ── 软件设置 > 交互行为 ──
+  { label: '鼠标移开自动收回', desc: '启用后，鼠标离开灵动岛时将自动回到空闲状态（若正在播放音乐则切到歌词态）', tab: 'app', appPage: 'behavior' },
+  { label: '空闲态点击展开', desc: '启用后，鼠标悬停在灵动岛上不会自动展开，需要点击才能展开，后续交互不受影响', tab: 'app', appPage: 'behavior' },
+  { label: '待办事项 / 倒数日 / 设置 打开方式', desc: '选择点击导航时，在灵动岛内显示还是打开独立窗口', tab: 'app', appPage: 'behavior' },
+  { label: '悬停界面截图按钮模式', desc: '配置 hover 界面的截图按钮触发选区截图或显示器截图', tab: 'app', appPage: 'behavior' },
+  // ── 软件设置 > 动画 ──
+  { label: '灵动岛弹性动画', desc: '关闭后，展开和收起动画将变得更加平滑内敛，消除弹跳感', tab: 'app', appPage: 'animation' },
+  { label: '灵动岛动画速度', desc: '控制灵动岛状态切换时的过渡动画快慢', tab: 'app', appPage: 'animation' },
+  { label: 'Expand 切换动画', desc: '启用后，展开态切换页面时将播放左右滑动过渡动画', tab: 'app', appPage: 'animation' },
+  { label: 'MaxExpand 切换动画', desc: '启用后，最大展开态切换页面时将播放左右滑动过渡动画', tab: 'app', appPage: 'animation' },
+  // ── 软件设置 > URL 解析 ──
+  { label: '剪贴板 URL 监听', desc: '启用后，检测到剪贴板含链接时会弹出询问通知', tab: 'app', appPage: 'url-parser' },
+  { label: '识别项目', desc: '选择剪贴板中被识别为 URL 的匹配范围，并可在收藏界面临时静音通知。', tab: 'app', appPage: 'url-parser' },
+  { label: 'URL 黑名单（按域名）', desc: '命中黑名单域名时：单个链接不弹窗，多链接自动剔除', tab: 'app', appPage: 'url-parser' },
+  // ── 软件设置 > 剪贴板历史 ──
+  { label: '历史记录开关', desc: '关闭后不再追加新的剪贴板记录，已有记录会保留。', tab: 'app', appPage: 'clipboard-history' },
+  { label: '最大保留条数', desc: '新记录会在前端按该条数滚动保存。', tab: 'app', appPage: 'clipboard-history' },
+  { label: '复制后自动退出', desc: '复制历史项后自动退出最大展开；有歌曲时回到歌曲态，无歌曲时回到 idle。', tab: 'app', appPage: 'clipboard-history' },
+  { label: '数据管理', desc: '可一键清空已保存的剪贴板历史记录。', tab: 'app', appPage: 'clipboard-history' },
+  // ── 软件设置 > 闹钟 ──
+  { label: '提醒音', desc: '闹钟到点时播放提示音效。', tab: 'app', appPage: 'alarm' },
+  { label: '系统通知', desc: '闹钟触发时发送系统通知提醒。', tab: 'app', appPage: 'alarm' },
+  { label: '贪睡时长', desc: '点击贪睡后延迟再次提醒的分钟数。', tab: 'app', appPage: 'alarm' },
+  { label: '自动关闭', desc: '闹钟响铃后自动关闭的分钟数，设为"不自动关闭"则需手动操作。', tab: 'app', appPage: 'alarm' },
+  // ── 软件设置 > 实用工具 ──
+  { label: '实用工具', desc: '常用应用操作与日志工具', tab: 'app', appPage: 'autostart' },
+  { label: '开机自启', desc: '设置系统启动时是否自动运行灵动岛', tab: 'app', appPage: 'autostart' },
+  // ── 网络配置 ──
+  { label: '请求超时时间', desc: '设置网络请求的最长等待时间，网络较差时可适当增大', tab: 'network' },
+  { label: '静态资源节点', desc: '所有用户默认使用 R2，PRO 用户可选择 R2/COS/OSS。', tab: 'network' },
+  // ── 邮箱配置 ──
+  { label: '账户信息', desc: '邮箱地址用于展示与默认发件人信息。', tab: 'mail' },
+  { label: 'IMAP', desc: '用于收信、同步收件箱和文件夹状态。', tab: 'mail' },
+  { label: '收信设置', desc: '控制每次获取邮件的数量和其他收信行为。', tab: 'mail' },
+  // ── 天气配置 ──
+  { label: '定位来源优先级', desc: '选择天气定位优先使用 IP 自动定位或自定义位置', tab: 'weather' },
+  { label: '自定义城市', desc: '仅在"自定义位置优先"生效，可先测试再保存；支持中文 / 拼音 / 英文。', tab: 'weather' },
+  { label: '天气接口优先级', desc: '可选择优先使用 Open-Meteo 或 UAPI，失败时自动切换到另一源', tab: 'weather' },
+  { label: '启动天气预警提醒', desc: '应用启动自动检查更新前，先请求和风天气预警并提示；确认关闭后再继续检查更新。', tab: 'weather' },
+  // ── 歌曲设置 > 白名单 ──
+  { label: '播放器白名单', desc: '只有白名单内的播放器才会触发歌曲信息获取', tab: 'music', musicPage: 'whitelist' },
+  { label: '添加播放器', desc: '手动输入播放器进程名，或自动从当前 SMTC 会话中检测', tab: 'music', musicPage: 'whitelist' },
+  // ── 歌曲设置 > 歌词源 ──
+  { label: '歌词源', desc: '自动模式根据 SMTC 检测到的播放器进程选择对应源，失败后依次尝试其他源，最后使用 LRCLIB 兜底', tab: 'music', musicPage: 'lyrics' },
+  { label: '歌词显示', desc: '控制歌词界面的展示效果', tab: 'music', musicPage: 'lyrics' },
+  // ── 歌曲设置 > SMTC ──
+  { label: 'SMTC 自动取消订阅', desc: '用于清理长时间无更新的播放会话，默认永不取消订阅', tab: 'music', musicPage: 'smtc' },
+  // ── AI Agent ──
+  { label: '模型凭据', desc: '用于 Agent 中转调用的自定义 API 凭据（可选）', tab: 'ai', aiPage: 'general' },
+  { label: 'Agent 工作区', desc: '配置 Agent 可操作的文件目录,所有文件读写、搜索、命令执行仅限于工作区内', tab: 'ai', aiPage: 'general' },
+  { label: 'r1pxc Agent 头像配置', desc: '支持拖入图片或从文件资源管理器选择，不支持 URL', tab: 'ai', aiPage: 'r1pxc' },
+  { label: 'Ollama 本地模型', desc: '配置本地 Ollama 服务地址与默认模型，在模型下拉中选择 ollama 即可使用', tab: 'ai', aiPage: 'ollama' },
+  // ── 快捷键 > 窗口操作 ──
+  { label: '隐藏/显示快捷键', desc: '点击"修改"后按下组合键（如 Alt+X、Ctrl+Shift+H）', tab: 'shortcut' },
+  { label: '关闭灵动岛快捷键', desc: '按下此快捷键将立即关闭灵动岛应用（如 Alt+Q、Ctrl+Shift+Q）', tab: 'shortcut' },
+  { label: '还原默认位置快捷键', desc: '按下此快捷键将把灵动岛恢复到默认顶部居中位置', tab: 'shortcut' },
+  { label: '隐藏/显示托盘图标快捷键', desc: '按下此快捷键将隐藏或显示系统托盘中的灵动岛图标', tab: 'shortcut' },
+  { label: '显示配置窗口快捷键', desc: '仅在独立窗口模式下生效：按下后将打开独立配置窗口并切换到设置页', tab: 'shortcut' },
+  { label: '打开剪贴板历史快捷键', desc: '按下后将打开灵动岛并直接切换到剪贴板历史界面', tab: 'shortcut' },
+  { label: '切换鼠标穿透快捷键', desc: '按下此快捷键将锁定或解锁鼠标穿透状态，锁定后灵动岛不会拦截鼠标事件', tab: 'shortcut' },
+  { label: '切换 UI 状态锁定快捷键', desc: '按下后锁定当前 UI 状态，锁定期间不会因鼠标进入/移出或自动逻辑切换状态，再次按下解锁', tab: 'shortcut' },
+  // ── 快捷键 > AI ──
+  { label: 'Agent 语音输入快捷键', desc: '长按此快捷键将触发 Agent 语音输入，释放后自动关闭', tab: 'shortcut' },
+  // ── 快捷键 > 截图 ──
+  { label: '选区截图快捷键', desc: '按下此快捷键将触发截图选区流程（如 Alt+A、Ctrl+Shift+A）', tab: 'shortcut' },
+  // ── 快捷键 > 媒体 ──
+  { label: '快速切换歌曲快捷键', desc: '按下后触发系统下一曲媒体按键（仅白名单播放器生效）', tab: 'shortcut' },
+  { label: '暂停/播放歌曲快捷键', desc: '按下后触发系统播放/暂停媒体按键（仅白名单播放器生效）', tab: 'shortcut' },
+  // ── 更新设置 ──
+  { label: '版本信息', desc: '查看当前版本并选择更新源,应用所有补丁包均通过该更新源下载', tab: 'update' },
+  { label: '检查与安装', desc: '手动触发检查,有新版本时可下载安装;下载完成后点击"安装并重启"应用更新', tab: 'update' },
 ];
