@@ -132,7 +132,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'hide-process-list': SvgIcon.TASK_MANAGER,
   position: SvgIcon.MOVE,
   network: SvgIcon.NETWORK,
-  mail: SvgIcon.MUSIC,
+  mail: SvgIcon.MAIL,
   weather: SvgIcon.WEATHER,
   music: SvgIcon.LRC,
   'music-whitelist': SvgIcon.MUSIC,
