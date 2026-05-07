@@ -333,6 +333,8 @@
   height: 38px;
   flex-shrink: 0;
   opacity: 0.35;
+  object-fit: contain;
+  filter: brightness(0) invert(var(--icon-invert));
 }
 
 .settings-index-search-dropdown-item:hover {
