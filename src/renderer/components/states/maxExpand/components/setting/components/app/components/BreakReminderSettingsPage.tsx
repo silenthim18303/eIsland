@@ -143,12 +143,13 @@ export function BreakReminderSettingsPage(): ReactElement {
                     }}
                   />
                   <span className="break-reminder-unit">min</span>
-                  <label className="settings-card-check break-reminder-toggle">
+                  <label className="break-reminder-capsule">
                     <input
                       type="checkbox"
                       checked={item.enabled}
                       onChange={(e) => handleChange(item.id, 'enabled', e.target.checked)}
                     />
+                    <span className="break-reminder-capsule-track" />
                   </label>
                   <button
                     type="button"

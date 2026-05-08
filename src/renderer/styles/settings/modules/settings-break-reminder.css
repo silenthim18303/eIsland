@@ -66,9 +66,49 @@
   user-select: none;
 }
 
-.break-reminder-toggle {
-  margin: 0;
+.break-reminder-capsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 36px;
+  height: 20px;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.break-reminder-capsule input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.break-reminder-capsule-track {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  transition: background 0.25s;
+}
+
+.break-reminder-capsule-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.break-reminder-capsule input:checked + .break-reminder-capsule-track {
+  background: #34c759;
+}
+
+.break-reminder-capsule input:checked + .break-reminder-capsule-track::after {
+  transform: translateX(16px);
 }
 
 .break-reminder-delete {
