@@ -1,0 +1,274 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+import type { IIslandStore } from '../../store/types';
+import { useDynamicIslandShell } from './useDynamicIslandShell';
+import { useIslandDominantColor } from './useIslandDominantColor';
+import { useIslandTimeStrings } from './useIslandTimeStrings';
+import { useIslandHoverInteraction } from './useIslandHoverInteraction';
+import { useIslandNowPlayingSync } from './useIslandNowPlayingSync';
+import { useIslandNotificationSubscriptions } from './useIslandNotificationSubscriptions';
+import { useIslandSettingsSync } from './useIslandSettingsSync';
+import { useIslandStartupAnnouncements } from './useIslandStartupAnnouncements';
+import { useIslandTimerAndAlarm } from './useIslandTimerAndAlarm';
+import { useIslandBackgroundVideoSync } from './useIslandBackgroundVideoSync';
+import { useIslandStateBridges } from './useIslandStateBridges';
+import { useIslandBackgroundMediaController } from './useIslandBackgroundMediaController';
+import { useIslandShellPresentation } from './useIslandShellPresentation';
+import { useIslandRuntimeRefs } from './useIslandRuntimeRefs';
+
+interface UseDynamicIslandCoordinatorOptions {
+  store: IIslandStore;
+  t: (key: string, options?: Record<string, unknown>) => string;
+  language: string | undefined;
+}
+
+interface DynamicIslandCoordinatorState {
+  shellClassName: string;
+  shellStyle: React.CSSProperties | undefined;
+  handleIslandClick: () => void;
+  timeStr: string;
+  dayStr: string;
+  fullTimeStr: string;
+  lunarStr: string;
+  bgMedia: { type: 'image' | 'video'; previewUrl: string } | null;
+  bgVideoElementRef: React.MutableRefObject<HTMLVideoElement | null>;
+  bgVideoHwDecode: boolean;
+  bgVideoMuted: boolean;
+  bgVideoVolume: number;
+  bgVideoFit: 'cover' | 'contain';
+  handleVideoLoadedMetadata: (event: React.SyntheticEvent<HTMLVideoElement>) => void;
+  handleVideoCanPlay: (event: React.SyntheticEvent<HTMLVideoElement>) => void;
+}
+
+export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinatorOptions): DynamicIslandCoordinatorState {
+  const { store, t, language } = options;
+  const {
+    state,
+    setHover,
+    setIdle,
+    setExpanded,
+    setLyrics,
+    setGuide,
+    setAnnouncement,
+    setAgentVoiceInput,
+    timerData,
+    setTimerData,
+    setNotification,
+    handleNowPlayingUpdate,
+    updateProgress,
+    coverImage,
+    isMusicPlaying,
+    isPlaying,
+    dominantColor,
+    setDominantColor,
+    setSyncedLyrics,
+    setLyricsLoading,
+    syncedLyrics,
+    lyricsLoading,
+    springAnimation,
+    animationSpeed,
+  } = store;
+
+  const {
+    initRef,
+    isHoveringRef,
+    enterTimerRef,
+    leaveTimerRef,
+    setNotificationRef,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    idleClickExpandRef,
+    pendingAnnouncementAfterGuideRef,
+    pendingAnnouncementAppVersionRef,
+    startupAutoCheckHandledRef,
+  } = useIslandRuntimeRefs({
+    setNotification,
+  });
+
+  const {
+    bgOpacityRef,
+    bgBlurRef,
+    bgVideoFit,
+    bgVideoMuted,
+    bgVideoLoop,
+    bgVideoVolume,
+    bgVideoRate,
+    bgVideoHwDecode,
+    bgVideoElementRef,
+    bgMedia,
+    setBgVideoFit,
+    setBgVideoMuted,
+    setBgVideoLoop,
+    setBgVideoVolume,
+    setBgVideoRate,
+    setBgVideoHwDecode,
+    applyBgMedia,
+    handleVideoLoadedMetadata,
+    handleVideoCanPlay,
+  } = useIslandBackgroundMediaController();
+
+  const {
+    morphing,
+    fromState,
+    showGlow,
+    handleIslandClick,
+  } = useDynamicIslandShell({
+    state,
+    animationSpeed,
+    isMusicPlaying,
+    coverImage,
+    isPlaying,
+    setHover,
+    setExpanded,
+    idleClickExpandRef,
+    isHoveringRef,
+  });
+
+  useIslandNowPlayingSync({
+    handleNowPlayingUpdate,
+    updateProgress,
+    setSyncedLyrics,
+    setLyricsLoading,
+  });
+
+  useIslandDominantColor({
+    coverImage,
+    setDominantColor,
+  });
+
+  const {
+    timeStr,
+    dayStr,
+    fullTimeStr,
+    lunarStr,
+  } = useIslandTimeStrings({
+    t,
+    language,
+  });
+
+  useIslandTimerAndAlarm({
+    language,
+    timerData,
+    setTimerData,
+    setNotificationRef,
+    t,
+  });
+
+  useIslandSettingsSync({
+    language,
+    initRef,
+    setGuide,
+    setNotificationRef,
+    applyBgMedia,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    idleClickExpandRef,
+    bgOpacityRef,
+    bgBlurRef,
+    setBgVideoFit,
+    setBgVideoMuted,
+    setBgVideoLoop,
+    setBgVideoVolume,
+    setBgVideoRate,
+    setBgVideoHwDecode,
+  });
+
+  useIslandStateBridges({
+    state,
+    timerState: timerData?.state ?? 'idle',
+    isPlaying,
+    syncedLyrics,
+    lyricsLoading,
+    setLyrics,
+    setAgentVoiceInput,
+    setIdle,
+  });
+
+  useIslandStartupAnnouncements({
+    language,
+    state,
+    setAnnouncement,
+    startupAutoCheckHandledRef,
+    pendingAnnouncementAfterGuideRef,
+    pendingAnnouncementAppVersionRef,
+    setNotificationRef,
+    t,
+  });
+
+  useIslandBackgroundVideoSync({
+    bgMedia,
+    bgVideoElementRef,
+    bgVideoVolume,
+    bgVideoRate,
+    bgVideoLoop,
+    bgVideoHwDecode,
+  });
+
+  useIslandNotificationSubscriptions({
+    language,
+    t,
+    setNotificationRef,
+  });
+
+  useIslandHoverInteraction({
+    state,
+    setHover,
+    setIdle,
+    setLyrics,
+    isHoveringRef,
+    idleClickExpandRef,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    enterTimerRef,
+    leaveTimerRef,
+  });
+
+  const {
+    shellClassName,
+    shellStyle,
+  } = useIslandShellPresentation({
+    state,
+    morphing,
+    fromState,
+    showGlow,
+    springAnimation,
+    animationSpeed,
+    dominantColor,
+  });
+
+  return {
+    shellClassName,
+    shellStyle,
+    handleIslandClick,
+    timeStr,
+    dayStr,
+    fullTimeStr,
+    lunarStr,
+    bgMedia,
+    bgVideoElementRef,
+    bgVideoHwDecode,
+    bgVideoMuted,
+    bgVideoVolume,
+    bgVideoFit,
+    handleVideoLoadedMetadata,
+    handleVideoCanPlay,
+  };
+}

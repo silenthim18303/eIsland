@@ -29,196 +29,47 @@ import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
 import { DynamicIslandBackground } from './components/DynamicIslandBackground';
 import { DynamicIslandStateContent } from './components/DynamicIslandStateContent';
-import { useDynamicIslandShell } from './hooks/useDynamicIslandShell';
-import { useIslandDominantColor } from './hooks/useIslandDominantColor';
-import { useIslandTimeStrings } from './hooks/useIslandTimeStrings';
-import { useIslandHoverInteraction } from './hooks/useIslandHoverInteraction';
-import { useIslandNowPlayingSync } from './hooks/useIslandNowPlayingSync';
-import { useIslandNotificationSubscriptions } from './hooks/useIslandNotificationSubscriptions';
-import { useIslandSettingsSync } from './hooks/useIslandSettingsSync';
-import { useIslandStartupAnnouncements } from './hooks/useIslandStartupAnnouncements';
-import { useIslandTimerAndAlarm } from './hooks/useIslandTimerAndAlarm';
-import { useIslandBackgroundVideoSync } from './hooks/useIslandBackgroundVideoSync';
-import { useIslandStateBridges } from './hooks/useIslandStateBridges';
-import { useIslandBackgroundMediaController } from './hooks/useIslandBackgroundMediaController';
-import { useIslandShellPresentation } from './hooks/useIslandShellPresentation';
-import { useIslandRuntimeRefs } from './hooks/useIslandRuntimeRefs';
+import { useDynamicIslandCoordinator } from './hooks/useDynamicIslandCoordinator';
 
 export type { IslandState } from './hooks/useDynamicIslandShell';
 export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from './config/dynamicIslandConfig';
 
 /**
  * 灵动岛主组件
- * @description 使用状态模式管理不同状态的 UI 渲染，通过 requestAnimationFrame 检测鼠标位置实现可靠的 hover 交互
+ * @description 使用状态模式管理不同状态的 UI 渲染
  */
 function DynamicIsland(): React.JSX.Element {
   const { t, i18n } = useTranslation();
-  const { state, weather, setHover, setIdle, setExpanded, setLyrics, setGuide, setAnnouncement, setAgentVoiceInput, timerData, setTimerData, notification, setNotification, handleNowPlayingUpdate, updateProgress, coverImage, isMusicPlaying, isPlaying, dominantColor, setDominantColor, setSyncedLyrics, setLyricsLoading, syncedLyrics, lyricsLoading, pomodoroRunning, pomodoroRemaining, springAnimation, animationSpeed } = useIslandStore();
-
+  const store = useIslandStore();
   const {
-    initRef,
-    isHoveringRef,
-    enterTimerRef,
-    leaveTimerRef,
-    setNotificationRef,
-    expandLeaveIdleRef,
-    maxExpandLeaveIdleRef,
-    idleClickExpandRef,
-    pendingAnnouncementAfterGuideRef,
-    pendingAnnouncementAppVersionRef,
-    startupAutoCheckHandledRef,
-  } = useIslandRuntimeRefs({
-    setNotification,
-  });
-  const {
-    bgOpacityRef,
-    bgBlurRef,
-    bgVideoFit,
-    bgVideoMuted,
-    bgVideoLoop,
-    bgVideoVolume,
-    bgVideoRate,
-    bgVideoHwDecode,
-    bgVideoElementRef,
-    bgMedia,
-    setBgVideoFit,
-    setBgVideoMuted,
-    setBgVideoLoop,
-    setBgVideoVolume,
-    setBgVideoRate,
-    setBgVideoHwDecode,
-    applyBgMedia,
-    handleVideoLoadedMetadata,
-    handleVideoCanPlay,
-  } = useIslandBackgroundMediaController();
-
-  const {
-    morphing,
-    fromState,
-    showGlow,
-    handleIslandClick,
-  } = useDynamicIslandShell({
     state,
-    animationSpeed,
-    isMusicPlaying,
-    coverImage,
-    isPlaying,
-    setHover,
-    setExpanded,
-    idleClickExpandRef,
-    isHoveringRef,
-  });
-
-  useIslandNowPlayingSync({
-    handleNowPlayingUpdate,
-    updateProgress,
-    setSyncedLyrics,
-    setLyricsLoading,
-  });
-
-  useIslandDominantColor({
-    coverImage,
-    setDominantColor,
-  });
+    weather,
+    timerData,
+    notification,
+    pomodoroRunning,
+    pomodoroRemaining,
+  } = store;
 
   const {
+    handleIslandClick,
+    shellClassName,
+    shellStyle,
     timeStr,
     dayStr,
     fullTimeStr,
     lunarStr,
-  } = useIslandTimeStrings({
-    t,
-    language: i18n.resolvedLanguage,
-  });
-
-  useIslandTimerAndAlarm({
-    language: i18n.resolvedLanguage,
-    timerData,
-    setTimerData,
-    setNotificationRef,
-    t,
-  });
-
-  useIslandSettingsSync({
-    language: i18n.resolvedLanguage,
-    initRef,
-    setGuide,
-    setNotificationRef,
-    applyBgMedia,
-    expandLeaveIdleRef,
-    maxExpandLeaveIdleRef,
-    idleClickExpandRef,
-    bgOpacityRef,
-    bgBlurRef,
-    setBgVideoFit,
-    setBgVideoMuted,
-    setBgVideoLoop,
-    setBgVideoVolume,
-    setBgVideoRate,
-    setBgVideoHwDecode,
-  });
-
-  useIslandStateBridges({
-    state,
-    timerState: timerData?.state ?? 'idle',
-    isPlaying,
-    syncedLyrics,
-    lyricsLoading,
-    setLyrics,
-    setAgentVoiceInput,
-    setIdle,
-  });
-
-  useIslandStartupAnnouncements({
-    language: i18n.resolvedLanguage,
-    state,
-    setAnnouncement,
-    startupAutoCheckHandledRef,
-    pendingAnnouncementAfterGuideRef,
-    pendingAnnouncementAppVersionRef,
-    setNotificationRef,
-    t,
-  });
-
-  useIslandBackgroundVideoSync({
     bgMedia,
     bgVideoElementRef,
-    bgVideoVolume,
-    bgVideoRate,
-    bgVideoLoop,
     bgVideoHwDecode,
-  });
-
-  useIslandNotificationSubscriptions({
-    language: i18n.resolvedLanguage,
+    bgVideoMuted,
+    bgVideoVolume,
+    bgVideoFit,
+    handleVideoLoadedMetadata,
+    handleVideoCanPlay,
+  } = useDynamicIslandCoordinator({
+    store,
     t,
-    setNotificationRef,
-  });
-
-  useIslandHoverInteraction({
-    state,
-    setHover,
-    setIdle,
-    setLyrics,
-    isHoveringRef,
-    idleClickExpandRef,
-    expandLeaveIdleRef,
-    maxExpandLeaveIdleRef,
-    enterTimerRef,
-    leaveTimerRef,
-  });
-
-  const {
-    shellClassName,
-    shellStyle,
-  } = useIslandShellPresentation({
-    state,
-    morphing,
-    fromState,
-    showGlow,
-    springAnimation,
-    animationSpeed,
-    dominantColor,
+    language: i18n.resolvedLanguage,
   });
 
   return (
