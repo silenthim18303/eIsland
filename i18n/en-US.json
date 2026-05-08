@@ -995,6 +995,7 @@
       "url-parser": "URL Parser",
       "clipboard-history": "Clipboard History",
       "alarm": "Alarm Settings",
+      "break-reminder": "Break Reminders",
       "autostart": "Utilities",
       "network": "Network",
       "mail": "Mail",
@@ -1432,6 +1433,20 @@
           "10": "10 min"
         }
       }
+    },
+    "breakReminder": {
+      "listTitle": "Reminders",
+      "listHint": "When enabled, a break reminder notification will appear at the set interval.",
+      "addBtn": "Add Reminder",
+      "deleteBtn": "Delete",
+      "nameLabel": "Name",
+      "intervalLabel": "Interval (min)",
+      "enabledLabel": "Enabled",
+      "emptyHint": "No reminders yet. Click the button above to add one.",
+      "defaultSedentary": "Sedentary Reminder",
+      "defaultHydration": "Hydration Reminder",
+      "notificationTitle": "Break Reminder",
+      "notificationBody": "Time for {{name}}!"
     },
     "network": {
       "timeout": {
@@ -2317,6 +2332,10 @@
       "animation": {
         "label": "Animations",
         "desc": "Dynamic Island spring animation and speed settings."
+      },
+      "break-reminder": {
+        "label": "Break Reminders",
+        "desc": "Custom timed break reminders with built-in sedentary and hydration alerts."
       },
       "url-parser": {
         "label": "URL Parser",

@@ -995,6 +995,7 @@
       "url-parser": "URL解析",
       "clipboard-history": "剪贴板历史",
       "alarm": "闹钟配置",
+      "break-reminder": "休息提醒",
       "autostart": "实用工具",
       "network": "网络配置",
       "mail": "邮箱配置",
@@ -1432,6 +1433,20 @@
           "10": "10 分钟"
         }
       }
+    },
+    "breakReminder": {
+      "listTitle": "提醒事项",
+      "listHint": "开启后，到达设定的间隔时间将弹出休息提醒通知。",
+      "addBtn": "新建提醒",
+      "deleteBtn": "删除",
+      "nameLabel": "提醒名称",
+      "intervalLabel": "间隔（分钟）",
+      "enabledLabel": "启用",
+      "emptyHint": "暂无提醒事项，点击上方按钮新建。",
+      "defaultSedentary": "久坐提醒",
+      "defaultHydration": "喝水提醒",
+      "notificationTitle": "休息提醒",
+      "notificationBody": "该{{name}}啦！"
     },
     "network": {
       "timeout": {
@@ -2312,6 +2327,10 @@
       "animation": {
         "label": "软件动画",
         "desc": "灵动岛弹性动画与动画速度配置。"
+      },
+      "break-reminder": {
+        "label": "休息提醒",
+        "desc": "自定义定时休息提醒，预置久坐与喝水提醒。"
       },
       "url-parser": {
         "label": "URL解析",

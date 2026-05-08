@@ -1,0 +1,90 @@
+/*
+ * eIsland - Break Reminder Settings Styles
+ */
+
+.break-reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.break-reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.break-reminder-name {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.break-reminder-name:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.break-reminder-interval {
+  width: 60px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 6px;
+  color: inherit;
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.break-reminder-interval::-webkit-inner-spin-button,
+.break-reminder-interval::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.break-reminder-interval:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.break-reminder-unit {
+  font-size: 12px;
+  opacity: 0.5;
+  user-select: none;
+}
+
+.break-reminder-toggle {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.break-reminder-delete {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.break-reminder-delete:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
