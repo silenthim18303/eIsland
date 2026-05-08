@@ -24,8 +24,8 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ReactElement, ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ReactElement } from 'react';
 import useIslandStore from '../../../store/isLandStore';
 import {
   streamMihtnelisAgent,
@@ -40,100 +40,14 @@ import { readLocalToken, getRoleFromToken } from '../../../utils/userAccount';
 import { loadLocationFromStorage } from '../../../store/utils/storage';
 import { buildMihtnelisContext } from '../../states/maxExpand/components/agent/utils/chatUtils';
 import type { AiChatMessage } from '../../../store/types';
+import type { AgentPhase, AuthPending } from './config/agentContentConfig';
+import { INLINE_PROMPT_HINT } from './config/agentContentConfig';
+import { loadAgentMode } from './utils/agentMode';
+import { isClientLocalToolName, isHighRiskLocalToolName } from './utils/agentToolPolicy';
+import { useAgentAutoScroll } from './hooks/useAgentAutoScroll';
+import { useAgentDisplayState } from './hooks/useAgentDisplayState';
+import { AgentContentView } from './components/AgentContentView';
 import '../../../styles/agent/agent.css';
-
-type AgentPhase = 'connecting' | 'thinking' | 'toolCalling' | 'answering' | 'done' | 'error';
-
-const PHASE_IMAGE: Record<AgentPhase, string> = {
-  connecting: 'image/AGENT_DEFAULT.png',
-  thinking: 'image/AGENT_THINKING.png',
-  toolCalling: 'image/AGENT_TOOL_CALLING.png',
-  answering: 'image/AGENT_FINAL_ANSWER.png',
-  done: 'image/AGENT_FINAL_ANSWER.png',
-  error: 'image/AGENT_CONFUSE.png',
-};
-
-const PHASE_LABEL: Record<AgentPhase, string> = {
-  connecting: '正在连接…',
-  thinking: '正在思考…',
-  toolCalling: '正在调用工具…',
-  answering: '正在回答…',
-  done: '回答完成',
-  error: '出错了',
-};
-
-const AGENT_MODE_STORAGE_KEY = 'eIsland_agentMode';
-const VALID_AGENT_MODES = new Set(['mihtnelis', 'r1pxc', 'edoc']);
-function loadAgentMode(): string {
-  try {
-    const raw = localStorage.getItem(AGENT_MODE_STORAGE_KEY);
-    if (raw && VALID_AGENT_MODES.has(raw)) return raw;
-  } catch { /* ignore */ }
-  return 'mihtnelis';
-}
-
-const INLINE_PROMPT_HINT = '[快问快答模式] 请用简洁精炼的语言回答，输出不超过3句话，避免冗长解释和列表。直接给出核心结论。思考过程(thinking)也请尽量精简，不要输出冗长的推理链，控制在几句话以内。';
-
-/**
- * 轻量级内联 Markdown 渲染器
- * 仅支持：**加粗**、*斜体*、~~删除线~~
- */
-function renderInlineMarkdown(text: string): ReactNode[] {
-  const parts: ReactNode[] = [];
-  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|~~(.+?)~~)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  let key = 0;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-    if (match[2]) {
-      parts.push(<strong key={key++}>{match[2]}</strong>);
-    } else if (match[3]) {
-      parts.push(<em key={key++}>{match[3]}</em>);
-    } else if (match[4]) {
-      parts.push(<del key={key++}>{match[4]}</del>);
-    }
-    lastIndex = regex.lastIndex;
-  }
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
-  return parts;
-}
-
-const CLIENT_LOCAL_TOOL_PREFIXES = [
-  'file.', 'cmd.', 'sys.', 'win.', 'clipboard.', 'notification.', 'net.',
-  'monitor.', 'volume.', 'brightness.', 'display.', 'power.', 'wifi.',
-  'registry.', 'service.', 'schedule.', 'firewall.', 'defender.', 'island.', 'alarm.', 'todolist.',
-] as const;
-const CLIENT_LOCAL_TOOL_EXACT_NAMES = new Set(['web.search']);
-const HIGH_RISK_LOCAL_TOOL_PREFIXES = [
-  'file.delete', 'file.rename', 'file.trash', 'cmd.exec', 'cmd.powershell',
-  'win.close', 'win.minimize', 'win.maximize', 'win.restore', 'power.',
-  'registry.write', 'registry.delete', 'service.start', 'service.stop',
-  'service.restart', 'schedule.task.create', 'net.proxy', 'net.hosts',
-  'defender.scan', 'island.settings.write', 'island.theme.set',
-  'island.opacity.set', 'island.restart', 'alarm.delete', 'todolist.delete',
-] as const;
-function isClientLocalToolName(tool: string): boolean {
-  const n = tool.trim().toLowerCase();
-  return CLIENT_LOCAL_TOOL_EXACT_NAMES.has(n) || CLIENT_LOCAL_TOOL_PREFIXES.some((p) => n.startsWith(p));
-}
-function isHighRiskLocalToolName(tool: string): boolean {
-  const n = tool.trim().toLowerCase();
-  return HIGH_RISK_LOCAL_TOOL_PREFIXES.some((p) => n.startsWith(p));
-}
-
-interface AuthPending {
-  type: 'web' | 'tool';
-  requestId: string;
-  description: string;
-  tool?: string;
-  argumentsPayload?: Record<string, unknown>;
-}
 
 /**
  * Agent 状态内容组件
@@ -157,11 +71,11 @@ export function AgentContent(): ReactElement {
   const traceIdRef = useRef('');
   const tokenRef = useRef('');
 
-  useEffect(() => {
-    if (textRef.current) {
-      textRef.current.scrollTop = textRef.current.scrollHeight;
-    }
-  }, [thinkText, answerText]);
+  useAgentAutoScroll({
+    textRef,
+    thinkText,
+    answerText,
+  });
 
   useEffect(() => {
     const token = readLocalToken();
@@ -542,45 +456,32 @@ export function AgentContent(): ReactElement {
     } catch { /* ignore resolve errors */ }
   }, [authPending, aiConfig.workspaces]);
 
-  const overlayText = authPending ? authPending.description : toolCallInfo ? toolCallInfo.purpose : null;
-  const overlayLabel = authPending ? '需要授权' : toolCallInfo ? `正在调用: ${toolCallInfo.tool}` : null;
-  const displayText = (answerText || thinkText || errorMsg || PHASE_LABEL[phase]).replace(/\n{2,}/g, '\n');
-  const isThinkOnly = !answerText && !!thinkText;
-
-  const renderedDisplay = useMemo(() => {
-    if (overlayText) return overlayText;
-    return renderInlineMarkdown(displayText);
-  }, [overlayText, displayText]);
+  const {
+    overlayText,
+    overlayLabel,
+    isThinkOnly,
+    renderedDisplay,
+  } = useAgentDisplayState({
+    phase,
+    answerText,
+    thinkText,
+    errorMsg,
+    authPending,
+    toolCallInfo,
+  });
 
   return (
-    <div className="agent-content">
-      <img
-        className="agent-icon"
-        src={PHASE_IMAGE[phase]}
-        alt=""
-        draggable={false}
-      />
-      <div className="agent-text-area">
-        <span className="agent-text-label">
-          {overlayLabel ?? PHASE_LABEL[phase]}
-        </span>
-        <div
-          ref={textRef}
-          className={`agent-text-body${overlayText ? ' agent-text-auth' : isThinkOnly ? ' agent-text-thinking' : ''}${phase === 'error' ? ' agent-text-error' : ''}`}
-        >
-          {renderedDisplay}
-        </div>
-      </div>
-      <div className="agent-actions">
-        {authPending ? (
-          <>
-            <button className="agent-action-btn agent-action-deny" onClick={() => void handleAuthDecision(false)}>不授权</button>
-            <button className="agent-action-btn agent-action-allow" onClick={() => void handleAuthDecision(true)}>授权</button>
-          </>
-        ) : (
-          <button className="agent-action-btn" onClick={() => setIdle(true)}>关闭</button>
-        )}
-      </div>
-    </div>
+    <AgentContentView
+      phase={phase}
+      overlayLabel={overlayLabel}
+      renderedDisplay={renderedDisplay}
+      textRef={textRef}
+      overlayText={overlayText}
+      isThinkOnly={isThinkOnly}
+      authPending={authPending}
+      onClose={() => setIdle(true)}
+      onDeny={() => { void handleAuthDecision(false); }}
+      onAllow={() => { void handleAuthDecision(true); }}
+    />
   );
 }
