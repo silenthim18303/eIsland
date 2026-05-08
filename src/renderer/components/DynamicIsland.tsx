@@ -25,14 +25,38 @@
  */
 
 import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
-import { getColor } from 'colorthief';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
-import { formatTime, formatFullTime, getDayName, getLunarDate } from '../utils/timeUtils';
 import { DynamicIslandBackground } from './components/DynamicIslandBackground';
 import { DynamicIslandStateContent } from './components/DynamicIslandStateContent';
 import { useDynamicIslandShell } from './hooks/useDynamicIslandShell';
-import type { IslandState } from './hooks/useDynamicIslandShell';
+import { useIslandDominantColor } from './hooks/useIslandDominantColor';
+import { useIslandTimeStrings } from './hooks/useIslandTimeStrings';
+import { useIslandHoverInteraction } from './hooks/useIslandHoverInteraction';
+import {
+  CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY,
+  ISLAND_BG_MEDIA_STORE_KEY,
+  ISLAND_BG_IMAGE_STORE_KEY,
+  ISLAND_BG_VIDEO_FIT_STORE_KEY,
+  ISLAND_BG_VIDEO_MUTED_STORE_KEY,
+  ISLAND_BG_VIDEO_LOOP_STORE_KEY,
+  ISLAND_BG_VIDEO_VOLUME_STORE_KEY,
+  ISLAND_BG_VIDEO_RATE_STORE_KEY,
+  ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY,
+  LOCAL_ISLAND_BG_SYNC_EVENT,
+  UPDATE_SOURCE_STORE_KEY,
+  UPDATE_AUTO_PROMPT_STORE_KEY,
+  WEATHER_ALERT_ENABLED_STORE_KEY,
+  STATE_AREA,
+  getStateClassName,
+  normalizeUpdateSource,
+  isProOnlyUpdateSource,
+  getRoleFromToken,
+  getUpdateSourceLabel,
+  normalizeBgMediaConfig,
+  resolveBgMediaPreviewUrl,
+} from './config/dynamicIslandConfig';
+import type { UpdateSourceKey, IslandBgMediaType, IslandBgMediaConfig } from './config/dynamicIslandConfig';
 import { SvgIcon } from '../utils/SvgIcon';
 import type { NowPlayingInfo } from '../store/isLandStore';
 import { fetchLyrics } from '../api/lyrics/lrcApi';
@@ -52,294 +76,7 @@ import {
 import { readLocalToken } from '../utils/userAccount';
 
 export type { IslandState } from './hooks/useDynamicIslandShell';
-
-const CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY = 'clipboard-url-suppress-in-url-favorites';
-export const AI_CHAT_CLIPBOARD_URL_EVENT = 'eisland:ai-chat-clipboard-urls-detected';
-const ISLAND_BG_MEDIA_STORE_KEY = 'island-bg-media';
-const ISLAND_BG_IMAGE_STORE_KEY = 'island-bg-image';
-const ISLAND_BG_VIDEO_FIT_STORE_KEY = 'island-bg-video-fit';
-const ISLAND_BG_VIDEO_MUTED_STORE_KEY = 'island-bg-video-muted';
-const ISLAND_BG_VIDEO_LOOP_STORE_KEY = 'island-bg-video-loop';
-const ISLAND_BG_VIDEO_VOLUME_STORE_KEY = 'island-bg-video-volume';
-const ISLAND_BG_VIDEO_RATE_STORE_KEY = 'island-bg-video-rate';
-const ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY = 'island-bg-video-hw-decode';
-const LOCAL_ISLAND_BG_SYNC_EVENT = 'island-bg-local-sync';
-const UPDATE_SOURCE_STORE_KEY = 'update-source';
-const UPDATE_AUTO_PROMPT_STORE_KEY = 'update-auto-prompt-enabled';
-const WEATHER_ALERT_ENABLED_STORE_KEY = 'weather-alert-enabled';
-
-type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
-
-const PRO_UPDATE_SOURCE_SET: ReadonlySet<UpdateSourceKey> = new Set<UpdateSourceKey>(['tencent-cos', 'aliyun-oss']);
-
-function normalizeUpdateSource(value: unknown): UpdateSourceKey {
-  if (value === 'github') return 'github';
-  if (value === 'tencent-cos') return 'tencent-cos';
-  if (value === 'aliyun-oss') return 'aliyun-oss';
-  return 'cloudflare-r2';
-}
-
-function isProOnlyUpdateSource(source: UpdateSourceKey): boolean {
-  return PRO_UPDATE_SOURCE_SET.has(source);
-}
-
-const normalizeRoleValue = (value: string): string => {
-  return value.trim().toLowerCase().replace(/^role_/, '');
-};
-
-const getRoleFromToken = (token: string | null | undefined): string | null => {
-  if (!token) return null;
-  const rawToken = token.trim().replace(/^bearer\s+/i, '');
-  const parts = rawToken.split('.');
-  if (parts.length < 2) return null;
-  try {
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const normalizedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
-    const decoded = JSON.parse(atob(normalizedPayload)) as { role?: unknown };
-    return typeof decoded.role === 'string' ? normalizeRoleValue(decoded.role) : null;
-  } catch {
-    return null;
-  }
-};
-
-function getUpdateSourceLabel(value: unknown): string {
-  if (value === 'github') return 'GitHub Releases';
-  if (value === 'tencent-cos') return 'Tencent COS';
-  if (value === 'aliyun-oss') return 'Aliyun OSS';
-  return 'Cloudflare R2';
-}
-
-type IslandBgMediaType = 'image' | 'video';
-
-interface IslandBgMediaConfig {
-  type: IslandBgMediaType;
-  source: string;
-}
-
-function isDirectBgMediaUrl(source: string): boolean {
-  return source.startsWith('data:')
-    || source.startsWith('http://')
-    || source.startsWith('https://')
-    || source.startsWith('blob:')
-    || source.startsWith('file:')
-    || source.startsWith('/')
-    || source.startsWith('./')
-    || source.startsWith('../')
-    || source.startsWith('assets/');
-}
-
-function toMediaUrl(path: string): string {
-  const normalized = path.replace(/\\/g, '/');
-  return `eisland-media://local/${encodeURIComponent(normalized)}`;
-}
-
-function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | null {
-  if (typeof value === 'string') {
-    const source = value.trim();
-    return source ? { type: 'image', source } : null;
-  }
-  if (!value || typeof value !== 'object') return null;
-
-  const candidate = value as { type?: unknown; source?: unknown; image?: unknown; url?: unknown };
-  const sourceRaw = typeof candidate.source === 'string'
-    ? candidate.source
-    : typeof candidate.image === 'string'
-      ? candidate.image
-      : typeof candidate.url === 'string'
-        ? candidate.url
-        : null;
-  if (!sourceRaw) return null;
-
-  const source = sourceRaw.trim();
-  if (!source) return null;
-
-  if (candidate.type === 'video') {
-    return { type: 'video', source };
-  }
-  return { type: 'image', source };
-}
-
-async function resolveBgMediaPreviewUrl(media: IslandBgMediaConfig): Promise<string | null> {
-  if (media.type === 'image') {
-    if (isDirectBgMediaUrl(media.source)) return media.source;
-    return window.api?.loadWallpaperFile?.(media.source) ?? null;
-  }
-  if (isDirectBgMediaUrl(media.source)) return media.source;
-  return toMediaUrl(media.source);
-}
-
-/** 各状态对应的窗口面积（宽×高），用于判断状态切换是放大还是缩小 */
-const STATE_AREA: Record<string, number> = {
-  idle: 260 * 42,
-  minimal: 260 * 42,
-  lyrics: 500 * 42,
-  hover: 500 * 60,
-  notification: 500 * 88,
-  expanded: 860 * 150,
-  maxExpand: 860 * 400,
-  guide: 860 * 400,
-  login: 860 * 400,
-  register: 860 * 400,
-  payment: 860 * 400,
-  announcement: 860 * 400,
-  agentVoiceInput: 500 * 42,
-  agent: 500 * 88,
-  stt: 500 * 88,
-};
-
-/** 状态配置接口 */
-interface StateConfig {
-  /** 状态名称 */
-  name: IslandState;
-  /** 是否启用鼠标穿透 */
-  mousePassthrough: boolean;
-  /** 是否展开窗口 */
-  expanded: boolean;
-  /** 状态切换延迟（毫秒） */
-  enterDelay: number;
-  /** 状态退出延迟（毫秒） */
-  leaveDelay: number;
-}
-
-/** 状态配置映射表 */
-export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
-  idle: {
-    name: 'idle',
-    mousePassthrough: true,
-    expanded: false,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  hover: {
-    name: 'hover',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 60,
-    leaveDelay: 80,
-  },
-  expanded: {
-    name: 'expanded',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  notification: {
-    name: 'notification',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  maxExpand: {
-    name: 'maxExpand',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  minimal: {
-    name: 'minimal',
-    mousePassthrough: true,
-    expanded: false,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  lyrics: {
-    name: 'lyrics',
-    mousePassthrough: true,
-    expanded: true,
-    enterDelay: 50,
-    leaveDelay: 0,
-  },
-  guide: {
-    name: 'guide',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  login: {
-    name: 'login',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  register: {
-    name: 'register',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  payment: {
-    name: 'payment',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  announcement: {
-    name: 'announcement',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  agentVoiceInput: {
-    name: 'agentVoiceInput',
-    mousePassthrough: true,
-    expanded: true,
-    enterDelay: 50,
-    leaveDelay: 0,
-  },
-  agent: {
-    name: 'agent',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-  stt: {
-    name: 'stt',
-    mousePassthrough: false,
-    expanded: true,
-    enterDelay: 0,
-    leaveDelay: 0,
-  },
-};
-
-/**
- * 检查鼠标是否在灵动岛窗口范围内
- * @returns 鼠标在窗口内返回 true，否则返回 false
- */
-async function isMouseInWindow(): Promise<boolean> {
-  try {
-    const mousePos = await window.api?.getMousePosition();
-    const bounds = await window.api?.getWindowBounds();
-
-    if (!mousePos || !bounds) return false;
-
-    return (
-      mousePos.x >= bounds.x &&
-      mousePos.x <= bounds.x + bounds.width &&
-      mousePos.y >= bounds.y &&
-      mousePos.y <= bounds.y + bounds.height
-    );
-  } catch {
-    return false;
-  }
-}
-
-/**
- * 获取状态对应的 CSS 类名
- * @param state 当前状态
- * @returns CSS 类名字符串
- */
-export function getStateClassName(state: IslandState): string {
-  return state === 'idle' ? '' : state;
-}
+export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from './config/dynamicIslandConfig';
 
 /**
  * 灵动岛主组件
@@ -443,41 +180,20 @@ function DynamicIsland(): React.JSX.Element {
     setNotificationRef.current = setNotification;
   });
 
-  /** 从专辑封面提取主题色并存入 store */
-  useEffect(() => {
-    if (!coverImage) {
-      setDominantColor([0, 0, 0]);
-      return;
-    }
-    let isStale = false;
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.src = coverImage;
-    img.onload = async () => {
-      if (isStale) return;
-      try {
-        const color = await getColor(img, { colorSpace: 'rgb' });
-        if (color && !isStale) {
-          const { r, g, b } = color.rgb();
-          setDominantColor([r, g, b]);
-        }
-      } catch (e) {
-        console.error('ColorThief error:', e);
-      }
-    };
-    return () => {
-      isStale = true;
-      img.onload = null;
-      img.src = '';
-    };
-  }, [coverImage, setDominantColor]);
+  useIslandDominantColor({
+    coverImage,
+    setDominantColor,
+  });
 
-  const formatWeekday = (date: Date): string => t(`overview.time.weekdays.${date.getDay()}`, { defaultValue: getDayName(date) });
-
-  const [timeStr, setTimeStr] = useState(() => formatTime(new Date()));
-  const [dayStr, setDayStr] = useState(() => formatWeekday(new Date()));
-  const [fullTimeStr, setFullTimeStr] = useState(() => formatFullTime(new Date()));
-  const [lunarStr, setLunarStr] = useState(() => getLunarDate(new Date()));
+  const {
+    timeStr,
+    dayStr,
+    fullTimeStr,
+    lunarStr,
+  } = useIslandTimeStrings({
+    t,
+    language: i18n.resolvedLanguage,
+  });
 
   // 全局计时器逻辑
   useEffect(() => {
@@ -568,19 +284,6 @@ function DynamicIsland(): React.JSX.Element {
       } catch { /* noop */ }
     }, 1000);
     return () => clearInterval(alarmInterval);
-  }, [i18n.resolvedLanguage]);
-
-  useEffect(() => {
-    const update = (): void => {
-      const now = new Date();
-      setTimeStr(formatTime(now));
-      setDayStr(formatWeekday(now));
-      setFullTimeStr(formatFullTime(now));
-      setLunarStr(getLunarDate(now));
-    };
-    update();
-    const timer = setInterval(update, 1000);
-    return () => clearInterval(timer);
   }, [i18n.resolvedLanguage]);
 
   useEffect(() => {
@@ -1214,146 +917,18 @@ function DynamicIsland(): React.JSX.Element {
     };
   }, [i18n.resolvedLanguage]);
 
-  // 必须放在 useEffect 之前，且 useCallback 依赖为空（所有依赖都是 ref/函数）
-  const clearAllTimers = React.useCallback(() => {
-    if (enterTimerRef.current !== null) {
-      clearTimeout(enterTimerRef.current);
-      enterTimerRef.current = null;
-    }
-    if (leaveTimerRef.current !== null) {
-      clearTimeout(leaveTimerRef.current);
-      leaveTimerRef.current = null;
-    }
-  }, []);
-
-  useEffect(() => {
-    let rafId: number | null = null;
-    let aborted = false;
-    let lastCheckTime = 0;
-    const CHECK_INTERVAL = 16; // ~60fps throttle
-
-    if (state === 'maxExpand' || state === 'expanded' || state === 'announcement') {
-      isHoveringRef.current = true;
-    }
-
-    const checkMousePosition = async (): Promise<void> => {
-      if (aborted) return;
-
-      const now = Date.now();
-      if (now - lastCheckTime < CHECK_INTERVAL) {
-        rafId = requestAnimationFrame(checkMousePosition);
-        return;
-      }
-      lastCheckTime = now;
-
-      const inWindow = await isMouseInWindow();
-      if (aborted) return;
-
-      if (useIslandStore.getState().uiStateLocked) {
-        clearAllTimers();
-        if (!aborted) {
-          rafId = requestAnimationFrame(checkMousePosition);
-        }
-        return;
-      }
-
-      const config = STATE_CONFIGS[state];
-      const sliderCaptchaActive = Boolean(document.querySelector('.slider-captcha-overlay'));
-
-      if (sliderCaptchaActive) {
-        if (leaveTimerRef.current !== null) {
-          clearTimeout(leaveTimerRef.current);
-          leaveTimerRef.current = null;
-        }
-        isHoveringRef.current = true;
-        window.api?.disableMousePassthrough();
-        if (!aborted) {
-          rafId = requestAnimationFrame(checkMousePosition);
-        }
-        return;
-      }
-
-      if (state === 'notification' || state === 'agent' || state === 'stt' || state === 'agentVoiceInput' || state === 'guide' || state === 'login' || state === 'register' || state === 'payment' || state === 'announcement') {
-        if (inWindow) {
-          window.api?.disableMousePassthrough();
-        }
-        if (!aborted) {
-          rafId = requestAnimationFrame(checkMousePosition);
-        }
-        return;
-      }
-
-      if (inWindow) {
-        if (leaveTimerRef.current !== null) {
-          clearTimeout(leaveTimerRef.current);
-          leaveTimerRef.current = null;
-        }
-
-        if (!isHoveringRef.current && enterTimerRef.current === null) {
-          if (state === 'idle' && idleClickExpandRef.current) {
-            if (config.mousePassthrough) {
-              window.api?.disableMousePassthrough();
-            }
-          } else {
-            enterTimerRef.current = setTimeout(() => {
-              enterTimerRef.current = null;
-              if (aborted || isHoveringRef.current) return;
-
-              isHoveringRef.current = true;
-              if (config.mousePassthrough) {
-                window.api?.disableMousePassthrough();
-              }
-              setHover();
-            });
-          }
-        }
-      } else {
-        if (enterTimerRef.current !== null) {
-          clearTimeout(enterTimerRef.current);
-          enterTimerRef.current = null;
-        }
-
-        // idle 点击展开模式：鼠标离开时恢复穿透
-        if (state === 'idle' && idleClickExpandRef.current && !isHoveringRef.current) {
-          window.api?.enableMousePassthrough();
-        }
-
-        if (isHoveringRef.current && leaveTimerRef.current === null) {
-          const shouldLeave =
-            state === 'expanded' ? expandLeaveIdleRef.current :
-            state === 'maxExpand' ? maxExpandLeaveIdleRef.current :
-            true;
-
-          if (shouldLeave) {
-            leaveTimerRef.current = setTimeout(() => {
-              leaveTimerRef.current = null;
-              if (aborted || !isHoveringRef.current) return;
-
-              isHoveringRef.current = false;
-              const store = useIslandStore.getState();
-              if (store.isPlaying && store.timerData.state === 'idle' && ((store.syncedLyrics?.length ?? 0) > 0 || store.lyricsLoading)) {
-                setLyrics();
-              } else {
-                setIdle(true);
-              }
-            });
-          }
-        }
-      }
-
-      if (!aborted) {
-        rafId = requestAnimationFrame(checkMousePosition);
-      }
-    };
-
-    rafId = requestAnimationFrame(checkMousePosition);
-
-    return () => {
-      aborted = true;
-      if (rafId !== null) cancelAnimationFrame(rafId);
-      clearAllTimers();
-    };
-  }, [state, setHover, setIdle, setExpanded, setLyrics, clearAllTimers]);
+  useIslandHoverInteraction({
+    state,
+    setHover,
+    setIdle,
+    setLyrics,
+    isHoveringRef,
+    idleClickExpandRef,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    enterTimerRef,
+    leaveTimerRef,
+  });
 
   const [r, g, b] = dominantColor;
 
