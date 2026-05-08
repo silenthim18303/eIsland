@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
 import { DynamicIslandBackground } from './components/DynamicIslandBackground';
@@ -37,12 +37,14 @@ import { useIslandNowPlayingSync } from './hooks/useIslandNowPlayingSync';
 import { useIslandNotificationSubscriptions } from './hooks/useIslandNotificationSubscriptions';
 import { useIslandSettingsSync } from './hooks/useIslandSettingsSync';
 import { useIslandStartupAnnouncements } from './hooks/useIslandStartupAnnouncements';
+import { useIslandTimerAndAlarm } from './hooks/useIslandTimerAndAlarm';
+import { useIslandBackgroundVideoSync } from './hooks/useIslandBackgroundVideoSync';
+import { useIslandStateBridges } from './hooks/useIslandStateBridges';
 import {
   STATE_AREA,
   getStateClassName,
 } from './config/dynamicIslandConfig';
 import type { IslandBgMediaType, IslandBgMediaConfig } from './config/dynamicIslandConfig';
-import { SvgIcon } from '../utils/SvgIcon';
 
 export type { IslandState } from './hooks/useDynamicIslandShell';
 export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from './config/dynamicIslandConfig';
@@ -59,7 +61,6 @@ function DynamicIsland(): React.JSX.Element {
   const isHoveringRef = useRef(false);
   const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const setNotificationRef = useRef(setNotification);
   const expandLeaveIdleRef = useRef(false);
   const maxExpandLeaveIdleRef = useRef(false);
@@ -147,96 +148,13 @@ function DynamicIsland(): React.JSX.Element {
     language: i18n.resolvedLanguage,
   });
 
-  // 全局计时器逻辑
-  useEffect(() => {
-    if (timerIntervalRef.current) {
-      clearInterval(timerIntervalRef.current);
-    }
-
-    if (timerData?.state === 'running' && timerData.remainingSeconds > 0) {
-      timerIntervalRef.current = setInterval(() => {
-        const next = (timerData.remainingSeconds ?? 0) - 1;
-        if (next <= 0) {
-          setTimerData({
-            state: 'idle',
-            remainingSeconds: 0,
-            inputHours: '00',
-            inputMinutes: '00',
-            inputSeconds: '00',
-          });
-          setNotificationRef.current({
-            title: t('notification.timer.title', { defaultValue: '计时器' }),
-            body: t('notification.timer.finished', { defaultValue: '倒计时已结束' }),
-            icon: SvgIcon.TIMER
-          });
-        } else {
-          setTimerData({ remainingSeconds: next });
-        }
-      }, 1000);
-    }
-
-    return () => {
-      if (timerIntervalRef.current) {
-        clearInterval(timerIntervalRef.current);
-        timerIntervalRef.current = null;
-      }
-    };
-  }, [timerData?.state, timerData?.remainingSeconds, setTimerData, i18n.resolvedLanguage]);
-
-  const alarmFiredSetRef = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    const ALARM_STORE_KEY = 'alarms';
-    const alarmInterval = setInterval(async () => {
-      try {
-        const data = await window.api?.storeRead(ALARM_STORE_KEY);
-        if (!Array.isArray(data) || data.length === 0) return;
-        const now = new Date();
-        const h = now.getHours();
-        const m = now.getMinutes();
-        const s = now.getSeconds();
-        const weekday = now.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
-        const timeKey = `${h}:${m}:${s}`;
-        const disableOnceAlarmIds: number[] = [];
-
-        data.forEach((alarm) => {
-          if (!alarm || !alarm.enabled) return;
-          if (alarm.hour !== h || alarm.minute !== m || alarm.second !== s) return;
-          const hasRepeat = Array.isArray(alarm.repeat) && alarm.repeat.length > 0;
-          if (hasRepeat && !alarm.repeat.includes(weekday)) return;
-
-          const firedKey = `${alarm.id}-${timeKey}`;
-          if (alarmFiredSetRef.current.has(firedKey)) return;
-          alarmFiredSetRef.current.add(firedKey);
-
-          const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-          const label = alarm.label ? `${alarm.label}` : '';
-          const body = label
-            ? t('notification.alarm.bodyWithLabel', { defaultValue: '{{time}} — {{label}}', time: timeStr, label })
-            : t('notification.alarm.body', { defaultValue: '{{time}}', time: timeStr });
-          setNotificationRef.current({
-            title: t('notification.alarm.title', { defaultValue: '闹钟提醒' }),
-            body,
-          });
-
-          if (!hasRepeat) {
-            disableOnceAlarmIds.push(alarm.id);
-          }
-        });
-
-        if (disableOnceAlarmIds.length > 0) {
-          const updated = data.map((a: { id: number }) =>
-            disableOnceAlarmIds.includes(a.id) ? { ...a, enabled: false } : a,
-          );
-          await window.api?.storeWrite(ALARM_STORE_KEY, updated).catch(() => {});
-        }
-
-        if (alarmFiredSetRef.current.size > 200) {
-          alarmFiredSetRef.current.clear();
-        }
-      } catch { /* noop */ }
-    }, 1000);
-    return () => clearInterval(alarmInterval);
-  }, [i18n.resolvedLanguage]);
+  useIslandTimerAndAlarm({
+    language: i18n.resolvedLanguage,
+    timerData,
+    setTimerData,
+    setNotificationRef,
+    t,
+  });
 
   useIslandSettingsSync({
     language: i18n.resolvedLanguage,
@@ -257,26 +175,16 @@ function DynamicIsland(): React.JSX.Element {
     setBgVideoHwDecode,
   });
 
-  // Agent 语音输入快捷键触发时切换灵动岛状态
-  useEffect(() => {
-    const unsub = window.api?.onAgentVoiceInputState?.((active: boolean) => {
-      if (active) {
-        setAgentVoiceInput();
-      } else {
-        setIdle(true);
-      }
-    });
-    return () => { unsub?.(); };
-  }, [setAgentVoiceInput, setIdle]);
-
-  // idle 状态下：正在播放且歌词已识别/加载中时，自动切到歌词态
-  useEffect(() => {
-    if (state !== 'idle') return;
-    if (timerData?.state !== 'idle') return;
-    if (isPlaying && ((syncedLyrics?.length ?? 0) > 0 || lyricsLoading)) {
-      setLyrics();
-    }
-  }, [state, timerData?.state, isPlaying, syncedLyrics, lyricsLoading, setLyrics]);
+  useIslandStateBridges({
+    state,
+    timerState: timerData?.state ?? 'idle',
+    isPlaying,
+    syncedLyrics,
+    lyricsLoading,
+    setLyrics,
+    setAgentVoiceInput,
+    setIdle,
+  });
 
   useIslandStartupAnnouncements({
     language: i18n.resolvedLanguage,
@@ -289,57 +197,14 @@ function DynamicIsland(): React.JSX.Element {
     t,
   });
 
-  // 背景视频的音量 / 速度随设置变更即时生效，避免重建 <video>
-  useEffect(() => {
-    const el = bgVideoElementRef.current;
-    if (!el) return;
-    el.volume = Math.max(0, Math.min(1, bgVideoVolume));
-    el.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
-  }, [bgVideoVolume, bgVideoRate]);
-
-  // 用 ref 保存最新的循环开关，让下面的原生事件监听随时读到最新值
-  const bgVideoLoopRef = useRef<boolean>(bgVideoLoop);
-  useEffect(() => { bgVideoLoopRef.current = bgVideoLoop; }, [bgVideoLoop]);
-
-  // 自定义背景视频循环：绕开 React 合成事件与 Chromium 原生 loop 的偶发失效，
-  // 直接用 DOM 级 addEventListener 监听 ended + timeupdate 双重触发。
-  useEffect(() => {
-    if (bgMedia?.type !== 'video') return;
-    const el = bgVideoElementRef.current;
-    if (!el) return;
-    el.loop = false;
-    const restart = (): void => {
-      if (!bgVideoLoopRef.current) return;
-      try { el.currentTime = 0; } catch { /* ignore */ }
-      el.play().catch(() => {});
-    };
-    const onEnded = (): void => { restart(); };
-    const onTimeUpdate = (): void => {
-      if (!bgVideoLoopRef.current) return;
-      const duration = el.duration;
-      if (!Number.isFinite(duration) || duration <= 0) return;
-      if (duration - el.currentTime <= 0.12) {
-        restart();
-      }
-    };
-    el.addEventListener('ended', onEnded);
-    el.addEventListener('timeupdate', onTimeUpdate);
-    return () => {
-      el.removeEventListener('ended', onEnded);
-      el.removeEventListener('timeupdate', onTimeUpdate);
-    };
-  }, [bgMedia?.previewUrl, bgMedia?.type, bgVideoHwDecode]);
-
-  // 用户在视频已经播完后再开启循环，需要立刻重启
-  useEffect(() => {
-    if (!bgVideoLoop) return;
-    const el = bgVideoElementRef.current;
-    if (!el) return;
-    if (el.ended) {
-      try { el.currentTime = 0; } catch { /* ignore */ }
-      el.play().catch(() => {});
-    }
-  }, [bgVideoLoop]);
+  useIslandBackgroundVideoSync({
+    bgMedia,
+    bgVideoElementRef,
+    bgVideoVolume,
+    bgVideoRate,
+    bgVideoLoop,
+    bgVideoHwDecode,
+  });
 
   useIslandNotificationSubscriptions({
     language: i18n.resolvedLanguage,
