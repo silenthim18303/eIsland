@@ -191,7 +191,7 @@ export function BreakReminderSettingsPage(): ReactElement {
                       <img src={SvgIcon.DELETE} alt="" width={14} height={14} className="break-reminder-icon-img" />
                     </button>
                   </div>
-                  {openPickerId === item.id && (
+                  <div className={`break-reminder-icon-dropdown-wrap${openPickerId === item.id ? ' open' : ''}`}>
                     <div className="break-reminder-icon-dropdown">
                       {BREAK_REMINDER_ICON_OPTIONS.map((opt) => (
                         <button
@@ -204,7 +204,7 @@ export function BreakReminderSettingsPage(): ReactElement {
                         </button>
                       ))}
                     </div>
-                  )}
+                  </div>
                 </div>
               ))}
             </div>

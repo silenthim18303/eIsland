@@ -74,13 +74,30 @@
   gap: 0;
 }
 
+.break-reminder-icon-dropdown-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.break-reminder-icon-dropdown-wrap.open {
+  grid-template-rows: 1fr;
+}
+
 .break-reminder-icon-dropdown {
   display: flex;
   gap: 4px;
-  padding: 6px 8px;
+  padding: 0 8px;
+  overflow: hidden;
   border-radius: 0 0 6px 6px;
   background: rgba(255, 255, 255, 0.03);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 0 solid rgba(255, 255, 255, 0.06);
+  transition: padding 0.25s ease, border-top-width 0.25s ease;
+}
+
+.break-reminder-icon-dropdown-wrap.open .break-reminder-icon-dropdown {
+  padding: 6px 8px;
+  border-top-width: 1px;
 }
 
 [data-theme='light'] .break-reminder-icon-dropdown {
