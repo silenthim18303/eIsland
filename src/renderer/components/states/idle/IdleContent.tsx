@@ -31,6 +31,8 @@ import { SvgIcon } from '../../../utils/SvgIcon';
 import { abbreviateWeatherDescription } from '../../../utils/weatherText';
 import '../../../styles/shell/shell.css';
 
+const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
+
 type TimerState = 'idle' | 'running' | 'paused';
 
 interface IdleContentProps {
@@ -85,11 +87,34 @@ export function IdleContent({
     } catch { return 0; }
   }, []);
   const [p0Count, setP0Count] = useState(checkP0Count);
+  const [musicOuterGlowEffectEnabled, setMusicOuterGlowEffectEnabled] = useState<boolean>(true);
 
   useEffect(() => {
     const id = setInterval(() => setP0Count(checkP0Count()), 2000);
     return () => clearInterval(id);
   }, [checkP0Count]);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MUSIC_OUTER_GLOW_EFFECT_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      if (typeof value === 'boolean') {
+        setMusicOuterGlowEffectEnabled(value);
+      }
+    }).catch(() => {});
+
+    const handler = (e: Event): void => {
+      if (cancelled) return;
+      const val = (e as CustomEvent).detail;
+      if (typeof val === 'boolean') setMusicOuterGlowEffectEnabled(val);
+    };
+    window.addEventListener('music-outer-glow-effect-changed', handler);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('music-outer-glow-effect-changed', handler);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isMusicPlaying || isPlaying) {
@@ -113,8 +138,8 @@ export function IdleContent({
   return (
     <div className="idle-content">
       <div
-        className={`idle-glow${isMusicPlaying && coverImage ? ' active' : ''}${isMusicPlaying && coverImage && !isPlaying ? ' paused' : ''}`}
-        style={isMusicPlaying && coverImage
+        className={`idle-glow${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' active' : ''}${isMusicPlaying && coverImage && !isPlaying && musicOuterGlowEffectEnabled ? ' paused' : ''}`}
+        style={isMusicPlaying && coverImage && musicOuterGlowEffectEnabled
           ? { background: `radial-gradient(ellipse at 10% 50%, rgba(${r}, ${g}, ${b}, 0.35) 0%, transparent 60%)` }
           : undefined}
       />
@@ -122,10 +147,10 @@ export function IdleContent({
         <>
           <div className="flex items-center gap-2">
             <div
-              className={`idle-album-cover${!isPlaying ? ' paused' : ''}${isMusicPlaying && coverImage ? ' glowing' : ''}`}
+              className={`idle-album-cover${!isPlaying ? ' paused' : ''}${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' glowing' : ''}`}
               style={{
                 backgroundImage: `url(${coverImage})`,
-                ...(isMusicPlaying && coverImage ? { boxShadow: `0 0 12px 4px rgba(${r}, ${g}, ${b}, 0.5)` } : {})
+                ...(isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? { boxShadow: `0 0 12px 4px rgba(${r}, ${g}, ${b}, 0.5)` } : {})
               }}
             />
             <div className="flex items-center gap-1">

@@ -1243,6 +1243,9 @@
       "theme": {
         "title": "Theme Mode",
         "hint": "Switch dark/light/system themes",
+        "musicOuterGlowTitle": "Music Outer Glow Effect",
+        "musicOuterGlowHint": "Control the marquee/glow animation around the album cover while music is playing.",
+        "musicOuterGlowToggle": "Enable outer glow marquee effect while music is playing",
         "windowControlsTitle": "Standalone Window Controls Style",
         "windowControlsHint": "When enabled, the top-right controls in standalone window use macOS-style traffic-light dots",
         "windowControlsMacToggle": "Use Mac-style window controls",

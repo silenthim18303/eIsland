@@ -20,6 +20,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
+
 export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'minimal' | 'lyrics' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt';
 
 const MORPH_DURATION_BY_SPEED: Record<string, number> = { slow: 1100, medium: 550, fast: 280 };
@@ -59,6 +61,27 @@ export function useDynamicIslandShell(options: UseDynamicIslandShellOptions): Dy
   const prevStateRef = useRef(state);
   const [morphing, setMorphing] = useState(false);
   const [fromState, setFromState] = useState('');
+  const [glowEffectEnabled, setGlowEffectEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MUSIC_OUTER_GLOW_EFFECT_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      if (typeof value === 'boolean') setGlowEffectEnabled(value);
+    }).catch(() => {});
+
+    const handler = (e: Event): void => {
+      if (cancelled) return;
+      const val = (e as CustomEvent).detail;
+      if (typeof val === 'boolean') setGlowEffectEnabled(val);
+    };
+    window.addEventListener('music-outer-glow-effect-changed', handler);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('music-outer-glow-effect-changed', handler);
+    };
+  }, []);
 
   useEffect(() => {
     if (prevStateRef.current === state) return;
@@ -92,7 +115,7 @@ export function useDynamicIslandShell(options: UseDynamicIslandShellOptions): Dy
   return {
     morphing,
     fromState,
-    showGlow: isMusicPlaying && coverImage ? (isPlaying ? 'playing' : 'paused') : null,
+    showGlow: glowEffectEnabled && isMusicPlaying && coverImage ? (isPlaying ? 'playing' : 'paused') : null,
     handleIslandClick,
   };
 }

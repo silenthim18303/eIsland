@@ -31,6 +31,8 @@ import type { SyncedLyricLine, SyncedLyricSyllable } from '../../../store/types'
 import { SvgIcon } from '../../../utils/SvgIcon';
 import '../../../styles/lyrics/lyrics.css';
 
+const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
+
 /** 二分查找当前歌词行索引 */
 function findCurrentIndex(lyrics: SyncedLyricLine[], posMs: number): number {
   if (lyrics.length === 0 || posMs < lyrics[0].time_ms) return -1;
@@ -101,11 +103,34 @@ export function LyricsContent(): ReactElement {
   const [karaokeEnabled, setKaraokeEnabled] = useState(false);
   const [clockEnabled, setClockEnabled] = useState(true);
   const [clockText, setClockText] = useState('');
+  const [musicOuterGlowEffectEnabled, setMusicOuterGlowEffectEnabled] = useState<boolean>(true);
 
   /** 加载逐字扫光配置 */
   useEffect(() => {
     window.api?.musicLyricsKaraokeGet().then(setKaraokeEnabled).catch(() => {});
     window.api?.musicLyricsClockGet().then(setClockEnabled).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MUSIC_OUTER_GLOW_EFFECT_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      if (typeof value === 'boolean') {
+        setMusicOuterGlowEffectEnabled(value);
+      }
+    }).catch(() => {});
+
+    const handler = (e: Event): void => {
+      if (cancelled) return;
+      const val = (e as CustomEvent).detail;
+      if (typeof val === 'boolean') setMusicOuterGlowEffectEnabled(val);
+    };
+    window.addEventListener('music-outer-glow-effect-changed', handler);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('music-outer-glow-effect-changed', handler);
+    };
   }, []);
 
   /** 按分钟边界更新北京时间，避免每秒重渲染 */
@@ -175,8 +200,8 @@ export function LyricsContent(): ReactElement {
     <div className="lyrics-content">
       {/* 背景光晕 — 与 IdleContent 一致 */}
       <div
-        className={`idle-glow${isMusicPlaying && coverImage ? ' active' : ''}${isMusicPlaying && coverImage && !isPlaying ? ' paused' : ''}`}
-        style={isMusicPlaying && coverImage
+        className={`idle-glow${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' active' : ''}${isMusicPlaying && coverImage && !isPlaying && musicOuterGlowEffectEnabled ? ' paused' : ''}`}
+        style={isMusicPlaying && coverImage && musicOuterGlowEffectEnabled
           ? { background: `radial-gradient(ellipse at 10% 50%, rgba(${r}, ${g}, ${b}, 0.35) 0%, transparent 60%)` }
           : undefined}
       />
@@ -184,10 +209,10 @@ export function LyricsContent(): ReactElement {
       {/* 左侧：专辑封面 */}
       <div className="lyrics-left">
         <div
-          className={`idle-album-cover${!isPlaying ? ' paused' : ''}${isMusicPlaying && coverImage ? ' glowing' : ''}`}
+          className={`idle-album-cover${!isPlaying ? ' paused' : ''}${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' glowing' : ''}`}
           style={{
             backgroundImage: coverImage ? `url(${coverImage})` : undefined,
-            ...(isMusicPlaying && coverImage ? { boxShadow: `0 0 12px 4px rgba(${r}, ${g}, ${b}, 0.5)` } : {}),
+            ...(isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? { boxShadow: `0 0 12px 4px rgba(${r}, ${g}, ${b}, 0.5)` } : {}),
           }}
         />
       </div>
