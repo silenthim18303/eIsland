@@ -30,6 +30,7 @@ import useIslandStore from '../../../../store/slices';
 import { getDayName, getDayJi, getDayYi, getLunarDate } from '../../../../utils/timeUtils';
 import {
   AlbumCarouselWidget,
+  BreakReminderWidget,
   CountdownWidget,
   MokugyoWidget,
   PomodoroWidget,
@@ -49,7 +50,7 @@ import {
 } from './OverviewTab/utils/overviewUtils';
 
 /** 总览控件类型 */
-export type OverviewWidgetType = 'shortcuts' | 'todo' | 'song' | 'countdown' | 'pomodoro' | 'urlFavorites' | 'album' | 'mokugyo';
+export type OverviewWidgetType = 'shortcuts' | 'todo' | 'song' | 'countdown' | 'pomodoro' | 'urlFavorites' | 'album' | 'mokugyo' | 'breakReminder';
 
 /** 控件选项列表 */
 export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string }[] = [
@@ -61,6 +62,7 @@ export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string
   { value: 'pomodoro', label: '番茄钟' },
   { value: 'mokugyo', label: '电子木鱼' },
   { value: 'urlFavorites', label: 'URL 收藏' },
+  { value: 'breakReminder', label: '休息提醒' },
 ];
 
 /** 总览布局配置 */
@@ -306,6 +308,8 @@ export function OverviewTab(): React.ReactElement {
         return <MokugyoWidget />;
       case 'urlFavorites':
         return <UrlFavoritesWidget openUrlFavoritesPage={() => openTargetPage('urlFavorites')} />;
+      case 'breakReminder':
+        return <BreakReminderWidget openBreakReminderPage={() => openTargetPage('settings')} />;
       default:
         return null;
     }

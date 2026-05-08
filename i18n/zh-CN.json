@@ -462,6 +462,13 @@
       "title": "倒数日",
       "empty": "暂无倒数日"
     },
+    "breakReminder": {
+      "title": "休息提醒",
+      "count": "{{count}} 项",
+      "empty": "暂无启用的提醒",
+      "remain": "{{min}} 分钟",
+      "due": "即将提醒"
+    },
     "pomodoro": {
       "title": "番茄钟",
       "completedTitle": "已完成番茄数",
@@ -984,15 +991,18 @@
       "index": "快速导航",
       "app": "软件设置",
       "layout-preview": "布局预览",
+      "maxexpand-layout": "全展开布局",
       "album": "相册配置",
       "hide-process-list": "隐藏窗口管理",
       "position": "位置校准",
       "theme": "主题外观",
       "language": "语言切换",
       "behavior": "交互行为",
+      "animation": "软件动画",
       "url-parser": "URL解析",
       "clipboard-history": "剪贴板历史",
       "alarm": "闹钟配置",
+      "break-reminder": "休息提醒",
       "autostart": "实用工具",
       "network": "网络配置",
       "mail": "邮箱配置",
@@ -1143,7 +1153,30 @@
           "pomodoro": "番茄钟",
           "urlFavorites": "URL 收藏",
           "album": "相册轮播",
-          "mokugyo": "电子木鱼"
+          "mokugyo": "电子木鱼",
+          "breakReminder": "休息提醒"
+        },
+        "previewMock": {
+          "previewTag": "预览",
+          "shortcutA": "应用A",
+          "shortcutB": "应用B",
+          "shortcutC": "应用C",
+          "todoA": "示例待办 A",
+          "todoB": "示例待办 B",
+          "todoC": "示例待办 C",
+          "songTitle": "示例歌曲",
+          "songArtist": "示例艺术家",
+          "songAlbum": "示例专辑",
+          "samplePreview": "示例预览",
+          "albumFile": "示例图片.jpg",
+          "urlNoteGithub": "代码托管",
+          "urlNoteStackOverflow": "技术问答",
+          "breakSedentary": "站起来活动",
+          "breakGeneric": "休息一下",
+          "date": "2026年01月01日 星期四",
+          "lunar": "乙巳年 腊月十二",
+          "yiItems": "祈福 · 出行 · 开市",
+          "jiItems": "动土 · 安葬 · 破土"
         }
       },
       "maxExpandLayout": {
@@ -1210,6 +1243,9 @@
       "theme": {
         "title": "主题模式",
         "hint": "选择深色、浅色或跟随系统主题",
+        "musicOuterGlowTitle": "音乐外光圈特效",
+        "musicOuterGlowHint": "控制歌曲播放时专辑封面外圈的跑马灯/光晕动态效果。",
+        "musicOuterGlowToggle": "启用歌曲播放外光圈跑马灯特效",
         "windowControlsTitle": "独立窗口控制按钮样式",
         "windowControlsHint": "启用后，独立窗口右上角将显示 macOS 风格三色圆点控制按钮",
         "windowControlsMacToggle": "使用 Mac 风格窗口控制按钮",
@@ -1430,6 +1466,21 @@
           "10": "10 分钟"
         }
       }
+    },
+    "breakReminder": {
+      "listTitle": "提醒事项",
+      "listHint": "开启后，到达设定的间隔时间将弹出休息提醒通知。",
+      "addBtn": "新建提醒",
+      "deleteBtn": "删除",
+      "nameLabel": "提醒名称",
+      "intervalLabel": "间隔（分钟）",
+      "enabledLabel": "启用",
+      "emptyHint": "暂无提醒事项，点击上方按钮新建。",
+      "resetBtn": "恢复默认",
+      "defaultSedentary": "起来动动",
+      "defaultHydration": "喝水",
+      "notificationTitle": "休息提醒",
+      "notificationBody": "该{{name}}啦！"
     },
     "network": {
       "timeout": {
@@ -2310,6 +2361,10 @@
       "animation": {
         "label": "软件动画",
         "desc": "灵动岛弹性动画与动画速度配置。"
+      },
+      "break-reminder": {
+        "label": "休息提醒",
+        "desc": "定时休息与喝水提醒。"
       },
       "url-parser": {
         "label": "URL解析",

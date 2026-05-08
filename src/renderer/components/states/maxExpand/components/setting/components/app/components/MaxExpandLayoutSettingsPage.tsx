@@ -113,9 +113,6 @@ export function MaxExpandLayoutSettingsPage({
           </div>
           <div className="maxexpand-layout-preview-wrap">
             <div className="maxexpand-layout-preview-dots">
-              <div className="maxexpand-layout-preview-dot maxexpand-layout-preview-dot--fixed" title={t('settings.app.maxExpandLayout.backLabel', { defaultValue: '返回' })}>
-                <span className="maxexpand-layout-dot-label">{t('settings.app.maxExpandLayout.backLabel', { defaultValue: '返回' })}</span>
-              </div>
               {maxExpandNavLayout.map((item) => (
                 <div
                   key={item.id}

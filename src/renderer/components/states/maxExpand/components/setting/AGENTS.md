@@ -26,3 +26,11 @@ Scope: `src/renderer/components/states/maxExpand/components/setting/**`
   - `i18n/en-US.json`
 - Search-related controls (placeholder / empty state / clear button aria label) must always have complete translations in both locales.
 
+## Global UI Translation Requirement
+
+- Any user-facing text change in this scope (titles, subtitles, button labels, hints, empty states, tooltips, aria labels) must include i18n verification.
+- Do not rely on long-term fallback/default text for new or changed UI copy.
+- Keep affected translation keys synchronized in:
+  - `i18n/zh-CN.json`
+  - `i18n/en-US.json`
+

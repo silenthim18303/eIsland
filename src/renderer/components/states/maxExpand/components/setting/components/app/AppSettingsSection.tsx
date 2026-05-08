@@ -37,6 +37,7 @@ import { LanguageSettingsPage } from './components/LanguageSettingsPage';
 import { UrlParserSettingsPage } from './components/UrlParserSettingsPage';
 import { ClipboardHistorySettingsSection } from './components/ClipboardHistorySettingsSection';
 import { AlarmSettingsPage } from './components/AlarmSettingsPage';
+import { BreakReminderSettingsPage } from './components/BreakReminderSettingsPage';
 import { AutostartSettingsPage } from './components/AutostartSettingsPage';
 import { AlbumSettingsPage } from './components/AlbumSettingsPage';
 import { AppSettingsPageDots } from './components/AppSettingsPageDots';
@@ -289,6 +290,8 @@ export function AppSettingsSection({
         return <ClipboardHistorySettingsSection />;
       case 'alarm':
         return <AlarmSettingsPage />;
+      case 'break-reminder':
+        return <BreakReminderSettingsPage />;
       case 'autostart':
         return <AutostartSettingsPage autostartMode={autostartMode} setAutostartMode={setAutostartMode} />;
       default:

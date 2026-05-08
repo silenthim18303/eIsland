@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BUILTIN_WALLPAPERS } from '../../../../../../../../assets/wallpaper/builtinWallpapers';
@@ -88,6 +88,8 @@ type ThemeSettingsPageProps = Pick<
   | 'opacitySaveTimerRef'
 >;
 
+const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
+
 /**
  * 渲染软件主题与背景设置页面
  * @param props - 主题与背景设置所需状态与操作集合
@@ -149,6 +151,7 @@ export function ThemeSettingsPage({
 }: ThemeSettingsPageProps): ReactElement {
   const { t } = useTranslation();
   const setNotification = useIslandStore((s) => s.setNotification);
+  const [musicOuterGlowEffectEnabled, setMusicOuterGlowEffectEnabled] = useState<boolean>(true);
 
   const bgPreviewVideoRef = useRef<HTMLVideoElement | null>(null);
   const bgPreviewVideoLoopRef = useRef<boolean>(bgVideoLoop);
@@ -156,6 +159,17 @@ export function ThemeSettingsPage({
   useEffect(() => {
     bgPreviewVideoLoopRef.current = bgVideoLoop;
   }, [bgVideoLoop]);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MUSIC_OUTER_GLOW_EFFECT_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      if (typeof value === 'boolean') {
+        setMusicOuterGlowEffectEnabled(value);
+      }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const el = bgPreviewVideoRef.current;
@@ -241,6 +255,27 @@ export function ThemeSettingsPage({
                 {opt.label}
               </button>
             ))}
+          </div>
+
+          <div className="settings-card-subgroup" style={{ marginTop: 10 }}>
+            <div className="settings-card-subgroup-title">{t('settings.app.theme.musicOuterGlowTitle', { defaultValue: '音乐外光圈特效' })}</div>
+            <div className="settings-music-hint">{t('settings.app.theme.musicOuterGlowHint', { defaultValue: '控制歌曲播放时专辑封面外圈的跑马灯/光晕动态效果。' })}</div>
+            <div className="settings-card-inline-row">
+              <label className="settings-card-check">
+                <input
+                  type="checkbox"
+                  checked={musicOuterGlowEffectEnabled}
+                  onChange={(event) => {
+                    const next = event.target.checked;
+                    setMusicOuterGlowEffectEnabled(next);
+                    window.api.storeWrite(MUSIC_OUTER_GLOW_EFFECT_STORE_KEY, next).catch(() => {});
+                    window.api.settingsPreview(`store:${MUSIC_OUTER_GLOW_EFFECT_STORE_KEY}`, next).catch(() => {});
+                    window.dispatchEvent(new CustomEvent('music-outer-glow-effect-changed', { detail: next }));
+                  }}
+                />
+                {t('settings.app.theme.musicOuterGlowToggle', { defaultValue: '启用歌曲播放外光圈跑马灯特效' })}
+              </label>
+            </div>
           </div>
         </div>
 

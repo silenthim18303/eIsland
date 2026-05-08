@@ -1,0 +1,267 @@
+/*
+ * eIsland - Break Reminder Settings Styles
+ */
+
+.break-reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.break-reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.break-reminder-name {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.break-reminder-name:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.break-reminder-interval {
+  width: 60px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 4px 6px;
+  color: inherit;
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.break-reminder-interval::-webkit-inner-spin-button,
+.break-reminder-interval::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.break-reminder-interval:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.break-reminder-unit {
+  font-size: 12px;
+  opacity: 0.5;
+  user-select: none;
+}
+
+/* ── 图标选择器：当前图标 + 向下展开 ── */
+
+.break-reminder-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.break-reminder-icon-dropdown-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.break-reminder-icon-dropdown-wrap.open {
+  grid-template-rows: 1fr;
+}
+
+.break-reminder-icon-dropdown {
+  display: flex;
+  gap: 4px;
+  padding: 0 8px;
+  overflow: hidden;
+  border-radius: 0 0 6px 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 0 solid rgba(255, 255, 255, 0.06);
+  transition: padding 0.25s ease, border-top-width 0.25s ease;
+}
+
+.break-reminder-icon-dropdown-wrap.open .break-reminder-icon-dropdown {
+  padding: 6px 8px;
+  border-top-width: 1px;
+}
+
+[data-theme='light'] .break-reminder-icon-dropdown {
+  background: rgba(0, 0, 0, 0.02);
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.break-reminder-icon-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.break-reminder-icon-current:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.break-reminder-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.5;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.break-reminder-icon-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.break-reminder-icon-btn.active {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── 图标深色/浅色自适应 ── */
+
+.break-reminder-icon-img {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='light'] .break-reminder-icon-current {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme='light'] .break-reminder-icon-current:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='light'] .break-reminder-icon-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='light'] .break-reminder-icon-btn.active {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='light'] .break-reminder-icon-img {
+  filter: brightness(0) invert(0);
+}
+
+.break-reminder-capsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.break-reminder-capsule input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.break-reminder-capsule-track {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  transition: background 0.25s;
+}
+
+.break-reminder-capsule-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.25s;
+}
+
+.break-reminder-capsule input:checked + .break-reminder-capsule-track {
+  background: #34c759;
+}
+
+.break-reminder-capsule input:checked + .break-reminder-capsule-track::after {
+  transform: translateX(16px);
+}
+
+.break-reminder-delete {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.break-reminder-delete:hover {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+}
+
+/* ══════ 浅色主题覆盖 ══════ */
+
+[data-theme='light'] .break-reminder-row {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='light'] .break-reminder-name,
+[data-theme='light'] .break-reminder-interval {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .break-reminder-name:focus,
+[data-theme='light'] .break-reminder-interval:focus {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='light'] .break-reminder-capsule-track {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .break-reminder-delete {
+  color: rgba(0, 0, 0, 0.35);
+}

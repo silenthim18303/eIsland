@@ -301,6 +301,7 @@ export function SettingsTab(): ReactElement {
       urlFavorites: 'settings.app.layout.widgetNames.urlFavorites',
       album: 'settings.app.layout.widgetNames.album',
       mokugyo: 'settings.app.layout.widgetNames.mokugyo',
+      breakReminder: 'settings.app.layout.widgetNames.breakReminder',
     };
     return OVERVIEW_WIDGET_OPTIONS.map((option) => ({
       ...option,

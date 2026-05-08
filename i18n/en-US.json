@@ -462,6 +462,13 @@
       "title": "Countdown",
       "empty": "No countdown events"
     },
+    "breakReminder": {
+      "title": "Break Reminder",
+      "count": "{{count}} items",
+      "empty": "No enabled reminders",
+      "remain": "{{min}} min",
+      "due": "Due soon"
+    },
     "pomodoro": {
       "title": "Pomodoro",
       "completedTitle": "Completed pomodoros",
@@ -984,15 +991,18 @@
       "index": "Navigation",
       "app": "App Settings",
       "layout-preview": "Layout Preview",
+      "maxexpand-layout": "MaxExpand Layout",
       "album": "Album Settings",
       "hide-process-list": "Hidden Window List",
       "position": "Position Calibration",
       "theme": "Theme",
       "language": "Language",
       "behavior": "Interaction",
+      "animation": "Animations",
       "url-parser": "URL Parser",
       "clipboard-history": "Clipboard History",
       "alarm": "Alarm Settings",
+      "break-reminder": "Break Reminders",
       "autostart": "Utilities",
       "network": "Network",
       "mail": "Mail",
@@ -1143,7 +1153,30 @@
           "pomodoro": "Pomodoro",
           "urlFavorites": "URL Favorites",
           "album": "Album Carousel",
-          "mokugyo": "Mokugyo"
+          "mokugyo": "Mokugyo",
+          "breakReminder": "Break Reminder"
+        },
+        "previewMock": {
+          "previewTag": "Preview",
+          "shortcutA": "App A",
+          "shortcutB": "App B",
+          "shortcutC": "App C",
+          "todoA": "Sample Todo A",
+          "todoB": "Sample Todo B",
+          "todoC": "Sample Todo C",
+          "songTitle": "Sample Song",
+          "songArtist": "Sample Artist",
+          "songAlbum": "Sample Album",
+          "samplePreview": "Sample Preview",
+          "albumFile": "sample-image.jpg",
+          "urlNoteGithub": "Code Hosting",
+          "urlNoteStackOverflow": "Tech Q&A",
+          "breakSedentary": "Stand up and move",
+          "breakGeneric": "Take a short break",
+          "date": "2026-01-01 Thursday",
+          "lunar": "Yisi Year, Twelfth Lunar Month",
+          "yiItems": "Pray · Travel · Open Market",
+          "jiItems": "Groundbreaking · Burial · Soil Breaking"
         }
       },
       "maxExpandLayout": {
@@ -1210,6 +1243,9 @@
       "theme": {
         "title": "Theme Mode",
         "hint": "Switch dark/light/system themes",
+        "musicOuterGlowTitle": "Music Outer Glow Effect",
+        "musicOuterGlowHint": "Control the marquee/glow animation around the album cover while music is playing.",
+        "musicOuterGlowToggle": "Enable outer glow marquee effect while music is playing",
         "windowControlsTitle": "Standalone Window Controls Style",
         "windowControlsHint": "When enabled, the top-right controls in standalone window use macOS-style traffic-light dots",
         "windowControlsMacToggle": "Use Mac-style window controls",
@@ -1430,6 +1466,21 @@
           "10": "10 min"
         }
       }
+    },
+    "breakReminder": {
+      "listTitle": "Reminders",
+      "listHint": "When enabled, a break reminder notification will appear at the set interval.",
+      "addBtn": "Add Reminder",
+      "deleteBtn": "Delete",
+      "nameLabel": "Name",
+      "intervalLabel": "Interval (min)",
+      "enabledLabel": "Enabled",
+      "emptyHint": "No reminders yet. Click the button above to add one.",
+      "resetBtn": "Reset Defaults",
+      "defaultSedentary": "Get Up and Move",
+      "defaultHydration": "Drink Water",
+      "notificationTitle": "Break Reminder",
+      "notificationBody": "Time for {{name}}!"
     },
     "network": {
       "timeout": {
@@ -2315,6 +2366,10 @@
       "animation": {
         "label": "Animations",
         "desc": "Dynamic Island spring animation and speed settings."
+      },
+      "break-reminder": {
+        "label": "Break Reminders",
+        "desc": "Timed break and hydration reminders."
       },
       "url-parser": {
         "label": "URL Parser",

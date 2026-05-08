@@ -32,3 +32,4 @@ export * from './UrlFavoritesWidget';
 export * from './AlbumCarouselWidget';
 export * from './ShortcutsWidget';
 export * from './TodoWidget';
+export * from './BreakReminderWidget';

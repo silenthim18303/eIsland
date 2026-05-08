@@ -99,6 +99,9 @@ export const SvgIcon = {
   UPDATE_TIME: './svg/UPDATE_TIME.svg',
   PLUGIN: './svg/PLUGIN.svg',
   MINIMAX: './svg/MINIMAX.svg',
+  BREAK: './svg/BREAK.svg',
+  PROLONGED_SITTING: './svg/PROLONGED_SITTING.svg',
+  DRINKING_WATER: './svg/DRINKING_WATER.svg',
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;

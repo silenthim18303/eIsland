@@ -50,7 +50,7 @@ export const WEATHER_LOCATION_PRIORITY_OPTIONS: Array<{ value: WeatherLocationPr
 
 export const SETTINGS_TABS = ['index', 'app', 'network', 'mail', 'weather', 'music', 'ai', 'shortcut', 'user', 'update', 'pluginMarket', 'about'] as const;
 export type SettingsSidebarTabKey = (typeof SETTINGS_TABS)[number];
-export type AppSettingsPageKey = 'layout-preview' | 'maxexpand-layout' | 'album' | 'hide-process-list' | 'position' | 'theme' | 'language' | 'behavior' | 'animation' | 'url-parser' | 'clipboard-history' | 'alarm' | 'autostart';
+export type AppSettingsPageKey = 'layout-preview' | 'maxexpand-layout' | 'album' | 'hide-process-list' | 'position' | 'theme' | 'language' | 'behavior' | 'animation' | 'url-parser' | 'clipboard-history' | 'alarm' | 'break-reminder' | 'autostart';
 export type WeatherSettingsPageKey = 'location' | 'provider';
 export type MailSettingsPageKey = 'account' | 'imap' | 'preferences';
 export type AiSettingsPageKey = 'general' | 'r1pxc' | 'ollama';
@@ -73,6 +73,7 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTabLabelKey, string> = {
   'url-parser': 'URL解析',
   'clipboard-history': '剪贴板历史',
   alarm: '闹钟配置',
+  'break-reminder': '休息提醒',
   autostart: '实用工具',
   network: '网络配置',
   mail: '邮箱配置',
@@ -106,6 +107,7 @@ export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'ind
   'url-parser': '配置剪贴板 URL 识别模式与黑名单。',
   'clipboard-history': '配置剪贴板历史记录能力与条数。',
   alarm: '配置闹钟提醒音、贪睡与通知行为。',
+  'break-reminder': '定时休息与喝水提醒。',
   autostart: '应用控制、日志与开机启动配置。',
   network: '请求超时与网络行为设置',
   mail: '配置 IMAP 收信参数',
@@ -150,6 +152,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'url-parser': SvgIcon.LINK,
   'clipboard-history': SvgIcon.COPY,
   alarm: SvgIcon.TIMER,
+  'break-reminder': SvgIcon.BREAK,
   autostart: SvgIcon.CONTINUE,
   pluginMarket: SvgIcon.PLUGIN,
 };
@@ -192,7 +195,7 @@ export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
 };
 
 export const DEFAULT_MAXEXPAND_NAV_LAYOUT: MaxExpandNavLayoutConfig = MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: true }));
-export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'autostart'];
+export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart'];
 export const WEATHER_SETTINGS_PAGES: WeatherSettingsPageKey[] = ['location', 'provider'];
 export const WEATHER_SETTINGS_PAGE_LABELS: Record<WeatherSettingsPageKey, string> = {
   location: '定位配置',
@@ -244,6 +247,7 @@ export const NAV_CARDS: NavCardDef[] = [
   { id: 'url-parser', label: SETTINGS_TAB_LABELS['url-parser'], desc: SETTINGS_TAB_DESCRIPTIONS['url-parser'], icon: SETTINGS_TAB_ICONS['url-parser'], tab: 'app', appPage: 'url-parser' },
   { id: 'clipboard-history', label: SETTINGS_TAB_LABELS['clipboard-history'], desc: SETTINGS_TAB_DESCRIPTIONS['clipboard-history'], icon: SETTINGS_TAB_ICONS['clipboard-history'], tab: 'app', appPage: 'clipboard-history' },
   { id: 'alarm', label: SETTINGS_TAB_LABELS.alarm, desc: SETTINGS_TAB_DESCRIPTIONS.alarm, icon: SETTINGS_TAB_ICONS.alarm, tab: 'app', appPage: 'alarm' },
+  { id: 'break-reminder', label: SETTINGS_TAB_LABELS['break-reminder'], desc: SETTINGS_TAB_DESCRIPTIONS['break-reminder'], icon: SETTINGS_TAB_ICONS['break-reminder'], tab: 'app', appPage: 'break-reminder' },
   { id: 'autostart', label: SETTINGS_TAB_LABELS.autostart, desc: SETTINGS_TAB_DESCRIPTIONS.autostart, icon: SETTINGS_TAB_ICONS.autostart, tab: 'app', appPage: 'autostart' },
   { id: 'network', label: SETTINGS_TAB_LABELS.network, desc: SETTINGS_TAB_DESCRIPTIONS.network, icon: SETTINGS_TAB_ICONS.network, tab: 'network' },
   { id: 'mail', label: SETTINGS_TAB_LABELS.mail, desc: SETTINGS_TAB_DESCRIPTIONS.mail, icon: SETTINGS_TAB_ICONS.mail, tab: 'mail' },
@@ -325,6 +329,8 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '系统通知', desc: '闹钟触发时发送系统通知提醒。', labelKey: 'settings.alarm.notification.title', descKey: 'settings.alarm.notification.hint', tab: 'app', appPage: 'alarm' },
   { label: '贪睡时长', desc: '点击贪睡后延迟再次提醒的分钟数。', labelKey: 'settings.alarm.snooze.title', descKey: 'settings.alarm.snooze.hint', tab: 'app', appPage: 'alarm' },
   { label: '自动关闭', desc: '闹钟响铃后自动关闭的分钟数，设为"不自动关闭"则需手动操作。', labelKey: 'settings.alarm.autoDismiss.title', descKey: 'settings.alarm.autoDismiss.hint', tab: 'app', appPage: 'alarm' },
+  // ── 软件设置 > 休息提醒 ──
+  { label: '提醒事项', desc: '开启后，到达设定的间隔时间将弹出休息提醒通知。', labelKey: 'settings.breakReminder.listTitle', descKey: 'settings.breakReminder.listHint', tab: 'app', appPage: 'break-reminder' },
   // ── 软件设置 > 实用工具 ──
   { label: '实用工具', desc: '常用应用操作与日志工具', labelKey: 'settings.labels.autostart', descKey: 'settings.app.autostart.toolsHint', tab: 'app', appPage: 'autostart' },
   { label: '开机自启', desc: '设置系统启动时是否自动运行灵动岛', labelKey: 'settings.app.autostart.title', descKey: 'settings.app.autostart.hint', tab: 'app', appPage: 'autostart' },
