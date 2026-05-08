@@ -65,7 +65,7 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
         const firedMap = lastFiredRef.current;
 
         (data as BreakReminderItem[]).forEach((item) => {
-          if (!item || !item.enabled || !item.intervalMinutes) return;
+          if (!item || !item.enabled || !item.intervalMinutes || !item.name?.trim()) return;
 
           const intervalMs = item.intervalMinutes * 60_000;
           const lastFired = firedMap.get(item.id);
