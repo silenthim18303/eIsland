@@ -1390,3 +1390,77 @@
   background: rgba(var(--color-text-rgb), 0.06);
   color: rgba(var(--color-text-rgb), 0.7);
 }
+
+/** ========== 休息提醒小组件 ========== */
+
+.ov-dash-break-reminder-count {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.45);
+  margin-left: auto;
+}
+.ov-dash-break-reminder-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.35);
+}
+.ov-dash-break-reminder-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+.ov-dash-break-reminder-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 5px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  transition: background 0.15s;
+}
+.ov-dash-break-reminder-item:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+}
+.ov-dash-break-reminder-icon {
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+  opacity: 0.7;
+}
+[data-theme='light'] .ov-dash-break-reminder-icon {
+  filter: brightness(0) invert(0);
+  opacity: 0.6;
+}
+.ov-dash-break-reminder-name {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex-shrink: 1;
+}
+.ov-dash-break-reminder-bar {
+  flex: 1;
+  min-width: 30px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  overflow: hidden;
+}
+.ov-dash-break-reminder-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: #34c759;
+  transition: width 1s linear;
+}
+.ov-dash-break-reminder-remain {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.5);
+  white-space: nowrap;
+  flex-shrink: 0;
+}

@@ -29,6 +29,7 @@ import { SvgIcon } from '../../utils/SvgIcon';
 import type { NotificationData } from '../../store/types';
 
 const BREAK_REMINDER_STORE_KEY = 'break-reminder-items';
+const BREAK_REMINDER_LAST_FIRED_KEY = 'break-reminder-last-fired';
 const POLL_INTERVAL_MS = 10_000;
 
 interface BreakReminderItem {
@@ -70,6 +71,7 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
 
         const now = Date.now();
         const firedMap = lastFiredRef.current;
+        let changed = false;
 
         items.forEach((item) => {
           if (!item || !item.enabled || !item.intervalMinutes || !item.name?.trim()) return;
@@ -80,11 +82,13 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
           if (lastFired === undefined) {
             // 首次发现该条目，初始化计时起点为当前时刻
             firedMap.set(item.id, now);
+            changed = true;
             return;
           }
 
           if (now - lastFired >= intervalMs) {
             firedMap.set(item.id, now);
+            changed = true;
             const name = item.name || t('settings.breakReminder.notificationTitle', { defaultValue: '休息提醒' });
             setNotificationRef.current({
               title: t('settings.breakReminder.notificationTitle', { defaultValue: '休息提醒' }),
@@ -97,7 +101,13 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
         // 清理已不存在的条目
         const activeIds = new Set((data as BreakReminderItem[]).map((i) => i.id));
         for (const key of firedMap.keys()) {
-          if (!activeIds.has(key)) firedMap.delete(key);
+          if (!activeIds.has(key)) { firedMap.delete(key); changed = true; }
+        }
+
+        if (changed) {
+          const obj: Record<string, number> = {};
+          firedMap.forEach((v, k) => { obj[k] = v; });
+          window.api?.storeWrite(BREAK_REMINDER_LAST_FIRED_KEY, obj).catch(() => {});
         }
       } catch {
         // noop

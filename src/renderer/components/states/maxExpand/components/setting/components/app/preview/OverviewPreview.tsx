@@ -322,6 +322,33 @@ export function OverviewPreview({ layoutConfig }: { layoutConfig: OverviewLayout
           </div>
         );
       }
+      case 'breakReminder': {
+        const sampleReminders = [
+          { id: '1', name: '喝水', icon: SvgIcon.DRINKING_WATER, remain: 18 },
+          { id: '2', name: '站起来活动', icon: SvgIcon.PROLONGED_SITTING, remain: 42 },
+          { id: '3', name: '休息一下', icon: SvgIcon.BREAK, remain: 5 },
+        ];
+        return (
+          <div className="ov-dash-widget ov-dash-break-reminder-widget">
+            <div className="ov-dash-widget-header">
+              <span className="ov-dash-widget-title">休息提醒</span>
+              <span className="ov-dash-break-reminder-count">3 项</span>
+            </div>
+            <div className="ov-dash-break-reminder-list">
+              {sampleReminders.map((item) => (
+                <div key={item.id} className="ov-dash-break-reminder-item" style={{ cursor: 'default' }}>
+                  <img src={item.icon} alt="" width={16} height={16} className="ov-dash-break-reminder-icon" />
+                  <span className="ov-dash-break-reminder-name">{item.name}</span>
+                  <div className="ov-dash-break-reminder-bar">
+                    <div className="ov-dash-break-reminder-bar-fill" style={{ width: `${Math.min(100, (1 - item.remain / 60) * 100)}%` }} />
+                  </div>
+                  <span className="ov-dash-break-reminder-remain">{item.remain} 分钟</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
       default:
         return null;
     }
