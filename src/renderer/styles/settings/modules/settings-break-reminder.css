@@ -66,6 +66,42 @@
   user-select: none;
 }
 
+.break-reminder-icon-selector {
+  display: inline-flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.break-reminder-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.4;
+  transition: opacity 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.break-reminder-icon-btn:hover {
+  opacity: 0.7;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.break-reminder-icon-btn.active {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.break-reminder-icon-btn img {
+  filter: invert(1);
+}
+
 .break-reminder-capsule {
   position: relative;
   display: inline-flex;

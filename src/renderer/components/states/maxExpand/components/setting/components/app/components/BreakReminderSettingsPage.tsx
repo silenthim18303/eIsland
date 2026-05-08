@@ -36,7 +36,13 @@ interface BreakReminderItem {
   name: string;
   intervalMinutes: number;
   enabled: boolean;
+  icon?: string;
 }
+
+const BREAK_REMINDER_ICON_OPTIONS: { key: string; src: string }[] = [
+  { key: 'PROLONGED_SITTING', src: SvgIcon.PROLONGED_SITTING },
+  { key: 'DRINKING_WATER', src: SvgIcon.DRINKING_WATER },
+];
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -44,8 +50,8 @@ function generateId(): string {
 
 function getDefaultReminders(t: (key: string, opts?: Record<string, string>) => string): BreakReminderItem[] {
   return [
-    { id: generateId(), name: t('settings.breakReminder.defaultSedentary', { defaultValue: '起来动动' }), intervalMinutes: 30, enabled: true },
-    { id: generateId(), name: t('settings.breakReminder.defaultHydration', { defaultValue: '喝水' }), intervalMinutes: 60, enabled: true },
+    { id: generateId(), name: t('settings.breakReminder.defaultSedentary', { defaultValue: '起来动动' }), intervalMinutes: 30, enabled: true, icon: SvgIcon.PROLONGED_SITTING },
+    { id: generateId(), name: t('settings.breakReminder.defaultHydration', { defaultValue: '喝水' }), intervalMinutes: 60, enabled: true, icon: SvgIcon.DRINKING_WATER },
   ];
 }
 
@@ -63,7 +69,15 @@ export function BreakReminderSettingsPage(): ReactElement {
     window.api.storeRead(BREAK_REMINDER_STORE_KEY).then((value: unknown) => {
       if (cancelled) return;
       if (Array.isArray(value)) {
-        setItems(value as BreakReminderItem[]);
+        const loaded = value as BreakReminderItem[];
+        const needsMigration = loaded.some((item) => !item.icon);
+        if (needsMigration) {
+          const migrated = loaded.map((item) => item.icon ? item : { ...item, icon: SvgIcon.PROLONGED_SITTING });
+          setItems(migrated);
+          window.api.storeWrite(BREAK_REMINDER_STORE_KEY, migrated).catch(() => {});
+        } else {
+          setItems(loaded);
+        }
       } else if (value == null) {
         const defaults = getDefaultReminders(t);
         setItems(defaults);
@@ -87,7 +101,7 @@ export function BreakReminderSettingsPage(): ReactElement {
   }, []);
 
   const handleAdd = (): void => {
-    const next: BreakReminderItem[] = [...items, { id: generateId(), name: '', intervalMinutes: 30, enabled: true }];
+    const next: BreakReminderItem[] = [...items, { id: generateId(), name: '', intervalMinutes: 30, enabled: true, icon: SvgIcon.PROLONGED_SITTING }];
     persist(next);
   };
 
@@ -131,6 +145,18 @@ export function BreakReminderSettingsPage(): ReactElement {
             <div className="break-reminder-list">
               {items.map((item) => (
                 <div key={item.id} className="break-reminder-row">
+                  <div className="break-reminder-icon-selector">
+                    {BREAK_REMINDER_ICON_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.key}
+                        type="button"
+                        className={`break-reminder-icon-btn${item.icon === opt.src ? ' active' : ''}`}
+                        onClick={() => handleChange(item.id, 'icon', opt.src)}
+                      >
+                        <img src={opt.src} alt="" width={16} height={16} />
+                      </button>
+                    ))}
+                  </div>
                   <input
                     className="break-reminder-name"
                     type="text"

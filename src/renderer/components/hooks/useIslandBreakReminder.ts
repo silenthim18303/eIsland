@@ -36,6 +36,7 @@ interface BreakReminderItem {
   name: string;
   intervalMinutes: number;
   enabled: boolean;
+  icon?: string;
 }
 
 interface UseIslandBreakReminderOptions {
@@ -61,10 +62,16 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
         const data = await window.api?.storeRead(BREAK_REMINDER_STORE_KEY);
         if (!Array.isArray(data) || data.length === 0) return;
 
+        let items = data as BreakReminderItem[];
+        if (items.some((i) => i && !i.icon)) {
+          items = items.map((i) => i.icon ? i : { ...i, icon: SvgIcon.BREAK });
+          window.api?.storeWrite(BREAK_REMINDER_STORE_KEY, items).catch(() => {});
+        }
+
         const now = Date.now();
         const firedMap = lastFiredRef.current;
 
-        (data as BreakReminderItem[]).forEach((item) => {
+        items.forEach((item) => {
           if (!item || !item.enabled || !item.intervalMinutes || !item.name?.trim()) return;
 
           const intervalMs = item.intervalMinutes * 60_000;
@@ -82,7 +89,7 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
             setNotificationRef.current({
               title: t('settings.breakReminder.notificationTitle', { defaultValue: '休息提醒' }),
               body: t('settings.breakReminder.notificationBody', { defaultValue: '该{{name}}啦！', name }),
-              icon: SvgIcon.BREAK,
+              icon: item.icon || SvgIcon.BREAK,
             });
           }
         });
