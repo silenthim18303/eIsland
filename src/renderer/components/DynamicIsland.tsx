@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React, { useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
 import { DynamicIslandBackground } from './components/DynamicIslandBackground';
@@ -40,11 +40,8 @@ import { useIslandStartupAnnouncements } from './hooks/useIslandStartupAnnouncem
 import { useIslandTimerAndAlarm } from './hooks/useIslandTimerAndAlarm';
 import { useIslandBackgroundVideoSync } from './hooks/useIslandBackgroundVideoSync';
 import { useIslandStateBridges } from './hooks/useIslandStateBridges';
-import {
-  STATE_AREA,
-  getStateClassName,
-} from './config/dynamicIslandConfig';
-import type { IslandBgMediaType, IslandBgMediaConfig } from './config/dynamicIslandConfig';
+import { useIslandBackgroundMediaController } from './hooks/useIslandBackgroundMediaController';
+import { useIslandShellPresentation } from './hooks/useIslandShellPresentation';
 
 export type { IslandState } from './hooks/useDynamicIslandShell';
 export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from './config/dynamicIslandConfig';
@@ -68,16 +65,27 @@ function DynamicIsland(): React.JSX.Element {
   const pendingAnnouncementAfterGuideRef = useRef(false);
   const pendingAnnouncementAppVersionRef = useRef('');
   const startupAutoCheckHandledRef = useRef(false);
-  const bgOpacityRef = useRef<number>(30);
-  const bgBlurRef = useRef<number>(0);
-  const [bgVideoFit, setBgVideoFit] = useState<'cover' | 'contain'>('cover');
-  const [bgVideoMuted, setBgVideoMuted] = useState<boolean>(true);
-  const [bgVideoLoop, setBgVideoLoop] = useState<boolean>(true);
-  const [bgVideoVolume, setBgVideoVolume] = useState<number>(0.6);
-  const [bgVideoRate, setBgVideoRate] = useState<number>(1);
-  const [bgVideoHwDecode, setBgVideoHwDecode] = useState<boolean>(true);
-  const bgVideoElementRef = useRef<HTMLVideoElement | null>(null);
-  const [bgMedia, setBgMedia] = useState<{ type: IslandBgMediaType; previewUrl: string } | null>(null);
+  const {
+    bgOpacityRef,
+    bgBlurRef,
+    bgVideoFit,
+    bgVideoMuted,
+    bgVideoLoop,
+    bgVideoVolume,
+    bgVideoRate,
+    bgVideoHwDecode,
+    bgVideoElementRef,
+    bgMedia,
+    setBgVideoFit,
+    setBgVideoMuted,
+    setBgVideoLoop,
+    setBgVideoVolume,
+    setBgVideoRate,
+    setBgVideoHwDecode,
+    applyBgMedia,
+    handleVideoLoadedMetadata,
+    handleVideoCanPlay,
+  } = useIslandBackgroundMediaController();
 
   const {
     morphing,
@@ -95,31 +103,6 @@ function DynamicIsland(): React.JSX.Element {
     idleClickExpandRef,
     isHoveringRef,
   });
-
-  const applyBgMedia = (media: IslandBgMediaConfig | null, previewUrl: string | null): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (!el) return;
-    const applyLayerVisibility = (): void => {
-      el.style.opacity = String(Math.max(0, Math.min(100, bgOpacityRef.current)) / 100);
-      const safeBlur = Math.max(0, Math.min(20, Math.round(bgBlurRef.current)));
-      el.style.filter = safeBlur > 0 ? `blur(${safeBlur}px)` : 'none';
-    };
-    if (media?.type === 'image' && previewUrl) {
-      el.style.backgroundImage = `url(${previewUrl})`;
-      applyLayerVisibility();
-      setBgMedia(null);
-      return;
-    }
-    el.style.backgroundImage = '';
-    if (media?.type === 'video' && previewUrl) {
-      applyLayerVisibility();
-      setBgMedia({ type: 'video', previewUrl });
-      return;
-    }
-    el.style.opacity = '0';
-    el.style.filter = 'none';
-    setBgMedia(null);
-  };
 
   // 同步 ref 以在回调中使用最新函数
   useLayoutEffect(() => {
@@ -225,17 +208,24 @@ function DynamicIsland(): React.JSX.Element {
     leaveTimerRef,
   });
 
-  const [r, g, b] = dominantColor;
+  const {
+    shellClassName,
+    shellStyle,
+  } = useIslandShellPresentation({
+    state,
+    morphing,
+    fromState,
+    showGlow,
+    springAnimation,
+    animationSpeed,
+    dominantColor,
+  });
 
   return (
     <div
-      className={`island-shell ${getStateClassName(state)}${morphing ? ' morphing' : ''}${fromState ? ` from-${fromState}` : ''}${morphing && fromState && (STATE_AREA[fromState] ?? 0) > (STATE_AREA[state] ?? 0) ? ' instant-resize' : ''}${showGlow ? ' music-glow' : ''}${showGlow === 'paused' ? ' music-paused' : ''}${springAnimation ? ' spring-animation' : ''} speed-${animationSpeed}`}
+      className={shellClassName}
       onClick={handleIslandClick}
-      style={showGlow ? {
-        '--glow-r': r,
-        '--glow-g': g,
-        '--glow-b': b,
-      } as React.CSSProperties : undefined}
+      style={shellStyle}
     >
       <DynamicIslandBackground
         bgMedia={bgMedia}
@@ -244,17 +234,8 @@ function DynamicIsland(): React.JSX.Element {
         bgVideoMuted={bgVideoMuted}
         bgVideoVolume={bgVideoVolume}
         bgVideoFit={bgVideoFit}
-        onVideoLoadedMetadata={(event) => {
-          event.currentTarget.loop = false;
-          event.currentTarget.volume = Math.max(0, Math.min(1, bgVideoVolume));
-          event.currentTarget.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
-        }}
-        onVideoCanPlay={(event) => {
-          event.currentTarget.loop = false;
-          event.currentTarget.volume = Math.max(0, Math.min(1, bgVideoVolume));
-          event.currentTarget.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
-          event.currentTarget.play().catch(() => {});
-        }}
+        onVideoLoadedMetadata={handleVideoLoadedMetadata}
+        onVideoCanPlay={handleVideoCanPlay}
       />
       <DynamicIslandStateContent
         state={state}
