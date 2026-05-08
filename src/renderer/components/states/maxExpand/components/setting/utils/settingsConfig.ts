@@ -107,7 +107,7 @@ export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'ind
   'url-parser': '配置剪贴板 URL 识别模式与黑名单。',
   'clipboard-history': '配置剪贴板历史记录能力与条数。',
   alarm: '配置闹钟提醒音、贪睡与通知行为。',
-  'break-reminder': '自定义定时休息提醒，预置久坐与喝水提醒。',
+  'break-reminder': '定时休息与喝水提醒。',
   autostart: '应用控制、日志与开机启动配置。',
   network: '请求超时与网络行为设置',
   mail: '配置 IMAP 收信参数',
@@ -152,7 +152,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'url-parser': SvgIcon.LINK,
   'clipboard-history': SvgIcon.COPY,
   alarm: SvgIcon.TIMER,
-  'break-reminder': SvgIcon.POMODORO,
+  'break-reminder': SvgIcon.BREAK,
   autostart: SvgIcon.CONTINUE,
   pluginMarket: SvgIcon.PLUGIN,
 };

@@ -82,7 +82,7 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
             setNotificationRef.current({
               title: t('settings.breakReminder.notificationTitle', { defaultValue: '休息提醒' }),
               body: t('settings.breakReminder.notificationBody', { defaultValue: '该{{name}}啦！', name }),
-              icon: SvgIcon.POMODORO,
+              icon: SvgIcon.BREAK,
             });
           }
         });
