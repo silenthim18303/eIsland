@@ -27,6 +27,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
 
 const BREAK_REMINDER_STORE_KEY = 'break-reminder-items';
 
@@ -43,8 +44,8 @@ function generateId(): string {
 
 function getDefaultReminders(t: (key: string, opts?: Record<string, string>) => string): BreakReminderItem[] {
   return [
-    { id: generateId(), name: t('settings.breakReminder.defaultSedentary', { defaultValue: '久坐提醒' }), intervalMinutes: 30, enabled: true },
-    { id: generateId(), name: t('settings.breakReminder.defaultHydration', { defaultValue: '喝水提醒' }), intervalMinutes: 60, enabled: true },
+    { id: generateId(), name: t('settings.breakReminder.defaultSedentary', { defaultValue: '起来动动' }), intervalMinutes: 30, enabled: true },
+    { id: generateId(), name: t('settings.breakReminder.defaultHydration', { defaultValue: '喝水' }), intervalMinutes: 60, enabled: true },
   ];
 }
 
@@ -157,7 +158,7 @@ export function BreakReminderSettingsPage(): ReactElement {
                     title={t('settings.breakReminder.deleteBtn', { defaultValue: '删除' })}
                     onClick={() => handleDelete(item.id)}
                   >
-                    ×
+                    <img src={SvgIcon.DELETE} alt="" width={14} height={14} />
                   </button>
                 </div>
               ))}

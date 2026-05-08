@@ -1443,8 +1443,8 @@
       "intervalLabel": "Interval (min)",
       "enabledLabel": "Enabled",
       "emptyHint": "No reminders yet. Click the button above to add one.",
-      "defaultSedentary": "Sedentary Reminder",
-      "defaultHydration": "Hydration Reminder",
+      "defaultSedentary": "Get Up and Move",
+      "defaultHydration": "Drink Water",
       "notificationTitle": "Break Reminder",
       "notificationBody": "Time for {{name}}!"
     },
