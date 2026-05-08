@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandNowPlayingSync.ts
+ * @description 音乐播放信息与歌词同步 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { NowPlayingInfo } from '../../store/isLandStore';
 import type { SyncedLyricLine } from '../../store/types';
@@ -32,6 +38,10 @@ interface UseIslandNowPlayingSyncOptions {
   setLyricsLoading: (loading: boolean) => void;
 }
 
+/**
+ * @description 同步系统播放信息、进度与歌词数据。
+ * @param options - 播放信息同步配置。
+ */
 export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions): void {
   const {
     handleNowPlayingUpdate,

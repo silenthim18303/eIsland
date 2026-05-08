@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file dynamicIslandStateConfig.ts
+ * @description 灵动岛状态面积与状态行为配置。
+ * @author 鸡哥
+ */
+
 import type { IslandState } from '../hooks/useDynamicIslandShell';
 
 export const STATE_AREA: Record<string, number> = {
@@ -154,6 +160,11 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   },
 };
 
+/**
+ * @description 获取状态对应的 CSS 类名。
+ * @param state - 灵动岛状态标识。
+ * @returns 状态对应的 CSS 类名。
+ */
 export function getStateClassName(state: IslandState): string {
   return state === 'idle' ? '' : state;
 }

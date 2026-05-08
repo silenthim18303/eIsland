@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useAgentAutoScroll.ts
+ * @description Agent 文本区域自动滚动 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 
 interface UseAgentAutoScrollOptions {
@@ -26,6 +32,10 @@ interface UseAgentAutoScrollOptions {
   answerText: string;
 }
 
+/**
+ * @description 在输出变化时滚动到底部。
+ * @param options - 自动滚动配置。
+ */
 export function useAgentAutoScroll(options: UseAgentAutoScrollOptions): void {
   const { textRef, thinkText, answerText } = options;
 

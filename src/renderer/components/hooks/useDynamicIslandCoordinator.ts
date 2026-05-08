@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useDynamicIslandCoordinator.ts
+ * @description 灵动岛主协调 Hook，整合状态、订阅与渲染数据。
+ * @author 鸡哥
+ */
+
 import type { IIslandStore } from '../../store/types';
 import { useDynamicIslandShell } from './useDynamicIslandShell';
 import { useIslandDominantColor } from './useIslandDominantColor';
@@ -59,6 +65,11 @@ interface DynamicIslandCoordinatorState {
   handleVideoCanPlay: (event: React.SyntheticEvent<HTMLVideoElement>) => void;
 }
 
+/**
+ * @description 协调灵动岛运行时逻辑并返回渲染所需状态。
+ * @param options - 协调器初始化参数。
+ * @returns 灵动岛渲染所需的聚合状态。
+ */
 export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinatorOptions): DynamicIslandCoordinatorState {
   const { store, t, language } = options;
   const {

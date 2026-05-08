@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandStateBridges.ts
+ * @description 灵动岛状态桥接逻辑 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import type { SyncedLyricLine, TimerState } from '../../store/types';
 import type { IslandState } from './useDynamicIslandShell';
@@ -33,6 +39,10 @@ interface UseIslandStateBridgesOptions {
   setIdle: (force?: boolean) => void;
 }
 
+/**
+ * @description 处理语音输入状态与歌词状态桥接。
+ * @param options - 状态桥接配置。
+ */
 export function useIslandStateBridges(options: UseIslandStateBridgesOptions): void {
   const {
     state,

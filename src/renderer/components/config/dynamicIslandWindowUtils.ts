@@ -18,6 +18,16 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file dynamicIslandWindowUtils.ts
+ * @description 灵动岛窗口相关工具函数。
+ * @author 鸡哥
+ */
+
+/**
+ * @description 判断鼠标是否位于当前窗口范围内。
+ * @returns 鼠标在窗口内返回 true，否则返回 false。
+ */
 export async function isMouseInWindow(): Promise<boolean> {
   try {
     const mousePos = await window.api?.getMousePosition();

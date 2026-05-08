@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file StandaloneWindowViewport.tsx
+ * @description 独立窗口内容视口组件。
+ * @author 鸡哥
+ */
+
 import React from 'react';
 import { TodoTab } from '../states/maxExpand/components/TodoTab';
 import { CountdownTab } from '../states/maxExpand/components/CountdownTab';
@@ -38,6 +44,11 @@ interface StandaloneWindowViewportProps {
   state: string;
 }
 
+/**
+ * @description 根据标签页渲染独立窗口内容。
+ * @param props - 视口渲染参数。
+ * @returns 独立窗口内容视口节点。
+ */
 export function StandaloneWindowViewport({ activeTab, state }: StandaloneWindowViewportProps): React.JSX.Element {
   return (
     <div className="cw-viewport">

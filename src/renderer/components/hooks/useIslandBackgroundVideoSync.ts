@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandBackgroundVideoSync.ts
+ * @description 灵动岛背景视频参数同步 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect, useRef } from 'react';
 import type { IslandBgMediaType } from '../config/dynamicIslandConfig';
 
@@ -30,6 +36,10 @@ interface UseIslandBackgroundVideoSyncOptions {
   bgVideoHwDecode: boolean;
 }
 
+/**
+ * @description 同步背景视频的音量、倍速与循环控制。
+ * @param options - 背景视频同步配置。
+ */
 export function useIslandBackgroundVideoSync(options: UseIslandBackgroundVideoSyncOptions): void {
   const {
     bgMedia,

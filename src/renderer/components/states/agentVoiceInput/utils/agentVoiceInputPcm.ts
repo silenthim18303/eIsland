@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentVoiceInputPcm.ts
+ * @description Agent 语音输入 PCM 帧处理工具。
+ * @author 鸡哥
+ */
+
 interface PushFloat32FramesOptions {
   input: Float32Array<ArrayBufferLike>;
   pending: Float32Array<ArrayBufferLike>;
@@ -25,6 +31,11 @@ interface PushFloat32FramesOptions {
   onFrame: (pcm16: Int16Array) => void;
 }
 
+/**
+ * @description 将 Float32 音频样本按帧转换并推送为 PCM16。
+ * @param options - 帧转换配置对象。
+ * @returns 未凑满一帧的剩余 Float32 样本。
+ */
 export function pushFloat32Frames(options: PushFloat32FramesOptions): Float32Array<ArrayBufferLike> {
   const { input, pending, frameSize, onFrame } = options;
   if (input.length === 0) return pending;

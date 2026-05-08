@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file StandaloneWindowBackground.tsx
+ * @description 独立窗口背景渲染组件（图片/视频）。
+ * @author 鸡哥
+ */
+
 import React from 'react';
 import type { IslandBgMediaType } from '../config/dynamicIslandConfig';
 
@@ -34,6 +40,11 @@ interface StandaloneWindowBackgroundProps {
   onVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
 }
 
+/**
+ * @description 渲染独立窗口背景层。
+ * @param props - 独立窗口背景渲染参数。
+ * @returns 独立窗口背景层节点。
+ */
 export function StandaloneWindowBackground(props: StandaloneWindowBackgroundProps): React.JSX.Element {
   const {
     bgMedia,

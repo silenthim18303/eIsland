@@ -18,8 +18,17 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentMode.ts
+ * @description Agent 模式读取工具。
+ * @author 鸡哥
+ */
+
 import { AGENT_MODE_STORAGE_KEY, VALID_AGENT_MODES } from '../config/agentContentConfig';
 
+/**
+ * @description 从本地存储读取 Agent 模式。
+ */
 export function loadAgentMode(): string {
   try {
     const raw = localStorage.getItem(AGENT_MODE_STORAGE_KEY);

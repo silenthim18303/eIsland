@@ -18,8 +18,18 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file standaloneWindowAuth.ts
+ * @description 独立窗口认证意图处理工具。
+ * @author 鸡哥
+ */
+
 import useIslandStore from '../../store/slices';
 
+/**
+ * @description 根据认证意图切换独立窗口状态。
+ * @param intent - 认证意图值（login/register/none）。
+ */
 export function applyAuthIntent(intent: unknown): void {
   if (intent === 'login') {
     useIslandStore.setState({ state: 'login' });

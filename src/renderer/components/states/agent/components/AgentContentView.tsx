@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file AgentContentView.tsx
+ * @description Agent 状态内容展示组件。
+ * @author 鸡哥
+ */
+
 import type { ReactElement, ReactNode } from 'react';
 import type { AgentPhase, AuthPending } from '../config/agentContentConfig';
 import { PHASE_IMAGE, PHASE_LABEL } from '../config/agentContentConfig';
@@ -35,6 +41,11 @@ interface AgentContentViewProps {
   onDeny: () => void;
 }
 
+/**
+ * @description 渲染 Agent 文本区与授权操作区。
+ * @param props - Agent 内容视图参数。
+ * @returns Agent 内容视图节点。
+ */
 export function AgentContentView(props: AgentContentViewProps): ReactElement {
   const {
     phase,

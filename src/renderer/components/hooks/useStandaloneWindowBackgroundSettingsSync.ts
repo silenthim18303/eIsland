@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useStandaloneWindowBackgroundSettingsSync.ts
+ * @description 独立窗口背景设置同步 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import {
   ISLAND_BG_MEDIA_STORE_KEY,
@@ -52,6 +58,10 @@ interface UseStandaloneWindowBackgroundSettingsSyncOptions {
   applyBgBlur: (blurValue: unknown) => void;
 }
 
+/**
+ * @description 同步独立窗口背景与视频相关配置。
+ * @param options - 独立窗口背景设置同步配置。
+ */
 export function useStandaloneWindowBackgroundSettingsSync(options: UseStandaloneWindowBackgroundSettingsSyncOptions): void {
   const {
     setBgVideoFit,

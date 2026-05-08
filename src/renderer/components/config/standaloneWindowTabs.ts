@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file standaloneWindowTabs.ts
+ * @description 独立窗口标签页配置。
+ * @author 鸡哥
+ */
+
 import type { WindowTab } from './standaloneWindowTypes';
 
 export const VALID_TABS = new Set<WindowTab>(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'settings']);

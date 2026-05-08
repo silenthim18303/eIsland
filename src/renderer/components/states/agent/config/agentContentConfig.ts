@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentContentConfig.ts
+ * @description Agent 内容区状态配置与常量定义。
+ * @author 鸡哥
+ */
+
 export type AgentPhase = 'connecting' | 'thinking' | 'toolCalling' | 'answering' | 'done' | 'error';
 
 export const PHASE_IMAGE: Record<AgentPhase, string> = {

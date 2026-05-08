@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandStartupAnnouncements.ts
+ * @description 启动阶段更新检查与公告展示 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import useIslandStore from '../../store/isLandStore';
 import { SvgIcon } from '../../utils/SvgIcon';
@@ -63,6 +69,10 @@ interface UseIslandStartupAnnouncementsOptions {
   t: (key: string, options?: Record<string, unknown>) => string;
 }
 
+/**
+ * @description 处理启动更新提醒、天气预警与公告触发逻辑。
+ * @param options - 启动公告与更新检查配置。
+ */
 export function useIslandStartupAnnouncements(options: UseIslandStartupAnnouncementsOptions): void {
   const {
     language,

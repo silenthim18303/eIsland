@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file dynamicIslandStorageKeys.ts
+ * @description 灵动岛相关存储键常量定义。
+ * @author 鸡哥
+ */
+
 export const CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY = 'clipboard-url-suppress-in-url-favorites';
 export const AI_CHAT_CLIPBOARD_URL_EVENT = 'eisland:ai-chat-clipboard-urls-detected';
 export const ISLAND_BG_MEDIA_STORE_KEY = 'island-bg-media';

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useStandaloneWindowTabSync.ts
+ * @description 独立窗口标签状态同步 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import {
   ACTIVE_TAB_STORE_KEY,
@@ -32,6 +38,10 @@ interface UseStandaloneWindowTabSyncOptions {
   setActiveTab: React.Dispatch<React.SetStateAction<WindowTab>>;
 }
 
+/**
+ * @description 同步独立窗口活动标签与认证跳转意图。
+ * @param options - 标签同步配置。
+ */
 export function useStandaloneWindowTabSync(options: UseStandaloneWindowTabSyncOptions): void {
   const { setActiveTab } = options;
 

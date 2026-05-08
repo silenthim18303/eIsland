@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useAgentVoiceInputAutoScroll.ts
+ * @description Agent 语音输入文本自动滚动 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 
 interface UseAgentVoiceInputAutoScrollOptions {
@@ -25,6 +31,10 @@ interface UseAgentVoiceInputAutoScrollOptions {
   transcript: string;
 }
 
+/**
+ * @description 在转写文本变化时滚动到末尾。
+ * @param options - 自动滚动配置。
+ */
 export function useAgentVoiceInputAutoScroll(options: UseAgentVoiceInputAutoScrollOptions): void {
   const { textRef, transcript } = options;
 

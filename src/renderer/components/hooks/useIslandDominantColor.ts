@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandDominantColor.ts
+ * @description 专辑封面主色提取 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import { getColor } from 'colorthief';
 
@@ -26,6 +32,10 @@ interface UseIslandDominantColorOptions {
   setDominantColor: (color: [number, number, number]) => void;
 }
 
+/**
+ * @description 根据封面图提取并更新主色。
+ * @param options - 主色提取配置。
+ */
 export function useIslandDominantColor(options: UseIslandDominantColorOptions): void {
   const { coverImage, setDominantColor } = options;
 

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useAgentRunner.ts
+ * @description Agent 执行流程编排 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import useIslandStore from '../../../../store/isLandStore';
 import {
@@ -52,6 +58,10 @@ interface UseAgentRunnerOptions {
   tokenRef: React.MutableRefObject<string>;
 }
 
+/**
+ * @description 执行 Agent 请求并同步流式事件状态。
+ * @param options - Agent 执行流程配置。
+ */
 export function useAgentRunner(options: UseAgentRunnerOptions): void {
   const {
     agentPrompt,

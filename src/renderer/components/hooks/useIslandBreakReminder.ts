@@ -50,6 +50,7 @@ interface UseIslandBreakReminderOptions {
  * 休息提醒调度 hook
  * 每 {@link POLL_INTERVAL_MS} 毫秒读取 store 中的提醒列表，
  * 对每个启用的提醒条目按 intervalMinutes 触发通知。
+ * @param options - 休息提醒调度配置。
  */
 export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): void {
   const { language, setNotificationRef, t } = options;

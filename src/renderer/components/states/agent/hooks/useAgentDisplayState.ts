@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useAgentDisplayState.ts
+ * @description Agent 展示态计算 Hook。
+ * @author 鸡哥
+ */
+
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { AgentPhase, AuthPending } from '../config/agentContentConfig';
@@ -40,6 +46,11 @@ interface AgentDisplayState {
   renderedDisplay: ReactNode;
 }
 
+/**
+ * @description 计算 Agent UI 展示文本与状态。
+ * @param options - 展示态计算参数。
+ * @returns Agent 展示态数据。
+ */
 export function useAgentDisplayState(options: UseAgentDisplayStateOptions): AgentDisplayState {
   const {
     phase,

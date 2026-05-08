@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandShellPresentation.ts
+ * @description 灵动岛壳层 className 与样式计算 Hook。
+ * @author 鸡哥
+ */
+
 import { useMemo } from 'react';
 import { STATE_AREA, getStateClassName } from '../config/dynamicIslandConfig';
 
@@ -36,6 +42,11 @@ interface IslandShellPresentationState {
   shellStyle: React.CSSProperties | undefined;
 }
 
+/**
+ * @description 计算灵动岛壳层展示所需类名与样式。
+ * @param options - 壳层展示计算参数。
+ * @returns 壳层 className 与 style。
+ */
 export function useIslandShellPresentation(options: UseIslandShellPresentationOptions): IslandShellPresentationState {
   const {
     state,

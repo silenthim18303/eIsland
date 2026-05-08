@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandSettingsSync.ts
+ * @description 灵动岛设置读取与同步 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import useIslandStore from '../../store/isLandStore';
 import type { NotificationData } from '../../store/types';
@@ -55,6 +61,10 @@ interface UseIslandSettingsSyncOptions {
   setBgVideoHwDecode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+/**
+ * @description 同步存储中的灵动岛设置并监听配置变更。
+ * @param options - 设置同步配置。
+ */
 export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): void {
   const {
     language,

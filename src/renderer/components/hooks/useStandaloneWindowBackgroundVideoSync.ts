@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useStandaloneWindowBackgroundVideoSync.ts
+ * @description 独立窗口背景视频同步 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect, useRef } from 'react';
 import type { IslandBgMediaType } from '../config/dynamicIslandConfig';
 
@@ -35,6 +41,11 @@ interface StandaloneWindowBackgroundVideoSyncState {
   handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
 }
 
+/**
+ * @description 管理独立窗口背景视频循环与播放参数。
+ * @param options - 独立窗口背景视频同步配置。
+ * @returns 视频事件处理函数集合。
+ */
 export function useStandaloneWindowBackgroundVideoSync(options: UseStandaloneWindowBackgroundVideoSyncOptions): StandaloneWindowBackgroundVideoSyncState {
   const {
     bgMedia,

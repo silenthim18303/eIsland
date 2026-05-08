@@ -18,4 +18,10 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file standaloneWindowTypes.ts
+ * @description 独立窗口共享类型定义。
+ * @author 鸡哥
+ */
+
 export type WindowTab = 'todo' | 'countdown' | 'urlFavorites' | 'album' | 'mail' | 'localFileSearch' | 'clipboardHistory' | 'memo' | 'settings';

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandHoverInteraction.ts
+ * @description 灵动岛悬停与鼠标穿透交互控制 Hook。
+ * @author 鸡哥
+ */
+
 import { useCallback, useEffect } from 'react';
 import useIslandStore from '../../store/isLandStore';
 import type { IslandState } from './useDynamicIslandShell';
@@ -36,6 +42,10 @@ interface UseIslandHoverInteractionOptions {
   leaveTimerRef: React.MutableRefObject<ReturnType<typeof setTimeout> | null>;
 }
 
+/**
+ * @description 处理灵动岛进入/离开窗口时的状态切换逻辑。
+ * @param options - 悬停交互控制参数。
+ */
 export function useIslandHoverInteraction(options: UseIslandHoverInteractionOptions): void {
   const {
     state,

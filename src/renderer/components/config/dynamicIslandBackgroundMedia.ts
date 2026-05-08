@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file dynamicIslandBackgroundMedia.ts
+ * @description 灵动岛背景媒体配置与预览 URL 解析工具。
+ * @author 鸡哥
+ */
+
 export type IslandBgMediaType = 'image' | 'video';
 
 export interface IslandBgMediaConfig {
@@ -42,6 +48,11 @@ function toMediaUrl(path: string): string {
   return `eisland-media://local/${encodeURIComponent(normalized)}`;
 }
 
+/**
+ * @description 归一化背景媒体配置输入。
+ * @param value - 待归一化的背景媒体原始值。
+ * @returns 归一化后的背景媒体配置；无效输入返回 null。
+ */
 export function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | null {
   if (typeof value === 'string') {
     const source = value.trim();
@@ -68,6 +79,11 @@ export function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | nu
   return { type: 'image', source };
 }
 
+/**
+ * @description 解析背景媒体的可预览 URL。
+ * @param media - 背景媒体配置。
+ * @returns 可用于渲染的预览 URL；失败时返回 null。
+ */
 export async function resolveBgMediaPreviewUrl(media: IslandBgMediaConfig): Promise<string | null> {
   if (media.type === 'image') {
     if (isDirectBgMediaUrl(media.source)) return media.source;

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file DynamicIslandBackground.tsx
+ * @description 灵动岛背景渲染组件（图片/视频）。
+ * @author 鸡哥
+ */
+
 import React from 'react';
 
 type IslandBgMediaType = 'image' | 'video';
@@ -33,6 +39,11 @@ interface DynamicIslandBackgroundProps {
   onVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
 }
 
+/**
+ * @description 渲染灵动岛背景层。
+ * @param props - 灵动岛背景渲染参数。
+ * @returns 灵动岛背景层节点。
+ */
 export function DynamicIslandBackground({
   bgMedia,
   bgVideoElementRef,

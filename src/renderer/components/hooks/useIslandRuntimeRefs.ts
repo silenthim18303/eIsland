@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandRuntimeRefs.ts
+ * @description 灵动岛运行时 Ref 容器 Hook。
+ * @author 鸡哥
+ */
+
 import { useLayoutEffect, useRef } from 'react';
 import type { NotificationData } from '../../store/types';
 
@@ -39,6 +45,11 @@ interface IslandRuntimeRefsState {
   startupAutoCheckHandledRef: React.MutableRefObject<boolean>;
 }
 
+/**
+ * @description 创建并维护灵动岛运行时共享 refs。
+ * @param options - 运行时 refs 初始化参数。
+ * @returns 运行时共享 refs 集合。
+ */
 export function useIslandRuntimeRefs(options: UseIslandRuntimeRefsOptions): IslandRuntimeRefsState {
   const { setNotification } = options;
 

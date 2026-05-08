@@ -18,10 +18,21 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file dynamicIslandUpdateSource.ts
+ * @description 更新源相关类型与工具函数。
+ * @author 鸡哥
+ */
+
 export type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
 
 const PRO_UPDATE_SOURCE_SET: ReadonlySet<UpdateSourceKey> = new Set<UpdateSourceKey>(['tencent-cos', 'aliyun-oss']);
 
+/**
+ * @description 归一化更新源值。
+ * @param value - 待归一化的更新源值。
+ * @returns 归一化后的更新源键值。
+ */
 export function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   if (value === 'github') return 'github';
   if (value === 'tencent-cos') return 'tencent-cos';
@@ -29,6 +40,11 @@ export function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   return 'cloudflare-r2';
 }
 
+/**
+ * @description 判断更新源是否为 Pro 专属。
+ * @param source - 更新源键值。
+ * @returns 是否为 Pro 专属更新源。
+ */
 export function isProOnlyUpdateSource(source: UpdateSourceKey): boolean {
   return PRO_UPDATE_SOURCE_SET.has(source);
 }
@@ -52,6 +68,11 @@ export const getRoleFromToken = (token: string | null | undefined): string | nul
   }
 };
 
+/**
+ * @description 获取更新源显示标签。
+ * @param value - 更新源键值。
+ * @returns 更新源展示标签文本。
+ */
 export function getUpdateSourceLabel(value: unknown): string {
   if (value === 'github') return 'GitHub Releases';
   if (value === 'tencent-cos') return 'Tencent COS';

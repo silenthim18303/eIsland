@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file AgentVoiceInputView.tsx
+ * @description Agent 语音输入状态展示组件。
+ * @author 鸡哥
+ */
+
 import type { ReactElement } from 'react';
 
 interface AgentVoiceInputViewProps {
@@ -26,6 +32,11 @@ interface AgentVoiceInputViewProps {
   textRef: React.RefObject<HTMLDivElement | null>;
 }
 
+/**
+ * @description 渲染语音输入状态与转写文本。
+ * @param props - 视图渲染参数。
+ * @returns Agent 语音输入视图节点。
+ */
 export function AgentVoiceInputView(props: AgentVoiceInputViewProps): ReactElement {
   const { statusText, transcript, textRef } = props;
 

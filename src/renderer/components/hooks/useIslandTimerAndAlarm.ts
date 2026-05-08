@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandTimerAndAlarm.ts
+ * @description 计时器与闹钟触发处理 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect, useRef } from 'react';
 import { SvgIcon } from '../../utils/SvgIcon';
 import type { NotificationData, TimerData } from '../../store/types';
@@ -30,6 +36,10 @@ interface UseIslandTimerAndAlarmOptions {
   t: (key: string, options?: Record<string, unknown>) => string;
 }
 
+/**
+ * @description 处理倒计时与闹钟提醒通知。
+ * @param options - 计时器与闹钟配置。
+ */
 export function useIslandTimerAndAlarm(options: UseIslandTimerAndAlarmOptions): void {
   const {
     language,

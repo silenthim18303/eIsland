@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandBackgroundMediaController.ts
+ * @description 灵动岛背景媒体控制 Hook。
+ * @author 鸡哥
+ */
+
 import { useCallback, useRef, useState } from 'react';
 import type { IslandBgMediaConfig, IslandBgMediaType } from '../config/dynamicIslandConfig';
 
@@ -43,6 +49,10 @@ interface IslandBackgroundMediaControllerState {
   handleVideoCanPlay: (event: React.SyntheticEvent<HTMLVideoElement>) => void;
 }
 
+/**
+ * @description 管理灵动岛背景媒体状态与视频行为。
+ * @returns 背景媒体控制状态与操作方法。
+ */
 export function useIslandBackgroundMediaController(): IslandBackgroundMediaControllerState {
   const bgOpacityRef = useRef<number>(30);
   const bgBlurRef = useRef<number>(0);

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file standaloneWindowConfig.ts
+ * @description 独立窗口配置导出聚合入口。
+ * @author 鸡哥
+ */
+
 export * from './standaloneWindowTypes';
 export * from './standaloneWindowKeys';
 export * from './standaloneWindowTabs';

@@ -18,6 +18,16 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentVoiceInputAudio.ts
+ * @description Agent 语音输入音频上下文工具。
+ * @author 鸡哥
+ */
+
+/**
+ * @description 获取可用的 AudioContext 构造函数。
+ * @returns AudioContext 构造函数；不支持时返回 undefined。
+ */
 export function getAudioContextCtor(): typeof AudioContext | undefined {
   return window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
 }

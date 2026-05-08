@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandNotificationSubscriptions.ts
+ * @description 灵动岛通知事件订阅 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect, useRef } from 'react';
 import useIslandStore from '../../store/isLandStore';
 import type { NotificationData } from '../../store/types';
@@ -32,6 +38,10 @@ interface UseIslandNotificationSubscriptionsOptions {
   setNotificationRef: React.MutableRefObject<(data: NotificationData) => void>;
 }
 
+/**
+ * @description 订阅更新、播放源与剪贴板通知事件。
+ * @param options - 通知订阅配置。
+ */
 export function useIslandNotificationSubscriptions(options: UseIslandNotificationSubscriptionsOptions): void {
   const { language, t, setNotificationRef } = options;
   const updateNotifiedRef = useRef(false);

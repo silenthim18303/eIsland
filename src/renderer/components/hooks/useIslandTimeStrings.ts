@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useIslandTimeStrings.ts
+ * @description 灵动岛时间字符串计算 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect, useMemo, useState } from 'react';
 import { formatTime, formatFullTime, getDayName, getLunarDate } from '../../utils/timeUtils';
 
@@ -33,6 +39,11 @@ interface IslandTimeStrings {
   lunarStr: string;
 }
 
+/**
+ * @description 提供灵动岛展示所需的时间与日期文本。
+ * @param options - 时间文本格式化配置。
+ * @returns 灵动岛时间字符串集合。
+ */
 export function useIslandTimeStrings(options: UseIslandTimeStringsOptions): IslandTimeStrings {
   const { t, language } = options;
 

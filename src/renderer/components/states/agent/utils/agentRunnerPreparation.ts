@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentRunnerPreparation.ts
+ * @description Agent 运行前路由与上下文准备工具。
+ * @author 鸡哥
+ */
+
 import useIslandStore from '../../../../store/isLandStore';
 import { getRoleFromToken } from '../../../../utils/userAccount';
 import { loadLocationFromStorage } from '../../../../store/utils/storage';
@@ -42,6 +48,12 @@ interface AgentContextAndSkills {
 
 const AVAILABLE_MODELS = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'];
 
+/**
+ * @description 解析 Agent 运行路由配置。
+ * @param aiConfig - 当前 AI 配置。
+ * @param token - 当前登录令牌。
+ * @returns Agent 路由解析结果。
+ */
 export function resolveAgentRouting(aiConfig: AiConfig, token: string): AgentRouting {
   const isOllama = aiConfig.model === 'ollama';
   const isCustomApi = aiConfig.model === 'custom-api';
@@ -81,6 +93,9 @@ export function resolveAgentRouting(aiConfig: AiConfig, token: string): AgentRou
   };
 }
 
+/**
+ * @description 构建 Agent 上下文与可用技能列表。
+ */
 export async function resolveAgentContextAndSkills(aiConfig: AiConfig): Promise<AgentContextAndSkills> {
   const state = useIslandStore.getState();
   const activeSessionId = state.activeAiChatSessionId || 'island-agent-inline';
@@ -108,6 +123,9 @@ export async function resolveAgentContextAndSkills(aiConfig: AiConfig): Promise<
   };
 }
 
+/**
+ * @description 生成带时区偏移的当前时间戳。
+ */
 export function buildCurrentTimestamp(): string {
   const d = new Date();
   const off = -d.getTimezoneOffset();
@@ -116,6 +134,9 @@ export function buildCurrentTimestamp(): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}${sign}${pad(Math.floor(Math.abs(off) / 60))}:${pad(Math.abs(off) % 60)}`;
 }
 
+/**
+ * @description 从本地位置信息构建位置字符串。
+ */
 export function buildCurrentLocation(): string | undefined {
   const loc = loadLocationFromStorage();
   if (!loc) return undefined;

@@ -18,8 +18,19 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file renderInlineMarkdown.tsx
+ * @description 轻量级行内 Markdown 渲染工具。
+ * @author 鸡哥
+ */
+
 import type { ReactNode } from 'react';
 
+/**
+ * @description 将简易 Markdown 文本渲染为 React 节点数组。
+ * @param text - 原始 Markdown 文本。
+ * @returns 渲染后的 React 节点数组。
+ */
 export function renderInlineMarkdown(text: string): ReactNode[] {
   const parts: ReactNode[] = [];
   const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|~~(.+?)~~)/g;

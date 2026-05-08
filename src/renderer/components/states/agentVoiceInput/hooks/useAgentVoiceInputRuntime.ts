@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useAgentVoiceInputRuntime.ts
+ * @description Agent 语音输入运行时控制 Hook。
+ * @author 鸡哥
+ */
+
 import { useEffect } from 'react';
 import { startTencentRealtimeStt } from '../../../../api/ai/tencentRealtimeStt';
 import { readLocalToken } from '../../../../utils/userAccount';
@@ -39,6 +45,10 @@ interface UseAgentVoiceInputRuntimeOptions {
 
 let moduleSttCleanup: (() => void) | null = null;
 
+/**
+ * @description 管理语音输入采集、ASR 会话与清理流程。
+ * @param options - 语音输入运行时控制配置。
+ */
 export function useAgentVoiceInputRuntime(options: UseAgentVoiceInputRuntimeOptions): void {
   const { setStatusText, setTranscript, transcriptRef } = options;
 

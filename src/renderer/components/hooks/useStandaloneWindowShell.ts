@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useStandaloneWindowShell.ts
+ * @description 独立窗口壳层状态管理 Hook。
+ * @author 鸡哥
+ */
+
 import { useCallback, useRef, useState } from 'react';
 import type { IslandBgMediaConfig, IslandBgMediaType } from '../config/dynamicIslandConfig';
 import {
@@ -46,6 +52,10 @@ interface StandaloneWindowShellState {
   handleVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
 }
 
+/**
+ * @description 管理独立窗口标签、背景与控制区状态。
+ * @returns 独立窗口壳层状态与操作函数。
+ */
 export function useStandaloneWindowShell(): StandaloneWindowShellState {
   const [activeTab, setActiveTab] = useState<WindowTab>('todo');
   const [bgMedia, setBgMedia] = useState<{ type: IslandBgMediaType; previewUrl: string } | null>(null);

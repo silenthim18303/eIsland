@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useAgentAuthDecision.ts
+ * @description Agent 授权决策处理 Hook。
+ * @author 鸡哥
+ */
+
 import { useCallback } from 'react';
 import {
   resolveMihtnelisWebAccess,
@@ -33,6 +39,11 @@ interface UseAgentAuthDecisionOptions {
   workspaces: string[];
 }
 
+/**
+ * @description 返回处理 Agent 授权通过/拒绝的回调。
+ * @param options - Agent 授权决策配置。
+ * @returns 授权决策执行函数。
+ */
 export function useAgentAuthDecision(options: UseAgentAuthDecisionOptions): (allow: boolean) => Promise<void> {
   const {
     authPending,

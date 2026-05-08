@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentRunnerEventHandler.ts
+ * @description Agent 流式事件处理器构建工具。
+ * @author 鸡哥
+ */
+
 import type React from 'react';
 import { resolveMihtnelisLocalToolResult } from '../../../../api/ai/mihtnelisAgentStream';
 import type { MihtnelisAgentStreamEvent } from '../../../../api/ai/mihtnelisAgentStream';
@@ -40,6 +46,11 @@ interface CreateAgentStreamEventHandlerOptions {
   traceIdRef: React.MutableRefObject<string>;
 }
 
+/**
+ * @description 创建 Agent 流式事件处理函数。
+ * @param options - 流式事件处理器配置。
+ * @returns 处理单个流事件的回调函数。
+ */
 export function createAgentStreamEventHandler(options: CreateAgentStreamEventHandlerOptions): (event: MihtnelisAgentStreamEvent) => void {
   const {
     isActive,

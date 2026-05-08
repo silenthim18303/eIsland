@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file StandaloneWindowChrome.tsx
+ * @description 独立窗口标题栏与标签栏组件。
+ * @author 鸡哥
+ */
+
 import React from 'react';
 import type { WindowTab } from '../config/standaloneWindowConfig';
 
@@ -30,6 +36,11 @@ interface StandaloneWindowChromeProps {
   t: (key: string) => string;
 }
 
+/**
+ * @description 渲染独立窗口 Chrome 区域。
+ * @param props - 独立窗口标题栏渲染参数。
+ * @returns 独立窗口 Chrome 节点。
+ */
 export function StandaloneWindowChrome(props: StandaloneWindowChromeProps): React.JSX.Element {
   const {
     windowIcon,

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file DynamicIslandStateContent.tsx
+ * @description 灵动岛状态内容路由组件。
+ * @author 鸡哥
+ */
+
 import React from 'react';
 import type { NotificationData, WeatherData } from '../../store/types';
 import { IdleContent } from '../states/idle/IdleContent';
@@ -50,6 +56,11 @@ interface DynamicIslandStateContentProps {
   notification: NotificationData;
 }
 
+/**
+ * @description 根据当前状态渲染对应的内容组件。
+ * @param props - 状态内容渲染参数。
+ * @returns 对应状态的内容节点；无匹配时返回 null。
+ */
 export function DynamicIslandStateContent({
   state,
   timeStr,

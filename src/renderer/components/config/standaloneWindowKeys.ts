@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file standaloneWindowKeys.ts
+ * @description 独立窗口配置存储键常量定义。
+ * @author 鸡哥
+ */
+
 export const ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
 export const LEGACY_ACTIVE_TAB_STORE_KEY = 'countdown-window-active-tab';
 export const AUTH_INTENT_STORE_KEY = 'standalone-window-auth-intent';

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useDynamicIslandShell.ts
+ * @description 灵动岛外壳状态与交互控制 Hook。
+ * @author 鸡哥
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
@@ -45,6 +51,11 @@ interface DynamicIslandShellState {
   handleIslandClick: () => void;
 }
 
+/**
+ * @description 管理灵动岛壳层形变状态与点击行为。
+ * @param options - 壳层交互配置。
+ * @returns 壳层状态与点击处理函数。
+ */
 export function useDynamicIslandShell(options: UseDynamicIslandShellOptions): DynamicIslandShellState {
   const {
     state,

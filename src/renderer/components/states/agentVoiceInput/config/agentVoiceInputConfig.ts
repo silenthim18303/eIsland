@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentVoiceInputConfig.ts
+ * @description Agent 语音输入配置常量定义。
+ * @author 鸡哥
+ */
+
 export const AGENT_VOICE_INITIAL_STATUS = '正在连接ASR服务';
 export const AGENT_VOICE_STT_LANGUAGE = 'zh-CN';
 export const AGENT_VOICE_FRAME_SIZE = 320;

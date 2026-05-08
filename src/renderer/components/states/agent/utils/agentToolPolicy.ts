@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file agentToolPolicy.ts
+ * @description Agent 本地工具风险策略判断。
+ * @author 鸡哥
+ */
+
 const CLIENT_LOCAL_TOOL_PREFIXES = [
   'file.', 'cmd.', 'sys.', 'win.', 'clipboard.', 'notification.', 'net.',
   'monitor.', 'volume.', 'brightness.', 'display.', 'power.', 'wifi.',
@@ -35,11 +41,21 @@ const HIGH_RISK_LOCAL_TOOL_PREFIXES = [
   'island.opacity.set', 'island.restart', 'alarm.delete', 'todolist.delete',
 ] as const;
 
+/**
+ * @description 判断工具名是否属于客户端本地工具。
+ * @param tool - 工具名称。
+ * @returns 命中本地工具策略返回 true。
+ */
 export function isClientLocalToolName(tool: string): boolean {
   const n = tool.trim().toLowerCase();
   return CLIENT_LOCAL_TOOL_EXACT_NAMES.has(n) || CLIENT_LOCAL_TOOL_PREFIXES.some((p) => n.startsWith(p));
 }
 
+/**
+ * @description 判断本地工具是否属于高风险操作。
+ * @param tool - 工具名称。
+ * @returns 命中高风险策略返回 true。
+ */
 export function isHighRiskLocalToolName(tool: string): boolean {
   const n = tool.trim().toLowerCase();
   return HIGH_RISK_LOCAL_TOOL_PREFIXES.some((p) => n.startsWith(p));
