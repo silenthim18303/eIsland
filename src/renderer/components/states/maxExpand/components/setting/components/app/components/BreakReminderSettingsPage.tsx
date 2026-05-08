@@ -79,7 +79,7 @@ export function BreakReminderSettingsPage(): ReactElement {
         } else {
           setItems(loaded);
         }
-      } else if (value == null) {
+      } else if (value === null || value === undefined) {
         const defaults = getDefaultReminders(t);
         setItems(defaults);
         window.api.storeWrite(BREAK_REMINDER_STORE_KEY, defaults).catch(() => {});

@@ -24,19 +24,19 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { JSX, MutableRefObject, ReactEventHandler } from 'react';
 
 type IslandBgMediaType = 'image' | 'video';
 
 interface DynamicIslandBackgroundProps {
   bgMedia: { type: IslandBgMediaType; previewUrl: string } | null;
-  bgVideoElementRef: React.MutableRefObject<HTMLVideoElement | null>;
+  bgVideoElementRef: MutableRefObject<HTMLVideoElement | null>;
   bgVideoHwDecode: boolean;
   bgVideoMuted: boolean;
   bgVideoVolume: number;
   bgVideoFit: 'cover' | 'contain';
-  onVideoLoadedMetadata: React.ReactEventHandler<HTMLVideoElement>;
-  onVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
+  onVideoLoadedMetadata: ReactEventHandler<HTMLVideoElement>;
+  onVideoCanPlay: ReactEventHandler<HTMLVideoElement>;
 }
 
 /**
@@ -53,7 +53,7 @@ export function DynamicIslandBackground({
   bgVideoFit,
   onVideoLoadedMetadata,
   onVideoCanPlay,
-}: DynamicIslandBackgroundProps): React.JSX.Element {
+}: DynamicIslandBackgroundProps): JSX.Element {
   return (
     <div className="island-bg-layer" id="island-bg-layer">
       {bgMedia?.type === 'video' && (

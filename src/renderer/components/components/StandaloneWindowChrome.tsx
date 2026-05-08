@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { JSX } from 'react';
 import type { WindowTab } from '../config/standaloneWindowConfig';
 
 interface StandaloneWindowChromeProps {
@@ -41,7 +41,7 @@ interface StandaloneWindowChromeProps {
  * @param props - 独立窗口标题栏渲染参数。
  * @returns 独立窗口 Chrome 节点。
  */
-export function StandaloneWindowChrome(props: StandaloneWindowChromeProps): React.JSX.Element {
+export function StandaloneWindowChrome(props: StandaloneWindowChromeProps): JSX.Element {
   const {
     windowIcon,
     tabList,

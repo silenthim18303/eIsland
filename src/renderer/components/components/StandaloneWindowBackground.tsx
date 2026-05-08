@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { JSX, MutableRefObject, ReactEventHandler } from 'react';
 import type { IslandBgMediaType } from '../config/dynamicIslandConfig';
 
 interface StandaloneWindowBackgroundProps {
@@ -32,12 +32,12 @@ interface StandaloneWindowBackgroundProps {
   bgImageOpacity: number;
   bgImageBlur: number;
   bgVideoHwDecode: boolean;
-  bgVideoElementRef: React.MutableRefObject<HTMLVideoElement | null>;
+  bgVideoElementRef: MutableRefObject<HTMLVideoElement | null>;
   bgVideoMuted: boolean;
   bgVideoVolume: number;
   bgVideoFit: 'cover' | 'contain';
-  onVideoLoadedMetadata: React.ReactEventHandler<HTMLVideoElement>;
-  onVideoCanPlay: React.ReactEventHandler<HTMLVideoElement>;
+  onVideoLoadedMetadata: ReactEventHandler<HTMLVideoElement>;
+  onVideoCanPlay: ReactEventHandler<HTMLVideoElement>;
 }
 
 /**
@@ -45,7 +45,7 @@ interface StandaloneWindowBackgroundProps {
  * @param props - 独立窗口背景渲染参数。
  * @returns 独立窗口背景层节点。
  */
-export function StandaloneWindowBackground(props: StandaloneWindowBackgroundProps): React.JSX.Element {
+export function StandaloneWindowBackground(props: StandaloneWindowBackgroundProps): JSX.Element {
   const {
     bgMedia,
     bgImageOpacity,

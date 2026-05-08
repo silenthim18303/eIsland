@@ -101,9 +101,9 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
 
         // 清理已不存在的条目
         const activeIds = new Set((data as BreakReminderItem[]).map((i) => i.id));
-        for (const key of firedMap.keys()) {
+        Array.from(firedMap.keys()).forEach((key) => {
           if (!activeIds.has(key)) { firedMap.delete(key); changed = true; }
-        }
+        });
 
         if (changed) {
           const obj: Record<string, number> = {};

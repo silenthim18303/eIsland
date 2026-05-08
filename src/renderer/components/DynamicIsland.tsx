@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
 import { DynamicIslandBackground } from './components/DynamicIslandBackground';
@@ -38,7 +38,7 @@ export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from '.
  * 灵动岛主组件
  * @description 使用状态模式管理不同状态的 UI 渲染
  */
-function DynamicIsland(): React.JSX.Element {
+function DynamicIsland(): JSX.Element {
   const { t, i18n } = useTranslation();
   const store = useIslandStore();
   const {

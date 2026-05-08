@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { JSX } from 'react';
 import type { NotificationData, WeatherData } from '../../store/types';
 import { IdleContent } from '../states/idle/IdleContent';
 import { HoverContent } from '../states/hover/HoverContent';
@@ -73,7 +73,7 @@ export function DynamicIslandStateContent({
   fullTimeStr,
   lunarStr,
   notification,
-}: DynamicIslandStateContentProps): React.JSX.Element | null {
+}: DynamicIslandStateContentProps): JSX.Element | null {
   if (state === 'idle') {
     return (
       <IdleContent

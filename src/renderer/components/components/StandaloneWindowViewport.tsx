@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { JSX } from 'react';
 import { TodoTab } from '../states/maxExpand/components/TodoTab';
 import { CountdownTab } from '../states/maxExpand/components/CountdownTab';
 import { UrlFavoritesTab } from '../states/maxExpand/components/UrlFavoritesTab';
@@ -49,7 +49,7 @@ interface StandaloneWindowViewportProps {
  * @param props - 视口渲染参数。
  * @returns 独立窗口内容视口节点。
  */
-export function StandaloneWindowViewport({ activeTab, state }: StandaloneWindowViewportProps): React.JSX.Element {
+export function StandaloneWindowViewport({ activeTab, state }: StandaloneWindowViewportProps): JSX.Element {
   return (
     <div className="cw-viewport">
       {activeTab === 'todo' && <TodoTab />}
