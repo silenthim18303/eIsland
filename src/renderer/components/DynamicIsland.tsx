@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React, { useRef, useLayoutEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
 import { DynamicIslandBackground } from './components/DynamicIslandBackground';
@@ -42,6 +42,7 @@ import { useIslandBackgroundVideoSync } from './hooks/useIslandBackgroundVideoSy
 import { useIslandStateBridges } from './hooks/useIslandStateBridges';
 import { useIslandBackgroundMediaController } from './hooks/useIslandBackgroundMediaController';
 import { useIslandShellPresentation } from './hooks/useIslandShellPresentation';
+import { useIslandRuntimeRefs } from './hooks/useIslandRuntimeRefs';
 
 export type { IslandState } from './hooks/useDynamicIslandShell';
 export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from './config/dynamicIslandConfig';
@@ -54,17 +55,21 @@ function DynamicIsland(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { state, weather, setHover, setIdle, setExpanded, setLyrics, setGuide, setAnnouncement, setAgentVoiceInput, timerData, setTimerData, notification, setNotification, handleNowPlayingUpdate, updateProgress, coverImage, isMusicPlaying, isPlaying, dominantColor, setDominantColor, setSyncedLyrics, setLyricsLoading, syncedLyrics, lyricsLoading, pomodoroRunning, pomodoroRemaining, springAnimation, animationSpeed } = useIslandStore();
 
-  const initRef = useRef(false);
-  const isHoveringRef = useRef(false);
-  const enterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const setNotificationRef = useRef(setNotification);
-  const expandLeaveIdleRef = useRef(false);
-  const maxExpandLeaveIdleRef = useRef(false);
-  const idleClickExpandRef = useRef(false);
-  const pendingAnnouncementAfterGuideRef = useRef(false);
-  const pendingAnnouncementAppVersionRef = useRef('');
-  const startupAutoCheckHandledRef = useRef(false);
+  const {
+    initRef,
+    isHoveringRef,
+    enterTimerRef,
+    leaveTimerRef,
+    setNotificationRef,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    idleClickExpandRef,
+    pendingAnnouncementAfterGuideRef,
+    pendingAnnouncementAppVersionRef,
+    startupAutoCheckHandledRef,
+  } = useIslandRuntimeRefs({
+    setNotification,
+  });
   const {
     bgOpacityRef,
     bgBlurRef,
@@ -102,11 +107,6 @@ function DynamicIsland(): React.JSX.Element {
     setExpanded,
     idleClickExpandRef,
     isHoveringRef,
-  });
-
-  // 同步 ref 以在回调中使用最新函数
-  useLayoutEffect(() => {
-    setNotificationRef.current = setNotification;
   });
 
   useIslandNowPlayingSync({
