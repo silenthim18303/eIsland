@@ -1413,6 +1413,23 @@
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.18) rgba(var(--color-text-rgb), 0.04);
+}
+.ov-dash-break-reminder-list::-webkit-scrollbar {
+  width: 4px;
+}
+.ov-dash-break-reminder-list::-webkit-scrollbar-track {
+  background: rgba(var(--color-text-rgb), 0.04);
+  border-radius: 2px;
+}
+.ov-dash-break-reminder-list::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.12);
+  border-radius: 2px;
+}
+.ov-dash-break-reminder-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.22);
 }
 .ov-dash-break-reminder-item {
   display: flex;
