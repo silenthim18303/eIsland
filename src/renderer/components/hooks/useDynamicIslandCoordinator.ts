@@ -28,6 +28,7 @@ import { useIslandNotificationSubscriptions } from './useIslandNotificationSubsc
 import { useIslandSettingsSync } from './useIslandSettingsSync';
 import { useIslandStartupAnnouncements } from './useIslandStartupAnnouncements';
 import { useIslandTimerAndAlarm } from './useIslandTimerAndAlarm';
+import { useIslandBreakReminder } from './useIslandBreakReminder';
 import { useIslandBackgroundVideoSync } from './useIslandBackgroundVideoSync';
 import { useIslandStateBridges } from './useIslandStateBridges';
 import { useIslandBackgroundMediaController } from './useIslandBackgroundMediaController';
@@ -168,6 +169,12 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     language,
     timerData,
     setTimerData,
+    setNotificationRef,
+    t,
+  });
+
+  useIslandBreakReminder({
+    language,
     setNotificationRef,
     t,
   });
