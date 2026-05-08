@@ -984,6 +984,7 @@
       "index": "Navigation",
       "app": "App Settings",
       "layout-preview": "Layout Preview",
+      "maxexpand-layout": "MaxExpand Layout",
       "album": "Album Settings",
       "hide-process-list": "Hidden Window List",
       "position": "Position Calibration",
