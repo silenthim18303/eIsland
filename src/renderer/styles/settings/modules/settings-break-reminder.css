@@ -241,3 +241,27 @@
   color: #ff6b6b;
   background: rgba(255, 107, 107, 0.1);
 }
+
+/* ══════ 浅色主题覆盖 ══════ */
+
+[data-theme='light'] .break-reminder-row {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='light'] .break-reminder-name,
+[data-theme='light'] .break-reminder-interval {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .break-reminder-name:focus,
+[data-theme='light'] .break-reminder-interval:focus {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='light'] .break-reminder-capsule-track {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .break-reminder-delete {
+  color: rgba(0, 0, 0, 0.35);
+}
