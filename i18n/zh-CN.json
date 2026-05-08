@@ -2331,7 +2331,7 @@
       },
       "break-reminder": {
         "label": "休息提醒",
-        "desc": "自定义定时休息提醒，预置久坐与喝水提醒。"
+        "desc": "定时休息与喝水提醒。"
       },
       "url-parser": {
         "label": "URL解析",

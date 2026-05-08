@@ -2336,7 +2336,7 @@
       },
       "break-reminder": {
         "label": "Break Reminders",
-        "desc": "Custom timed break reminders with built-in sedentary and hydration alerts."
+        "desc": "Timed break and hydration reminders."
       },
       "url-parser": {
         "label": "URL Parser",
