@@ -85,7 +85,8 @@ export function MaxExpandContent(): React.ReactElement {
 
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
   const [tabAnimation, setTabAnimation] = useState(true);
-  const [navLayoutConfig, setNavLayoutConfig] = useState<MaxExpandNavLayoutConfig>(DEFAULT_MAXEXPAND_NAV_LAYOUT);
+  const [navLayoutConfig, setNavLayoutConfig] = useState<MaxExpandNavLayoutConfig>([]);
+  const [navLayoutLoaded, setNavLayoutLoaded] = useState(false);
 
   /** 根据用户配置动态生成导航点序列 */
   const NAV_DOTS: NavDotId[] = useMemo(() => {
@@ -126,7 +127,10 @@ export function MaxExpandContent(): React.ReactElement {
       if (cancelled) return;
       if (Array.isArray(data) && data.length > 0) {
         setNavLayoutConfig(data as MaxExpandNavLayoutConfig);
+      } else {
+        setNavLayoutConfig(DEFAULT_MAXEXPAND_NAV_LAYOUT);
       }
+      setNavLayoutLoaded(true);
     }).catch(() => {});
     const unsub = window.api.onSettingsChanged((channel: string, value: unknown) => {
       if (cancelled) return;
@@ -287,7 +291,7 @@ export function MaxExpandContent(): React.ReactElement {
       </div>
 
       {/* 底部导航点 */}
-      <div className="settings-nav-dots" onClick={(e) => e.stopPropagation()}>
+      <div className="settings-nav-dots" onClick={(e) => e.stopPropagation()} style={navLayoutLoaded ? undefined : { visibility: 'hidden' }}>
         {filteredNavDots.map(({ id, label }) => (
           <button
             key={id}
