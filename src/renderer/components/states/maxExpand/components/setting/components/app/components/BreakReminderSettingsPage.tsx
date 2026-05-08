@@ -99,6 +99,10 @@ export function BreakReminderSettingsPage(): ReactElement {
     persist(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
   };
 
+  const handleResetDefaults = (): void => {
+    persist(getDefaultReminders(t));
+  };
+
   if (!loaded) return <div className="max-expand-settings-section" />;
 
   return (
@@ -113,6 +117,9 @@ export function BreakReminderSettingsPage(): ReactElement {
           <div className="settings-card-inline-row">
             <button type="button" className="settings-lyrics-source-btn active" onClick={handleAdd}>
               {t('settings.breakReminder.addBtn', { defaultValue: '新建提醒' })}
+            </button>
+            <button type="button" className="settings-lyrics-source-btn" onClick={handleResetDefaults}>
+              {t('settings.breakReminder.resetBtn', { defaultValue: '恢复默认' })}
             </button>
           </div>
 

@@ -1443,6 +1443,7 @@
       "intervalLabel": "间隔（分钟）",
       "enabledLabel": "启用",
       "emptyHint": "暂无提醒事项，点击上方按钮新建。",
+      "resetBtn": "恢复默认",
       "defaultSedentary": "起来动动",
       "defaultHydration": "喝水",
       "notificationTitle": "休息提醒",
