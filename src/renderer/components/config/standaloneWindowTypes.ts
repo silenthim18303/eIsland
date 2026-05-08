@@ -18,7 +18,4 @@
  * GNU General Public License for more details.
  */
 
-export * from './standaloneWindowTypes';
-export * from './standaloneWindowKeys';
-export * from './standaloneWindowTabs';
-export * from './standaloneWindowAuth';
+export type WindowTab = 'todo' | 'countdown' | 'urlFavorites' | 'album' | 'mail' | 'localFileSearch' | 'clipboardHistory' | 'memo' | 'settings';

@@ -18,7 +18,18 @@
  * GNU General Public License for more details.
  */
 
-export * from './standaloneWindowTypes';
-export * from './standaloneWindowKeys';
-export * from './standaloneWindowTabs';
-export * from './standaloneWindowAuth';
+import useIslandStore from '../../store/slices';
+
+export function applyAuthIntent(intent: unknown): void {
+  if (intent === 'login') {
+    useIslandStore.setState({ state: 'login' });
+    return;
+  }
+  if (intent === 'register') {
+    useIslandStore.setState({ state: 'register' });
+    return;
+  }
+  if (intent === null || intent === '' || intent === 'none') {
+    useIslandStore.setState({ state: 'maxExpand' });
+  }
+}

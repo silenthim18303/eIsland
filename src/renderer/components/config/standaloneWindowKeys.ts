@@ -18,7 +18,9 @@
  * GNU General Public License for more details.
  */
 
-export * from './standaloneWindowTypes';
-export * from './standaloneWindowKeys';
-export * from './standaloneWindowTabs';
-export * from './standaloneWindowAuth';
+export const ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
+export const LEGACY_ACTIVE_TAB_STORE_KEY = 'countdown-window-active-tab';
+export const AUTH_INTENT_STORE_KEY = 'standalone-window-auth-intent';
+export const ISLAND_BG_OPACITY_STORE_KEY = 'island-bg-opacity';
+export const ISLAND_BG_BLUR_STORE_KEY = 'island-bg-blur';
+export const STANDALONE_WINDOW_MAC_CONTROLS_STORE_KEY = 'standalone-window-mac-controls';
