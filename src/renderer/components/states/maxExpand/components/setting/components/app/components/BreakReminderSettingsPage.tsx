@@ -61,9 +61,9 @@ export function BreakReminderSettingsPage(): ReactElement {
     let cancelled = false;
     window.api.storeRead(BREAK_REMINDER_STORE_KEY).then((value: unknown) => {
       if (cancelled) return;
-      if (Array.isArray(value) && value.length > 0) {
+      if (Array.isArray(value)) {
         setItems(value as BreakReminderItem[]);
-      } else {
+      } else if (value == null) {
         const defaults = getDefaultReminders(t);
         setItems(defaults);
         window.api.storeWrite(BREAK_REMINDER_STORE_KEY, defaults).catch(() => {});
