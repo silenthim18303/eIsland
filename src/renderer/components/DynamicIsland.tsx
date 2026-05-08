@@ -29,20 +29,10 @@ import { getColor } from 'colorthief';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../store/isLandStore';
 import { formatTime, formatFullTime, getDayName, getLunarDate } from '../utils/timeUtils';
-import { IdleContent } from './states/idle/IdleContent';
-import { HoverContent } from './states/hover/HoverContent';
-import { NotificationContent } from './states/notification/NotificationContent';
-import { ExpandedContent } from './states/expand/ExpandedContent';
-import { MaxExpandContent } from './states/maxExpand/MaxExpandContent';
-import { LyricsContent } from './states/lyrics/LyricsContent';
-import { GuideContent } from './states/guide/GuideContent';
-import { LoginContent } from './states/login/LoginContent';
-import { RegisterContent } from './states/register/RegisterContent';
-import { PaymentContent } from './states/payment/PaymentContent';
-import { AnnouncementContent } from './states/announcement/AnnouncementContent';
-import { AgentVoiceInputContent } from './states/agentVoiceInput/AgentVoiceInputContent';
-import { AgentContent } from './states/agent/AgentContent';
-import { SttContent } from './states/stt/SttContent';
+import { DynamicIslandBackground } from './components/DynamicIslandBackground';
+import { DynamicIslandStateContent } from './components/DynamicIslandStateContent';
+import { useDynamicIslandShell } from './hooks/useDynamicIslandShell';
+import type { IslandState } from './hooks/useDynamicIslandShell';
 import { SvgIcon } from '../utils/SvgIcon';
 import type { NowPlayingInfo } from '../store/isLandStore';
 import { fetchLyrics } from '../api/lyrics/lrcApi';
@@ -61,11 +51,8 @@ import {
 } from '../api/announcement/announcementApi';
 import { readLocalToken } from '../utils/userAccount';
 
-/** 灵动岛状态类型 */
-export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'minimal' | 'lyrics' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt';
+export type { IslandState } from './hooks/useDynamicIslandShell';
 
-/** shell.css 中 morph/transition 主时长，按速度档位区分 */
-const MORPH_DURATION_BY_SPEED: Record<string, number> = { slow: 1100, medium: 550, fast: 280 };
 const CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY = 'clipboard-url-suppress-in-url-favorites';
 export const AI_CHAT_CLIPBOARD_URL_EVENT = 'eisland:ai-chat-clipboard-urls-detected';
 const ISLAND_BG_MEDIA_STORE_KEY = 'island-bg-media';
@@ -355,39 +342,18 @@ export function getStateClassName(state: IslandState): string {
 }
 
 /**
- * 状态渲染配置
- */
-interface StateRenderer {
-  /** 状态名称 */
-  state: IslandState;
-  /** 渲染函数 */
-  render: () => React.ReactNode;
-}
-
-/**
  * 灵动岛主组件
  * @description 使用状态模式管理不同状态的 UI 渲染，通过 requestAnimationFrame 检测鼠标位置实现可靠的 hover 交互
  */
 function DynamicIsland(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { state, weather, setHover, setIdle, setExpanded, setLyrics, setGuide, setAnnouncement, setAgentVoiceInput, timerData, setTimerData, notification, setNotification, handleNowPlayingUpdate, updateProgress, coverImage, isMusicPlaying, isPlaying, dominantColor, setDominantColor, setSyncedLyrics, setLyricsLoading, syncedLyrics, lyricsLoading, pomodoroRunning, pomodoroRemaining, springAnimation, animationSpeed } = useIslandStore();
-  const prevStateRef = useRef(state);
-  const [morphing, setMorphing] = useState(false);
-  const [fromState, setFromState] = useState('');
   const handleNowPlayingUpdateRef = useRef(handleNowPlayingUpdate);
   const updateProgressRef = useRef(updateProgress);
   const setSyncedLyricsRef = useRef(setSyncedLyrics);
   const setLyricsLoadingRef = useRef(setLyricsLoading);
   /** 当前歌曲标识，用于检测切歌 */
   const songKeyRef = useRef('');
-  useEffect(() => {
-    if (prevStateRef.current === state) return;
-    setFromState(prevStateRef.current);
-    prevStateRef.current = state;
-    setMorphing(true);
-    const id = setTimeout(() => { setMorphing(false); setFromState(''); }, MORPH_DURATION_BY_SPEED[animationSpeed] ?? 550);
-    return () => clearTimeout(id);
-  }, [state]);
 
   useLayoutEffect(() => {
     handleNowPlayingUpdateRef.current = handleNowPlayingUpdate;
@@ -429,6 +395,23 @@ function DynamicIsland(): React.JSX.Element {
   const [bgVideoHwDecode, setBgVideoHwDecode] = useState<boolean>(true);
   const bgVideoElementRef = useRef<HTMLVideoElement | null>(null);
   const [bgMedia, setBgMedia] = useState<{ type: IslandBgMediaType; previewUrl: string } | null>(null);
+
+  const {
+    morphing,
+    fromState,
+    showGlow,
+    handleIslandClick,
+  } = useDynamicIslandShell({
+    state,
+    animationSpeed,
+    isMusicPlaying,
+    coverImage,
+    isPlaying,
+    setHover,
+    setExpanded,
+    idleClickExpandRef,
+    isHoveringRef,
+  });
 
   const applyBgMedia = (media: IslandBgMediaConfig | null, previewUrl: string | null): void => {
     const el = document.getElementById('island-bg-layer');
@@ -1372,138 +1355,11 @@ function DynamicIsland(): React.JSX.Element {
     };
   }, [state, setHover, setIdle, setExpanded, setLyrics, clearAllTimers]);
 
-  // 状态渲染配置
-  const stateRenderers: StateRenderer[] = [
-    {
-      state: 'idle',
-      render: () => (
-        <IdleContent
-          timeStr={timeStr}
-          dayStr={dayStr}
-          weather={weather}
-          timerState={timerData?.state ?? 'idle'}
-          remainingSeconds={timerData?.remainingSeconds ?? 0}
-          pomodoroRunning={pomodoroRunning}
-          pomodoroRemaining={pomodoroRemaining}
-        />
-      ),
-    },
-    {
-      state: 'hover',
-      render: () => (
-        <HoverContent
-          fullTimeStr={fullTimeStr}
-          lunarStr={lunarStr}
-        />
-      ),
-    },
-    {
-      state: 'expanded',
-      render: () => (
-        <ExpandedContent />
-      ),
-    },
-    {
-      state: 'notification',
-      render: () => (
-        <NotificationContent
-          title={notification.title}
-          body={notification.body}
-          icon={notification.icon}
-          type={notification.type}
-          sourceAppId={notification.sourceAppId}
-          updateVersion={notification.updateVersion}
-          updateSourceLabel={notification.updateSourceLabel}
-          weatherAlertTime={notification.weatherAlertTime}
-          startupUpdateSource={notification.startupUpdateSource}
-          startupUpdateResolvedUrl={notification.startupUpdateResolvedUrl}
-          urls={notification.urls}
-        />
-      ),
-    },
-    {
-      state: 'maxExpand',
-      render: () => (
-        <MaxExpandContent />
-      ),
-    },
-    {
-      state: 'lyrics',
-      render: () => (
-        <LyricsContent />
-      ),
-    },
-    {
-      state: 'guide',
-      render: () => (
-        <GuideContent />
-      ),
-    },
-    {
-      state: 'login',
-      render: () => (
-        <LoginContent />
-      ),
-    },
-    {
-      state: 'register',
-      render: () => (
-        <RegisterContent />
-      ),
-    },
-    {
-      state: 'payment',
-      render: () => (
-        <PaymentContent />
-      ),
-    },
-    {
-      state: 'announcement',
-      render: () => (
-        <AnnouncementContent />
-      ),
-    },
-    {
-      state: 'agentVoiceInput',
-      render: () => (
-        <AgentVoiceInputContent />
-      ),
-    },
-    {
-      state: 'agent',
-      render: () => (
-        <AgentContent />
-      ),
-    },
-    {
-      state: 'stt',
-      render: () => (
-        <SttContent />
-      ),
-    },
-  ];
-
-  /**
-   * 单击灵动岛切换状态
-   * @description hover 状态下单击展开到 expanded；expanded 状态下单击收回到 hover
-   */
-  const handleIslandClick = React.useCallback(() => {
-    if (state === 'idle' && idleClickExpandRef.current) {
-      isHoveringRef.current = true;
-      setHover();
-    } else if (state === 'hover') {
-      setExpanded();
-    } else if (state === 'expanded' || state === 'maxExpand' || state === 'announcement') {
-      setHover();
-    }
-  }, [state, setExpanded, setHover]);
-
   const [r, g, b] = dominantColor;
-  const showGlow = isMusicPlaying && coverImage;
 
   return (
     <div
-      className={`island-shell ${getStateClassName(state)}${morphing ? ' morphing' : ''}${fromState ? ` from-${fromState}` : ''}${morphing && fromState && (STATE_AREA[fromState] ?? 0) > (STATE_AREA[state] ?? 0) ? ' instant-resize' : ''}${showGlow ? ' music-glow' : ''}${showGlow && !isPlaying ? ' music-paused' : ''}${springAnimation ? ' spring-animation' : ''} speed-${animationSpeed}`}
+      className={`island-shell ${getStateClassName(state)}${morphing ? ' morphing' : ''}${fromState ? ` from-${fromState}` : ''}${morphing && fromState && (STATE_AREA[fromState] ?? 0) > (STATE_AREA[state] ?? 0) ? ' instant-resize' : ''}${showGlow ? ' music-glow' : ''}${showGlow === 'paused' ? ' music-paused' : ''}${springAnimation ? ' spring-animation' : ''} speed-${animationSpeed}`}
       onClick={handleIslandClick}
       style={showGlow ? {
         '--glow-r': r,
@@ -1511,40 +1367,38 @@ function DynamicIsland(): React.JSX.Element {
         '--glow-b': b,
       } as React.CSSProperties : undefined}
     >
-      <div className="island-bg-layer" id="island-bg-layer">
-        {bgMedia?.type === 'video' && (
-          <video
-            key={`${bgMedia.previewUrl}-${bgVideoHwDecode ? 'hw' : 'sw'}`}
-            ref={bgVideoElementRef}
-            className="island-bg-video"
-            src={bgMedia.previewUrl}
-            autoPlay
-            muted={bgVideoMuted || bgVideoVolume <= 0}
-            playsInline
-            preload="auto"
-            disableRemotePlayback
-            style={{ objectFit: bgVideoFit, imageRendering: bgVideoHwDecode ? undefined : 'auto' }}
-            onLoadedMetadata={(event) => {
-              // Chromium 原生 loop 在 eisland-media:// 协议 / 部分 mp4 容器下会偶发失效，
-              // 这里完全关掉原生 loop，统一由 onEnded 手动回到 0 重播。
-              event.currentTarget.loop = false;
-              event.currentTarget.volume = Math.max(0, Math.min(1, bgVideoVolume));
-              event.currentTarget.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
-            }}
-            onCanPlay={(event) => {
-              event.currentTarget.loop = false;
-              event.currentTarget.volume = Math.max(0, Math.min(1, bgVideoVolume));
-              event.currentTarget.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
-              event.currentTarget.play().catch(() => {});
-            }}
-          />
-        )}
-      </div>
-      {stateRenderers
-        .filter(renderer => renderer.state === state)
-        .map(renderer => (
-          <React.Fragment key={renderer.state}>{renderer.render()}</React.Fragment>
-        ))}
+      <DynamicIslandBackground
+        bgMedia={bgMedia}
+        bgVideoElementRef={bgVideoElementRef}
+        bgVideoHwDecode={bgVideoHwDecode}
+        bgVideoMuted={bgVideoMuted}
+        bgVideoVolume={bgVideoVolume}
+        bgVideoFit={bgVideoFit}
+        onVideoLoadedMetadata={(event) => {
+          event.currentTarget.loop = false;
+          event.currentTarget.volume = Math.max(0, Math.min(1, bgVideoVolume));
+          event.currentTarget.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
+        }}
+        onVideoCanPlay={(event) => {
+          event.currentTarget.loop = false;
+          event.currentTarget.volume = Math.max(0, Math.min(1, bgVideoVolume));
+          event.currentTarget.playbackRate = Math.max(0.25, Math.min(3, bgVideoRate));
+          event.currentTarget.play().catch(() => {});
+        }}
+      />
+      <DynamicIslandStateContent
+        state={state}
+        timeStr={timeStr}
+        dayStr={dayStr}
+        weather={weather}
+        timerState={timerData?.state ?? 'idle'}
+        remainingSeconds={timerData?.remainingSeconds ?? 0}
+        pomodoroRunning={pomodoroRunning}
+        pomodoroRemaining={pomodoroRemaining}
+        fullTimeStr={fullTimeStr}
+        lunarStr={lunarStr}
+        notification={notification}
+      />
     </div>
   );
 }
