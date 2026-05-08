@@ -22,19 +22,20 @@ import { useEffect } from 'react';
 import useIslandStore from '../../../../store/isLandStore';
 import {
   streamMihtnelisAgent,
-  resolveMihtnelisLocalToolResult,
 } from '../../../../api/ai/mihtnelisAgentStream';
-import type { MihtnelisAgentStreamEvent } from '../../../../api/ai/mihtnelisAgentStream';
 import { streamOllamaLocalAgent } from '../../../../api/ai/ollamaLocalAgent';
 import { streamCustomDirectAgent } from '../../../../api/ai/customDirectAgent';
-import { readLocalToken, getRoleFromToken } from '../../../../utils/userAccount';
-import { loadLocationFromStorage } from '../../../../store/utils/storage';
-import { buildMihtnelisContext } from '../../../states/maxExpand/components/agent/utils/chatUtils';
+import { readLocalToken } from '../../../../utils/userAccount';
 import type { AiChatMessage } from '../../../../store/types';
 import type { AuthPending, AgentPhase } from '../config/agentContentConfig';
 import { INLINE_PROMPT_HINT } from '../config/agentContentConfig';
-import { loadAgentMode } from '../utils/agentMode';
-import { isClientLocalToolName, isHighRiskLocalToolName } from '../utils/agentToolPolicy';
+import {
+  resolveAgentRouting,
+  resolveAgentContextAndSkills,
+  buildCurrentTimestamp,
+  buildCurrentLocation,
+} from '../utils/agentRunnerPreparation';
+import { createAgentStreamEventHandler } from '../utils/agentRunnerEventHandler';
 
 interface UseAgentRunnerOptions {
   agentPrompt: string;
@@ -49,21 +50,6 @@ interface UseAgentRunnerOptions {
   thinkAccRef: React.MutableRefObject<string>;
   traceIdRef: React.MutableRefObject<string>;
   tokenRef: React.MutableRefObject<string>;
-}
-
-function buildCurrentTimestamp(): string {
-  const d = new Date();
-  const off = -d.getTimezoneOffset();
-  const sign = off >= 0 ? '+' : '-';
-  const pad = (n: number): string => String(Math.abs(n)).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}${sign}${pad(Math.floor(Math.abs(off) / 60))}:${pad(Math.abs(off) % 60)}`;
-}
-
-function buildCurrentLocation(): string | undefined {
-  const loc = loadLocationFromStorage();
-  if (!loc) return undefined;
-  const parts = [loc.city, loc.regionName, loc.country].filter(Boolean);
-  return parts.length > 0 ? parts.join(', ') : undefined;
 }
 
 export function useAgentRunner(options: UseAgentRunnerOptions): void {
@@ -105,181 +91,37 @@ export function useAgentRunner(options: UseAgentRunnerOptions): void {
       thinkAccRef.current = '';
       traceIdRef.current = '';
 
-      const isOllama = aiConfig.model === 'ollama';
-      const isCustomApi = aiConfig.model === 'custom-api';
-      const userRole = getRoleFromToken(token);
-      const isProUser = userRole === 'pro' || userRole === 'admin';
-      const useCustomApi = isCustomApi && isProUser && Boolean(aiConfig.apiKey?.trim() && aiConfig.endpoint?.trim());
-      const availableModels = ['deepseek-v4-flash', 'deepseek-v4-pro', 'mimo-v2.5', 'mimo-v2.5-pro', 'MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'];
-      const selectedModelBase = isOllama ? 'ollama'
-        : useCustomApi ? (aiConfig.customApiModel?.trim() || 'gpt-4o-mini')
-        : (availableModels.includes(aiConfig.model) ? aiConfig.model : 'deepseek-v4-flash');
-      const selectedModel = (!isProUser && (selectedModelBase === 'deepseek-v4-pro'
-        || selectedModelBase === 'mimo-v2.5-pro'
-        || selectedModelBase === 'MiniMax-M2.7-highspeed'
-        || selectedModelBase === 'MiniMax-M2.5-highspeed'))
-        ? 'deepseek-v4-flash'
-        : selectedModelBase;
-      const isMinimaxModel = (modelName: string): boolean => {
-        const normalized = modelName.toLowerCase();
-        return normalized.startsWith('minimax-');
-      };
-      const selectedProvider = isOllama ? 'ollama'
-        : useCustomApi ? 'custom'
-        : (selectedModel.startsWith('mimo-') ? 'mimo' : (isMinimaxModel(selectedModel) ? 'MiniMax' : 'deepseek'));
-      const agentMode = loadAgentMode();
+      const {
+        isOllama,
+        useCustomApi,
+        selectedModel,
+        selectedProvider,
+        agentMode,
+      } = resolveAgentRouting(aiConfig, token);
 
-      const state = useIslandStore.getState();
-      const activeSessionId = state.activeAiChatSessionId;
-      const activeSession = state.aiChatSessions.find((s) => s.id === activeSessionId);
-      const sessionMessages = activeSession?.messages ?? [];
-      const context = buildMihtnelisContext(sessionMessages);
-
-      const enabledSkills = Array.isArray(aiConfig.skills) ? aiConfig.skills.filter((s) => s.enabled && s.filePath) : [];
-      let resolvedSkills: Array<{ name: string; content: string }> | undefined;
-      if (enabledSkills.length > 0) {
-        const results = await Promise.all(
-          enabledSkills.map(async (s) => {
-            const content = await window.api.readTextFile(s.filePath);
-            return content ? { name: s.name, content } : null;
-          }),
-        );
-        const valid = results.filter((r): r is { name: string; content: string } => r !== null && r.content.trim().length > 0);
-        if (valid.length > 0) resolvedSkills = valid;
-      }
+      const {
+        activeSessionId,
+        context,
+        resolvedSkills,
+      } = await resolveAgentContextAndSkills(aiConfig);
 
       const message = `${INLINE_PROMPT_HINT}\n\n${agentPrompt.trim()}`;
 
-      const handleEvent = (event: MihtnelisAgentStreamEvent): void => {
-        if (!active) return;
-
-        if (event.type === 'think') {
-          setPhase('thinking');
-          const payload = event.payload as { text?: unknown };
-          const text = typeof payload?.text === 'string' ? payload.text : '';
-          if (text) {
-            thinkAccRef.current += text;
-            setThinkText((prev) => prev + text);
-          }
-          return;
-        }
-
-        if (event.type === 'chunk') {
-          setPhase('answering');
-          setToolCallInfo(null);
-          const payload = event.payload as { text?: unknown };
-          const text = typeof payload?.text === 'string' ? payload.text : '';
-          if (text) {
-            answerAccRef.current += text;
-            setAnswerText((prev) => prev + text);
-          }
-          return;
-        }
-
-        if (event.type === 'chunk_reset' || (event.type as string) === 'stream_rollback') {
-          answerAccRef.current = '';
-          setAnswerText('');
-          return;
-        }
-
-        if (event.type === 'tool') {
-          setPhase('toolCalling');
-          const payload = event.payload as { success?: unknown };
-          const hasResult = payload?.success !== undefined;
-          if (hasResult) setToolCallInfo(null);
-          return;
-        }
-
-        if (event.type === 'tool_call_request') {
-          const payload = event.payload as {
-            requestId?: unknown; tool?: unknown; purpose?: unknown;
-            authorizationRequired?: unknown; message?: unknown;
-            arguments?: unknown;
-          };
-          const requestId = typeof payload?.requestId === 'string' ? payload.requestId.trim() : '';
-          const tool = typeof payload?.tool === 'string' ? payload.tool.trim() : '';
-          const purpose = typeof payload?.purpose === 'string' ? payload.purpose.trim() : '';
-          const authorizationRequired = Boolean(payload?.authorizationRequired);
-          const authMessage = typeof payload?.message === 'string' ? payload.message : '';
-          const argumentsPayload = typeof payload?.arguments === 'object' && payload?.arguments !== null
-            ? payload.arguments as Record<string, unknown> : {};
-          if (!tool) return;
-
-          setPhase('toolCalling');
-          setToolCallInfo({ tool, purpose: purpose || `调用 ${tool}` });
-
-          if (isOllama) return;
-
-          const isLocal = isClientLocalToolName(tool);
-          if (!isLocal || !requestId) return;
-
-          const needsAuth = authorizationRequired || isHighRiskLocalToolName(tool);
-          if (needsAuth) {
-            const desc = authMessage || purpose || `工具 ${tool} 请求授权`;
-            setAuthPending({ type: 'tool', requestId, description: desc, tool, argumentsPayload });
-            return;
-          }
-
-          void (async () => {
-            try {
-              const executor = window.api?.executeAgentLocalTool;
-              if (typeof executor !== 'function') {
-                await resolveMihtnelisLocalToolResult({ token, requestId, success: false, result: {}, error: 'LOCAL_RUNTIME_UNAVAILABLE', durationMs: 0 });
-                return;
-              }
-              const execution = await executor({ tool, arguments: argumentsPayload, workspaces: aiConfig.workspaces });
-              await resolveMihtnelisLocalToolResult({
-                token,
-                requestId,
-                success: Boolean(execution?.success),
-                result: execution?.result,
-                error: typeof execution?.error === 'string' ? execution.error : '',
-                durationMs: typeof execution?.durationMs === 'number' ? execution.durationMs : 0,
-              });
-            } catch {
-              // ignore
-            }
-          })();
-          return;
-        }
-
-        if (event.type === 'tool_call_result') {
-          setToolCallInfo(null);
-          return;
-        }
-
-        if (event.type === 'web_access_request') {
-          const payload = event.payload as { requestId?: unknown; url?: unknown; message?: unknown };
-          const requestId = typeof payload?.requestId === 'string' ? payload.requestId.trim() : '';
-          const url = typeof payload?.url === 'string' ? payload.url.trim() : '';
-          if (!requestId || !url) return;
-          const desc = typeof payload?.message === 'string' && payload.message ? payload.message : `请求访问: ${url}`;
-          setAuthPending({ type: 'web', requestId, description: desc });
-          return;
-        }
-
-        if (event.type === 'web_access_resolved') {
-          setAuthPending((prev) => (prev?.type === 'web' ? null : prev));
-          return;
-        }
-
-        if (event.type === 'error') {
-          const payload = event.payload as { message?: unknown };
-          const msg = typeof payload?.message === 'string' ? payload.message : '未知错误';
-          setPhase('error');
-          setErrorMsg(msg);
-          return;
-        }
-
-        if (event.type === 'final') {
-          const payload = event.payload as { traceId?: unknown; traceid?: unknown; trace_id?: unknown };
-          const rawTraceId = payload?.traceId ?? payload?.traceid ?? payload?.trace_id;
-          if (typeof rawTraceId === 'string' && rawTraceId.trim()) {
-            traceIdRef.current = rawTraceId.trim();
-          }
-          setPhase('done');
-        }
-      };
+      const handleEvent = createAgentStreamEventHandler({
+        isActive: () => active,
+        isOllama,
+        token,
+        workspaces: aiConfig.workspaces,
+        setPhase,
+        setThinkText,
+        setAnswerText,
+        setErrorMsg,
+        setAuthPending,
+        setToolCallInfo,
+        answerAccRef,
+        thinkAccRef,
+        traceIdRef,
+      });
 
       try {
         if (isOllama) {
