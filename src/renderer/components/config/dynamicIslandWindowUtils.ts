@@ -18,8 +18,20 @@
  * GNU General Public License for more details.
  */
 
-export * from './dynamicIslandStorageKeys';
-export * from './dynamicIslandUpdateSource';
-export * from './dynamicIslandBackgroundMedia';
-export * from './dynamicIslandStateConfig';
-export * from './dynamicIslandWindowUtils';
+export async function isMouseInWindow(): Promise<boolean> {
+  try {
+    const mousePos = await window.api?.getMousePosition();
+    const bounds = await window.api?.getWindowBounds();
+
+    if (!mousePos || !bounds) return false;
+
+    return (
+      mousePos.x >= bounds.x
+      && mousePos.x <= bounds.x + bounds.width
+      && mousePos.y >= bounds.y
+      && mousePos.y <= bounds.y + bounds.height
+    );
+  } catch {
+    return false;
+  }
+}
