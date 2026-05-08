@@ -63,6 +63,7 @@ export function BreakReminderSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [items, setItems] = useState<BreakReminderItem[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [openPickerId, setOpenPickerId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -144,55 +145,66 @@ export function BreakReminderSettingsPage(): ReactElement {
           ) : (
             <div className="break-reminder-list">
               {items.map((item) => (
-                <div key={item.id} className="break-reminder-row">
-                  <div className="break-reminder-icon-selector">
-                    {BREAK_REMINDER_ICON_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.key}
-                        type="button"
-                        className={`break-reminder-icon-btn${item.icon === opt.src ? ' active' : ''}`}
-                        onClick={() => handleChange(item.id, 'icon', opt.src)}
-                      >
-                        <img src={opt.src} alt="" width={16} height={16} />
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    className="break-reminder-name"
-                    type="text"
-                    value={item.name}
-                    placeholder={t('settings.breakReminder.nameLabel', { defaultValue: '提醒名称' })}
-                    onChange={(e) => handleChange(item.id, 'name', e.target.value)}
-                  />
-                  <input
-                    className="break-reminder-interval"
-                    type="number"
-                    min={1}
-                    max={1440}
-                    value={item.intervalMinutes}
-                    title={t('settings.breakReminder.intervalLabel', { defaultValue: '间隔（分钟）' })}
-                    onChange={(e) => {
-                      const v = Math.max(1, Math.min(1440, Math.round(Number(e.target.value) || 1)));
-                      handleChange(item.id, 'intervalMinutes', v);
-                    }}
-                  />
-                  <span className="break-reminder-unit">min</span>
-                  <label className="break-reminder-capsule">
+                <div key={item.id} className="break-reminder-item">
+                  <div className="break-reminder-row">
+                    <button
+                      type="button"
+                      className="break-reminder-icon-current"
+                      onClick={() => setOpenPickerId(openPickerId === item.id ? null : item.id)}
+                    >
+                      <img src={item.icon || SvgIcon.BREAK} alt="" width={18} height={18} className="break-reminder-icon-img" />
+                    </button>
                     <input
-                      type="checkbox"
-                      checked={item.enabled}
-                      onChange={(e) => handleChange(item.id, 'enabled', e.target.checked)}
+                      className="break-reminder-name"
+                      type="text"
+                      value={item.name}
+                      placeholder={t('settings.breakReminder.nameLabel', { defaultValue: '提醒名称' })}
+                      onChange={(e) => handleChange(item.id, 'name', e.target.value)}
                     />
-                    <span className="break-reminder-capsule-track" />
-                  </label>
-                  <button
-                    type="button"
-                    className="break-reminder-delete"
-                    title={t('settings.breakReminder.deleteBtn', { defaultValue: '删除' })}
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    <img src={SvgIcon.DELETE} alt="" width={14} height={14} />
-                  </button>
+                    <input
+                      className="break-reminder-interval"
+                      type="number"
+                      min={1}
+                      max={1440}
+                      value={item.intervalMinutes}
+                      title={t('settings.breakReminder.intervalLabel', { defaultValue: '间隔（分钟）' })}
+                      onChange={(e) => {
+                        const v = Math.max(1, Math.min(1440, Math.round(Number(e.target.value) || 1)));
+                        handleChange(item.id, 'intervalMinutes', v);
+                      }}
+                    />
+                    <span className="break-reminder-unit">min</span>
+                    <label className="break-reminder-capsule">
+                      <input
+                        type="checkbox"
+                        checked={item.enabled}
+                        onChange={(e) => handleChange(item.id, 'enabled', e.target.checked)}
+                      />
+                      <span className="break-reminder-capsule-track" />
+                    </label>
+                    <button
+                      type="button"
+                      className="break-reminder-delete"
+                      title={t('settings.breakReminder.deleteBtn', { defaultValue: '删除' })}
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      <img src={SvgIcon.DELETE} alt="" width={14} height={14} className="break-reminder-icon-img" />
+                    </button>
+                  </div>
+                  {openPickerId === item.id && (
+                    <div className="break-reminder-icon-dropdown">
+                      {BREAK_REMINDER_ICON_OPTIONS.map((opt) => (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          className={`break-reminder-icon-btn${item.icon === opt.src ? ' active' : ''}`}
+                          onClick={() => { handleChange(item.id, 'icon', opt.src); setOpenPickerId(null); }}
+                        >
+                          <img src={opt.src} alt="" width={20} height={20} className="break-reminder-icon-img" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
