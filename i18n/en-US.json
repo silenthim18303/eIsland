@@ -462,6 +462,13 @@
       "title": "Countdown",
       "empty": "No countdown events"
     },
+    "breakReminder": {
+      "title": "Break Reminder",
+      "count": "{{count}} items",
+      "empty": "No enabled reminders",
+      "remain": "{{min}} min",
+      "due": "Due soon"
+    },
     "pomodoro": {
       "title": "Pomodoro",
       "completedTitle": "Completed pomodoros",
@@ -1146,7 +1153,30 @@
           "pomodoro": "Pomodoro",
           "urlFavorites": "URL Favorites",
           "album": "Album Carousel",
-          "mokugyo": "Mokugyo"
+          "mokugyo": "Mokugyo",
+          "breakReminder": "Break Reminder"
+        },
+        "previewMock": {
+          "previewTag": "Preview",
+          "shortcutA": "App A",
+          "shortcutB": "App B",
+          "shortcutC": "App C",
+          "todoA": "Sample Todo A",
+          "todoB": "Sample Todo B",
+          "todoC": "Sample Todo C",
+          "songTitle": "Sample Song",
+          "songArtist": "Sample Artist",
+          "songAlbum": "Sample Album",
+          "samplePreview": "Sample Preview",
+          "albumFile": "sample-image.jpg",
+          "urlNoteGithub": "Code Hosting",
+          "urlNoteStackOverflow": "Tech Q&A",
+          "breakSedentary": "Stand up and move",
+          "breakGeneric": "Take a short break",
+          "date": "2026-01-01 Thursday",
+          "lunar": "Yisi Year, Twelfth Lunar Month",
+          "yiItems": "Pray · Travel · Open Market",
+          "jiItems": "Groundbreaking · Burial · Soil Breaking"
         }
       },
       "maxExpandLayout": {

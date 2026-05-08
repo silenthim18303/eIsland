@@ -462,6 +462,13 @@
       "title": "倒数日",
       "empty": "暂无倒数日"
     },
+    "breakReminder": {
+      "title": "休息提醒",
+      "count": "{{count}} 项",
+      "empty": "暂无启用的提醒",
+      "remain": "{{min}} 分钟",
+      "due": "即将提醒"
+    },
     "pomodoro": {
       "title": "番茄钟",
       "completedTitle": "已完成番茄数",
@@ -1146,7 +1153,30 @@
           "pomodoro": "番茄钟",
           "urlFavorites": "URL 收藏",
           "album": "相册轮播",
-          "mokugyo": "电子木鱼"
+          "mokugyo": "电子木鱼",
+          "breakReminder": "休息提醒"
+        },
+        "previewMock": {
+          "previewTag": "预览",
+          "shortcutA": "应用A",
+          "shortcutB": "应用B",
+          "shortcutC": "应用C",
+          "todoA": "示例待办 A",
+          "todoB": "示例待办 B",
+          "todoC": "示例待办 C",
+          "songTitle": "示例歌曲",
+          "songArtist": "示例艺术家",
+          "songAlbum": "示例专辑",
+          "samplePreview": "示例预览",
+          "albumFile": "示例图片.jpg",
+          "urlNoteGithub": "代码托管",
+          "urlNoteStackOverflow": "技术问答",
+          "breakSedentary": "站起来活动",
+          "breakGeneric": "休息一下",
+          "date": "2026年01月01日 星期四",
+          "lunar": "乙巳年 腊月十二",
+          "yiItems": "祈福 · 出行 · 开市",
+          "jiItems": "动土 · 安葬 · 破土"
         }
       },
       "maxExpandLayout": {
