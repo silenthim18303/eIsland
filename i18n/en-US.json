@@ -991,6 +991,7 @@
       "theme": "Theme",
       "language": "Language",
       "behavior": "Interaction",
+      "animation": "Animations",
       "url-parser": "URL Parser",
       "clipboard-history": "Clipboard History",
       "alarm": "Alarm Settings",

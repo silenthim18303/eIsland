@@ -991,6 +991,7 @@
       "theme": "主题外观",
       "language": "语言切换",
       "behavior": "交互行为",
+      "animation": "软件动画",
       "url-parser": "URL解析",
       "clipboard-history": "剪贴板历史",
       "alarm": "闹钟配置",
