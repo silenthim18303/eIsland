@@ -1,0 +1,305 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+import { useEffect } from 'react';
+import useIslandStore from '../../store/isLandStore';
+import type { NotificationData } from '../../store/types';
+import {
+  ISLAND_BG_MEDIA_STORE_KEY,
+  ISLAND_BG_IMAGE_STORE_KEY,
+  ISLAND_BG_VIDEO_FIT_STORE_KEY,
+  ISLAND_BG_VIDEO_MUTED_STORE_KEY,
+  ISLAND_BG_VIDEO_LOOP_STORE_KEY,
+  ISLAND_BG_VIDEO_VOLUME_STORE_KEY,
+  ISLAND_BG_VIDEO_RATE_STORE_KEY,
+  ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY,
+  LOCAL_ISLAND_BG_SYNC_EVENT,
+  normalizeBgMediaConfig,
+  resolveBgMediaPreviewUrl,
+} from '../config/dynamicIslandConfig';
+import type { IslandBgMediaConfig, UpdateSourceKey } from '../config/dynamicIslandConfig';
+
+interface UseIslandSettingsSyncOptions {
+  language: string | undefined;
+  initRef: React.MutableRefObject<boolean>;
+  setGuide: () => void;
+  setNotificationRef: React.MutableRefObject<(data: NotificationData) => void>;
+  applyBgMedia: (media: IslandBgMediaConfig | null, previewUrl: string | null) => void;
+  expandLeaveIdleRef: React.MutableRefObject<boolean>;
+  maxExpandLeaveIdleRef: React.MutableRefObject<boolean>;
+  idleClickExpandRef: React.MutableRefObject<boolean>;
+  bgOpacityRef: React.MutableRefObject<number>;
+  bgBlurRef: React.MutableRefObject<number>;
+  setBgVideoFit: React.Dispatch<React.SetStateAction<'cover' | 'contain'>>;
+  setBgVideoMuted: React.Dispatch<React.SetStateAction<boolean>>;
+  setBgVideoLoop: React.Dispatch<React.SetStateAction<boolean>>;
+  setBgVideoVolume: React.Dispatch<React.SetStateAction<number>>;
+  setBgVideoRate: React.Dispatch<React.SetStateAction<number>>;
+  setBgVideoHwDecode: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): void {
+  const {
+    language,
+    initRef,
+    setGuide,
+    setNotificationRef,
+    applyBgMedia,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    idleClickExpandRef,
+    bgOpacityRef,
+    bgBlurRef,
+    setBgVideoFit,
+    setBgVideoMuted,
+    setBgVideoLoop,
+    setBgVideoVolume,
+    setBgVideoRate,
+    setBgVideoHwDecode,
+  } = options;
+
+  useEffect(() => {
+    if (!initRef.current) {
+      initRef.current = true;
+      window.api?.enableMousePassthrough();
+      window.api?.expandMouseleaveIdleGet?.().then((value) => { expandLeaveIdleRef.current = value; }).catch(() => {});
+      window.api?.maxexpandMouseleaveIdleGet?.().then((value) => { maxExpandLeaveIdleRef.current = value; }).catch(() => {});
+      window.api?.idleClickExpandGet?.().then((value) => { idleClickExpandRef.current = value; }).catch(() => {});
+      window.api?.springAnimationGet?.().then((value) => { useIslandStore.getState().setSpringAnimation(value); }).catch(() => {});
+      window.api?.animationSpeedGet?.().then((value) => {
+        const speed = value === 'slow' || value === 'medium' || value === 'fast' ? value : 'medium';
+        useIslandStore.getState().setAnimationSpeed(speed);
+      }).catch(() => {});
+
+      Promise.all([
+        window.api?.storeRead?.(ISLAND_BG_MEDIA_STORE_KEY),
+        window.api?.storeRead?.(ISLAND_BG_IMAGE_STORE_KEY) as Promise<string | null>,
+        window.api?.storeRead?.(ISLAND_BG_VIDEO_FIT_STORE_KEY) as Promise<'cover' | 'contain' | null>,
+        window.api?.storeRead?.(ISLAND_BG_VIDEO_MUTED_STORE_KEY) as Promise<boolean | null>,
+        window.api?.storeRead?.(ISLAND_BG_VIDEO_LOOP_STORE_KEY) as Promise<boolean | null>,
+        window.api?.storeRead?.('island-bg-opacity') as Promise<number | null>,
+        window.api?.storeRead?.('island-bg-blur') as Promise<number | null>,
+        window.api?.storeRead?.(ISLAND_BG_VIDEO_VOLUME_STORE_KEY) as Promise<number | null>,
+        window.api?.storeRead?.(ISLAND_BG_VIDEO_RATE_STORE_KEY) as Promise<number | null>,
+        window.api?.storeRead?.(ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY) as Promise<boolean | null>,
+      ]).then(async ([mediaRaw, legacyImage, videoFit, videoMuted, videoLoop, bgOpacity, bgBlur, videoVolume, videoRate, videoHwDecode]) => {
+        const el = document.getElementById('island-bg-layer');
+        if (!el) return;
+        if (videoFit === 'cover' || videoFit === 'contain') {
+          setBgVideoFit(videoFit);
+        }
+        if (typeof videoMuted === 'boolean') {
+          setBgVideoMuted(videoMuted);
+        }
+        if (typeof videoLoop === 'boolean') {
+          setBgVideoLoop(videoLoop);
+        }
+        if (typeof videoVolume === 'number' && Number.isFinite(videoVolume)) {
+          setBgVideoVolume(Math.max(0, Math.min(1, videoVolume)));
+        }
+        if (typeof videoRate === 'number' && Number.isFinite(videoRate)) {
+          setBgVideoRate(Math.max(0.25, Math.min(3, videoRate)));
+        }
+        if (typeof videoHwDecode === 'boolean') {
+          setBgVideoHwDecode(videoHwDecode);
+        }
+        if (typeof bgOpacity === 'number' && Number.isFinite(bgOpacity)) {
+          bgOpacityRef.current = Math.max(0, Math.min(100, bgOpacity));
+        }
+        if (typeof bgBlur === 'number' && Number.isFinite(bgBlur)) {
+          bgBlurRef.current = Math.max(0, Math.min(20, Math.round(bgBlur)));
+        }
+        const media = normalizeBgMediaConfig(mediaRaw)
+          ?? (typeof legacyImage === 'string' ? normalizeBgMediaConfig(legacyImage) : null);
+        if (media) {
+          const previewUrl = await resolveBgMediaPreviewUrl(media);
+          if (previewUrl) {
+            applyBgMedia(media, previewUrl);
+          }
+        } else {
+          el.style.opacity = String(bgOpacityRef.current / 100);
+          const safeBlur = bgBlurRef.current;
+          el.style.filter = safeBlur > 0 ? `blur(${safeBlur}px)` : 'none';
+        }
+      }).catch(() => {});
+
+      Promise.all([
+        window.api?.storeRead?.('guide-shown-version') as Promise<string | null>,
+        window.api?.updaterVersion?.(),
+      ]).then(([shownVersion, currentVersion]) => {
+        if (currentVersion && shownVersion !== currentVersion) {
+          setTimeout(() => setGuide(), 800);
+        }
+      }).catch(() => {});
+
+      window.api?.onSettingsChanged?.((channel: string, value: unknown) => {
+        if (channel === 'shortcut:open-clipboard-history') {
+          const store = useIslandStore.getState();
+          store.setMaxExpandTab('clipboardHistory');
+          store.setMaxExpand();
+        }
+        if (channel === 'shortcut:toggle-ui-lock') {
+          const store = useIslandStore.getState();
+          store.toggleUiStateLock();
+        }
+        if (channel === 'notification:show') {
+          if (value && typeof value === 'object' && 'title' in (value as object) && 'body' in (value as object)) {
+            setNotificationRef.current(value as NotificationData & {
+              startupUpdateSource?: UpdateSourceKey;
+              startupUpdateResolvedUrl?: string;
+            });
+          }
+        }
+        if (channel === 'guide:show') {
+          setGuide();
+        }
+        if (channel === 'island:opacity') {
+          const v = typeof value === 'number' ? Math.max(10, Math.min(100, Math.round(value))) : 100;
+          document.documentElement.style.setProperty('--island-opacity', String(v));
+        }
+        if (channel === 'island:expand-mouseleave-idle') {
+          expandLeaveIdleRef.current = Boolean(value);
+        }
+        if (channel === 'island:maxexpand-mouseleave-idle') {
+          maxExpandLeaveIdleRef.current = Boolean(value);
+        }
+        if (channel === 'island:idle-click-expand') {
+          idleClickExpandRef.current = Boolean(value);
+        }
+        if (channel === 'island:spring-animation') {
+          useIslandStore.getState().setSpringAnimation(Boolean(value));
+        }
+        if (channel === 'island:animation-speed') {
+          const v = value === 'slow' || value === 'medium' || value === 'fast' ? value : 'medium';
+          useIslandStore.getState().setAnimationSpeed(v);
+        }
+        if (channel === 'store:island-bg-media') {
+          const media = normalizeBgMediaConfig(value);
+          if (!media) {
+            applyBgMedia(null, null);
+            return;
+          }
+          resolveBgMediaPreviewUrl(media).then((previewUrl) => {
+            if (!previewUrl) {
+              applyBgMedia(null, null);
+              return;
+            }
+            applyBgMedia(media, previewUrl);
+          }).catch(() => {});
+        }
+        if (channel === 'store:island-bg-opacity') {
+          const el = document.getElementById('island-bg-layer');
+          if (!el) return;
+          const v = typeof value === 'number' && Number.isFinite(value) ? value : 100;
+          bgOpacityRef.current = Math.max(0, Math.min(100, v));
+          el.style.opacity = String(bgOpacityRef.current / 100);
+        }
+        if (channel === 'store:island-bg-blur') {
+          const el = document.getElementById('island-bg-layer');
+          if (!el) return;
+          const v = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+          bgBlurRef.current = Math.max(0, Math.min(20, Math.round(v)));
+          el.style.filter = bgBlurRef.current > 0 ? `blur(${bgBlurRef.current}px)` : 'none';
+        }
+        if (channel === `store:${ISLAND_BG_VIDEO_FIT_STORE_KEY}`) {
+          if (value === 'cover' || value === 'contain') {
+            setBgVideoFit(value);
+          }
+        }
+        if (channel === `store:${ISLAND_BG_VIDEO_MUTED_STORE_KEY}`) {
+          if (typeof value === 'boolean') {
+            setBgVideoMuted(value);
+          }
+        }
+        if (channel === `store:${ISLAND_BG_VIDEO_LOOP_STORE_KEY}`) {
+          if (typeof value === 'boolean') {
+            setBgVideoLoop(value);
+          }
+        }
+        if (channel === `store:${ISLAND_BG_VIDEO_VOLUME_STORE_KEY}`) {
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            setBgVideoVolume(Math.max(0, Math.min(1, value)));
+          }
+        }
+        if (channel === `store:${ISLAND_BG_VIDEO_RATE_STORE_KEY}`) {
+          if (typeof value === 'number' && Number.isFinite(value)) {
+            setBgVideoRate(Math.max(0.25, Math.min(3, value)));
+          }
+        }
+        if (channel === `store:${ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY}`) {
+          if (typeof value === 'boolean') {
+            setBgVideoHwDecode(value);
+          }
+        }
+        if (channel === 'island:position') {
+          const offset = value as { x: number; y: number };
+          if (offset && typeof offset.x === 'number' && typeof offset.y === 'number') {
+            window.api?.setIslandPositionOffset?.(offset).catch(() => {});
+          }
+        }
+      });
+
+      const localBgSyncHandler = (event: Event): void => {
+        const customEvent = event as CustomEvent<{ media?: IslandBgMediaConfig | null; previewUrl?: string | null; opacity?: number; blur?: number; videoFit?: 'cover' | 'contain'; videoMuted?: boolean; videoLoop?: boolean; videoVolume?: number; videoRate?: number; videoHwDecode?: boolean }>;
+        const detail = customEvent.detail;
+        if (!detail || typeof detail !== 'object') return;
+        if ('media' in detail || 'previewUrl' in detail) {
+          applyBgMedia(detail.media ?? null, detail.previewUrl ?? null);
+        }
+        if (detail.videoFit === 'cover' || detail.videoFit === 'contain') {
+          setBgVideoFit(detail.videoFit);
+        }
+        if (typeof detail.videoMuted === 'boolean') {
+          setBgVideoMuted(detail.videoMuted);
+        }
+        if (typeof detail.videoLoop === 'boolean') {
+          setBgVideoLoop(detail.videoLoop);
+        }
+        if (typeof detail.videoVolume === 'number' && Number.isFinite(detail.videoVolume)) {
+          setBgVideoVolume(Math.max(0, Math.min(1, detail.videoVolume)));
+        }
+        if (typeof detail.videoRate === 'number' && Number.isFinite(detail.videoRate)) {
+          setBgVideoRate(Math.max(0.25, Math.min(3, detail.videoRate)));
+        }
+        if (typeof detail.videoHwDecode === 'boolean') {
+          setBgVideoHwDecode(detail.videoHwDecode);
+        }
+      };
+      window.addEventListener(LOCAL_ISLAND_BG_SYNC_EVENT, localBgSyncHandler as EventListener);
+    }
+  }, [
+    language,
+    initRef,
+    setGuide,
+    setNotificationRef,
+    applyBgMedia,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    idleClickExpandRef,
+    bgOpacityRef,
+    bgBlurRef,
+    setBgVideoFit,
+    setBgVideoMuted,
+    setBgVideoLoop,
+    setBgVideoVolume,
+    setBgVideoRate,
+    setBgVideoHwDecode,
+  ]);
+}

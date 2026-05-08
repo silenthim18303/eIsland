@@ -35,38 +35,14 @@ import { useIslandTimeStrings } from './hooks/useIslandTimeStrings';
 import { useIslandHoverInteraction } from './hooks/useIslandHoverInteraction';
 import { useIslandNowPlayingSync } from './hooks/useIslandNowPlayingSync';
 import { useIslandNotificationSubscriptions } from './hooks/useIslandNotificationSubscriptions';
+import { useIslandSettingsSync } from './hooks/useIslandSettingsSync';
+import { useIslandStartupAnnouncements } from './hooks/useIslandStartupAnnouncements';
 import {
-  ISLAND_BG_MEDIA_STORE_KEY,
-  ISLAND_BG_IMAGE_STORE_KEY,
-  ISLAND_BG_VIDEO_FIT_STORE_KEY,
-  ISLAND_BG_VIDEO_MUTED_STORE_KEY,
-  ISLAND_BG_VIDEO_LOOP_STORE_KEY,
-  ISLAND_BG_VIDEO_VOLUME_STORE_KEY,
-  ISLAND_BG_VIDEO_RATE_STORE_KEY,
-  ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY,
-  LOCAL_ISLAND_BG_SYNC_EVENT,
-  UPDATE_SOURCE_STORE_KEY,
-  UPDATE_AUTO_PROMPT_STORE_KEY,
-  WEATHER_ALERT_ENABLED_STORE_KEY,
   STATE_AREA,
   getStateClassName,
-  normalizeUpdateSource,
-  isProOnlyUpdateSource,
-  getRoleFromToken,
-  normalizeBgMediaConfig,
-  resolveBgMediaPreviewUrl,
 } from './config/dynamicIslandConfig';
-import type { UpdateSourceKey, IslandBgMediaType, IslandBgMediaConfig } from './config/dynamicIslandConfig';
+import type { IslandBgMediaType, IslandBgMediaConfig } from './config/dynamicIslandConfig';
 import { SvgIcon } from '../utils/SvgIcon';
-import { fetchStartupWeatherAlerts } from '../api/weather/weatherApi';
-import { fetchUpdateSourceUrl } from '../api/user/userAccountApi';
-import {
-  fetchCurrentAnnouncement,
-  readAnnouncementLastShownAppVersion,
-  readAnnouncementShowMode,
-  writeAnnouncementLastShownAppVersion,
-} from '../api/announcement/announcementApi';
-import { readLocalToken } from '../utils/userAccount';
 
 export type { IslandState } from './hooks/useDynamicIslandShell';
 export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from './config/dynamicIslandConfig';
@@ -262,225 +238,24 @@ function DynamicIsland(): React.JSX.Element {
     return () => clearInterval(alarmInterval);
   }, [i18n.resolvedLanguage]);
 
-  useEffect(() => {
-    if (!initRef.current) {
-      initRef.current = true;
-      window.api?.enableMousePassthrough();
-      window.api?.expandMouseleaveIdleGet?.().then((v) => { expandLeaveIdleRef.current = v; }).catch(() => {});
-      window.api?.maxexpandMouseleaveIdleGet?.().then((v) => { maxExpandLeaveIdleRef.current = v; }).catch(() => {});
-      window.api?.idleClickExpandGet?.().then((v) => { idleClickExpandRef.current = v; }).catch(() => {});
-      window.api?.springAnimationGet?.().then((v) => { useIslandStore.getState().setSpringAnimation(v); }).catch(() => {});
-      window.api?.animationSpeedGet?.().then((v) => { const s = v === 'slow' || v === 'medium' || v === 'fast' ? v : 'medium'; useIslandStore.getState().setAnimationSpeed(s); }).catch(() => {});
-
-      Promise.all([
-        window.api?.storeRead?.(ISLAND_BG_MEDIA_STORE_KEY),
-        window.api?.storeRead?.(ISLAND_BG_IMAGE_STORE_KEY) as Promise<string | null>,
-        window.api?.storeRead?.(ISLAND_BG_VIDEO_FIT_STORE_KEY) as Promise<'cover' | 'contain' | null>,
-        window.api?.storeRead?.(ISLAND_BG_VIDEO_MUTED_STORE_KEY) as Promise<boolean | null>,
-        window.api?.storeRead?.(ISLAND_BG_VIDEO_LOOP_STORE_KEY) as Promise<boolean | null>,
-        window.api?.storeRead?.('island-bg-opacity') as Promise<number | null>,
-        window.api?.storeRead?.('island-bg-blur') as Promise<number | null>,
-        window.api?.storeRead?.(ISLAND_BG_VIDEO_VOLUME_STORE_KEY) as Promise<number | null>,
-        window.api?.storeRead?.(ISLAND_BG_VIDEO_RATE_STORE_KEY) as Promise<number | null>,
-        window.api?.storeRead?.(ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY) as Promise<boolean | null>,
-      ]).then(async ([mediaRaw, legacyImage, videoFit, videoMuted, videoLoop, bgOpacity, bgBlur, videoVolume, videoRate, videoHwDecode]) => {
-        const el = document.getElementById('island-bg-layer');
-        if (!el) return;
-        if (videoFit === 'cover' || videoFit === 'contain') {
-          setBgVideoFit(videoFit);
-        }
-        if (typeof videoMuted === 'boolean') {
-          setBgVideoMuted(videoMuted);
-        }
-        if (typeof videoLoop === 'boolean') {
-          setBgVideoLoop(videoLoop);
-        }
-        if (typeof videoVolume === 'number' && Number.isFinite(videoVolume)) {
-          setBgVideoVolume(Math.max(0, Math.min(1, videoVolume)));
-        }
-        if (typeof videoRate === 'number' && Number.isFinite(videoRate)) {
-          setBgVideoRate(Math.max(0.25, Math.min(3, videoRate)));
-        }
-        if (typeof videoHwDecode === 'boolean') {
-          setBgVideoHwDecode(videoHwDecode);
-        }
-        if (typeof bgOpacity === 'number' && Number.isFinite(bgOpacity)) {
-          bgOpacityRef.current = Math.max(0, Math.min(100, bgOpacity));
-        }
-        if (typeof bgBlur === 'number' && Number.isFinite(bgBlur)) {
-          bgBlurRef.current = Math.max(0, Math.min(20, Math.round(bgBlur)));
-        }
-        const media = normalizeBgMediaConfig(mediaRaw)
-          ?? (typeof legacyImage === 'string' ? normalizeBgMediaConfig(legacyImage) : null);
-        if (media) {
-          const previewUrl = await resolveBgMediaPreviewUrl(media);
-          if (previewUrl) {
-            applyBgMedia(media, previewUrl);
-          }
-        } else {
-          el.style.opacity = String(bgOpacityRef.current / 100);
-          const safeBlur = bgBlurRef.current;
-          el.style.filter = safeBlur > 0 ? `blur(${safeBlur}px)` : 'none';
-        }
-      }).catch(() => {});
-
-      // 首次启动或更新后显示引导页
-      Promise.all([
-        window.api?.storeRead?.('guide-shown-version') as Promise<string | null>,
-        window.api?.updaterVersion?.(),
-      ]).then(([shownVersion, currentVersion]) => {
-        if (currentVersion && shownVersion !== currentVersion) {
-          setTimeout(() => setGuide(), 800);
-        }
-      }).catch(() => {});
-
-      // 跨窗口设置同步
-      window.api?.onSettingsChanged?.((channel: string, value: unknown) => {
-        if (channel === 'shortcut:open-clipboard-history') {
-          const store = useIslandStore.getState();
-          store.setMaxExpandTab('clipboardHistory');
-          store.setMaxExpand();
-        }
-        if (channel === 'shortcut:toggle-ui-lock') {
-          const store = useIslandStore.getState();
-          store.toggleUiStateLock();
-        }
-        if (channel === 'notification:show') {
-          if (value && typeof value === 'object' && 'title' in (value as object) && 'body' in (value as object)) {
-            setNotificationRef.current(value as {
-              title: string;
-              body: string;
-              icon?: string;
-              type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required';
-              sourceAppId?: string;
-              updateVersion?: string;
-              updateSourceLabel?: string;
-              weatherAlertTime?: string;
-              startupUpdateSource?: UpdateSourceKey;
-              startupUpdateResolvedUrl?: string;
-              urls?: string[];
-            });
-          }
-        }
-        if (channel === 'guide:show') {
-          setGuide();
-        }
-        if (channel === 'island:opacity') {
-          const v = typeof value === 'number' ? Math.max(10, Math.min(100, Math.round(value))) : 100;
-          document.documentElement.style.setProperty('--island-opacity', String(v));
-        }
-        if (channel === 'island:expand-mouseleave-idle') {
-          expandLeaveIdleRef.current = Boolean(value);
-        }
-        if (channel === 'island:maxexpand-mouseleave-idle') {
-          maxExpandLeaveIdleRef.current = Boolean(value);
-        }
-        if (channel === 'island:idle-click-expand') {
-          idleClickExpandRef.current = Boolean(value);
-        }
-        if (channel === 'island:spring-animation') {
-          useIslandStore.getState().setSpringAnimation(Boolean(value));
-        }
-        if (channel === 'island:animation-speed') {
-          const v = value === 'slow' || value === 'medium' || value === 'fast' ? value : 'medium';
-          useIslandStore.getState().setAnimationSpeed(v);
-        }
-        if (channel === 'store:island-bg-media') {
-          const media = normalizeBgMediaConfig(value);
-          if (!media) {
-            applyBgMedia(null, null);
-            return;
-          }
-          resolveBgMediaPreviewUrl(media).then((previewUrl) => {
-            if (!previewUrl) {
-              applyBgMedia(null, null);
-              return;
-            }
-            applyBgMedia(media, previewUrl);
-          }).catch(() => {});
-        }
-        if (channel === 'store:island-bg-opacity') {
-          const el = document.getElementById('island-bg-layer');
-          if (!el) return;
-          const v = typeof value === 'number' && Number.isFinite(value) ? value : 100;
-          bgOpacityRef.current = Math.max(0, Math.min(100, v));
-          el.style.opacity = String(bgOpacityRef.current / 100);
-        }
-        if (channel === 'store:island-bg-blur') {
-          const el = document.getElementById('island-bg-layer');
-          if (!el) return;
-          const v = typeof value === 'number' && Number.isFinite(value) ? value : 0;
-          bgBlurRef.current = Math.max(0, Math.min(20, Math.round(v)));
-          el.style.filter = bgBlurRef.current > 0 ? `blur(${bgBlurRef.current}px)` : 'none';
-        }
-        if (channel === `store:${ISLAND_BG_VIDEO_FIT_STORE_KEY}`) {
-          if (value === 'cover' || value === 'contain') {
-            setBgVideoFit(value);
-          }
-        }
-        if (channel === `store:${ISLAND_BG_VIDEO_MUTED_STORE_KEY}`) {
-          if (typeof value === 'boolean') {
-            setBgVideoMuted(value);
-          }
-        }
-        if (channel === `store:${ISLAND_BG_VIDEO_LOOP_STORE_KEY}`) {
-          if (typeof value === 'boolean') {
-            setBgVideoLoop(value);
-          }
-        }
-        if (channel === `store:${ISLAND_BG_VIDEO_VOLUME_STORE_KEY}`) {
-          if (typeof value === 'number' && Number.isFinite(value)) {
-            setBgVideoVolume(Math.max(0, Math.min(1, value)));
-          }
-        }
-        if (channel === `store:${ISLAND_BG_VIDEO_RATE_STORE_KEY}`) {
-          if (typeof value === 'number' && Number.isFinite(value)) {
-            setBgVideoRate(Math.max(0.25, Math.min(3, value)));
-          }
-        }
-        if (channel === `store:${ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY}`) {
-          if (typeof value === 'boolean') {
-            setBgVideoHwDecode(value);
-          }
-        }
-        if (channel === 'island:position') {
-          const offset = value as { x: number; y: number };
-          if (offset && typeof offset.x === 'number' && typeof offset.y === 'number') {
-            window.api?.setIslandPositionOffset?.(offset).catch(() => {});
-          }
-        }
-      });
-
-      // 同窗口内（集成模式）背景媒体同步：设置页直接 DOM 操作 + 本地事件
-      const localBgSyncHandler = (event: Event): void => {
-        const customEvent = event as CustomEvent<{ media?: IslandBgMediaConfig | null; previewUrl?: string | null; opacity?: number; blur?: number; videoFit?: 'cover' | 'contain'; videoMuted?: boolean; videoLoop?: boolean; videoVolume?: number; videoRate?: number; videoHwDecode?: boolean }>;
-        const detail = customEvent.detail;
-        if (!detail || typeof detail !== 'object') return;
-        if ('media' in detail || 'previewUrl' in detail) {
-          applyBgMedia(detail.media ?? null, detail.previewUrl ?? null);
-        }
-        if (detail.videoFit === 'cover' || detail.videoFit === 'contain') {
-          setBgVideoFit(detail.videoFit);
-        }
-        if (typeof detail.videoMuted === 'boolean') {
-          setBgVideoMuted(detail.videoMuted);
-        }
-        if (typeof detail.videoLoop === 'boolean') {
-          setBgVideoLoop(detail.videoLoop);
-        }
-        if (typeof detail.videoVolume === 'number' && Number.isFinite(detail.videoVolume)) {
-          setBgVideoVolume(Math.max(0, Math.min(1, detail.videoVolume)));
-        }
-        if (typeof detail.videoRate === 'number' && Number.isFinite(detail.videoRate)) {
-          setBgVideoRate(Math.max(0.25, Math.min(3, detail.videoRate)));
-        }
-        if (typeof detail.videoHwDecode === 'boolean') {
-          setBgVideoHwDecode(detail.videoHwDecode);
-        }
-      };
-      window.addEventListener(LOCAL_ISLAND_BG_SYNC_EVENT, localBgSyncHandler as EventListener);
-    }
-  }, [i18n.resolvedLanguage]);
+  useIslandSettingsSync({
+    language: i18n.resolvedLanguage,
+    initRef,
+    setGuide,
+    setNotificationRef,
+    applyBgMedia,
+    expandLeaveIdleRef,
+    maxExpandLeaveIdleRef,
+    idleClickExpandRef,
+    bgOpacityRef,
+    bgBlurRef,
+    setBgVideoFit,
+    setBgVideoMuted,
+    setBgVideoLoop,
+    setBgVideoVolume,
+    setBgVideoRate,
+    setBgVideoHwDecode,
+  });
 
   // Agent 语音输入快捷键触发时切换灵动岛状态
   useEffect(() => {
@@ -503,138 +278,16 @@ function DynamicIsland(): React.JSX.Element {
     }
   }, [state, timerData?.state, isPlaying, syncedLyrics, lyricsLoading, setLyrics]);
 
-  useEffect(() => {
-    const unsub = window.api?.onUpdaterStartupAutoCheckRequest?.(() => {
-      if (startupAutoCheckHandledRef.current) return;
-      startupAutoCheckHandledRef.current = true;
-      void (async () => {
-        const autoPromptValue = await window.api?.storeRead?.(UPDATE_AUTO_PROMPT_STORE_KEY).catch(() => null);
-        const autoPromptEnabled = typeof autoPromptValue === 'boolean' ? autoPromptValue : true;
-        if (!autoPromptEnabled) return;
-
-        const token = readLocalToken();
-        const isProUser = getRoleFromToken(token) === 'pro';
-        const sourceRaw = await window.api?.storeRead?.(UPDATE_SOURCE_STORE_KEY).catch(() => null);
-        let startupSource = normalizeUpdateSource(sourceRaw);
-        let startupResolvedUrl: string | undefined;
-
-        if (isProOnlyUpdateSource(startupSource)) {
-          if (!token || !isProUser) {
-            startupSource = 'cloudflare-r2';
-          } else {
-            const resolved = await fetchUpdateSourceUrl(token, startupSource);
-            if (resolved.ok && resolved.data?.url) {
-              startupResolvedUrl = resolved.data.url;
-            } else {
-              startupSource = 'cloudflare-r2';
-            }
-          }
-        }
-
-        const continueStartupUpdateCheck = async (): Promise<void> => {
-          await window.api?.updaterCheck(startupSource, startupResolvedUrl).catch(() => {});
-        };
-
-        const weatherAlertEnabledValue = await window.api?.storeRead?.(WEATHER_ALERT_ENABLED_STORE_KEY).catch(() => null);
-        const weatherAlertEnabled = typeof weatherAlertEnabledValue === 'boolean' ? weatherAlertEnabledValue : true;
-        if (!weatherAlertEnabled || !isProUser || !token) {
-          await continueStartupUpdateCheck();
-          return;
-        }
-
-        try {
-          const weatherAlertPayload = await fetchStartupWeatherAlerts(token);
-          if (weatherAlertPayload.alerts.length > 0) {
-            const firstAlert = weatherAlertPayload.alerts[0];
-            const firstAlertTitle = firstAlert.title
-              || firstAlert.typeName
-              || t('notification.weatherAlert.defaultTitle', { defaultValue: '天气预警' });
-            const city = weatherAlertPayload.location.city
-              || t('notification.weatherAlert.unknownCity', { defaultValue: '当前位置' });
-            const body = weatherAlertPayload.alerts.length > 1
-              ? t('notification.weatherAlert.bodyWithMore', {
-                  defaultValue: '{{city}}：{{title}}，另有 {{count}} 条预警。',
-                  city,
-                  title: firstAlertTitle,
-                  count: weatherAlertPayload.alerts.length - 1,
-                })
-              : t('notification.weatherAlert.bodySingle', {
-                  defaultValue: '{{city}}：{{title}}',
-                  city,
-                  title: firstAlertTitle,
-                });
-            setNotificationRef.current({
-              title: t('notification.weatherAlert.title', { defaultValue: '天气预警提醒' }),
-              body,
-              icon: SvgIcon.WEATHER,
-              type: 'weather-alert-startup',
-              weatherAlertTime: firstAlert.pubTime,
-              startupUpdateSource: startupSource,
-              startupUpdateResolvedUrl: startupResolvedUrl,
-            });
-            return;
-          }
-        } catch (error) {
-          console.warn('[Updater] startup weather alert pre-check failed:', error);
-        }
-
-        await continueStartupUpdateCheck();
-      })();
-    });
-    return () => {
-      unsub?.();
-    };
-  }, [i18n.resolvedLanguage, t]);
-
-  useEffect(() => {
-    const unsub = window.api?.onUpdaterNotAvailable?.(() => {
-      void (async () => {
-        const current = useIslandStore.getState().state;
-        if (current === 'login' || current === 'register' || current === 'payment') return;
-
-        const mode = await readAnnouncementShowMode();
-        const currentVersion = await window.api?.updaterVersion?.() ?? '';
-        if (mode === 'version-update-only') {
-          const lastShownVersion = await readAnnouncementLastShownAppVersion();
-          if (currentVersion && lastShownVersion === currentVersion) return;
-        }
-
-        const announcement = await fetchCurrentAnnouncement();
-        if (!announcement) return;
-
-        const applyShownVersion = async (): Promise<void> => {
-          if (mode !== 'version-update-only' || !currentVersion) return;
-          await writeAnnouncementLastShownAppVersion(currentVersion);
-        };
-
-        if (current === 'guide') {
-          pendingAnnouncementAfterGuideRef.current = true;
-          pendingAnnouncementAppVersionRef.current = mode === 'version-update-only' ? currentVersion : '';
-          return;
-        }
-
-        setAnnouncement();
-        await applyShownVersion();
-      })();
-    });
-    return () => {
-      unsub?.();
-    };
-  }, [setAnnouncement]);
-
-  useEffect(() => {
-    if (!pendingAnnouncementAfterGuideRef.current) return;
-    if (state === 'guide' || state === 'login' || state === 'register' || state === 'payment') return;
-
-    pendingAnnouncementAfterGuideRef.current = false;
-    setAnnouncement();
-
-    const pendingVersion = pendingAnnouncementAppVersionRef.current;
-    pendingAnnouncementAppVersionRef.current = '';
-    if (pendingVersion) {
-      void writeAnnouncementLastShownAppVersion(pendingVersion);
-    }
-  }, [state, setAnnouncement]);
+  useIslandStartupAnnouncements({
+    language: i18n.resolvedLanguage,
+    state,
+    setAnnouncement,
+    startupAutoCheckHandledRef,
+    pendingAnnouncementAfterGuideRef,
+    pendingAnnouncementAppVersionRef,
+    setNotificationRef,
+    t,
+  });
 
   // 背景视频的音量 / 速度随设置变更即时生效，避免重建 <video>
   useEffect(() => {
