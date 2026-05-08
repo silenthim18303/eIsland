@@ -33,8 +33,9 @@ import { useDynamicIslandShell } from './hooks/useDynamicIslandShell';
 import { useIslandDominantColor } from './hooks/useIslandDominantColor';
 import { useIslandTimeStrings } from './hooks/useIslandTimeStrings';
 import { useIslandHoverInteraction } from './hooks/useIslandHoverInteraction';
+import { useIslandNowPlayingSync } from './hooks/useIslandNowPlayingSync';
+import { useIslandNotificationSubscriptions } from './hooks/useIslandNotificationSubscriptions';
 import {
-  CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY,
   ISLAND_BG_MEDIA_STORE_KEY,
   ISLAND_BG_IMAGE_STORE_KEY,
   ISLAND_BG_VIDEO_FIT_STORE_KEY,
@@ -52,21 +53,13 @@ import {
   normalizeUpdateSource,
   isProOnlyUpdateSource,
   getRoleFromToken,
-  getUpdateSourceLabel,
   normalizeBgMediaConfig,
   resolveBgMediaPreviewUrl,
 } from './config/dynamicIslandConfig';
 import type { UpdateSourceKey, IslandBgMediaType, IslandBgMediaConfig } from './config/dynamicIslandConfig';
 import { SvgIcon } from '../utils/SvgIcon';
-import type { NowPlayingInfo } from '../store/isLandStore';
-import { fetchLyrics } from '../api/lyrics/lrcApi';
-import { fetchKaraokeLyrics } from '../api/lyrics/lrcs/karaoke';
-import type { KaraokeLine } from '../api/lyrics/lrcs/karaoke';
-import type { SyncedLyricLine } from '../store/types';
-import { fetchVersion, reportUpdateDownloadCount } from '../api/update/versionApi';
 import { fetchStartupWeatherAlerts } from '../api/weather/weatherApi';
 import { fetchUpdateSourceUrl } from '../api/user/userAccountApi';
-import { getWebsiteFaviconUrl, getWebsiteHostname } from '../api/site/siteMetaApi';
 import {
   fetchCurrentAnnouncement,
   readAnnouncementLastShownAppVersion,
@@ -85,30 +78,6 @@ export { AI_CHAT_CLIPBOARD_URL_EVENT, getStateClassName, STATE_CONFIGS } from '.
 function DynamicIsland(): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const { state, weather, setHover, setIdle, setExpanded, setLyrics, setGuide, setAnnouncement, setAgentVoiceInput, timerData, setTimerData, notification, setNotification, handleNowPlayingUpdate, updateProgress, coverImage, isMusicPlaying, isPlaying, dominantColor, setDominantColor, setSyncedLyrics, setLyricsLoading, syncedLyrics, lyricsLoading, pomodoroRunning, pomodoroRemaining, springAnimation, animationSpeed } = useIslandStore();
-  const handleNowPlayingUpdateRef = useRef(handleNowPlayingUpdate);
-  const updateProgressRef = useRef(updateProgress);
-  const setSyncedLyricsRef = useRef(setSyncedLyrics);
-  const setLyricsLoadingRef = useRef(setLyricsLoading);
-  /** 当前歌曲标识，用于检测切歌 */
-  const songKeyRef = useRef('');
-
-  useLayoutEffect(() => {
-    handleNowPlayingUpdateRef.current = handleNowPlayingUpdate;
-  });
-
-  useLayoutEffect(() => {
-    updateProgressRef.current = updateProgress;
-  });
-
-  useLayoutEffect(() => {
-    setSyncedLyricsRef.current = setSyncedLyrics;
-    setLyricsLoadingRef.current = setLyricsLoading;
-  });
-
-  // 用于平滑进度插值的基准数据（来自 SMTC Worker 事件）
-  const progressBaseRef = useRef({ positionMs: 0, durationMs: 0, timestamp: 0 });
-  // rAF 循环 ID，用于停止插值
-  const progressRafRef = useRef<number | null>(null);
 
   const initRef = useRef(false);
   const isHoveringRef = useRef(false);
@@ -178,6 +147,13 @@ function DynamicIsland(): React.JSX.Element {
   // 同步 ref 以在回调中使用最新函数
   useLayoutEffect(() => {
     setNotificationRef.current = setNotification;
+  });
+
+  useIslandNowPlayingSync({
+    handleNowPlayingUpdate,
+    updateProgress,
+    setSyncedLyrics,
+    setLyricsLoading,
   });
 
   useIslandDominantColor({
@@ -712,210 +688,11 @@ function DynamicIsland(): React.JSX.Element {
     }
   }, [bgVideoLoop]);
 
-  // 全局订阅 NowPlaying 歌曲信息（主进程推送）
-  // 在 DynamicIsland 层级订阅，确保应用启动时就开始监听
-  useEffect(() => {
-    const stopProgressRAF = () => {
-      if (progressRafRef.current !== null) {
-        cancelAnimationFrame(progressRafRef.current);
-        progressRafRef.current = null;
-      }
-    };
-    const unsubscribe = window.api?.onNowPlayingInfo((info: NowPlayingInfo | null) => {
-      handleNowPlayingUpdateRef.current(info);
-
-      // ===== 歌词获取：检测切歌后立即获取 =====
-      const newKey = info ? `${info.title}||${info.artist}` : '';
-      if (newKey && newKey !== songKeyRef.current) {
-        songKeyRef.current = newKey;
-        console.log('[Lyrics] Song changed:', info!.title, '-', info!.artist, '| pos_ms:', info!.position_ms, '| dur_ms:', info!.duration_ms);
-        setSyncedLyricsRef.current(null);
-        setLyricsLoadingRef.current(true);
-        const capturedKey = newKey;
-        const title = info!.title;
-        const artist = info!.artist;
-        const deviceId = info!.deviceId;
-
-        /**
-         * 逐字优先流程: 开关开启 → 先拉 YRC/QRC/KRC 等逐字歌词源,
-         * 任何一源命中则渲染逐字扫光; 全部失败则走原逐行链路。
-         */
-        const loadLyrics = async (): Promise<void> => {
-          let karaokeEnabled = false;
-          try {
-            karaokeEnabled = await window.api.musicLyricsKaraokeGet();
-          } catch {
-            karaokeEnabled = false;
-          }
-
-          if (karaokeEnabled) {
-            try {
-              const karaoke = await fetchKaraokeLyrics(title, artist, deviceId);
-              if (songKeyRef.current !== capturedKey) return;
-              if (karaoke && karaoke.length > 0) {
-                const mapped: SyncedLyricLine[] = karaoke.map((l: KaraokeLine) => ({
-                  time_ms: l.time_ms,
-                  text: l.text,
-                  duration_ms: l.duration_ms,
-                  syllables: l.syllables,
-                }));
-                console.log('[Lyrics] Karaoke fetched:', mapped.length, 'lines');
-                setSyncedLyricsRef.current(mapped);
-                return;
-              }
-            } catch (err) {
-              console.warn('[Lyrics] Karaoke fetch failed, falling back:', err);
-            }
-            if (songKeyRef.current !== capturedKey) return;
-          }
-
-          try {
-            const result = await fetchLyrics(title, artist, deviceId);
-            if (songKeyRef.current !== capturedKey) return;
-            console.log('[Lyrics] Fetched:', result ? `${result.length} lines` : 'null');
-            setSyncedLyricsRef.current(result);
-          } catch (err) {
-            console.error('[Lyrics] Fetch error:', err);
-            if (songKeyRef.current === capturedKey) setSyncedLyricsRef.current(null);
-          }
-        };
-
-        loadLyrics();
-      } else if (!newKey) {
-        songKeyRef.current = '';
-        setSyncedLyricsRef.current(null);
-      }
-
-      if (info && info.position_ms !== undefined) {
-        if (info.isPlaying) {
-          // 重置插值基准：必须无条件更新，确保切歌时 durationMs 也同步刷新
-          progressBaseRef.current = {
-            positionMs: info.position_ms,
-            durationMs: info.duration_ms,
-            timestamp: Date.now(),
-          };
-          // 复用已有循环；若旧循环已停止则自动重新启动
-          if (progressRafRef.current === null) {
-            let lastProgressWrite = 0;
-            const tick = () => {
-              const now = Date.now();
-              const base = progressBaseRef.current;
-              const elapsed = now - base.timestamp;
-              if (now - lastProgressWrite >= 66) {
-                lastProgressWrite = now;
-                updateProgressRef.current(base.positionMs + elapsed);
-              }
-              progressRafRef.current = requestAnimationFrame(tick);
-            };
-            progressRafRef.current = requestAnimationFrame(tick);
-          }
-        } else {
-          // 暂停时：停止插值并直接设置最终位置
-          stopProgressRAF();
-          updateProgressRef.current(info.position_ms);
-        }
-      }
-    });
-    return () => {
-      unsubscribe?.();
-      stopProgressRAF();
-    };
-  }, []);
-
-  // 订阅播放源切换请求（主进程推送）
-  useEffect(() => {
-    const unsubSwitch = window.api?.onSourceSwitchRequest((data) => {
-      setNotificationRef.current({
-        title: t('notification.sourceSwitch.title', { defaultValue: '检测到其他播放源' }),
-        body: `${data.title} - ${data.artist}（${data.sourceAppId}）`,
-        icon: SvgIcon.MUSIC,
-        type: 'source-switch',
-        sourceAppId: data.sourceAppId,
-      });
-    });
-    return () => {
-      unsubSwitch?.();
-    };
-  }, [i18n.resolvedLanguage]);
-
-  // 订阅有新版本可用事件（启动时自动检查推送，仅首次弹出通知）
-  const updateNotifiedRef = useRef(false);
-  useEffect(() => {
-    const unsubAvailable = window.api?.onUpdaterAvailable?.((data) => {
-      if (updateNotifiedRef.current) return;
-      updateNotifiedRef.current = true;
-      Promise.all([
-        fetchVersion().catch(() => null),
-        window.api?.storeRead?.(UPDATE_SOURCE_STORE_KEY).catch(() => null),
-      ]).then(([info, source]) => {
-        const desc = (info?.description ?? '').trim();
-        const updateSourceLabel = getUpdateSourceLabel(source);
-        setNotificationRef.current({
-          title: t('notification.update.availableTitle', { defaultValue: '发现新版本' }),
-          body: desc || t('notification.update.availableBody', { defaultValue: '是否立即下载？' }),
-          icon: SvgIcon.UPDATE,
-          type: 'update-available',
-          updateVersion: data.version,
-          updateSourceLabel,
-        });
-      });
-    });
-    return () => {
-      unsubAvailable?.();
-    };
-  }, [i18n.resolvedLanguage]);
-
-  // 订阅更新下载完成事件（主进程推送）
-  useEffect(() => {
-    const unsubUpdate = window.api?.onUpdaterDownloaded?.((data) => {
-      reportUpdateDownloadCount(data.version).catch(() => {});
-      setNotificationRef.current({
-        title: t('notification.update.readyTitle', { defaultValue: '更新就绪' }),
-        body: t('notification.update.readyBody', {
-          defaultValue: '新版本 v{{version}} 已下载完成，是否立即安装？',
-          version: data.version,
-        }),
-        icon: SvgIcon.UPDATE,
-        type: 'update-ready',
-        updateVersion: data.version,
-      });
-    });
-    return () => {
-      unsubUpdate?.();
-    };
-  }, [i18n.resolvedLanguage]);
-
-  // 订阅剪贴板 URL 检测事件（主进程推送）
-  useEffect(() => {
-    const unsubClipboard = window.api?.onClipboardUrlsDetected?.(({ urls, title }) => {
-      let suppressInFavorites = true;
-      try {
-        const raw = localStorage.getItem(CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY);
-        if (raw === '0') suppressInFavorites = false;
-        if (raw === '1') suppressInFavorites = true;
-      } catch { /* noop */ }
-
-      const store = useIslandStore.getState();
-      if (
-        suppressInFavorites
-        && store.state === 'maxExpand'
-        && (store.maxExpandTab === 'urlFavorites' || store.maxExpandTab === 'clipboardHistory' || store.maxExpandTab === 'aiChat')
-      ) return;
-
-      const faviconUrl = getWebsiteFaviconUrl(urls[0]);
-      const hostname = getWebsiteHostname(urls[0]);
-      setNotificationRef.current({
-        title: t('notification.clipboard.detectedTitle', { defaultValue: '检测到链接' }),
-        body: title || hostname || urls[0],
-        icon: faviconUrl || SvgIcon.LINK,
-        type: 'clipboard-url',
-        urls,
-      });
-    });
-    return () => {
-      unsubClipboard?.();
-    };
-  }, [i18n.resolvedLanguage]);
+  useIslandNotificationSubscriptions({
+    language: i18n.resolvedLanguage,
+    t,
+    setNotificationRef,
+  });
 
   useIslandHoverInteraction({
     state,
