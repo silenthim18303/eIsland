@@ -906,7 +906,11 @@
       "software": {
         "title": "Common Software",
         "subtitle": "Quick access and manage frequently used software.",
-        "empty": "No software added yet"
+        "empty": "No software added yet",
+        "download": "Download",
+        "items": {
+          "steam": "The world's largest gaming platform."
+        }
       },
       "download": {
         "title": "Multi-Thread Download",

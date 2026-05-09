@@ -906,7 +906,11 @@
       "software": {
         "title": "常用软件",
         "subtitle": "快速访问和管理常用软件。",
-        "empty": "暂无常用软件"
+        "empty": "暂无常用软件",
+        "download": "前往下载",
+        "items": {
+          "steam": "全球最大的游戏平台，海量游戏资源。"
+        }
       },
       "download": {
         "title": "多线程下载",

@@ -231,6 +231,7 @@ export function ToolboxTab(): ReactElement {
     {
       id: 'steam',
       name: 'Steam',
+      description: t('maxExpand.toolbox.software.items.steam'),
       url: 'https://store.steampowered.com/about/',
       icon: 'https://store.steampowered.com/favicon.ico',
     },
@@ -424,23 +425,27 @@ export function ToolboxTab(): ReactElement {
             </div>
           )}
           {activeSidebar === 'software' && (
-            <div className="software-grid">
+            <div className="software-list">
               {softwareItems.map((item) => (
-                <button
-                  key={item.id}
-                  className="software-grid-card"
-                  type="button"
-                  onClick={() => window.api?.clipboardOpenUrl(item.url)}
-                  title={item.url}
-                >
+                <div key={item.id} className="software-list-card">
                   <img
-                    className="software-grid-card-icon"
+                    className="software-list-card-icon"
                     src={item.icon}
                     alt={item.name}
                     draggable={false}
                   />
-                  <span className="software-grid-card-name">{item.name}</span>
-                </button>
+                  <div className="software-list-card-info">
+                    <span className="software-list-card-name">{item.name}</span>
+                    <span className="software-list-card-desc">{item.description}</span>
+                  </div>
+                  <button
+                    className="settings-lyrics-source-btn"
+                    type="button"
+                    onClick={() => window.api?.clipboardOpenUrl(item.url)}
+                  >
+                    {t('maxExpand.toolbox.software.download')}
+                  </button>
+                </div>
               ))}
             </div>
           )}
