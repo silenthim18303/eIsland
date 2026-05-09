@@ -24,37 +24,36 @@
  * @author 鸡哥
  */
 
-import 'devicon/devicon.min.css';
-import javascriptOriginalIcon from 'devicon/icons/javascript/javascript-original.svg';
-import typescriptOriginalIcon from 'devicon/icons/typescript/typescript-original.svg';
-import reactOriginalIcon from 'devicon/icons/react/react-original.svg';
-import pythonOriginalIcon from 'devicon/icons/python/python-original.svg';
-import javaOriginalIcon from 'devicon/icons/java/java-original.svg';
-import cOriginalIcon from 'devicon/icons/c/c-original.svg';
-import cplusplusOriginalIcon from 'devicon/icons/cplusplus/cplusplus-original.svg';
-import csharpOriginalIcon from 'devicon/icons/csharp/csharp-original.svg';
-import goOriginalIcon from 'devicon/icons/go/go-original.svg';
-import rustOriginalIcon from 'devicon/icons/rust/rust-original.svg';
-import phpOriginalIcon from 'devicon/icons/php/php-original.svg';
-import rubyOriginalIcon from 'devicon/icons/ruby/ruby-original.svg';
-import swiftOriginalIcon from 'devicon/icons/swift/swift-original.svg';
-import kotlinOriginalIcon from 'devicon/icons/kotlin/kotlin-original.svg';
-import dartOriginalIcon from 'devicon/icons/dart/dart-original.svg';
-import htmlOriginalIcon from 'devicon/icons/html5/html5-original.svg';
-import cssOriginalIcon from 'devicon/icons/css3/css3-original.svg';
-import sassOriginalIcon from 'devicon/icons/sass/sass-original.svg';
-import lessFallbackIcon from 'devicon/icons/less/less-plain-wordmark.svg';
-import vueOriginalIcon from 'devicon/icons/vuejs/vuejs-original.svg';
-import svelteOriginalIcon from 'devicon/icons/svelte/svelte-original.svg';
-import angularOriginalIcon from 'devicon/icons/angularjs/angularjs-original.svg';
-import jsonOriginalIcon from 'devicon/icons/json/json-original.svg';
-import yamlOriginalIcon from 'devicon/icons/yaml/yaml-original.svg';
-import xmlOriginalIcon from 'devicon/icons/xml/xml-original.svg';
-import bashOriginalIcon from 'devicon/icons/bash/bash-original.svg';
-import powershellOriginalIcon from 'devicon/icons/powershell/powershell-original.svg';
-import dockerOriginalIcon from 'devicon/icons/docker/docker-original.svg';
-import sqlOriginalIcon from 'devicon/icons/azuresqldatabase/azuresqldatabase-original.svg';
-import markdownOriginalIcon from 'devicon/icons/markdown/markdown-original.svg';
+const javascriptOriginalIcon = '/svg/devicons/javascript-original.svg';
+const typescriptOriginalIcon = '/svg/devicons/typescript-original.svg';
+const reactOriginalIcon = '/svg/devicons/react-original.svg';
+const pythonOriginalIcon = '/svg/devicons/python-original.svg';
+const javaOriginalIcon = '/svg/devicons/java-original.svg';
+const cOriginalIcon = '/svg/devicons/c-original.svg';
+const cplusplusOriginalIcon = '/svg/devicons/cplusplus-original.svg';
+const csharpOriginalIcon = '/svg/devicons/csharp-original.svg';
+const goOriginalIcon = '/svg/devicons/go-original.svg';
+const rustOriginalIcon = '/svg/devicons/rust-original.svg';
+const phpOriginalIcon = '/svg/devicons/php-original.svg';
+const rubyOriginalIcon = '/svg/devicons/ruby-original.svg';
+const swiftOriginalIcon = '/svg/devicons/swift-original.svg';
+const kotlinOriginalIcon = '/svg/devicons/kotlin-original.svg';
+const dartOriginalIcon = '/svg/devicons/dart-original.svg';
+const htmlOriginalIcon = '/svg/devicons/html5-original.svg';
+const cssOriginalIcon = '/svg/devicons/css3-original.svg';
+const sassOriginalIcon = '/svg/devicons/sass-original.svg';
+const lessFallbackIcon = '/svg/devicons/less-plain-wordmark.svg';
+const vueOriginalIcon = '/svg/devicons/vuejs-original.svg';
+const svelteOriginalIcon = '/svg/devicons/svelte-original.svg';
+const angularOriginalIcon = '/svg/devicons/angularjs-original.svg';
+const jsonOriginalIcon = '/svg/devicons/json-original.svg';
+const yamlOriginalIcon = '/svg/devicons/yaml-original.svg';
+const xmlOriginalIcon = '/svg/devicons/xml-original.svg';
+const bashOriginalIcon = '/svg/devicons/bash-original.svg';
+const powershellOriginalIcon = '/svg/devicons/powershell-original.svg';
+const dockerOriginalIcon = '/svg/devicons/docker-original.svg';
+const sqlOriginalIcon = '/svg/devicons/azuresqldatabase-original.svg';
+const markdownOriginalIcon = '/svg/devicons/markdown-original.svg';
 
 export const DEVICON_LANGUAGE_ALIASES: Record<string, string> = {
   js: 'javascript',

@@ -21,7 +21,6 @@
     "@coooookies/windows-smtc-monitor": "^1.0.12",
     "@tailwindcss/vite": "^4.2.2",
     "colorthief": "^3.3.1",
-    "devicon": "^2.17.0",
     "electron-updater": "^6.8.3",
     "fetch-installed-software": "^0.0.7",
     "get-windows": "^9.3.0",
