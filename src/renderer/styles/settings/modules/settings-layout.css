@@ -2662,6 +2662,23 @@
   background: rgba(var(--color-text-rgb), 0.06);
 }
 
+.download-save-path-input:disabled {
+  cursor: not-allowed;
+  color: rgba(var(--color-text-rgb), 0.35);
+  border-color: rgba(var(--color-text-rgb), 0.08);
+  background: rgba(var(--color-text-rgb), 0.03);
+}
+
+.download-path-row .settings-lyrics-source-btn:disabled,
+.download-path-row .settings-lyrics-source-btn.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  color: rgba(var(--color-text-rgb), 0.35);
+  border-color: rgba(var(--color-text-rgb), 0.08);
+  background: rgba(var(--color-text-rgb), 0.03);
+  pointer-events: none;
+}
+
 .download-field-title-row {
   display: flex;
   align-items: center;

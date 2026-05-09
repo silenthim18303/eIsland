@@ -130,8 +130,10 @@ export function ToolboxTab(): ReactElement {
   const activeTask = useMemo(() => {
     return tasks.find((task) => task.status === 'downloading') || null;
   }, [tasks]);
+  const hasDownloadUrl = url.trim().length > 0;
 
   const handlePickSavePath = (): void => {
+    if (!hasDownloadUrl) return;
     window.api.downloadPickSavePath(inferSuggestedName(url)).then((picked) => {
       if (!picked) return;
       setSavePath(picked);
@@ -260,11 +262,13 @@ export function ToolboxTab(): ReactElement {
                         type="text"
                         placeholder={defaultDir || t('maxExpand.toolbox.download.form.savePathPlaceholder')}
                         value={savePath}
+                        disabled={!hasDownloadUrl}
                         onChange={(event) => setSavePath(event.target.value)}
                       />
                       <button
-                        className="settings-lyrics-source-btn"
+                        className={`settings-lyrics-source-btn ${!hasDownloadUrl ? 'disabled' : ''}`}
                         type="button"
+                        disabled={!hasDownloadUrl}
                         onClick={handlePickSavePath}
                       >
                         {t('maxExpand.toolbox.download.form.pickPath')}
