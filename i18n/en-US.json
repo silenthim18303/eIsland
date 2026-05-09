@@ -907,6 +907,9 @@
         "title": "Common Software",
         "subtitle": "Quick access and manage frequently used software.",
         "empty": "No software added yet",
+        "loading": "Loading...",
+        "refresh": "Refresh Page",
+        "feedback": "Report Issue",
         "download": "Download",
         "items": {
           "steam": "The world's largest gaming platform."

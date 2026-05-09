@@ -83,9 +83,20 @@ export function useStandaloneWindowTabSync(options: UseStandaloneWindowTabSyncOp
       }
     });
 
+    const handleLocalTabSwitch = (e: Event): void => {
+      if (cancelled) return;
+      const tab = (e as CustomEvent).detail as WindowTab;
+      if (VALID_TABS.has(tab)) {
+        setActiveTab(tab);
+        window.api.storeWrite(ACTIVE_TAB_STORE_KEY, tab).catch(() => {});
+      }
+    };
+    window.addEventListener('standalone-tab-switch', handleLocalTabSwitch);
+
     return () => {
       cancelled = true;
       unsub();
+      window.removeEventListener('standalone-tab-switch', handleLocalTabSwitch);
     };
   }, [setActiveTab]);
 }

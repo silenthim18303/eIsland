@@ -907,6 +907,9 @@
         "title": "常用软件",
         "subtitle": "快速访问和管理常用软件。",
         "empty": "暂无常用软件",
+        "loading": "加载中…",
+        "refresh": "刷新界面",
+        "feedback": "反馈问题",
         "download": "前往下载",
         "items": {
           "steam": "全球最大的游戏平台，海量游戏资源。"

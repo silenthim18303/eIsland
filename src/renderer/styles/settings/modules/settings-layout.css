@@ -188,6 +188,8 @@
   background: rgba(var(--color-text-rgb), 0.04);
   border: 1px solid rgba(var(--color-text-rgb), 0.06);
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .max-expand-settings-panel::-webkit-scrollbar {
@@ -2714,6 +2716,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
 }
 
 .software-list-card {
@@ -2752,6 +2755,34 @@
   font-size: 12px;
   font-weight: 500;
   color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.software-list-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  flex: 1;
+}
+
+.software-list-empty-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.software-list-empty-subtitle {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.3);
+  margin-bottom: 4px;
+}
+
+.software-list-empty-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .software-list-card-desc {

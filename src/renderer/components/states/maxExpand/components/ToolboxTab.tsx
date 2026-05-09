@@ -27,6 +27,9 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchToolboxSoftwareList, type ToolboxSoftwareItem } from '../../../../api/tools/toolboxSoftwareApi';
+import useIslandStore from '../../../../store/slices';
+
+const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
 type ToolboxSidebarKey = 'download' | 'software';
 
@@ -84,6 +87,7 @@ function formatDurationMs(value: number): string {
 /** 最大展开模式工具箱页面 */
 export function ToolboxTab(): ReactElement {
   const { t } = useTranslation();
+  const { setMaxExpandTab } = useIslandStore();
   const [activeSidebar, setActiveSidebar] = useState<ToolboxSidebarKey>('download');
   const [url, setUrl] = useState('');
   const [savePath, setSavePath] = useState('');
@@ -229,9 +233,17 @@ export function ToolboxTab(): ReactElement {
   };
 
   const [softwareItems, setSoftwareItems] = useState<ToolboxSoftwareItem[]>([]);
+  const [softwareLoading, setSoftwareLoading] = useState(true);
+
+  const loadSoftware = () => {
+    setSoftwareLoading(true);
+    fetchToolboxSoftwareList()
+      .then(setSoftwareItems)
+      .finally(() => setSoftwareLoading(false));
+  };
 
   useEffect(() => {
-    fetchToolboxSoftwareList().then(setSoftwareItems);
+    loadSoftware();
   }, []);
 
   return (
@@ -423,27 +435,65 @@ export function ToolboxTab(): ReactElement {
           )}
           {activeSidebar === 'software' && (
             <div className="software-list">
-              {softwareItems.map((item) => (
-                <div key={item.id} className="software-list-card">
-                  <img
-                    className="software-list-card-icon"
-                    src={item.iconUrl}
-                    alt={item.name}
-                    draggable={false}
-                  />
-                  <div className="software-list-card-info">
-                    <span className="software-list-card-name">{item.name}</span>
-                    <span className="software-list-card-desc">{item.description}</span>
-                  </div>
-                  <button
-                    className="settings-lyrics-source-btn"
-                    type="button"
-                    onClick={() => window.api?.clipboardOpenUrl(item.url)}
-                  >
-                    {t('maxExpand.toolbox.software.download')}
-                  </button>
+              {softwareLoading ? (
+                <div className="software-list-empty">
+                  <span className="software-list-empty-text">
+                    {t('maxExpand.toolbox.software.loading')}
+                  </span>
                 </div>
-              ))}
+              ) : softwareItems.length === 0 ? (
+                <div className="software-list-empty">
+                  <span className="software-list-empty-text">
+                    {t('maxExpand.toolbox.software.empty')}
+                  </span>
+                  <span className="software-list-empty-subtitle">
+                    {t('maxExpand.toolbox.software.subtitle')}
+                  </span>
+                  <div className="software-list-empty-actions">
+                    <button
+                      className="settings-lyrics-source-btn"
+                      type="button"
+                      onClick={loadSoftware}
+                    >
+                      {t('maxExpand.toolbox.software.refresh')}
+                    </button>
+                    <button
+                      className="settings-lyrics-source-btn"
+                      type="button"
+                      onClick={() => {
+                        window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, 'about-feedback').catch(() => {});
+                        setMaxExpandTab('settings');
+                        window.dispatchEvent(new CustomEvent('standalone-tab-switch', { detail: 'settings' }));
+                        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'about-feedback' }));
+                      }}
+                    >
+                      {t('maxExpand.toolbox.software.feedback')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                softwareItems.map((item) => (
+                  <div key={item.id} className="software-list-card">
+                    <img
+                      className="software-list-card-icon"
+                      src={item.iconUrl}
+                      alt={item.name}
+                      draggable={false}
+                    />
+                    <div className="software-list-card-info">
+                      <span className="software-list-card-name">{item.name}</span>
+                      <span className="software-list-card-desc">{item.description}</span>
+                    </div>
+                    <button
+                      className="settings-lyrics-source-btn"
+                      type="button"
+                      onClick={() => window.api?.clipboardOpenUrl(item.url)}
+                    >
+                      {t('maxExpand.toolbox.software.download')}
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
