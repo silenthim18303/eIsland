@@ -926,7 +926,8 @@
           "elapsedLabel": "已使用下载时间",
           "pause": "暂停",
           "resume": "继续",
-          "delete": "删除记录"
+          "delete": "删除记录",
+          "openFolder": "打开文件所在位置"
         },
         "status": {
           "downloading": "下载中",
@@ -946,7 +947,8 @@
           "resumeSuccess": "已继续下载任务",
           "resumeFailed": "继续下载失败",
           "removeSuccess": "已删除下载记录",
-          "removeFailed": "删除下载记录失败"
+          "removeFailed": "删除下载记录失败",
+          "openFolderFailed": "打开文件所在位置失败"
         }
       }
     },

@@ -209,6 +209,16 @@ export function ToolboxTab(): ReactElement {
     });
   };
 
+  const handleOpenTaskFolder = (savePath: string): void => {
+    window.api.openInExplorer(savePath).then((ok) => {
+      if (!ok) {
+        setStatusMessage(t('maxExpand.toolbox.download.messages.openFolderFailed'));
+      }
+    }).catch(() => {
+      setStatusMessage(t('maxExpand.toolbox.download.messages.openFolderFailed'));
+    });
+  };
+
   const getStatusText = (status: DownloadTaskStatus): string => {
     if (status === 'paused') return t('maxExpand.toolbox.download.status.paused');
     if (status === 'completed') return t('maxExpand.toolbox.download.status.completed');
@@ -361,6 +371,15 @@ export function ToolboxTab(): ReactElement {
                                 onClick={() => handleRemoveTask(task.id)}
                               >
                                 {t('maxExpand.toolbox.download.tasks.delete')}
+                              </button>
+                            )}
+                            {task.status === 'completed' && (
+                              <button
+                                className="settings-lyrics-source-btn"
+                                type="button"
+                                onClick={() => handleOpenTaskFolder(task.savePath)}
+                              >
+                                {t('maxExpand.toolbox.download.tasks.openFolder')}
                               </button>
                             )}
                           </div>

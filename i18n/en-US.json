@@ -926,7 +926,8 @@
           "elapsedLabel": "Elapsed",
           "pause": "Pause",
           "resume": "Resume",
-          "delete": "Delete"
+          "delete": "Delete",
+          "openFolder": "Show in Folder"
         },
         "status": {
           "downloading": "Downloading",
@@ -946,7 +947,8 @@
           "resumeSuccess": "Download task resumed",
           "resumeFailed": "Failed to resume download",
           "removeSuccess": "Download task removed",
-          "removeFailed": "Failed to remove download task"
+          "removeFailed": "Failed to remove download task",
+          "openFolderFailed": "Failed to open file location"
         }
       }
     },
