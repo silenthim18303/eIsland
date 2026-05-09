@@ -2710,6 +2710,51 @@
   margin-top: 8px;
 }
 
+.software-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+}
+
+.software-grid-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.08);
+  background: rgba(var(--color-text-rgb), 0.03);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.software-grid-card:hover {
+  background: rgba(var(--color-text-rgb), 0.07);
+  border-color: rgba(var(--color-text-rgb), 0.15);
+  transform: translateY(-1px);
+}
+
+.software-grid-card:active {
+  transform: scale(0.96);
+}
+
+.software-grid-card-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.software-grid-card-name {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.75);
+  text-align: center;
+  line-height: 1.3;
+  word-break: break-word;
+  max-width: 100%;
+}
+
 .settings-card-inline-row {
   display: flex;
   flex-wrap: wrap;

@@ -227,6 +227,15 @@ export function ToolboxTab(): ReactElement {
     return t('maxExpand.toolbox.download.status.downloading');
   };
 
+  const softwareItems = [
+    {
+      id: 'steam',
+      name: 'Steam',
+      url: 'https://store.steampowered.com/about/',
+      icon: 'https://store.steampowered.com/favicon.ico',
+    },
+  ];
+
   return (
     <div className="max-expand-settings toolbox-tab-container">
       <div className="max-expand-settings-layout">
@@ -415,16 +424,24 @@ export function ToolboxTab(): ReactElement {
             </div>
           )}
           {activeSidebar === 'software' && (
-            <div className="settings-cards">
-              <div className="settings-card">
-                <div className="settings-card-header">
-                  <div className="settings-card-title">{t('maxExpand.toolbox.software.title')}</div>
-                  <div className="settings-card-subtitle">{t('maxExpand.toolbox.software.subtitle')}</div>
-                </div>
-                <div className="settings-card-body">
-                  <div className="settings-music-hint">{t('maxExpand.toolbox.software.empty')}</div>
-                </div>
-              </div>
+            <div className="software-grid">
+              {softwareItems.map((item) => (
+                <button
+                  key={item.id}
+                  className="software-grid-card"
+                  type="button"
+                  onClick={() => window.api?.clipboardOpenUrl(item.url)}
+                  title={item.url}
+                >
+                  <img
+                    className="software-grid-card-icon"
+                    src={item.icon}
+                    alt={item.name}
+                    draggable={false}
+                  />
+                  <span className="software-grid-card-name">{item.name}</span>
+                </button>
+              ))}
             </div>
           )}
         </div>
