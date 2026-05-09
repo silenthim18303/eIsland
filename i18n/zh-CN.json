@@ -1205,7 +1205,8 @@
           "aiChat": "AI 对话",
           "memo": "备忘录",
           "countdown": "倒数日",
-          "alarm": "闹钟"
+          "alarm": "闹钟",
+          "toolbox": "工具箱"
         }
       },
       "hideProcess": {

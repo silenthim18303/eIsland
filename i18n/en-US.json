@@ -1205,7 +1205,8 @@
           "aiChat": "AI Chat",
           "memo": "Memo",
           "countdown": "Countdown",
-          "alarm": "Alarm"
+          "alarm": "Alarm",
+          "toolbox": "Toolbox"
         }
       },
       "hideProcess": {
