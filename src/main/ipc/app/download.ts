@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file download.ts
+ * @description 下载相关主进程 IPC 处理器注册。
+ * @author 鸡哥
+ */
+
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
@@ -130,6 +156,10 @@ function normalizeStartPayload(payload: unknown): { url: string; savePath?: stri
   };
 }
 
+/**
+ * 注册下载模块相关的 IPC 处理器。
+ * @param options - IPC 注册配置项。
+ */
 export function registerDownloadIpcHandlers(options: RegisterDownloadIpcHandlersOptions): void {
   if (registered) return;
   registered = true;

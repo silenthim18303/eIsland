@@ -197,6 +197,11 @@ export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
 
 export const DEFAULT_MAXEXPAND_NAV_LAYOUT: MaxExpandNavLayoutConfig = MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: true }));
 
+/**
+ * 标准化最大展开导航布局配置。
+ * @param raw - 任意来源的原始配置。
+ * @returns 合法且完整的导航布局配置。
+ */
 export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLayoutConfig {
   const defaults = DEFAULT_MAXEXPAND_NAV_LAYOUT.map((item) => ({ ...item }));
   if (!Array.isArray(raw) || raw.length === 0) {
