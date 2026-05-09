@@ -1,8 +1,18 @@
 import { randomUUID } from 'crypto';
-import { createReadStream, createWriteStream, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { mkdir, open, rename, rm, unlink } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
-import { pipeline } from 'stream/promises';
+import { EMIT_INTERVAL_MS } from './downloadEngine/config';
+import {
+  buildChunks,
+  inferFileNameFromUrl,
+  isAbortError,
+  mergePartFiles,
+  normalizeThreads,
+  parseContentDispositionFileName,
+  safeFileName,
+  type ChunkInfo,
+} from './downloadEngine/utils';
 
 export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
@@ -40,13 +50,6 @@ interface DownloadProbeResult {
   supportsRange: boolean;
 }
 
-interface ChunkInfo {
-  index: number;
-  start: number;
-  end: number;
-  partPath: string;
-}
-
 interface InternalTask extends DownloadTaskSnapshot {
   tempDir: string;
   tempOutputPath: string;
@@ -55,17 +58,6 @@ interface InternalTask extends DownloadTaskSnapshot {
   lastSampleTime: number;
   lastSampleBytes: number;
   lastEmitTime: number;
-}
-
-const DEFAULT_THREADS = 8;
-const MAX_THREADS = 16;
-const MIN_THREADS = 1;
-const EMIT_INTERVAL_MS = 160;
-const MIN_CHUNK_BYTES = 1024 * 1024;
-
-function normalizeThreads(value: unknown): number {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return DEFAULT_THREADS;
-  return Math.max(MIN_THREADS, Math.min(MAX_THREADS, Math.floor(value)));
 }
 
 function toTaskSnapshot(task: InternalTask): DownloadTaskSnapshot {
@@ -85,72 +77,6 @@ function toTaskSnapshot(task: InternalTask): DownloadTaskSnapshot {
     createdAt: task.createdAt,
     updatedAt: task.updatedAt,
   };
-}
-
-function parseContentDispositionFileName(headerValue: string): string {
-  const utf8Match = /filename\*\s*=\s*UTF-8''([^;]+)/i.exec(headerValue);
-  if (utf8Match && utf8Match[1]) {
-    try {
-      return decodeURIComponent(utf8Match[1].trim());
-    } catch {
-      return utf8Match[1].trim();
-    }
-  }
-  const simpleMatch = /filename\s*=\s*"?([^";]+)"?/i.exec(headerValue);
-  if (simpleMatch && simpleMatch[1]) {
-    return simpleMatch[1].trim();
-  }
-  return '';
-}
-
-function inferFileNameFromUrl(url: URL): string {
-  const fromPath = basename(decodeURIComponent(url.pathname || ''));
-  if (fromPath && fromPath !== '/' && fromPath !== '.') {
-    return fromPath;
-  }
-  return `download-${Date.now()}.bin`;
-}
-
-function safeFileName(input: string): string {
-  const safe = input.trim().replace(/[<>:"/\\|?*\x00-\x1F]/g, '_');
-  if (!safe) return `download-${Date.now()}.bin`;
-  return safe.slice(0, 180);
-}
-
-function isAbortError(error: unknown): boolean {
-  if (error instanceof DOMException && error.name === 'AbortError') return true;
-  if (!(error instanceof Error)) return false;
-  return error.name === 'AbortError' || /aborted|abort/i.test(error.message);
-}
-
-function buildChunks(totalBytes: number, threads: number, tempDir: string): ChunkInfo[] {
-  const targetThreads = Math.max(1, Math.min(threads, Math.floor(totalBytes / MIN_CHUNK_BYTES) || 1));
-  const chunkSize = Math.ceil(totalBytes / targetThreads);
-  const chunks: ChunkInfo[] = [];
-  let start = 0;
-  for (let index = 0; index < targetThreads; index++) {
-    const end = index === targetThreads - 1 ? totalBytes - 1 : Math.min(totalBytes - 1, start + chunkSize - 1);
-    chunks.push({
-      index,
-      start,
-      end,
-      partPath: join(tempDir, `chunk-${index}.part`),
-    });
-    start = end + 1;
-  }
-  return chunks;
-}
-
-async function mergePartFiles(partPaths: string[], outputPath: string): Promise<void> {
-  await rm(outputPath, { force: true }).catch(() => {});
-  const writeStream = createWriteStream(outputPath, { flags: 'w' });
-  for (let index = 0; index < partPaths.length; index++) {
-    await pipeline(createReadStream(partPaths[index]), writeStream, { end: false });
-  }
-  await new Promise<void>((resolve, reject) => {
-    writeStream.end(() => resolve());
-    writeStream.on('error', reject);
-  });
 }
 
 export class MultiThreadDownloadEngine {
