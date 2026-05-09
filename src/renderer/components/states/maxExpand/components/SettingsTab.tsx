@@ -578,6 +578,7 @@ export function SettingsTab(): ReactElement {
     setAutoDimEnabled(enabled);
     window.api.storeWrite(ISLAND_AUTO_DIM_ENABLED_STORE_KEY, enabled).catch(() => {});
     window.api.settingsPreview(`store:${ISLAND_AUTO_DIM_ENABLED_STORE_KEY}`, enabled).catch(() => {});
+    window.dispatchEvent(new CustomEvent('island-auto-dim-local-sync', { detail: { autoDimEnabled: enabled } }));
   };
 
   const handleAutoDimDelayChange = (sec: number): void => {
@@ -585,6 +586,7 @@ export function SettingsTab(): ReactElement {
     setAutoDimDelaySec(safe);
     window.api.storeWrite(ISLAND_AUTO_DIM_DELAY_STORE_KEY, safe).catch(() => {});
     window.api.settingsPreview(`store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`, safe).catch(() => {});
+    window.dispatchEvent(new CustomEvent('island-auto-dim-local-sync', { detail: { autoDimDelaySec: safe } }));
   };
 
   const applyBgMedia = (media: IslandBgMediaConfig | null, previewUrl: string | null): void => {

@@ -306,6 +306,18 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
         }
       };
       window.addEventListener(LOCAL_ISLAND_BG_SYNC_EVENT, localBgSyncHandler as EventListener);
+
+      const autoDimLocalHandler = (event: Event): void => {
+        const detail = (event as CustomEvent).detail;
+        if (!detail || typeof detail !== 'object') return;
+        if (typeof detail.autoDimEnabled === 'boolean') {
+          autoDimEnabledRef.current = detail.autoDimEnabled;
+        }
+        if (typeof detail.autoDimDelaySec === 'number' && Number.isFinite(detail.autoDimDelaySec)) {
+          autoDimDelayRef.current = Math.max(1, detail.autoDimDelaySec);
+        }
+      };
+      window.addEventListener('island-auto-dim-local-sync', autoDimLocalHandler as EventListener);
     }
   }, [
     language,
