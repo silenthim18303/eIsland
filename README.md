@@ -38,6 +38,16 @@
 
 <img src="assets/4.png" alt="Settings Screen" width="680" />
 
+### Agent Screen
+<p>Built-in AI agent workspace for intelligent assistance and streamlined productivity workflows</p>
+
+<img src="assets/5.png" alt="Agent Screen" width="680" />
+
+### Toolbox Screen
+<p>Practical utility panel with quick-access tools and common software actions</p>
+
+<img src="assets/6.png" alt="Toolbox Screen" width="680" />
+
 </div>
 
 ---
