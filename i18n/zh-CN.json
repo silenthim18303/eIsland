@@ -898,6 +898,15 @@
       "settings": "设置",
       "switchTo": "切换到{{label}}"
     },
+    "toolbox": {
+      "sidebar": {
+        "download": "下载"
+      },
+      "download": {
+        "title": "下载",
+        "subtitle": "下载工具入口，后续将在这里提供下载任务与资源管理能力。"
+      }
+    },
     "localFileSearch": {
       "title": "本地文件查找",
       "count": "{{count}} 项",

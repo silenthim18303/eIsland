@@ -898,6 +898,15 @@
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
     },
+    "toolbox": {
+      "sidebar": {
+        "download": "Download"
+      },
+      "download": {
+        "title": "Download",
+        "subtitle": "Download tools entry. Download tasks and resource management will be added here later."
+      }
+    },
     "localFileSearch": {
       "title": "Local File Search",
       "count": "{{count}} items",

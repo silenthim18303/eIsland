@@ -20,13 +20,45 @@
 
 /**
  * @file ToolboxTab.tsx
- * @description 最大展开模式工具箱 Tab（占位，先留空）
+ * @description 最大展开模式工具箱 Tab
  * @author 鸡哥
  */
 
-import React from 'react';
+import { useState, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 
-/** 最大展开模式工具箱页面（占位） */
-export function ToolboxTab(): React.ReactElement {
-  return <div className="toolbox-tab-container" />;
+type ToolboxSidebarKey = 'download';
+
+/** 最大展开模式工具箱页面 */
+export function ToolboxTab(): ReactElement {
+  const { t } = useTranslation();
+  const [activeSidebar, setActiveSidebar] = useState<ToolboxSidebarKey>('download');
+
+  return (
+    <div className="max-expand-settings toolbox-tab-container">
+      <div className="max-expand-settings-layout">
+        <div className="max-expand-settings-sidebar">
+          <button
+            className={`max-expand-settings-sidebar-item ${activeSidebar === 'download' ? 'active' : ''}`}
+            onClick={() => setActiveSidebar('download')}
+            type="button"
+          >
+            <span className="sidebar-dot" />
+            {t('maxExpand.toolbox.sidebar.download')}
+          </button>
+        </div>
+
+        <div className="max-expand-settings-panel">
+          {activeSidebar === 'download' && (
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title">{t('maxExpand.toolbox.download.title')}</div>
+                <div className="settings-card-subtitle">{t('maxExpand.toolbox.download.subtitle')}</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
