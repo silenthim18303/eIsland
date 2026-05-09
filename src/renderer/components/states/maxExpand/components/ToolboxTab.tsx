@@ -26,6 +26,7 @@
 
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { fetchToolboxSoftwareList, type ToolboxSoftwareItem } from '../../../../api/tools/toolboxSoftwareApi';
 
 type ToolboxSidebarKey = 'download' | 'software';
 
@@ -227,15 +228,11 @@ export function ToolboxTab(): ReactElement {
     return t('maxExpand.toolbox.download.status.downloading');
   };
 
-  const softwareItems = [
-    {
-      id: 'steam',
-      name: 'Steam',
-      description: t('maxExpand.toolbox.software.items.steam'),
-      url: 'https://store.steampowered.com/about/',
-      icon: 'https://store.steampowered.com/favicon.ico',
-    },
-  ];
+  const [softwareItems, setSoftwareItems] = useState<ToolboxSoftwareItem[]>([]);
+
+  useEffect(() => {
+    fetchToolboxSoftwareList().then(setSoftwareItems);
+  }, []);
 
   return (
     <div className="max-expand-settings toolbox-tab-container">
@@ -430,7 +427,7 @@ export function ToolboxTab(): ReactElement {
                 <div key={item.id} className="software-list-card">
                   <img
                     className="software-list-card-icon"
-                    src={item.icon}
+                    src={item.iconUrl}
                     alt={item.name}
                     draggable={false}
                   />
