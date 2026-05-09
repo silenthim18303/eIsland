@@ -264,6 +264,58 @@ declare global {
       autostartSet: (mode: string) => Promise<boolean>;
       navOrderGet: () => Promise<{ visibleOrder: string[]; hiddenOrder: string[] }>;
       navOrderSet: (payload: { visibleOrder: string[]; hiddenOrder: string[] }) => Promise<boolean>;
+      downloadStart: (payload: { url: string; savePath?: string; threads?: number }) => Promise<{
+        ok: boolean;
+        task?: {
+          id: string;
+          url: string;
+          savePath: string;
+          fileName: string;
+          totalBytes: number;
+          downloadedBytes: number;
+          progress: number;
+          speedBytesPerSecond: number;
+          threads: number;
+          status: 'downloading' | 'completed' | 'failed' | 'canceled';
+          errorMessage?: string;
+          createdAt: number;
+          updatedAt: number;
+        };
+        message?: string;
+      }>;
+      downloadCancel: (taskId: string) => Promise<boolean>;
+      downloadList: () => Promise<Array<{
+        id: string;
+        url: string;
+        savePath: string;
+        fileName: string;
+        totalBytes: number;
+        downloadedBytes: number;
+        progress: number;
+        speedBytesPerSecond: number;
+        threads: number;
+        status: 'downloading' | 'completed' | 'failed' | 'canceled';
+        errorMessage?: string;
+        createdAt: number;
+        updatedAt: number;
+      }>>;
+      downloadPickSavePath: (suggestedName?: string) => Promise<string | null>;
+      downloadGetDefaultDir: () => Promise<string>;
+      onDownloadTaskUpdated: (callback: (task: {
+        id: string;
+        url: string;
+        savePath: string;
+        fileName: string;
+        totalBytes: number;
+        downloadedBytes: number;
+        progress: number;
+        speedBytesPerSecond: number;
+        threads: number;
+        status: 'downloading' | 'completed' | 'failed' | 'canceled';
+        errorMessage?: string;
+        createdAt: number;
+        updatedAt: number;
+      }) => void) => () => void;
       updaterCheck: (source?: string, resolvedUrl?: string) => Promise<{ available: boolean; version?: string; releaseNotes?: string; currentVersion?: string; error?: string }>;
       updaterDownload: (source?: string, resolvedUrl?: string) => Promise<boolean>;
       updaterInstall: () => Promise<boolean>;

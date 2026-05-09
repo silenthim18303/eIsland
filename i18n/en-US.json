@@ -904,7 +904,37 @@
       },
       "download": {
         "title": "Download",
-        "subtitle": "Download tools entry. Download tasks and resource management will be added here later."
+        "subtitle": "Supports multi-threaded downloads with custom save path and real-time progress.",
+        "form": {
+          "urlLabel": "Download URL",
+          "urlPlaceholder": "Enter file URL, e.g. https://example.com/file.zip",
+          "savePathLabel": "Save Path",
+          "savePathPlaceholder": "Leave empty to use system Downloads folder",
+          "pickPath": "Choose Path",
+          "defaultDirHint": "Default directory: {{dir}}",
+          "threadsLabel": "Threads (1-16)",
+          "start": "Start Download",
+          "starting": "Starting...",
+          "cancelCurrent": "Cancel Current Task"
+        },
+        "tasks": {
+          "title": "Download Tasks",
+          "subtitle": "Shows recent task progress, speed, and status.",
+          "empty": "No download tasks yet"
+        },
+        "status": {
+          "downloading": "Downloading",
+          "completed": "Completed",
+          "failed": "Failed",
+          "canceled": "Canceled"
+        },
+        "messages": {
+          "started": "Download task created",
+          "startFailed": "Failed to start download",
+          "pickPathFailed": "Failed to choose save path",
+          "cancelSuccess": "Download task canceled",
+          "cancelFailed": "Failed to cancel download"
+        }
       }
     },
     "localFileSearch": {

@@ -40,6 +40,7 @@ import { registerScreenshotHotkeyIpcHandlers } from './ipc/system/screenshotHotk
 import { registerAppIpcHandlers } from './ipc/app/app';
 import { registerSystemIpcHandlers } from './ipc/system/system';
 import { registerUpdaterIpcHandlers } from './ipc/app/updater';
+import { registerDownloadIpcHandlers } from './ipc/app/download';
 import { registerWallpaperIpcHandlers } from './ipc/window/wallpaper';
 import { registerWallpaperVideoIpcHandlers } from './ipc/media/wallpaperVideo';
 import { registerNetIpcHandlers } from './ipc/app/net';
@@ -570,6 +571,10 @@ function registerIpcHandlers(): void {
     updater: autoUpdater,
     getVersion: () => app.getVersion(),
     isPackaged: () => app.isPackaged,
+  });
+
+  registerDownloadIpcHandlers({
+    getDownloadsPath: () => app.getPath('downloads'),
   });
 }
 

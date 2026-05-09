@@ -904,7 +904,37 @@
       },
       "download": {
         "title": "下载",
-        "subtitle": "下载工具入口，后续将在这里提供下载任务与资源管理能力。"
+        "subtitle": "支持多线程下载，可自定义保存位置并查看实时进度。",
+        "form": {
+          "urlLabel": "下载地址",
+          "urlPlaceholder": "输入下载 URL，例如 https://example.com/file.zip",
+          "savePathLabel": "保存位置",
+          "savePathPlaceholder": "不填写时将使用系统下载目录",
+          "pickPath": "选择路径",
+          "defaultDirHint": "默认目录：{{dir}}",
+          "threadsLabel": "下载线程数 (1-16)",
+          "start": "开始下载",
+          "starting": "启动中...",
+          "cancelCurrent": "取消当前任务"
+        },
+        "tasks": {
+          "title": "下载任务",
+          "subtitle": "展示最近任务的进度、速度与状态。",
+          "empty": "暂无下载任务"
+        },
+        "status": {
+          "downloading": "下载中",
+          "completed": "已完成",
+          "failed": "失败",
+          "canceled": "已取消"
+        },
+        "messages": {
+          "started": "已创建下载任务",
+          "startFailed": "启动下载失败",
+          "pickPathFailed": "选择保存路径失败",
+          "cancelSuccess": "已取消下载任务",
+          "cancelFailed": "取消下载失败"
+        }
       }
     },
     "localFileSearch": {
