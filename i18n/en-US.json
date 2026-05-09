@@ -12,6 +12,7 @@
       "localFileSearch": "File Search",
       "clipboardHistory": "Clipboard",
       "memo": "Memo",
+      "toolbox": "Toolbox",
       "settings": "Settings"
     },
     "controls": {
@@ -893,6 +894,7 @@
       "memo": "Memo",
       "countdown": "Countdown",
       "alarm": "Alarm",
+      "toolbox": "Toolbox",
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
     },

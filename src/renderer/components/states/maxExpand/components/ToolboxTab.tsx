@@ -19,9 +19,14 @@
  */
 
 /**
- * @file standaloneWindowTypes.ts
- * @description 独立窗口共享类型定义。
+ * @file ToolboxTab.tsx
+ * @description 最大展开模式工具箱 Tab（占位，先留空）
  * @author 鸡哥
  */
 
-export type WindowTab = 'todo' | 'countdown' | 'urlFavorites' | 'album' | 'mail' | 'localFileSearch' | 'clipboardHistory' | 'memo' | 'toolbox' | 'settings';
+import React from 'react';
+
+/** 最大展开模式工具箱页面（占位） */
+export function ToolboxTab(): React.ReactElement {
+  return <div className="toolbox-tab-container" />;
+}

@@ -56,6 +56,7 @@ import {
   DEFAULT_LAYOUT,
   MAXEXPAND_NAV_LAYOUT_STORE_KEY,
   DEFAULT_MAXEXPAND_NAV_LAYOUT,
+  normalizeMaxExpandNavLayoutConfig,
   type MaxExpandNavLayoutConfig,
   APP_SETTINGS_PAGES,
   WEATHER_SETTINGS_PAGES,
@@ -1440,9 +1441,7 @@ export function SettingsTab(): ReactElement {
     let cancelled = false;
     window.api.storeRead(MAXEXPAND_NAV_LAYOUT_STORE_KEY).then((data) => {
       if (cancelled) return;
-      if (Array.isArray(data) && data.length > 0) {
-        setMaxExpandNavLayout(data as MaxExpandNavLayoutConfig);
-      }
+      setMaxExpandNavLayout(normalizeMaxExpandNavLayoutConfig(data));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -1650,9 +1649,10 @@ export function SettingsTab(): ReactElement {
   };
 
   const updateMaxExpandNavLayout = (layout: MaxExpandNavLayoutConfig): void => {
-    setMaxExpandNavLayout(layout);
-    window.api.storeWrite(MAXEXPAND_NAV_LAYOUT_STORE_KEY, layout).catch(() => {});
-    window.dispatchEvent(new CustomEvent('maxexpand-nav-layout-changed', { detail: layout }));
+    const normalized = normalizeMaxExpandNavLayoutConfig(layout);
+    setMaxExpandNavLayout(normalized);
+    window.api.storeWrite(MAXEXPAND_NAV_LAYOUT_STORE_KEY, normalized).catch(() => {});
+    window.dispatchEvent(new CustomEvent('maxexpand-nav-layout-changed', { detail: normalized }));
   };
 
   const applyIslandPositionOffset = (x: number, y: number): void => {

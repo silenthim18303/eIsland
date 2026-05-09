@@ -30,7 +30,7 @@ import useIslandStore from '../../../store/slices';
 import type { MaxExpandTab } from '../../../store/types';
 import {
   MAXEXPAND_NAV_LAYOUT_STORE_KEY,
-  DEFAULT_MAXEXPAND_NAV_LAYOUT,
+  normalizeMaxExpandNavLayoutConfig,
   type MaxExpandNavLayoutConfig,
 } from './components/setting/utils/settingsConfig';
 import '../../../styles/settings/settings.css';
@@ -45,6 +45,7 @@ import { SettingsTab } from './components/SettingsTab';
 import { CountdownTab } from './components/CountdownTab';
 import { MemoTab } from './components/MemoTab';
 import { AlarmTab } from './components/AlarmTab';
+import { ToolboxTab } from './components/ToolboxTab';
 
 /** 导航点标识 — 含特殊动作：expanded 返回 */
 type NavDotId = MaxExpandTab | 'expanded';
@@ -54,7 +55,7 @@ type NavDotId = MaxExpandTab | 'expanded';
  * @description 包含 AI 对话窗口和设置面板，底部导航点切换 Tab 或返回 expanded
  */
 /** 独立窗口模式下从灵动岛中移除的 Tab */
-const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'settings']);
+const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'settings']);
 
 /** 启动时读取一次，整个生命周期内不再变化（重启后生效） */
 let _startupMode: 'integrated' | 'standalone' = 'integrated';
@@ -125,27 +126,20 @@ export function MaxExpandContent(): React.ReactElement {
     let cancelled = false;
     window.api.storeRead(MAXEXPAND_NAV_LAYOUT_STORE_KEY).then((data: unknown) => {
       if (cancelled) return;
-      if (Array.isArray(data) && data.length > 0) {
-        setNavLayoutConfig(data as MaxExpandNavLayoutConfig);
-      } else {
-        setNavLayoutConfig(DEFAULT_MAXEXPAND_NAV_LAYOUT);
-      }
+      const normalized = normalizeMaxExpandNavLayoutConfig(data);
+      setNavLayoutConfig(normalized);
       setNavLayoutLoaded(true);
     }).catch(() => {});
     const unsub = window.api.onSettingsChanged((channel: string, value: unknown) => {
       if (cancelled) return;
       if (channel === `store:${MAXEXPAND_NAV_LAYOUT_STORE_KEY}`) {
-        if (Array.isArray(value) && value.length > 0) {
-          setNavLayoutConfig(value as MaxExpandNavLayoutConfig);
-        }
+        setNavLayoutConfig(normalizeMaxExpandNavLayoutConfig(value));
       }
     });
     const handleLocalChange = (e: Event): void => {
       if (cancelled) return;
       const detail = (e as CustomEvent).detail;
-      if (Array.isArray(detail) && detail.length > 0) {
-        setNavLayoutConfig(detail as MaxExpandNavLayoutConfig);
-      }
+      setNavLayoutConfig(normalizeMaxExpandNavLayoutConfig(detail));
     };
     window.addEventListener('maxexpand-nav-layout-changed', handleLocalChange);
     return () => { cancelled = true; unsub(); window.removeEventListener('maxexpand-nav-layout-changed', handleLocalChange); };
@@ -192,6 +186,8 @@ export function MaxExpandContent(): React.ReactElement {
                 ? '倒数日'
               : id === 'alarm'
                 ? '闹钟'
+              : id === 'toolbox'
+                ? '工具箱'
                 : '设置',
     });
     if (countdownMode === 'standalone') {
@@ -286,6 +282,7 @@ export function MaxExpandContent(): React.ReactElement {
           {activeTab === 'memo' && <MemoTab />}
           {activeTab === 'countdown' && <CountdownTab />}
           {activeTab === 'alarm' && <AlarmTab />}
+          {activeTab === 'toolbox' && <ToolboxTab />}
           {activeTab === 'settings' && <SettingsTab />}
         </div>
       </div>

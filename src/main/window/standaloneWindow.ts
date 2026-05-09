@@ -40,10 +40,10 @@ function openStandaloneWindow(): void {
   }
 
   standaloneWindow = new BrowserWindow({
-    width: 960,
+    width: 1060,
     height: 640,
-    minWidth: 795,
-    minHeight: 480,
+    minWidth: 1060,
+    minHeight: 640,
     show: false,
     frame: false,
     transparent: false,

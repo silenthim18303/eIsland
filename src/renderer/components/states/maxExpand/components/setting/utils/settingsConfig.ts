@@ -177,7 +177,7 @@ export interface MaxExpandNavItem {
 
 export type MaxExpandNavLayoutConfig = MaxExpandNavItem[];
 
-export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm'];
+export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox'];
 
 export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat']);
 
@@ -192,9 +192,33 @@ export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
   memo: '备忘录',
   countdown: '倒数日',
   alarm: '闹钟',
+  toolbox: '工具箱',
 };
 
 export const DEFAULT_MAXEXPAND_NAV_LAYOUT: MaxExpandNavLayoutConfig = MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: true }));
+
+export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLayoutConfig {
+  const defaults = DEFAULT_MAXEXPAND_NAV_LAYOUT.map((item) => ({ ...item }));
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return defaults;
+  }
+
+  const known = new Set(MAXEXPAND_CONFIGURABLE_TABS);
+  const merged = new Map<string, boolean>();
+
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const candidate = item as { id?: unknown; visible?: unknown };
+    if (typeof candidate.id !== 'string' || !known.has(candidate.id)) continue;
+    merged.set(candidate.id, candidate.visible !== false);
+  }
+
+  return MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({
+    id,
+    visible: merged.has(id) ? (merged.get(id) === true) : true,
+  }));
+}
+
 export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart'];
 export const WEATHER_SETTINGS_PAGES: WeatherSettingsPageKey[] = ['location', 'provider'];
 export const WEATHER_SETTINGS_PAGE_LABELS: Record<WeatherSettingsPageKey, string> = {
