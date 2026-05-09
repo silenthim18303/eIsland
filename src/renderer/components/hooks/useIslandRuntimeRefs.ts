@@ -43,6 +43,8 @@ interface IslandRuntimeRefsState {
   pendingAnnouncementAfterGuideRef: React.MutableRefObject<boolean>;
   pendingAnnouncementAppVersionRef: React.MutableRefObject<string>;
   startupAutoCheckHandledRef: React.MutableRefObject<boolean>;
+  autoDimEnabledRef: React.MutableRefObject<boolean>;
+  autoDimDelayRef: React.MutableRefObject<number>;
 }
 
 /**
@@ -64,6 +66,8 @@ export function useIslandRuntimeRefs(options: UseIslandRuntimeRefsOptions): Isla
   const pendingAnnouncementAfterGuideRef = useRef(false);
   const pendingAnnouncementAppVersionRef = useRef('');
   const startupAutoCheckHandledRef = useRef(false);
+  const autoDimEnabledRef = useRef(false);
+  const autoDimDelayRef = useRef(10);
 
   useLayoutEffect(() => {
     setNotificationRef.current = setNotification;
@@ -81,5 +85,7 @@ export function useIslandRuntimeRefs(options: UseIslandRuntimeRefsOptions): Isla
     pendingAnnouncementAfterGuideRef,
     pendingAnnouncementAppVersionRef,
     startupAutoCheckHandledRef,
+    autoDimEnabledRef,
+    autoDimDelayRef,
   };
 }
