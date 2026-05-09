@@ -322,6 +322,7 @@ export function ToolboxTab(): ReactElement {
                   )}
                   {tasks.map((task) => {
                     const percentText = `${(task.progress * 100).toFixed(1)}%`;
+                    const progressWidth = `${Math.max(0, Math.min(100, task.progress * 100))}%`;
                     return (
                       <div key={task.id} className="settings-card-subgroup download-task-card">
                         <div className="download-task-card-header">
@@ -358,6 +359,9 @@ export function ToolboxTab(): ReactElement {
                         </div>
                         <div className="settings-music-hint">
                           {getStatusText(task.status)} · {percentText} · {formatBytes(task.downloadedBytes)} / {task.totalBytes > 0 ? formatBytes(task.totalBytes) : '?'} · {formatBytes(task.speedBytesPerSecond)}/s · {task.threads}T
+                        </div>
+                        <div className="download-task-progress">
+                          <div className="download-task-progress-fill" style={{ width: progressWidth }} />
                         </div>
                         <div className="settings-music-hint">
                           {(task.status === 'completed' || task.status === 'paused' || task.status === 'failed' || task.status === 'canceled')
