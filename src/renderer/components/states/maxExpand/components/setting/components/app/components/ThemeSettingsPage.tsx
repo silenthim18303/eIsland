@@ -86,6 +86,10 @@ type ThemeSettingsPageProps = Pick<
   | 'applyIslandOpacity'
   | 'persistIslandOpacity'
   | 'opacitySaveTimerRef'
+  | 'autoDimEnabled'
+  | 'handleAutoDimEnabledChange'
+  | 'autoDimDelaySec'
+  | 'handleAutoDimDelayChange'
 >;
 
 const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
@@ -148,6 +152,10 @@ export function ThemeSettingsPage({
   applyIslandOpacity,
   persistIslandOpacity,
   opacitySaveTimerRef,
+  autoDimEnabled,
+  handleAutoDimEnabledChange,
+  autoDimDelaySec,
+  handleAutoDimDelayChange,
 }: ThemeSettingsPageProps): ReactElement {
   const { t } = useTranslation();
   const setNotification = useIslandStore((s) => s.setNotification);
@@ -681,6 +689,46 @@ export function ThemeSettingsPage({
               }}
             />
             <span className="settings-opacity-slider-value">{islandOpacity}%</span>
+          </div>
+
+          <div className="settings-card-subgroup" style={{ marginTop: 10 }}>
+            <div className="settings-card-subgroup-title">{t('settings.app.theme.autoDimTitle', { defaultValue: '闲置自动降低不透明度' })}</div>
+            <div className="settings-music-hint">{t('settings.app.theme.autoDimHint', { defaultValue: '开启后，灵动岛在指定时间内无鼠标操作时将自动降低不透明度，鼠标移入后恢复' })}</div>
+            <div className="settings-card-inline-row">
+              <label className="settings-card-check">
+                <input
+                  type="checkbox"
+                  checked={autoDimEnabled}
+                  onChange={(event) => {
+                    handleAutoDimEnabledChange(event.target.checked);
+                  }}
+                />
+                {t('settings.app.theme.autoDimToggle', { defaultValue: '启用闲置自动降低不透明度' })}
+              </label>
+            </div>
+            {autoDimEnabled && (
+              <>
+                <div className="settings-music-hint" style={{ marginTop: 6 }}>
+                  {t('settings.app.theme.autoDimDelayHint', { defaultValue: '无操作多少秒后自动降低（1 - 120 秒）' })}
+                </div>
+                <div className="settings-opacity-slider-row">
+                  <input
+                    className="settings-opacity-slider"
+                    type="range"
+                    min={1}
+                    max={120}
+                    step={1}
+                    value={autoDimDelaySec}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      const safe = Number.isFinite(v) ? Math.max(1, Math.min(120, Math.round(v))) : 10;
+                      handleAutoDimDelayChange(safe);
+                    }}
+                  />
+                  <span className="settings-opacity-slider-value">{autoDimDelaySec}s</span>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -90,6 +90,10 @@ export function AppSettingsSection({
   opacitySaveTimerRef,
   setIslandOpacity,
   persistIslandOpacity,
+  autoDimEnabled,
+  handleAutoDimEnabledChange,
+  autoDimDelaySec,
+  handleAutoDimDelayChange,
 
   expandLeaveIdle,
   setExpandLeaveIdle,
@@ -258,6 +262,10 @@ export function AppSettingsSection({
             applyIslandOpacity={applyIslandOpacity}
             persistIslandOpacity={persistIslandOpacity}
             opacitySaveTimerRef={opacitySaveTimerRef}
+            autoDimEnabled={autoDimEnabled}
+            handleAutoDimEnabledChange={handleAutoDimEnabledChange}
+            autoDimDelaySec={autoDimDelaySec}
+            handleAutoDimDelayChange={handleAutoDimDelayChange}
           />
         );
       case 'behavior':

@@ -12,6 +12,7 @@
       "localFileSearch": "文件查找",
       "clipboardHistory": "剪贴板历史",
       "memo": "备忘录",
+      "toolbox": "工具箱",
       "settings": "设置"
     },
     "controls": {
@@ -893,8 +894,76 @@
       "memo": "备忘录",
       "countdown": "倒数日",
       "alarm": "闹钟",
+      "toolbox": "工具箱",
       "settings": "设置",
       "switchTo": "切换到{{label}}"
+    },
+    "toolbox": {
+      "sidebar": {
+        "download": "多线程下载",
+        "software": "常用软件"
+      },
+      "software": {
+        "title": "常用软件",
+        "subtitle": "快速访问和管理常用软件。",
+        "empty": "暂无常用软件",
+        "loading": "加载中…",
+        "refresh": "刷新界面",
+        "feedback": "反馈问题",
+        "download": "前往下载",
+        "items": {
+          "steam": "全球最大的游戏平台，海量游戏资源。"
+        }
+      },
+      "download": {
+        "title": "多线程下载",
+        "subtitle": "支持多线程下载，可自定义保存位置并查看实时进度。",
+        "form": {
+          "urlLabel": "下载地址",
+          "urlPlaceholder": "输入下载 URL，例如 https://example.com/file.zip",
+          "savePathLabel": "保存位置",
+          "savePathPlaceholder": "不填写时将使用系统下载目录",
+          "pickPath": "选择路径",
+          "defaultDirHint": "默认目录：{{dir}}",
+          "threadsLabel": "下载线程数 (1-16)",
+          "start": "开始下载",
+          "starting": "启动中...",
+          "cancelCurrent": "取消当前任务"
+        },
+        "tasks": {
+          "title": "下载任务",
+          "subtitle": "展示最近任务的进度、速度与状态。",
+          "empty": "暂无下载任务",
+          "etaLabel": "预计结束",
+          "remainingLabel": "剩余时间",
+          "elapsedLabel": "已使用下载时间",
+          "pause": "暂停",
+          "resume": "继续",
+          "delete": "删除记录",
+          "openFolder": "打开文件所在位置"
+        },
+        "status": {
+          "downloading": "下载中",
+          "paused": "已暂停",
+          "completed": "已完成",
+          "failed": "失败",
+          "canceled": "已取消"
+        },
+        "messages": {
+          "started": "已创建下载任务",
+          "startFailed": "启动下载失败",
+          "pickPathFailed": "选择保存路径失败",
+          "cancelSuccess": "已取消下载任务",
+          "cancelFailed": "取消下载失败",
+          "pauseSuccess": "已暂停下载任务",
+          "pauseFailed": "暂停下载失败",
+          "resumeSuccess": "已继续下载任务",
+          "resumeFailed": "继续下载失败",
+          "removeSuccess": "已删除下载记录",
+          "removeFailed": "删除下载记录失败",
+          "openFolderFailed": "打开文件所在位置失败"
+        }
+      }
     },
     "localFileSearch": {
       "title": "本地文件查找",
@@ -1203,7 +1272,8 @@
           "aiChat": "AI 对话",
           "memo": "备忘录",
           "countdown": "倒数日",
-          "alarm": "闹钟"
+          "alarm": "闹钟",
+          "toolbox": "工具箱"
         }
       },
       "hideProcess": {
@@ -1289,7 +1359,11 @@
         "imageOpacityHint": "背景图片透明度（0% - 100%），数值越高图片越明显",
         "imageBlurHint": "背景图片模糊度（0px - 20px），数值越高越模糊",
         "islandOpacityTitle": "灵动岛透明度",
-        "islandOpacityHint": "数值越低越透明（10% - 100%）"
+        "islandOpacityHint": "数值越低越透明（10% - 100%）",
+        "autoDimTitle": "闲置自动降低不透明度",
+        "autoDimHint": "开启后，灵动岛在指定时间内无鼠标操作时将自动降低不透明度，鼠标移入后恢复",
+        "autoDimToggle": "启用闲置自动降低不透明度",
+        "autoDimDelayHint": "无操作多少秒后自动降低（1 - 120 秒）"
       },
       "behavior": {
         "mouseLeaveTitle": "鼠标移开自动收回",

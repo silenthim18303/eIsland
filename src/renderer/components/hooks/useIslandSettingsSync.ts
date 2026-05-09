@@ -40,6 +40,7 @@ import {
   normalizeBgMediaConfig,
   resolveBgMediaPreviewUrl,
 } from '../config/dynamicIslandConfig';
+import { ISLAND_AUTO_DIM_ENABLED_STORE_KEY, ISLAND_AUTO_DIM_DELAY_STORE_KEY, DEFAULT_AUTO_DIM_DELAY_SEC } from './useIslandAutoDim';
 import type { IslandBgMediaConfig, UpdateSourceKey } from '../config/dynamicIslandConfig';
 
 interface UseIslandSettingsSyncOptions {
@@ -59,6 +60,8 @@ interface UseIslandSettingsSyncOptions {
   setBgVideoVolume: React.Dispatch<React.SetStateAction<number>>;
   setBgVideoRate: React.Dispatch<React.SetStateAction<number>>;
   setBgVideoHwDecode: React.Dispatch<React.SetStateAction<boolean>>;
+  autoDimEnabledRef: React.MutableRefObject<boolean>;
+  autoDimDelayRef: React.MutableRefObject<number>;
 }
 
 /**
@@ -83,6 +86,8 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
     setBgVideoVolume,
     setBgVideoRate,
     setBgVideoHwDecode,
+    autoDimEnabledRef,
+    autoDimDelayRef,
   } = options;
 
   useEffect(() => {
@@ -92,6 +97,8 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
       window.api?.expandMouseleaveIdleGet?.().then((value) => { expandLeaveIdleRef.current = value; }).catch(() => {});
       window.api?.maxexpandMouseleaveIdleGet?.().then((value) => { maxExpandLeaveIdleRef.current = value; }).catch(() => {});
       window.api?.idleClickExpandGet?.().then((value) => { idleClickExpandRef.current = value; }).catch(() => {});
+      window.api?.storeRead?.(ISLAND_AUTO_DIM_ENABLED_STORE_KEY).then((value) => { autoDimEnabledRef.current = value === true; }).catch(() => {});
+      window.api?.storeRead?.(ISLAND_AUTO_DIM_DELAY_STORE_KEY).then((value) => { autoDimDelayRef.current = typeof value === 'number' && Number.isFinite(value) ? Math.max(1, value) : DEFAULT_AUTO_DIM_DELAY_SEC; }).catch(() => {});
       window.api?.springAnimationGet?.().then((value) => { useIslandStore.getState().setSpringAnimation(value); }).catch(() => {});
       window.api?.animationSpeedGet?.().then((value) => {
         const speed = value === 'slow' || value === 'medium' || value === 'fast' ? value : 'medium';
@@ -193,6 +200,12 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
         if (channel === 'island:idle-click-expand') {
           idleClickExpandRef.current = Boolean(value);
         }
+        if (channel === `store:${ISLAND_AUTO_DIM_ENABLED_STORE_KEY}`) {
+          autoDimEnabledRef.current = value === true;
+        }
+        if (channel === `store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`) {
+          autoDimDelayRef.current = typeof value === 'number' && Number.isFinite(value) ? Math.max(1, value) : DEFAULT_AUTO_DIM_DELAY_SEC;
+        }
         if (channel === 'island:spring-animation') {
           useIslandStore.getState().setSpringAnimation(Boolean(value));
         }
@@ -293,6 +306,18 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
         }
       };
       window.addEventListener(LOCAL_ISLAND_BG_SYNC_EVENT, localBgSyncHandler as EventListener);
+
+      const autoDimLocalHandler = (event: Event): void => {
+        const detail = (event as CustomEvent).detail;
+        if (!detail || typeof detail !== 'object') return;
+        if (typeof detail.autoDimEnabled === 'boolean') {
+          autoDimEnabledRef.current = detail.autoDimEnabled;
+        }
+        if (typeof detail.autoDimDelaySec === 'number' && Number.isFinite(detail.autoDimDelaySec)) {
+          autoDimDelayRef.current = Math.max(1, detail.autoDimDelaySec);
+        }
+      };
+      window.addEventListener('island-auto-dim-local-sync', autoDimLocalHandler as EventListener);
     }
   }, [
     language,
@@ -311,5 +336,7 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
     setBgVideoVolume,
     setBgVideoRate,
     setBgVideoHwDecode,
+    autoDimEnabledRef,
+    autoDimDelayRef,
   ]);
 }

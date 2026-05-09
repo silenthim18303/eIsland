@@ -12,6 +12,7 @@
       "localFileSearch": "File Search",
       "clipboardHistory": "Clipboard",
       "memo": "Memo",
+      "toolbox": "Toolbox",
       "settings": "Settings"
     },
     "controls": {
@@ -893,8 +894,76 @@
       "memo": "Memo",
       "countdown": "Countdown",
       "alarm": "Alarm",
+      "toolbox": "Toolbox",
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
+    },
+    "toolbox": {
+      "sidebar": {
+        "download": "MT Download",
+        "software": "Software"
+      },
+      "software": {
+        "title": "Common Software",
+        "subtitle": "Quick access and manage frequently used software.",
+        "empty": "No software added yet",
+        "loading": "Loading...",
+        "refresh": "Refresh Page",
+        "feedback": "Report Issue",
+        "download": "Download",
+        "items": {
+          "steam": "The world's largest gaming platform."
+        }
+      },
+      "download": {
+        "title": "Multi-Thread Download",
+        "subtitle": "Supports multi-threaded downloads with custom save path and real-time progress.",
+        "form": {
+          "urlLabel": "Download URL",
+          "urlPlaceholder": "Enter file URL, e.g. https://example.com/file.zip",
+          "savePathLabel": "Save Path",
+          "savePathPlaceholder": "Leave empty to use system Downloads folder",
+          "pickPath": "Choose Path",
+          "defaultDirHint": "Default directory: {{dir}}",
+          "threadsLabel": "Threads (1-16)",
+          "start": "Start Download",
+          "starting": "Starting...",
+          "cancelCurrent": "Cancel Current Task"
+        },
+        "tasks": {
+          "title": "Download Tasks",
+          "subtitle": "Shows recent task progress, speed, and status.",
+          "empty": "No download tasks yet",
+          "etaLabel": "ETA",
+          "remainingLabel": "Remaining",
+          "elapsedLabel": "Elapsed",
+          "pause": "Pause",
+          "resume": "Resume",
+          "delete": "Delete",
+          "openFolder": "Show in Folder"
+        },
+        "status": {
+          "downloading": "Downloading",
+          "paused": "Paused",
+          "completed": "Completed",
+          "failed": "Failed",
+          "canceled": "Canceled"
+        },
+        "messages": {
+          "started": "Download task created",
+          "startFailed": "Failed to start download",
+          "pickPathFailed": "Failed to choose save path",
+          "cancelSuccess": "Download task canceled",
+          "cancelFailed": "Failed to cancel download",
+          "pauseSuccess": "Download task paused",
+          "pauseFailed": "Failed to pause download",
+          "resumeSuccess": "Download task resumed",
+          "resumeFailed": "Failed to resume download",
+          "removeSuccess": "Download task removed",
+          "removeFailed": "Failed to remove download task",
+          "openFolderFailed": "Failed to open file location"
+        }
+      }
     },
     "localFileSearch": {
       "title": "Local File Search",
@@ -1203,7 +1272,8 @@
           "aiChat": "AI Chat",
           "memo": "Memo",
           "countdown": "Countdown",
-          "alarm": "Alarm"
+          "alarm": "Alarm",
+          "toolbox": "Toolbox"
         }
       },
       "hideProcess": {
@@ -1289,7 +1359,11 @@
         "imageOpacityHint": "Background opacity (0% - 100%)",
         "imageBlurHint": "Background blur (0px - 20px)",
         "islandOpacityTitle": "Island Opacity",
-        "islandOpacityHint": "Lower value = more transparent (10% - 100%)"
+        "islandOpacityHint": "Lower value = more transparent (10% - 100%)",
+        "autoDimTitle": "Auto-dim when idle",
+        "autoDimHint": "When enabled, the island opacity is reduced after no mouse interaction for the configured duration, and restores when the cursor enters",
+        "autoDimToggle": "Enable idle auto-dim",
+        "autoDimDelayHint": "Seconds before dimming on inactivity (1 - 120s)"
       },
       "behavior": {
         "mouseLeaveTitle": "Auto collapse on mouse leave",

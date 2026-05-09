@@ -107,6 +107,10 @@ export interface AppSettingsSectionProps {
   opacitySaveTimerRef: { current: ReturnType<typeof setTimeout> | null };
   setIslandOpacity: (value: number) => void;
   persistIslandOpacity: (value: number) => void;
+  autoDimEnabled: boolean;
+  handleAutoDimEnabledChange: (value: boolean) => void;
+  autoDimDelaySec: number;
+  handleAutoDimDelayChange: (value: number) => void;
   expandLeaveIdle: boolean;
   setExpandLeaveIdle: (value: boolean) => void;
   maxExpandLeaveIdle: boolean;

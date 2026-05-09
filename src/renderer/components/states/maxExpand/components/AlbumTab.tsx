@@ -30,6 +30,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent, ReactElement, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../utils/SvgIcon';
+import { resolveBgMediaPreviewUrl } from '../../../config/dynamicIslandBackgroundMedia';
 
 /** 持久化键（store） */
 const STORE_KEY = 'photo-album-items';
@@ -1000,10 +1001,10 @@ export function AlbumTab(): ReactElement {
   const handleSetAsIslandBackground = (item: AlbumItem): void => {
     const media: IslandBgMediaConfig = {
       type: item.mediaType,
-      source: item.mediaType === 'video' ? (activeMeta?.videoUrl || '') : item.path,
+      source: item.path,
     };
     const previewPromise = item.mediaType === 'video'
-      ? Promise.resolve(activeMeta?.videoUrl || null)
+      ? resolveBgMediaPreviewUrl(media)
       : (activeMeta?.dataUrl ? Promise.resolve(activeMeta.dataUrl) : window.api.loadWallpaperFile(item.path));
 
     previewPromise.then((previewUrl) => {

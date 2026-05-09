@@ -34,6 +34,7 @@ import { LocalFileSearchTab } from '../states/maxExpand/components/LocalFileSear
 import { ClipboardHistoryTab } from '../states/maxExpand/components/ClipboardHistoryTab';
 import { SettingsTab } from '../states/maxExpand/components/SettingsTab';
 import { MemoTab } from '../states/maxExpand/components/MemoTab';
+import { ToolboxTab } from '../states/maxExpand/components/ToolboxTab';
 import { LoginContent } from '../states/login/LoginContent';
 import { RegisterContent } from '../states/register/RegisterContent';
 import { PaymentContent } from '../states/payment/PaymentContent';
@@ -60,6 +61,7 @@ export function StandaloneWindowViewport({ activeTab, state }: StandaloneWindowV
       {activeTab === 'localFileSearch' && <LocalFileSearchTab />}
       {activeTab === 'clipboardHistory' && <ClipboardHistoryTab />}
       {activeTab === 'memo' && <MemoTab />}
+      {activeTab === 'toolbox' && <ToolboxTab />}
       {activeTab === 'settings' && state === 'login' && <LoginContent />}
       {activeTab === 'settings' && state === 'register' && <RegisterContent />}
       {activeTab === 'settings' && state === 'payment' && <PaymentContent />}

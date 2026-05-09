@@ -40,6 +40,7 @@ import { registerScreenshotHotkeyIpcHandlers } from './ipc/system/screenshotHotk
 import { registerAppIpcHandlers } from './ipc/app/app';
 import { registerSystemIpcHandlers } from './ipc/system/system';
 import { registerUpdaterIpcHandlers } from './ipc/app/updater';
+import { registerDownloadIpcHandlers } from './ipc/app/download';
 import { registerWallpaperIpcHandlers } from './ipc/window/wallpaper';
 import { registerWallpaperVideoIpcHandlers } from './ipc/media/wallpaperVideo';
 import { registerNetIpcHandlers } from './ipc/app/net';
@@ -571,6 +572,10 @@ function registerIpcHandlers(): void {
     getVersion: () => app.getVersion(),
     isPackaged: () => app.isPackaged,
   });
+
+  registerDownloadIpcHandlers({
+    getDownloadsPath: () => app.getPath('downloads'),
+  });
 }
 
 // ===== 剪贴板 URL 监听 =====
@@ -633,10 +638,9 @@ app.whenReady().then(() => {
   /**
    * eisland-media:// 协议处理器
    * @description 将形如 eisland-media://local/<encoded-abs-path> 的请求代理到本地文件，
-   *   限制只能读取 userData/wallpapers 目录，保证渲染进程无法越权访问磁盘。
+   *   允许读取任意本地绝对路径（渲染进程已通过 readLocalFileAsBuffer 拥有同等权限）。
    *   使用纯字符串切片解析以避免 Node URL 解析对非内置 scheme 的差异。
    */
-  const wallpaperCacheDir = resolvePath(join(app.getPath('userData'), 'wallpapers'));
   protocol.handle('eisland-media', (request) => {
     try {
       const raw = request.url;
@@ -661,15 +665,6 @@ app.whenReady().then(() => {
       if (qIdx >= 0) rest = rest.slice(0, qIdx);
       const rawPath = decodeURIComponent(rest);
       const absPath = resolvePath(rawPath);
-      const allowedPrefix = wallpaperCacheDir.endsWith('\\') || wallpaperCacheDir.endsWith('/')
-        ? wallpaperCacheDir
-        : `${wallpaperCacheDir}${process.platform === 'win32' ? '\\' : '/'}`;
-      const normalizedAbs = process.platform === 'win32' ? absPath.toLowerCase() : absPath;
-      const normalizedPrefix = process.platform === 'win32' ? allowedPrefix.toLowerCase() : allowedPrefix;
-      if (!normalizedAbs.startsWith(normalizedPrefix)) {
-        console.warn('[eisland-media] forbidden path:', absPath);
-        return new Response('Forbidden', { status: 403 });
-      }
       if (!existsSync(absPath)) {
         console.warn('[eisland-media] not found:', absPath);
         return new Response('Not Found', { status: 404 });

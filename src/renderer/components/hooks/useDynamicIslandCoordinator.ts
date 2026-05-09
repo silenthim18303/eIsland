@@ -40,6 +40,7 @@ import { useIslandStateBridges } from './useIslandStateBridges';
 import { useIslandBackgroundMediaController } from './useIslandBackgroundMediaController';
 import { useIslandShellPresentation } from './useIslandShellPresentation';
 import { useIslandRuntimeRefs } from './useIslandRuntimeRefs';
+import { useIslandAutoDim } from './useIslandAutoDim';
 
 interface UseDynamicIslandCoordinatorOptions {
   store: IIslandStore;
@@ -111,6 +112,8 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     pendingAnnouncementAfterGuideRef,
     pendingAnnouncementAppVersionRef,
     startupAutoCheckHandledRef,
+    autoDimEnabledRef,
+    autoDimDelayRef,
   } = useIslandRuntimeRefs({
     setNotification,
   });
@@ -207,6 +210,13 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setBgVideoVolume,
     setBgVideoRate,
     setBgVideoHwDecode,
+    autoDimEnabledRef,
+    autoDimDelayRef,
+  });
+
+  useIslandAutoDim({
+    autoDimEnabledRef,
+    autoDimDelayRef,
   });
 
   useIslandStateBridges({

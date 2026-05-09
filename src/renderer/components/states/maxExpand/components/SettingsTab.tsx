@@ -56,6 +56,7 @@ import {
   DEFAULT_LAYOUT,
   MAXEXPAND_NAV_LAYOUT_STORE_KEY,
   DEFAULT_MAXEXPAND_NAV_LAYOUT,
+  normalizeMaxExpandNavLayoutConfig,
   type MaxExpandNavLayoutConfig,
   APP_SETTINGS_PAGES,
   WEATHER_SETTINGS_PAGES,
@@ -128,6 +129,9 @@ const MAIL_CONFIG_STORE_KEY = 'mail-account-config';
 const MAIL_ACCOUNTS_STORE_KEY = 'mail-accounts-config';
 const MAIL_FETCH_LIMIT_STORE_KEY = 'mail-fetch-limit';
 const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
+const ISLAND_AUTO_DIM_ENABLED_STORE_KEY = 'island-auto-dim-enabled';
+const ISLAND_AUTO_DIM_DELAY_STORE_KEY = 'island-auto-dim-delay';
+const DEFAULT_AUTO_DIM_DELAY_SEC = 10;
 type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail';
 let _lastSettingsSidebarTab: SettingsSidebarTabKey = 'index';
 
@@ -476,6 +480,8 @@ export function SettingsTab(): ReactElement {
   const [standaloneMacControls, setStandaloneMacControls] = useState<boolean>(false);
   const [appLanguage, setAppLanguage] = useState<AppLanguage>(getLanguage);
   const [islandOpacity, setIslandOpacity] = useState<number>(100);
+  const [autoDimEnabled, setAutoDimEnabled] = useState<boolean>(false);
+  const [autoDimDelaySec, setAutoDimDelaySec] = useState<number>(DEFAULT_AUTO_DIM_DELAY_SEC);
   const [bgMedia, setBgMedia] = useState<IslandBgMediaConfig | null>(null);
   const [bgMediaPreviewUrl, setBgMediaPreviewUrl] = useState<string | null>(null);
   const [bgVideoFit, setBgVideoFit] = useState<'cover' | 'contain'>('cover');
@@ -567,6 +573,21 @@ export function SettingsTab(): ReactElement {
 
   const persistIslandOpacity = (opacity: number): void => {
     window.api.islandOpacitySet(opacity).catch(() => {});
+  };
+
+  const handleAutoDimEnabledChange = (enabled: boolean): void => {
+    setAutoDimEnabled(enabled);
+    window.api.storeWrite(ISLAND_AUTO_DIM_ENABLED_STORE_KEY, enabled).catch(() => {});
+    window.api.settingsPreview(`store:${ISLAND_AUTO_DIM_ENABLED_STORE_KEY}`, enabled).catch(() => {});
+    window.dispatchEvent(new CustomEvent('island-auto-dim-local-sync', { detail: { autoDimEnabled: enabled } }));
+  };
+
+  const handleAutoDimDelayChange = (sec: number): void => {
+    const safe = Math.max(1, Math.min(120, Math.round(sec)));
+    setAutoDimDelaySec(safe);
+    window.api.storeWrite(ISLAND_AUTO_DIM_DELAY_STORE_KEY, safe).catch(() => {});
+    window.api.settingsPreview(`store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`, safe).catch(() => {});
+    window.dispatchEvent(new CustomEvent('island-auto-dim-local-sync', { detail: { autoDimDelaySec: safe } }));
   };
 
   const applyBgMedia = (media: IslandBgMediaConfig | null, previewUrl: string | null): void => {
@@ -1078,6 +1099,14 @@ export function SettingsTab(): ReactElement {
       setIslandOpacity(safe);
       applyIslandOpacity(safe);
     }).catch(() => {});
+    window.api.storeRead(ISLAND_AUTO_DIM_ENABLED_STORE_KEY).then((val) => {
+      if (cancelled) return;
+      if (typeof val === 'boolean') setAutoDimEnabled(val);
+    }).catch(() => {});
+    window.api.storeRead(ISLAND_AUTO_DIM_DELAY_STORE_KEY).then((val) => {
+      if (cancelled) return;
+      if (typeof val === 'number' && Number.isFinite(val)) setAutoDimDelaySec(Math.max(1, Math.min(120, Math.round(val))));
+    }).catch(() => {});
     Promise.all([
       window.api.storeRead(ISLAND_BG_MEDIA_STORE_KEY),
       window.api.storeRead(ISLAND_BG_IMAGE_STORE_KEY) as Promise<string | null>,
@@ -1274,6 +1303,12 @@ export function SettingsTab(): ReactElement {
           setSyncDesktopWallpaperOnBackgroundChange(value);
         }
       }
+      if (channel === `store:${ISLAND_AUTO_DIM_ENABLED_STORE_KEY}`) {
+        if (typeof value === 'boolean') setAutoDimEnabled(value);
+      }
+      if (channel === `store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`) {
+        if (typeof value === 'number' && Number.isFinite(value)) setAutoDimDelaySec(Math.max(1, Math.min(120, Math.round(value))));
+      }
     });
     return () => {
       cancelled = true;
@@ -1406,9 +1441,7 @@ export function SettingsTab(): ReactElement {
     let cancelled = false;
     window.api.storeRead(MAXEXPAND_NAV_LAYOUT_STORE_KEY).then((data) => {
       if (cancelled) return;
-      if (Array.isArray(data) && data.length > 0) {
-        setMaxExpandNavLayout(data as MaxExpandNavLayoutConfig);
-      }
+      setMaxExpandNavLayout(normalizeMaxExpandNavLayoutConfig(data));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -1616,9 +1649,10 @@ export function SettingsTab(): ReactElement {
   };
 
   const updateMaxExpandNavLayout = (layout: MaxExpandNavLayoutConfig): void => {
-    setMaxExpandNavLayout(layout);
-    window.api.storeWrite(MAXEXPAND_NAV_LAYOUT_STORE_KEY, layout).catch(() => {});
-    window.dispatchEvent(new CustomEvent('maxexpand-nav-layout-changed', { detail: layout }));
+    const normalized = normalizeMaxExpandNavLayoutConfig(layout);
+    setMaxExpandNavLayout(normalized);
+    window.api.storeWrite(MAXEXPAND_NAV_LAYOUT_STORE_KEY, normalized).catch(() => {});
+    window.dispatchEvent(new CustomEvent('maxexpand-nav-layout-changed', { detail: normalized }));
   };
 
   const applyIslandPositionOffset = (x: number, y: number): void => {
@@ -2693,6 +2727,10 @@ export function SettingsTab(): ReactElement {
               opacitySaveTimerRef={opacitySaveTimerRef}
               setIslandOpacity={setIslandOpacity}
               persistIslandOpacity={persistIslandOpacity}
+              autoDimEnabled={autoDimEnabled}
+              handleAutoDimEnabledChange={handleAutoDimEnabledChange}
+              autoDimDelaySec={autoDimDelaySec}
+              handleAutoDimDelayChange={handleAutoDimDelayChange}
               expandLeaveIdle={expandLeaveIdle}
               setExpandLeaveIdle={setExpandLeaveIdle}
               maxExpandLeaveIdle={maxExpandLeaveIdle}

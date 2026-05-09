@@ -89,6 +89,15 @@ export function parseHtmlTitle(html: string): string {
     .trim();
 }
 
+function buildOriginFaviconUrl(rawUrl: string): string {
+  try {
+    const parsed = new URL(rawUrl);
+    return `${parsed.origin.replace(/\/$/, '')}/favicon.ico`;
+  } catch {
+    return '';
+  }
+}
+
 /**
  * 获取网站 favicon 候选地址列表
  * @param rawUrl - 网站 URL
@@ -97,10 +106,10 @@ export function parseHtmlTitle(html: string): string {
 export function getWebsiteFaviconUrls(rawUrl: string): string[] {
   try {
     const parsed = new URL(rawUrl);
+    const originFavicon = buildOriginFaviconUrl(rawUrl);
     const googleFavicon = `https://www.google.com/s2/favicons?sz=64&domain_url=${encodeURIComponent(parsed.origin)}`;
     const duckduckgoFavicon = `https://icons.duckduckgo.com/ip3/${parsed.hostname}.ico`;
-    const originFavicon = `${parsed.origin.replace(/\/$/, '')}/favicon.ico`;
-    return Array.from(new Set([googleFavicon, duckduckgoFavicon, originFavicon].filter(Boolean)));
+    return Array.from(new Set([originFavicon, duckduckgoFavicon, googleFavicon].filter(Boolean)));
   } catch {
     return [];
   }
@@ -113,6 +122,50 @@ export function getWebsiteFaviconUrls(rawUrl: string): string[] {
  */
 export function getWebsiteFaviconUrl(rawUrl: string): string {
   return getWebsiteFaviconUrls(rawUrl)[0] ?? '';
+}
+
+/**
+ * 首选获取网站 favicon（优先尝试站点自身 /favicon.ico）
+ * @param rawUrl - 网站 URL
+ * @param timeoutMs - 超时时间（毫秒）
+ * @returns favicon 地址，失败回退到现有候选策略
+ */
+export async function getWebsitePreferredFaviconUrl(rawUrl: string, timeoutMs = 3000): Promise<string> {
+  const originFavicon = buildOriginFaviconUrl(rawUrl);
+  if (originFavicon) {
+    try {
+      const headResp = await window.api.netFetch(originFavicon, {
+        method: 'HEAD',
+        timeoutMs,
+        headers: {
+          Accept: 'image/*,*/*;q=0.8',
+        },
+      });
+      if (headResp.ok) {
+        return originFavicon;
+      }
+    } catch {
+      // ignore and fallback to GET or existing strategy
+    }
+
+    try {
+      const getResp = await window.api.netFetch(originFavicon, {
+        method: 'GET',
+        timeoutMs,
+        headers: {
+          Accept: 'image/*,*/*;q=0.8',
+          Range: 'bytes=0-0',
+        },
+      });
+      if (getResp.ok) {
+        return originFavicon;
+      }
+    } catch {
+      // ignore and fallback to existing strategy
+    }
+  }
+
+  return getWebsiteFaviconUrl(rawUrl);
 }
 
 /**

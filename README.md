@@ -1,8 +1,8 @@
 <div align="center">
   <h1><img src="assets/eisland.svg" alt="eIsland Logo" height="32" style="vertical-align: middle;" />&nbsp;eIsland</h1>
-  <p><strong>Windows 灵动岛桌面应用</strong></p>
-  <p>基于 Electron + React + TypeScript 构建</p>
-  <p>支持实时显示天气、歌词、计时器、系统工具快捷操作等功能</p>
+  <p><strong>Dynamic Island-style desktop app for Windows</strong></p>
+  <p>Built with Electron + React + TypeScript</p>
+  <p>Supports real-time weather, synced lyrics, timers, and quick system utility actions</p>
 
   [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
   [![Electron](https://img.shields.io/badge/Electron-35-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
@@ -12,71 +12,81 @@
 
 ---
 
-> 许可证说明：本软件开源协议基于 GPLv3，并在其基础上进行了修改与补充（详见 `LICENSE`）。
+> License note: This project is open-sourced under GPLv3 with additional clauses and supplements (see `LICENSE` for details).
 
-## 界面预览
+## UI Preview
 
 <div align="center">
 
-### 总览界面
-<p>日期、天气、倒数日、快捷启动一览无余</p>
+### Overview Screen
+<p>At-a-glance view of date, weather, countdowns, and quick launch tools</p>
 
-<img src="assets/1.png" alt="总览界面" width="680" />
+<img src="assets/1.png" alt="Overview Screen" width="680" />
 
-### 天气界面
-<p>实时天气与未来预报，支持自动定位与手动设置</p>
+### Weather Screen
+<p>Live weather and forecast with both auto-location and manual configuration</p>
 
-<img src="assets/2.png" alt="天气界面" width="680" />
+<img src="assets/2.png" alt="Weather Screen" width="680" />
 
-### 歌词界面
-<p>实时同步显示歌词，支持多歌词源自动匹配</p>
+### Lyrics Screen
+<p>Real-time synced lyrics with automatic matching from multiple lyric sources</p>
 
-<img src="assets/3.png" alt="歌词界面" width="680" />
+<img src="assets/3.png" alt="Lyrics Screen" width="680" />
 
-### 设置界面
-<p>主题外观、交互行为、网络配置等全面自定义</p>
+### Settings Screen
+<p>Comprehensive customization for appearance, interaction behavior, and network configuration</p>
 
-<img src="assets/4.png" alt="设置界面" width="680" />
+<img src="assets/4.png" alt="Settings Screen" width="680" />
+
+### Agent Screen
+<p>Built-in AI agent workspace for intelligent assistance and streamlined productivity workflows</p>
+
+<img src="assets/5.png" alt="Agent Screen" width="680" />
+
+### Toolbox Screen
+<p>Practical utility panel with quick-access tools and common software actions</p>
+
+<img src="assets/6.png" alt="Toolbox Screen" width="680" />
 
 </div>
 
 ---
 
-## 图标来源
+## Icon Credits
 
-本软件使用的所有图标均来源于 [iconfont](https://www.iconfont.cn/)。
+All icons used in this project are sourced from [iconfont](https://www.iconfont.cn/).
 
-## Image Credits / 图像致谢
+## Image Credits
 
-本项目中使用的以下图像来自 Artemis II 任务：
+The following images used in this project are from the Artemis II mission:
 
-| 壁纸名称 | 文件名 | 拍摄设备 | 原始链接 |
-|----------|--------|---------|---------|
+| Wallpaper Name | File Name | Capture Device | Original Link |
+|---------------|-----------|----------------|---------------|
 | Spaceship Earth | `art002e008487~orig.jpg` | iPhone 17 Pro Max | [images.nasa.gov](https://images.nasa.gov/details/art002e008487) |
 | A Crescent Earth | `art002e004441~orig.jpg` | NIKON Z9 35mm f/2 | [images.nasa.gov](https://images.nasa.gov/details/art002e004441) |
 | Thinking of You, Earth | `art002e008486~orig.jpg` | iPhone 17 Pro Max | [images.nasa.gov](https://images.nasa.gov/details/art002e008486) |
 
-> 所有图像来源：[NASA](https://www.nasa.gov/)（National Aeronautics and Space Administration）
+> All images are sourced from [NASA](https://www.nasa.gov/) (National Aeronautics and Space Administration)
 >
-> 本仓库中所有 NASA 图像均按照 NASA 的图像使用政策使用。不暗示 NASA 对本项目的任何认可。
+> All NASA images in this repository are used under NASA's image usage policy and do not imply NASA endorsement of this project.
 
-更多 Artemis II 图像可访问：
+More Artemis II images are available at:
 - https://images.nasa.gov/
 - https://www.nasa.gov/artemis-ii-mobile-wallpapers/
 
-## License & Legal / 许可与合规
+## License & Legal
 
 - Terms of Service: `LEGAL/TERMS_OF_SERVICE.md`
 - Privacy Policy: `LEGAL/PRIVACY_POLICY.md`
 - Billing & Refund Policy: `LEGAL/BILLING_REFUND_POLICY.md`
 
-## 许可证 (License)
+## License
 
-本项目采用 **GNU General Public License v3.0 (GPLv3)** 或更高版本（GPL-3.0-or-later）发布。
+This project is released under **GNU General Public License v3.0 (GPLv3)** or later (`GPL-3.0-or-later`).
 
-根据 GPLv3 第 7 节(b) 款，添加了有限的附加条款：要求在所有副本、修改版本以及程序显示的 Appropriate Legal Notices 中保留以下作者署名信息：
+Under GPLv3 Section 7(b), limited additional terms apply: the following author attributions must be retained in all copies, modified versions, and any Appropriate Legal Notices displayed by the program:
 
 - Copyright (C) 2026-present JNTMTMTM (https://github.com/JNTMTMTM)
 - Copyright (C) 2026-present pyisland.com (https://pyisland.com)
 
-详细完整条款（包括标准 GPLv3 文本和附加条款）请参见仓库根目录的 `LICENSE` 文件。
+For full terms (including the standard GPLv3 text and additional clauses), see the `LICENSE` file in the repository root.

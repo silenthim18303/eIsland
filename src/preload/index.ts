@@ -1129,6 +1129,116 @@ const api = {
     return ipcRenderer.invoke('island:nav-order:set', payload);
   },
 
+  // ===== 下载工具 =====
+  downloadStart: (payload: { url: string; savePath?: string; threads?: number }): Promise<{ ok: boolean; task?: {
+    id: string;
+    url: string;
+    savePath: string;
+    fileName: string;
+    totalBytes: number;
+    downloadedBytes: number;
+    progress: number;
+    speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
+    threads: number;
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+    errorMessage?: string;
+    createdAt: number;
+    updatedAt: number;
+  }; message?: string }> => {
+    return ipcRenderer.invoke('download:start', payload);
+  },
+  downloadCancel: (taskId: string): Promise<boolean> => {
+    return ipcRenderer.invoke('download:cancel', taskId);
+  },
+  downloadPause: (taskId: string): Promise<boolean> => {
+    return ipcRenderer.invoke('download:pause', taskId);
+  },
+  downloadResume: (taskId: string): Promise<{ ok: boolean; task?: {
+    id: string;
+    url: string;
+    savePath: string;
+    fileName: string;
+    totalBytes: number;
+    downloadedBytes: number;
+    progress: number;
+    speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
+    threads: number;
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+    errorMessage?: string;
+    createdAt: number;
+    updatedAt: number;
+  }; message?: string }> => {
+    return ipcRenderer.invoke('download:resume', taskId);
+  },
+  downloadRemove: (taskId: string): Promise<boolean> => {
+    return ipcRenderer.invoke('download:remove', taskId);
+  },
+  downloadList: (): Promise<Array<{
+    id: string;
+    url: string;
+    savePath: string;
+    fileName: string;
+    totalBytes: number;
+    downloadedBytes: number;
+    progress: number;
+    speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
+    threads: number;
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+    errorMessage?: string;
+    createdAt: number;
+    updatedAt: number;
+  }>> => {
+    return ipcRenderer.invoke('download:list');
+  },
+  downloadPickSavePath: (suggestedName?: string): Promise<string | null> => {
+    return ipcRenderer.invoke('download:pick-save-path', suggestedName);
+  },
+  downloadGetDefaultDir: (): Promise<string> => {
+    return ipcRenderer.invoke('download:get-default-dir');
+  },
+  onDownloadTaskUpdated: (callback: (task: {
+    id: string;
+    url: string;
+    savePath: string;
+    fileName: string;
+    totalBytes: number;
+    downloadedBytes: number;
+    progress: number;
+    speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
+    threads: number;
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+    errorMessage?: string;
+    createdAt: number;
+    updatedAt: number;
+  }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, task: {
+      id: string;
+      url: string;
+      savePath: string;
+      fileName: string;
+      totalBytes: number;
+      downloadedBytes: number;
+      progress: number;
+      speedBytesPerSecond: number;
+      estimatedFinishAt: number | null;
+      threads: number;
+      status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+      errorMessage?: string;
+      createdAt: number;
+      updatedAt: number;
+    }): void => {
+      callback(task);
+    };
+    ipcRenderer.on('download:task-updated', handler);
+    return () => {
+      ipcRenderer.removeListener('download:task-updated', handler);
+    };
+  },
+
   // ===== 自动更新 =====
 
   /**
