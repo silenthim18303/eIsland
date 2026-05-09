@@ -1,5 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
-import { join } from 'path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { dirname, join } from 'path';
 import { MultiThreadDownloadEngine, type DownloadTaskSnapshot } from '../../core/downloadEngine';
 
 interface RegisterDownloadIpcHandlersOptions {
@@ -13,6 +14,98 @@ interface DownloadStartPayload {
 }
 
 let registered = false;
+const MAX_PERSISTED_TASKS = 200;
+const PERSIST_DEBOUNCE_MS = 600;
+
+function isDownloadTaskStatus(value: unknown): value is DownloadTaskSnapshot['status'] {
+  return value === 'downloading' || value === 'completed' || value === 'failed' || value === 'canceled';
+}
+
+function toPersistableTask(raw: unknown): DownloadTaskSnapshot | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const row = raw as Record<string, unknown>;
+  if (
+    typeof row.id !== 'string'
+    || typeof row.url !== 'string'
+    || typeof row.savePath !== 'string'
+    || typeof row.fileName !== 'string'
+    || typeof row.totalBytes !== 'number'
+    || typeof row.downloadedBytes !== 'number'
+    || typeof row.progress !== 'number'
+    || typeof row.speedBytesPerSecond !== 'number'
+    || (row.estimatedFinishAt !== null && typeof row.estimatedFinishAt !== 'number')
+    || typeof row.threads !== 'number'
+    || !isDownloadTaskStatus(row.status)
+    || typeof row.createdAt !== 'number'
+    || typeof row.updatedAt !== 'number'
+  ) {
+    return null;
+  }
+  return {
+    id: row.id,
+    url: row.url,
+    savePath: row.savePath,
+    fileName: row.fileName,
+    totalBytes: row.totalBytes,
+    downloadedBytes: row.downloadedBytes,
+    progress: row.progress,
+    speedBytesPerSecond: row.speedBytesPerSecond,
+    estimatedFinishAt: row.estimatedFinishAt,
+    threads: row.threads,
+    status: row.status,
+    errorMessage: typeof row.errorMessage === 'string' ? row.errorMessage : undefined,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function sortTasks(tasks: DownloadTaskSnapshot[]): DownloadTaskSnapshot[] {
+  return tasks.slice().sort((a, b) => b.createdAt - a.createdAt);
+}
+
+function normalizeLoadedTasks(raw: unknown): DownloadTaskSnapshot[] {
+  if (!Array.isArray(raw)) return [];
+  const now = Date.now();
+  const list: DownloadTaskSnapshot[] = [];
+  const seen = new Set<string>();
+  raw.forEach((item) => {
+    const task = toPersistableTask(item);
+    if (!task) return;
+    if (seen.has(task.id)) return;
+    seen.add(task.id);
+    if (task.status === 'downloading') {
+      task.status = 'failed';
+      task.speedBytesPerSecond = 0;
+      task.estimatedFinishAt = null;
+      task.errorMessage = task.errorMessage || '应用重启后任务中断';
+      task.updatedAt = now;
+    }
+    list.push(task);
+  });
+  return sortTasks(list).slice(0, MAX_PERSISTED_TASKS);
+}
+
+function loadPersistedTasks(storePath: string): DownloadTaskSnapshot[] {
+  try {
+    if (!existsSync(storePath)) return [];
+    const content = readFileSync(storePath, 'utf-8');
+    if (!content.trim()) return [];
+    const parsed = JSON.parse(content);
+    return normalizeLoadedTasks(parsed);
+  } catch (error) {
+    console.error('[Download] load persisted tasks error:', error);
+    return [];
+  }
+}
+
+function savePersistedTasks(storePath: string, tasks: DownloadTaskSnapshot[]): void {
+  try {
+    mkdirSync(dirname(storePath), { recursive: true });
+    writeFileSync(storePath, JSON.stringify(sortTasks(tasks).slice(0, MAX_PERSISTED_TASKS), null, 2), 'utf-8');
+  } catch (error) {
+    console.error('[Download] save persisted tasks error:', error);
+  }
+}
 
 function sanitizeThreads(value: unknown): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 8;
@@ -41,7 +134,38 @@ export function registerDownloadIpcHandlers(options: RegisterDownloadIpcHandlers
   if (registered) return;
   registered = true;
 
+  const taskStorePath = join(app.getPath('userData'), 'eIsland_store', 'download-tasks.json');
+  const taskSnapshotMap = new Map<string, DownloadTaskSnapshot>();
+  loadPersistedTasks(taskStorePath).forEach((task) => {
+    taskSnapshotMap.set(task.id, task);
+  });
+
+  let persistTimer: NodeJS.Timeout | null = null;
+  const persistSnapshots = (): void => {
+    const tasks = Array.from(taskSnapshotMap.values());
+    savePersistedTasks(taskStorePath, tasks);
+  };
+  const schedulePersist = (): void => {
+    if (persistTimer) {
+      clearTimeout(persistTimer);
+    }
+    persistTimer = setTimeout(() => {
+      persistTimer = null;
+      persistSnapshots();
+    }, PERSIST_DEBOUNCE_MS);
+  };
+
+  const upsertTaskSnapshot = (task: DownloadTaskSnapshot): void => {
+    taskSnapshotMap.set(task.id, task);
+    if (taskSnapshotMap.size <= MAX_PERSISTED_TASKS) return;
+    const trimmed = sortTasks(Array.from(taskSnapshotMap.values())).slice(0, MAX_PERSISTED_TASKS);
+    taskSnapshotMap.clear();
+    trimmed.forEach((item) => taskSnapshotMap.set(item.id, item));
+  };
+
   const emitToRenderer = (task: DownloadTaskSnapshot): void => {
+    upsertTaskSnapshot(task);
+    schedulePersist();
     BrowserWindow.getAllWindows().forEach((win) => {
       if (win.isDestroyed()) return;
       try {
@@ -68,6 +192,8 @@ export function registerDownloadIpcHandlers(options: RegisterDownloadIpcHandlers
         threads: normalized.threads,
         defaultDir: options.getDownloadsPath(),
       });
+      upsertTaskSnapshot(task);
+      schedulePersist();
       return { ok: true, task } as const;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -82,13 +208,13 @@ export function registerDownloadIpcHandlers(options: RegisterDownloadIpcHandlers
   });
 
   ipcMain.handle('download:list', () => {
-    return engine.listTasks();
+    return sortTasks(Array.from(taskSnapshotMap.values()));
   });
 
   ipcMain.handle('download:get', (_event, taskId: unknown) => {
     const id = typeof taskId === 'string' ? taskId.trim() : '';
     if (!id) return null;
-    return engine.getTask(id);
+    return taskSnapshotMap.get(id) ?? null;
   });
 
   ipcMain.handle('download:pick-save-path', async (event, suggestedName: unknown) => {
