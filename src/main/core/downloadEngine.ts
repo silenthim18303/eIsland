@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { existsSync } from 'fs';
-import { mkdir, open, rename, rm, unlink } from 'fs/promises';
+import { mkdir, open, rename, rm, stat, unlink } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 import { EMIT_INTERVAL_MS } from './downloadEngine/config';
 import {
@@ -54,6 +54,7 @@ interface InternalTask extends DownloadTaskSnapshot {
   tempDir: string;
   tempOutputPath: string;
   partPaths: string[];
+  supportsRange: boolean;
   abortControllers: Set<AbortController>;
   lastSampleTime: number;
   lastSampleBytes: number;
@@ -138,6 +139,7 @@ export class MultiThreadDownloadEngine {
       tempDir,
       tempOutputPath,
       partPaths: [],
+      supportsRange: probe.supportsRange,
       abortControllers: new Set<AbortController>(),
       lastSampleTime: now,
       lastSampleBytes: 0,
@@ -191,22 +193,31 @@ export class MultiThreadDownloadEngine {
       throw new Error('仅可继续已暂停的任务');
     }
 
-    await this.cleanupTaskFiles(task);
-    await mkdir(task.tempDir, { recursive: true });
-
     const now = Date.now();
     const probe = await this.probeRemoteFile(new URL(task.url));
+
+    const canResume =
+      probe.supportsRange &&
+      probe.totalBytes > 0 &&
+      probe.totalBytes === task.totalBytes;
+
+    if (!canResume) {
+      await this.cleanupTaskFiles(task);
+      await mkdir(task.tempDir, { recursive: true });
+      task.downloadedBytes = 0;
+      task.progress = 0;
+      task.partPaths = [];
+    }
+
     task.status = 'downloading';
     task.errorMessage = undefined;
     task.totalBytes = probe.totalBytes;
-    task.downloadedBytes = 0;
-    task.progress = 0;
+    task.supportsRange = probe.supportsRange;
     task.speedBytesPerSecond = 0;
     task.estimatedFinishAt = null;
-    task.partPaths = [];
     task.abortControllers.clear();
     task.lastSampleTime = now;
-    task.lastSampleBytes = 0;
+    task.lastSampleBytes = task.downloadedBytes;
     task.lastEmitTime = 0;
     task.updatedAt = now;
 
@@ -262,6 +273,22 @@ export class MultiThreadDownloadEngine {
     if (useMultiThread) {
       const chunks = buildChunks(probe.totalBytes, task.threads, task.tempDir);
       task.partPaths = chunks.map((chunk) => chunk.partPath);
+
+      // Sync downloadedBytes with actual chunk file sizes on disk
+      let existingBytes = 0;
+      for (const chunk of chunks) {
+        try {
+          const fileStat = await stat(chunk.partPath);
+          existingBytes += fileStat.size;
+        } catch {
+          // file doesn't exist yet
+        }
+      }
+      task.downloadedBytes = Math.min(existingBytes, probe.totalBytes);
+      if (existingBytes > 0) {
+        this.updateTaskProgress(task);
+      }
+
       await Promise.all(chunks.map((chunk) => this.downloadChunk(task, chunk)));
       if (task.status === 'canceled') {
         await this.cleanupTaskFiles(task);
@@ -269,6 +296,23 @@ export class MultiThreadDownloadEngine {
       }
       await mergePartFiles(task.partPaths, task.tempOutputPath);
     } else {
+      // Sync downloadedBytes with actual temp file size on disk
+      if (probe.supportsRange && probe.totalBytes > 0) {
+        try {
+          const fileStat = await stat(task.tempOutputPath);
+          if (fileStat.size > 0 && fileStat.size < probe.totalBytes) {
+            task.downloadedBytes = fileStat.size;
+            this.updateTaskProgress(task);
+          } else {
+            task.downloadedBytes = 0;
+          }
+        } catch {
+          task.downloadedBytes = 0;
+        }
+      } else {
+        task.downloadedBytes = 0;
+      }
+
       await this.downloadSingle(task);
       if (task.status === 'canceled') {
         await this.cleanupTaskFiles(task);
@@ -299,16 +343,41 @@ export class MultiThreadDownloadEngine {
     const controller = new AbortController();
     task.abortControllers.add(controller);
     try {
-      const response = await fetch(task.url, { signal: controller.signal });
-      if (!response.ok || !response.body) {
+      let existingSize = 0;
+      if (task.supportsRange && task.totalBytes > 0) {
+        try {
+          const fileStat = await stat(task.tempOutputPath);
+          if (fileStat.size > 0 && fileStat.size < task.totalBytes) {
+            existingSize = fileStat.size;
+          }
+        } catch {
+          // file doesn't exist
+        }
+      }
+
+      const headers: Record<string, string> = {};
+      if (existingSize > 0) {
+        headers['Range'] = `bytes=${existingSize}-`;
+      }
+
+      const response = await fetch(task.url, { signal: controller.signal, headers });
+      if (existingSize > 0 && response.status !== 206) {
+        // Server doesn't support range for this request, restart
+        existingSize = 0;
+        task.downloadedBytes = 0;
+      }
+      if (!existingSize && !response.ok) {
+        throw new Error(`下载请求失败: HTTP ${response.status}`);
+      }
+      if (!response.body) {
         throw new Error(`下载请求失败: HTTP ${response.status}`);
       }
       const contentLength = Number(response.headers.get('content-length') || 0) || 0;
       if (task.totalBytes <= 0 && contentLength > 0) {
-        task.totalBytes = contentLength;
+        task.totalBytes = existingSize + contentLength;
       }
 
-      const fileHandle = await open(task.tempOutputPath, 'w');
+      const fileHandle = await open(task.tempOutputPath, existingSize > 0 ? 'a' : 'w');
       try {
         const reader = response.body.getReader();
         while (true) {
@@ -330,20 +399,37 @@ export class MultiThreadDownloadEngine {
   }
 
   private async downloadChunk(task: InternalTask, chunk: ChunkInfo): Promise<void> {
+    const chunkExpectedSize = chunk.end - chunk.start + 1;
+
+    // Check existing partial data
+    let existingSize = 0;
+    try {
+      const fileStat = await stat(chunk.partPath);
+      existingSize = fileStat.size;
+    } catch {
+      // file doesn't exist
+    }
+
+    // Chunk already fully downloaded
+    if (existingSize >= chunkExpectedSize) {
+      return;
+    }
+
     const controller = new AbortController();
     task.abortControllers.add(controller);
     try {
+      const rangeStart = chunk.start + existingSize;
       const response = await fetch(task.url, {
         signal: controller.signal,
         headers: {
-          Range: `bytes=${chunk.start}-${chunk.end}`,
+          Range: `bytes=${rangeStart}-${chunk.end}`,
         },
       });
       if ((response.status !== 206 && response.status !== 200) || !response.body) {
         throw new Error(`分片下载失败: HTTP ${response.status}`);
       }
 
-      const fileHandle = await open(chunk.partPath, 'w');
+      const fileHandle = await open(chunk.partPath, existingSize > 0 ? 'a' : 'w');
       try {
         const reader = response.body.getReader();
         while (true) {

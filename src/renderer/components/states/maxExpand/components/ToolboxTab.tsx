@@ -314,7 +314,7 @@ export function ToolboxTab(): ReactElement {
                   {activeTask && (
                     <div className="settings-hotkey-row download-cancel-row">
                       <button
-                        className="settings-lyrics-source-btn"
+                        className="settings-lyrics-source-btn download-start-btn-full"
                         type="button"
                         onClick={() => handleCancelTask(activeTask.id)}
                       >
