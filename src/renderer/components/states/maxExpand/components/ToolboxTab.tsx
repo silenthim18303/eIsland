@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 
 type ToolboxSidebarKey = 'download';
 
-type DownloadTaskStatus = 'downloading' | 'completed' | 'failed' | 'canceled';
+type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
 interface DownloadTaskSnapshot {
   id: string;
@@ -172,7 +172,43 @@ export function ToolboxTab(): ReactElement {
     });
   };
 
+  const handlePauseTask = (taskId: string): void => {
+    window.api.downloadPause(taskId).then((ok) => {
+      if (ok) {
+        setStatusMessage(t('maxExpand.toolbox.download.messages.pauseSuccess'));
+      }
+    }).catch(() => {
+      setStatusMessage(t('maxExpand.toolbox.download.messages.pauseFailed'));
+    });
+  };
+
+  const handleResumeTask = (taskId: string): void => {
+    window.api.downloadResume(taskId).then((result) => {
+      if (!result.ok) {
+        setStatusMessage(result.message || t('maxExpand.toolbox.download.messages.resumeFailed'));
+        return;
+      }
+      setStatusMessage(t('maxExpand.toolbox.download.messages.resumeSuccess'));
+    }).catch(() => {
+      setStatusMessage(t('maxExpand.toolbox.download.messages.resumeFailed'));
+    });
+  };
+
+  const handleRemoveTask = (taskId: string): void => {
+    window.api.downloadRemove(taskId).then((ok) => {
+      if (!ok) {
+        setStatusMessage(t('maxExpand.toolbox.download.messages.removeFailed'));
+        return;
+      }
+      setTasks((prev) => prev.filter((item) => item.id !== taskId));
+      setStatusMessage(t('maxExpand.toolbox.download.messages.removeSuccess'));
+    }).catch(() => {
+      setStatusMessage(t('maxExpand.toolbox.download.messages.removeFailed'));
+    });
+  };
+
   const getStatusText = (status: DownloadTaskStatus): string => {
+    if (status === 'paused') return t('maxExpand.toolbox.download.status.paused');
     if (status === 'completed') return t('maxExpand.toolbox.download.status.completed');
     if (status === 'failed') return t('maxExpand.toolbox.download.status.failed');
     if (status === 'canceled') return t('maxExpand.toolbox.download.status.canceled');
@@ -287,13 +323,44 @@ export function ToolboxTab(): ReactElement {
                   {tasks.map((task) => {
                     const percentText = `${(task.progress * 100).toFixed(1)}%`;
                     return (
-                      <div key={task.id} className="settings-card-subgroup">
-                        <div className="settings-card-subgroup-title">{task.fileName || task.url}</div>
+                      <div key={task.id} className="settings-card-subgroup download-task-card">
+                        <div className="download-task-card-header">
+                          <div className="settings-card-subgroup-title">{task.fileName || task.url}</div>
+                          <div className="settings-hotkey-row download-task-actions">
+                            {task.status === 'downloading' && (
+                              <button
+                                className="settings-lyrics-source-btn"
+                                type="button"
+                                onClick={() => handlePauseTask(task.id)}
+                              >
+                                {t('maxExpand.toolbox.download.tasks.pause')}
+                              </button>
+                            )}
+                            {task.status === 'paused' && (
+                              <button
+                                className="settings-lyrics-source-btn"
+                                type="button"
+                                onClick={() => handleResumeTask(task.id)}
+                              >
+                                {t('maxExpand.toolbox.download.tasks.resume')}
+                              </button>
+                            )}
+                            {task.status !== 'downloading' && (
+                              <button
+                                className="settings-lyrics-source-btn"
+                                type="button"
+                                onClick={() => handleRemoveTask(task.id)}
+                              >
+                                {t('maxExpand.toolbox.download.tasks.delete')}
+                              </button>
+                            )}
+                          </div>
+                        </div>
                         <div className="settings-music-hint">
                           {getStatusText(task.status)} · {percentText} · {formatBytes(task.downloadedBytes)} / {task.totalBytes > 0 ? formatBytes(task.totalBytes) : '?'} · {formatBytes(task.speedBytesPerSecond)}/s · {task.threads}T
                         </div>
                         <div className="settings-music-hint">
-                          {task.status === 'completed'
+                          {(task.status === 'completed' || task.status === 'paused' || task.status === 'failed' || task.status === 'canceled')
                             ? `${t('maxExpand.toolbox.download.tasks.elapsedLabel')}: ${formatDurationMs(task.updatedAt - task.createdAt)}`
                             : `${t('maxExpand.toolbox.download.tasks.remainingLabel')}: ${formatDurationMs((task.estimatedFinishAt || 0) - nowMs)}`}
                         </div>

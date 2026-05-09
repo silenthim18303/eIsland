@@ -923,10 +923,14 @@
           "empty": "暂无下载任务",
           "etaLabel": "预计结束",
           "remainingLabel": "剩余时间",
-          "elapsedLabel": "已使用下载时间"
+          "elapsedLabel": "已使用下载时间",
+          "pause": "暂停",
+          "resume": "继续",
+          "delete": "删除记录"
         },
         "status": {
           "downloading": "下载中",
+          "paused": "已暂停",
           "completed": "已完成",
           "failed": "失败",
           "canceled": "已取消"
@@ -936,7 +940,13 @@
           "startFailed": "启动下载失败",
           "pickPathFailed": "选择保存路径失败",
           "cancelSuccess": "已取消下载任务",
-          "cancelFailed": "取消下载失败"
+          "cancelFailed": "取消下载失败",
+          "pauseSuccess": "已暂停下载任务",
+          "pauseFailed": "暂停下载失败",
+          "resumeSuccess": "已继续下载任务",
+          "resumeFailed": "继续下载失败",
+          "removeSuccess": "已删除下载记录",
+          "removeFailed": "删除下载记录失败"
         }
       }
     },

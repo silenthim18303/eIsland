@@ -923,10 +923,14 @@
           "empty": "No download tasks yet",
           "etaLabel": "ETA",
           "remainingLabel": "Remaining",
-          "elapsedLabel": "Elapsed"
+          "elapsedLabel": "Elapsed",
+          "pause": "Pause",
+          "resume": "Resume",
+          "delete": "Delete"
         },
         "status": {
           "downloading": "Downloading",
+          "paused": "Paused",
           "completed": "Completed",
           "failed": "Failed",
           "canceled": "Canceled"
@@ -936,7 +940,13 @@
           "startFailed": "Failed to start download",
           "pickPathFailed": "Failed to choose save path",
           "cancelSuccess": "Download task canceled",
-          "cancelFailed": "Failed to cancel download"
+          "cancelFailed": "Failed to cancel download",
+          "pauseSuccess": "Download task paused",
+          "pauseFailed": "Failed to pause download",
+          "resumeSuccess": "Download task resumed",
+          "resumeFailed": "Failed to resume download",
+          "removeSuccess": "Download task removed",
+          "removeFailed": "Failed to remove download task"
         }
       }
     },

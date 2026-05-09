@@ -18,7 +18,7 @@ const MAX_PERSISTED_TASKS = 200;
 const PERSIST_DEBOUNCE_MS = 600;
 
 function isDownloadTaskStatus(value: unknown): value is DownloadTaskSnapshot['status'] {
-  return value === 'downloading' || value === 'completed' || value === 'failed' || value === 'canceled';
+  return value === 'downloading' || value === 'paused' || value === 'completed' || value === 'failed' || value === 'canceled';
 }
 
 function toPersistableTask(raw: unknown): DownloadTaskSnapshot | null {
@@ -205,6 +205,42 @@ export function registerDownloadIpcHandlers(options: RegisterDownloadIpcHandlers
     const id = typeof taskId === 'string' ? taskId.trim() : '';
     if (!id) return false;
     return engine.cancelDownload(id);
+  });
+
+  ipcMain.handle('download:pause', (_event, taskId: unknown) => {
+    const id = typeof taskId === 'string' ? taskId.trim() : '';
+    if (!id) return false;
+    return engine.pauseDownload(id);
+  });
+
+  ipcMain.handle('download:resume', async (_event, taskId: unknown) => {
+    try {
+      const id = typeof taskId === 'string' ? taskId.trim() : '';
+      if (!id) return { ok: false, message: '任务标识不能为空' } as const;
+      const task = await engine.resumeDownload(id);
+      upsertTaskSnapshot(task);
+      schedulePersist();
+      return { ok: true, task } as const;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ok: false, message } as const;
+    }
+  });
+
+  ipcMain.handle('download:remove', (_event, taskId: unknown) => {
+    const id = typeof taskId === 'string' ? taskId.trim() : '';
+    if (!id) return false;
+    const snapshot = taskSnapshotMap.get(id);
+    if (!snapshot) return false;
+
+    const removedFromEngine = engine.removeTask(id);
+    if (!removedFromEngine && snapshot.status === 'downloading') {
+      return false;
+    }
+
+    taskSnapshotMap.delete(id);
+    schedulePersist();
+    return true;
   });
 
   ipcMain.handle('download:list', () => {

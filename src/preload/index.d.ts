@@ -277,7 +277,7 @@ declare global {
           speedBytesPerSecond: number;
           estimatedFinishAt: number | null;
           threads: number;
-          status: 'downloading' | 'completed' | 'failed' | 'canceled';
+          status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
           errorMessage?: string;
           createdAt: number;
           updatedAt: number;
@@ -285,6 +285,28 @@ declare global {
         message?: string;
       }>;
       downloadCancel: (taskId: string) => Promise<boolean>;
+      downloadPause: (taskId: string) => Promise<boolean>;
+      downloadResume: (taskId: string) => Promise<{
+        ok: boolean;
+        task?: {
+          id: string;
+          url: string;
+          savePath: string;
+          fileName: string;
+          totalBytes: number;
+          downloadedBytes: number;
+          progress: number;
+          speedBytesPerSecond: number;
+          estimatedFinishAt: number | null;
+          threads: number;
+          status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+          errorMessage?: string;
+          createdAt: number;
+          updatedAt: number;
+        };
+        message?: string;
+      }>;
+      downloadRemove: (taskId: string) => Promise<boolean>;
       downloadList: () => Promise<Array<{
         id: string;
         url: string;
@@ -296,7 +318,7 @@ declare global {
         speedBytesPerSecond: number;
         estimatedFinishAt: number | null;
         threads: number;
-        status: 'downloading' | 'completed' | 'failed' | 'canceled';
+        status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
         errorMessage?: string;
         createdAt: number;
         updatedAt: number;
@@ -314,7 +336,7 @@ declare global {
         speedBytesPerSecond: number;
         estimatedFinishAt: number | null;
         threads: number;
-        status: 'downloading' | 'completed' | 'failed' | 'canceled';
+        status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
         errorMessage?: string;
         createdAt: number;
         updatedAt: number;

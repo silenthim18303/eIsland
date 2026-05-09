@@ -2610,6 +2610,29 @@
   color: rgba(var(--color-text-rgb), 0.78);
 }
 
+.download-task-card {
+  padding: 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 10px;
+  background: rgba(var(--color-text-rgb), 0.03);
+}
+
+.download-task-card + .download-task-card {
+  margin-top: 8px;
+}
+
+.download-task-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.download-task-actions {
+  flex-shrink: 0;
+  gap: 6px;
+}
+
 .settings-card-inline-row {
   display: flex;
   flex-wrap: wrap;

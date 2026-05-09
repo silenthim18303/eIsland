@@ -4,7 +4,7 @@ import { mkdir, open, rename, rm, unlink } from 'fs/promises';
 import { basename, dirname, extname, join } from 'path';
 import { pipeline } from 'stream/promises';
 
-export type DownloadTaskStatus = 'downloading' | 'completed' | 'failed' | 'canceled';
+export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
 export interface DownloadTaskSnapshot {
   id: string;
@@ -241,6 +241,66 @@ export class MultiThreadDownloadEngine {
     return true;
   }
 
+  pauseDownload(taskId: string): boolean {
+    const task = this.tasks.get(taskId);
+    if (!task) return false;
+    if (task.status !== 'downloading') return false;
+
+    task.status = 'paused';
+    task.speedBytesPerSecond = 0;
+    task.estimatedFinishAt = null;
+    task.updatedAt = Date.now();
+    task.abortControllers.forEach((controller) => controller.abort());
+    task.abortControllers.clear();
+    this.emitTask(task, true);
+    return true;
+  }
+
+  async resumeDownload(taskId: string): Promise<DownloadTaskSnapshot> {
+    const task = this.tasks.get(taskId);
+    if (!task) {
+      throw new Error('下载任务不存在');
+    }
+    if (task.status !== 'paused') {
+      throw new Error('仅可继续已暂停的任务');
+    }
+
+    await this.cleanupTaskFiles(task);
+    await mkdir(task.tempDir, { recursive: true });
+
+    const now = Date.now();
+    const probe = await this.probeRemoteFile(new URL(task.url));
+    task.status = 'downloading';
+    task.errorMessage = undefined;
+    task.totalBytes = probe.totalBytes;
+    task.downloadedBytes = 0;
+    task.progress = 0;
+    task.speedBytesPerSecond = 0;
+    task.estimatedFinishAt = null;
+    task.partPaths = [];
+    task.abortControllers.clear();
+    task.lastSampleTime = now;
+    task.lastSampleBytes = 0;
+    task.lastEmitTime = 0;
+    task.updatedAt = now;
+
+    this.emitTask(task, true);
+    void this.executeDownload(task, probe).catch((error) => {
+      this.handleTaskFailure(task, error);
+    });
+
+    return toTaskSnapshot(task);
+  }
+
+  removeTask(taskId: string): boolean {
+    const task = this.tasks.get(taskId);
+    if (!task) return false;
+    if (task.status === 'downloading') return false;
+    this.tasks.delete(taskId);
+    void this.cleanupTaskFiles(task);
+    return true;
+  }
+
   private async probeRemoteFile(url: URL): Promise<DownloadProbeResult> {
     let fileName = inferFileNameFromUrl(url);
     let totalBytes = 0;
@@ -421,6 +481,14 @@ export class MultiThreadDownloadEngine {
   }
 
   private handleTaskFailure(task: InternalTask, error: unknown): void {
+    if (task.status === 'paused') {
+      task.speedBytesPerSecond = 0;
+      task.estimatedFinishAt = null;
+      task.updatedAt = Date.now();
+      this.emitTask(task, true);
+      return;
+    }
+
     if (task.status === 'canceled' || isAbortError(error)) {
       task.status = 'canceled';
       task.speedBytesPerSecond = 0;

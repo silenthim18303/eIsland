@@ -1141,7 +1141,7 @@ const api = {
     speedBytesPerSecond: number;
     estimatedFinishAt: number | null;
     threads: number;
-    status: 'downloading' | 'completed' | 'failed' | 'canceled';
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
     errorMessage?: string;
     createdAt: number;
     updatedAt: number;
@@ -1150,6 +1150,30 @@ const api = {
   },
   downloadCancel: (taskId: string): Promise<boolean> => {
     return ipcRenderer.invoke('download:cancel', taskId);
+  },
+  downloadPause: (taskId: string): Promise<boolean> => {
+    return ipcRenderer.invoke('download:pause', taskId);
+  },
+  downloadResume: (taskId: string): Promise<{ ok: boolean; task?: {
+    id: string;
+    url: string;
+    savePath: string;
+    fileName: string;
+    totalBytes: number;
+    downloadedBytes: number;
+    progress: number;
+    speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
+    threads: number;
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+    errorMessage?: string;
+    createdAt: number;
+    updatedAt: number;
+  }; message?: string }> => {
+    return ipcRenderer.invoke('download:resume', taskId);
+  },
+  downloadRemove: (taskId: string): Promise<boolean> => {
+    return ipcRenderer.invoke('download:remove', taskId);
   },
   downloadList: (): Promise<Array<{
     id: string;
@@ -1162,7 +1186,7 @@ const api = {
     speedBytesPerSecond: number;
     estimatedFinishAt: number | null;
     threads: number;
-    status: 'downloading' | 'completed' | 'failed' | 'canceled';
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
     errorMessage?: string;
     createdAt: number;
     updatedAt: number;
@@ -1186,7 +1210,7 @@ const api = {
     speedBytesPerSecond: number;
     estimatedFinishAt: number | null;
     threads: number;
-    status: 'downloading' | 'completed' | 'failed' | 'canceled';
+    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
     errorMessage?: string;
     createdAt: number;
     updatedAt: number;
@@ -1202,7 +1226,7 @@ const api = {
       speedBytesPerSecond: number;
       estimatedFinishAt: number | null;
       threads: number;
-      status: 'downloading' | 'completed' | 'failed' | 'canceled';
+      status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
       errorMessage?: string;
       createdAt: number;
       updatedAt: number;
