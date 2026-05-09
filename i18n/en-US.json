@@ -1289,7 +1289,11 @@
         "imageOpacityHint": "Background opacity (0% - 100%)",
         "imageBlurHint": "Background blur (0px - 20px)",
         "islandOpacityTitle": "Island Opacity",
-        "islandOpacityHint": "Lower value = more transparent (10% - 100%)"
+        "islandOpacityHint": "Lower value = more transparent (10% - 100%)",
+        "autoDimTitle": "Auto-dim when idle",
+        "autoDimHint": "When enabled, the island opacity is reduced after no mouse interaction for the configured duration, and restores when the cursor enters",
+        "autoDimToggle": "Enable idle auto-dim",
+        "autoDimDelayHint": "Seconds before dimming on inactivity (1 - 120s)"
       },
       "behavior": {
         "mouseLeaveTitle": "Auto collapse on mouse leave",

@@ -1289,7 +1289,11 @@
         "imageOpacityHint": "背景图片透明度（0% - 100%），数值越高图片越明显",
         "imageBlurHint": "背景图片模糊度（0px - 20px），数值越高越模糊",
         "islandOpacityTitle": "灵动岛透明度",
-        "islandOpacityHint": "数值越低越透明（10% - 100%）"
+        "islandOpacityHint": "数值越低越透明（10% - 100%）",
+        "autoDimTitle": "闲置自动降低不透明度",
+        "autoDimHint": "开启后，灵动岛在指定时间内无鼠标操作时将自动降低不透明度，鼠标移入后恢复",
+        "autoDimToggle": "启用闲置自动降低不透明度",
+        "autoDimDelayHint": "无操作多少秒后自动降低（1 - 120 秒）"
       },
       "behavior": {
         "mouseLeaveTitle": "鼠标移开自动收回",
