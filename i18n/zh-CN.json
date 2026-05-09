@@ -920,7 +920,10 @@
         "tasks": {
           "title": "下载任务",
           "subtitle": "展示最近任务的进度、速度与状态。",
-          "empty": "暂无下载任务"
+          "empty": "暂无下载任务",
+          "etaLabel": "预计结束",
+          "remainingLabel": "剩余时间",
+          "elapsedLabel": "已使用下载时间"
         },
         "status": {
           "downloading": "下载中",

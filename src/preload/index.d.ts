@@ -275,6 +275,7 @@ declare global {
           downloadedBytes: number;
           progress: number;
           speedBytesPerSecond: number;
+          estimatedFinishAt: number | null;
           threads: number;
           status: 'downloading' | 'completed' | 'failed' | 'canceled';
           errorMessage?: string;
@@ -293,6 +294,7 @@ declare global {
         downloadedBytes: number;
         progress: number;
         speedBytesPerSecond: number;
+        estimatedFinishAt: number | null;
         threads: number;
         status: 'downloading' | 'completed' | 'failed' | 'canceled';
         errorMessage?: string;
@@ -310,6 +312,7 @@ declare global {
         downloadedBytes: number;
         progress: number;
         speedBytesPerSecond: number;
+        estimatedFinishAt: number | null;
         threads: number;
         status: 'downloading' | 'completed' | 'failed' | 'canceled';
         errorMessage?: string;

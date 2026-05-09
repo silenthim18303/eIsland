@@ -920,7 +920,10 @@
         "tasks": {
           "title": "Download Tasks",
           "subtitle": "Shows recent task progress, speed, and status.",
-          "empty": "No download tasks yet"
+          "empty": "No download tasks yet",
+          "etaLabel": "ETA",
+          "remainingLabel": "Remaining",
+          "elapsedLabel": "Elapsed"
         },
         "status": {
           "downloading": "Downloading",

@@ -1139,6 +1139,7 @@ const api = {
     downloadedBytes: number;
     progress: number;
     speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
     threads: number;
     status: 'downloading' | 'completed' | 'failed' | 'canceled';
     errorMessage?: string;
@@ -1159,6 +1160,7 @@ const api = {
     downloadedBytes: number;
     progress: number;
     speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
     threads: number;
     status: 'downloading' | 'completed' | 'failed' | 'canceled';
     errorMessage?: string;
@@ -1182,6 +1184,7 @@ const api = {
     downloadedBytes: number;
     progress: number;
     speedBytesPerSecond: number;
+    estimatedFinishAt: number | null;
     threads: number;
     status: 'downloading' | 'completed' | 'failed' | 'canceled';
     errorMessage?: string;
@@ -1197,6 +1200,7 @@ const api = {
       downloadedBytes: number;
       progress: number;
       speedBytesPerSecond: number;
+      estimatedFinishAt: number | null;
       threads: number;
       status: 'downloading' | 'completed' | 'failed' | 'canceled';
       errorMessage?: string;

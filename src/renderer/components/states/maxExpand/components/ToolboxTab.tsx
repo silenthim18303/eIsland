@@ -40,6 +40,7 @@ interface DownloadTaskSnapshot {
   downloadedBytes: number;
   progress: number;
   speedBytesPerSecond: number;
+  estimatedFinishAt: number | null;
   threads: number;
   status: DownloadTaskStatus;
   errorMessage?: string;
@@ -67,6 +68,18 @@ function inferSuggestedName(url: string): string {
   }
 }
 
+function formatDurationMs(value: number): string {
+  if (!Number.isFinite(value) || value <= 0) return '-';
+  const totalSeconds = Math.max(0, Math.floor(value / 1000));
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) {
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+  return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 /** 最大展开模式工具箱页面 */
 export function ToolboxTab(): ReactElement {
   const { t } = useTranslation();
@@ -78,6 +91,7 @@ export function ToolboxTab(): ReactElement {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [tasks, setTasks] = useState<DownloadTaskSnapshot[]>([]);
+  const [nowMs, setNowMs] = useState(() => Date.now());
 
   useEffect(() => {
     let disposed = false;
@@ -101,6 +115,15 @@ export function ToolboxTab(): ReactElement {
     return () => {
       disposed = true;
       off();
+    };
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNowMs(Date.now());
+    }, 1000);
+    return () => {
+      window.clearInterval(timer);
     };
   }, []);
 
@@ -268,6 +291,11 @@ export function ToolboxTab(): ReactElement {
                         <div className="settings-card-subgroup-title">{task.fileName || task.url}</div>
                         <div className="settings-music-hint">
                           {getStatusText(task.status)} · {percentText} · {formatBytes(task.downloadedBytes)} / {task.totalBytes > 0 ? formatBytes(task.totalBytes) : '?'} · {formatBytes(task.speedBytesPerSecond)}/s · {task.threads}T
+                        </div>
+                        <div className="settings-music-hint">
+                          {task.status === 'completed'
+                            ? `${t('maxExpand.toolbox.download.tasks.elapsedLabel')}: ${formatDurationMs(task.updatedAt - task.createdAt)}`
+                            : `${t('maxExpand.toolbox.download.tasks.remainingLabel')}: ${formatDurationMs((task.estimatedFinishAt || 0) - nowMs)}`}
                         </div>
                         <div className="settings-music-hint">{task.savePath}</div>
                         {task.errorMessage && (

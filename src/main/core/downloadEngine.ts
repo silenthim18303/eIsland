@@ -15,6 +15,7 @@ export interface DownloadTaskSnapshot {
   downloadedBytes: number;
   progress: number;
   speedBytesPerSecond: number;
+  estimatedFinishAt: number | null;
   threads: number;
   status: DownloadTaskStatus;
   errorMessage?: string;
@@ -77,6 +78,7 @@ function toTaskSnapshot(task: InternalTask): DownloadTaskSnapshot {
     downloadedBytes: task.downloadedBytes,
     progress: task.progress,
     speedBytesPerSecond: task.speedBytesPerSecond,
+    estimatedFinishAt: task.estimatedFinishAt,
     threads: task.threads,
     status: task.status,
     errorMessage: task.errorMessage,
@@ -202,6 +204,7 @@ export class MultiThreadDownloadEngine {
       downloadedBytes: 0,
       progress: 0,
       speedBytesPerSecond: 0,
+      estimatedFinishAt: null,
       threads,
       status: 'downloading',
       createdAt: now,
@@ -298,6 +301,7 @@ export class MultiThreadDownloadEngine {
     task.downloadedBytes = Math.max(task.downloadedBytes, task.totalBytes);
     task.progress = 1;
     task.speedBytesPerSecond = 0;
+    task.estimatedFinishAt = null;
     task.status = 'completed';
     task.updatedAt = Date.now();
     this.emitTask(task, true);
@@ -384,6 +388,14 @@ export class MultiThreadDownloadEngine {
     task.lastSampleTime = now;
     task.updatedAt = now;
 
+    if (task.totalBytes > 0 && task.speedBytesPerSecond > 0 && task.downloadedBytes < task.totalBytes) {
+      const remainBytes = task.totalBytes - task.downloadedBytes;
+      const remainSeconds = remainBytes / task.speedBytesPerSecond;
+      task.estimatedFinishAt = now + Math.max(0, Math.round(remainSeconds * 1000));
+    } else {
+      task.estimatedFinishAt = null;
+    }
+
     if (task.totalBytes > 0) {
       task.progress = Math.max(0, Math.min(1, task.downloadedBytes / task.totalBytes));
     }
@@ -412,6 +424,7 @@ export class MultiThreadDownloadEngine {
     if (task.status === 'canceled' || isAbortError(error)) {
       task.status = 'canceled';
       task.speedBytesPerSecond = 0;
+      task.estimatedFinishAt = null;
       task.updatedAt = Date.now();
       this.emitTask(task, true);
       void this.cleanupTaskFiles(task);
@@ -421,6 +434,7 @@ export class MultiThreadDownloadEngine {
     task.status = 'failed';
     task.errorMessage = error instanceof Error ? error.message : String(error);
     task.speedBytesPerSecond = 0;
+    task.estimatedFinishAt = null;
     task.updatedAt = Date.now();
     this.emitTask(task, true);
     void this.cleanupTaskFiles(task);
