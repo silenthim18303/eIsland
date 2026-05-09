@@ -900,10 +900,10 @@
     },
     "toolbox": {
       "sidebar": {
-        "download": "Download"
+        "download": "MT Download"
       },
       "download": {
-        "title": "Download",
+        "title": "Multi-Thread Download",
         "subtitle": "Supports multi-threaded downloads with custom save path and real-time progress.",
         "form": {
           "urlLabel": "Download URL",

@@ -900,10 +900,10 @@
     },
     "toolbox": {
       "sidebar": {
-        "download": "下载"
+        "download": "多线程下载"
       },
       "download": {
-        "title": "下载",
+        "title": "多线程下载",
         "subtitle": "支持多线程下载，可自定义保存位置并查看实时进度。",
         "form": {
           "urlLabel": "下载地址",
