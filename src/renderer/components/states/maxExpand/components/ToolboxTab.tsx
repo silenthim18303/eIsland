@@ -250,10 +250,13 @@ export function ToolboxTab(): ReactElement {
                   </label>
 
                   <label className="settings-field">
-                    <span className="settings-field-label">{t('maxExpand.toolbox.download.form.savePathLabel')}</span>
-                    <div className="settings-hotkey-row">
+                    <div className="download-field-title-row">
+                      <span className="settings-field-label">{t('maxExpand.toolbox.download.form.savePathLabel')}</span>
+                      <span className="settings-field-label download-threads-title-inline">{t('maxExpand.toolbox.download.form.threadsLabel')}</span>
+                    </div>
+                    <div className="settings-hotkey-row download-path-row">
                       <input
-                        className="settings-hotkey-input"
+                        className="settings-hotkey-input download-save-path-input"
                         type="text"
                         placeholder={defaultDir || t('maxExpand.toolbox.download.form.savePathPlaceholder')}
                         value={savePath}
@@ -266,35 +269,36 @@ export function ToolboxTab(): ReactElement {
                       >
                         {t('maxExpand.toolbox.download.form.pickPath')}
                       </button>
+                      <label className="download-threads-inline">
+                        <input
+                          className="settings-field-input download-threads-inline-input"
+                          type="number"
+                          min="1"
+                          max="16"
+                          step="1"
+                          value={threads}
+                          onChange={(event) => setThreads(event.target.value)}
+                        />
+                      </label>
                     </div>
                     <span className="settings-field-hint">
                       {t('maxExpand.toolbox.download.form.defaultDirHint', { dir: defaultDir || '-' })}
                     </span>
                   </label>
 
-                  <label className="settings-field" style={{ maxWidth: 220 }}>
-                    <span className="settings-field-label">{t('maxExpand.toolbox.download.form.threadsLabel')}</span>
-                    <input
-                      className="settings-field-input"
-                      type="number"
-                      min="1"
-                      max="16"
-                      step="1"
-                      value={threads}
-                      onChange={(event) => setThreads(event.target.value)}
-                    />
-                  </label>
-
                   <div className="settings-hotkey-row">
                     <button
-                      className={`settings-lyrics-source-btn ${loading ? 'disabled' : ''}`}
+                      className={`settings-lyrics-source-btn download-start-btn-full ${loading ? 'disabled' : ''}`}
                       type="button"
                       disabled={loading}
                       onClick={handleStartDownload}
                     >
                       {loading ? t('maxExpand.toolbox.download.form.starting') : t('maxExpand.toolbox.download.form.start')}
                     </button>
-                    {activeTask && (
+                  </div>
+
+                  {activeTask && (
+                    <div className="settings-hotkey-row download-cancel-row">
                       <button
                         className="settings-lyrics-source-btn"
                         type="button"
@@ -302,8 +306,8 @@ export function ToolboxTab(): ReactElement {
                       >
                         {t('maxExpand.toolbox.download.form.cancelCurrent')}
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
 
                   {!!statusMessage && (
                     <div className="settings-music-hint">{statusMessage}</div>

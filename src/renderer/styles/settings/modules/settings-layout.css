@@ -2648,6 +2648,51 @@
   transition: width 0.2s ease;
 }
 
+.download-path-row {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.download-save-path-input {
+  cursor: text;
+}
+
+.download-save-path-input:focus {
+  border-color: rgba(var(--color-text-rgb), 0.3);
+  background: rgba(var(--color-text-rgb), 0.06);
+}
+
+.download-field-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.download-threads-title-inline {
+  margin-left: auto;
+}
+
+.download-threads-inline {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: flex-end;
+}
+
+.download-threads-inline-input {
+  width: 120px;
+  min-width: 120px;
+}
+
+.download-start-btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+.download-cancel-row {
+  margin-top: 8px;
+}
+
 .settings-card-inline-row {
   display: flex;
   flex-wrap: wrap;
