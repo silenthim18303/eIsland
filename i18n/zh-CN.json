@@ -900,7 +900,13 @@
     },
     "toolbox": {
       "sidebar": {
-        "download": "多线程下载"
+        "download": "多线程下载",
+        "software": "常用软件"
+      },
+      "software": {
+        "title": "常用软件",
+        "subtitle": "快速访问和管理常用软件。",
+        "empty": "暂无常用软件"
       },
       "download": {
         "title": "多线程下载",

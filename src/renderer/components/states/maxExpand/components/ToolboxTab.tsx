@@ -27,7 +27,7 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type ToolboxSidebarKey = 'download';
+type ToolboxSidebarKey = 'download' | 'software';
 
 type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
@@ -239,6 +239,14 @@ export function ToolboxTab(): ReactElement {
             <span className="sidebar-dot" />
             {t('maxExpand.toolbox.sidebar.download')}
           </button>
+          <button
+            className={`max-expand-settings-sidebar-item ${activeSidebar === 'software' ? 'active' : ''}`}
+            onClick={() => setActiveSidebar('software')}
+            type="button"
+          >
+            <span className="sidebar-dot" />
+            {t('maxExpand.toolbox.sidebar.software')}
+          </button>
         </div>
 
         <div className="max-expand-settings-panel">
@@ -402,6 +410,19 @@ export function ToolboxTab(): ReactElement {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            </div>
+          )}
+          {activeSidebar === 'software' && (
+            <div className="settings-cards">
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <div className="settings-card-title">{t('maxExpand.toolbox.software.title')}</div>
+                  <div className="settings-card-subtitle">{t('maxExpand.toolbox.software.subtitle')}</div>
+                </div>
+                <div className="settings-card-body">
+                  <div className="settings-music-hint">{t('maxExpand.toolbox.software.empty')}</div>
                 </div>
               </div>
             </div>

@@ -900,7 +900,13 @@
     },
     "toolbox": {
       "sidebar": {
-        "download": "MT Download"
+        "download": "MT Download",
+        "software": "Software"
+      },
+      "software": {
+        "title": "Common Software",
+        "subtitle": "Quick access and manage frequently used software.",
+        "empty": "No software added yet"
       },
       "download": {
         "title": "Multi-Thread Download",
