@@ -122,9 +122,6 @@ export function MaxExpandLayoutSettingsPage({
                   <span className="maxexpand-layout-dot-label">{getTabLabel(item.id)}</span>
                 </div>
               ))}
-              <div className="maxexpand-layout-preview-dot maxexpand-layout-preview-dot--fixed" title={t('settings.app.maxExpandLayout.settingsLabel', { defaultValue: '设置' })}>
-                <span className="maxexpand-layout-dot-label">{t('settings.app.maxExpandLayout.settingsLabel', { defaultValue: '设置' })}</span>
-              </div>
             </div>
           </div>
         </div>
