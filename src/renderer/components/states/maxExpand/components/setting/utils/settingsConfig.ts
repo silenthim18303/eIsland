@@ -211,12 +211,12 @@ export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLay
   const known = new Set(MAXEXPAND_CONFIGURABLE_TABS);
   const merged = new Map<string, boolean>();
 
-  for (const item of raw) {
-    if (!item || typeof item !== 'object') continue;
+  raw.forEach((item) => {
+    if (!item || typeof item !== 'object') return;
     const candidate = item as { id?: unknown; visible?: unknown };
-    if (typeof candidate.id !== 'string' || !known.has(candidate.id)) continue;
+    if (typeof candidate.id !== 'string' || !known.has(candidate.id)) return;
     merged.set(candidate.id, candidate.visible !== false);
-  }
+  });
 
   return MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({
     id,

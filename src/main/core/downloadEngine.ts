@@ -301,15 +301,17 @@ export class MultiThreadDownloadEngine {
       task.partPaths = chunks.map((chunk) => chunk.partPath);
 
       // Sync downloadedBytes with actual chunk file sizes on disk
-      let existingBytes = 0;
-      for (const chunk of chunks) {
-        try {
-          const fileStat = await stat(chunk.partPath);
-          existingBytes += fileStat.size;
-        } catch {
-          // file doesn't exist yet
-        }
-      }
+      const chunkSizes = await Promise.all(
+        chunks.map(async (chunk) => {
+          try {
+            const fileStat = await stat(chunk.partPath);
+            return fileStat.size;
+          } catch {
+            return 0;
+          }
+        }),
+      );
+      const existingBytes = chunkSizes.reduce((sum, size) => sum + size, 0);
       task.downloadedBytes = Math.min(existingBytes, probe.totalBytes);
       if (existingBytes > 0) {
         this.updateTaskProgress(task);
