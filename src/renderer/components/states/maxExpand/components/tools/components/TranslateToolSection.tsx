@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { fetchTranslate } from '../../../../../../api/tools/toolboxTranslateApi';
 import { readLocalToken } from '../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import { resolveCountryIcon } from '../../../../../../utils/SvgIcon/country-icon';
 import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/toolboxConfig';
 
 export function TranslateToolSection(): ReactElement {
@@ -87,17 +88,27 @@ export function TranslateToolSection(): ReactElement {
         </div>
         <div className="settings-card-body">
           <div className="translate-lang-row">
-            <select
-              className="translate-lang-select"
-              value={sourceLang}
-              onChange={(e) => setSourceLang(e.target.value)}
-            >
-              {TRANSLATE_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {t(lang.labelKey)}
-                </option>
-              ))}
-            </select>
+            <div className="translate-lang-select-wrapper">
+              {resolveCountryIcon(sourceLang) && (
+                <img
+                  className="translate-lang-flag no-filter"
+                  src={resolveCountryIcon(sourceLang)}
+                  alt=""
+                  draggable={false}
+                />
+              )}
+              <select
+                className="translate-lang-select"
+                value={sourceLang}
+                onChange={(e) => setSourceLang(e.target.value)}
+              >
+                {TRANSLATE_LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {t(lang.labelKey)}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               className="translate-swap-btn"
               type="button"
@@ -107,17 +118,27 @@ export function TranslateToolSection(): ReactElement {
             >
               <img className="translate-swap-icon" src={SvgIcon.SWITCHING} alt="" draggable={false} />
             </button>
-            <select
-              className="translate-lang-select"
-              value={targetLang}
-              onChange={(e) => setTargetLang(e.target.value)}
-            >
-              {TRANSLATE_TARGET_LANGUAGES.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {t(lang.labelKey)}
-                </option>
-              ))}
-            </select>
+            <div className="translate-lang-select-wrapper">
+              {resolveCountryIcon(targetLang) && (
+                <img
+                  className="translate-lang-flag no-filter"
+                  src={resolveCountryIcon(targetLang)}
+                  alt=""
+                  draggable={false}
+                />
+              )}
+              <select
+                className="translate-lang-select"
+                value={targetLang}
+                onChange={(e) => setTargetLang(e.target.value)}
+              >
+                {TRANSLATE_TARGET_LANGUAGES.map((lang) => (
+                  <option key={lang.code} value={lang.code}>
+                    {t(lang.labelKey)}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="translate-text-area-group">

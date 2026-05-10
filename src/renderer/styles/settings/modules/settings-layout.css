@@ -2842,6 +2842,25 @@
   gap: 8px;
 }
 
+.translate-lang-select-wrapper {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.translate-lang-flag {
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  height: 12px;
+  object-fit: cover;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .translate-lang-select {
   flex: 1;
   min-width: 0;
@@ -2856,6 +2875,10 @@
   cursor: pointer;
   transition: border-color 0.15s;
   color-scheme: dark;
+}
+
+.translate-lang-flag + .translate-lang-select {
+  padding-left: 30px;
 }
 
 .translate-lang-select:focus {
