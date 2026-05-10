@@ -176,11 +176,11 @@ export function NetworkServiceToolSection(): ReactElement {
                 </div>
                 <div className="ipinfo-result-item">
                   <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.latitude')}</span>
-                  <span className="ipinfo-result-value">{result.latitude != null ? String(result.latitude) : '-'}</span>
+                  <span className="ipinfo-result-value">{result.latitude !== undefined ? String(result.latitude) : '-'}</span>
                 </div>
                 <div className="ipinfo-result-item">
                   <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.longitude')}</span>
-                  <span className="ipinfo-result-value">{result.longitude != null ? String(result.longitude) : '-'}</span>
+                  <span className="ipinfo-result-value">{result.longitude !== undefined ? String(result.longitude) : '-'}</span>
                 </div>
               </div>
             </div>
