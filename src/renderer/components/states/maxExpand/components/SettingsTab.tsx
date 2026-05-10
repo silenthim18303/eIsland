@@ -1581,6 +1581,7 @@ export function SettingsTab(): ReactElement {
   useEffect(() => {
     const unsub = window.api.onUpdaterProgress?.((progress) => {
       setDownloadProgress(progress);
+      setUpdateStatus((prev) => (prev === 'downloading' ? prev : 'downloading'));
     });
     return () => { unsub?.(); };
   }, []);
@@ -1589,7 +1590,10 @@ export function SettingsTab(): ReactElement {
     const unsub = window.api.onUpdaterAvailable?.((data) => {
       if (!updateAutoPromptEnabled) return;
       setUpdateVersion(data.version);
-      setUpdateStatus('available');
+      setUpdateStatus((prev) => {
+        if (prev === 'downloading' || prev === 'ready') return prev;
+        return 'available';
+      });
       setUpdateError('');
     });
     return () => { unsub?.(); };
