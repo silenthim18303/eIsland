@@ -33,6 +33,9 @@ interface SoftwareToolSectionProps {
   onFeedbackNavigate: () => void;
 }
 
+/**
+ * 软件推荐模块主视图。
+ */
 export function SoftwareToolSection({ onFeedbackNavigate }: SoftwareToolSectionProps): ReactElement {
   const { t } = useTranslation();
   const [softwareItems, setSoftwareItems] = useState<ToolboxSoftwareItem[]>([]);

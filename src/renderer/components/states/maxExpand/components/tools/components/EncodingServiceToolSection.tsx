@@ -45,6 +45,9 @@ function decodeBase64Utf8(value: string): string {
   return new TextDecoder().decode(bytes);
 }
 
+/**
+ * 编码服务模块主视图。
+ */
 export function EncodingServiceToolSection(): ReactElement {
   const { t } = useTranslation();
 

@@ -107,6 +107,9 @@ function TranslateLangDropdown({
   );
 }
 
+/**
+ * 翻译工具模块主视图。
+ */
 export function TranslateToolSection(): ReactElement {
   const { t } = useTranslation();
   const [sourceLang, setSourceLang] = useState('auto');

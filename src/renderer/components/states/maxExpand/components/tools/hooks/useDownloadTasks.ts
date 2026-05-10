@@ -35,6 +35,9 @@ interface UseDownloadTasksResult {
   activeTask: DownloadTaskSnapshot | null;
 }
 
+/**
+ * 管理下载任务列表、默认目录与实时状态。
+ */
 export function useDownloadTasks(): UseDownloadTasksResult {
   const [tasks, setTasks] = useState<DownloadTaskSnapshot[]>([]);
   const [defaultDir, setDefaultDir] = useState('');

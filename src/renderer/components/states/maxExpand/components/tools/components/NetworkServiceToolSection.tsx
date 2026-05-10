@@ -51,6 +51,9 @@ interface IpInfoResponse {
 
 const IPINFO_ENDPOINT = 'https://uapis.cn/api/v1/network/ipinfo';
 
+/**
+ * 网络服务模块主视图。
+ */
 export function NetworkServiceToolSection(): ReactElement {
   const { t } = useTranslation();
   const [ipInput, setIpInput] = useState('');

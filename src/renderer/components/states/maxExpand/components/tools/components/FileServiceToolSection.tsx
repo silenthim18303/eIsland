@@ -36,6 +36,9 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
+/**
+ * 文件服务模块主视图。
+ */
 export function FileServiceToolSection(): ReactElement {
   const { t } = useTranslation();
   const [algorithm, setAlgorithm] = useState<string>('sha256');

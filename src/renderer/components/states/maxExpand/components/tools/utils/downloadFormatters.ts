@@ -24,6 +24,12 @@
  * @author 鸡哥
  */
 
+/**
+ * 将字节数格式化为可读文本。
+ * 
+ * @param value 字节数
+ * @returns 格式化后的文本
+ */
 export function formatBytes(value: number): string {
   if (!Number.isFinite(value) || value <= 0) return '0 B';
   if (value < 1024) return `${value.toFixed(0)} B`;
@@ -32,6 +38,12 @@ export function formatBytes(value: number): string {
   return `${(value / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
+/**
+ * 从下载链接推断建议文件名。
+ * 
+ * @param url 下载链接
+ * @returns 推断的文件名
+ */
 export function inferSuggestedName(url: string): string {
   const text = url.trim();
   if (!text) return `download-${Date.now()}.bin`;
@@ -44,6 +56,9 @@ export function inferSuggestedName(url: string): string {
   }
 }
 
+/**
+ * 将毫秒时长格式化为时分秒文本。
+ */
 export function formatDurationMs(value: number): string {
   if (!Number.isFinite(value) || value <= 0) return '-';
   const totalSeconds = Math.max(0, Math.floor(value / 1000));

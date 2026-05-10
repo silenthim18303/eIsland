@@ -30,6 +30,9 @@ import { useDownloadTasks } from '../hooks/useDownloadTasks';
 import type { DownloadTaskStatus } from '../config/toolboxConfig';
 import { formatBytes, formatDurationMs, inferSuggestedName } from '../utils/downloadFormatters';
 
+/**
+ * 下载工具模块主视图。
+ */
 export function DownloadToolSection(): ReactElement {
   const { t } = useTranslation();
   const [url, setUrl] = useState('');
