@@ -2816,6 +2816,157 @@
   accent-color: var(--color-island-text);
 }
 
+/** ========== 翻译面板 ========== */
+.translate-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.translate-panel .settings-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.translate-panel .settings-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.translate-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.translate-lang-select {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.85);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.translate-lang-select:focus {
+  border-color: rgba(var(--color-text-rgb), 0.28);
+}
+
+.translate-swap-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.translate-swap-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.translate-swap-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.translate-text-area-group {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  min-height: 0;
+}
+
+.translate-text-area-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 10px;
+  background: rgba(var(--color-text-rgb), 0.03);
+  overflow: hidden;
+  transition: border-color 0.15s;
+  min-height: 80px;
+}
+
+.translate-text-area-wrapper:focus-within {
+  border-color: rgba(var(--color-text-rgb), 0.28);
+}
+
+.translate-result-wrapper {
+  background: rgba(var(--color-text-rgb), 0.05);
+}
+
+.translate-textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 10px 12px 4px;
+  border: none;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.88);
+  font-size: 12.5px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.translate-textarea::placeholder {
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
+.translate-textarea-result {
+  cursor: default;
+}
+
+.translate-textarea-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 10px 6px;
+  min-height: 22px;
+}
+
+.translate-char-count {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
+.translate-inline-btn {
+  padding: 2px 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.translate-inline-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
 /** ========== 用户中心 ========== */
 .settings-user {
   gap: 12px;

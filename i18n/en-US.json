@@ -901,7 +901,8 @@
     "toolbox": {
       "sidebar": {
         "download": "MT Download",
-        "software": "Software"
+        "software": "Software",
+        "translate": "Translate"
       },
       "software": {
         "title": "Common Software",
@@ -962,6 +963,28 @@
           "removeSuccess": "Download task removed",
           "removeFailed": "Failed to remove download task",
           "openFolderFailed": "Failed to open file location"
+        }
+      },
+      "translate": {
+        "title": "Text Translation",
+        "subtitle": "Enter text and select target language to translate.",
+        "inputPlaceholder": "Enter text to translate...",
+        "outputPlaceholder": "Translation result will appear here",
+        "translateBtn": "Translate",
+        "translating": "Translating...",
+        "swap": "Swap Languages",
+        "clear": "Clear",
+        "copy": "Copy",
+        "lang": {
+          "auto": "Auto Detect",
+          "zh": "Chinese",
+          "en": "English",
+          "ja": "Japanese",
+          "ko": "Korean",
+          "fr": "French",
+          "de": "German",
+          "es": "Spanish",
+          "ru": "Russian"
         }
       }
     },

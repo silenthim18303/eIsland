@@ -901,7 +901,8 @@
     "toolbox": {
       "sidebar": {
         "download": "多线程下载",
-        "software": "常用软件"
+        "software": "常用软件",
+        "translate": "文本翻译"
       },
       "software": {
         "title": "常用软件",
@@ -962,6 +963,28 @@
           "removeSuccess": "已删除下载记录",
           "removeFailed": "删除下载记录失败",
           "openFolderFailed": "打开文件所在位置失败"
+        }
+      },
+      "translate": {
+        "title": "文本翻译",
+        "subtitle": "输入文本并选择目标语言，一键翻译。",
+        "inputPlaceholder": "输入要翻译的文本…",
+        "outputPlaceholder": "翻译结果将显示在此处",
+        "translateBtn": "翻译",
+        "translating": "翻译中…",
+        "swap": "交换语言",
+        "clear": "清空",
+        "copy": "复制",
+        "lang": {
+          "auto": "自动检测",
+          "zh": "中文",
+          "en": "英语",
+          "ja": "日语",
+          "ko": "韩语",
+          "fr": "法语",
+          "de": "德语",
+          "es": "西班牙语",
+          "ru": "俄语"
         }
       }
     },

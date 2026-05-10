@@ -24,14 +24,28 @@
  * @author 鸡哥
  */
 
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchToolboxSoftwareList, type ToolboxSoftwareItem } from '../../../../api/tools/toolboxSoftwareApi';
 import useIslandStore from '../../../../store/slices';
 
 const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
-type ToolboxSidebarKey = 'download' | 'software';
+type ToolboxSidebarKey = 'download' | 'software' | 'translate';
+
+const TRANSLATE_LANGUAGES = [
+  { code: 'auto', labelKey: 'maxExpand.toolbox.translate.lang.auto' },
+  { code: 'zh', labelKey: 'maxExpand.toolbox.translate.lang.zh' },
+  { code: 'en', labelKey: 'maxExpand.toolbox.translate.lang.en' },
+  { code: 'ja', labelKey: 'maxExpand.toolbox.translate.lang.ja' },
+  { code: 'ko', labelKey: 'maxExpand.toolbox.translate.lang.ko' },
+  { code: 'fr', labelKey: 'maxExpand.toolbox.translate.lang.fr' },
+  { code: 'de', labelKey: 'maxExpand.toolbox.translate.lang.de' },
+  { code: 'es', labelKey: 'maxExpand.toolbox.translate.lang.es' },
+  { code: 'ru', labelKey: 'maxExpand.toolbox.translate.lang.ru' },
+] as const;
+
+const TRANSLATE_TARGET_LANGUAGES = TRANSLATE_LANGUAGES.filter((l) => l.code !== 'auto');
 
 type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
@@ -266,6 +280,14 @@ export function ToolboxTab(): ReactElement {
             <span className="sidebar-dot" />
             {t('maxExpand.toolbox.sidebar.software')}
           </button>
+          <button
+            className={`max-expand-settings-sidebar-item ${activeSidebar === 'translate' ? 'active' : ''}`}
+            onClick={() => setActiveSidebar('translate')}
+            type="button"
+          >
+            <span className="sidebar-dot" />
+            {t('maxExpand.toolbox.sidebar.translate')}
+          </button>
         </div>
 
         <div className="max-expand-settings-panel">
@@ -433,6 +455,9 @@ export function ToolboxTab(): ReactElement {
               </div>
             </div>
           )}
+          {activeSidebar === 'translate' && (
+            <TranslatePanel t={t} />
+          )}
           {activeSidebar === 'software' && (
             <div className="software-list">
               {softwareLoading ? (
@@ -496,6 +521,141 @@ export function ToolboxTab(): ReactElement {
               )}
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** 翻译面板子组件 */
+function TranslatePanel({ t }: { t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
+  const [sourceLang, setSourceLang] = useState('auto');
+  const [targetLang, setTargetLang] = useState('en');
+  const [sourceText, setSourceText] = useState('');
+  const [resultText, setResultText] = useState('');
+  const [translating, setTranslating] = useState(false);
+
+  const handleSwapLanguages = useCallback((): void => {
+    if (sourceLang === 'auto') return;
+    const prevSource = sourceLang;
+    const prevTarget = targetLang;
+    setSourceLang(prevTarget);
+    setTargetLang(prevSource);
+    setSourceText(resultText);
+    setResultText(sourceText);
+  }, [sourceLang, targetLang, sourceText, resultText]);
+
+  const handleTranslate = useCallback((): void => {
+    if (!sourceText.trim() || translating) return;
+    setTranslating(true);
+    // TODO: 接入翻译 API
+    setTimeout(() => {
+      setResultText('');
+      setTranslating(false);
+    }, 300);
+  }, [sourceText, translating]);
+
+  const handleCopyResult = useCallback((): void => {
+    if (!resultText) return;
+    navigator.clipboard.writeText(resultText).catch(() => {});
+  }, [resultText]);
+
+  const handleClearAll = useCallback((): void => {
+    setSourceText('');
+    setResultText('');
+  }, []);
+
+  return (
+    <div className="settings-cards translate-panel">
+      <div className="settings-card">
+        <div className="settings-card-header">
+          <div className="settings-card-title">{t('maxExpand.toolbox.translate.title')}</div>
+          <div className="settings-card-subtitle">{t('maxExpand.toolbox.translate.subtitle')}</div>
+        </div>
+        <div className="settings-card-body">
+          <div className="translate-lang-row">
+            <select
+              className="translate-lang-select"
+              value={sourceLang}
+              onChange={(e) => setSourceLang(e.target.value)}
+            >
+              {TRANSLATE_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {t(lang.labelKey)}
+                </option>
+              ))}
+            </select>
+            <button
+              className="translate-swap-btn"
+              type="button"
+              onClick={handleSwapLanguages}
+              disabled={sourceLang === 'auto'}
+              title={t('maxExpand.toolbox.translate.swap')}
+            >
+              ⇄
+            </button>
+            <select
+              className="translate-lang-select"
+              value={targetLang}
+              onChange={(e) => setTargetLang(e.target.value)}
+            >
+              {TRANSLATE_TARGET_LANGUAGES.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {t(lang.labelKey)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="translate-text-area-group">
+            <div className="translate-text-area-wrapper">
+              <textarea
+                className="translate-textarea"
+                placeholder={t('maxExpand.toolbox.translate.inputPlaceholder')}
+                value={sourceText}
+                onChange={(e) => setSourceText(e.target.value)}
+                rows={5}
+              />
+              <div className="translate-textarea-footer">
+                <span className="translate-char-count">{sourceText.length}</span>
+                {sourceText && (
+                  <button className="translate-inline-btn" type="button" onClick={handleClearAll}>
+                    {t('maxExpand.toolbox.translate.clear')}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="translate-text-area-wrapper translate-result-wrapper">
+              <textarea
+                className="translate-textarea translate-textarea-result"
+                placeholder={t('maxExpand.toolbox.translate.outputPlaceholder')}
+                value={resultText}
+                readOnly
+                rows={5}
+              />
+              <div className="translate-textarea-footer">
+                {resultText && (
+                  <button className="translate-inline-btn" type="button" onClick={handleCopyResult}>
+                    {t('maxExpand.toolbox.translate.copy')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-hotkey-row">
+            <button
+              className={`settings-lyrics-source-btn download-start-btn-full ${(!sourceText.trim() || translating) ? 'disabled' : ''}`}
+              type="button"
+              disabled={!sourceText.trim() || translating}
+              onClick={handleTranslate}
+            >
+              {translating
+                ? t('maxExpand.toolbox.translate.translating')
+                : t('maxExpand.toolbox.translate.translateBtn')}
+            </button>
+          </div>
         </div>
       </div>
     </div>
