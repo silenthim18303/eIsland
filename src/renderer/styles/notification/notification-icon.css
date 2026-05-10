@@ -44,6 +44,10 @@
   filter: none;
 }
 
+.notification-icon-img--vector {
+  filter: brightness(0) invert(var(--icon-invert));
+}
+
 .notification-icon-vector {
   width: 24px;
   height: 24px;

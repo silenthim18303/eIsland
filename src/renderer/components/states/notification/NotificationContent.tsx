@@ -236,6 +236,7 @@ export function NotificationContent({
   })();
   const effectiveDisplayIcon = useClipboardVectorFallbackIcon && type === 'clipboard-url' ? SvgIcon.LINK : displayIcon;
   const resolvedDisplayIcon = resolveNotificationIconUrl(effectiveDisplayIcon);
+  const isVectorIcon = typeof effectiveDisplayIcon === 'string' && /^\.?\/svg\//i.test(effectiveDisplayIcon);
 
   useEffect(() => {
     setCurrentUrlIndex(0);
@@ -573,7 +574,7 @@ export function NotificationContent({
             <img
               src={resolvedDisplayIcon}
               alt=""
-              className="notification-icon-img"
+              className={isVectorIcon ? 'notification-icon-img notification-icon-img--vector' : 'notification-icon-img'}
               onError={() => {
                 if (type === 'clipboard-url') {
                   if (clipboardFaviconIndex < clipboardFaviconCandidates.length - 1) {
