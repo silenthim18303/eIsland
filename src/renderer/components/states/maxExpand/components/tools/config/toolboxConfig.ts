@@ -26,7 +26,7 @@
 
 export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
-export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate'] as const;
+export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate', 'fileService'] as const;
 export type ToolboxSidebarKey = (typeof TOOLBOX_SIDEBAR_KEYS)[number];
 
 export const TRANSLATE_LANGUAGES = [

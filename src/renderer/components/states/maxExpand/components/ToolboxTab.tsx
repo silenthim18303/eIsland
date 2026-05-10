@@ -36,6 +36,7 @@ const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }>
   { key: 'download', labelKey: 'maxExpand.toolbox.sidebar.download' },
   { key: 'software', labelKey: 'maxExpand.toolbox.sidebar.software' },
   { key: 'translate', labelKey: 'maxExpand.toolbox.sidebar.translate' },
+  { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
 ];
 
 /** 最大展开模式工具箱页面 */

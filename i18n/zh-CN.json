@@ -902,7 +902,8 @@
       "sidebar": {
         "download": "多线程下载",
         "software": "常用软件",
-        "translate": "文本翻译"
+        "translate": "文本翻译",
+        "fileService": "文件服务"
       },
       "software": {
         "title": "常用软件",
