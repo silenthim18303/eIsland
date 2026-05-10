@@ -170,6 +170,8 @@ interface NotificationContentProps {
   startupUpdateResolvedUrl?: string;
   /** 检测到的 URL 列表（仅 clipboard-url） */
   urls?: string[];
+  /** 休息提醒条目 ID（仅默认通知中由休息提醒触发时使用） */
+  breakReminderItemId?: string;
 }
 
 /**
@@ -188,6 +190,7 @@ export function NotificationContent({
   startupUpdateSource,
   startupUpdateResolvedUrl,
   urls,
+  breakReminderItemId,
 }: NotificationContentProps): ReactElement {
   const { t } = useTranslation();
   const { setIdle, setLyrics, setNotification, setMaxExpand, setMaxExpandTab } = useIslandStore();
@@ -404,8 +407,13 @@ export function NotificationContent({
   };
 
   const handleSnooze = (minutes: number): void => {
+    if (breakReminderItemId) {
+      window.dispatchEvent(new CustomEvent('break-reminder-snooze', {
+        detail: { itemId: breakReminderItemId, snoozeMinutes: minutes },
+      }));
+    }
     window.setTimeout(() => {
-      setNotification({ title, body, icon });
+      setNotification({ title, body, icon, breakReminderItemId });
     }, minutes * 60 * 1000);
     dismiss();
   };
