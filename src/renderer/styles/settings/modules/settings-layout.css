@@ -2849,16 +2849,33 @@
   padding: 0 8px;
   border: 1px solid rgba(var(--color-text-rgb), 0.12);
   border-radius: 8px;
-  background: rgba(var(--color-text-rgb), 0.04);
-  color: rgba(var(--color-text-rgb), 0.85);
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.86);
   font-size: 12px;
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s;
+  color-scheme: dark;
 }
 
 .translate-lang-select:focus {
-  border-color: rgba(var(--color-text-rgb), 0.28);
+  border-color: rgba(var(--color-text-rgb), 0.22);
+}
+
+.translate-lang-select option,
+.translate-lang-select optgroup {
+  background-color: #1f1f22;
+  color: #fff;
+}
+
+[data-theme='light'] .translate-lang-select {
+  color-scheme: light;
+}
+
+[data-theme='light'] .translate-lang-select option,
+[data-theme='light'] .translate-lang-select optgroup {
+  background-color: #ffffff;
+  color: #1d1d1f;
 }
 
 .translate-swap-btn {
