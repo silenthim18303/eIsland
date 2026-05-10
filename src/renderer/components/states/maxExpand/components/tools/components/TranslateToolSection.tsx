@@ -27,6 +27,7 @@
 import { useCallback, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchTranslate } from '../../../../../../api/tools/toolboxTranslateApi';
+import { readLocalToken } from '../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/toolboxConfig';
 
@@ -50,8 +51,13 @@ export function TranslateToolSection(): ReactElement {
 
   const handleTranslate = useCallback((): void => {
     if (!sourceText.trim() || translating) return;
+    const token = readLocalToken();
+    if (!token) {
+      setResultText(t('maxExpand.toolbox.translate.loginRequired', { defaultValue: '请先登录后再使用翻译服务' }));
+      return;
+    }
     setTranslating(true);
-    fetchTranslate(sourceText, sourceLang, targetLang)
+    fetchTranslate(token, sourceText, sourceLang, targetLang)
       .then((result) => {
         if (result.success && result.data) {
           setResultText(result.data.targetText);

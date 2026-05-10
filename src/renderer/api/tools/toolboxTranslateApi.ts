@@ -44,6 +44,7 @@ export interface TranslateApiResult {
 }
 
 export async function fetchTranslate(
+  token: string,
   text: string,
   source: string,
   target: string,
@@ -51,7 +52,10 @@ export async function fetchTranslate(
   try {
     const response = await window.api.netFetch(`${TOOLBOX_API_BASE}/v1/toolbox/translate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ text, source, target }),
       timeoutMs: 15000,
     });
