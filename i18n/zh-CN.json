@@ -976,6 +976,8 @@
         "swap": "交换语言",
         "clear": "清空",
         "copy": "复制",
+        "loginRequired": "请先登录后再使用翻译服务",
+        "error": "翻译失败，请稍后重试",
         "lang": {
           "auto": "自动检测",
           "zh": "中文",
@@ -986,6 +988,20 @@
           "de": "德语",
           "es": "西班牙语",
           "ru": "俄语"
+        }
+      },
+      "fileService": {
+        "hash": {
+          "title": "文件哈希校验",
+          "subtitle": "选择文件并计算哈希值，可与预期值对比校验文件完整性",
+          "pickFile": "选择文件",
+          "noFile": "未选择文件",
+          "expectedPlaceholder": "输入预期哈希值进行校验（可选）",
+          "computeBtn": "计算哈希",
+          "computing": "计算中…",
+          "copy": "复制",
+          "match": "校验通过：哈希值一致",
+          "mismatch": "校验失败：哈希值不一致"
         }
       }
     },

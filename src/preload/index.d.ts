@@ -168,6 +168,13 @@ declare global {
       getFileIcon: (filePath: string) => Promise<string | null>;
       openFile: (filePath: string) => Promise<boolean>;
       openInExplorer: (filePath: string) => Promise<boolean>;
+      pickFileForHash: () => Promise<string | null>;
+      computeFileHash: (filePath: string, algorithm: string) => Promise<{
+        hash: string;
+        algorithm: string;
+        fileName: string;
+        fileSize: number;
+      } | null>;
       saveImageAs: (sourcePath: string) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
       resolveShortcut: (lnkPath: string) => Promise<{ target: string; name: string } | null>;
       openImageDialog: () => Promise<string | null>;

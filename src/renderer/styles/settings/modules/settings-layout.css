@@ -3079,6 +3079,168 @@
   filter: brightness(0) invert(var(--icon-invert));
 }
 
+/** ========== 文件服务 ========== */
+.file-service-panel {
+  gap: 12px;
+}
+
+.file-hash-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.file-hash-algo-group {
+  display: flex;
+  gap: 4px;
+}
+
+.file-hash-algo-btn {
+  padding: 4px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.file-hash-algo-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.file-hash-algo-btn.active {
+  background: rgba(var(--color-text-rgb), 0.14);
+  color: rgba(var(--color-text-rgb), 0.95);
+  border-color: rgba(var(--color-text-rgb), 0.25);
+  font-weight: 600;
+}
+
+.file-hash-pick-btn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.8);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.file-hash-pick-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  border-color: rgba(var(--color-text-rgb), 0.22);
+}
+
+.file-hash-filename {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-hash-input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 12px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.file-hash-input:focus {
+  border-color: rgba(var(--color-text-rgb), 0.25);
+}
+
+.file-hash-input::placeholder {
+  color: rgba(var(--color-text-rgb), 0.3);
+  font-family: inherit;
+}
+
+.file-hash-result {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.03);
+}
+
+.file-hash-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.file-hash-result-algo {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.65);
+}
+
+.file-hash-result-size {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.4);
+}
+
+.file-hash-copy-btn {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.file-hash-copy-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.file-hash-result-value {
+  font-size: 11.5px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  color: rgba(var(--color-text-rgb), 0.8);
+  word-break: break-all;
+  line-height: 1.5;
+  user-select: all;
+}
+
+.file-hash-verify {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.file-hash-verify.match {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34c759;
+}
+
+.file-hash-verify.mismatch {
+  background: rgba(255, 59, 48, 0.15);
+  color: #ff3b30;
+}
+
 /** ========== 用户中心 ========== */
 .settings-user {
   gap: 12px;

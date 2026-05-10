@@ -976,6 +976,8 @@
         "swap": "Swap Languages",
         "clear": "Clear",
         "copy": "Copy",
+        "loginRequired": "Please sign in before using translation",
+        "error": "Translation failed. Please try again later",
         "lang": {
           "auto": "Auto Detect",
           "zh": "Chinese",
@@ -986,6 +988,20 @@
           "de": "German",
           "es": "Spanish",
           "ru": "Russian"
+        }
+      },
+      "fileService": {
+        "hash": {
+          "title": "File Hash Verification",
+          "subtitle": "Select a file and compute its hash to verify file integrity",
+          "pickFile": "Select File",
+          "noFile": "No file selected",
+          "expectedPlaceholder": "Enter expected hash for verification (optional)",
+          "computeBtn": "Compute Hash",
+          "computing": "Computing...",
+          "copy": "Copy",
+          "match": "Verification passed: hash matches",
+          "mismatch": "Verification failed: hash does not match"
         }
       }
     },

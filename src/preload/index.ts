@@ -492,6 +492,25 @@ const api = {
     return ipcRenderer.invoke('app:open-in-explorer', filePath);
   },
   /**
+   * 选择任意文件用于哈希校验
+   */
+  pickFileForHash: (): Promise<string | null> => {
+    return ipcRenderer.invoke('app:pick-file-for-hash');
+  },
+  /**
+   * 计算文件哈希值
+   * @param filePath - 文件绝对路径
+   * @param algorithm - 哈希算法 (md5 | sha1 | sha256 | sha512)
+   */
+  computeFileHash: (filePath: string, algorithm: string): Promise<{
+    hash: string;
+    algorithm: string;
+    fileName: string;
+    fileSize: number;
+  } | null> => {
+    return ipcRenderer.invoke('app:compute-file-hash', filePath, algorithm);
+  },
+  /**
    * 将图片另存到用户指定路径
    * @param sourcePath - 源图片绝对路径
    * @returns 保存结果（ok/canceled/filePath）

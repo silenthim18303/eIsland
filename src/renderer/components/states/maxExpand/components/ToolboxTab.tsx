@@ -28,6 +28,7 @@ import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
 import { DownloadToolSection } from './tools/components/DownloadToolSection';
+import { FileServiceToolSection } from './tools/components/FileServiceToolSection';
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
 import type { ToolboxSidebarKey } from './tools/config/toolboxConfig';
@@ -73,6 +74,7 @@ export function ToolboxTab(): ReactElement {
           {activeSidebar === 'software' && (
             <SoftwareToolSection onFeedbackNavigate={handleSoftwareFeedbackNavigate} />
           )}
+          {activeSidebar === 'fileService' && <FileServiceToolSection />}
         </div>
       </div>
     </div>
