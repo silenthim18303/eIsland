@@ -1033,7 +1033,8 @@
         "subtitle": "IP 信息查询工具",
         "ipinfo": {
           "ipPlaceholder": "输入要查询的 IP 地址，例如 8.8.8.8",
-          "queryBtn": "查询 IP 信息",
+          "fillLocal": "本机 IP",
+          "queryBtn": "查询",
           "querying": "查询中...",
           "emptyIp": "请输入 IP 地址",
           "failed": "查询失败，请稍后重试",

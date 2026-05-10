@@ -1033,7 +1033,8 @@
         "subtitle": "IP information lookup tool",
         "ipinfo": {
           "ipPlaceholder": "Enter IP address, e.g. 8.8.8.8",
-          "queryBtn": "Query IP Info",
+          "fillLocal": "My IP",
+          "queryBtn": "Query",
           "querying": "Querying...",
           "emptyIp": "Please enter an IP address",
           "failed": "Query failed. Please try again later",

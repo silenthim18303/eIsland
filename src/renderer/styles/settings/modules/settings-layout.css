@@ -3242,6 +3242,66 @@
   color: #ff3b30;
 }
 
+/** ========== IP 信息查询输入行 ========== */
+.ipinfo-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ipinfo-input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.85);
+  font-size: 12.5px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ipinfo-input:focus {
+  border-color: rgba(100, 180, 255, 0.5);
+}
+
+.ipinfo-btn {
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.ipinfo-btn-fill {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.7);
+}
+
+.ipinfo-btn-fill:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+}
+
+.ipinfo-btn-query {
+  background: rgba(100, 180, 255, 0.18);
+  color: rgba(100, 180, 255, 0.95);
+}
+
+.ipinfo-btn-query:hover {
+  background: rgba(100, 180, 255, 0.28);
+}
+
+.ipinfo-btn-query.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /** ========== IP 信息查询结果 ========== */
 .ipinfo-result-card {
   margin-top: 10px;

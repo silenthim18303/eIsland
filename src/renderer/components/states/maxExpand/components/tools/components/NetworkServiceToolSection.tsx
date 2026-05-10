@@ -58,6 +58,20 @@ export function NetworkServiceToolSection(): ReactElement {
   const [errorMessage, setErrorMessage] = useState('');
   const [result, setResult] = useState<IpInfoData | null>(null);
 
+  const handleFillLocalIp = useCallback(async (): Promise<void> => {
+    try {
+      const response = await window.api.netFetch(IPINFO_ENDPOINT, {
+        method: 'GET',
+        timeoutMs: 10000,
+      });
+      if (response.ok) {
+        const parsed = JSON.parse(response.body);
+        const ip = parsed.data?.ip || parsed.ip;
+        if (ip) setIpInput(ip);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   const handleQueryIpInfo = useCallback(async (): Promise<void> => {
     if (loading) return;
     setLoading(true);
@@ -125,20 +139,25 @@ export function NetworkServiceToolSection(): ReactElement {
           <div className="settings-card-subtitle">{t('maxExpand.toolbox.networkService.subtitle')}</div>
         </div>
         <div className="settings-card-body">
-          <div className="file-hash-row">
+          <div className="ipinfo-input-row">
             <input
               type="text"
-              className="file-hash-input"
+              className="ipinfo-input"
               placeholder={t('maxExpand.toolbox.networkService.ipinfo.ipPlaceholder')}
               value={ipInput}
               onChange={(e) => setIpInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') void handleQueryIpInfo(); }}
             />
-          </div>
-
-          <div className="settings-hotkey-row">
             <button
-              className={`settings-lyrics-source-btn download-start-btn-full ${loading ? 'disabled' : ''}`}
+              className="ipinfo-btn ipinfo-btn-fill"
+              type="button"
+              onClick={handleFillLocalIp}
+              title={t('maxExpand.toolbox.networkService.ipinfo.fillLocal')}
+            >
+              {t('maxExpand.toolbox.networkService.ipinfo.fillLocal')}
+            </button>
+            <button
+              className={`ipinfo-btn ipinfo-btn-query ${loading ? 'disabled' : ''}`}
               type="button"
               disabled={loading}
               onClick={handleQueryIpInfo}
@@ -149,7 +168,7 @@ export function NetworkServiceToolSection(): ReactElement {
             </button>
           </div>
 
-          {errorMessage && <div className="download-status-text">{errorMessage}</div>}
+          {errorMessage && <div className="ipinfo-error">{errorMessage}</div>}
 
           {result && (
             <div className="ipinfo-result-card">
