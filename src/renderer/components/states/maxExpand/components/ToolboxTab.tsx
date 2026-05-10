@@ -30,6 +30,7 @@ import useIslandStore from '../../../../store/slices';
 import { DownloadToolSection } from './tools/components/DownloadToolSection';
 import { EncodingServiceToolSection } from './tools/components/EncodingServiceToolSection';
 import { FileServiceToolSection } from './tools/components/FileServiceToolSection';
+import { NetworkServiceToolSection } from './tools/components/NetworkServiceToolSection';
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
 import type { ToolboxSidebarKey } from './tools/config/toolboxConfig';
@@ -40,6 +41,7 @@ const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }>
   { key: 'translate', labelKey: 'maxExpand.toolbox.sidebar.translate' },
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
   { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
+  { key: 'networkService', labelKey: 'maxExpand.toolbox.sidebar.networkService' },
 ];
 
 /** 最大展开模式工具箱页面 */
@@ -78,6 +80,7 @@ export function ToolboxTab(): ReactElement {
           )}
           {activeSidebar === 'fileService' && <FileServiceToolSection />}
           {activeSidebar === 'encodingService' && <EncodingServiceToolSection />}
+          {activeSidebar === 'networkService' && <NetworkServiceToolSection />}
         </div>
       </div>
     </div>

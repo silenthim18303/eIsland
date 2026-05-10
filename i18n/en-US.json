@@ -904,7 +904,8 @@
         "software": "Software",
         "translate": "Translate",
         "fileService": "File Service",
-        "encodingService": "Encoding Svc"
+        "encodingService": "Encoding Svc",
+        "networkService": "Network Svc"
       },
       "software": {
         "title": "Common Software",
@@ -1026,6 +1027,10 @@
           "encodeError": "Base64 encode failed",
           "decodeError": "Base64 decode failed. Please check input"
         }
+      },
+      "networkService": {
+        "title": "Network Service",
+        "subtitle": "Reserved area for network-related tools"
       }
     },
     "localFileSearch": {

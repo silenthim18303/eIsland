@@ -904,7 +904,8 @@
         "software": "常用软件",
         "translate": "文本翻译",
         "fileService": "文件服务",
-        "encodingService": "编码服务"
+        "encodingService": "编码服务",
+        "networkService": "网络服务"
       },
       "software": {
         "title": "常用软件",
@@ -1026,6 +1027,10 @@
           "encodeError": "Base64 编码失败",
           "decodeError": "Base64 解码失败，请检查输入内容"
         }
+      },
+      "networkService": {
+        "title": "网络服务",
+        "subtitle": "网络相关工具预留区域"
       }
     },
     "localFileSearch": {
