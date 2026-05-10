@@ -1004,6 +1004,28 @@
           "match": "Verification passed: hash matches",
           "mismatch": "Verification failed: hash does not match"
         }
+      },
+      "encodingService": {
+        "json": {
+          "title": "JSON Encode/Decode",
+          "subtitle": "Encode plain text to JSON string or decode JSON string",
+          "inputPlaceholder": "Input text to encode or JSON string to decode",
+          "outputPlaceholder": "Result will appear here",
+          "encodeBtn": "JSON Encode",
+          "decodeBtn": "JSON Decode",
+          "encodeError": "JSON encode failed",
+          "decodeError": "JSON decode failed. Please check input format"
+        },
+        "base64": {
+          "title": "Base64 Encode/Decode",
+          "subtitle": "Convert between UTF-8 text and Base64",
+          "inputPlaceholder": "Input text to encode or Base64 string to decode",
+          "outputPlaceholder": "Result will appear here",
+          "encodeBtn": "Base64 Encode",
+          "decodeBtn": "Base64 Decode",
+          "encodeError": "Base64 encode failed",
+          "decodeError": "Base64 decode failed. Please check input"
+        }
       }
     },
     "localFileSearch": {

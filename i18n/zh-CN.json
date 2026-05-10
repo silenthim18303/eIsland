@@ -1004,6 +1004,28 @@
           "match": "校验通过：哈希值一致",
           "mismatch": "校验失败：哈希值不一致"
         }
+      },
+      "encodingService": {
+        "json": {
+          "title": "JSON 编解码",
+          "subtitle": "支持 JSON 字符串编码与解码",
+          "inputPlaceholder": "输入待处理文本（编码）或 JSON 字符串（解码）",
+          "outputPlaceholder": "处理结果将显示在这里",
+          "encodeBtn": "JSON 编码",
+          "decodeBtn": "JSON 解码",
+          "encodeError": "JSON 编码失败",
+          "decodeError": "JSON 解码失败，请检查输入格式"
+        },
+        "base64": {
+          "title": "Base64 编解码",
+          "subtitle": "支持 UTF-8 文本与 Base64 互转",
+          "inputPlaceholder": "输入待处理文本（编码）或 Base64 字符串（解码）",
+          "outputPlaceholder": "处理结果将显示在这里",
+          "encodeBtn": "Base64 编码",
+          "decodeBtn": "Base64 解码",
+          "encodeError": "Base64 编码失败",
+          "decodeError": "Base64 解码失败，请检查输入内容"
+        }
       }
     },
     "localFileSearch": {
