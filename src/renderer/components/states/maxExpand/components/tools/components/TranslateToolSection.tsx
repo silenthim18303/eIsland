@@ -24,13 +24,88 @@
  * @author 鸡哥
  */
 
-import { useCallback, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchTranslate } from '../../../../../../api/tools/toolboxTranslateApi';
 import { readLocalToken } from '../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { resolveCountryIcon } from '../../../../../../utils/SvgIcon/country-icon';
 import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/toolboxConfig';
+
+interface LangOption {
+  code: string;
+  labelKey: string;
+}
+
+function TranslateLangDropdown({
+  options,
+  value,
+  onChange,
+}: {
+  options: readonly LangOption[];
+  value: string;
+  onChange: (code: string) => void;
+}): ReactElement {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent): void => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  const selected = options.find((o) => o.code === value);
+  const selectedFlag = resolveCountryIcon(value);
+
+  return (
+    <div className="translate-lang-dropdown" ref={wrapperRef}>
+      <button
+        type="button"
+        className="translate-lang-dropdown-trigger"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {selectedFlag && (
+          <img className="translate-lang-flag no-filter" src={selectedFlag} alt="" draggable={false} />
+        )}
+        <span className="translate-lang-dropdown-label">
+          {selected ? t(selected.labelKey) : value}
+        </span>
+        <span className="translate-lang-dropdown-arrow">▾</span>
+      </button>
+      {open && (
+        <div className="translate-lang-dropdown-menu">
+          {options.map((lang) => {
+            const flag = resolveCountryIcon(lang.code);
+            return (
+              <button
+                key={lang.code}
+                type="button"
+                className={`translate-lang-dropdown-item ${lang.code === value ? 'active' : ''}`}
+                onClick={() => {
+                  onChange(lang.code);
+                  setOpen(false);
+                }}
+              >
+                {flag ? (
+                  <img className="translate-lang-flag no-filter" src={flag} alt="" draggable={false} />
+                ) : (
+                  <span className="translate-lang-flag-placeholder" />
+                )}
+                <span>{t(lang.labelKey)}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function TranslateToolSection(): ReactElement {
   const { t } = useTranslation();
@@ -88,27 +163,11 @@ export function TranslateToolSection(): ReactElement {
         </div>
         <div className="settings-card-body">
           <div className="translate-lang-row">
-            <div className="translate-lang-select-wrapper">
-              {resolveCountryIcon(sourceLang) && (
-                <img
-                  className="translate-lang-flag no-filter"
-                  src={resolveCountryIcon(sourceLang)}
-                  alt=""
-                  draggable={false}
-                />
-              )}
-              <select
-                className="translate-lang-select"
-                value={sourceLang}
-                onChange={(e) => setSourceLang(e.target.value)}
-              >
-                {TRANSLATE_LANGUAGES.map((lang) => (
-                  <option key={lang.code} value={lang.code}>
-                    {t(lang.labelKey)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TranslateLangDropdown
+              options={TRANSLATE_LANGUAGES}
+              value={sourceLang}
+              onChange={setSourceLang}
+            />
             <button
               className="translate-swap-btn"
               type="button"
@@ -118,27 +177,11 @@ export function TranslateToolSection(): ReactElement {
             >
               <img className="translate-swap-icon" src={SvgIcon.SWITCHING} alt="" draggable={false} />
             </button>
-            <div className="translate-lang-select-wrapper">
-              {resolveCountryIcon(targetLang) && (
-                <img
-                  className="translate-lang-flag no-filter"
-                  src={resolveCountryIcon(targetLang)}
-                  alt=""
-                  draggable={false}
-                />
-              )}
-              <select
-                className="translate-lang-select"
-                value={targetLang}
-                onChange={(e) => setTargetLang(e.target.value)}
-              >
-                {TRANSLATE_TARGET_LANGUAGES.map((lang) => (
-                  <option key={lang.code} value={lang.code}>
-                    {t(lang.labelKey)}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TranslateLangDropdown
+              options={TRANSLATE_TARGET_LANGUAGES}
+              value={targetLang}
+              onChange={setTargetLang}
+            />
           </div>
 
           <div className="translate-text-area-group">
