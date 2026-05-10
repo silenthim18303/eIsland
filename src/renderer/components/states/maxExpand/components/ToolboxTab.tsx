@@ -28,6 +28,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactElement } from 're
 import { useTranslation } from 'react-i18next';
 import { fetchToolboxSoftwareList, type ToolboxSoftwareItem } from '../../../../api/tools/toolboxSoftwareApi';
 import useIslandStore from '../../../../store/slices';
+import { SvgIcon } from '../../../../utils/SvgIcon';
 
 const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
@@ -592,7 +593,7 @@ function TranslatePanel({ t }: { t: (key: string, opts?: Record<string, unknown>
               disabled={sourceLang === 'auto'}
               title={t('maxExpand.toolbox.translate.swap')}
             >
-              ⇄
+              <img className="translate-swap-icon" src={SvgIcon.SWITCHING} alt="" draggable={false} />
             </button>
             <select
               className="translate-lang-select"

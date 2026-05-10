@@ -2904,6 +2904,13 @@
   cursor: not-allowed;
 }
 
+.translate-swap-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(var(--icon-invert));
+}
+
 .translate-text-area-group {
   flex: 1;
   display: flex;
@@ -2982,6 +2989,14 @@
 .translate-inline-btn:hover {
   background: rgba(var(--color-text-rgb), 0.1);
   color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.translate-btn-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(var(--icon-invert));
 }
 
 /** ========== 用户中心 ========== */
