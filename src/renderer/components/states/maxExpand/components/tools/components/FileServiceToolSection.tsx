@@ -113,6 +113,9 @@ export function FileServiceToolSection(): ReactElement {
                 </button>
               ))}
             </div>
+            <span className="file-hash-filename" title={filePath}>
+              {fileName || t('maxExpand.toolbox.fileService.hash.noFile')}
+            </span>
           </div>
 
           <div className="file-hash-row">
@@ -123,9 +126,6 @@ export function FileServiceToolSection(): ReactElement {
             >
               {t('maxExpand.toolbox.fileService.hash.pickFile')}
             </button>
-            <span className="file-hash-filename" title={filePath}>
-              {fileName || t('maxExpand.toolbox.fileService.hash.noFile')}
-            </span>
           </div>
 
           <div className="file-hash-row">
