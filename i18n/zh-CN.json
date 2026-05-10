@@ -967,7 +967,7 @@
       },
       "translate": {
         "title": "文本翻译",
-        "subtitle": "输入文本并选择目标语言，一键翻译。",
+        "subtitle": "由腾讯云提供机器翻译服务",
         "inputPlaceholder": "输入要翻译的文本…",
         "outputPlaceholder": "翻译结果将显示在此处",
         "translateBtn": "翻译",

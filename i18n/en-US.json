@@ -967,7 +967,7 @@
       },
       "translate": {
         "title": "Text Translation",
-        "subtitle": "Enter text and select target language to translate.",
+        "subtitle": "Machine translation powered by Tencent Cloud",
         "inputPlaceholder": "Enter text to translate...",
         "outputPlaceholder": "Translation result will appear here",
         "translateBtn": "Translate",
