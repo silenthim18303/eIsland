@@ -45,6 +45,8 @@ interface IpInfoResponse {
   msg?: string;
   message?: string;
   data?: IpInfoData;
+  ip?: string;
+  [key: string]: unknown;
 }
 
 const IPINFO_ENDPOINT = 'https://uapis.cn/api/v1/network/ipinfo';
@@ -55,7 +57,6 @@ export function NetworkServiceToolSection(): ReactElement {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [result, setResult] = useState<IpInfoData | null>(null);
-  const [rawJson, setRawJson] = useState('');
 
   const handleQueryIpInfo = useCallback(async (): Promise<void> => {
     if (loading) return;
@@ -77,31 +78,39 @@ export function NetworkServiceToolSection(): ReactElement {
 
       if (!response.ok) {
         setResult(null);
-        setRawJson(response.body || '');
         setErrorMessage(t('maxExpand.toolbox.networkService.ipinfo.httpError', { status: response.status }));
         return;
       }
 
       if (response.body.trimStart().startsWith('<')) {
         setResult(null);
-        setRawJson(response.body);
         setErrorMessage(t('maxExpand.toolbox.networkService.ipinfo.nonJson'));
         return;
       }
 
       const parsed = JSON.parse(response.body) as IpInfoResponse;
-      if ((typeof parsed.code === 'number' && parsed.code !== 200) || !parsed.data) {
+
+      let info: IpInfoData | null = null;
+      if (parsed.data && typeof parsed.data === 'object') {
+        if (typeof parsed.code === 'number' && parsed.code !== 200) {
+          setResult(null);
+          setErrorMessage(parsed.msg || parsed.message || t('maxExpand.toolbox.networkService.ipinfo.failed'));
+          return;
+        }
+        info = parsed.data;
+      } else if (parsed.ip) {
+        info = parsed as unknown as IpInfoData;
+      }
+
+      if (!info || !info.ip) {
         setResult(null);
-        setRawJson(JSON.stringify(parsed, null, 2));
-        setErrorMessage(parsed.msg || parsed.message || t('maxExpand.toolbox.networkService.ipinfo.failed'));
+        setErrorMessage(t('maxExpand.toolbox.networkService.ipinfo.failed'));
         return;
       }
 
-      setResult(parsed.data);
-      setRawJson(JSON.stringify(parsed, null, 2));
+      setResult(info);
     } catch {
       setResult(null);
-      setRawJson('');
       setErrorMessage(t('maxExpand.toolbox.networkService.ipinfo.failed'));
     } finally {
       setLoading(false);
@@ -143,31 +152,40 @@ export function NetworkServiceToolSection(): ReactElement {
           {errorMessage && <div className="download-status-text">{errorMessage}</div>}
 
           {result && (
-            <div className="file-hash-result">
-              <div className="file-hash-result-header">
-                <span className="file-hash-result-algo">{t('maxExpand.toolbox.networkService.ipinfo.resultTitle')}</span>
+            <div className="ipinfo-result-card">
+              <div className="ipinfo-result-header">
+                <span className="ipinfo-result-ip">{String(result.ip || '-')}</span>
+                <span className="ipinfo-result-badge">{String(result.asn || '-')}</span>
               </div>
-              <div className="file-hash-result-value">IP: {String(result.ip || '-')}</div>
-              <div className="file-hash-result-value">{t('maxExpand.toolbox.networkService.ipinfo.region')}: {String(result.region || '-')}</div>
-              <div className="file-hash-result-value">ISP: {String(result.isp || '-')}</div>
-              <div className="file-hash-result-value">{t('maxExpand.toolbox.networkService.ipinfo.llc')}: {String(result.llc || '-')}</div>
-              <div className="file-hash-result-value">ASN: {String(result.asn || '-')}</div>
-              <div className="file-hash-result-value">{t('maxExpand.toolbox.networkService.ipinfo.latitude')}: {result.latitude != null ? String(result.latitude) : '-'}</div>
-              <div className="file-hash-result-value">{t('maxExpand.toolbox.networkService.ipinfo.longitude')}: {result.longitude != null ? String(result.longitude) : '-'}</div>
-              <div className="file-hash-result-value">{t('maxExpand.toolbox.networkService.ipinfo.ipRange')}: {String(result.beginip || '-')} ~ {String(result.endip || '-')}</div>
+              <div className="ipinfo-result-grid">
+                <div className="ipinfo-result-item">
+                  <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.region')}</span>
+                  <span className="ipinfo-result-value">{String(result.region || '-')}</span>
+                </div>
+                <div className="ipinfo-result-item">
+                  <span className="ipinfo-result-label">ISP</span>
+                  <span className="ipinfo-result-value">{String(result.isp || '-')}</span>
+                </div>
+                <div className="ipinfo-result-item">
+                  <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.llc')}</span>
+                  <span className="ipinfo-result-value">{String(result.llc || '-')}</span>
+                </div>
+                <div className="ipinfo-result-item">
+                  <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.ipRange')}</span>
+                  <span className="ipinfo-result-value">{String(result.beginip || '-')} ~ {String(result.endip || '-')}</span>
+                </div>
+                <div className="ipinfo-result-item">
+                  <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.latitude')}</span>
+                  <span className="ipinfo-result-value">{result.latitude != null ? String(result.latitude) : '-'}</span>
+                </div>
+                <div className="ipinfo-result-item">
+                  <span className="ipinfo-result-label">{t('maxExpand.toolbox.networkService.ipinfo.longitude')}</span>
+                  <span className="ipinfo-result-value">{result.longitude != null ? String(result.longitude) : '-'}</span>
+                </div>
+              </div>
             </div>
           )}
 
-          {rawJson && (
-            <div className="file-hash-row" style={{ marginTop: 8 }}>
-              <textarea
-                className="translate-textarea translate-textarea-result"
-                value={rawJson}
-                readOnly
-                rows={8}
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
