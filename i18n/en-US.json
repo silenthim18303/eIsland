@@ -1029,8 +1029,34 @@
         }
       },
       "networkService": {
-        "title": "Network Service",
-        "subtitle": "Reserved area for network-related tools"
+        "title": "IP Info Lookup",
+        "subtitle": "IP information lookup tool",
+        "ipinfo": {
+          "ipPlaceholder": "Enter IP address, e.g. 8.8.8.8",
+          "queryBtn": "Query IP Info",
+          "querying": "Querying...",
+          "emptyIp": "Please enter an IP address",
+          "failed": "Query failed. Please try again later",
+          "httpError": "Request failed: HTTP {{status}}",
+          "nonJson": "API returned non-JSON content",
+          "resultTitle": "Query Result",
+          "region": "Region",
+          "llc": "Organization",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "ipRange": "IP Range"
+        },
+        "librespeed": {
+          "urlPlaceholder": "Enter LibreSpeed URL, e.g. http://127.0.0.1:19366",
+          "applyBtn": "Apply URL",
+          "testBtn": "Run Speed Test",
+          "testing": "Testing...",
+          "ping": "Ping",
+          "download": "Download",
+          "upload": "Upload",
+          "resultTitle": "Test Result",
+          "result": "Result"
+        }
       }
     },
     "localFileSearch": {
