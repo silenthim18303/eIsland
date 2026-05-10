@@ -903,7 +903,8 @@
         "download": "MT Download",
         "software": "Software",
         "translate": "Translate",
-        "fileService": "File Service"
+        "fileService": "File Service",
+        "encodingService": "Encoding Svc"
       },
       "software": {
         "title": "Common Software",

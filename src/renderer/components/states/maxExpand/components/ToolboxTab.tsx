@@ -28,6 +28,7 @@ import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
 import { DownloadToolSection } from './tools/components/DownloadToolSection';
+import { EncodingServiceToolSection } from './tools/components/EncodingServiceToolSection';
 import { FileServiceToolSection } from './tools/components/FileServiceToolSection';
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
@@ -38,6 +39,7 @@ const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }>
   { key: 'software', labelKey: 'maxExpand.toolbox.sidebar.software' },
   { key: 'translate', labelKey: 'maxExpand.toolbox.sidebar.translate' },
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
+  { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
 ];
 
 /** 最大展开模式工具箱页面 */
@@ -75,6 +77,7 @@ export function ToolboxTab(): ReactElement {
             <SoftwareToolSection onFeedbackNavigate={handleSoftwareFeedbackNavigate} />
           )}
           {activeSidebar === 'fileService' && <FileServiceToolSection />}
+          {activeSidebar === 'encodingService' && <EncodingServiceToolSection />}
         </div>
       </div>
     </div>
