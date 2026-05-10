@@ -57,6 +57,8 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
 
   /** 记录每个提醒条目上次触发的时间戳 (ms) */
   const lastFiredRef = useRef<Map<string, number>>(new Map());
+  /** 缓存最近一次轮询到的提醒条目列表，供 snooze 事件查找间隔时长 */
+  const itemsCacheRef = useRef<BreakReminderItem[]>([]);
 
   useEffect(() => {
     const check = async (): Promise<void> => {
@@ -69,6 +71,7 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
           items = items.map((i) => i.icon ? i : { ...i, icon: SvgIcon.BREAK });
           window.api?.storeWrite(BREAK_REMINDER_STORE_KEY, items).catch(() => {});
         }
+        itemsCacheRef.current = items;
 
         const now = Date.now();
         const firedMap = lastFiredRef.current;
@@ -95,6 +98,7 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
               title: t('settings.breakReminder.notificationTitle', { defaultValue: '休息提醒' }),
               body: t('settings.breakReminder.notificationBody', { defaultValue: '该{{name}}啦！', name }),
               icon: item.icon || SvgIcon.BREAK,
+              breakReminderItemId: item.id,
             });
           }
         });
@@ -119,6 +123,23 @@ export function useIslandBreakReminder(options: UseIslandBreakReminderOptions): 
     // 启动后立即执行一次初始化
     check().catch(() => {});
 
-    return () => clearInterval(interval);
+    const handleSnoozeEvent = (e: Event): void => {
+      const detail = (e as CustomEvent<{ itemId: string; snoozeMinutes: number }>).detail;
+      if (!detail?.itemId || !detail.snoozeMinutes) return;
+      const firedMap = lastFiredRef.current;
+      const matched = itemsCacheRef.current.find((i) => i.id === detail.itemId);
+      const intervalMs = matched ? matched.intervalMinutes * 60_000 : 0;
+      const snoozeMs = detail.snoozeMinutes * 60_000;
+      firedMap.set(detail.itemId, Date.now() + snoozeMs - (intervalMs || snoozeMs));
+      const obj: Record<string, number> = {};
+      firedMap.forEach((v, k) => { obj[k] = v; });
+      window.api?.storeWrite(BREAK_REMINDER_LAST_FIRED_KEY, obj).catch(() => {});
+    };
+    window.addEventListener('break-reminder-snooze', handleSnoozeEvent);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('break-reminder-snooze', handleSnoozeEvent);
+    };
   }, [language, setNotificationRef, t]);
 }

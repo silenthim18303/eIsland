@@ -901,7 +901,11 @@
     "toolbox": {
       "sidebar": {
         "download": "多线程下载",
-        "software": "常用软件"
+        "software": "常用软件",
+        "translate": "文本翻译",
+        "fileService": "文件服务",
+        "encodingService": "编码服务",
+        "networkService": "网络服务"
       },
       "software": {
         "title": "常用软件",
@@ -962,6 +966,97 @@
           "removeSuccess": "已删除下载记录",
           "removeFailed": "删除下载记录失败",
           "openFolderFailed": "打开文件所在位置失败"
+        }
+      },
+      "translate": {
+        "title": "文本翻译",
+        "subtitle": "由腾讯云提供机器翻译服务",
+        "inputPlaceholder": "输入要翻译的文本…",
+        "outputPlaceholder": "翻译结果将显示在此处",
+        "translateBtn": "翻译",
+        "translating": "翻译中…",
+        "swap": "交换语言",
+        "clear": "清空",
+        "copy": "复制",
+        "loginRequired": "请先登录后再使用翻译服务",
+        "error": "翻译失败，请稍后重试",
+        "lang": {
+          "auto": "自动检测",
+          "zh": "中文",
+          "en": "英语",
+          "ja": "日语",
+          "ko": "韩语",
+          "fr": "法语",
+          "de": "德语",
+          "es": "西班牙语",
+          "ru": "俄语"
+        }
+      },
+      "fileService": {
+        "hash": {
+          "title": "文件哈希校验",
+          "subtitle": "选择文件并计算哈希值，可与预期值对比校验文件完整性",
+          "pickFile": "选择文件",
+          "noFile": "未选择文件",
+          "expectedPlaceholder": "输入预期哈希值进行校验（可选）",
+          "computeBtn": "计算哈希",
+          "computing": "计算中…",
+          "copy": "复制",
+          "match": "校验通过：哈希值一致",
+          "mismatch": "校验失败：哈希值不一致"
+        }
+      },
+      "encodingService": {
+        "json": {
+          "title": "JSON 编解码",
+          "subtitle": "支持 JSON 字符串编码与解码",
+          "inputPlaceholder": "输入待处理文本（编码）或 JSON 字符串（解码）",
+          "outputPlaceholder": "处理结果将显示在这里",
+          "encodeBtn": "JSON 编码",
+          "decodeBtn": "JSON 解码",
+          "encodeError": "JSON 编码失败",
+          "decodeError": "JSON 解码失败，请检查输入格式"
+        },
+        "base64": {
+          "title": "Base64 编解码",
+          "subtitle": "支持 UTF-8 文本与 Base64 互转",
+          "inputPlaceholder": "输入待处理文本（编码）或 Base64 字符串（解码）",
+          "outputPlaceholder": "处理结果将显示在这里",
+          "encodeBtn": "Base64 编码",
+          "decodeBtn": "Base64 解码",
+          "encodeError": "Base64 编码失败",
+          "decodeError": "Base64 解码失败，请检查输入内容"
+        }
+      },
+      "networkService": {
+        "title": "IP 信息查询",
+        "subtitle": "IP 信息查询工具",
+        "ipinfo": {
+          "ipPlaceholder": "输入要查询的 IP 地址，例如 8.8.8.8",
+          "fillLocal": "本机 IP",
+          "queryBtn": "查询",
+          "querying": "查询中...",
+          "emptyIp": "请输入 IP 地址",
+          "failed": "查询失败，请稍后重试",
+          "httpError": "请求失败：HTTP {{status}}",
+          "nonJson": "接口返回了非 JSON 内容",
+          "resultTitle": "查询结果",
+          "region": "地理位置",
+          "llc": "归属机构",
+          "latitude": "纬度",
+          "longitude": "经度",
+          "ipRange": "IP 段"
+        },
+        "librespeed": {
+          "urlPlaceholder": "输入 LibreSpeed 地址，例如 http://127.0.0.1:19366",
+          "applyBtn": "应用地址",
+          "testBtn": "开始测试",
+          "testing": "测试中...",
+          "failed": "测试失败，请稍后重试",
+          "ping": "延迟",
+          "download": "下载速度",
+          "upload": "上传速度",
+          "resultTitle": "测试结果"
         }
       }
     },

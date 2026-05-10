@@ -170,6 +170,8 @@ interface NotificationContentProps {
   startupUpdateResolvedUrl?: string;
   /** 检测到的 URL 列表（仅 clipboard-url） */
   urls?: string[];
+  /** 休息提醒条目 ID（仅默认通知中由休息提醒触发时使用） */
+  breakReminderItemId?: string;
 }
 
 /**
@@ -188,6 +190,7 @@ export function NotificationContent({
   startupUpdateSource,
   startupUpdateResolvedUrl,
   urls,
+  breakReminderItemId,
 }: NotificationContentProps): ReactElement {
   const { t } = useTranslation();
   const { setIdle, setLyrics, setNotification, setMaxExpand, setMaxExpandTab } = useIslandStore();
@@ -233,6 +236,7 @@ export function NotificationContent({
   })();
   const effectiveDisplayIcon = useClipboardVectorFallbackIcon && type === 'clipboard-url' ? SvgIcon.LINK : displayIcon;
   const resolvedDisplayIcon = resolveNotificationIconUrl(effectiveDisplayIcon);
+  const isVectorIcon = typeof effectiveDisplayIcon === 'string' && /^\.?\/svg\//i.test(effectiveDisplayIcon);
 
   useEffect(() => {
     setCurrentUrlIndex(0);
@@ -404,8 +408,13 @@ export function NotificationContent({
   };
 
   const handleSnooze = (minutes: number): void => {
+    if (breakReminderItemId) {
+      window.dispatchEvent(new CustomEvent('break-reminder-snooze', {
+        detail: { itemId: breakReminderItemId, snoozeMinutes: minutes },
+      }));
+    }
     window.setTimeout(() => {
-      setNotification({ title, body, icon });
+      setNotification({ title, body, icon, breakReminderItemId });
     }, minutes * 60 * 1000);
     dismiss();
   };
@@ -565,7 +574,7 @@ export function NotificationContent({
             <img
               src={resolvedDisplayIcon}
               alt=""
-              className="notification-icon-img"
+              className={isVectorIcon ? 'notification-icon-img notification-icon-img--vector' : 'notification-icon-img'}
               onError={() => {
                 if (type === 'clipboard-url') {
                   if (clipboardFaviconIndex < clipboardFaviconCandidates.length - 1) {

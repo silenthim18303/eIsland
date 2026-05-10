@@ -30,6 +30,7 @@ import { existsSync } from 'fs';
 import { appendFile, copyFile, mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'fs/promises';
 import { execFile } from 'child_process';
 import { basename, dirname, resolve } from 'path';
+import { createHash } from 'crypto';
 import os from 'os';
 import { clearLogsCacheFiles, ensureLogsDir } from '../../log/mainLog';
 import { openStandaloneWindow, closeStandaloneWindow } from '../../window/standaloneWindow';
@@ -2480,5 +2481,50 @@ export function registerAppIpcHandlers(): void {
   ipcMain.on('window:close', (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (win && !win.isDestroyed()) win.close();
+  });
+
+  ipcMain.handle('app:pick-file-for-hash', async (event) => {
+    try {
+      const win = BrowserWindow.fromWebContents(event.sender) ?? BrowserWindow.getFocusedWindow();
+      if (!win) return null;
+      const result = await dialog.showOpenDialog(win, {
+        title: '选择文件',
+        properties: ['openFile'],
+      });
+      if (result.canceled || result.filePaths.length === 0) {
+        return null;
+      }
+      return result.filePaths[0] || null;
+    } catch (err) {
+      console.error('[App] pick-file-for-hash error:', err);
+      return null;
+    }
+  });
+
+  ipcMain.handle('app:compute-file-hash', async (_event, filePath: string, algorithm: string) => {
+    try {
+      if (!filePath || typeof filePath !== 'string') return null;
+      if (!existsSync(filePath)) return null;
+      const algo = ['md5', 'sha1', 'sha256', 'sha512'].includes(algorithm) ? algorithm : 'sha256';
+      const { createReadStream } = await import('fs');
+      const hash = createHash(algo);
+      const fileInfo = await stat(filePath);
+      return new Promise<{ hash: string; algorithm: string; fileName: string; fileSize: number }>((resolvePromise, rejectPromise) => {
+        const stream = createReadStream(filePath);
+        stream.on('data', (chunk: string | Buffer) => hash.update(chunk));
+        stream.on('end', () => {
+          resolvePromise({
+            hash: hash.digest('hex'),
+            algorithm: algo,
+            fileName: basename(filePath),
+            fileSize: fileInfo.size,
+          });
+        });
+        stream.on('error', (err) => rejectPromise(err));
+      });
+    } catch (err) {
+      console.error('[App] compute-file-hash error:', err);
+      return null;
+    }
   });
 }

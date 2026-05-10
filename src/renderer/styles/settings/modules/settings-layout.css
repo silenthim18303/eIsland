@@ -2816,6 +2816,568 @@
   accent-color: var(--color-island-text);
 }
 
+/** ========== 翻译面板 ========== */
+.translate-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.translate-panel .settings-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.translate-panel .settings-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.translate-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.translate-lang-dropdown {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+.translate-lang-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.translate-lang-dropdown-trigger:hover {
+  border-color: rgba(var(--color-text-rgb), 0.22);
+}
+
+.translate-lang-flag {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.translate-lang-flag-placeholder {
+  display: inline-block;
+  width: 18px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.translate-lang-dropdown-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.translate-lang-dropdown-arrow {
+  flex-shrink: 0;
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.translate-lang-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: #2a2a2d;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  padding: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.15) transparent;
+}
+
+.translate-lang-dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.translate-lang-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.15);
+  border-radius: 2px;
+}
+
+.translate-lang-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.25);
+}
+
+[data-theme='light'] .translate-lang-dropdown-menu {
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.translate-lang-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.translate-lang-dropdown-item:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+}
+
+.translate-lang-dropdown-item.active {
+  background: rgba(var(--color-text-rgb), 0.12);
+  font-weight: 600;
+}
+
+.translate-swap-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.translate-swap-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.translate-swap-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.translate-swap-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(var(--icon-invert));
+}
+
+.translate-text-area-group {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  min-height: 0;
+}
+
+.translate-text-area-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 10px;
+  background: rgba(var(--color-text-rgb), 0.03);
+  overflow: hidden;
+  transition: border-color 0.15s;
+  min-height: 80px;
+}
+
+.translate-text-area-wrapper:focus-within {
+  border-color: rgba(var(--color-text-rgb), 0.28);
+}
+
+.translate-result-wrapper {
+  background: rgba(var(--color-text-rgb), 0.05);
+}
+
+.translate-textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 10px 12px 4px;
+  border: none;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.88);
+  font-size: 12.5px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+}
+
+.translate-textarea::placeholder {
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
+.translate-textarea-result {
+  cursor: default;
+}
+
+.translate-textarea-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 10px 6px;
+  min-height: 22px;
+}
+
+.translate-char-count {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
+.translate-inline-btn {
+  padding: 2px 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.translate-inline-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.translate-btn-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(var(--icon-invert));
+}
+
+/** ========== 文件服务 ========== */
+.file-service-panel {
+  gap: 12px;
+}
+
+.file-hash-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.file-hash-algo-group {
+  display: flex;
+  gap: 4px;
+}
+
+.file-hash-algo-btn {
+  padding: 4px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.file-hash-algo-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.file-hash-algo-btn.active {
+  background: rgba(var(--color-text-rgb), 0.14);
+  color: rgba(var(--color-text-rgb), 0.95);
+  border-color: rgba(var(--color-text-rgb), 0.25);
+  font-weight: 600;
+}
+
+.file-hash-pick-btn {
+  width: 100%;
+  padding: 5px 12px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.8);
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.file-hash-pick-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  border-color: rgba(var(--color-text-rgb), 0.22);
+}
+
+.file-hash-filename {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-hash-input {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 12px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.file-hash-input:focus {
+  border-color: rgba(var(--color-text-rgb), 0.25);
+}
+
+.file-hash-input::placeholder {
+  color: rgba(var(--color-text-rgb), 0.3);
+  font-family: inherit;
+}
+
+.file-hash-result {
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.03);
+}
+
+.file-hash-result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.file-hash-result-algo {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.65);
+}
+
+.file-hash-result-size {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.4);
+}
+
+.file-hash-copy-btn {
+  margin-left: auto;
+  padding: 2px 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 10.5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.file-hash-copy-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.file-hash-result-value {
+  font-size: 11.5px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  color: rgba(var(--color-text-rgb), 0.8);
+  word-break: break-all;
+  line-height: 1.5;
+  user-select: all;
+}
+
+.file-hash-verify {
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.file-hash-verify.match {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34c759;
+}
+
+.file-hash-verify.mismatch {
+  background: rgba(255, 59, 48, 0.15);
+  color: #ff3b30;
+}
+
+/** ========== IP 信息查询输入行 ========== */
+.ipinfo-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ipinfo-input {
+  flex: 1;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.85);
+  font-size: 12.5px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.ipinfo-input:focus {
+  border-color: rgba(100, 180, 255, 0.5);
+}
+
+.ipinfo-btn {
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.ipinfo-btn-fill {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.7);
+}
+
+.ipinfo-btn-fill:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+}
+
+.ipinfo-btn-query {
+  background: rgba(100, 180, 255, 0.18);
+  color: rgba(100, 180, 255, 0.95);
+}
+
+.ipinfo-btn-query:hover {
+  background: rgba(100, 180, 255, 0.28);
+}
+
+.ipinfo-btn-query.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.ipinfo-error {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/** ========== IP 信息查询结果 ========== */
+.ipinfo-result-card {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(var(--color-text-rgb), 0.04), rgba(var(--color-text-rgb), 0.015));
+  box-shadow: inset 0 1px 0 rgba(var(--color-text-rgb), 0.04);
+}
+
+.ipinfo-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.08);
+}
+
+.ipinfo-result-ip {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Consolas', 'Monaco', monospace;
+  color: rgba(var(--color-text-rgb), 0.9);
+  letter-spacing: 0.3px;
+}
+
+.ipinfo-result-badge {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(100, 180, 255, 0.15);
+  color: rgba(100, 180, 255, 0.9);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.ipinfo-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 12px;
+}
+
+.ipinfo-result-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 3px 0;
+}
+
+.ipinfo-result-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.45);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.ipinfo-result-value {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.85);
+  font-family: 'Consolas', 'Monaco', monospace;
+  word-break: break-all;
+}
+
 /** ========== 用户中心 ========== */
 .settings-user {
   gap: 12px;

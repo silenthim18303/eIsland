@@ -901,7 +901,11 @@
     "toolbox": {
       "sidebar": {
         "download": "MT Download",
-        "software": "Software"
+        "software": "Software",
+        "translate": "Translate",
+        "fileService": "File Service",
+        "encodingService": "Encoding Svc",
+        "networkService": "Network Svc"
       },
       "software": {
         "title": "Common Software",
@@ -962,6 +966,97 @@
           "removeSuccess": "Download task removed",
           "removeFailed": "Failed to remove download task",
           "openFolderFailed": "Failed to open file location"
+        }
+      },
+      "translate": {
+        "title": "Text Translation",
+        "subtitle": "Machine translation powered by Tencent Cloud",
+        "inputPlaceholder": "Enter text to translate...",
+        "outputPlaceholder": "Translation result will appear here",
+        "translateBtn": "Translate",
+        "translating": "Translating...",
+        "swap": "Swap Languages",
+        "clear": "Clear",
+        "copy": "Copy",
+        "loginRequired": "Please sign in before using translation",
+        "error": "Translation failed. Please try again later",
+        "lang": {
+          "auto": "Auto Detect",
+          "zh": "Chinese",
+          "en": "English",
+          "ja": "Japanese",
+          "ko": "Korean",
+          "fr": "French",
+          "de": "German",
+          "es": "Spanish",
+          "ru": "Russian"
+        }
+      },
+      "fileService": {
+        "hash": {
+          "title": "File Hash Verification",
+          "subtitle": "Select a file and compute its hash to verify file integrity",
+          "pickFile": "Select File",
+          "noFile": "No file selected",
+          "expectedPlaceholder": "Enter expected hash for verification (optional)",
+          "computeBtn": "Compute Hash",
+          "computing": "Computing...",
+          "copy": "Copy",
+          "match": "Verification passed: hash matches",
+          "mismatch": "Verification failed: hash does not match"
+        }
+      },
+      "encodingService": {
+        "json": {
+          "title": "JSON Encode/Decode",
+          "subtitle": "Encode plain text to JSON string or decode JSON string",
+          "inputPlaceholder": "Input text to encode or JSON string to decode",
+          "outputPlaceholder": "Result will appear here",
+          "encodeBtn": "JSON Encode",
+          "decodeBtn": "JSON Decode",
+          "encodeError": "JSON encode failed",
+          "decodeError": "JSON decode failed. Please check input format"
+        },
+        "base64": {
+          "title": "Base64 Encode/Decode",
+          "subtitle": "Convert between UTF-8 text and Base64",
+          "inputPlaceholder": "Input text to encode or Base64 string to decode",
+          "outputPlaceholder": "Result will appear here",
+          "encodeBtn": "Base64 Encode",
+          "decodeBtn": "Base64 Decode",
+          "encodeError": "Base64 encode failed",
+          "decodeError": "Base64 decode failed. Please check input"
+        }
+      },
+      "networkService": {
+        "title": "IP Info Lookup",
+        "subtitle": "IP information lookup tool",
+        "ipinfo": {
+          "ipPlaceholder": "Enter IP address, e.g. 8.8.8.8",
+          "fillLocal": "My IP",
+          "queryBtn": "Query",
+          "querying": "Querying...",
+          "emptyIp": "Please enter an IP address",
+          "failed": "Query failed. Please try again later",
+          "httpError": "Request failed: HTTP {{status}}",
+          "nonJson": "API returned non-JSON content",
+          "resultTitle": "Query Result",
+          "region": "Region",
+          "llc": "Organization",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "ipRange": "IP Range"
+        },
+        "librespeed": {
+          "urlPlaceholder": "Enter LibreSpeed URL, e.g. http://127.0.0.1:19366",
+          "applyBtn": "Apply URL",
+          "testBtn": "Run Speed Test",
+          "testing": "Testing...",
+          "ping": "Ping",
+          "download": "Download",
+          "upload": "Upload",
+          "resultTitle": "Test Result",
+          "result": "Result"
         }
       }
     },
