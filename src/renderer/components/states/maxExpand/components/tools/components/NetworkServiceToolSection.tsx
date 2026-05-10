@@ -58,20 +58,6 @@ export function NetworkServiceToolSection(): ReactElement {
   const [errorMessage, setErrorMessage] = useState('');
   const [result, setResult] = useState<IpInfoData | null>(null);
 
-  const handleFillLocalIp = useCallback(async (): Promise<void> => {
-    try {
-      const response = await window.api.netFetch(IPINFO_ENDPOINT, {
-        method: 'GET',
-        timeoutMs: 10000,
-      });
-      if (response.ok) {
-        const parsed = JSON.parse(response.body);
-        const ip = parsed.data?.ip || parsed.ip;
-        if (ip) setIpInput(ip);
-      }
-    } catch { /* ignore */ }
-  }, []);
-
   const handleQueryIpInfo = useCallback(async (): Promise<void> => {
     if (loading) return;
     setLoading(true);
@@ -148,14 +134,6 @@ export function NetworkServiceToolSection(): ReactElement {
               onChange={(e) => setIpInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') void handleQueryIpInfo(); }}
             />
-            <button
-              className="ipinfo-btn ipinfo-btn-fill"
-              type="button"
-              onClick={handleFillLocalIp}
-              title={t('maxExpand.toolbox.networkService.ipinfo.fillLocal')}
-            >
-              {t('maxExpand.toolbox.networkService.ipinfo.fillLocal')}
-            </button>
             <button
               className={`ipinfo-btn ipinfo-btn-query ${loading ? 'disabled' : ''}`}
               type="button"
