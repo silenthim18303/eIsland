@@ -26,6 +26,7 @@
 
 import { useCallback, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { fetchTranslate } from '../../../../../../api/tools/toolboxTranslateApi';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/toolboxConfig';
 
@@ -50,12 +51,16 @@ export function TranslateToolSection(): ReactElement {
   const handleTranslate = useCallback((): void => {
     if (!sourceText.trim() || translating) return;
     setTranslating(true);
-    // TODO: 接入翻译 API
-    setTimeout(() => {
-      setResultText('');
-      setTranslating(false);
-    }, 300);
-  }, [sourceText, translating]);
+    fetchTranslate(sourceText, sourceLang, targetLang)
+      .then((result) => {
+        if (result.success && result.data) {
+          setResultText(result.data.targetText);
+        } else {
+          setResultText(result.message ?? t('maxExpand.toolbox.translate.error'));
+        }
+      })
+      .finally(() => setTranslating(false));
+  }, [sourceText, sourceLang, targetLang, translating, t]);
 
   const handleCopyResult = useCallback((): void => {
     if (!resultText) return;
