@@ -29,6 +29,8 @@ import { useTranslation } from 'react-i18next';
 
 const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
 type ImageFormat = (typeof IMAGE_FORMATS)[number];
+const ICO_SIZES = [16, 32, 64] as const;
+type IcoSize = (typeof ICO_SIZES)[number];
 
 function getExtension(filePath: string): string {
   const parts = filePath.replace(/\\/g, '/').split('/');
@@ -79,6 +81,7 @@ export function FormatFactoryToolSection(): ReactElement {
   const [fileName, setFileName] = useState('');
   const [sourceExt, setSourceExt] = useState('');
   const [targetFormat, setTargetFormat] = useState<ImageFormat>('png');
+  const [targetIcoSize, setTargetIcoSize] = useState<IcoSize>(32);
   const [converting, setConverting] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
@@ -260,6 +263,26 @@ export function FormatFactoryToolSection(): ReactElement {
               ))}
             </div>
           </div>
+
+          {targetFormat === 'ico' && (
+            <div className="file-hash-row">
+              <span style={{ fontSize: 12, opacity: 0.6, marginRight: 8, whiteSpace: 'nowrap' }}>
+                {t('maxExpand.toolbox.formatFactory.image.targetSize')}
+              </span>
+              <div className="file-hash-algo-group">
+                {ICO_SIZES.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    className={`file-hash-algo-btn ${targetIcoSize === size ? 'active' : ''}`}
+                    onClick={() => setTargetIcoSize(size)}
+                  >
+                    {size}x{size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="settings-hotkey-row">
             <button

@@ -1066,6 +1066,7 @@
           "subtitle": "Select an image and convert it to another format. Supports PNG, JPG, WebP, BMP, ICO",
           "pickFile": "Select Image",
           "targetFormat": "Target Format",
+          "targetSize": "Target Size",
           "quality": "Output Quality",
           "convertBtn": "Convert",
           "converting": "Converting...",

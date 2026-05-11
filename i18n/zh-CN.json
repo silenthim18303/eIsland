@@ -1066,6 +1066,7 @@
           "subtitle": "选择图片文件并转换为目标格式，支持 PNG、JPG、WebP、BMP、ICO",
           "pickFile": "选择图片",
           "targetFormat": "目标格式",
+          "targetSize": "目标尺寸",
           "quality": "输出质量",
           "convertBtn": "开始转换",
           "converting": "转换中…",
