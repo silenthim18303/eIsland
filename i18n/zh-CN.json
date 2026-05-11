@@ -905,7 +905,8 @@
         "translate": "文本翻译",
         "fileService": "文件服务",
         "encodingService": "编码服务",
-        "networkService": "网络服务"
+        "networkService": "网络服务",
+        "formatFactory": "格式工厂"
       },
       "software": {
         "title": "常用软件",
@@ -1032,7 +1033,7 @@
         "title": "IP 信息查询",
         "subtitle": "IP 信息查询工具",
         "ipinfo": {
-          "ipPlaceholder": "输入要查询的 IP 地址，例如 8.8.8.8",
+          "ipPlaceholder": "输入要查询的 IP 地址",
           "fillLocal": "本机 IP",
           "queryBtn": "查询",
           "querying": "查询中...",
