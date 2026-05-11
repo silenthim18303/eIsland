@@ -1089,6 +1089,25 @@
             "targetFormat": "目标格式",
             "path": "完整路径"
           }
+        },
+        "video": {
+          "title": "视频轨道提取",
+          "subtitle": "从视频文件中提取音轨或视频轨，支持常见音视频封装格式",
+          "pickFile": "选择视频文件",
+          "trackType": "提取类型",
+          "trackAudio": "音轨",
+          "trackVideo": "视频轨",
+          "outputFormat": "输出格式",
+          "extractBtn": "开始提取",
+          "extracting": "提取中…",
+          "success": "提取成功 → {{path}}",
+          "failed": "提取失败，请稍后重试",
+          "meta": {
+            "name": "文件名",
+            "format": "封装格式",
+            "size": "文件大小",
+            "path": "完整路径"
+          }
         }
       }
     },

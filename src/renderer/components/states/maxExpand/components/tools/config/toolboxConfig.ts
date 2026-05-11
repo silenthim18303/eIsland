@@ -52,6 +52,15 @@ export type FormatFactoryImageOutputFormat = (typeof FORMAT_FACTORY_IMAGE_OUTPUT
 export const FORMAT_FACTORY_ICO_OUTPUT_SIZES = [16, 32, 64, 128, 256] as const;
 export type FormatFactoryIcoOutputSize = (typeof FORMAT_FACTORY_ICO_OUTPUT_SIZES)[number];
 
+export const FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS = ['audio', 'video'] as const;
+export type FormatFactoryVideoExtractTrack = (typeof FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS)[number];
+
+export const FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS = ['mp3', 'aac', 'wav', 'flac', 'ogg'] as const;
+export type FormatFactoryAudioOutputFormat = (typeof FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS)[number];
+
+export const FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS = ['mp4', 'mkv', 'avi', 'webm'] as const;
+export type FormatFactoryVideoOutputFormat = (typeof FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS)[number];
+
 export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
 export interface DownloadTaskSnapshot {

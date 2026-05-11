@@ -32,9 +32,15 @@ import {
 import {
   FORMAT_FACTORY_ICO_OUTPUT_SIZES,
   FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS,
+  FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS,
+  FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS,
+  FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS,
   FORMAT_FACTORY_PAGES,
   type FormatFactoryIcoOutputSize,
   type FormatFactoryImageOutputFormat,
+  type FormatFactoryAudioOutputFormat,
+  type FormatFactoryVideoOutputFormat,
+  type FormatFactoryVideoExtractTrack,
   type FormatFactoryPageKey,
 } from '../config/toolboxConfig';
 
@@ -133,6 +139,89 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
 
   const pixelCount = imgWidth > 0 && imgHeight > 0 ? imgWidth * imgHeight : 0;
   const previewMime = previewDataUrl ? getMimeFromDataUrl(previewDataUrl) : '-';
+
+  const [videoFilePath, setVideoFilePath] = useState('');
+  const [videoFileName, setVideoFileName] = useState('');
+  const [videoSourceExt, setVideoSourceExt] = useState('');
+  const [videoFileSize, setVideoFileSize] = useState<number | null>(null);
+  const [extractTrack, setExtractTrack] = useState<FormatFactoryVideoExtractTrack>('audio');
+  const [audioOutputFormat, setAudioOutputFormat] = useState<FormatFactoryAudioOutputFormat>('mp3');
+  const [videoOutputFormat, setVideoOutputFormat] = useState<FormatFactoryVideoOutputFormat>('mp4');
+  const [extracting, setExtracting] = useState(false);
+  const [extractProgress, setExtractProgress] = useState(0);
+  const [extractResultMessage, setExtractResultMessage] = useState('');
+  const [extractResultType, setExtractResultType] = useState<'success' | 'error' | ''>('');
+
+  const handlePickVideoFile = useCallback(async (): Promise<void> => {
+    try {
+      const picked = await window.api?.pickFileForHash?.();
+      if (picked) {
+        setVideoFilePath(picked);
+        setVideoFileName(getFileName(picked));
+        setVideoSourceExt(getExtension(picked));
+        setVideoFileSize(null);
+        setExtractResultMessage('');
+        setExtractResultType('');
+        setExtractProgress(0);
+        try {
+          const stat = await (window.api as Record<string, unknown> & {
+            getFileStat?: (p: string) => Promise<{ size: number } | null>;
+          }).getFileStat?.(picked);
+          if (stat?.size != null) setVideoFileSize(stat.size);
+        } catch { /* ignore */ }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleExtractTrack = useCallback(async (): Promise<void> => {
+    if (!videoFilePath || extracting) return;
+    setExtracting(true);
+    setExtractProgress(3);
+    setExtractResultMessage('');
+    setExtractResultType('');
+    const progressTimer = window.setInterval(() => {
+      setExtractProgress((prev) => {
+        if (prev >= 92) return prev;
+        if (prev < 35) return prev + 5;
+        if (prev < 70) return prev + 3;
+        return prev + 1;
+      });
+    }, 200);
+    try {
+      const outputFmt = extractTrack === 'audio' ? audioOutputFormat : videoOutputFormat;
+      const result = await (window.api as Record<string, unknown> & {
+        extractVideoTrack?: (opts: {
+          filePath: string;
+          trackType: string;
+          outputFormat: string;
+        }) => Promise<{ success: boolean; outputPath?: string; error?: string; fileSize?: number }>;
+      }).extractVideoTrack?.({
+        filePath: videoFilePath,
+        trackType: extractTrack,
+        outputFormat: outputFmt,
+      });
+      setExtractProgress(100);
+      if (result?.success) {
+        setExtractResultMessage(t('maxExpand.toolbox.formatFactory.video.success', { path: result.outputPath ?? '' }));
+        setExtractResultType('success');
+      } else {
+        setExtractResultMessage(result?.error || t('maxExpand.toolbox.formatFactory.video.failed'));
+        setExtractResultType('error');
+      }
+    } catch {
+      setExtractProgress(100);
+      setExtractResultMessage(t('maxExpand.toolbox.formatFactory.video.failed'));
+      setExtractResultType('error');
+    } finally {
+      window.clearInterval(progressTimer);
+      setExtracting(false);
+      window.setTimeout(() => {
+        setExtractProgress(0);
+      }, 700);
+    }
+  }, [videoFilePath, extracting, extractTrack, audioOutputFormat, videoOutputFormat, t]);
 
   const handlePickFile = useCallback(async (): Promise<void> => {
     try {
@@ -391,7 +480,135 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
   );
 
   const renderVideoPage = (): ReactElement => (
-    <div className="settings-cards format-factory-panel" />
+    <div className="settings-cards format-factory-panel">
+      <div className="settings-card">
+        <div className="settings-card-header">
+          <div className="settings-card-title">{t('maxExpand.toolbox.formatFactory.video.title')}</div>
+          <div className="settings-card-subtitle">{t('maxExpand.toolbox.formatFactory.video.subtitle')}</div>
+        </div>
+        <div className="settings-card-body">
+          <div className="file-hash-row">
+            <button
+              type="button"
+              className="file-hash-pick-btn"
+              onClick={handlePickVideoFile}
+            >
+              {t('maxExpand.toolbox.formatFactory.video.pickFile')}
+            </button>
+          </div>
+
+          {videoFilePath && (
+            <div className="ff-preview-area ff-video-meta-area">
+              <ul className="album-meta-list ff-meta-list">
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.video.meta.name')}</span>
+                  <span className="album-meta-value" title={videoFileName}>{videoFileName}</span>
+                </li>
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.video.meta.format')}</span>
+                  <span className="album-meta-value">{videoSourceExt.toUpperCase() || '-'}</span>
+                </li>
+                {videoFileSize != null && (
+                  <li className="album-meta-row">
+                    <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.video.meta.size')}</span>
+                    <span className="album-meta-value">{formatFileSize(videoFileSize)}</span>
+                  </li>
+                )}
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.video.meta.path')}</span>
+                  <span className="album-meta-value" title={videoFilePath}>{videoFilePath}</span>
+                </li>
+              </ul>
+            </div>
+          )}
+
+          <div className="file-hash-row">
+            <span style={{ fontSize: 12, opacity: 0.6, marginRight: 8, whiteSpace: 'nowrap' }}>
+              {t('maxExpand.toolbox.formatFactory.video.trackType')}
+            </span>
+            <div className="file-hash-algo-group">
+              {FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS.map((track) => (
+                <button
+                  key={track}
+                  type="button"
+                  className={`file-hash-algo-btn ${extractTrack === track ? 'active' : ''}`}
+                  onClick={() => setExtractTrack(track)}
+                >
+                  {t(`maxExpand.toolbox.formatFactory.video.track${track.charAt(0).toUpperCase() + track.slice(1)}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="file-hash-row">
+            <span style={{ fontSize: 12, opacity: 0.6, marginRight: 8, whiteSpace: 'nowrap' }}>
+              {t('maxExpand.toolbox.formatFactory.video.outputFormat')}
+            </span>
+            <div className="file-hash-algo-group">
+              {extractTrack === 'audio'
+                ? FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS.map((fmt) => (
+                    <button
+                      key={fmt}
+                      type="button"
+                      className={`file-hash-algo-btn ${audioOutputFormat === fmt ? 'active' : ''}`}
+                      onClick={() => setAudioOutputFormat(fmt)}
+                    >
+                      {fmt.toUpperCase()}
+                    </button>
+                  ))
+                : FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS.map((fmt) => (
+                    <button
+                      key={fmt}
+                      type="button"
+                      className={`file-hash-algo-btn ${videoOutputFormat === fmt ? 'active' : ''}`}
+                      onClick={() => setVideoOutputFormat(fmt)}
+                    >
+                      {fmt.toUpperCase()}
+                    </button>
+                  ))}
+            </div>
+          </div>
+
+          <div className="settings-hotkey-row">
+            <button
+              className={`settings-lyrics-source-btn download-start-btn-full ff-convert-btn ${(!videoFilePath || extracting) ? 'disabled' : ''}`}
+              type="button"
+              disabled={!videoFilePath || extracting}
+              onClick={handleExtractTrack}
+            >
+              {extracting
+                ? (
+                  <>
+                    <span className="ff-convert-spinner" aria-hidden="true" />
+                    <span>{t('maxExpand.toolbox.formatFactory.video.extracting')}</span>
+                  </>
+                )
+                : t('maxExpand.toolbox.formatFactory.video.extractBtn')}
+            </button>
+          </div>
+
+          {(extracting || extractProgress > 0) && (
+            <div className="ff-convert-progress">
+              <div className="ff-convert-progress-track">
+                <div
+                  className="ff-convert-progress-fill"
+                  style={{ width: `${Math.max(0, Math.min(100, extractProgress))}%` }}
+                />
+              </div>
+              <span className="ff-convert-progress-text">
+                {Math.max(0, Math.min(100, Math.round(extractProgress)))}%
+              </span>
+            </div>
+          )}
+
+          {extractResultMessage && (
+            <div className={`file-hash-verify ${extractResultType === 'success' ? 'match' : 'mismatch'}`}>
+              <span>{extractResultMessage}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 
   return (

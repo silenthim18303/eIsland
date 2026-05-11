@@ -1089,6 +1089,25 @@
             "targetFormat": "Target Format",
             "path": "Full Path"
           }
+        },
+        "video": {
+          "title": "Video Track Extraction",
+          "subtitle": "Extract audio or video tracks from video files. Supports common container formats",
+          "pickFile": "Select Video File",
+          "trackType": "Extract Type",
+          "trackAudio": "Audio Track",
+          "trackVideo": "Video Track",
+          "outputFormat": "Output Format",
+          "extractBtn": "Extract",
+          "extracting": "Extracting...",
+          "success": "Extracted → {{path}}",
+          "failed": "Extraction failed. Please try again later",
+          "meta": {
+            "name": "Name",
+            "format": "Container",
+            "size": "File Size",
+            "path": "Full Path"
+          }
         }
       }
     },
