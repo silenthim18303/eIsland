@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 
 const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
 type ImageFormat = (typeof IMAGE_FORMATS)[number];
-const ICO_SIZES = [16, 32, 64] as const;
+const ICO_SIZES = [16, 32, 64, 128, 256] as const;
 type IcoSize = (typeof ICO_SIZES)[number];
 
 function getExtension(filePath: string): string {
