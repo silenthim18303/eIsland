@@ -246,7 +246,7 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
           const stat = await (window.api as Record<string, unknown> & {
             getFileStat?: (p: string) => Promise<{ size: number } | null>;
           }).getFileStat?.(picked);
-          if (stat?.size != null) setImgFileSize(stat.size);
+          if (stat?.size !== null && stat?.size !== undefined) setImgFileSize(stat.size);
         } catch { /* ignore */ }
         if (ext && FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS.includes(ext as FormatFactoryImageOutputFormat)) {
           const firstOther = FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS.find((f) => f !== ext);
