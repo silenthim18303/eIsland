@@ -181,9 +181,9 @@ export function FormatFactoryToolSection(): ReactElement {
                     <span className="album-meta-value">{formatFileSize(imgFileSize)}</span>
                   </li>
                 )}
-                <li className="album-meta-row album-meta-row--path">
+                <li className="album-meta-row">
                   <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.path')}</span>
-                  <span className="album-meta-value album-meta-path" title={filePath}>{filePath}</span>
+                  <span className="album-meta-value" title={filePath}>{filePath}</span>
                 </li>
               </ul>
             </div>
