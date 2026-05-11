@@ -77,14 +77,6 @@ function runFfmpeg(args: string[]): Promise<{ code: number; stdout: string; stde
 }
 
 /**
- * 生成不冲突的输出路径
- */
-function buildOutputPath(sourceDir: string, baseName: string, suffix: string, ext: string): string {
-  const stamp = Date.now();
-  return join(sourceDir, `${baseName}_${suffix}_${stamp}.${ext}`);
-}
-
-/**
  * 注册格式工厂 IPC 处理器
  */
 export function registerFormatFactoryIpcHandlers(): void {
@@ -128,7 +120,7 @@ export function registerFormatFactoryIpcHandlers(): void {
    * format-factory:extract-track
    * @description 提取视频文件的音轨或视频轨
    */
-  ipcMain.handle('format-factory:extract-track', async (_event, options: ExtractVideoTrackOptions): Promise<ExtractVideoTrackResult> => {
+  ipcMain.handle('format-factory:extract-track', async (event, options: ExtractVideoTrackOptions): Promise<ExtractVideoTrackResult> => {
     if (!options || typeof options !== 'object') {
       return { success: false, error: 'invalid options' };
     }
@@ -143,10 +135,24 @@ export function registerFormatFactoryIpcHandlers(): void {
       return { success: false, error: 'invalid output format' };
     }
 
-    const sourceDir = dirname(filePath);
-    const sourceBase = basename(filePath, extname(filePath)).replace(/[^a-zA-Z0-9_\-\u4e00-\u9fff]+/g, '_');
+    const win = BrowserWindow.fromWebContents(event.sender) ?? BrowserWindow.getFocusedWindow();
+    if (!win) return { success: false, error: 'no window' };
+
+    const sourceBase = basename(filePath, extname(filePath));
     const suffix = trackType === 'audio' ? 'audio' : 'video';
-    const outputPath = buildOutputPath(sourceDir, sourceBase, suffix, outputFormat);
+    const defaultName = `${sourceBase}_${suffix}.${outputFormat}`;
+    const saveResult = await dialog.showSaveDialog(win, {
+      title: trackType === 'audio' ? '保存提取的音轨' : '保存提取的视频轨',
+      defaultPath: join(dirname(filePath), defaultName),
+      filters: [
+        { name: outputFormat.toUpperCase(), extensions: [outputFormat] },
+        { name: 'All Files', extensions: ['*'] },
+      ],
+    });
+    if (saveResult.canceled || !saveResult.filePath) {
+      return { success: false, error: 'canceled' };
+    }
+    const outputPath = saveResult.filePath;
 
     try {
       const args: string[] = [

@@ -190,6 +190,10 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
         trackType: extractTrack,
         outputFormat: outputFmt,
       });
+      if (result?.error === 'canceled') {
+        // 用户取消保存对话框，静默退出
+        return;
+      }
       setExtractProgress(100);
       if (result?.success) {
         setExtractResultMessage(t('maxExpand.toolbox.formatFactory.video.success', { path: result.outputPath ?? '' }));
