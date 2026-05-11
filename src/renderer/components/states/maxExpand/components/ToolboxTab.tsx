@@ -43,6 +43,7 @@ const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }>
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
   { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
   { key: 'networkService', labelKey: 'maxExpand.toolbox.sidebar.networkService' },
+  { key: 'formatFactory', labelKey: 'maxExpand.toolbox.sidebar.formatFactory' },
 ];
 
 /** 最大展开模式工具箱页面 */
