@@ -1073,9 +1073,15 @@
           "failed": "转换失败，请稍后重试",
           "meta": {
             "name": "文件名",
+            "mediaType": "媒体类型",
+            "mediaTypeImage": "图片",
+            "mime": "MIME",
             "format": "格式",
             "resolution": "分辨率",
             "size": "文件大小",
+            "pixels": "像素总数",
+            "aspectRatio": "宽高比",
+            "targetFormat": "目标格式",
             "path": "完整路径"
           }
         }

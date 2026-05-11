@@ -49,6 +49,26 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
+function estimateBytesFromDataUrl(dataUrl: string): number {
+  const idx = dataUrl.indexOf(',');
+  if (idx < 0) return 0;
+  const b64 = dataUrl.slice(idx + 1);
+  const padding = b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0;
+  return Math.max(0, Math.floor((b64.length * 3) / 4) - padding);
+}
+
+function getMimeFromDataUrl(dataUrl: string): string {
+  const match = /^data:([^;]+);base64,/i.exec(dataUrl);
+  return match?.[1] ?? 'image/*';
+}
+
+function formatAspectRatio(width: number, height: number): string {
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+  if (width <= 0 || height <= 0) return '-';
+  const d = gcd(width, height);
+  return `${Math.round(width / d)}:${Math.round(height / d)}`;
+}
+
 /**
  * 格式工厂模块主视图。
  */
@@ -68,6 +88,9 @@ export function FormatFactoryToolSection(): ReactElement {
   const [imgHeight, setImgHeight] = useState(0);
   const [imgFileSize, setImgFileSize] = useState<number | null>(null);
 
+  const pixelCount = imgWidth > 0 && imgHeight > 0 ? imgWidth * imgHeight : 0;
+  const previewMime = previewDataUrl ? getMimeFromDataUrl(previewDataUrl) : '-';
+
   const handlePickFile = useCallback(async (): Promise<void> => {
     try {
       const picked = await window.api?.pickFileForHash?.();
@@ -85,7 +108,13 @@ export function FormatFactoryToolSection(): ReactElement {
         setPreviewDataUrl('');
         try {
           const dataUrl = await window.api?.loadWallpaperFile?.(picked);
-          if (dataUrl) setPreviewDataUrl(dataUrl);
+          if (dataUrl) {
+            setPreviewDataUrl(dataUrl);
+            if (imgFileSize === null) {
+              const estimated = estimateBytesFromDataUrl(dataUrl);
+              if (estimated > 0) setImgFileSize(estimated);
+            }
+          }
         } catch { /* ignore */ }
         try {
           const stat = await (window.api as Record<string, unknown> & {
@@ -166,6 +195,14 @@ export function FormatFactoryToolSection(): ReactElement {
                   <span className="album-meta-value" title={fileName}>{fileName}</span>
                 </li>
                 <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.mediaType')}</span>
+                  <span className="album-meta-value">{t('maxExpand.toolbox.formatFactory.image.meta.mediaTypeImage')}</span>
+                </li>
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.mime')}</span>
+                  <span className="album-meta-value">{previewMime}</span>
+                </li>
+                <li className="album-meta-row">
                   <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.format')}</span>
                   <span className="album-meta-value">{sourceExt.toUpperCase()}</span>
                 </li>
@@ -181,6 +218,22 @@ export function FormatFactoryToolSection(): ReactElement {
                     <span className="album-meta-value">{formatFileSize(imgFileSize)}</span>
                   </li>
                 )}
+                {pixelCount > 0 && (
+                  <li className="album-meta-row">
+                    <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.pixels')}</span>
+                    <span className="album-meta-value">{pixelCount.toLocaleString()} px</span>
+                  </li>
+                )}
+                {imgWidth > 0 && imgHeight > 0 && (
+                  <li className="album-meta-row">
+                    <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.aspectRatio')}</span>
+                    <span className="album-meta-value">{formatAspectRatio(imgWidth, imgHeight)}</span>
+                  </li>
+                )}
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.targetFormat')}</span>
+                  <span className="album-meta-value">{targetFormat.toUpperCase()}</span>
+                </li>
                 <li className="album-meta-row">
                   <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.path')}</span>
                   <span className="album-meta-value" title={filePath}>{filePath}</span>

@@ -1073,9 +1073,15 @@
           "failed": "Conversion failed. Please try again later",
           "meta": {
             "name": "Name",
+            "mediaType": "Media Type",
+            "mediaTypeImage": "Image",
+            "mime": "MIME",
             "format": "Format",
             "resolution": "Resolution",
             "size": "File Size",
+            "pixels": "Pixels",
+            "aspectRatio": "Aspect Ratio",
+            "targetFormat": "Target Format",
             "path": "Full Path"
           }
         }
