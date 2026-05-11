@@ -4899,3 +4899,56 @@
 .ff-meta-list::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--color-text-rgb), 0.18);
 }
+
+.ff-convert-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ff-convert-spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--color-text-rgb), 0.2);
+  border-top-color: rgba(var(--color-text-rgb), 0.8);
+  animation: ffSpin 0.85s linear infinite;
+}
+
+.ff-convert-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ff-convert-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  overflow: hidden;
+}
+
+.ff-convert-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(var(--color-text-rgb), 0.45), rgba(var(--color-text-rgb), 0.75));
+  transition: width 0.16s ease;
+}
+
+.ff-convert-progress-text {
+  min-width: 36px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.62);
+  text-align: right;
+}
+
+@keyframes ffSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

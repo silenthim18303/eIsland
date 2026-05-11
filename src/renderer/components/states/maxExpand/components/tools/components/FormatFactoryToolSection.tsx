@@ -87,6 +87,7 @@ export function FormatFactoryToolSection(): ReactElement {
   const [targetFormat, setTargetFormat] = useState<FormatFactoryImageOutputFormat>('png');
   const [targetIcoSize, setTargetIcoSize] = useState<FormatFactoryIcoOutputSize>(32);
   const [converting, setConverting] = useState(false);
+  const [convertProgress, setConvertProgress] = useState(0);
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
   const [resultFileSize, setResultFileSize] = useState<number | null>(null);
@@ -109,6 +110,7 @@ export function FormatFactoryToolSection(): ReactElement {
         setResultMessage('');
         setResultType('');
         setResultFileSize(null);
+        setConvertProgress(0);
         setImgWidth(0);
         setImgHeight(0);
         setImgFileSize(null);
@@ -142,9 +144,18 @@ export function FormatFactoryToolSection(): ReactElement {
   const handleConvert = useCallback(async (): Promise<void> => {
     if (!filePath || converting) return;
     setConverting(true);
+    setConvertProgress(3);
     setResultMessage('');
     setResultType('');
     setResultFileSize(null);
+    const progressTimer = window.setInterval(() => {
+      setConvertProgress((prev) => {
+        if (prev >= 92) return prev;
+        if (prev < 35) return prev + 7;
+        if (prev < 70) return prev + 4;
+        return prev + 2;
+      });
+    }, 140);
     try {
       const result = await convertImageInRenderer({
         filePath,
@@ -152,6 +163,7 @@ export function FormatFactoryToolSection(): ReactElement {
         icoSize: targetIcoSize,
         quality: 1,
       });
+      setConvertProgress(100);
       if (result?.success) {
         setResultMessage(t('maxExpand.toolbox.formatFactory.image.success', { path: result.outputPath ?? '' }));
         setResultType('success');
@@ -161,10 +173,15 @@ export function FormatFactoryToolSection(): ReactElement {
         setResultType('error');
       }
     } catch {
+      setConvertProgress(100);
       setResultMessage(t('maxExpand.toolbox.formatFactory.image.failed'));
       setResultType('error');
     } finally {
+      window.clearInterval(progressTimer);
       setConverting(false);
+      window.setTimeout(() => {
+        setConvertProgress(0);
+      }, 700);
     }
   }, [filePath, converting, targetFormat, targetIcoSize, t]);
 
@@ -293,16 +310,35 @@ export function FormatFactoryToolSection(): ReactElement {
 
           <div className="settings-hotkey-row">
             <button
-              className={`settings-lyrics-source-btn download-start-btn-full ${(!filePath || converting || sourceExt === targetFormat) ? 'disabled' : ''}`}
+              className={`settings-lyrics-source-btn download-start-btn-full ff-convert-btn ${(!filePath || converting || sourceExt === targetFormat) ? 'disabled' : ''}`}
               type="button"
               disabled={!filePath || converting || sourceExt === targetFormat}
               onClick={handleConvert}
             >
               {converting
-                ? t('maxExpand.toolbox.formatFactory.image.converting')
+                ? (
+                  <>
+                    <span className="ff-convert-spinner" aria-hidden="true" />
+                    <span>{t('maxExpand.toolbox.formatFactory.image.converting')}</span>
+                  </>
+                )
                 : t('maxExpand.toolbox.formatFactory.image.convertBtn')}
             </button>
           </div>
+
+          {(converting || convertProgress > 0) && (
+            <div className="ff-convert-progress">
+              <div className="ff-convert-progress-track">
+                <div
+                  className="ff-convert-progress-fill"
+                  style={{ width: `${Math.max(0, Math.min(100, convertProgress))}%` }}
+                />
+              </div>
+              <span className="ff-convert-progress-text">
+                {Math.max(0, Math.min(100, Math.round(convertProgress)))}%
+              </span>
+            </div>
+          )}
 
           {resultMessage && (
             <div className={`file-hash-verify ${resultType === 'success' ? 'match' : 'mismatch'}`}>
