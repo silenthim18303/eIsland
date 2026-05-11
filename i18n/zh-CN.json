@@ -1070,7 +1070,13 @@
           "convertBtn": "开始转换",
           "converting": "转换中…",
           "success": "转换成功 → {{path}}",
-          "failed": "转换失败，请稍后重试"
+          "failed": "转换失败，请稍后重试",
+          "meta": {
+            "name": "文件名",
+            "format": "格式",
+            "resolution": "分辨率",
+            "size": "大小"
+          }
         }
       }
     },

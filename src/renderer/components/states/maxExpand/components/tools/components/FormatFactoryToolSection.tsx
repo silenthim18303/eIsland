@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useState, type ReactElement } from 'react';
+import { useCallback, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
@@ -63,6 +63,11 @@ export function FormatFactoryToolSection(): ReactElement {
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
   const [resultFileSize, setResultFileSize] = useState<number | null>(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [imgWidth, setImgWidth] = useState(0);
+  const [imgHeight, setImgHeight] = useState(0);
+  const [imgFileSize, setImgFileSize] = useState<number | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const handlePickFile = useCallback(async (): Promise<void> => {
     try {
@@ -75,6 +80,17 @@ export function FormatFactoryToolSection(): ReactElement {
         setResultMessage('');
         setResultType('');
         setResultFileSize(null);
+        setImgWidth(0);
+        setImgHeight(0);
+        setImgFileSize(null);
+        const url = 'file:///' + picked.replace(/\\/g, '/').replace(/^\/+/, '');
+        setPreviewUrl(url);
+        try {
+          const stat = await (window.api as Record<string, unknown> & {
+            getFileStat?: (p: string) => Promise<{ size: number } | null>;
+          }).getFileStat?.(picked);
+          if (stat?.size != null) setImgFileSize(stat.size);
+        } catch { /* ignore */ }
         if (ext && IMAGE_FORMATS.includes(ext as ImageFormat)) {
           const firstOther = IMAGE_FORMATS.find((f) => f !== ext);
           if (firstOther) setTargetFormat(firstOther);
@@ -129,16 +145,42 @@ export function FormatFactoryToolSection(): ReactElement {
             </button>
           </div>
 
-          {fileName && (
-            <div className="file-hash-row">
-              <span className="file-hash-filename" title={filePath}>
-                {fileName}
-                {sourceExt && (
-                  <span style={{ opacity: 0.5, marginLeft: 6 }}>
-                    ({sourceExt.toUpperCase()})
-                  </span>
+          {previewUrl && (
+            <div className="ff-preview-area">
+              <div className="ff-preview-thumb">
+                <img
+                  ref={imgRef}
+                  src={previewUrl}
+                  alt={fileName}
+                  onLoad={(e) => {
+                    const img = e.currentTarget;
+                    setImgWidth(img.naturalWidth);
+                    setImgHeight(img.naturalHeight);
+                  }}
+                />
+              </div>
+              <div className="ff-preview-meta">
+                <div className="ff-meta-row">
+                  <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.name')}</span>
+                  <span className="ff-meta-value" title={fileName}>{fileName}</span>
+                </div>
+                <div className="ff-meta-row">
+                  <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.format')}</span>
+                  <span className="ff-meta-value">{sourceExt.toUpperCase()}</span>
+                </div>
+                {imgWidth > 0 && imgHeight > 0 && (
+                  <div className="ff-meta-row">
+                    <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.resolution')}</span>
+                    <span className="ff-meta-value">{imgWidth} × {imgHeight}</span>
+                  </div>
                 )}
-              </span>
+                {imgFileSize != null && (
+                  <div className="ff-meta-row">
+                    <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.size')}</span>
+                    <span className="ff-meta-value">{formatFileSize(imgFileSize)}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

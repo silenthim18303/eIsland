@@ -1070,7 +1070,13 @@
           "convertBtn": "Convert",
           "converting": "Converting...",
           "success": "Converted → {{path}}",
-          "failed": "Conversion failed. Please try again later"
+          "failed": "Conversion failed. Please try again later",
+          "meta": {
+            "name": "Name",
+            "format": "Format",
+            "resolution": "Resolution",
+            "size": "Size"
+          }
         }
       }
     },
