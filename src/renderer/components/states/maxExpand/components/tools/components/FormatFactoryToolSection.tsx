@@ -72,7 +72,8 @@ function estimateBytesFromDataUrl(dataUrl: string): number {
   const idx = dataUrl.indexOf(',');
   if (idx < 0) return 0;
   const b64 = dataUrl.slice(idx + 1);
-  const padding = b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0;
+  const trimmed = b64.replace(/=+$/u, '');
+  const padding = b64.length - trimmed.length;
   return Math.max(0, Math.floor((b64.length * 3) / 4) - padding);
 }
 
