@@ -43,6 +43,12 @@ export const TRANSLATE_LANGUAGES = [
 
 export const TRANSLATE_TARGET_LANGUAGES = TRANSLATE_LANGUAGES.filter((lang) => lang.code !== 'auto');
 
+export const FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
+export type FormatFactoryImageOutputFormat = (typeof FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS)[number];
+
+export const FORMAT_FACTORY_ICO_OUTPUT_SIZES = [16, 32, 64, 128, 256] as const;
+export type FormatFactoryIcoOutputSize = (typeof FORMAT_FACTORY_ICO_OUTPUT_SIZES)[number];
+
 export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
 export interface DownloadTaskSnapshot {

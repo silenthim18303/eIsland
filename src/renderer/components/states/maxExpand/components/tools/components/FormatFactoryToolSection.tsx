@@ -27,12 +27,14 @@
 import { useCallback, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ICO_OUTPUT_SIZES,
-  IMAGE_OUTPUT_FORMATS,
   convertImageInRenderer,
-  type IcoOutputSize,
-  type ImageOutputFormat,
 } from '../utils/imageConverter';
+import {
+  FORMAT_FACTORY_ICO_OUTPUT_SIZES,
+  FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS,
+  type FormatFactoryIcoOutputSize,
+  type FormatFactoryImageOutputFormat,
+} from '../config/toolboxConfig';
 
 function getExtension(filePath: string): string {
   const parts = filePath.replace(/\\/g, '/').split('/');
@@ -82,8 +84,8 @@ export function FormatFactoryToolSection(): ReactElement {
   const [filePath, setFilePath] = useState('');
   const [fileName, setFileName] = useState('');
   const [sourceExt, setSourceExt] = useState('');
-  const [targetFormat, setTargetFormat] = useState<ImageOutputFormat>('png');
-  const [targetIcoSize, setTargetIcoSize] = useState<IcoOutputSize>(32);
+  const [targetFormat, setTargetFormat] = useState<FormatFactoryImageOutputFormat>('png');
+  const [targetIcoSize, setTargetIcoSize] = useState<FormatFactoryIcoOutputSize>(32);
   const [converting, setConverting] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
@@ -127,8 +129,8 @@ export function FormatFactoryToolSection(): ReactElement {
           }).getFileStat?.(picked);
           if (stat?.size != null) setImgFileSize(stat.size);
         } catch { /* ignore */ }
-        if (ext && IMAGE_OUTPUT_FORMATS.includes(ext as ImageOutputFormat)) {
-          const firstOther = IMAGE_OUTPUT_FORMATS.find((f) => f !== ext);
+        if (ext && FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS.includes(ext as FormatFactoryImageOutputFormat)) {
+          const firstOther = FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS.find((f) => f !== ext);
           if (firstOther) setTargetFormat(firstOther);
         }
       }
@@ -255,7 +257,7 @@ export function FormatFactoryToolSection(): ReactElement {
               {t('maxExpand.toolbox.formatFactory.image.targetFormat')}
             </span>
             <div className="file-hash-algo-group">
-              {IMAGE_OUTPUT_FORMATS.map((fmt) => (
+              {FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS.map((fmt) => (
                 <button
                   key={fmt}
                   type="button"
@@ -275,7 +277,7 @@ export function FormatFactoryToolSection(): ReactElement {
                 {t('maxExpand.toolbox.formatFactory.image.targetSize')}
               </span>
               <div className="file-hash-algo-group">
-                {ICO_OUTPUT_SIZES.map((size) => (
+                {FORMAT_FACTORY_ICO_OUTPUT_SIZES.map((size) => (
                   <button
                     key={size}
                     type="button"

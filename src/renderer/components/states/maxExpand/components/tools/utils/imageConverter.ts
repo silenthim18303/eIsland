@@ -23,17 +23,15 @@
  * @description 格式工厂图片格式转换工具函数（前端实现）
  * @author 鸡哥
  */
-
-export const IMAGE_OUTPUT_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
-export type ImageOutputFormat = (typeof IMAGE_OUTPUT_FORMATS)[number];
-
-export const ICO_OUTPUT_SIZES = [16, 32, 64, 128, 256] as const;
-export type IcoOutputSize = (typeof ICO_OUTPUT_SIZES)[number];
+import type {
+  FormatFactoryIcoOutputSize,
+  FormatFactoryImageOutputFormat,
+} from '../config/toolboxConfig';
 
 export interface ConvertImageInRendererParams {
   filePath: string;
-  targetFormat: ImageOutputFormat;
-  icoSize: IcoOutputSize;
+  targetFormat: FormatFactoryImageOutputFormat;
+  icoSize: FormatFactoryIcoOutputSize;
   quality?: number;
 }
 
