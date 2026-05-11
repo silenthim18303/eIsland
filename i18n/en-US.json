@@ -1063,7 +1063,7 @@
       "formatFactory": {
         "image": {
           "title": "Image Format Conversion",
-          "subtitle": "Select an image and convert it to another format. Supports PNG, JPG, WebP, BMP, GIF, TIFF, ICO",
+          "subtitle": "Select an image and convert it to another format. Supports PNG, JPG, WebP, BMP, ICO",
           "pickFile": "Select Image",
           "targetFormat": "Target Format",
           "quality": "Output Quality",

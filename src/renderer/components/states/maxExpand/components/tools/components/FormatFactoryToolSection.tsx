@@ -27,7 +27,7 @@
 import { useCallback, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'gif', 'tiff', 'ico'] as const;
+const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
 type ImageFormat = (typeof IMAGE_FORMATS)[number];
 
 function getExtension(filePath: string): string {
