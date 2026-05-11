@@ -3120,6 +3120,21 @@
   font-weight: 600;
 }
 
+.file-hash-algo-btn.disabled,
+.file-hash-algo-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  color: rgba(var(--color-text-rgb), 0.35);
+  background: rgba(var(--color-text-rgb), 0.04);
+  border-color: rgba(var(--color-text-rgb), 0.08);
+}
+
+.file-hash-algo-btn.disabled:hover,
+.file-hash-algo-btn:disabled:hover {
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.35);
+}
+
 .file-hash-pick-btn {
   width: 100%;
   padding: 5px 12px;
