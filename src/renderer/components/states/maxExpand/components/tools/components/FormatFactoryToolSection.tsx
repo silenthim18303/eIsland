@@ -501,7 +501,7 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
                   <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.video.meta.format')}</span>
                   <span className="album-meta-value">{videoSourceExt.toUpperCase() || '-'}</span>
                 </li>
-                {videoFileSize != null && (
+                {videoFileSize !== null && videoFileSize !== undefined && (
                   <li className="album-meta-row">
                     <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.video.meta.size')}</span>
                     <span className="album-meta-value">{formatFileSize(videoFileSize)}</span>
