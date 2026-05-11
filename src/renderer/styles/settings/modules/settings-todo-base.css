@@ -31,7 +31,7 @@
   width: 100%;
   height: 100%;
   gap: 4px;
-  animation: maxExpandFadeIn 0.2s ease;
+  animation: maxExpandFadeIn 0.2s ease forwards;
 }
 
 /** 标题栏 */

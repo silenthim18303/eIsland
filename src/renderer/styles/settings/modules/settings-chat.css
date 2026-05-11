@@ -30,7 +30,7 @@
   flex-direction: column;
   width: 100%;
   overflow: hidden;
-  animation: maxExpandFadeIn 0.2s ease;
+  animation: maxExpandFadeIn 0.2s ease forwards;
   border-radius: 12px;
   background: rgba(var(--color-text-rgb), 0.04);
   --session-sidebar-open-width: 220px;
