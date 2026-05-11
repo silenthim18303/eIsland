@@ -59,13 +59,10 @@ export function FormatFactoryToolSection(): ReactElement {
   const [fileName, setFileName] = useState('');
   const [sourceExt, setSourceExt] = useState('');
   const [targetFormat, setTargetFormat] = useState<ImageFormat>('png');
-  const [quality, setQuality] = useState(90);
   const [converting, setConverting] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
   const [resultFileSize, setResultFileSize] = useState<number | null>(null);
-
-  const supportsQuality = targetFormat === 'jpg' || targetFormat === 'webp';
 
   const handlePickFile = useCallback(async (): Promise<void> => {
     try {
@@ -97,7 +94,7 @@ export function FormatFactoryToolSection(): ReactElement {
     try {
       const result = await (window.api as Record<string, unknown> & {
         convertImageFormat?: (src: string, format: string, quality: number) => Promise<{ success: boolean; outputPath?: string; fileSize?: number; error?: string }>;
-      }).convertImageFormat?.(filePath, targetFormat, supportsQuality ? quality : 100);
+      }).convertImageFormat?.(filePath, targetFormat, 100);
       if (result?.success) {
         setResultMessage(t('maxExpand.toolbox.formatFactory.image.success', { path: result.outputPath ?? '' }));
         setResultType('success');
@@ -112,7 +109,7 @@ export function FormatFactoryToolSection(): ReactElement {
     } finally {
       setConverting(false);
     }
-  }, [filePath, converting, targetFormat, quality, supportsQuality, t]);
+  }, [filePath, converting, targetFormat, t]);
 
   return (
     <div className="settings-cards format-factory-panel">
@@ -163,25 +160,6 @@ export function FormatFactoryToolSection(): ReactElement {
               ))}
             </div>
           </div>
-
-          {supportsQuality && (
-            <div className="file-hash-row" style={{ gap: 12 }}>
-              <span style={{ fontSize: 12, opacity: 0.6, whiteSpace: 'nowrap' }}>
-                {t('maxExpand.toolbox.formatFactory.image.quality')}
-              </span>
-              <input
-                type="range"
-                min={1}
-                max={100}
-                value={quality}
-                onChange={(e) => setQuality(Number(e.target.value))}
-                style={{ flex: 1 }}
-              />
-              <span style={{ fontSize: 12, opacity: 0.7, minWidth: 32, textAlign: 'right' }}>
-                {quality}%
-              </span>
-            </div>
-          )}
 
           <div className="settings-hotkey-row">
             <button
