@@ -1059,6 +1059,19 @@
           "resultTitle": "Test Result",
           "result": "Result"
         }
+      },
+      "formatFactory": {
+        "image": {
+          "title": "Image Format Conversion",
+          "subtitle": "Select an image and convert it to another format. Supports PNG, JPG, WebP, BMP, GIF, TIFF, ICO",
+          "pickFile": "Select Image",
+          "targetFormat": "Target Format",
+          "quality": "Output Quality",
+          "convertBtn": "Convert",
+          "converting": "Converting...",
+          "success": "Converted → {{path}}",
+          "failed": "Conversion failed. Please try again later"
+        }
       }
     },
     "localFileSearch": {

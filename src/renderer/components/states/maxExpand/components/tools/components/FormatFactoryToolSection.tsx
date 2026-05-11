@@ -24,14 +24,190 @@
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
+import { useCallback, useState, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+
+const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'gif', 'tiff', 'ico'] as const;
+type ImageFormat = (typeof IMAGE_FORMATS)[number];
+
+function getExtension(filePath: string): string {
+  const parts = filePath.replace(/\\/g, '/').split('/');
+  const name = parts[parts.length - 1] || '';
+  const dotIdx = name.lastIndexOf('.');
+  return dotIdx > 0 ? name.slice(dotIdx + 1).toLowerCase() : '';
+}
+
+function getFileName(filePath: string): string {
+  const parts = filePath.replace(/\\/g, '/').split('/');
+  return parts[parts.length - 1] || filePath;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
 
 /**
  * 格式工厂模块主视图。
  */
 export function FormatFactoryToolSection(): ReactElement {
+  const { t } = useTranslation();
+
+  const [filePath, setFilePath] = useState('');
+  const [fileName, setFileName] = useState('');
+  const [sourceExt, setSourceExt] = useState('');
+  const [targetFormat, setTargetFormat] = useState<ImageFormat>('png');
+  const [quality, setQuality] = useState(90);
+  const [converting, setConverting] = useState(false);
+  const [resultMessage, setResultMessage] = useState('');
+  const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
+  const [resultFileSize, setResultFileSize] = useState<number | null>(null);
+
+  const supportsQuality = targetFormat === 'jpg' || targetFormat === 'webp';
+
+  const handlePickFile = useCallback(async (): Promise<void> => {
+    try {
+      const picked = await window.api?.pickFileForHash?.();
+      if (picked) {
+        setFilePath(picked);
+        setFileName(getFileName(picked));
+        const ext = getExtension(picked);
+        setSourceExt(ext);
+        setResultMessage('');
+        setResultType('');
+        setResultFileSize(null);
+        if (ext && IMAGE_FORMATS.includes(ext as ImageFormat)) {
+          const firstOther = IMAGE_FORMATS.find((f) => f !== ext);
+          if (firstOther) setTargetFormat(firstOther);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleConvert = useCallback(async (): Promise<void> => {
+    if (!filePath || converting) return;
+    setConverting(true);
+    setResultMessage('');
+    setResultType('');
+    setResultFileSize(null);
+    try {
+      const result = await (window.api as Record<string, unknown> & {
+        convertImageFormat?: (src: string, format: string, quality: number) => Promise<{ success: boolean; outputPath?: string; fileSize?: number; error?: string }>;
+      }).convertImageFormat?.(filePath, targetFormat, supportsQuality ? quality : 100);
+      if (result?.success) {
+        setResultMessage(t('maxExpand.toolbox.formatFactory.image.success', { path: result.outputPath ?? '' }));
+        setResultType('success');
+        if (result.fileSize) setResultFileSize(result.fileSize);
+      } else {
+        setResultMessage(result?.error || t('maxExpand.toolbox.formatFactory.image.failed'));
+        setResultType('error');
+      }
+    } catch {
+      setResultMessage(t('maxExpand.toolbox.formatFactory.image.failed'));
+      setResultType('error');
+    } finally {
+      setConverting(false);
+    }
+  }, [filePath, converting, targetFormat, quality, supportsQuality, t]);
+
   return (
-    <div className="settings-cards">
+    <div className="settings-cards format-factory-panel">
+      <div className="settings-card">
+        <div className="settings-card-header">
+          <div className="settings-card-title">{t('maxExpand.toolbox.formatFactory.image.title')}</div>
+          <div className="settings-card-subtitle">{t('maxExpand.toolbox.formatFactory.image.subtitle')}</div>
+        </div>
+        <div className="settings-card-body">
+          <div className="file-hash-row">
+            <button
+              type="button"
+              className="file-hash-pick-btn"
+              onClick={handlePickFile}
+            >
+              {t('maxExpand.toolbox.formatFactory.image.pickFile')}
+            </button>
+          </div>
+
+          {fileName && (
+            <div className="file-hash-row">
+              <span className="file-hash-filename" title={filePath}>
+                {fileName}
+                {sourceExt && (
+                  <span style={{ opacity: 0.5, marginLeft: 6 }}>
+                    ({sourceExt.toUpperCase()})
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
+
+          <div className="file-hash-row">
+            <span style={{ fontSize: 12, opacity: 0.6, marginRight: 8, whiteSpace: 'nowrap' }}>
+              {t('maxExpand.toolbox.formatFactory.image.targetFormat')}
+            </span>
+            <div className="file-hash-algo-group">
+              {IMAGE_FORMATS.map((fmt) => (
+                <button
+                  key={fmt}
+                  type="button"
+                  className={`file-hash-algo-btn ${targetFormat === fmt ? 'active' : ''} ${sourceExt === fmt ? 'disabled' : ''}`}
+                  disabled={sourceExt === fmt}
+                  onClick={() => setTargetFormat(fmt)}
+                >
+                  {fmt.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {supportsQuality && (
+            <div className="file-hash-row" style={{ gap: 12 }}>
+              <span style={{ fontSize: 12, opacity: 0.6, whiteSpace: 'nowrap' }}>
+                {t('maxExpand.toolbox.formatFactory.image.quality')}
+              </span>
+              <input
+                type="range"
+                min={1}
+                max={100}
+                value={quality}
+                onChange={(e) => setQuality(Number(e.target.value))}
+                style={{ flex: 1 }}
+              />
+              <span style={{ fontSize: 12, opacity: 0.7, minWidth: 32, textAlign: 'right' }}>
+                {quality}%
+              </span>
+            </div>
+          )}
+
+          <div className="settings-hotkey-row">
+            <button
+              className={`settings-lyrics-source-btn download-start-btn-full ${(!filePath || converting || sourceExt === targetFormat) ? 'disabled' : ''}`}
+              type="button"
+              disabled={!filePath || converting || sourceExt === targetFormat}
+              onClick={handleConvert}
+            >
+              {converting
+                ? t('maxExpand.toolbox.formatFactory.image.converting')
+                : t('maxExpand.toolbox.formatFactory.image.convertBtn')}
+            </button>
+          </div>
+
+          {resultMessage && (
+            <div className={`file-hash-verify ${resultType === 'success' ? 'match' : 'mismatch'}`}>
+              <span>{resultMessage}</span>
+              {resultType === 'success' && resultFileSize !== null && (
+                <span style={{ opacity: 0.7, marginLeft: 8, fontSize: 11 }}>
+                  ({formatFileSize(resultFileSize)})
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

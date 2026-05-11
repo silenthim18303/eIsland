@@ -1059,6 +1059,19 @@
           "upload": "上传速度",
           "resultTitle": "测试结果"
         }
+      },
+      "formatFactory": {
+        "image": {
+          "title": "图片格式转换",
+          "subtitle": "选择图片文件并转换为目标格式，支持 PNG、JPG、WebP、BMP、GIF、TIFF、ICO",
+          "pickFile": "选择图片",
+          "targetFormat": "目标格式",
+          "quality": "输出质量",
+          "convertBtn": "开始转换",
+          "converting": "转换中…",
+          "success": "转换成功 → {{path}}",
+          "failed": "转换失败，请稍后重试"
+        }
       }
     },
     "localFileSearch": {
