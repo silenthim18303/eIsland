@@ -46,8 +46,9 @@
   overflow: hidden;
   box-shadow: 0 0 0 rgba(0, 0, 0, 0);
   margin: 0 auto;
-  will-change: width, height, border-radius;
+  will-change: width, height, border-radius, transform;
   transform-origin: top center;
+  backface-visibility: hidden;
   mask-image: radial-gradient(white, white);
   -webkit-mask-image: -webkit-radial-gradient(white, white);
 }
@@ -190,9 +191,9 @@
 }
 
 @keyframes shellCrossfade {
-  0%   { transform: scaleY(1.06) scaleX(0.99); opacity: 0.9; }
-  50%  { transform: scaleY(0.995) scaleX(1.003); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+  0%   { transform: scaleY(1.06) scaleX(0.99); }
+  50%  { transform: scaleY(0.995) scaleX(1.003); }
+  100% { transform: scale(1); }
 }
 
 /** hover → idle：柔和收拢 */

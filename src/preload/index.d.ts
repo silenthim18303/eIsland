@@ -184,6 +184,12 @@ declare global {
       setSystemDesktopWallpaper: (payload: { sourcePath?: string | null; previewUrl?: string | null; clear?: boolean }) => Promise<boolean>;
       wallpaperVideoCover: (sourcePath: string) => Promise<string | null>;
       readLocalFileAsBuffer: (filePath: string) => Promise<Uint8Array | null>;
+      pickVideoForExtract: () => Promise<{ filePath: string; fileSize: number | null } | null>;
+      extractVideoTrack: (options: {
+        filePath: string;
+        trackType: string;
+        outputFormat: string;
+      }) => Promise<{ success: boolean; outputPath?: string; error?: string; fileSize?: number }>;
       netFetch: (url: string, options?: {
         method?: string;
         headers?: Record<string, string>;

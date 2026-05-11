@@ -576,6 +576,26 @@ const api = {
   readLocalFileAsBuffer: (filePath: string): Promise<Uint8Array | null> => {
     return ipcRenderer.invoke('wallpaper:read-file-buffer', filePath);
   },
+  /** ===== 格式工厂 API ===== */
+  /**
+   * 选择视频文件对话框
+   * @returns 文件路径和大小，取消返回 null
+   */
+  pickVideoForExtract: (): Promise<{ filePath: string; fileSize: number | null } | null> => {
+    return ipcRenderer.invoke('format-factory:pick-video');
+  },
+  /**
+   * 提取视频文件的音轨或视频轨
+   * @param options - 提取选项
+   * @returns 提取结果
+   */
+  extractVideoTrack: (options: {
+    filePath: string;
+    trackType: string;
+    outputFormat: string;
+  }): Promise<{ success: boolean; outputPath?: string; error?: string; fileSize?: number }> => {
+    return ipcRenderer.invoke('format-factory:extract-track', options);
+  },
   /** ===== HTTP 代理 API（绕过 CORS） ===== */
   /**
    * 通过主进程代理 HTTP 请求（绕过浏览器 CORS 限制）

@@ -26,7 +26,7 @@
 
 export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
-export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate', 'fileService', 'encodingService', 'networkService'] as const;
+export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate', 'fileService', 'encodingService', 'networkService', 'formatFactory'] as const;
 export type ToolboxSidebarKey = (typeof TOOLBOX_SIDEBAR_KEYS)[number];
 
 export const TRANSLATE_LANGUAGES = [
@@ -42,6 +42,24 @@ export const TRANSLATE_LANGUAGES = [
 ] as const;
 
 export const TRANSLATE_TARGET_LANGUAGES = TRANSLATE_LANGUAGES.filter((lang) => lang.code !== 'auto');
+
+export const FORMAT_FACTORY_PAGES = ['image', 'video'] as const;
+export type FormatFactoryPageKey = (typeof FORMAT_FACTORY_PAGES)[number];
+
+export const FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
+export type FormatFactoryImageOutputFormat = (typeof FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS)[number];
+
+export const FORMAT_FACTORY_ICO_OUTPUT_SIZES = [16, 32, 64, 128, 256] as const;
+export type FormatFactoryIcoOutputSize = (typeof FORMAT_FACTORY_ICO_OUTPUT_SIZES)[number];
+
+export const FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS = ['audio', 'video'] as const;
+export type FormatFactoryVideoExtractTrack = (typeof FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS)[number];
+
+export const FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS = ['mp3', 'aac', 'wav', 'flac', 'ogg'] as const;
+export type FormatFactoryAudioOutputFormat = (typeof FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS)[number];
+
+export const FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS = ['mp4', 'mkv', 'avi', 'webm'] as const;
+export type FormatFactoryVideoOutputFormat = (typeof FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS)[number];
 
 export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 

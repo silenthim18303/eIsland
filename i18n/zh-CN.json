@@ -905,7 +905,8 @@
         "translate": "文本翻译",
         "fileService": "文件服务",
         "encodingService": "编码服务",
-        "networkService": "网络服务"
+        "networkService": "网络服务",
+        "formatFactory": "格式工厂"
       },
       "software": {
         "title": "常用软件",
@@ -1032,7 +1033,7 @@
         "title": "IP 信息查询",
         "subtitle": "IP 信息查询工具",
         "ipinfo": {
-          "ipPlaceholder": "输入要查询的 IP 地址，例如 8.8.8.8",
+          "ipPlaceholder": "输入要查询的 IP 地址",
           "fillLocal": "本机 IP",
           "queryBtn": "查询",
           "querying": "查询中...",
@@ -1057,6 +1058,56 @@
           "download": "下载速度",
           "upload": "上传速度",
           "resultTitle": "测试结果"
+        }
+      },
+      "formatFactory": {
+        "pages": {
+          "image": "图片转换",
+          "video": "视频转换"
+        },
+        "image": {
+          "title": "图片格式转换",
+          "subtitle": "选择图片文件并转换为目标格式，支持 PNG、JPG、WebP、BMP、ICO",
+          "pickFile": "选择图片",
+          "targetFormat": "目标格式",
+          "targetSize": "目标尺寸",
+          "quality": "输出质量",
+          "convertBtn": "开始转换",
+          "converting": "转换中…",
+          "success": "转换成功 → {{path}}",
+          "failed": "转换失败，请稍后重试",
+          "meta": {
+            "name": "文件名",
+            "mediaType": "媒体类型",
+            "mediaTypeImage": "图片",
+            "mime": "MIME",
+            "format": "格式",
+            "resolution": "分辨率",
+            "size": "文件大小",
+            "pixels": "像素总数",
+            "aspectRatio": "宽高比",
+            "targetFormat": "目标格式",
+            "path": "完整路径"
+          }
+        },
+        "video": {
+          "title": "视频轨道提取",
+          "subtitle": "从视频文件中提取音轨或视频轨，支持常见音视频封装格式",
+          "pickFile": "选择视频文件",
+          "trackType": "提取类型",
+          "trackAudio": "音轨",
+          "trackVideo": "视频轨",
+          "outputFormat": "输出格式",
+          "extractBtn": "开始提取",
+          "extracting": "提取中…",
+          "success": "提取成功 → {{path}}",
+          "failed": "提取失败，请稍后重试",
+          "meta": {
+            "name": "文件名",
+            "format": "封装格式",
+            "size": "文件大小",
+            "path": "完整路径"
+          }
         }
       }
     },

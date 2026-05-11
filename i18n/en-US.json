@@ -905,7 +905,8 @@
         "translate": "Translate",
         "fileService": "File Service",
         "encodingService": "Encoding Svc",
-        "networkService": "Network Svc"
+        "networkService": "Network Svc",
+        "formatFactory": "Format Factory"
       },
       "software": {
         "title": "Common Software",
@@ -1032,7 +1033,7 @@
         "title": "IP Info Lookup",
         "subtitle": "IP information lookup tool",
         "ipinfo": {
-          "ipPlaceholder": "Enter IP address, e.g. 8.8.8.8",
+          "ipPlaceholder": "Enter IP address",
           "fillLocal": "My IP",
           "queryBtn": "Query",
           "querying": "Querying...",
@@ -1057,6 +1058,56 @@
           "upload": "Upload",
           "resultTitle": "Test Result",
           "result": "Result"
+        }
+      },
+      "formatFactory": {
+        "pages": {
+          "image": "Image Conversion",
+          "video": "Video Conversion"
+        },
+        "image": {
+          "title": "Image Format Conversion",
+          "subtitle": "Select an image and convert it to another format. Supports PNG, JPG, WebP, BMP, ICO",
+          "pickFile": "Select Image",
+          "targetFormat": "Target Format",
+          "targetSize": "Target Size",
+          "quality": "Output Quality",
+          "convertBtn": "Convert",
+          "converting": "Converting...",
+          "success": "Converted → {{path}}",
+          "failed": "Conversion failed. Please try again later",
+          "meta": {
+            "name": "Name",
+            "mediaType": "Media Type",
+            "mediaTypeImage": "Image",
+            "mime": "MIME",
+            "format": "Format",
+            "resolution": "Resolution",
+            "size": "File Size",
+            "pixels": "Pixels",
+            "aspectRatio": "Aspect Ratio",
+            "targetFormat": "Target Format",
+            "path": "Full Path"
+          }
+        },
+        "video": {
+          "title": "Video Track Extraction",
+          "subtitle": "Extract audio or video tracks from video files. Supports common container formats",
+          "pickFile": "Select Video File",
+          "trackType": "Extract Type",
+          "trackAudio": "Audio Track",
+          "trackVideo": "Video Track",
+          "outputFormat": "Output Format",
+          "extractBtn": "Extract",
+          "extracting": "Extracting...",
+          "success": "Extracted → {{path}}",
+          "failed": "Extraction failed. Please try again later",
+          "meta": {
+            "name": "Name",
+            "format": "Container",
+            "size": "File Size",
+            "path": "Full Path"
+          }
         }
       }
     },

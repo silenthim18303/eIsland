@@ -41,7 +41,7 @@
   justify-content: center;
   width: 100%;
   overflow: hidden;
-  animation: expandFadeIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  animation: expandFadeIn 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .expand-tab-transition {
@@ -53,11 +53,11 @@
 }
 
 .expand-tab-slide-right {
-  animation: expandSlideRight 0.2s ease-out;
+  animation: expandSlideRight 0.2s ease-out forwards;
 }
 
 .expand-tab-slide-left {
-  animation: expandSlideLeft 0.2s ease-out;
+  animation: expandSlideLeft 0.2s ease-out forwards;
 }
 
 @keyframes expandSlideRight {

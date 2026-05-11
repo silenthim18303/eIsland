@@ -49,11 +49,11 @@
 }
 
 .max-expand-tab-slide-right {
-  animation: maxExpandSlideRight 0.22s ease-out;
+  animation: maxExpandSlideRight 0.22s ease-out forwards;
 }
 
 .max-expand-tab-slide-left {
-  animation: maxExpandSlideLeft 0.22s ease-out;
+  animation: maxExpandSlideLeft 0.22s ease-out forwards;
 }
 
 @keyframes maxExpandSlideRight {
@@ -73,7 +73,7 @@
   width: 100%;
   height: 100%;
   flex-direction: column;
-  animation: maxExpandFadeIn 0.2s ease;
+  animation: maxExpandFadeIn 0.2s ease forwards;
 }
 
 .max-expand-settings-layout {
@@ -634,6 +634,11 @@
   font-size: 14px;
   font-weight: 600;
   color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.toolbox-panel-title {
+  flex-shrink: 0;
+  margin-bottom: 8px;
 }
 
 .max-expand-settings-section.settings-update .settings-cards {
@@ -3120,6 +3125,21 @@
   font-weight: 600;
 }
 
+.file-hash-algo-btn.disabled,
+.file-hash-algo-btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  color: rgba(var(--color-text-rgb), 0.35);
+  background: rgba(var(--color-text-rgb), 0.04);
+  border-color: rgba(var(--color-text-rgb), 0.08);
+}
+
+.file-hash-algo-btn.disabled:hover,
+.file-hash-algo-btn:disabled:hover {
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.35);
+}
+
 .file-hash-pick-btn {
   width: 100%;
   padding: 5px 12px;
@@ -3289,12 +3309,13 @@
 }
 
 .ipinfo-btn-query {
-  background: rgba(100, 180, 255, 0.18);
-  color: rgba(100, 180, 255, 0.95);
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.8);
 }
 
 .ipinfo-btn-query:hover {
-  background: rgba(100, 180, 255, 0.28);
+  background: rgba(var(--color-text-rgb), 0.12);
 }
 
 .ipinfo-btn-query.disabled {
@@ -4825,4 +4846,110 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+/** ========== 格式工厂 - 图片预览 + 元数据 ========== */
+.ff-preview-area {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.03);
+  max-height: 160px;
+  overflow: hidden;
+}
+
+.ff-preview-thumb {
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(var(--color-text-rgb), 0.05);
+}
+
+.ff-preview-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.ff-meta-list {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 2px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.12) transparent;
+}
+
+.ff-meta-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ff-meta-list::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.12);
+  border-radius: 2px;
+}
+
+.ff-meta-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.18);
+}
+
+.ff-convert-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ff-convert-spinner {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--color-text-rgb), 0.2);
+  border-top-color: rgba(var(--color-text-rgb), 0.8);
+  animation: ffSpin 0.85s linear infinite;
+}
+
+.ff-convert-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ff-convert-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  overflow: hidden;
+}
+
+.ff-convert-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(var(--color-text-rgb), 0.45), rgba(var(--color-text-rgb), 0.75));
+  transition: width 0.16s ease;
+}
+
+.ff-convert-progress-text {
+  min-width: 36px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.62);
+  text-align: right;
+}
+
+@keyframes ffSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
