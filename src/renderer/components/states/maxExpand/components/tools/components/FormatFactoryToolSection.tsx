@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useRef, useState, type ReactElement } from 'react';
+import { useCallback, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
@@ -63,11 +63,10 @@ export function FormatFactoryToolSection(): ReactElement {
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
   const [resultFileSize, setResultFileSize] = useState<number | null>(null);
-  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewDataUrl, setPreviewDataUrl] = useState('');
   const [imgWidth, setImgWidth] = useState(0);
   const [imgHeight, setImgHeight] = useState(0);
   const [imgFileSize, setImgFileSize] = useState<number | null>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
 
   const handlePickFile = useCallback(async (): Promise<void> => {
     try {
@@ -83,8 +82,11 @@ export function FormatFactoryToolSection(): ReactElement {
         setImgWidth(0);
         setImgHeight(0);
         setImgFileSize(null);
-        const url = 'file:///' + picked.replace(/\\/g, '/').replace(/^\/+/, '');
-        setPreviewUrl(url);
+        setPreviewDataUrl('');
+        try {
+          const dataUrl = await window.api?.loadWallpaperFile?.(picked);
+          if (dataUrl) setPreviewDataUrl(dataUrl);
+        } catch { /* ignore */ }
         try {
           const stat = await (window.api as Record<string, unknown> & {
             getFileStat?: (p: string) => Promise<{ size: number } | null>;
@@ -145,12 +147,11 @@ export function FormatFactoryToolSection(): ReactElement {
             </button>
           </div>
 
-          {previewUrl && (
+          {previewDataUrl && (
             <div className="ff-preview-area">
               <div className="ff-preview-thumb">
                 <img
-                  ref={imgRef}
-                  src={previewUrl}
+                  src={previewDataUrl}
                   alt={fileName}
                   onLoad={(e) => {
                     const img = e.currentTarget;
@@ -159,28 +160,32 @@ export function FormatFactoryToolSection(): ReactElement {
                   }}
                 />
               </div>
-              <div className="ff-preview-meta">
-                <div className="ff-meta-row">
-                  <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.name')}</span>
-                  <span className="ff-meta-value" title={fileName}>{fileName}</span>
-                </div>
-                <div className="ff-meta-row">
-                  <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.format')}</span>
-                  <span className="ff-meta-value">{sourceExt.toUpperCase()}</span>
-                </div>
+              <ul className="album-meta-list ff-meta-list">
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.name')}</span>
+                  <span className="album-meta-value" title={fileName}>{fileName}</span>
+                </li>
+                <li className="album-meta-row">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.format')}</span>
+                  <span className="album-meta-value">{sourceExt.toUpperCase()}</span>
+                </li>
                 {imgWidth > 0 && imgHeight > 0 && (
-                  <div className="ff-meta-row">
-                    <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.resolution')}</span>
-                    <span className="ff-meta-value">{imgWidth} × {imgHeight}</span>
-                  </div>
+                  <li className="album-meta-row">
+                    <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.resolution')}</span>
+                    <span className="album-meta-value">{imgWidth} × {imgHeight}</span>
+                  </li>
                 )}
                 {imgFileSize != null && (
-                  <div className="ff-meta-row">
-                    <span className="ff-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.size')}</span>
-                    <span className="ff-meta-value">{formatFileSize(imgFileSize)}</span>
-                  </div>
+                  <li className="album-meta-row">
+                    <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.size')}</span>
+                    <span className="album-meta-value">{formatFileSize(imgFileSize)}</span>
+                  </li>
                 )}
-              </div>
+                <li className="album-meta-row album-meta-row--path">
+                  <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.path')}</span>
+                  <span className="album-meta-value album-meta-path" title={filePath}>{filePath}</span>
+                </li>
+              </ul>
             </div>
           )}
 

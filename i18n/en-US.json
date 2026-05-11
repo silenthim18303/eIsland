@@ -1075,7 +1075,8 @@
             "name": "Name",
             "format": "Format",
             "resolution": "Resolution",
-            "size": "Size"
+            "size": "File Size",
+            "path": "Full Path"
           }
         }
       }
