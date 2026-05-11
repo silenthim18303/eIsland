@@ -51,6 +51,7 @@ export function ToolboxTab(): ReactElement {
   const { t } = useTranslation();
   const { setMaxExpandTab } = useIslandStore();
   const [activeSidebar, setActiveSidebar] = useState<ToolboxSidebarKey>('download');
+  const activeSidebarItem = TOOLBOX_SIDEBAR_ITEMS.find((item) => item.key === activeSidebar);
   const handleSoftwareFeedbackNavigate = (): void => {
     setMaxExpandTab('settings');
     window.dispatchEvent(new CustomEvent('standalone-tab-switch', { detail: 'settings' }));
@@ -75,6 +76,9 @@ export function ToolboxTab(): ReactElement {
         </div>
 
         <div className="max-expand-settings-panel">
+          <div className="max-expand-settings-title toolbox-panel-title">
+            {activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}
+          </div>
           {activeSidebar === 'download' && <DownloadToolSection />}
           {activeSidebar === 'translate' && <TranslateToolSection />}
           {activeSidebar === 'software' && (
