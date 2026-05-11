@@ -32,6 +32,7 @@ import { EncodingServiceToolSection } from './tools/components/EncodingServiceTo
 import { FileServiceToolSection } from './tools/components/FileServiceToolSection';
 import { NetworkServiceToolSection } from './tools/components/NetworkServiceToolSection';
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
+import { FormatFactoryToolSection } from './tools/components/FormatFactoryToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
 import type { ToolboxSidebarKey } from './tools/config/toolboxConfig';
 
@@ -81,6 +82,7 @@ export function ToolboxTab(): ReactElement {
           {activeSidebar === 'fileService' && <FileServiceToolSection />}
           {activeSidebar === 'encodingService' && <EncodingServiceToolSection />}
           {activeSidebar === 'networkService' && <NetworkServiceToolSection />}
+          {activeSidebar === 'formatFactory' && <FormatFactoryToolSection />}
         </div>
       </div>
     </div>
