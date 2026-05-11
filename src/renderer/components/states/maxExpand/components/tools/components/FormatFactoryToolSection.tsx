@@ -356,7 +356,7 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
                     <span className="album-meta-value">{imgWidth} × {imgHeight}</span>
                   </li>
                 )}
-                {imgFileSize != null && (
+                {imgFileSize !== null && imgFileSize !== undefined && (
                   <li className="album-meta-row">
                     <span className="album-meta-label">{t('maxExpand.toolbox.formatFactory.image.meta.size')}</span>
                     <span className="album-meta-value">{formatFileSize(imgFileSize)}</span>
