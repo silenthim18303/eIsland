@@ -3309,12 +3309,13 @@
 }
 
 .ipinfo-btn-query {
-  background: rgba(100, 180, 255, 0.18);
-  color: rgba(100, 180, 255, 0.95);
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.8);
 }
 
 .ipinfo-btn-query:hover {
-  background: rgba(100, 180, 255, 0.28);
+  background: rgba(var(--color-text-rgb), 0.12);
 }
 
 .ipinfo-btn-query.disabled {
