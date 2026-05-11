@@ -27,7 +27,7 @@
 import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDownloadTasks } from '../hooks/useDownloadTasks';
-import type { DownloadTaskStatus } from '../config/toolboxConfig';
+import type { DownloadTaskStatus } from '../config/downloadToolConfig';
 import { formatBytes, formatDurationMs, inferSuggestedName } from '../utils/downloadFormatters';
 
 /**

@@ -30,7 +30,7 @@ import { fetchTranslate } from '../../../../../../api/tools/toolboxTranslateApi'
 import { readLocalToken } from '../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { resolveCountryIcon } from '../../../../../../utils/SvgIcon/country-icon';
-import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/toolboxConfig';
+import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/translateToolConfig';
 
 interface LangOption {
   code: string;

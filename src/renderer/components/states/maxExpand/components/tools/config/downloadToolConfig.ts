@@ -19,12 +19,26 @@
  */
 
 /**
- * @file toolboxConfig.ts
- * @description 工具箱配置聚合导出（兼容层）
+ * @file downloadToolConfig.ts
+ * @description 工具箱下载模块配置类型
  * @author 鸡哥
  */
 
-export * from './commonToolboxConfig';
-export * from './translateToolConfig';
-export * from './formatFactoryToolConfig';
-export * from './downloadToolConfig';
+export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+
+export interface DownloadTaskSnapshot {
+  id: string;
+  url: string;
+  savePath: string;
+  fileName: string;
+  totalBytes: number;
+  downloadedBytes: number;
+  progress: number;
+  speedBytesPerSecond: number;
+  estimatedFinishAt: number | null;
+  threads: number;
+  status: DownloadTaskStatus;
+  errorMessage?: string;
+  createdAt: number;
+  updatedAt: number;
+}

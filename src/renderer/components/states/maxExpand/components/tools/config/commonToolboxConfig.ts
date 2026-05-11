@@ -19,12 +19,12 @@
  */
 
 /**
- * @file toolboxConfig.ts
- * @description 工具箱配置聚合导出（兼容层）
+ * @file commonToolboxConfig.ts
+ * @description 工具箱公共配置常量与类型
  * @author 鸡哥
  */
 
-export * from './commonToolboxConfig';
-export * from './translateToolConfig';
-export * from './formatFactoryToolConfig';
-export * from './downloadToolConfig';
+export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
+
+export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate', 'fileService', 'encodingService', 'networkService', 'formatFactory'] as const;
+export type ToolboxSidebarKey = (typeof TOOLBOX_SIDEBAR_KEYS)[number];
