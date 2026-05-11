@@ -154,21 +154,15 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
 
   const handlePickVideoFile = useCallback(async (): Promise<void> => {
     try {
-      const picked = await window.api?.pickFileForHash?.();
+      const picked = await window.api?.pickVideoForExtract?.();
       if (picked) {
-        setVideoFilePath(picked);
-        setVideoFileName(getFileName(picked));
-        setVideoSourceExt(getExtension(picked));
-        setVideoFileSize(null);
+        setVideoFilePath(picked.filePath);
+        setVideoFileName(getFileName(picked.filePath));
+        setVideoSourceExt(getExtension(picked.filePath));
+        setVideoFileSize(picked.fileSize ?? null);
         setExtractResultMessage('');
         setExtractResultType('');
         setExtractProgress(0);
-        try {
-          const stat = await (window.api as Record<string, unknown> & {
-            getFileStat?: (p: string) => Promise<{ size: number } | null>;
-          }).getFileStat?.(picked);
-          if (stat?.size != null) setVideoFileSize(stat.size);
-        } catch { /* ignore */ }
       }
     } catch {
       // ignore
@@ -191,13 +185,7 @@ export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPa
     }, 200);
     try {
       const outputFmt = extractTrack === 'audio' ? audioOutputFormat : videoOutputFormat;
-      const result = await (window.api as Record<string, unknown> & {
-        extractVideoTrack?: (opts: {
-          filePath: string;
-          trackType: string;
-          outputFormat: string;
-        }) => Promise<{ success: boolean; outputPath?: string; error?: string; fileSize?: number }>;
-      }).extractVideoTrack?.({
+      const result = await window.api?.extractVideoTrack?.({
         filePath: videoFilePath,
         trackType: extractTrack,
         outputFormat: outputFmt,

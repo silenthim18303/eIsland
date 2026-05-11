@@ -33,6 +33,7 @@ import { app, ipcMain, WebContents } from 'electron';
 import { spawn } from 'child_process';
 import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { basename, join, resolve as resolvePath } from 'path';
+import { getFfmpegBinary } from '../../utils/ffmpegPath';
 
 interface VideoProbeResult {
   width: number;
@@ -69,7 +70,6 @@ interface VideoPrepareResult {
 
 const TARGET_VIDEO_EXT = 'mp4';
 const TARGET_COVER_EXT = 'jpg';
-const FFMPEG_BINARY = process.platform === 'win32' ? 'ffmpeg.exe' : 'ffmpeg';
 const FFPROBE_BINARY = process.platform === 'win32' ? 'ffprobe.exe' : 'ffprobe';
 
 /**
@@ -348,7 +348,7 @@ export function registerWallpaperVideoIpcHandlers(): void {
 
     try {
       if (useRemux) {
-        const result = await runCommand(FFMPEG_BINARY, [
+        const result = await runCommand(getFfmpegBinary(), [
           '-y',
           '-hide_banner',
           '-i', sourcePath,
@@ -366,7 +366,7 @@ export function registerWallpaperVideoIpcHandlers(): void {
       }
 
       // 提取封面
-      const coverResult = await runCommand(FFMPEG_BINARY, [
+      const coverResult = await runCommand(getFfmpegBinary(), [
         '-y',
         '-hide_banner',
         '-i', playbackPath,
@@ -429,7 +429,7 @@ export function registerWallpaperVideoIpcHandlers(): void {
     const baseName = basename(sourcePath).replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]+/g, '_');
     const coverPath = resolvePath(join(coverDir, `${baseName}-${stamp}.${TARGET_COVER_EXT}`));
     try {
-      const result = await runCommand(FFMPEG_BINARY, [
+      const result = await runCommand(getFfmpegBinary(), [
         '-y',
         '-hide_banner',
         '-i', sourcePath,
@@ -477,7 +477,7 @@ async function transcode(
   onProgress: (line: string) => void,
 ): Promise<VideoPrepareResult> {
   try {
-    const result = await runCommand(FFMPEG_BINARY, [
+    const result = await runCommand(getFfmpegBinary(), [
       '-y',
       '-hide_banner',
       '-i', sourcePath,
