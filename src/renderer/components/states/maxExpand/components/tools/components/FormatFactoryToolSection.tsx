@@ -26,11 +26,13 @@
 
 import { useCallback, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const IMAGE_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
-type ImageFormat = (typeof IMAGE_FORMATS)[number];
-const ICO_SIZES = [16, 32, 64, 128, 256] as const;
-type IcoSize = (typeof ICO_SIZES)[number];
+import {
+  ICO_OUTPUT_SIZES,
+  IMAGE_OUTPUT_FORMATS,
+  convertImageInRenderer,
+  type IcoOutputSize,
+  type ImageOutputFormat,
+} from '../utils/imageConverter';
 
 function getExtension(filePath: string): string {
   const parts = filePath.replace(/\\/g, '/').split('/');
@@ -80,8 +82,8 @@ export function FormatFactoryToolSection(): ReactElement {
   const [filePath, setFilePath] = useState('');
   const [fileName, setFileName] = useState('');
   const [sourceExt, setSourceExt] = useState('');
-  const [targetFormat, setTargetFormat] = useState<ImageFormat>('png');
-  const [targetIcoSize, setTargetIcoSize] = useState<IcoSize>(32);
+  const [targetFormat, setTargetFormat] = useState<ImageOutputFormat>('png');
+  const [targetIcoSize, setTargetIcoSize] = useState<IcoOutputSize>(32);
   const [converting, setConverting] = useState(false);
   const [resultMessage, setResultMessage] = useState('');
   const [resultType, setResultType] = useState<'success' | 'error' | ''>('');
@@ -125,8 +127,8 @@ export function FormatFactoryToolSection(): ReactElement {
           }).getFileStat?.(picked);
           if (stat?.size != null) setImgFileSize(stat.size);
         } catch { /* ignore */ }
-        if (ext && IMAGE_FORMATS.includes(ext as ImageFormat)) {
-          const firstOther = IMAGE_FORMATS.find((f) => f !== ext);
+        if (ext && IMAGE_OUTPUT_FORMATS.includes(ext as ImageOutputFormat)) {
+          const firstOther = IMAGE_OUTPUT_FORMATS.find((f) => f !== ext);
           if (firstOther) setTargetFormat(firstOther);
         }
       }
@@ -142,9 +144,12 @@ export function FormatFactoryToolSection(): ReactElement {
     setResultType('');
     setResultFileSize(null);
     try {
-      const result = await (window.api as Record<string, unknown> & {
-        convertImageFormat?: (src: string, format: string, quality: number) => Promise<{ success: boolean; outputPath?: string; fileSize?: number; error?: string }>;
-      }).convertImageFormat?.(filePath, targetFormat, 100);
+      const result = await convertImageInRenderer({
+        filePath,
+        targetFormat,
+        icoSize: targetIcoSize,
+        quality: 1,
+      });
       if (result?.success) {
         setResultMessage(t('maxExpand.toolbox.formatFactory.image.success', { path: result.outputPath ?? '' }));
         setResultType('success');
@@ -159,7 +164,7 @@ export function FormatFactoryToolSection(): ReactElement {
     } finally {
       setConverting(false);
     }
-  }, [filePath, converting, targetFormat, t]);
+  }, [filePath, converting, targetFormat, targetIcoSize, t]);
 
   return (
     <div className="settings-cards format-factory-panel">
@@ -250,7 +255,7 @@ export function FormatFactoryToolSection(): ReactElement {
               {t('maxExpand.toolbox.formatFactory.image.targetFormat')}
             </span>
             <div className="file-hash-algo-group">
-              {IMAGE_FORMATS.map((fmt) => (
+              {IMAGE_OUTPUT_FORMATS.map((fmt) => (
                 <button
                   key={fmt}
                   type="button"
@@ -270,7 +275,7 @@ export function FormatFactoryToolSection(): ReactElement {
                 {t('maxExpand.toolbox.formatFactory.image.targetSize')}
               </span>
               <div className="file-hash-algo-group">
-                {ICO_SIZES.map((size) => (
+                {ICO_OUTPUT_SIZES.map((size) => (
                   <button
                     key={size}
                     type="button"
