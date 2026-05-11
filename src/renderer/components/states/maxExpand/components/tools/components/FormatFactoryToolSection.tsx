@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   convertImageInRenderer,
@@ -32,9 +32,16 @@ import {
 import {
   FORMAT_FACTORY_ICO_OUTPUT_SIZES,
   FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS,
+  FORMAT_FACTORY_PAGES,
   type FormatFactoryIcoOutputSize,
   type FormatFactoryImageOutputFormat,
+  type FormatFactoryPageKey,
 } from '../config/toolboxConfig';
+
+interface FormatFactoryToolSectionProps {
+  formatFactoryPage: FormatFactoryPageKey;
+  setFormatFactoryPage: (page: FormatFactoryPageKey) => void;
+}
 
 function getExtension(filePath: string): string {
   const parts = filePath.replace(/\\/g, '/').split('/');
@@ -78,8 +85,36 @@ function formatAspectRatio(width: number, height: number): string {
 /**
  * 格式工厂模块主视图。
  */
-export function FormatFactoryToolSection(): ReactElement {
+export function FormatFactoryToolSection({ formatFactoryPage, setFormatFactoryPage }: FormatFactoryToolSectionProps): ReactElement {
   const { t } = useTranslation();
+  const pageRef = useRef<FormatFactoryPageKey>(formatFactoryPage);
+  pageRef.current = formatFactoryPage;
+  const layoutRef = useRef<HTMLDivElement | null>(null);
+
+  const pageLabels: Record<FormatFactoryPageKey, string> = {
+    image: t('maxExpand.toolbox.formatFactory.pages.image'),
+    video: t('maxExpand.toolbox.formatFactory.pages.video'),
+  };
+
+  useEffect(() => {
+    const el = layoutRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent): void => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest('.settings-app-page-dots')) return;
+      const idx = FORMAT_FACTORY_PAGES.indexOf(pageRef.current);
+      if (idx < 0) return;
+      const next = e.deltaY > 0
+        ? Math.min(idx + 1, FORMAT_FACTORY_PAGES.length - 1)
+        : Math.max(idx - 1, 0);
+      if (next !== idx) {
+        e.preventDefault();
+        setFormatFactoryPage(FORMAT_FACTORY_PAGES[next]);
+      }
+    };
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [setFormatFactoryPage]);
 
   const [filePath, setFilePath] = useState('');
   const [fileName, setFileName] = useState('');
@@ -185,7 +220,7 @@ export function FormatFactoryToolSection(): ReactElement {
     }
   }, [filePath, converting, targetFormat, targetIcoSize, t]);
 
-  return (
+  const renderImagePage = (): ReactElement => (
     <div className="settings-cards format-factory-panel">
       <div className="settings-card">
         <div className="settings-card-header">
@@ -351,6 +386,32 @@ export function FormatFactoryToolSection(): ReactElement {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+
+  const renderVideoPage = (): ReactElement => (
+    <div className="settings-cards format-factory-panel" />
+  );
+
+  return (
+    <div className="settings-app-pages-layout" ref={layoutRef}>
+      <div className="settings-app-page-main">
+        {formatFactoryPage === 'image' && renderImagePage()}
+        {formatFactoryPage === 'video' && renderVideoPage()}
+      </div>
+      <div className="settings-app-page-dots">
+        {FORMAT_FACTORY_PAGES.map((page) => (
+          <button
+            key={page}
+            className={`settings-app-page-dot ${formatFactoryPage === page ? 'active' : ''}`}
+            data-label={pageLabels[page]}
+            type="button"
+            onClick={() => setFormatFactoryPage(page)}
+            title={pageLabels[page]}
+            aria-label={pageLabels[page]}
+          />
+        ))}
       </div>
     </div>
   );

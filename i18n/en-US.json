@@ -1061,6 +1061,10 @@
         }
       },
       "formatFactory": {
+        "pages": {
+          "image": "Image Conversion",
+          "video": "Video Conversion"
+        },
         "image": {
           "title": "Image Format Conversion",
           "subtitle": "Select an image and convert it to another format. Supports PNG, JPG, WebP, BMP, ICO",

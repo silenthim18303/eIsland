@@ -1061,6 +1061,10 @@
         }
       },
       "formatFactory": {
+        "pages": {
+          "image": "图片转换",
+          "video": "视频转换"
+        },
         "image": {
           "title": "图片格式转换",
           "subtitle": "选择图片文件并转换为目标格式，支持 PNG、JPG、WebP、BMP、ICO",

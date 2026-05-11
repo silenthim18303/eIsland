@@ -34,7 +34,7 @@ import { NetworkServiceToolSection } from './tools/components/NetworkServiceTool
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { FormatFactoryToolSection } from './tools/components/FormatFactoryToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
-import type { ToolboxSidebarKey } from './tools/config/toolboxConfig';
+import type { FormatFactoryPageKey, ToolboxSidebarKey } from './tools/config/toolboxConfig';
 
 const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }> = [
   { key: 'download', labelKey: 'maxExpand.toolbox.sidebar.download' },
@@ -51,6 +51,10 @@ export function ToolboxTab(): ReactElement {
   const { t } = useTranslation();
   const { setMaxExpandTab } = useIslandStore();
   const [activeSidebar, setActiveSidebar] = useState<ToolboxSidebarKey>('download');
+  const [formatFactoryPage, setFormatFactoryPage] = useState<FormatFactoryPageKey>('image');
+  const formatFactoryPageLabel = activeSidebar === 'formatFactory'
+    ? t(`maxExpand.toolbox.formatFactory.pages.${formatFactoryPage}`)
+    : '';
   const activeSidebarItem = TOOLBOX_SIDEBAR_ITEMS.find((item) => item.key === activeSidebar);
   const handleSoftwareFeedbackNavigate = (): void => {
     setMaxExpandTab('settings');
@@ -78,6 +82,9 @@ export function ToolboxTab(): ReactElement {
         <div className="max-expand-settings-panel">
           <div className="max-expand-settings-title toolbox-panel-title">
             {activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}
+            {activeSidebar === 'formatFactory' && formatFactoryPageLabel && (
+              <span className="settings-app-title-sub"> - {formatFactoryPageLabel}</span>
+            )}
           </div>
           {activeSidebar === 'download' && <DownloadToolSection />}
           {activeSidebar === 'translate' && <TranslateToolSection />}
@@ -87,7 +94,12 @@ export function ToolboxTab(): ReactElement {
           {activeSidebar === 'fileService' && <FileServiceToolSection />}
           {activeSidebar === 'encodingService' && <EncodingServiceToolSection />}
           {activeSidebar === 'networkService' && <NetworkServiceToolSection />}
-          {activeSidebar === 'formatFactory' && <FormatFactoryToolSection />}
+          {activeSidebar === 'formatFactory' && (
+            <FormatFactoryToolSection
+              formatFactoryPage={formatFactoryPage}
+              setFormatFactoryPage={setFormatFactoryPage}
+            />
+          )}
         </div>
       </div>
     </div>

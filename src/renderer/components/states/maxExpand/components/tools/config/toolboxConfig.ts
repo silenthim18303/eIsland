@@ -43,6 +43,9 @@ export const TRANSLATE_LANGUAGES = [
 
 export const TRANSLATE_TARGET_LANGUAGES = TRANSLATE_LANGUAGES.filter((lang) => lang.code !== 'auto');
 
+export const FORMAT_FACTORY_PAGES = ['image', 'video'] as const;
+export type FormatFactoryPageKey = (typeof FORMAT_FACTORY_PAGES)[number];
+
 export const FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
 export type FormatFactoryImageOutputFormat = (typeof FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS)[number];
 
