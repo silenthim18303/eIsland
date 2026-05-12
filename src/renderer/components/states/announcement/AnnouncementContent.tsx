@@ -24,14 +24,10 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
-import {
-  fetchCurrentAnnouncement,
-  type AnnouncementData,
-} from '../../../api/announcement/announcementApi';
+import { useAnnouncementData } from './hooks/useAnnouncementData';
 import '../../../styles/announcement/announcement.css';
 
 function formatDatetime(value?: string): string {
@@ -48,22 +44,7 @@ function formatDatetime(value?: string): string {
 export function AnnouncementContent(): ReactElement {
   const { t } = useTranslation();
   const { setHover } = useIslandStore();
-  const [loading, setLoading] = useState(true);
-  const [announcement, setAnnouncement] = useState<AnnouncementData | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async (): Promise<void> => {
-      const result = await fetchCurrentAnnouncement();
-      if (cancelled) return;
-      setAnnouncement(result);
-      setLoading(false);
-    };
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { loading, announcement } = useAnnouncementData();
 
   return (
     <div className="announcement-state-content" onClick={(event) => event.stopPropagation()}>
