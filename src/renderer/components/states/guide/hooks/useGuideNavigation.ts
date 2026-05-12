@@ -81,7 +81,7 @@ export function useGuideNavigation({
     else if (p?.interactive === 'settings') cardCountRef.current = settingCardsLength;
     else cardCountRef.current = 0;
     setCardIndex(0);
-  }, [page, guidePages, interactionCardsLength, musicCardsLength, toolCardsLength, settingCardsLength]);
+  }, [page]);
 
   const handleCardWheel = useCallback((e: WheelEvent) => {
     e.stopPropagation();
