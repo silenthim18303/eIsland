@@ -20,16 +20,16 @@
 
 /**
  * @file useGuideNavigation.ts
- * @description 引导页分页与卡片切换状态 Hook
+ * @description 引导页导航编排 Hook — 组合 useGuidePage 与 useGuideCardScroll
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useRef, useState, type MutableRefObject, type WheelEvent } from 'react';
+import type { MutableRefObject, WheelEvent } from 'react';
 import type { GuidePage } from '../config/guideContentConfig';
+import { useGuidePage } from './useGuidePage';
+import { useGuideCardScroll } from './useGuideCardScroll';
 
-let lastGuidePage = 0;
-
-interface UseGuideNavigationParams {
+export interface UseGuideNavigationParams {
   guidePages: GuidePage[];
   interactionCardsLength: number;
   musicCardsLength: number;
@@ -37,7 +37,7 @@ interface UseGuideNavigationParams {
   settingCardsLength: number;
 }
 
-interface UseGuideNavigationResult {
+export interface UseGuideNavigationResult {
   page: number;
   setPage: (updater: number | ((prev: number) => number)) => void;
   cardIndex: number;
@@ -56,73 +56,27 @@ export function useGuideNavigation({
   toolCardsLength,
   settingCardsLength,
 }: UseGuideNavigationParams): UseGuideNavigationResult {
-  const [page, setPageState] = useState(() => lastGuidePage);
-  const [cardIndex, setCardIndex] = useState(0);
-  const animDirRef = useRef<'up' | 'down'>('down');
-  const wheelCooldownRef = useRef(false);
-  const cardCountRef = useRef(interactionCardsLength);
+  const {
+    page,
+    setPage,
+    isLast,
+    handlePrev,
+    handleNext,
+    resetGuideState,
+  } = useGuidePage(guidePages.length);
 
-  const isLast = page === guidePages.length - 1;
-
-  useEffect(() => {
-    lastGuidePage = page;
-  }, [page]);
-
-  useEffect(() => {
-    if (page <= guidePages.length - 1) return;
-    setPageState(Math.max(guidePages.length - 1, 0));
-  }, [guidePages.length, page]);
-
-  useEffect(() => {
-    const p = guidePages[page];
-    if (p?.interactive === 'basic') cardCountRef.current = interactionCardsLength;
-    else if (p?.interactive === 'music') cardCountRef.current = musicCardsLength;
-    else if (p?.interactive === 'tools') cardCountRef.current = toolCardsLength;
-    else if (p?.interactive === 'settings') cardCountRef.current = settingCardsLength;
-    else cardCountRef.current = 0;
-    setCardIndex(0);
-  }, [page]);
-
-  const handleCardWheel = useCallback((e: WheelEvent) => {
-    e.stopPropagation();
-    if (wheelCooldownRef.current) return;
-    wheelCooldownRef.current = true;
-    setTimeout(() => {
-      wheelCooldownRef.current = false;
-    }, 400);
-
-    if (e.deltaY > 0) {
-      animDirRef.current = 'down';
-      setCardIndex((prev) => Math.min(prev + 1, cardCountRef.current - 1));
-    } else if (e.deltaY < 0) {
-      animDirRef.current = 'up';
-      setCardIndex((prev) => Math.max(prev - 1, 0));
-    }
-  }, []);
-
-  const handlePrev = useCallback(() => {
-    setPageState((p) => Math.max(0, p - 1));
-  }, []);
-
-  const handleNext = useCallback((onFinish: () => void) => {
-    if (isLast) {
-      onFinish();
-    } else {
-      setPageState((p) => p + 1);
-    }
-  }, [isLast]);
-
-  const setPage = useCallback((updater: number | ((prev: number) => number)) => {
-    if (typeof updater === 'number') {
-      setPageState(updater);
-      return;
-    }
-    setPageState(updater);
-  }, []);
-
-  const resetGuideState = useCallback(() => {
-    lastGuidePage = 0;
-  }, []);
+  const {
+    cardIndex,
+    animDirRef,
+    handleCardWheel,
+  } = useGuideCardScroll({
+    page,
+    guidePages,
+    interactionCardsLength,
+    musicCardsLength,
+    toolCardsLength,
+    settingCardsLength,
+  });
 
   return {
     page,
