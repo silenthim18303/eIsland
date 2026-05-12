@@ -25,7 +25,6 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import '../../../styles/guide/guide.css';
@@ -33,276 +32,29 @@ import { SvgIcon } from '../../../utils/SvgIcon';
 import { GuideInteractivePage } from './components/GuideInteractivePage';
 import { GuideStaticPage } from './components/GuideStaticPage';
 import { GuideFooter } from './components/GuideFooter';
+import {
+  getGuidePages,
+  getInteractionCards,
+  getMusicCards,
+  getSampleLyrics,
+  getSettingCards,
+  getToolCards,
+  type MiniIslandDemo,
+  type MiniMusicDemo,
+  type MiniSettingDemo,
+  type MiniToolDemo,
+} from './config/guideContentConfig';
+import {
+  extractDominantColor,
+  readStandaloneWindowMode,
+  STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY,
+  STANDALONE_WINDOW_AUTH_INTENT_STORE_KEY,
+} from './utils/guideContentUtils';
+import { useGuideNavigation } from './hooks/useGuideNavigation';
 import albumArt from '../../../assets/avatar/T.jpg';
 import { setThemeMode as applyThemeMode, getThemeMode, type ThemeMode } from '../../../utils/theme';
 import i18n from '../../../i18n';
 import { readLocalToken } from '../../../utils/userAccount';
-
-/** 从图片提取主题色（canvas 1×1 缩放取均值） */
-function extractDominantColor(src: string): Promise<[number, number, number]> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => {
-      const c = document.createElement('canvas');
-      c.width = c.height = 1;
-      const ctx = c.getContext('2d');
-      if (!ctx) { resolve([100, 100, 100]); return; }
-      ctx.drawImage(img, 0, 0, 1, 1);
-      const d = ctx.getImageData(0, 0, 1, 1).data;
-      resolve([d[0], d[1], d[2]]);
-    };
-    img.onerror = () => resolve([100, 100, 100]);
-    img.src = src;
-  });
-}
-
-/** 单个引导页配置 */
-interface GuidePage {
-  icon?: string;
-  imageSrc?: string;
-  interactive?: 'basic' | 'music' | 'tools' | 'settings';
-  actionPrompt?: 'auth';
-  title: string;
-  desc: string;
-  tips?: { text: string }[];
-}
-
-const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
-const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
-const STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
-const STANDALONE_WINDOW_AUTH_INTENT_STORE_KEY = 'standalone-window-auth-intent';
-let _lastGuidePage = 0;
-
-async function readStandaloneWindowMode(): Promise<'integrated' | 'standalone'> {
-  try {
-    const mode = await window.api.storeRead(STANDALONE_WINDOW_MODE_STORE_KEY);
-    if (mode === 'standalone') return 'standalone';
-    if (mode === 'integrated') return 'integrated';
-  } catch {
-    // ignore
-  }
-  try {
-    const legacyMode = await window.api.storeRead(LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY);
-    if (legacyMode === 'standalone') return 'standalone';
-  } catch {
-    // ignore
-  }
-  return 'integrated';
-}
-
-/** 迷你灵动岛演示模式 */
-type MiniIslandDemo = 'scroll' | 'hover' | 'click' | 'retract';
-
-/** 交互卡片配置 */
-interface InteractionCard {
-  iconSrc: string;
-  title: string;
-  desc: string;
-  demo: MiniIslandDemo;
-}
-
-/** 迷你音乐岛演示模式 */
-type MiniMusicDemo = 'smtc' | 'lyrics' | 'karaoke';
-
-/** 音乐卡片配置 */
-interface MusicCard {
-  iconSrc: string;
-  title: string;
-  desc: string;
-  demo: MiniMusicDemo;
-}
-
-function getSampleLyrics(t: TFunction): string[] {
-  return [
-    t('guide.mini.music.sampleLyrics.0', { defaultValue: '这是一句歌词示例' }),
-    t('guide.mini.music.sampleLyrics.1', { defaultValue: '音乐在空中飘荡' }),
-    t('guide.mini.music.sampleLyrics.2', { defaultValue: '旋律轻轻回响' }),
-  ];
-}
-
-/** 迷你工具岛演示模式 */
-type MiniToolDemo = 'todo' | 'ai' | 'timer' | 'pomodoro';
-
-/** 工具卡片配置 */
-interface ToolCard {
-  iconSrc: string;
-  title: string;
-  desc: string;
-  demo: MiniToolDemo;
-}
-
-/** 迷你设置岛演示模式 */
-type MiniSettingDemo = 'theme' | 'opacity' | 'position' | 'autostart' | 'shortcut';
-
-/** 设置卡片配置 */
-interface SettingCard {
-  iconSrc: string;
-  title: string;
-  desc: string;
-  demo: MiniSettingDemo;
-}
-
-function getSettingCards(t: TFunction): SettingCard[] {
-  return [
-    {
-      iconSrc: SvgIcon.THEME,
-      title: t('guide.settingCards.theme.title', { defaultValue: '主题切换' }),
-      desc: t('guide.settingCards.theme.desc', { defaultValue: '在深色、浅色和跟随系统之间自由切换。' }),
-      demo: 'theme',
-    },
-    {
-      iconSrc: SvgIcon.LAYOUT,
-      title: t('guide.settingCards.opacity.title', { defaultValue: '透明度调整' }),
-      desc: t('guide.settingCards.opacity.desc', { defaultValue: '自定义灵动岛的背景透明度。' }),
-      demo: 'opacity',
-    },
-    {
-      iconSrc: SvgIcon.MOVE,
-      title: t('guide.settingCards.position.title', { defaultValue: '位置微调' }),
-      desc: t('guide.settingCards.position.desc', { defaultValue: '微调灵动岛在屏幕顶部的水平与垂直偏移。' }),
-      demo: 'position',
-    },
-    {
-      iconSrc: SvgIcon.SHORTCUT_KEY,
-      title: t('guide.settingCards.autostart.title', { defaultValue: '开机自启' }),
-      desc: t('guide.settingCards.autostart.desc', { defaultValue: '设置灵动岛是否随系统启动自动运行。' }),
-      demo: 'autostart',
-    },
-    {
-      iconSrc: SvgIcon.SHORTCUT_KEY,
-      title: t('guide.settingCards.shortcut.title', { defaultValue: '快捷键' }),
-      desc: t('guide.settingCards.shortcut.desc', { defaultValue: '通过全局快捷键快速控制灵动岛。' }),
-      demo: 'shortcut',
-    },
-  ];
-}
-
-function getToolCards(t: TFunction): ToolCard[] {
-  return [
-    {
-      iconSrc: SvgIcon.TASK_MANAGER,
-      title: t('guide.toolCards.todo.title', { defaultValue: '待办事项' }),
-      desc: t('guide.toolCards.todo.desc', { defaultValue: '在扩展面板中管理你的待办任务清单。' }),
-      demo: 'todo',
-    },
-    {
-      iconSrc: SvgIcon.AI,
-      title: t('guide.toolCards.ai.title', { defaultValue: 'AI 对话助手' }),
-      desc: t('guide.toolCards.ai.desc', { defaultValue: '内置 AI 对话，随时获取智能回答与建议。' }),
-      demo: 'ai',
-    },
-    {
-      iconSrc: SvgIcon.TIMER,
-      title: t('guide.toolCards.timer.title', { defaultValue: '倒数日与计时器' }),
-      desc: t('guide.toolCards.timer.desc', { defaultValue: '设置倒计时或倒数日，精准跟踪重要时刻。' }),
-      demo: 'timer',
-    },
-    {
-      iconSrc: SvgIcon.POMODORO,
-      title: t('guide.toolCards.pomodoro.title', { defaultValue: '番茄钟专注' }),
-      desc: t('guide.toolCards.pomodoro.desc', { defaultValue: '番茄工作法，帮助你保持高效专注。' }),
-      demo: 'pomodoro',
-    },
-  ];
-}
-
-function getMusicCards(t: TFunction): MusicCard[] {
-  return [
-    {
-      iconSrc: SvgIcon.SMTC,
-      title: t('guide.musicCards.smtc.title', { defaultValue: 'SMTC 自动检测' }),
-      desc: t('guide.musicCards.smtc.desc', { defaultValue: '自动识别正在播放的音乐源，实时同步播放信息。' }),
-      demo: 'smtc',
-    },
-    {
-      iconSrc: SvgIcon.LRC,
-      title: t('guide.musicCards.lyrics.title', { defaultValue: '歌词匹配与同步' }),
-      desc: t('guide.musicCards.lyrics.desc', { defaultValue: '多源歌词自动匹配，实时滚动显示当前歌词。' }),
-      demo: 'lyrics',
-    },
-    {
-      iconSrc: SvgIcon.MUSIC,
-      title: t('guide.musicCards.karaoke.title', { defaultValue: '逐字扫光模式' }),
-      desc: t('guide.musicCards.karaoke.desc', { defaultValue: '支持逐字高亮的卡拉 OK 歌词显示模式。' }),
-      demo: 'karaoke',
-    },
-  ];
-}
-
-function getInteractionCards(t: TFunction): InteractionCard[] {
-  return [
-    {
-      iconSrc: SvgIcon.INTERACTION,
-      title: t('guide.interactionCards.scroll.title', { defaultValue: '基本交互' }),
-      desc: t('guide.interactionCards.scroll.desc', { defaultValue: '在灵动岛顶部滚动鼠标滚轮，切换灵动岛状态。' }),
-      demo: 'scroll',
-    },
-    {
-      iconSrc: SvgIcon.LAYOUT,
-      title: t('guide.interactionCards.hover.title', { defaultValue: '悬停展开' }),
-      desc: t('guide.interactionCards.hover.desc', { defaultValue: '将鼠标悬停在灵动岛上方，即可展开预览面板。' }),
-      demo: 'hover',
-    },
-    {
-      iconSrc: SvgIcon.SCREENSHOT,
-      title: t('guide.interactionCards.click.title', { defaultValue: '单击操作' }),
-      desc: t('guide.interactionCards.click.desc', { defaultValue: '单击灵动岛，打开完整的操作面板。' }),
-      demo: 'click',
-    },
-    {
-      iconSrc: SvgIcon.HIDE,
-      title: t('guide.interactionCards.retract.title', { defaultValue: '自动收回' }),
-      desc: t('guide.interactionCards.retract.desc', { defaultValue: '将鼠标移开灵动岛，自动收回至待机状态。' }),
-      demo: 'retract',
-    },
-  ];
-}
-
-function getGuidePages(t: TFunction, showAuthPrompt: boolean): GuidePage[] {
-  const pages: GuidePage[] = [
-    {
-      imageSrc: './svg/eisland.svg',
-      title: t('guide.welcome.title', { defaultValue: '欢迎使用 eIsland' }),
-      desc: t('guide.welcome.desc', {
-        defaultValue: '一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。',
-      }),
-    },
-    {
-      interactive: 'basic',
-      title: t('guide.sections.basic.title', { defaultValue: '基本交互' }),
-      desc: t('guide.sections.basic.desc', { defaultValue: '通过鼠标与灵动岛进行交互，解锁不同状态。' }),
-    },
-    {
-      interactive: 'music',
-      title: t('guide.sections.music.title', { defaultValue: '音乐与歌词' }),
-      desc: t('guide.sections.music.desc', { defaultValue: '自动识别正在播放的音乐，实时显示同步歌词。' }),
-    },
-    {
-      interactive: 'tools',
-      title: t('guide.sections.tools.title', { defaultValue: '实用工具' }),
-      desc: t('guide.sections.tools.desc', { defaultValue: '扩展面板中集成了多种实用功能。' }),
-    },
-    {
-      interactive: 'settings',
-      title: t('guide.sections.settings.title', { defaultValue: '个性化设置' }),
-      desc: t('guide.sections.settings.desc', { defaultValue: '在扩展面板的设置中自定义你的灵动岛体验。' }),
-    },
-    {
-      actionPrompt: 'auth',
-      icon: SvgIcon.USER,
-      title: t('guide.sections.auth.title', { defaultValue: '账号服务' }),
-      desc: t('guide.sections.auth.desc', { defaultValue: '现在就登录或注册，开启跨设备同步与账号管理。' }),
-      tips: [
-        { text: t('guide.sections.auth.tipSync', { defaultValue: '登录后可同步账号资料。' }) },
-        { text: t('guide.sections.auth.tipMode', { defaultValue: '可使用插件市场和壁纸市场功能。' }) },
-      ],
-    },
-  ];
-  if (!showAuthPrompt) {
-    return pages.filter((page) => page.actionPrompt !== 'auth');
-  }
-  return pages;
-}
 
 /** 迷你设置岛演示组件 — 带实际生效的设置切换按钮 */
 function MiniSettingIsland({ demo }: { demo: MiniSettingDemo }): React.ReactElement {
@@ -797,68 +549,32 @@ export function GuideContent(): React.ReactElement {
   const toolCards = getToolCards(t);
   const settingCards = getSettingCards(t);
   const guidePages = getGuidePages(t, !isLoggedIn);
-  const [page, setPage] = useState(() => _lastGuidePage);
-  const [cardIndex, setCardIndex] = useState(0);
-  const animDirRef = useRef<'up' | 'down'>('down');
-  const wheelCooldownRef = useRef(false);
   const { setIdle, setLogin, setRegister } = useIslandStore();
-
-  const isLast = page === guidePages.length - 1;
-
-  const cardCountRef = useRef(interactionCards.length);
-
-  useEffect(() => {
-    _lastGuidePage = page;
-  }, [page]);
-
-  useEffect(() => {
-    if (page <= guidePages.length - 1) return;
-    setPage(Math.max(guidePages.length - 1, 0));
-  }, [guidePages.length, page]);
-
-  useEffect(() => {
-    const p = guidePages[page];
-    if (p.interactive === 'basic') cardCountRef.current = interactionCards.length;
-    else if (p.interactive === 'music') cardCountRef.current = musicCards.length;
-    else if (p.interactive === 'tools') cardCountRef.current = toolCards.length;
-    else if (p.interactive === 'settings') cardCountRef.current = settingCards.length;
-    else cardCountRef.current = 0;
-    setCardIndex(0);
-  }, [page]);
-
-  const handleCardWheel = useCallback((e: React.WheelEvent) => {
-    e.stopPropagation();
-    if (wheelCooldownRef.current) return;
-    wheelCooldownRef.current = true;
-    setTimeout(() => { wheelCooldownRef.current = false; }, 400);
-    if (e.deltaY > 0) {
-      animDirRef.current = 'down';
-      setCardIndex((prev) => Math.min(prev + 1, cardCountRef.current - 1));
-    } else if (e.deltaY < 0) {
-      animDirRef.current = 'up';
-      setCardIndex((prev) => Math.max(prev - 1, 0));
-    }
-  }, []);
+  const {
+    page,
+    setPage,
+    cardIndex,
+    animDirRef,
+    isLast,
+    handleCardWheel,
+    handlePrev,
+    handleNext,
+    resetGuideState,
+  } = useGuideNavigation({
+    guidePages,
+    interactionCardsLength: interactionCards.length,
+    musicCardsLength: musicCards.length,
+    toolCardsLength: toolCards.length,
+    settingCardsLength: settingCards.length,
+  });
 
   const handleFinish = useCallback(() => {
-    _lastGuidePage = 0;
+    resetGuideState();
     window.api?.updaterVersion?.().then((v) => {
       if (v) window.api?.storeWrite?.('guide-shown-version', v);
     }).catch(() => {});
     setIdle(true);
-  }, [setIdle]);
-
-  const handleNext = useCallback(() => {
-    if (isLast) {
-      handleFinish();
-    } else {
-      setPage((p) => p + 1);
-    }
-  }, [isLast, handleFinish]);
-
-  const handlePrev = useCallback(() => {
-    setPage((p) => Math.max(0, p - 1));
-  }, []);
+  }, [resetGuideState, setIdle]);
 
   const openAuthFromGuide = useCallback(async (target: 'login' | 'register'): Promise<void> => {
     const mode = await readStandaloneWindowMode();
@@ -924,7 +640,7 @@ export function GuideContent(): React.ReactElement {
         onSelectPage={setPage}
         onFinish={handleFinish}
         onPrev={handlePrev}
-        onNext={handleNext}
+        onNext={() => handleNext(handleFinish)}
       />
     </div>
   );
