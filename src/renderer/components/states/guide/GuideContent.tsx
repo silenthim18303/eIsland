@@ -30,6 +30,9 @@ import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import '../../../styles/guide/guide.css';
 import { SvgIcon } from '../../../utils/SvgIcon';
+import { GuideInteractivePage } from './components/GuideInteractivePage';
+import { GuideStaticPage } from './components/GuideStaticPage';
+import { GuideFooter } from './components/GuideFooter';
 import albumArt from '../../../assets/avatar/T.jpg';
 import { setThemeMode as applyThemeMode, getThemeMode, type ThemeMode } from '../../../utils/theme';
 import i18n from '../../../i18n';
@@ -873,130 +876,56 @@ export function GuideContent(): React.ReactElement {
   }, [setLogin, setRegister]);
 
   const current = guidePages[page];
+  const isBasic = current.interactive === 'basic';
+  const isMusic = current.interactive === 'music';
+  const isTools = current.interactive === 'tools';
+  const cards: Array<{ iconSrc: string; title: string; desc: string }> =
+    isBasic ? interactionCards : isMusic ? musicCards : isTools ? toolCards : settingCards;
+  const hint = isBasic
+    ? t('guide.hints.basicWheel', { defaultValue: '在此区域附近滚动滚轮可切换灵动岛状态' })
+    : isMusic
+      ? t('guide.hints.musicWheel', { defaultValue: '滚动查看更多音乐功能' })
+      : isTools
+        ? t('guide.hints.toolsWheel', { defaultValue: '滚动查看更多实用工具' })
+        : t('guide.hints.settingsWheel', { defaultValue: '滚动查看个性化设置' });
 
   return (
     <div className="guide-content" onClick={(e) => e.stopPropagation()}>
-      {current.interactive ? (() => {
-        const isBasic = current.interactive === 'basic';
-        const isMusic = current.interactive === 'music';
-        const isTools = current.interactive === 'tools';
-        const isSettings = current.interactive === 'settings';
-        const cards: Array<{ iconSrc: string; title: string; desc: string }> =
-          isBasic ? interactionCards : isMusic ? musicCards : isTools ? toolCards : settingCards;
-        const safeIdx = Math.min(cardIndex, cards.length - 1);
-        const card = cards[safeIdx];
-        const hint = isBasic
-          ? t('guide.hints.basicWheel', { defaultValue: '在此区域附近滚动滚轮可切换灵动岛状态' })
-          : isMusic
-            ? t('guide.hints.musicWheel', { defaultValue: '滚动查看更多音乐功能' })
-            : isTools
-              ? t('guide.hints.toolsWheel', { defaultValue: '滚动查看更多实用工具' })
-              : t('guide.hints.settingsWheel', { defaultValue: '滚动查看个性化设置' });
-        return (
-          <div className="guide-page guide-page-interactive" key={`page-${page}`}>
-            <div className="guide-interact-zone" onWheel={handleCardWheel}>
-              <span className="guide-interact-hint">{hint}</span>
-              <div className="guide-interact-dots">
-                {cards.map((_, i) => (
-                  <span
-                    key={i}
-                    className={`guide-interact-dot${cardIndex === i ? ' active' : ''}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div
-              className={`guide-interact-card ${animDirRef.current === 'down' ? 'guide-slide-up' : 'guide-slide-down'}`}
-              key={`card-${cardIndex}`}
-            >
-              <div className="guide-interact-card-text">
-                <img className={`guide-interact-icon${card.iconSrc === SvgIcon.POMODORO ? ' no-invert' : ''}`} src={card.iconSrc} alt="" aria-hidden="true" />
-                <div className="guide-title">{card.title}</div>
-                <div className="guide-desc">{card.desc}</div>
-              </div>
-              {isBasic && <MiniIsland demo={interactionCards[safeIdx].demo} />}
-              {isMusic && <MiniMusicIsland demo={musicCards[safeIdx].demo} />}
-              {isTools && <MiniToolIsland demo={toolCards[safeIdx].demo} />}
-              {isSettings && <MiniSettingIsland demo={settingCards[safeIdx].demo} />}
-            </div>
-          </div>
-        );
-      })() : (
-        <div className={`guide-page${page === 0 ? ' guide-page-welcome' : ''}${current.actionPrompt === 'auth' ? ' guide-page-auth' : ''}`} key={page}>
-          <div className="guide-hero">
-            {current.imageSrc
-              ? <img className="guide-page-logo" src={current.imageSrc} alt="" aria-hidden="true" />
-              : current.actionPrompt === 'auth'
-                ? <img className="guide-page-auth-icon" src={SvgIcon.USER} alt="" aria-hidden="true" />
-                : <div className="guide-page-icon" aria-hidden="true">{current.icon}</div>
-            }
-            <div className="guide-title">{current.title}</div>
-          </div>
-          <div className="guide-desc">{current.desc}</div>
-
-          {current.tips && (
-            <div className="guide-tips" aria-label={t('guide.tipsAria', { defaultValue: '要点' })}>
-              {current.tips.map((tip, i) => (
-                <div className="guide-tip" key={i}>
-                  <span className="guide-tip-text">{tip.text}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {current.actionPrompt === 'auth' && (
-            <div className="guide-auth-actions">
-              <button
-                type="button"
-                className="guide-btn guide-btn-primary"
-                onClick={() => void openAuthFromGuide('login')}
-              >
-                {t('guide.actions.loginNow', { defaultValue: '立即登录' })}
-              </button>
-              <button
-                type="button"
-                className="guide-btn guide-btn-secondary"
-                onClick={() => void openAuthFromGuide('register')}
-              >
-                {t('guide.actions.registerNow', { defaultValue: '立即注册' })}
-              </button>
-            </div>
-          )}
-        </div>
+      {current.interactive ? (
+        <GuideInteractivePage
+          page={page}
+          cards={cards}
+          cardIndex={cardIndex}
+          hint={hint}
+          animDir={animDirRef.current}
+          onWheel={handleCardWheel}
+          renderMini={(safeIdx) => {
+            if (isBasic) return <MiniIsland demo={interactionCards[safeIdx].demo} />;
+            if (isMusic) return <MiniMusicIsland demo={musicCards[safeIdx].demo} />;
+            if (isTools) return <MiniToolIsland demo={toolCards[safeIdx].demo} />;
+            return <MiniSettingIsland demo={settingCards[safeIdx].demo} />;
+          }}
+        />
+      ) : (
+        <GuideStaticPage
+          page={page}
+          current={current}
+          t={t}
+          onAuthLogin={() => void openAuthFromGuide('login')}
+          onAuthRegister={() => void openAuthFromGuide('register')}
+        />
       )}
 
-      <div className="guide-footer">
-        <div className="guide-nav-dots">
-          {guidePages.map((_, i) => (
-            <button
-              type="button"
-              key={i}
-              className={`guide-nav-dot ${page === i ? 'active' : ''}`}
-              onClick={() => setPage(i)}
-              aria-label={t('guide.nav.pageAria', { defaultValue: '第 {{index}} 页', index: i + 1 })}
-            />
-          ))}
-        </div>
-
-        <div className="guide-actions">
-          {!isLast && (
-            <button type="button" className="guide-btn guide-btn-secondary" onClick={handleFinish}>
-              {t('guide.actions.skip', { defaultValue: '跳过引导' })}
-            </button>
-          )}
-
-          {page > 0 && (
-            <button type="button" className="guide-btn guide-btn-secondary" onClick={handlePrev}>
-              {t('guide.actions.prev')}
-            </button>
-          )}
-
-          <button type="button" className="guide-btn guide-btn-primary" onClick={handleNext}>
-            {isLast ? t('guide.actions.start') : t('guide.actions.next')}
-          </button>
-        </div>
-      </div>
+      <GuideFooter
+        t={t}
+        page={page}
+        isLast={isLast}
+        pageCount={guidePages.length}
+        onSelectPage={setPage}
+        onFinish={handleFinish}
+        onPrev={handlePrev}
+        onNext={handleNext}
+      />
     </div>
   );
 }
