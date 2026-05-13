@@ -26,6 +26,8 @@
 
 import { readEffectiveAudioVolume } from './volume';
 
+export const NOTIFICATION_SOUND_ENABLED_STORE_KEY = 'notification-sound-enabled';
+
 const NOTIFICATION_SOUND_SRC = './audio/NOTIFICATION.wav';
 const NOTIFICATION_SOUND_FALLBACK_SRC = './public/audio/NOTIFICATION.wav';
 
@@ -42,6 +44,9 @@ function ensureNotificationAudio(): HTMLAudioElement {
 
 export function playNotificationSoundOnce(): void {
   void (async () => {
+    const enabled = await window.api?.storeRead(NOTIFICATION_SOUND_ENABLED_STORE_KEY).catch(() => true);
+    if (enabled === false) return;
+
     const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
     if (targetVolume <= 0) return;
 

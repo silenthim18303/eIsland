@@ -1714,7 +1714,12 @@
     },
     "notification": {
       "pageTitle": "通知设置",
-      "pageHint": "配置灵动岛通知提醒与展示行为。"
+      "pageHint": "配置灵动岛通知提醒与展示行为。",
+      "sound": {
+        "title": "通知音效",
+        "hint": "通知触发时播放一次提示音。",
+        "toggle": "启用通知音效"
+      }
     },
     "breakReminder": {
       "listTitle": "提醒事项",

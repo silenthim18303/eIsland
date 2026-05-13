@@ -1714,7 +1714,12 @@
     },
     "notification": {
       "pageTitle": "Notification Settings",
-      "pageHint": "Configure Dynamic Island notification alerts and display behavior."
+      "pageHint": "Configure Dynamic Island notification alerts and display behavior.",
+      "sound": {
+        "title": "Notification Sound",
+        "hint": "Play a one-shot sound when a notification is triggered.",
+        "toggle": "Enable Notification Sound"
+      }
     },
     "breakReminder": {
       "listTitle": "Reminders",

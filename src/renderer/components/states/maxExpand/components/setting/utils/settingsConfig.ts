@@ -377,6 +377,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '音效音量', desc: '影响 STT 触发音与木鱼敲击音。', labelKey: 'settings.sound.effectVolume.title', descKey: 'settings.sound.effectVolume.hint', tab: 'app', appPage: 'sound' },
   // ── 软件设置 > 通知设置 ──
   { label: '通知设置', desc: '配置灵动岛通知提醒与展示行为。', labelKey: 'settings.notification.pageTitle', descKey: 'settings.notification.pageHint', tab: 'app', appPage: 'notification' },
+  { label: '通知音效', desc: '通知触发时播放一次提示音。', labelKey: 'settings.notification.sound.title', descKey: 'settings.notification.sound.hint', tab: 'app', appPage: 'notification' },
   // ── 网络配置 ──
   { label: '请求超时时间', desc: '设置网络请求的最长等待时间，网络较差时可适当增大', labelKey: 'settings.network.timeout.title', descKey: 'settings.network.timeout.hint', tab: 'network' },
   { label: '静态资源节点', desc: '所有用户默认使用 R2，PRO 用户可选择 R2/COS/OSS。', labelKey: 'settings.network.staticAssetNode.title', descKey: 'settings.network.staticAssetNode.hint', tab: 'network' },

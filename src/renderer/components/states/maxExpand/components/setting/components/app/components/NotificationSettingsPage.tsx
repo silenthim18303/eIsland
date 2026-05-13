@@ -24,14 +24,58 @@
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import { NOTIFICATION_SOUND_ENABLED_STORE_KEY } from '../../../../../../../../utils/audio/notificationSound';
 
 /**
  * 渲染通知设置页面
  * @returns 通知设置页面
  */
 export function NotificationSettingsPage(): ReactElement {
+  const { t } = useTranslation();
+  const [notificationSoundEnabled, setNotificationSoundEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(NOTIFICATION_SOUND_ENABLED_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      if (typeof value === 'boolean') setNotificationSoundEnabled(value);
+    }).catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleChangeNotificationSoundEnabled = (next: boolean): void => {
+    const prev = notificationSoundEnabled;
+    setNotificationSoundEnabled(next);
+    window.api.storeWrite(NOTIFICATION_SOUND_ENABLED_STORE_KEY, next).catch(() => {
+      setNotificationSoundEnabled(prev);
+    });
+  };
+
   return (
-    <div className="settings-notification-page-panel" />
+    <div className="max-expand-settings-section">
+      <div className="settings-cards settings-notification-page-panel">
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-card-title">{t('settings.notification.sound.title', { defaultValue: '通知音效' })}</div>
+            <div className="settings-card-subtitle">{t('settings.notification.sound.hint', { defaultValue: '通知触发时播放一次提示音。' })}</div>
+          </div>
+          <div className="settings-card-inline-row">
+            <label className="settings-card-check">
+              <input
+                type="checkbox"
+                checked={notificationSoundEnabled}
+                onChange={(e) => handleChangeNotificationSoundEnabled(e.target.checked)}
+              />
+              {t('settings.notification.sound.toggle', { defaultValue: '启用通知音效' })}
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
