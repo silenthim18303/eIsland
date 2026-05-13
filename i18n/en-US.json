@@ -1219,6 +1219,7 @@
       "alarm": "Alarm Settings",
       "break-reminder": "Break Reminders",
       "autostart": "Utilities",
+      "sound": "Sound Settings",
       "network": "Network",
       "mail": "Mail",
       "weather": "Weather",
@@ -2606,6 +2607,10 @@
       "autostart": {
         "label": "Utilities",
         "desc": "App controls, logs, and startup options."
+      },
+      "sound": {
+        "label": "Sound Settings",
+        "desc": "Sound effects, notification sounds, and audio output configuration."
       },
       "network": {
         "label": "Network",

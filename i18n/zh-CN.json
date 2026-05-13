@@ -1219,6 +1219,7 @@
       "alarm": "闹钟配置",
       "break-reminder": "休息提醒",
       "autostart": "实用工具",
+      "sound": "声音设置",
       "network": "网络配置",
       "mail": "邮箱配置",
       "weather": "天气配置",
@@ -2601,6 +2602,10 @@
       "autostart": {
         "label": "实用工具",
         "desc": "应用控制、日志与开机启动配置。"
+      },
+      "sound": {
+        "label": "声音设置",
+        "desc": "音效、通知声音与音频输出配置。"
       },
       "network": {
         "label": "网络配置",
