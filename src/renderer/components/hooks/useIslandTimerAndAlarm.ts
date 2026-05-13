@@ -158,6 +158,7 @@ export function useIslandTimerAndAlarm(options: UseIslandTimerAndAlarmOptions): 
             setNotificationRef.current({
               title: t('notification.alarm.title', { defaultValue: '闹钟提醒' }),
               body,
+              icon: SvgIcon.TIMER,
             });
           }
 
