@@ -1228,6 +1228,7 @@
       "break-reminder": "Break Reminders",
       "autostart": "Utilities",
       "sound": "Sound Settings",
+      "notification": "Notification Settings",
       "network": "Network",
       "mail": "Mail",
       "weather": "Weather",
@@ -1709,6 +1710,10 @@
         "title": "Effect Volume",
         "hint": "Affects STT trigger sound and Mokugyo strike sound."
       }
+    },
+    "notification": {
+      "pageTitle": "Notification Settings",
+      "pageHint": "Configure Dynamic Island notification alerts and display behavior."
     },
     "breakReminder": {
       "listTitle": "Reminders",
@@ -2633,6 +2638,10 @@
       "sound": {
         "label": "Sound Settings",
         "desc": "Sound effects, notification sounds, and audio output configuration."
+      },
+      "notification": {
+        "label": "Notification Settings",
+        "desc": "Configure Dynamic Island notification alerts and display behavior."
       },
       "network": {
         "label": "Network",

@@ -50,7 +50,7 @@ export const WEATHER_LOCATION_PRIORITY_OPTIONS: Array<{ value: WeatherLocationPr
 
 export const SETTINGS_TABS = ['index', 'app', 'network', 'mail', 'weather', 'music', 'ai', 'shortcut', 'user', 'update', 'pluginMarket', 'about'] as const;
 export type SettingsSidebarTabKey = (typeof SETTINGS_TABS)[number];
-export type AppSettingsPageKey = 'layout-preview' | 'maxexpand-layout' | 'album' | 'hide-process-list' | 'position' | 'theme' | 'language' | 'behavior' | 'animation' | 'url-parser' | 'clipboard-history' | 'alarm' | 'break-reminder' | 'autostart' | 'sound';
+export type AppSettingsPageKey = 'layout-preview' | 'maxexpand-layout' | 'album' | 'hide-process-list' | 'position' | 'theme' | 'language' | 'behavior' | 'animation' | 'url-parser' | 'clipboard-history' | 'alarm' | 'break-reminder' | 'autostart' | 'sound' | 'notification';
 export type WeatherSettingsPageKey = 'location' | 'provider';
 export type MailSettingsPageKey = 'account' | 'imap' | 'preferences';
 export type AiSettingsPageKey = 'general' | 'r1pxc' | 'ollama';
@@ -76,6 +76,7 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTabLabelKey, string> = {
   'break-reminder': '休息提醒',
   autostart: '实用工具',
   sound: '声音设置',
+  notification: '通知设置',
   network: '网络配置',
   mail: '邮箱配置',
   weather: '天气配置',
@@ -111,6 +112,7 @@ export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'ind
   'break-reminder': '定时休息与喝水提醒。',
   autostart: '应用控制、日志与开机启动配置。',
   sound: '音效、通知声音与音频输出配置。',
+  notification: '配置灵动岛通知提醒与展示行为。',
   network: '请求超时与网络行为设置',
   mail: '配置 IMAP 收信参数',
   weather: '天气接口优先级设置',
@@ -157,6 +159,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'break-reminder': SvgIcon.BREAK,
   autostart: SvgIcon.CONTINUE,
   sound: SvgIcon.SOUND,
+  notification: SvgIcon.SOUND,
   pluginMarket: SvgIcon.PLUGIN,
 };
 
@@ -227,7 +230,7 @@ export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLay
   }));
 }
 
-export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart', 'sound'];
+export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart', 'sound', 'notification'];
 export const WEATHER_SETTINGS_PAGES: WeatherSettingsPageKey[] = ['location', 'provider'];
 export const WEATHER_SETTINGS_PAGE_LABELS: Record<WeatherSettingsPageKey, string> = {
   location: '定位配置',
@@ -371,6 +374,8 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '全局音量', desc: '影响闹钟与音效的整体输出音量。', labelKey: 'settings.sound.global.title', descKey: 'settings.sound.global.hint', tab: 'app', appPage: 'sound' },
   { label: '闹钟音量', desc: '仅影响闹钟响铃与试听音量。', labelKey: 'settings.sound.alarmVolume.title', descKey: 'settings.sound.alarmVolume.hint', tab: 'app', appPage: 'sound' },
   { label: '音效音量', desc: '影响 STT 触发音与木鱼敲击音。', labelKey: 'settings.sound.effectVolume.title', descKey: 'settings.sound.effectVolume.hint', tab: 'app', appPage: 'sound' },
+  // ── 软件设置 > 通知设置 ──
+  { label: '通知设置', desc: '配置灵动岛通知提醒与展示行为。', labelKey: 'settings.notification.pageTitle', descKey: 'settings.notification.pageHint', tab: 'app', appPage: 'notification' },
   // ── 网络配置 ──
   { label: '请求超时时间', desc: '设置网络请求的最长等待时间，网络较差时可适当增大', labelKey: 'settings.network.timeout.title', descKey: 'settings.network.timeout.hint', tab: 'network' },
   { label: '静态资源节点', desc: '所有用户默认使用 R2，PRO 用户可选择 R2/COS/OSS。', labelKey: 'settings.network.staticAssetNode.title', descKey: 'settings.network.staticAssetNode.hint', tab: 'network' },

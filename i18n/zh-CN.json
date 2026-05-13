@@ -1228,6 +1228,7 @@
       "break-reminder": "休息提醒",
       "autostart": "实用工具",
       "sound": "声音设置",
+      "notification": "通知设置",
       "network": "网络配置",
       "mail": "邮箱配置",
       "weather": "天气配置",
@@ -1709,6 +1710,10 @@
         "title": "音效音量",
         "hint": "影响 STT 触发音与木鱼敲击音。"
       }
+    },
+    "notification": {
+      "pageTitle": "通知设置",
+      "pageHint": "配置灵动岛通知提醒与展示行为。"
     },
     "breakReminder": {
       "listTitle": "提醒事项",
@@ -2628,6 +2633,10 @@
       "sound": {
         "label": "声音设置",
         "desc": "音效、通知声音与音频输出配置。"
+      },
+      "notification": {
+        "label": "通知设置",
+        "desc": "配置灵动岛通知提醒与展示行为。"
       },
       "network": {
         "label": "网络配置",
