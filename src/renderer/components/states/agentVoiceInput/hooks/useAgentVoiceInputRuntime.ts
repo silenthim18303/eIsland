@@ -88,16 +88,13 @@ export function useAgentVoiceInputRuntime(options: UseAgentVoiceInputRuntimeOpti
     moduleSttCleanup = stopAll;
 
     const start = async (): Promise<void> => {
+      const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
       const triggerSound = new Audio('./audio/AGENT.wav');
-      void triggerSound.play().then(async () => {
-        const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
-        triggerSound.volume = targetVolume;
-      }).catch(() => {
+      triggerSound.volume = targetVolume;
+      void triggerSound.play().catch(() => {
         triggerSound.src = './public/audio/AGENT.wav';
-        void triggerSound.play().then(async () => {
-          const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
-          triggerSound.volume = targetVolume;
-        }).catch(() => {});
+        triggerSound.volume = targetVolume;
+        void triggerSound.play().catch(() => {});
       });
 
       const token = readLocalToken();

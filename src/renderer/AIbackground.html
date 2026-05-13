@@ -72,16 +72,6 @@ function startFadeOut() {
     fadingOut = true;
 }
 
-// 出现时播放音效
-const agentAudio = new Audio('./audio/AGENT.wav');
-agentAudio.volume = 1.0;
-agentAudio.onerror = function() {
-    this.onerror = null;
-    this.src = './public/audio/AGENT.wav';
-    this.play().catch(() => {});
-};
-agentAudio.play().catch(() => {});
-
 function resize() {
     w = window.innerWidth;
     h = window.innerHeight;
