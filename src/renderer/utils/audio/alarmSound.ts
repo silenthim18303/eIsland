@@ -70,7 +70,7 @@ const previewStateListeners = new Set<(state: { playing: boolean; ringtone: Syst
 
 function notifyPreviewState(): void {
   const state = {
-    playing: playbackMode === 'preview' && Boolean(activeAudio && !activeAudio.paused),
+    playing: playbackMode === 'preview',
     ringtone: activeRingtone,
   };
   previewStateListeners.forEach((listener) => listener(state));
@@ -239,7 +239,7 @@ export function subscribePreviewAlarmSoundState(
 ): () => void {
   previewStateListeners.add(listener);
   listener({
-    playing: playbackMode === 'preview' && Boolean(activeAudio && !activeAudio.paused),
+    playing: playbackMode === 'preview',
     ringtone: activeRingtone,
   });
   return () => {
