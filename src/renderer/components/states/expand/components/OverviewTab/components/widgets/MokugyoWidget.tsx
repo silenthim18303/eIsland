@@ -27,6 +27,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../../utils/SvgIcon';
+import { readEffectiveAudioVolume } from '../../../../../../../utils/audio/volume';
 import {
   MOKUGYO_AUDIO_SRC,
   MOKUGYO_FLOAT_DURATION_MS,
@@ -101,7 +102,10 @@ export function MokugyoWidget(): React.ReactElement {
     } catch {
       // noop
     }
-    audio.play().catch(() => {});
+    audio.play().then(async () => {
+      const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
+      audio.volume = targetVolume;
+    }).catch(() => {});
   }, []);
 
   return (

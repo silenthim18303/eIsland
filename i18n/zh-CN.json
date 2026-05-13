@@ -1696,6 +1696,20 @@
         }
       }
     },
+    "sound": {
+      "global": {
+        "title": "全局音量",
+        "hint": "影响闹钟与音效的整体输出音量。"
+      },
+      "alarmVolume": {
+        "title": "闹钟音量",
+        "hint": "仅影响闹钟响铃与试听音量。"
+      },
+      "effectVolume": {
+        "title": "音效音量",
+        "hint": "影响 STT 触发音与木鱼敲击音。"
+      }
+    },
     "breakReminder": {
       "listTitle": "提醒事项",
       "listHint": "开启后，到达设定的间隔时间将弹出休息提醒通知。",

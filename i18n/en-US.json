@@ -1696,6 +1696,20 @@
         }
       }
     },
+    "sound": {
+      "global": {
+        "title": "Global Volume",
+        "hint": "Controls the overall output for alarms and effects."
+      },
+      "alarmVolume": {
+        "title": "Alarm Volume",
+        "hint": "Only affects alarm ringing and ringtone preview volume."
+      },
+      "effectVolume": {
+        "title": "Effect Volume",
+        "hint": "Affects STT trigger sound and Mokugyo strike sound."
+      }
+    },
     "breakReminder": {
       "listTitle": "Reminders",
       "listHint": "When enabled, a break reminder notification will appear at the set interval.",

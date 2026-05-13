@@ -24,6 +24,8 @@
  * @author 鸡哥
  */
 
+import { readEffectiveAudioVolume } from './volume';
+
 export enum SystemAlarmRingtone {
   ALARM_1 = 'alarm-1',
   ALARM_2 = 'alarm-2',
@@ -156,8 +158,9 @@ export function playAlarmSound(options: { ringtone: SystemAlarmRingtone; loop: b
   } catch {
     // noop
   }
-  audio.play().then(() => {
-    fadeVolume(0, 1, FADE_IN_DURATION_MS);
+  audio.play().then(async () => {
+    const targetVolume = await readEffectiveAudioVolume('alarm').catch(() => 1);
+    fadeVolume(0, targetVolume, FADE_IN_DURATION_MS);
   }).catch(() => {});
 }
 
@@ -195,12 +198,17 @@ export function previewAlarmSound(ringtone: SystemAlarmRingtone): void {
   }
 
   audio.play().then(() => {
-    if (canResume) {
-      audio.volume = 1;
-      notifyPreviewState();
-      return;
-    }
-    fadeVolume(0, 1, PREVIEW_FADE_IN_DURATION_MS);
+    const applyPreviewVolume = async (): Promise<void> => {
+      const targetVolume = await readEffectiveAudioVolume('alarm').catch(() => 1);
+      if (canResume) {
+        audio.volume = targetVolume;
+        notifyPreviewState();
+        return;
+      }
+      fadeVolume(0, targetVolume, PREVIEW_FADE_IN_DURATION_MS);
+    };
+
+    void applyPreviewVolume();
   }).catch(() => {
     setPlaybackMode('idle');
   });
