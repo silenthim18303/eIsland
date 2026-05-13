@@ -27,6 +27,7 @@
 import type { StateCreator } from 'zustand';
 import type { IslandSlice } from '../types';
 import { emptyNotification } from '../constants/defaults';
+import { playNotificationSoundOnce } from '../../utils/audio/notificationSound';
 
 function isStandaloneRenderer(): boolean {
   try {
@@ -163,6 +164,7 @@ export const createIslandSlice: StateCreator<
   setNotification: (data) => set((prev) => {
     if (prev.uiStateLocked && prev.state !== 'notification') return prev;
     window.api?.expandWindowNotification();
+    playNotificationSoundOnce();
     return { state: 'notification', notification: data, authReturnState: null };
   }),
 
