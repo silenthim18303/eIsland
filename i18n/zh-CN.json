@@ -1175,6 +1175,7 @@
       "repeatField": "重复",
       "ringtoneField": "铃声",
       "previewRingtone": "试听",
+      "pausePreviewRingtone": "暂停",
       "loopPlayback": "循环播放铃声",
       "cancel": "取消",
       "save": "保存",

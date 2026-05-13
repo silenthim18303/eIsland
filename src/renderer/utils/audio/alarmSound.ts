@@ -60,10 +60,33 @@ const RINGTONE_SRC_MAP = new Map<SystemAlarmRingtone, string>(
 
 const FADE_IN_DURATION_MS = 1800;
 const FADE_OUT_DURATION_MS = 520;
+const PREVIEW_FADE_IN_DURATION_MS = 240;
 
 let activeAudio: HTMLAudioElement | null = null;
 let activeRingtone: SystemAlarmRingtone | null = null;
 let fadeAnimationFrameId: number | null = null;
+let playbackMode: 'idle' | 'preview' | 'alarm' = 'idle';
+const previewStateListeners = new Set<(state: { playing: boolean; ringtone: SystemAlarmRingtone | null }) => void>();
+
+function notifyPreviewState(): void {
+  const state = {
+    playing: playbackMode === 'preview' && Boolean(activeAudio && !activeAudio.paused),
+    ringtone: activeRingtone,
+  };
+  previewStateListeners.forEach((listener) => listener(state));
+}
+
+function setPlaybackMode(mode: 'idle' | 'preview' | 'alarm'): void {
+  playbackMode = mode;
+  notifyPreviewState();
+}
+
+function bindAudioEvents(audio: HTMLAudioElement): void {
+  audio.onended = () => {
+    if (playbackMode !== 'preview') return;
+    setPlaybackMode('idle');
+  };
+}
 
 function cancelFadeAnimation(): void {
   if (fadeAnimationFrameId === null) return;
@@ -83,6 +106,7 @@ function ensureAudio(ringtone: SystemAlarmRingtone): HTMLAudioElement {
     }
     activeAudio = new Audio(src);
     activeAudio.preload = 'auto';
+    bindAudioEvents(activeAudio);
     activeRingtone = ringtone;
   }
   return activeAudio;
@@ -123,6 +147,7 @@ export function normalizeSystemAlarmRingtone(value: unknown): SystemAlarmRington
 
 export function playAlarmSound(options: { ringtone: SystemAlarmRingtone; loop: boolean }): void {
   const audio = ensureAudio(options.ringtone);
+  setPlaybackMode('alarm');
   cancelFadeAnimation();
   audio.loop = options.loop;
   audio.volume = 0;
@@ -137,18 +162,60 @@ export function playAlarmSound(options: { ringtone: SystemAlarmRingtone; loop: b
 }
 
 export function previewAlarmSound(ringtone: SystemAlarmRingtone): void {
-  const audio = ensureAudio(ringtone);
+  const normalizedRingtone = normalizeSystemAlarmRingtone(ringtone);
+  const isSamePreviewPlaying = playbackMode === 'preview'
+    && activeAudio
+    && activeRingtone === normalizedRingtone
+    && !activeAudio.paused;
+
+  if (isSamePreviewPlaying && activeAudio) {
+    cancelFadeAnimation();
+    activeAudio.pause();
+    setPlaybackMode('idle');
+    return;
+  }
+
+  const audio = ensureAudio(normalizedRingtone);
+  const canResume = playbackMode === 'idle'
+    && activeRingtone === normalizedRingtone
+    && Number.isFinite(audio.currentTime)
+    && audio.currentTime > 0
+    && audio.currentTime < audio.duration;
+
+  setPlaybackMode('preview');
   cancelFadeAnimation();
   audio.loop = false;
-  audio.volume = 0;
+  if (!canResume) {
+    audio.volume = 0;
+    try {
+      audio.currentTime = 0;
+    } catch {
+      // noop
+    }
+  }
+
+  audio.play().then(() => {
+    if (canResume) {
+      audio.volume = 1;
+      notifyPreviewState();
+      return;
+    }
+    fadeVolume(0, 1, PREVIEW_FADE_IN_DURATION_MS);
+  }).catch(() => {
+    setPlaybackMode('idle');
+  });
+}
+
+export function stopPreviewAlarmSound(): void {
+  if (!activeAudio || playbackMode !== 'preview') return;
+  cancelFadeAnimation();
+  activeAudio.pause();
   try {
-    audio.currentTime = 0;
+    activeAudio.currentTime = 0;
   } catch {
     // noop
   }
-  audio.play().then(() => {
-    fadeVolume(0, 1, 240);
-  }).catch(() => {});
+  setPlaybackMode('idle');
 }
 
 export function stopAlarmSound(): void {
@@ -163,5 +230,19 @@ export function stopAlarmSound(): void {
     } catch {
       // noop
     }
+    setPlaybackMode('idle');
   });
+}
+
+export function subscribePreviewAlarmSoundState(
+  listener: (state: { playing: boolean; ringtone: SystemAlarmRingtone | null }) => void,
+): () => void {
+  previewStateListeners.add(listener);
+  listener({
+    playing: playbackMode === 'preview' && Boolean(activeAudio && !activeAudio.paused),
+    ringtone: activeRingtone,
+  });
+  return () => {
+    previewStateListeners.delete(listener);
+  };
 }

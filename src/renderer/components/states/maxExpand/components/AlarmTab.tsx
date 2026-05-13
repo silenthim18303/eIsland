@@ -31,6 +31,8 @@ import {
   DEFAULT_SYSTEM_ALARM_RINGTONE,
   normalizeSystemAlarmRingtone,
   previewAlarmSound,
+  stopPreviewAlarmSound,
+  subscribePreviewAlarmSoundState,
   SYSTEM_ALARM_RINGTONE_OPTIONS,
   type SystemAlarmRingtone,
 } from '../../../../utils/audio/alarmSound';
@@ -208,6 +210,7 @@ export function AlarmTab(): React.ReactElement {
   const [alarms, setAlarms] = useState<AlarmItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const skipPersistOnceRef = useRef(false);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
 
   /* 编辑态 */
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -271,6 +274,16 @@ export function AlarmTab(): React.ReactElement {
     persistAlarms(alarms);
   }, [alarms, loaded]);
 
+  useEffect(() => {
+    const unsubscribe = subscribePreviewAlarmSoundState((state) => {
+      setPreviewPlaying(state.playing);
+    });
+    return () => {
+      unsubscribe();
+      stopPreviewAlarmSound();
+    };
+  }, []);
+
   /** 星期几简写 */
   const weekdayLabel = useCallback((d: Weekday): string => {
     const keys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -323,6 +336,7 @@ export function AlarmTab(): React.ReactElement {
 
   /** 关闭编辑面板（新建 / 编辑共用） */
   const closeEditor = (): void => {
+    stopPreviewAlarmSound();
     setAdding(false);
     setEditingId(null);
     const _now = new Date();
@@ -590,7 +604,9 @@ export function AlarmTab(): React.ReactElement {
                 type="button"
                 onClick={() => previewAlarmSound(editorRingtone)}
               >
-                {t('maxExpand.alarm.previewRingtone', { defaultValue: '试听' })}
+                {previewPlaying
+                  ? t('maxExpand.alarm.pausePreviewRingtone', { defaultValue: '暂停' })
+                  : t('maxExpand.alarm.previewRingtone', { defaultValue: '试听' })}
               </button>
             </div>
             <div className="alarm-editor-ringtone-options">

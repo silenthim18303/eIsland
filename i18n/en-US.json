@@ -1175,6 +1175,7 @@
       "repeatField": "Repeat",
       "ringtoneField": "Ringtone",
       "previewRingtone": "Preview",
+      "pausePreviewRingtone": "Pause",
       "loopPlayback": "Loop ringtone playback",
       "cancel": "Cancel",
       "save": "Save",
