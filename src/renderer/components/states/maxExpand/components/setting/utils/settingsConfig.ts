@@ -159,7 +159,7 @@ export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = 
   'break-reminder': SvgIcon.BREAK,
   autostart: SvgIcon.CONTINUE,
   sound: SvgIcon.SOUND,
-  notification: SvgIcon.SOUND,
+  notification: SvgIcon.NOTIFICATION,
   pluginMarket: SvgIcon.PLUGIN,
 };
 
@@ -285,6 +285,7 @@ export const NAV_CARDS: NavCardDef[] = [
   { id: 'break-reminder', label: SETTINGS_TAB_LABELS['break-reminder'], desc: SETTINGS_TAB_DESCRIPTIONS['break-reminder'], icon: SETTINGS_TAB_ICONS['break-reminder'], tab: 'app', appPage: 'break-reminder' },
   { id: 'autostart', label: SETTINGS_TAB_LABELS.autostart, desc: SETTINGS_TAB_DESCRIPTIONS.autostart, icon: SETTINGS_TAB_ICONS.autostart, tab: 'app', appPage: 'autostart' },
   { id: 'sound', label: SETTINGS_TAB_LABELS.sound, desc: SETTINGS_TAB_DESCRIPTIONS.sound, icon: SETTINGS_TAB_ICONS.sound, tab: 'app', appPage: 'sound' },
+  { id: 'notification', label: SETTINGS_TAB_LABELS.notification, desc: SETTINGS_TAB_DESCRIPTIONS.notification, icon: SETTINGS_TAB_ICONS.notification, tab: 'app', appPage: 'notification' },
   { id: 'network', label: SETTINGS_TAB_LABELS.network, desc: SETTINGS_TAB_DESCRIPTIONS.network, icon: SETTINGS_TAB_ICONS.network, tab: 'network' },
   { id: 'mail', label: SETTINGS_TAB_LABELS.mail, desc: SETTINGS_TAB_DESCRIPTIONS.mail, icon: SETTINGS_TAB_ICONS.mail, tab: 'mail' },
   { id: 'weather', label: SETTINGS_TAB_LABELS.weather, desc: SETTINGS_TAB_DESCRIPTIONS.weather, icon: SETTINGS_TAB_ICONS.weather, tab: 'weather' },
