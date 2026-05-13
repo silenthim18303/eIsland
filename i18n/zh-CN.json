@@ -1173,6 +1173,10 @@
       "labelField": "备注",
       "labelPlaceholder": "闹钟备注（可选）",
       "repeatField": "重复",
+      "ringtoneField": "铃声",
+      "previewRingtone": "试听",
+      "pausePreviewRingtone": "暂停",
+      "loopPlayback": "循环播放铃声",
       "cancel": "取消",
       "save": "保存",
       "delete": "删除",
@@ -1195,6 +1199,11 @@
         "thu": "四",
         "fri": "五",
         "sat": "六"
+      },
+      "ringtones": {
+        "alarm1": "系统铃声 1",
+        "alarm2": "核弹",
+        "alarm3": "奶蛙捧腹大笑"
       }
     }
   },
@@ -1219,6 +1228,8 @@
       "alarm": "闹钟配置",
       "break-reminder": "休息提醒",
       "autostart": "实用工具",
+      "sound": "声音设置",
+      "notification": "通知设置",
       "network": "网络配置",
       "mail": "邮箱配置",
       "weather": "天气配置",
@@ -1685,6 +1696,29 @@
           "5": "5 分钟",
           "10": "10 分钟"
         }
+      }
+    },
+    "sound": {
+      "global": {
+        "title": "全局音量",
+        "hint": "影响闹钟与音效的整体输出音量。"
+      },
+      "alarmVolume": {
+        "title": "闹钟音量",
+        "hint": "仅影响闹钟响铃与试听音量。"
+      },
+      "effectVolume": {
+        "title": "音效音量",
+        "hint": "影响 STT 触发音与木鱼敲击音。"
+      }
+    },
+    "notification": {
+      "pageTitle": "通知设置",
+      "pageHint": "配置灵动岛通知提醒与展示行为。",
+      "sound": {
+        "title": "通知音效",
+        "hint": "通知触发时播放一次提示音。",
+        "toggle": "启用通知音效"
       }
     },
     "breakReminder": {
@@ -2601,6 +2635,14 @@
       "autostart": {
         "label": "实用工具",
         "desc": "应用控制、日志与开机启动配置。"
+      },
+      "sound": {
+        "label": "声音设置",
+        "desc": "音效、通知声音与音频输出配置。"
+      },
+      "notification": {
+        "label": "通知设置",
+        "desc": "配置灵动岛通知提醒与展示行为。"
       },
       "network": {
         "label": "网络配置",

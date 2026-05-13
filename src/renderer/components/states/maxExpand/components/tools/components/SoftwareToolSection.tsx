@@ -27,7 +27,7 @@
 import { useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchToolboxSoftwareList, type ToolboxSoftwareItem } from '../../../../../../api/tools/toolboxSoftwareApi';
-import { SETTINGS_OPEN_TAB_STORE_KEY } from '../config/toolboxConfig';
+import { SETTINGS_OPEN_TAB_STORE_KEY } from '../config/commonToolboxConfig';
 
 interface SoftwareToolSectionProps {
   onFeedbackNavigate: () => void;

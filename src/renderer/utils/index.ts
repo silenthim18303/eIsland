@@ -25,6 +25,7 @@
  */
 
 export * from './authSession';
+export * from './audio/alarmSound';
 export * from './logger';
 export * from './lrcParser';
 export * from './security';

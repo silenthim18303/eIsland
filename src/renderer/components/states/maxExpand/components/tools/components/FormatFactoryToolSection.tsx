@@ -42,7 +42,7 @@ import {
   type FormatFactoryVideoOutputFormat,
   type FormatFactoryVideoExtractTrack,
   type FormatFactoryPageKey,
-} from '../config/toolboxConfig';
+} from '../config/formatFactoryToolConfig';
 
 interface FormatFactoryToolSectionProps {
   formatFactoryPage: FormatFactoryPageKey;

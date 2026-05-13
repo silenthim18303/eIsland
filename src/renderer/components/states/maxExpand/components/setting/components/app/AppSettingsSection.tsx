@@ -40,6 +40,8 @@ import { AlarmSettingsPage } from './components/AlarmSettingsPage';
 import { BreakReminderSettingsPage } from './components/BreakReminderSettingsPage';
 import { AutostartSettingsPage } from './components/AutostartSettingsPage';
 import { AlbumSettingsPage } from './components/AlbumSettingsPage';
+import { SoundSettingsPage } from './components/SoundSettingsPage';
+import { NotificationSettingsPage } from './components/NotificationSettingsPage';
 import { AppSettingsPageDots } from './components/AppSettingsPageDots';
 import type { AppSettingsSectionProps } from './components/types';
 
@@ -302,6 +304,10 @@ export function AppSettingsSection({
         return <BreakReminderSettingsPage />;
       case 'autostart':
         return <AutostartSettingsPage autostartMode={autostartMode} setAutostartMode={setAutostartMode} />;
+      case 'sound':
+        return <SoundSettingsPage />;
+      case 'notification':
+        return <NotificationSettingsPage />;
       default:
         return null;
     }

@@ -20,62 +20,11 @@
 
 /**
  * @file toolboxConfig.ts
- * @description 工具箱页面公共配置常量与类型
+ * @description 工具箱配置聚合导出（兼容层）
  * @author 鸡哥
  */
 
-export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
-
-export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate', 'fileService', 'encodingService', 'networkService', 'formatFactory'] as const;
-export type ToolboxSidebarKey = (typeof TOOLBOX_SIDEBAR_KEYS)[number];
-
-export const TRANSLATE_LANGUAGES = [
-  { code: 'auto', labelKey: 'maxExpand.toolbox.translate.lang.auto' },
-  { code: 'zh', labelKey: 'maxExpand.toolbox.translate.lang.zh' },
-  { code: 'en', labelKey: 'maxExpand.toolbox.translate.lang.en' },
-  { code: 'ja', labelKey: 'maxExpand.toolbox.translate.lang.ja' },
-  { code: 'ko', labelKey: 'maxExpand.toolbox.translate.lang.ko' },
-  { code: 'fr', labelKey: 'maxExpand.toolbox.translate.lang.fr' },
-  { code: 'de', labelKey: 'maxExpand.toolbox.translate.lang.de' },
-  { code: 'es', labelKey: 'maxExpand.toolbox.translate.lang.es' },
-  { code: 'ru', labelKey: 'maxExpand.toolbox.translate.lang.ru' },
-] as const;
-
-export const TRANSLATE_TARGET_LANGUAGES = TRANSLATE_LANGUAGES.filter((lang) => lang.code !== 'auto');
-
-export const FORMAT_FACTORY_PAGES = ['image', 'video'] as const;
-export type FormatFactoryPageKey = (typeof FORMAT_FACTORY_PAGES)[number];
-
-export const FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS = ['png', 'jpg', 'webp', 'bmp', 'ico'] as const;
-export type FormatFactoryImageOutputFormat = (typeof FORMAT_FACTORY_IMAGE_OUTPUT_FORMATS)[number];
-
-export const FORMAT_FACTORY_ICO_OUTPUT_SIZES = [16, 32, 64, 128, 256] as const;
-export type FormatFactoryIcoOutputSize = (typeof FORMAT_FACTORY_ICO_OUTPUT_SIZES)[number];
-
-export const FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS = ['audio', 'video'] as const;
-export type FormatFactoryVideoExtractTrack = (typeof FORMAT_FACTORY_VIDEO_EXTRACT_TRACKS)[number];
-
-export const FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS = ['mp3', 'aac', 'wav', 'flac', 'ogg'] as const;
-export type FormatFactoryAudioOutputFormat = (typeof FORMAT_FACTORY_AUDIO_OUTPUT_FORMATS)[number];
-
-export const FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS = ['mp4', 'mkv', 'avi', 'webm'] as const;
-export type FormatFactoryVideoOutputFormat = (typeof FORMAT_FACTORY_VIDEO_OUTPUT_FORMATS)[number];
-
-export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-
-export interface DownloadTaskSnapshot {
-  id: string;
-  url: string;
-  savePath: string;
-  fileName: string;
-  totalBytes: number;
-  downloadedBytes: number;
-  progress: number;
-  speedBytesPerSecond: number;
-  estimatedFinishAt: number | null;
-  threads: number;
-  status: DownloadTaskStatus;
-  errorMessage?: string;
-  createdAt: number;
-  updatedAt: number;
-}
+export * from './commonToolboxConfig';
+export * from './translateToolConfig';
+export * from './formatFactoryToolConfig';
+export * from './downloadToolConfig';

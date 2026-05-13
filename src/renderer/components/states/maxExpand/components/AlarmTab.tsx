@@ -27,6 +27,15 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../utils/SvgIcon';
+import {
+  DEFAULT_SYSTEM_ALARM_RINGTONE,
+  normalizeSystemAlarmRingtone,
+  previewAlarmSound,
+  stopPreviewAlarmSound,
+  subscribePreviewAlarmSoundState,
+  SYSTEM_ALARM_RINGTONE_OPTIONS,
+  type SystemAlarmRingtone,
+} from '../../../../utils/audio/alarmSound';
 
 /** 星期几 0=周日 ... 6=周六 */
 type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -40,6 +49,8 @@ interface AlarmItem {
   label: string;
   enabled: boolean;
   repeat: Weekday[];
+  ringtone: SystemAlarmRingtone;
+  loop: boolean;
   createdAt: number;
 }
 
@@ -62,6 +73,8 @@ function normalizeAlarms(items: AlarmItem[]): AlarmItem[] {
     label: a.label ?? '',
     enabled: a.enabled ?? true,
     repeat: Array.isArray(a.repeat) ? a.repeat : [],
+    ringtone: normalizeSystemAlarmRingtone(a.ringtone),
+    loop: typeof a.loop === 'boolean' ? a.loop : true,
     createdAt: a.createdAt ?? Date.now(),
   }));
 }
@@ -197,6 +210,7 @@ export function AlarmTab(): React.ReactElement {
   const [alarms, setAlarms] = useState<AlarmItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const skipPersistOnceRef = useRef(false);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
 
   /* 编辑态 */
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -205,6 +219,8 @@ export function AlarmTab(): React.ReactElement {
   const [editSecond, setEditSecond] = useState(0);
   const [editLabel, setEditLabel] = useState('');
   const [editRepeat, setEditRepeat] = useState<Weekday[]>([]);
+  const [editRingtone, setEditRingtone] = useState<SystemAlarmRingtone>(DEFAULT_SYSTEM_ALARM_RINGTONE);
+  const [editLoop, setEditLoop] = useState(true);
 
   /* 新建态 */
   const [adding, setAdding] = useState(false);
@@ -213,6 +229,8 @@ export function AlarmTab(): React.ReactElement {
   const [newSecond, setNewSecond] = useState(0);
   const [newLabel, setNewLabel] = useState('');
   const [newRepeat, setNewRepeat] = useState<Weekday[]>([]);
+  const [newRingtone, setNewRingtone] = useState<SystemAlarmRingtone>(DEFAULT_SYSTEM_ALARM_RINGTONE);
+  const [newLoop, setNewLoop] = useState(true);
 
   /** 启动时从文件加载 */
   useEffect(() => {
@@ -256,6 +274,16 @@ export function AlarmTab(): React.ReactElement {
     persistAlarms(alarms);
   }, [alarms, loaded]);
 
+  useEffect(() => {
+    const unsubscribe = subscribePreviewAlarmSoundState((state) => {
+      setPreviewPlaying(state.playing);
+    });
+    return () => {
+      unsubscribe();
+      stopPreviewAlarmSound();
+    };
+  }, []);
+
   /** 星期几简写 */
   const weekdayLabel = useCallback((d: Weekday): string => {
     const keys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -298,6 +326,8 @@ export function AlarmTab(): React.ReactElement {
       label: newLabel.trim(),
       enabled: true,
       repeat: [...newRepeat],
+      ringtone: newRingtone,
+      loop: newLoop,
       createdAt: Date.now(),
     };
     setAlarms((prev) => [...prev, item]);
@@ -306,6 +336,7 @@ export function AlarmTab(): React.ReactElement {
 
   /** 关闭编辑面板（新建 / 编辑共用） */
   const closeEditor = (): void => {
+    stopPreviewAlarmSound();
     setAdding(false);
     setEditingId(null);
     const _now = new Date();
@@ -314,6 +345,10 @@ export function AlarmTab(): React.ReactElement {
     setNewSecond(_now.getSeconds());
     setNewLabel('');
     setNewRepeat([]);
+    setNewRingtone(DEFAULT_SYSTEM_ALARM_RINGTONE);
+    setNewLoop(true);
+    setEditRingtone(DEFAULT_SYSTEM_ALARM_RINGTONE);
+    setEditLoop(true);
   };
 
   /** 删除闹钟 */
@@ -336,6 +371,8 @@ export function AlarmTab(): React.ReactElement {
     setEditSecond(alarm.second);
     setEditLabel(alarm.label);
     setEditRepeat([...alarm.repeat]);
+    setEditRingtone(normalizeSystemAlarmRingtone(alarm.ringtone));
+    setEditLoop(typeof alarm.loop === 'boolean' ? alarm.loop : true);
   };
 
   /** 保存编辑 */
@@ -349,6 +386,8 @@ export function AlarmTab(): React.ReactElement {
       second: editSecond,
       label: editLabel.trim(),
       repeat: [...editRepeat],
+      ringtone: editRingtone,
+      loop: editLoop,
     } : a));
     closeEditor();
   };
@@ -426,11 +465,15 @@ export function AlarmTab(): React.ReactElement {
   const editorSecond = adding ? newSecond : editSecond;
   const editorLabel = adding ? newLabel : editLabel;
   const editorRepeat = adding ? newRepeat : editRepeat;
+  const editorRingtone = adding ? newRingtone : editRingtone;
+  const editorLoop = adding ? newLoop : editLoop;
   const setEditorHour = adding ? setNewHour : setEditHour;
   const setEditorMinute = adding ? setNewMinute : setEditMinute;
   const setEditorSecond = adding ? setNewSecond : setEditSecond;
   const setEditorLabel = adding ? setNewLabel : setEditLabel;
   const setEditorRepeat = adding ? setNewRepeat : setEditRepeat;
+  const setEditorRingtone = adding ? setNewRingtone : setEditRingtone;
+  const setEditorLoop = adding ? setNewLoop : setEditLoop;
 
   return (
     <div className={`alarm-tab-container${showEditor ? ' alarm-tab-container--split' : ''}`}>
@@ -551,6 +594,44 @@ export function AlarmTab(): React.ReactElement {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="alarm-editor-field">
+            <div className="alarm-editor-field-label-row">
+              <span className="alarm-editor-field-label">{t('maxExpand.alarm.ringtoneField', { defaultValue: '铃声' })}</span>
+              <button
+                className="alarm-editor-preview-btn"
+                type="button"
+                onClick={() => previewAlarmSound(editorRingtone)}
+              >
+                {previewPlaying
+                  ? t('maxExpand.alarm.pausePreviewRingtone', { defaultValue: '暂停' })
+                  : t('maxExpand.alarm.previewRingtone', { defaultValue: '试听' })}
+              </button>
+            </div>
+            <div className="alarm-editor-ringtone-options">
+              {SYSTEM_ALARM_RINGTONE_OPTIONS.map((item) => (
+                <button
+                  key={item.value}
+                  type="button"
+                  className={`alarm-editor-ringtone-btn${editorRingtone === item.value ? ' alarm-editor-ringtone-btn--active' : ''}`}
+                  onClick={() => setEditorRingtone(item.value)}
+                >
+                  {t(item.labelKey, { defaultValue: item.defaultLabel })}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="alarm-editor-field">
+            <label className="alarm-editor-check-row">
+              <input
+                type="checkbox"
+                checked={editorLoop}
+                onChange={(e) => setEditorLoop(e.target.checked)}
+              />
+              {t('maxExpand.alarm.loopPlayback', { defaultValue: '循环播放铃声' })}
+            </label>
           </div>
         </div>
       </div>

@@ -57,14 +57,18 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
 
   useEffect(() => {
     const unsub = window.api?.onAgentVoiceInputState?.((active: boolean) => {
+      const currentState = state;
       if (active) {
+        if (currentState === 'expanded' || currentState === 'maxExpand') return;
         setAgentVoiceInput();
       } else {
-        setIdle(true);
+        if (currentState === 'agentVoiceInput') {
+          setIdle(true);
+        }
       }
     });
     return () => { unsub?.(); };
-  }, [setAgentVoiceInput, setIdle]);
+  }, [state, setAgentVoiceInput, setIdle]);
 
   useEffect(() => {
     if (state !== 'idle') return;

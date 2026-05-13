@@ -34,7 +34,8 @@ import { NetworkServiceToolSection } from './tools/components/NetworkServiceTool
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { FormatFactoryToolSection } from './tools/components/FormatFactoryToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
-import type { FormatFactoryPageKey, ToolboxSidebarKey } from './tools/config/toolboxConfig';
+import type { FormatFactoryPageKey } from './tools/config/formatFactoryToolConfig';
+import type { ToolboxSidebarKey } from './tools/config/commonToolboxConfig';
 
 const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }> = [
   { key: 'download', labelKey: 'maxExpand.toolbox.sidebar.download' },

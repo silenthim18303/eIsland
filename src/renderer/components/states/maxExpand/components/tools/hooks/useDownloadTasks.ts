@@ -25,7 +25,7 @@
  */
 
 import { useEffect, useMemo, useState, type Dispatch, type SetStateAction } from 'react';
-import type { DownloadTaskSnapshot } from '../config/toolboxConfig';
+import type { DownloadTaskSnapshot } from '../config/downloadToolConfig';
 
 interface UseDownloadTasksResult {
   tasks: DownloadTaskSnapshot[];

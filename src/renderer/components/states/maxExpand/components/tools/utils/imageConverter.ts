@@ -26,7 +26,7 @@
 import type {
   FormatFactoryIcoOutputSize,
   FormatFactoryImageOutputFormat,
-} from '../config/toolboxConfig';
+} from '../config/formatFactoryToolConfig';
 
 export interface ConvertImageInRendererParams {
   filePath: string;

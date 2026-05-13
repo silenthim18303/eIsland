@@ -1173,6 +1173,10 @@
       "labelField": "Label",
       "labelPlaceholder": "Label (optional)",
       "repeatField": "Repeat",
+      "ringtoneField": "Ringtone",
+      "previewRingtone": "Preview",
+      "pausePreviewRingtone": "Pause",
+      "loopPlayback": "Loop ringtone playback",
       "cancel": "Cancel",
       "save": "Save",
       "delete": "Delete",
@@ -1195,6 +1199,11 @@
         "thu": "Thu",
         "fri": "Fri",
         "sat": "Sat"
+      },
+      "ringtones": {
+        "alarm1": "System Ringtone 1",
+        "alarm2": "Nuke",
+        "alarm3": "NL Laughing"
       }
     }
   },
@@ -1219,6 +1228,8 @@
       "alarm": "Alarm Settings",
       "break-reminder": "Break Reminders",
       "autostart": "Utilities",
+      "sound": "Sound Settings",
+      "notification": "Notification Settings",
       "network": "Network",
       "mail": "Mail",
       "weather": "Weather",
@@ -1685,6 +1696,29 @@
           "5": "5 min",
           "10": "10 min"
         }
+      }
+    },
+    "sound": {
+      "global": {
+        "title": "Global Volume",
+        "hint": "Controls the overall output for alarms and effects."
+      },
+      "alarmVolume": {
+        "title": "Alarm Volume",
+        "hint": "Only affects alarm ringing and ringtone preview volume."
+      },
+      "effectVolume": {
+        "title": "Effect Volume",
+        "hint": "Affects STT trigger sound and Mokugyo strike sound."
+      }
+    },
+    "notification": {
+      "pageTitle": "Notification Settings",
+      "pageHint": "Configure Dynamic Island notification alerts and display behavior.",
+      "sound": {
+        "title": "Notification Sound",
+        "hint": "Play a one-shot sound when a notification is triggered.",
+        "toggle": "Enable Notification Sound"
       }
     },
     "breakReminder": {
@@ -2606,6 +2640,14 @@
       "autostart": {
         "label": "Utilities",
         "desc": "App controls, logs, and startup options."
+      },
+      "sound": {
+        "label": "Sound Settings",
+        "desc": "Sound effects, notification sounds, and audio output configuration."
+      },
+      "notification": {
+        "label": "Notification Settings",
+        "desc": "Configure Dynamic Island notification alerts and display behavior."
       },
       "network": {
         "label": "Network",

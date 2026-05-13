@@ -36,6 +36,7 @@ import {
 } from '../config/agentVoiceInputConfig';
 import { getAudioContextCtor } from '../utils/agentVoiceInputAudio';
 import { pushFloat32Frames } from '../utils/agentVoiceInputPcm';
+import { readEffectiveAudioVolume } from '../../../../utils/audio/volume';
 
 interface UseAgentVoiceInputRuntimeOptions {
   setStatusText: React.Dispatch<React.SetStateAction<string>>;
@@ -87,6 +88,15 @@ export function useAgentVoiceInputRuntime(options: UseAgentVoiceInputRuntimeOpti
     moduleSttCleanup = stopAll;
 
     const start = async (): Promise<void> => {
+      const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
+      const triggerSound = new Audio('./audio/AGENT.wav');
+      triggerSound.volume = targetVolume;
+      void triggerSound.play().catch(() => {
+        triggerSound.src = './public/audio/AGENT.wav';
+        triggerSound.volume = targetVolume;
+        void triggerSound.play().catch(() => {});
+      });
+
       const token = readLocalToken();
       if (!token) {
         setStatusText('请先登录后使用语音识别');
