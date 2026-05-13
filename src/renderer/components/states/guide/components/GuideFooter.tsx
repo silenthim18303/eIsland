@@ -38,6 +38,11 @@ interface GuideFooterProps {
   onNext: () => void;
 }
 
+/**
+ * 渲染引导页底部导航与操作按钮。
+ * @param props - 引导页底部参数。
+ * @returns 引导页底部区域。
+ */
 export function GuideFooter({
   t,
   page,

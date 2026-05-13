@@ -36,6 +36,11 @@ export const SOUND_VOLUME_STORE_KEYS = new Set<string>([
 
 const DEFAULT_VOLUME = 1;
 
+/**
+ * 将音量值限制在 0 到 1 之间。
+ * @param value - 原始音量值。
+ * @returns 限制后的音量值。
+ */
 export function clampVolume(value: number): number {
   if (!Number.isFinite(value)) return DEFAULT_VOLUME;
   return Math.max(0, Math.min(1, value));

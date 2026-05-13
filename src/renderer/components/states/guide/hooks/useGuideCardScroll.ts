@@ -42,6 +42,11 @@ export interface UseGuideCardScrollResult {
   handleCardWheel: (e: WheelEvent) => void;
 }
 
+/**
+ * 管理引导页交互卡片的滚轮切换状态。
+ * @param params - 卡片滚轮切换所需参数。
+ * @returns 当前卡片索引、动画方向与滚轮处理器。
+ */
 export function useGuideCardScroll({
   page,
   guidePages,

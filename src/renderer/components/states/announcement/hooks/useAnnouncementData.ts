@@ -35,6 +35,10 @@ interface UseAnnouncementDataResult {
   announcement: AnnouncementData | null;
 }
 
+/**
+ * 拉取并维护公告数据状态。
+ * @returns 公告加载状态与数据。
+ */
 export function useAnnouncementData(): UseAnnouncementDataResult {
   const [loading, setLoading] = useState(true);
   const [announcement, setAnnouncement] = useState<AnnouncementData | null>(null);

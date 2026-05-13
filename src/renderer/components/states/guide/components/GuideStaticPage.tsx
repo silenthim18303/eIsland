@@ -49,6 +49,11 @@ interface GuideStaticPageProps {
   onAuthRegister: () => void;
 }
 
+/**
+ * 渲染引导页静态展示内容。
+ * @param props - 静态页面渲染参数。
+ * @returns 静态页面区域。
+ */
 export function GuideStaticPage({
   page,
   current,

@@ -42,6 +42,9 @@ function ensureNotificationAudio(): HTMLAudioElement {
   return notificationAudio;
 }
 
+/**
+ * 播放一次通知提示音。
+ */
 export function playNotificationSoundOnce(): void {
   void (async () => {
     const enabled = await window.api?.storeRead(NOTIFICATION_SOUND_ENABLED_STORE_KEY).catch(() => true);

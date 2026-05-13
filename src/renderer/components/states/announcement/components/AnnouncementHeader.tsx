@@ -40,6 +40,11 @@ function formatDatetime(value?: string): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
+/**
+ * 渲染公告面板头部信息与关闭按钮。
+ * @param props - 公告头部渲染参数。
+ * @returns 公告头部区域。
+ */
 export function AnnouncementHeader({ announcement, onClose }: AnnouncementHeaderProps): ReactElement {
   const { t } = useTranslation();
 

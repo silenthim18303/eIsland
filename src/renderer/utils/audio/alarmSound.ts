@@ -147,6 +147,11 @@ function fadeVolume(from: number, to: number, durationMs: number, onDone?: () =>
   fadeAnimationFrameId = window.requestAnimationFrame(step);
 }
 
+/**
+ * 标准化系统闹钟铃声值。
+ * @param value - 任意来源的铃声值。
+ * @returns 合法的系统闹钟铃声枚举。
+ */
 export function normalizeSystemAlarmRingtone(value: unknown): SystemAlarmRingtone {
   if (value === SystemAlarmRingtone.ALARM_1 || value === SystemAlarmRingtone.ALARM_2 || value === SystemAlarmRingtone.ALARM_3) {
     return value;
@@ -154,6 +159,10 @@ export function normalizeSystemAlarmRingtone(value: unknown): SystemAlarmRington
   return DEFAULT_SYSTEM_ALARM_RINGTONE;
 }
 
+/**
+ * 播放闹钟铃声。
+ * @param options - 闹钟播放配置。
+ */
 export function playAlarmSound(options: { ringtone: SystemAlarmRingtone; loop: boolean }): void {
   const audio = ensureAudio(options.ringtone);
   setPlaybackMode('alarm');
@@ -171,6 +180,10 @@ export function playAlarmSound(options: { ringtone: SystemAlarmRingtone; loop: b
   }).catch(() => {});
 }
 
+/**
+ * 预览指定铃声，再次触发同一铃声可暂停预览。
+ * @param ringtone - 需要预览的铃声。
+ */
 export function previewAlarmSound(ringtone: SystemAlarmRingtone): void {
   const normalizedRingtone = normalizeSystemAlarmRingtone(ringtone);
   const isSamePreviewPlaying = playbackMode === 'preview'
@@ -221,6 +234,9 @@ export function previewAlarmSound(ringtone: SystemAlarmRingtone): void {
   });
 }
 
+/**
+ * 停止铃声预览播放。
+ */
 export function stopPreviewAlarmSound(): void {
   if (!activeAudio || playbackMode !== 'preview') return;
   cancelFadeAnimation();
@@ -233,6 +249,9 @@ export function stopPreviewAlarmSound(): void {
   setPlaybackMode('idle');
 }
 
+/**
+ * 停止闹钟铃声播放。
+ */
 export function stopAlarmSound(): void {
   if (!activeAudio) return;
   const audio = activeAudio;
@@ -249,6 +268,11 @@ export function stopAlarmSound(): void {
   });
 }
 
+/**
+ * 订阅铃声预览状态变化。
+ * @param listener - 预览状态监听器。
+ * @returns 取消订阅函数。
+ */
 export function subscribePreviewAlarmSoundState(
   listener: (state: { playing: boolean; ringtone: SystemAlarmRingtone | null }) => void,
 ): () => void {

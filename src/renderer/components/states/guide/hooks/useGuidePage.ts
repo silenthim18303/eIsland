@@ -37,6 +37,11 @@ export interface UseGuidePageResult {
   resetGuideState: () => void;
 }
 
+/**
+ * 管理引导页分页与前进后退逻辑。
+ * @param pageCount - 引导页总页数。
+ * @returns 引导页分页状态与导航函数。
+ */
 export function useGuidePage(pageCount: number): UseGuidePageResult {
   const [page, setPageState] = useState(() => lastGuidePage);
 

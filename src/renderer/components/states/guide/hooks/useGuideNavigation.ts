@@ -49,6 +49,11 @@ export interface UseGuideNavigationResult {
   resetGuideState: () => void;
 }
 
+/**
+ * 组合引导页分页与卡片滚轮切换逻辑。
+ * @param params - 引导导航参数。
+ * @returns 引导页导航状态与事件处理器。
+ */
 export function useGuideNavigation({
   guidePages,
   interactionCardsLength,

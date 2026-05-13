@@ -73,6 +73,11 @@ export interface SettingCard {
   demo: MiniSettingDemo;
 }
 
+/**
+ * 获取示例歌词内容。
+ * @param t - 国际化函数。
+ * @returns 示例歌词数组。
+ */
 export function getSampleLyrics(t: TFunction): string[] {
   return [
     t('guide.mini.music.sampleLyrics.0', { defaultValue: '这是一句歌词示例' }),
@@ -81,6 +86,11 @@ export function getSampleLyrics(t: TFunction): string[] {
   ];
 }
 
+/**
+ * 获取设置功能卡片列表。
+ * @param t - 国际化函数。
+ * @returns 设置卡片数组。
+ */
 export function getSettingCards(t: TFunction): SettingCard[] {
   return [
     {
@@ -116,6 +126,11 @@ export function getSettingCards(t: TFunction): SettingCard[] {
   ];
 }
 
+/**
+ * 获取实用工具卡片列表。
+ * @param t - 国际化函数。
+ * @returns 工具卡片数组。
+ */
 export function getToolCards(t: TFunction): ToolCard[] {
   return [
     {
@@ -145,6 +160,11 @@ export function getToolCards(t: TFunction): ToolCard[] {
   ];
 }
 
+/**
+ * 获取音乐能力卡片列表。
+ * @param t - 国际化函数。
+ * @returns 音乐卡片数组。
+ */
 export function getMusicCards(t: TFunction): MusicCard[] {
   return [
     {
@@ -168,6 +188,11 @@ export function getMusicCards(t: TFunction): MusicCard[] {
   ];
 }
 
+/**
+ * 获取交互演示卡片列表。
+ * @param t - 国际化函数。
+ * @returns 交互卡片数组。
+ */
 export function getInteractionCards(t: TFunction): InteractionCard[] {
   return [
     {
@@ -197,6 +222,12 @@ export function getInteractionCards(t: TFunction): InteractionCard[] {
   ];
 }
 
+/**
+ * 获取引导页内容配置。
+ * @param t - 国际化函数。
+ * @param showAuthPrompt - 是否展示账号引导页。
+ * @returns 引导页数组。
+ */
 export function getGuidePages(t: TFunction, showAuthPrompt: boolean): GuidePage[] {
   const pages: GuidePage[] = [
     {

@@ -43,6 +43,11 @@ interface GuideInteractivePageProps {
   renderMini: (safeIndex: number) => ReactElement;
 }
 
+/**
+ * 渲染引导页互动卡片内容。
+ * @param props - 互动卡片页面参数。
+ * @returns 互动卡片页面。
+ */
 export function GuideInteractivePage({
   page,
   cards,

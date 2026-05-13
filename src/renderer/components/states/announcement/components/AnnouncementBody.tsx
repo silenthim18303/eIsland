@@ -33,6 +33,11 @@ interface AnnouncementBodyProps {
   announcement: AnnouncementData | null;
 }
 
+/**
+ * 渲染公告面板正文内容。
+ * @param props - 公告正文渲染参数。
+ * @returns 公告正文区域。
+ */
 export function AnnouncementBody({ loading, announcement }: AnnouncementBodyProps): ReactElement {
   const { t } = useTranslation();
 
