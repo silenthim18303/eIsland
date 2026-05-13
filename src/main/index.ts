@@ -125,11 +125,23 @@ if (!gotTheLock) {
 let mainWindow: BrowserWindow | null = null;
 let agentVoiceInputWindow: BrowserWindow | null = null;
 
+function isIslandInExpandedOrMaxExpandState(): boolean {
+  if (!mainWindow || mainWindow.isDestroyed()) return false;
+  const bounds = mainWindow.getBounds();
+  const inExpanded = bounds.width === EXPANDED_FULL_WIDTH && bounds.height === EXPANDED_FULL_HEIGHT;
+  const inMaxExpand = bounds.width === SETTINGS_WIDTH && bounds.height === SETTINGS_HEIGHT;
+  return inExpanded || inMaxExpand;
+}
+
 /**
  * 创建全屏透明 Agent 语音输入窗口
  * @description 加载 AIbackground.html，显示 Agent 语音输入背景光效
  */
 function showAgentVoiceInputWindow(): void {
+  if (isIslandInExpandedOrMaxExpandState()) {
+    return;
+  }
+
   if (agentVoiceInputWindow && !agentVoiceInputWindow.isDestroyed()) {
     agentVoiceInputWindow.show();
     return;
