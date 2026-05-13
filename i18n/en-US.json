@@ -1173,6 +1173,9 @@
       "labelField": "Label",
       "labelPlaceholder": "Label (optional)",
       "repeatField": "Repeat",
+      "ringtoneField": "Ringtone",
+      "previewRingtone": "Preview",
+      "loopPlayback": "Loop ringtone playback",
       "cancel": "Cancel",
       "save": "Save",
       "delete": "Delete",
@@ -1195,6 +1198,10 @@
         "thu": "Thu",
         "fri": "Fri",
         "sat": "Sat"
+      },
+      "ringtones": {
+        "alarm1": "System Ringtone 1",
+        "alarm2": "System Ringtone 2"
       }
     }
   },

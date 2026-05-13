@@ -1173,6 +1173,9 @@
       "labelField": "备注",
       "labelPlaceholder": "闹钟备注（可选）",
       "repeatField": "重复",
+      "ringtoneField": "铃声",
+      "previewRingtone": "试听",
+      "loopPlayback": "循环播放铃声",
       "cancel": "取消",
       "save": "保存",
       "delete": "删除",
@@ -1195,6 +1198,10 @@
         "thu": "四",
         "fri": "五",
         "sat": "六"
+      },
+      "ringtones": {
+        "alarm1": "系统铃声 1",
+        "alarm2": "系统铃声 2"
       }
     }
   },

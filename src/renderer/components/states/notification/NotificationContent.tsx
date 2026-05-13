@@ -28,6 +28,7 @@ import { useEffect, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import { SvgIcon } from '../../../utils/SvgIcon';
+import { ALARM_SOUND_STOP_EVENT } from '../../../utils/audio/alarmSound';
 import { getWebsiteFaviconUrl, getWebsiteFaviconUrls, getWebsiteHostname } from '../../../api/site/siteMetaApi';
 import { fetchUpdateSourceUrl } from '../../../api/user/userAccountApi';
 import { readLocalToken } from '../../../utils/userAccount';
@@ -330,6 +331,7 @@ export function NotificationContent({
   })();
 
   const dismiss = (): void => {
+    window.dispatchEvent(new CustomEvent(ALARM_SOUND_STOP_EVENT));
     const store = useIslandStore.getState();
     if (store.isMusicPlaying && store.coverImage && (store.syncedLyrics?.length || store.lyricsLoading)) {
       setLyrics();

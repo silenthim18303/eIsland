@@ -27,6 +27,28 @@
 import { useEffect, useRef } from 'react';
 import { SvgIcon } from '../../utils/SvgIcon';
 import type { NotificationData, TimerData } from '../../store/types';
+import {
+  ALARM_SOUND_STOP_EVENT,
+  normalizeSystemAlarmRingtone,
+  playAlarmSound,
+  stopAlarmSound,
+} from '../../utils/audio/alarmSound';
+
+const ALARM_STORE_KEY = 'alarms';
+const ALARM_SOUND_ENABLED_STORE_KEY = 'alarm-sound-enabled';
+const ALARM_NOTIFICATION_STORE_KEY = 'alarm-notification-enabled';
+
+interface AlarmItemSnapshot {
+  id: number;
+  hour: number;
+  minute: number;
+  second: number;
+  label?: string;
+  enabled?: boolean;
+  repeat?: number[];
+  ringtone?: unknown;
+  loop?: boolean;
+}
 
 interface UseIslandTimerAndAlarmOptions {
   language: string | undefined;
@@ -51,6 +73,18 @@ export function useIslandTimerAndAlarm(options: UseIslandTimerAndAlarmOptions): 
 
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const alarmFiredSetRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const handleStop = (): void => {
+      stopAlarmSound();
+    };
+
+    window.addEventListener(ALARM_SOUND_STOP_EVENT, handleStop);
+    return () => {
+      window.removeEventListener(ALARM_SOUND_STOP_EVENT, handleStop);
+      stopAlarmSound();
+    };
+  }, []);
 
   useEffect(() => {
     if (timerIntervalRef.current) {
@@ -88,11 +122,12 @@ export function useIslandTimerAndAlarm(options: UseIslandTimerAndAlarmOptions): 
   }, [timerData?.state, timerData?.remainingSeconds, setTimerData, language, setNotificationRef, t]);
 
   useEffect(() => {
-    const ALARM_STORE_KEY = 'alarms';
     const alarmInterval = setInterval(async () => {
       try {
         const data = await window.api?.storeRead(ALARM_STORE_KEY);
         if (!Array.isArray(data) || data.length === 0) return;
+        const soundEnabled = (await window.api?.storeRead(ALARM_SOUND_ENABLED_STORE_KEY).catch(() => true)) !== false;
+        const notificationEnabled = (await window.api?.storeRead(ALARM_NOTIFICATION_STORE_KEY).catch(() => true)) !== false;
         const now = new Date();
         const h = now.getHours();
         const m = now.getMinutes();
@@ -100,12 +135,15 @@ export function useIslandTimerAndAlarm(options: UseIslandTimerAndAlarmOptions): 
         const weekday = now.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
         const timeKey = `${h}:${m}:${s}`;
         const disableOnceAlarmIds: number[] = [];
+        const triggeredSounds: Array<{ ringtone: unknown; loop: boolean }> = [];
 
-        data.forEach((alarm) => {
+        data.forEach((alarmRaw) => {
+          const alarm = alarmRaw as AlarmItemSnapshot;
           if (!alarm || !alarm.enabled) return;
           if (alarm.hour !== h || alarm.minute !== m || alarm.second !== s) return;
-          const hasRepeat = Array.isArray(alarm.repeat) && alarm.repeat.length > 0;
-          if (hasRepeat && !alarm.repeat.includes(weekday)) return;
+          const repeatDays = Array.isArray(alarm.repeat) ? alarm.repeat : [];
+          const hasRepeat = repeatDays.length > 0;
+          if (hasRepeat && !repeatDays.includes(weekday)) return;
 
           const firedKey = `${alarm.id}-${timeKey}`;
           if (alarmFiredSetRef.current.has(firedKey)) return;
@@ -113,18 +151,33 @@ export function useIslandTimerAndAlarm(options: UseIslandTimerAndAlarmOptions): 
 
           const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
           const label = alarm.label ? `${alarm.label}` : '';
-          const body = label
-            ? t('notification.alarm.bodyWithLabel', { defaultValue: '{{time}} — {{label}}', time: timeStr, label })
-            : t('notification.alarm.body', { defaultValue: '{{time}}', time: timeStr });
-          setNotificationRef.current({
-            title: t('notification.alarm.title', { defaultValue: '闹钟提醒' }),
-            body,
+          if (notificationEnabled) {
+            const body = label
+              ? t('notification.alarm.bodyWithLabel', { defaultValue: '{{time}} — {{label}}', time: timeStr, label })
+              : t('notification.alarm.body', { defaultValue: '{{time}}', time: timeStr });
+            setNotificationRef.current({
+              title: t('notification.alarm.title', { defaultValue: '闹钟提醒' }),
+              body,
+            });
+          }
+
+          triggeredSounds.push({
+            ringtone: alarm.ringtone,
+            loop: alarm.loop !== false,
           });
 
           if (!hasRepeat) {
             disableOnceAlarmIds.push(alarm.id);
           }
         });
+
+        if (soundEnabled && triggeredSounds.length > 0) {
+          const latestSound = triggeredSounds[triggeredSounds.length - 1];
+          playAlarmSound({
+            ringtone: normalizeSystemAlarmRingtone(latestSound.ringtone),
+            loop: latestSound.loop,
+          });
+        }
 
         if (disableOnceAlarmIds.length > 0) {
           const updated = data.map((a: { id: number }) =>

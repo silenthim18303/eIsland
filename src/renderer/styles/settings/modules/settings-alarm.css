@@ -533,6 +533,63 @@
   letter-spacing: -0.01em;
 }
 
+.alarm-editor-preview-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.62);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.alarm-editor-preview-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+  color: rgba(var(--color-text-rgb), 0.82);
+}
+
+.alarm-editor-ringtone-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.alarm-editor-ringtone-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.48);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.alarm-editor-ringtone-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.12);
+  color: rgba(var(--color-text-rgb), 0.72);
+}
+
+.alarm-editor-ringtone-btn--active,
+.alarm-editor-ringtone-btn--active:hover {
+  background: rgba(var(--color-text-rgb), 0.82);
+  color: rgba(var(--color-bg-rgb, 0, 0, 0), 0.95);
+}
+
+.alarm-editor-check-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(var(--color-text-rgb), 0.62);
+  font-size: 13px;
+}
+
+.alarm-editor-check-row input[type='checkbox'] {
+  width: 14px;
+  height: 14px;
+}
+
 .alarm-editor-label-input {
   width: 100%;
   border: none;
