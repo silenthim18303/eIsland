@@ -1202,7 +1202,8 @@
       },
       "ringtones": {
         "alarm1": "System Ringtone 1",
-        "alarm2": "System Ringtone 2"
+        "alarm2": "Nuke",
+        "alarm3": "NL Laughing"
       }
     }
   },

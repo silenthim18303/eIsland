@@ -29,6 +29,7 @@ import { readEffectiveAudioVolume } from './volume';
 export enum SystemAlarmRingtone {
   ALARM_1 = 'alarm-1',
   ALARM_2 = 'alarm-2',
+  ALARM_3 = 'alarm-3',
 }
 
 export interface SystemAlarmRingtoneOption {
@@ -53,6 +54,12 @@ export const SYSTEM_ALARM_RINGTONE_OPTIONS: SystemAlarmRingtoneOption[] = [
     src: './audio/ALARM/ALARM_2.wav',
     labelKey: 'maxExpand.alarm.ringtones.alarm2',
     defaultLabel: '系统铃声 2',
+  },
+  {
+    value: SystemAlarmRingtone.ALARM_3,
+    src: './audio/ALARM/ALARM_NAILONG_3.mp3',
+    labelKey: 'maxExpand.alarm.ringtones.alarm3',
+    defaultLabel: '奶蛙捧腹大笑',
   },
 ];
 
@@ -141,7 +148,7 @@ function fadeVolume(from: number, to: number, durationMs: number, onDone?: () =>
 }
 
 export function normalizeSystemAlarmRingtone(value: unknown): SystemAlarmRingtone {
-  if (value === SystemAlarmRingtone.ALARM_1 || value === SystemAlarmRingtone.ALARM_2) {
+  if (value === SystemAlarmRingtone.ALARM_1 || value === SystemAlarmRingtone.ALARM_2 || value === SystemAlarmRingtone.ALARM_3) {
     return value;
   }
   return DEFAULT_SYSTEM_ALARM_RINGTONE;
