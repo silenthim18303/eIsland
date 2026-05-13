@@ -906,6 +906,7 @@
         "fileService": "文件服务",
         "encodingService": "编码服务",
         "networkService": "网络服务",
+        "fileCompression": "文件压缩",
         "formatFactory": "格式工厂"
       },
       "software": {
@@ -1059,6 +1060,15 @@
           "upload": "上传速度",
           "resultTitle": "测试结果"
         }
+      },
+      "fileCompression": {
+        "title": "文件压缩",
+        "subtitle": "选择文件并配置输出路径后进行压缩，当前版本先提供界面入口。",
+        "pickFile": "选择文件",
+        "noFile": "未选择文件",
+        "outputPlaceholder": "输出路径配置即将开放",
+        "startBtn": "开始压缩",
+        "comingSoon": "文件压缩能力开发中，敬请期待。"
       },
       "formatFactory": {
         "pages": {

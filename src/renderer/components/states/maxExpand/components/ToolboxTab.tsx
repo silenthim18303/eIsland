@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
 import { DownloadToolSection } from './tools/components/DownloadToolSection';
 import { EncodingServiceToolSection } from './tools/components/EncodingServiceToolSection';
+import { FileCompressionToolSection } from './tools/components/FileCompressionToolSection';
 import { FileServiceToolSection } from './tools/components/FileServiceToolSection';
 import { NetworkServiceToolSection } from './tools/components/NetworkServiceToolSection';
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
@@ -44,6 +45,7 @@ const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }>
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
   { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
   { key: 'networkService', labelKey: 'maxExpand.toolbox.sidebar.networkService' },
+  { key: 'fileCompression', labelKey: 'maxExpand.toolbox.sidebar.fileCompression' },
   { key: 'formatFactory', labelKey: 'maxExpand.toolbox.sidebar.formatFactory' },
 ];
 
@@ -95,6 +97,7 @@ export function ToolboxTab(): ReactElement {
           {activeSidebar === 'fileService' && <FileServiceToolSection />}
           {activeSidebar === 'encodingService' && <EncodingServiceToolSection />}
           {activeSidebar === 'networkService' && <NetworkServiceToolSection />}
+          {activeSidebar === 'fileCompression' && <FileCompressionToolSection />}
           {activeSidebar === 'formatFactory' && (
             <FormatFactoryToolSection
               formatFactoryPage={formatFactoryPage}

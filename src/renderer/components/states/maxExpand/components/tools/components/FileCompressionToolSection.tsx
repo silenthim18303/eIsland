@@ -19,12 +19,16 @@
  */
 
 /**
- * @file commonToolboxConfig.ts
- * @description 工具箱公共配置常量与类型
+ * @file FileCompressionToolSection.tsx
+ * @description 工具箱文件压缩模块（界面入口）
  * @author 鸡哥
  */
 
-export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
+import type { ReactElement } from 'react';
 
-export const TOOLBOX_SIDEBAR_KEYS = ['download', 'software', 'translate', 'fileService', 'encodingService', 'networkService', 'fileCompression', 'formatFactory'] as const;
-export type ToolboxSidebarKey = (typeof TOOLBOX_SIDEBAR_KEYS)[number];
+/**
+ * 文件压缩模块主视图。
+ */
+export function FileCompressionToolSection(): ReactElement {
+  return <div />;
+}

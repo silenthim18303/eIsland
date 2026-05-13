@@ -906,6 +906,7 @@
         "fileService": "File Service",
         "encodingService": "Encoding Svc",
         "networkService": "Network Svc",
+        "fileCompression": "File Compression",
         "formatFactory": "Format Factory"
       },
       "software": {
@@ -1059,6 +1060,15 @@
           "resultTitle": "Test Result",
           "result": "Result"
         }
+      },
+      "fileCompression": {
+        "title": "File Compression",
+        "subtitle": "Select a file and configure output path for compression. This version currently provides the UI entry first.",
+        "pickFile": "Select File",
+        "noFile": "No file selected",
+        "outputPlaceholder": "Output path configuration will be available soon",
+        "startBtn": "Start Compression",
+        "comingSoon": "File compression capability is under development."
       },
       "formatFactory": {
         "pages": {
