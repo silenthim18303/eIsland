@@ -51,7 +51,7 @@
 .pm-gauge-grid {
   display: grid;
   grid-template-columns: auto auto;
-  gap: 4px 8px;
+  gap: 2px 8px;
 }
 
 .pm-gauge-cell {
