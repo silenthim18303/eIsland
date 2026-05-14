@@ -417,6 +417,7 @@
       "overview": "总览",
       "song": "歌曲",
       "tools": "工具",
+      "performanceMonitor": "性能监控",
       "maxExpand": "最大展开",
       "switchToPage": "切换到{{label}}页面"
     }

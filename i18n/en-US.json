@@ -417,6 +417,7 @@
       "overview": "Overview",
       "song": "Music",
       "tools": "Tools",
+      "performanceMonitor": "Performance Monitor",
       "maxExpand": "Max Expand",
       "switchToPage": "Switch to {{label}} page"
     }

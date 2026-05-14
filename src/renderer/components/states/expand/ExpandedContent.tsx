@@ -30,6 +30,7 @@ import useIslandStore from '../../../store/slices';
 import type { ExpandTab } from '../../../store/types';
 import '../../../styles/expanded/expanded.css';
 import { OverviewTab } from './components/OverviewTab';
+import { PerformanceMonitorTab } from './components/PerformanceMonitorTab';
 import { SongTab } from './components/SongTab';
 import { ToolsTab } from './components/ToolsTab';
 
@@ -37,7 +38,7 @@ import { ToolsTab } from './components/ToolsTab';
 type NavDotId = ExpandTab | 'maxExpand';
 
 /** 导航点配置 */
-const EXPAND_NAV_DOTS: NavDotId[] = ['hover', 'overview', 'song', 'tools', 'maxExpand'];
+const EXPAND_NAV_DOTS: NavDotId[] = ['hover', 'overview', 'song', 'tools', 'performanceMonitor', 'maxExpand'];
 
 /**
  * Expanded 状态内容组件
@@ -75,7 +76,9 @@ export function ExpandedContent(): React.ReactElement {
           ? '歌曲'
           : tab === 'tools'
             ? '工具'
-            : '最大展开',
+            : tab === 'performanceMonitor'
+              ? '性能监控'
+              : '最大展开',
   });
 
   /** 滚轮切换 Tab */
@@ -119,6 +122,7 @@ export function ExpandedContent(): React.ReactElement {
           {expandTab === 'overview' && <OverviewTab />}
           {expandTab === 'song' && <SongTab />}
           {expandTab === 'tools' && <ToolsTab />}
+          {expandTab === 'performanceMonitor' && <PerformanceMonitorTab />}
         </div>
       </div>
 
