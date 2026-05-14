@@ -956,30 +956,6 @@ const api = {
   getFocusedWindow: (): Promise<{ id: string; title: string; processName: string; processPath: string | null; processId: number | null; iconDataUrl: string | null } | null> => {
     return ipcRenderer.invoke('system:focused-window:get');
   },
-  /** 获取系统性能快照 */
-  getSystemPerformanceSnapshot: (): Promise<{
-    timestamp: number;
-    cpuUsagePercent: number;
-    gpuUsagePercent: number;
-    memoryUsagePercent: number;
-    memoryUsedBytes: number;
-    memoryTotalBytes: number;
-    diskUsagePercent: number;
-    diskUsedBytes: number;
-    diskTotalBytes: number;
-    netRxBytesPerSec: number;
-    netTxBytesPerSec: number;
-    uptimeSeconds: number;
-    cpuModel: string;
-    cpuCores: number;
-    cpuThreads: number;
-    cpuSpeedGHz: number;
-    gpuModel: string;
-    gpuVramMB: number;
-    osName: string;
-  } | null> => {
-    return ipcRenderer.invoke('system:performance:snapshot:get');
-  },
   /** 获取隐藏进程名单 */
   hideProcessListGet: (): Promise<string[]> => {
     return ipcRenderer.invoke('hide-process-list:get');

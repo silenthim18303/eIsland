@@ -56,28 +56,6 @@ export interface RunningWindowInfo {
   iconDataUrl: string | null;
 }
 
-export interface SystemPerformanceSnapshot {
-  timestamp: number;
-  cpuUsagePercent: number;
-  gpuUsagePercent: number;
-  memoryUsagePercent: number;
-  memoryUsedBytes: number;
-  memoryTotalBytes: number;
-  diskUsagePercent: number;
-  diskUsedBytes: number;
-  diskTotalBytes: number;
-  netRxBytesPerSec: number;
-  netTxBytesPerSec: number;
-  uptimeSeconds: number;
-  cpuModel: string;
-  cpuCores: number;
-  cpuThreads: number;
-  cpuSpeedGHz: number;
-  gpuModel: string;
-  gpuVramMB: number;
-  osName: string;
-}
-
 declare global {
   interface Window {
     electron: ElectronAPI;
@@ -265,7 +243,6 @@ declare global {
       getRunningNonSystemProcessesWithIcons: () => Promise<RunningProcessInfo[]>;
       getOpenWindowsWithIcons: () => Promise<RunningWindowInfo[]>;
       getFocusedWindow: () => Promise<RunningWindowInfo | null>;
-      getSystemPerformanceSnapshot: () => Promise<SystemPerformanceSnapshot | null>;
       hideProcessListGet: () => Promise<string[]>;
       hideProcessListSet: (list: string[]) => Promise<boolean>;
       onSourceSwitchRequest: (callback: (data: { sourceAppId: string; title: string; artist: string }) => void) => () => void;
