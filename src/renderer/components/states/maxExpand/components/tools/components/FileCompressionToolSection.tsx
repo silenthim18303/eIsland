@@ -25,10 +25,50 @@
  */
 
 import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  FILE_COMPRESSION_PAGES,
+  type FileCompressionPageKey,
+} from '../config/fileCompressionToolConfig';
+
+interface FileCompressionToolSectionProps {
+  fileCompressionPage: FileCompressionPageKey;
+  setFileCompressionPage: (page: FileCompressionPageKey) => void;
+}
 
 /**
  * 文件压缩模块主视图。
  */
-export function FileCompressionToolSection(): ReactElement {
-  return <div />;
+export function FileCompressionToolSection({
+  fileCompressionPage,
+  setFileCompressionPage,
+}: FileCompressionToolSectionProps): ReactElement {
+  const { t } = useTranslation();
+
+  const pageLabels: Record<FileCompressionPageKey, string> = {
+    imageCompression: t('maxExpand.toolbox.fileCompression.pages.imageCompression'),
+  };
+
+  return (
+    <div className="settings-app-pages-layout">
+      <div className="settings-app-page-main">
+        {fileCompressionPage === 'imageCompression' && (
+          <div className="settings-file-compression-page-panel" />
+        )}
+      </div>
+      <div className="settings-app-page-dots">
+        {FILE_COMPRESSION_PAGES.map((page) => (
+          <button
+            key={page}
+            className={`settings-app-page-dot ${fileCompressionPage === page ? 'active' : ''}`}
+            data-label={pageLabels[page]}
+            type="button"
+            onClick={() => setFileCompressionPage(page)}
+            title={pageLabels[page]}
+            aria-label={pageLabels[page]}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }

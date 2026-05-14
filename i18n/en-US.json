@@ -1063,6 +1063,9 @@
       },
       "fileCompression": {
         "title": "File Compression",
+        "pages": {
+          "imageCompression": "Image Compression"
+        },
         "subtitle": "Select a file and configure output path for compression. This version currently provides the UI entry first.",
         "pickFile": "Select File",
         "noFile": "No file selected",

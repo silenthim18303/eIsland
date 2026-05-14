@@ -1063,6 +1063,9 @@
       },
       "fileCompression": {
         "title": "文件压缩",
+        "pages": {
+          "imageCompression": "图像压缩"
+        },
         "subtitle": "选择文件并配置输出路径后进行压缩，当前版本先提供界面入口。",
         "pickFile": "选择文件",
         "noFile": "未选择文件",
