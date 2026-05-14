@@ -88,13 +88,13 @@ export function ToolboxTab(): ReactElement {
         </div>
 
         <div className="max-expand-settings-panel">
-          <div className="max-expand-settings-title toolbox-panel-title">
-            {activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}
+          <div className="max-expand-settings-title toolbox-panel-title settings-app-title-line">
+            <span>{activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}</span>
             {activeSidebar === 'fileCompression' && fileCompressionPageLabel && (
-              <span className="settings-app-title-sub"> - {fileCompressionPageLabel}</span>
+              <span className="settings-app-title-sub">- {fileCompressionPageLabel}</span>
             )}
             {activeSidebar === 'formatFactory' && formatFactoryPageLabel && (
-              <span className="settings-app-title-sub"> - {formatFactoryPageLabel}</span>
+              <span className="settings-app-title-sub">- {formatFactoryPageLabel}</span>
             )}
           </div>
           {activeSidebar === 'download' && <DownloadToolSection />}
