@@ -960,6 +960,7 @@ const api = {
   getSystemPerformanceSnapshot: (): Promise<{
     timestamp: number;
     cpuUsagePercent: number;
+    gpuUsagePercent: number;
     memoryUsagePercent: number;
     memoryUsedBytes: number;
     memoryTotalBytes: number;
@@ -969,6 +970,13 @@ const api = {
     netRxBytesPerSec: number;
     netTxBytesPerSec: number;
     uptimeSeconds: number;
+    cpuModel: string;
+    cpuCores: number;
+    cpuThreads: number;
+    cpuSpeedGHz: number;
+    gpuModel: string;
+    gpuVramMB: number;
+    osName: string;
   } | null> => {
     return ipcRenderer.invoke('system:performance:snapshot:get');
   },

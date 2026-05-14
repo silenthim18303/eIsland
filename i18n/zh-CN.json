@@ -422,29 +422,13 @@
       "switchToPage": "切换到{{label}}页面"
     },
     "performanceMonitor": {
-      "title": "系统性能监控",
-      "subtitle": "实时采样（1 秒）",
       "loading": "正在读取系统性能数据...",
-      "cards": {
-        "cpu": "CPU 占用",
-        "memory": "内存占用",
-        "disk": "磁盘占用",
-        "download": "下载速率",
-        "upload": "上传速率",
-        "uptime": "系统运行时长"
-      },
-      "charts": {
-        "resources": "资源占用折线图",
-        "network": "网络吞吐折线图"
-      },
       "legend": {
         "cpu": "CPU",
+        "gpu": "GPU",
         "memory": "内存",
-        "disk": "磁盘",
-        "download": "下载",
-        "upload": "上传"
-      },
-      "updatedAt": "更新时间：{{time}}"
+        "disk": "磁盘"
+      }
     }
   },
   "toolsTab": {

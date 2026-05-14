@@ -59,6 +59,7 @@ export interface RunningWindowInfo {
 export interface SystemPerformanceSnapshot {
   timestamp: number;
   cpuUsagePercent: number;
+  gpuUsagePercent: number;
   memoryUsagePercent: number;
   memoryUsedBytes: number;
   memoryTotalBytes: number;
@@ -68,6 +69,13 @@ export interface SystemPerformanceSnapshot {
   netRxBytesPerSec: number;
   netTxBytesPerSec: number;
   uptimeSeconds: number;
+  cpuModel: string;
+  cpuCores: number;
+  cpuThreads: number;
+  cpuSpeedGHz: number;
+  gpuModel: string;
+  gpuVramMB: number;
+  osName: string;
 }
 
 declare global {

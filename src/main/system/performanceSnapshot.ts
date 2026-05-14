@@ -29,6 +29,7 @@ import * as si from 'systeminformation';
 export interface SystemPerformanceSnapshot {
   timestamp: number;
   cpuUsagePercent: number;
+  gpuUsagePercent: number;
   memoryUsagePercent: number;
   memoryUsedBytes: number;
   memoryTotalBytes: number;
@@ -38,9 +39,45 @@ export interface SystemPerformanceSnapshot {
   netRxBytesPerSec: number;
   netTxBytesPerSec: number;
   uptimeSeconds: number;
+  cpuModel: string;
+  cpuCores: number;
+  cpuThreads: number;
+  cpuSpeedGHz: number;
+  gpuModel: string;
+  gpuVramMB: number;
+  osName: string;
 }
 
 let previousNetworkSample: { timestamp: number; rxBytes: number; txBytes: number } | null = null;
+
+let cachedHardwareInfo: {
+  cpuModel: string;
+  cpuCores: number;
+  cpuThreads: number;
+  cpuSpeedGHz: number;
+  gpuModel: string;
+  gpuVramMB: number;
+  osName: string;
+} | null = null;
+
+async function getHardwareInfo(): Promise<typeof cachedHardwareInfo & object> {
+  if (cachedHardwareInfo) return cachedHardwareInfo;
+  const [cpu, graphics, osInfo] = await Promise.all([
+    si.cpu(),
+    si.graphics(),
+    si.osInfo(),
+  ]);
+  cachedHardwareInfo = {
+    cpuModel: cpu.brand || cpu.manufacturer || 'Unknown',
+    cpuCores: toSafeNumber(cpu.physicalCores) || toSafeNumber(cpu.cores),
+    cpuThreads: toSafeNumber(cpu.cores),
+    cpuSpeedGHz: toSafeNumber(cpu.speed),
+    gpuModel: graphics.controllers.length > 0 ? (graphics.controllers[0].model || 'Unknown') : 'N/A',
+    gpuVramMB: graphics.controllers.length > 0 ? toSafeNumber(graphics.controllers[0].vram) : 0,
+    osName: `${osInfo.distro} ${osInfo.release}`.trim() || 'Unknown',
+  };
+  return cachedHardwareInfo;
+}
 
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) return 0;
@@ -108,13 +145,19 @@ function summarizeNetworkRate(networkStats: si.Systeminformation.NetworkStatsDat
  * @description 返回 CPU/内存/磁盘/网络/运行时长的当前值
  */
 export async function querySystemPerformanceSnapshot(): Promise<SystemPerformanceSnapshot> {
-  const [cpuLoad, memory, fsList, networkStats, time] = await Promise.all([
+  const [cpuLoad, graphics, memory, fsList, networkStats, time, hw] = await Promise.all([
     si.currentLoad(),
+    si.graphics(),
     si.mem(),
     si.fsSize(),
     si.networkStats(),
     si.time(),
+    getHardwareInfo(),
   ]);
+
+  const gpuUsagePercent = graphics.controllers.length > 0
+    ? clampPercent(toSafeNumber(graphics.controllers[0].utilizationGpu))
+    : 0;
 
   const memoryTotalBytes = toSafeNumber(memory.total);
   const memoryUsedBytes = toSafeNumber(memory.used);
@@ -128,6 +171,7 @@ export async function querySystemPerformanceSnapshot(): Promise<SystemPerformanc
   return {
     timestamp: Date.now(),
     cpuUsagePercent: clampPercent(toSafeNumber(cpuLoad.currentLoad)),
+    gpuUsagePercent,
     memoryUsagePercent,
     memoryUsedBytes,
     memoryTotalBytes,
@@ -137,5 +181,12 @@ export async function querySystemPerformanceSnapshot(): Promise<SystemPerformanc
     netRxBytesPerSec: network.rxBytesPerSec,
     netTxBytesPerSec: network.txBytesPerSec,
     uptimeSeconds: Math.max(0, Math.floor(toSafeNumber(time.uptime))),
+    cpuModel: hw.cpuModel,
+    cpuCores: hw.cpuCores,
+    cpuThreads: hw.cpuThreads,
+    cpuSpeedGHz: hw.cpuSpeedGHz,
+    gpuModel: hw.gpuModel,
+    gpuVramMB: hw.gpuVramMB,
+    osName: hw.osName,
   };
 }
