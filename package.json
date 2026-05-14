@@ -35,6 +35,7 @@
     "react-i18next": "^15.7.2",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
+    "systeminformation": "^5.31.6",
     "uapi-sdk-typescript": "^0.1.14",
     "zustand": "^5.0.4"
   },

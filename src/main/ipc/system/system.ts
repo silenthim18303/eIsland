@@ -42,11 +42,26 @@ interface RunningWindowInfo {
   iconDataUrl: string | null;
 }
 
+interface SystemPerformanceSnapshot {
+  timestamp: number;
+  cpuUsagePercent: number;
+  memoryUsagePercent: number;
+  memoryUsedBytes: number;
+  memoryTotalBytes: number;
+  diskUsagePercent: number;
+  diskUsedBytes: number;
+  diskTotalBytes: number;
+  netRxBytesPerSec: number;
+  netTxBytesPerSec: number;
+  uptimeSeconds: number;
+}
+
 interface RegisterSystemIpcHandlersOptions {
   queryRunningNonSystemProcessNames: () => Promise<string[]>;
   queryRunningNonSystemProcessesWithIcons: () => Promise<RunningProcessInfo[]>;
   queryOpenWindowsWithIcons: () => Promise<RunningWindowInfo[]>;
   queryFocusedWindow: () => Promise<RunningWindowInfo | null>;
+  querySystemPerformanceSnapshot: () => Promise<SystemPerformanceSnapshot>;
 }
 
 /**
@@ -83,5 +98,10 @@ export function registerSystemIpcHandlers(options: RegisterSystemIpcHandlersOpti
   ipcMain.handle('system:focused-window:get', async () => {
     if (process.platform !== 'win32') return null;
     return options.queryFocusedWindow();
+  });
+
+  ipcMain.handle('system:performance:snapshot:get', async () => {
+    if (process.platform !== 'win32') return null;
+    return options.querySystemPerformanceSnapshot();
   });
 }

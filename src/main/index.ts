@@ -74,6 +74,7 @@ import {
   queryRunningNonSystemProcessesWithIcons,
   sanitizeProcessNameList,
 } from './system/runningProcesses';
+import { querySystemPerformanceSnapshot } from './system/performanceSnapshot';
 import {
   ISLAND_WIDTH, ISLAND_HEIGHT,
   EXPANDED_WIDTH, EXPANDED_HEIGHT,
@@ -579,6 +580,7 @@ function registerIpcHandlers(): void {
     queryRunningNonSystemProcessesWithIcons,
     queryOpenWindowsWithIcons,
     queryFocusedWindow,
+    querySystemPerformanceSnapshot,
   });
 
   registerUpdaterIpcHandlers({

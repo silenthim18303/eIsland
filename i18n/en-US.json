@@ -420,6 +420,31 @@
       "performanceMonitor": "Performance Monitor",
       "maxExpand": "Max Expand",
       "switchToPage": "Switch to {{label}} page"
+    },
+    "performanceMonitor": {
+      "title": "System Performance",
+      "subtitle": "Live sampling (1s)",
+      "loading": "Loading system performance data...",
+      "cards": {
+        "cpu": "CPU Usage",
+        "memory": "Memory Usage",
+        "disk": "Disk Usage",
+        "download": "Download Rate",
+        "upload": "Upload Rate",
+        "uptime": "System Uptime"
+      },
+      "charts": {
+        "resources": "Resource Trend",
+        "network": "Network Throughput Trend"
+      },
+      "legend": {
+        "cpu": "CPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "download": "Download",
+        "upload": "Upload"
+      },
+      "updatedAt": "Updated at: {{time}}"
     }
   },
   "toolsTab": {
