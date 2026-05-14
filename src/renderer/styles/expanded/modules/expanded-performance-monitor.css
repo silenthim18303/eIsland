@@ -33,7 +33,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .pm-loading {
@@ -48,41 +48,32 @@
 /* ── 4-gauge grid ── */
 
 .pm-gauge-grid {
-  width: 100%;
-  flex: 1;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-template-rows: 1fr;
-  gap: 0;
-  align-items: stretch;
-  justify-items: stretch;
+  grid-template-columns: auto auto;
+  gap: 4px 8px;
 }
 
 .pm-gauge-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  width: 100%;
-  height: 100%;
+  gap: 1px;
 }
 
 .pm-gauge-svg {
-  width: 80%;
-  max-width: 140px;
+  width: 80px;
   height: auto;
 }
 
 .pm-gauge-pct {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 700;
   fill: rgba(var(--color-text-rgb), 0.92);
   font-family: inherit;
 }
 
 .pm-gauge-label {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 500;
   color: rgba(var(--color-text-rgb), 0.62);
 }

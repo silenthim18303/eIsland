@@ -113,8 +113,8 @@ export function PerformanceMonitorTab(): React.ReactElement {
         {snapshot && (
           <div className="pm-gauge-grid">
             <GaugeChart percent={snapshot.cpuUsagePercent} label="CPU" />
-            <GaugeChart percent={snapshot.gpuUsagePercent} label="GPU" />
             <GaugeChart percent={snapshot.memoryUsagePercent} label={t('expanded.performanceMonitor.legend.memory')} />
+            <GaugeChart percent={snapshot.gpuUsagePercent} label="GPU" />
             <GaugeChart percent={snapshot.diskUsagePercent} label={t('expanded.performanceMonitor.legend.disk')} />
           </div>
         )}
