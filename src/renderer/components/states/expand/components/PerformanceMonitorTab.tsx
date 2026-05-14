@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 type PerformanceSnapshot = NonNullable<Awaited<ReturnType<typeof window.api.getSystemPerformanceSnapshot>>>;
 
 const POLL_INTERVAL_MS = 1000;
+const POLL_START_DELAY_MS = 280;
 const GAUGE_R = 42;
 const GAUGE_CX = 50;
 const GAUGE_CY = 50;
@@ -78,6 +79,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
   useEffect(() => {
     let disposed = false;
     let timer: ReturnType<typeof setInterval> | null = null;
+    let startTimer: ReturnType<typeof setTimeout> | null = null;
 
     const pull = (): void => {
       window.api.getSystemPerformanceSnapshot().then((next) => {
@@ -86,11 +88,17 @@ export function PerformanceMonitorTab(): React.ReactElement {
       }).catch(() => {});
     };
 
-    pull();
-    timer = setInterval(pull, POLL_INTERVAL_MS);
+    startTimer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        if (disposed) return;
+        pull();
+        timer = setInterval(pull, POLL_INTERVAL_MS);
+      });
+    }, POLL_START_DELAY_MS);
 
     return () => {
       disposed = true;
+      if (startTimer) clearTimeout(startTimer);
       if (timer) clearInterval(timer);
     };
   }, []);
