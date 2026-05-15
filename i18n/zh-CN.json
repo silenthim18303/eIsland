@@ -1398,7 +1398,10 @@
       "pagination": "软件设置分页",
       "performance": {
         "title": "性能设置",
-        "hint": "性能相关配置。"
+        "hint": "性能相关配置。",
+        "modeTitle": "启用性能模式",
+        "modeHint": "启用后 MaxExpand 首次进入将延迟加载各页面，降低首次切换卡顿；关闭后使用旧版一次性加载方式。",
+        "modeToggle": "启用性能模式"
       },
       "performanceMonitor": {
         "title": "性能监控",

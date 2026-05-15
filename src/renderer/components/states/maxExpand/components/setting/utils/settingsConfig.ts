@@ -387,6 +387,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '通知设置', desc: '配置灵动岛通知提醒与展示行为。', labelKey: 'settings.notification.pageTitle', descKey: 'settings.notification.pageHint', tab: 'app', appPage: 'notification' },
   { label: '通知音效', desc: '通知触发时播放一次提示音。', labelKey: 'settings.notification.sound.title', descKey: 'settings.notification.sound.hint', tab: 'app', appPage: 'notification' },
   { label: '性能设置', desc: '性能相关配置。', labelKey: 'settings.app.performance.title', descKey: 'settings.app.performance.hint', tab: 'app', appPage: 'performance' },
+  { label: '启用性能模式', desc: '启用后 MaxExpand 首次进入将延迟加载各页面，降低首次切换卡顿；关闭后使用旧版一次性加载方式。', labelKey: 'settings.app.performance.modeTitle', descKey: 'settings.app.performance.modeHint', tab: 'app', appPage: 'performance' },
   // ── 软件设置 > 性能监控 ──
   { label: '性能监控', desc: '性能监控展示与硬件状态配置。', labelKey: 'settings.app.performanceMonitor.title', descKey: 'settings.app.performanceMonitor.hint', tab: 'app', appPage: 'performance-monitor' },
   { label: '监控硬件', desc: '选择性能监控图表读取的 CPU、GPU 和磁盘目标。', labelKey: 'settings.app.performanceMonitor.hardwareTitle', descKey: 'settings.app.performanceMonitor.hardwareHint', tab: 'app', appPage: 'performance-monitor' },

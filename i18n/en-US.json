@@ -1398,7 +1398,10 @@
       "pagination": "App settings pagination",
       "performance": {
         "title": "Performance Settings",
-        "hint": "Performance-related configuration."
+        "hint": "Performance-related configuration.",
+        "modeTitle": "Enable Performance Mode",
+        "modeHint": "When enabled, MaxExpand lazily loads pages on first entry to reduce initial switching lag. When disabled, it uses the previous eager loading behavior.",
+        "modeToggle": "Enable performance mode"
       },
       "performanceMonitor": {
         "title": "Performance Monitor",
