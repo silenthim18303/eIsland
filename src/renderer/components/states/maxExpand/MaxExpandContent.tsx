@@ -34,18 +34,19 @@ import {
   type MaxExpandNavLayoutConfig,
 } from './components/setting/utils/settingsConfig';
 import '../../../styles/settings/settings.css';
-import { AiChatTab } from './components/AiChatTab';
-import { TodoTab } from './components/TodoTab';
-import { UrlFavoritesTab } from './components/UrlFavoritesTab';
-import { LocalFileSearchTab } from './components/LocalFileSearchTab';
-import { ClipboardHistoryTab } from './components/ClipboardHistoryTab';
-import { AlbumTab } from './components/AlbumTab';
-import { MailTab } from './components/MailTab';
-import { SettingsTab } from './components/SettingsTab';
-import { CountdownTab } from './components/CountdownTab';
-import { MemoTab } from './components/MemoTab';
-import { AlarmTab } from './components/AlarmTab';
-import { ToolboxTab } from './components/ToolboxTab';
+
+const AiChatTab = React.lazy(() => import('./components/AiChatTab').then((module) => ({ default: module.AiChatTab })));
+const TodoTab = React.lazy(() => import('./components/TodoTab').then((module) => ({ default: module.TodoTab })));
+const UrlFavoritesTab = React.lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
+const LocalFileSearchTab = React.lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
+const ClipboardHistoryTab = React.lazy(() => import('./components/ClipboardHistoryTab').then((module) => ({ default: module.ClipboardHistoryTab })));
+const AlbumTab = React.lazy(() => import('./components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
+const MailTab = React.lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));
+const SettingsTab = React.lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
+const CountdownTab = React.lazy(() => import('./components/CountdownTab').then((module) => ({ default: module.CountdownTab })));
+const MemoTab = React.lazy(() => import('./components/MemoTab').then((module) => ({ default: module.MemoTab })));
+const AlarmTab = React.lazy(() => import('./components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
+const ToolboxTab = React.lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));
 
 /** 导航点标识 — 含特殊动作：expanded 返回 */
 type NavDotId = MaxExpandTab | 'expanded';
@@ -86,8 +87,14 @@ export function MaxExpandContent(): React.ReactElement {
 
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
   const [tabAnimation, setTabAnimation] = useState(true);
+  const [contentReady, setContentReady] = useState(false);
   const [navLayoutConfig, setNavLayoutConfig] = useState<MaxExpandNavLayoutConfig>([]);
   const [navLayoutLoaded, setNavLayoutLoaded] = useState(false);
+
+  useEffect(() => {
+    const raf = window.requestAnimationFrame(() => setContentReady(true));
+    return () => window.cancelAnimationFrame(raf);
+  }, []);
 
   /** 根据用户配置动态生成导航点序列 */
   const NAV_DOTS: NavDotId[] = useMemo(() => {
@@ -267,23 +274,31 @@ export function MaxExpandContent(): React.ReactElement {
     navigateTab(id);
   };
 
+  const renderActiveTab = (): React.ReactElement | null => {
+    if (!contentReady) return null;
+    if (activeTab === 'aiChat') return <AiChatTab />;
+    if (activeTab === 'todo') return <TodoTab />;
+    if (activeTab === 'urlFavorites') return <UrlFavoritesTab />;
+    if (activeTab === 'localFileSearch') return <LocalFileSearchTab />;
+    if (activeTab === 'clipboardHistory') return <ClipboardHistoryTab />;
+    if (activeTab === 'album') return <AlbumTab />;
+    if (activeTab === 'mail') return <MailTab />;
+    if (activeTab === 'memo') return <MemoTab />;
+    if (activeTab === 'countdown') return <CountdownTab />;
+    if (activeTab === 'alarm') return <AlarmTab />;
+    if (activeTab === 'toolbox') return <ToolboxTab />;
+    if (activeTab === 'settings') return <SettingsTab />;
+    return null;
+  };
+
   return (
     <div className="settings-content" ref={contentRef}>
       {/* Tab 内容区域 */}
       <div className="max-expand-tab-content" onClick={(e) => e.stopPropagation()}>
         <div className={`max-expand-tab-transition${tabAnimation ? ` max-expand-tab-slide-${slideDir}` : ''}`} key={activeTab}>
-          {activeTab === 'aiChat' && <AiChatTab />}
-          {activeTab === 'todo' && <TodoTab />}
-          {activeTab === 'urlFavorites' && <UrlFavoritesTab />}
-          {activeTab === 'localFileSearch' && <LocalFileSearchTab />}
-          {activeTab === 'clipboardHistory' && <ClipboardHistoryTab />}
-          {activeTab === 'album' && <AlbumTab />}
-          {activeTab === 'mail' && <MailTab />}
-          {activeTab === 'memo' && <MemoTab />}
-          {activeTab === 'countdown' && <CountdownTab />}
-          {activeTab === 'alarm' && <AlarmTab />}
-          {activeTab === 'toolbox' && <ToolboxTab />}
-          {activeTab === 'settings' && <SettingsTab />}
+          <React.Suspense fallback={null}>
+            {renderActiveTab()}
+          </React.Suspense>
         </div>
       </div>
 
