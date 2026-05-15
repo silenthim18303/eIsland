@@ -274,8 +274,17 @@ export function MaxExpandContent(): React.ReactElement {
     navigateTab(id);
   };
 
+  const renderLoadingFallback = (): React.ReactElement => (
+    <div className="max-expand-tab-loading">
+      <span className="max-expand-tab-loading-spinner" aria-hidden="true" />
+      <span className="max-expand-tab-loading-text">
+        {t('maxExpand.loading', { defaultValue: '正在加载最大展开界面...' })}
+      </span>
+    </div>
+  );
+
   const renderActiveTab = (): React.ReactElement | null => {
-    if (!contentReady) return null;
+    if (!contentReady) return renderLoadingFallback();
     if (activeTab === 'aiChat') return <AiChatTab />;
     if (activeTab === 'todo') return <TodoTab />;
     if (activeTab === 'urlFavorites') return <UrlFavoritesTab />;
@@ -296,7 +305,7 @@ export function MaxExpandContent(): React.ReactElement {
       {/* Tab 内容区域 */}
       <div className="max-expand-tab-content" onClick={(e) => e.stopPropagation()}>
         <div className={`max-expand-tab-transition${tabAnimation ? ` max-expand-tab-slide-${slideDir}` : ''}`} key={activeTab}>
-          <React.Suspense fallback={null}>
+          <React.Suspense fallback={renderLoadingFallback()}>
             {renderActiveTab()}
           </React.Suspense>
         </div>

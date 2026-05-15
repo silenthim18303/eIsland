@@ -907,6 +907,7 @@
     }
   },
   "maxExpand": {
+    "loading": "正在加载最大展开界面...",
     "nav": {
       "expanded": "返回",
       "todo": "待办",

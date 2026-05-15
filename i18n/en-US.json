@@ -907,6 +907,7 @@
     }
   },
   "maxExpand": {
+    "loading": "Loading max expand view...",
     "nav": {
       "expanded": "Back",
       "todo": "Todo",
