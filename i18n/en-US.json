@@ -12,6 +12,7 @@
       "localFileSearch": "File Search",
       "clipboardHistory": "Clipboard",
       "memo": "Memo",
+      "alarm": "Alarm",
       "toolbox": "Toolbox",
       "settings": "Settings"
     },
@@ -416,8 +417,32 @@
       "overview": "Overview",
       "song": "Music",
       "tools": "Tools",
+      "performanceMonitor": "Performance Monitor",
       "maxExpand": "Max Expand",
       "switchToPage": "Switch to {{label}} page"
+    },
+    "performanceMonitor": {
+      "title": "System Performance",
+      "subtitle": "Live hardware status and temperatures",
+      "hardwareSettingsLink": "Hardware looks different? Click to adjust",
+      "loading": "Loading system performance data...",
+      "error": "System performance data is unavailable",
+      "labels": {
+        "cpu": "CPU",
+        "gpu": "GPU",
+        "memory": "Memory",
+        "disk": "Disk",
+        "available": "Available",
+        "host": "Host",
+        "os": "OS",
+        "cpuModel": "Processor",
+        "gpuModel": "GPU",
+        "uptime": "Uptime"
+      },
+      "status": {
+        "unavailable": "Unavailable",
+        "noGpu": "No GPU detected"
+      }
     }
   },
   "toolsTab": {
@@ -882,6 +907,7 @@
     }
   },
   "maxExpand": {
+    "loading": "Loading max expand view...",
     "nav": {
       "expanded": "Back",
       "todo": "Todo",
@@ -906,6 +932,7 @@
         "fileService": "File Service",
         "encodingService": "Encoding Svc",
         "networkService": "Network Svc",
+        "fileCompression": "File Compression",
         "formatFactory": "Format Factory"
       },
       "software": {
@@ -1059,6 +1086,18 @@
           "resultTitle": "Test Result",
           "result": "Result"
         }
+      },
+      "fileCompression": {
+        "title": "File Compression",
+        "pages": {
+          "imageCompression": "Image Compression"
+        },
+        "subtitle": "Select a file and configure output path for compression. This version currently provides the UI entry first.",
+        "pickFile": "Select File",
+        "noFile": "No file selected",
+        "outputPlaceholder": "Output path configuration will be available soon",
+        "startBtn": "Start Compression",
+        "comingSoon": "File compression capability is under development."
       },
       "formatFactory": {
         "pages": {
@@ -1230,6 +1269,8 @@
       "autostart": "Utilities",
       "sound": "Sound Settings",
       "notification": "Notification Settings",
+      "performance": "Performance Settings",
+      "performance-monitor": "Performance Monitor",
       "network": "Network",
       "mail": "Mail",
       "weather": "Weather",
@@ -1355,6 +1396,38 @@
     },
     "app": {
       "pagination": "App settings pagination",
+      "performance": {
+        "title": "Performance Settings",
+        "hint": "Performance-related configuration.",
+        "modeTitle": "Enable Performance Mode",
+        "modeHint": "When enabled, MaxExpand lazily loads pages on first entry to reduce initial switching lag. When disabled, it uses the previous eager loading behavior.",
+        "modeToggle": "Enable performance mode"
+      },
+      "performanceMonitor": {
+        "title": "Performance Monitor",
+        "hint": "Configure performance monitor display and hardware status.",
+        "hardwareTitle": "Monitored Hardware",
+        "hardwareHint": "Choose which CPU, GPU, and disk targets the performance monitor charts should read.",
+        "hardware": {
+          "cpu": "CPU",
+          "gpu": "GPU",
+          "disk": "Disk"
+        },
+        "hardwareOptions": {
+          "allCpu": "All CPU",
+          "autoGpu": "Auto GPU",
+          "allDisks": "All Disks"
+        },
+        "colorsTitle": "Chart Colors",
+        "colorsHint": "Adjust CPU, GPU, memory, and disk chart colors in the Expand performance monitor.",
+        "resetColors": "Restore Default Colors",
+        "colors": {
+          "cpu": "CPU",
+          "gpu": "GPU",
+          "memory": "Memory",
+          "disk": "Disk"
+        }
+      },
       "notifications": {
         "configChanged": {
           "title": "Configuration Changed",
@@ -2648,6 +2721,14 @@
       "notification": {
         "label": "Notification Settings",
         "desc": "Configure Dynamic Island notification alerts and display behavior."
+      },
+      "performance": {
+        "label": "Performance Settings",
+        "desc": "Performance-related configuration."
+      },
+      "performance-monitor": {
+        "label": "Performance Monitor",
+        "desc": "Configure performance monitor display and hardware status."
       },
       "network": {
         "label": "Network",

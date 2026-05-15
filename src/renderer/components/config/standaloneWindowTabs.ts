@@ -26,7 +26,7 @@
 
 import type { WindowTab } from './standaloneWindowTypes';
 
-export const VALID_TABS = new Set<WindowTab>(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'toolbox', 'settings']);
+export const VALID_TABS = new Set<WindowTab>(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'settings']);
 
 export const TAB_LIST: { key: WindowTab; labelKey: string }[] = [
   { key: 'todo', labelKey: 'standalone.tabs.todo' },
@@ -37,6 +37,7 @@ export const TAB_LIST: { key: WindowTab; labelKey: string }[] = [
   { key: 'localFileSearch', labelKey: 'standalone.tabs.localFileSearch' },
   { key: 'clipboardHistory', labelKey: 'standalone.tabs.clipboardHistory' },
   { key: 'memo', labelKey: 'standalone.tabs.memo' },
+  { key: 'alarm', labelKey: 'standalone.tabs.alarm' },
   { key: 'toolbox', labelKey: 'standalone.tabs.toolbox' },
   { key: 'settings', labelKey: 'standalone.tabs.settings' },
 ];

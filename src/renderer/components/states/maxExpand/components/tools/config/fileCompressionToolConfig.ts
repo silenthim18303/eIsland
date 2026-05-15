@@ -19,9 +19,10 @@
  */
 
 /**
- * @file standaloneWindowTypes.ts
- * @description 独立窗口共享类型定义。
+ * @file fileCompressionToolConfig.ts
+ * @description 工具箱文件压缩模块分页配置
  * @author 鸡哥
  */
 
-export type WindowTab = 'todo' | 'countdown' | 'urlFavorites' | 'album' | 'mail' | 'localFileSearch' | 'clipboardHistory' | 'memo' | 'alarm' | 'toolbox' | 'settings';
+export const FILE_COMPRESSION_PAGES = ['imageCompression'] as const;
+export type FileCompressionPageKey = (typeof FILE_COMPRESSION_PAGES)[number];

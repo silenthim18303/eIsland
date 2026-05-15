@@ -1,0 +1,274 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file expanded-performance-monitor.css
+ * @description Expanded 性能监控面板样式 — 4 仪表盘撑满
+ */
+
+.pm-tab-panel {
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.pm-panel-wrap {
+  width: 100%;
+  height: calc(100% - 2px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 5px;
+  padding: 2px 4px 0;
+  overflow: hidden;
+}
+
+.pm-panel-loading {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pm-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.62);
+}
+
+.pm-loading-spinner {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  border: 2px solid rgba(var(--color-text-rgb), 0.16);
+  border-top-color: rgba(var(--color-text-rgb), 0.72);
+  border-radius: 50%;
+  animation: pmLoadingSpin 0.8s linear infinite;
+}
+
+.pm-loading-text {
+  line-height: 1;
+}
+
+@keyframes pmLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pm-dashboard-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.pm-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pm-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(var(--color-text-rgb), 0.92);
+  white-space: nowrap;
+}
+
+.pm-subtitle {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 9px;
+  color: rgba(var(--color-text-rgb), 0.38);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pm-hardware-settings-link {
+  justify-self: end;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.45);
+  font-size: 9px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pm-hardware-settings-link:hover {
+  color: rgba(var(--color-text-rgb), 0.78);
+}
+
+.pm-dashboard-body {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pm-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 4px 7px;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pm-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 0;
+  padding: 4px 2px;
+  overflow: hidden;
+}
+
+.pm-meter-ring {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.pm-meter-core {
+  width: 31px;
+  height: 31px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-island-bg);
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(var(--color-text-rgb), 0.9);
+  font-variant-numeric: tabular-nums;
+}
+
+.pm-metric-body {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pm-metric-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pm-metric-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(var(--color-text-rgb), 0.86);
+  letter-spacing: 0.2px;
+}
+
+.pm-metric-temp {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(var(--color-text-rgb), 0.54);
+  white-space: nowrap;
+}
+
+.pm-metric-detail {
+  overflow: hidden;
+  font-size: 9px;
+  color: rgba(var(--color-text-rgb), 0.42);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pm-progress-track {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.09);
+}
+
+.pm-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.35s ease;
+}
+
+.pm-info-panel {
+  display: grid;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  min-width: 0;
+  min-height: 0;
+  padding: 6px 0;
+  overflow: hidden;
+}
+
+.pm-info-row {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  padding: 0 4px;
+}
+
+.pm-info-label {
+  font-size: 9px;
+  color: rgba(var(--color-text-rgb), 0.36);
+  white-space: nowrap;
+}
+
+.pm-info-value {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.72);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 520px) {
+  .pm-dashboard-body {
+    grid-template-columns: 1fr;
+  }
+
+  .pm-info-panel {
+    display: none;
+  }
+}

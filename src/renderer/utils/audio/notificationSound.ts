@@ -29,7 +29,7 @@ import { readEffectiveAudioVolume } from './volume';
 export const NOTIFICATION_SOUND_ENABLED_STORE_KEY = 'notification-sound-enabled';
 
 const NOTIFICATION_SOUND_SRC = './audio/NOTIFICATION.wav';
-const NOTIFICATION_SOUND_FALLBACK_SRC = './public/audio/NOTIFICATION.wav';
+const NOTIFICATION_SOUND_FALLBACK_SRC = '/audio/NOTIFICATION.wav';
 
 let notificationAudio: HTMLAudioElement | null = null;
 

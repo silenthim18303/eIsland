@@ -29,11 +29,13 @@ import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
 import { DownloadToolSection } from './tools/components/DownloadToolSection';
 import { EncodingServiceToolSection } from './tools/components/EncodingServiceToolSection';
+import { FileCompressionToolSection } from './tools/components/FileCompressionToolSection';
 import { FileServiceToolSection } from './tools/components/FileServiceToolSection';
 import { NetworkServiceToolSection } from './tools/components/NetworkServiceToolSection';
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { FormatFactoryToolSection } from './tools/components/FormatFactoryToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
+import type { FileCompressionPageKey } from './tools/config/fileCompressionToolConfig';
 import type { FormatFactoryPageKey } from './tools/config/formatFactoryToolConfig';
 import type { ToolboxSidebarKey } from './tools/config/commonToolboxConfig';
 
@@ -44,6 +46,7 @@ const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }>
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
   { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
   { key: 'networkService', labelKey: 'maxExpand.toolbox.sidebar.networkService' },
+  { key: 'fileCompression', labelKey: 'maxExpand.toolbox.sidebar.fileCompression' },
   { key: 'formatFactory', labelKey: 'maxExpand.toolbox.sidebar.formatFactory' },
 ];
 
@@ -52,7 +55,11 @@ export function ToolboxTab(): ReactElement {
   const { t } = useTranslation();
   const { setMaxExpandTab } = useIslandStore();
   const [activeSidebar, setActiveSidebar] = useState<ToolboxSidebarKey>('download');
+  const [fileCompressionPage, setFileCompressionPage] = useState<FileCompressionPageKey>('imageCompression');
   const [formatFactoryPage, setFormatFactoryPage] = useState<FormatFactoryPageKey>('image');
+  const fileCompressionPageLabel = activeSidebar === 'fileCompression'
+    ? t(`maxExpand.toolbox.fileCompression.pages.${fileCompressionPage}`)
+    : '';
   const formatFactoryPageLabel = activeSidebar === 'formatFactory'
     ? t(`maxExpand.toolbox.formatFactory.pages.${formatFactoryPage}`)
     : '';
@@ -81,10 +88,13 @@ export function ToolboxTab(): ReactElement {
         </div>
 
         <div className="max-expand-settings-panel">
-          <div className="max-expand-settings-title toolbox-panel-title">
-            {activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}
+          <div className="max-expand-settings-title toolbox-panel-title settings-app-title-line">
+            <span>{activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}</span>
+            {activeSidebar === 'fileCompression' && fileCompressionPageLabel && (
+              <span className="settings-app-title-sub">- {fileCompressionPageLabel}</span>
+            )}
             {activeSidebar === 'formatFactory' && formatFactoryPageLabel && (
-              <span className="settings-app-title-sub"> - {formatFactoryPageLabel}</span>
+              <span className="settings-app-title-sub">- {formatFactoryPageLabel}</span>
             )}
           </div>
           {activeSidebar === 'download' && <DownloadToolSection />}
@@ -95,6 +105,12 @@ export function ToolboxTab(): ReactElement {
           {activeSidebar === 'fileService' && <FileServiceToolSection />}
           {activeSidebar === 'encodingService' && <EncodingServiceToolSection />}
           {activeSidebar === 'networkService' && <NetworkServiceToolSection />}
+          {activeSidebar === 'fileCompression' && (
+            <FileCompressionToolSection
+              fileCompressionPage={fileCompressionPage}
+              setFileCompressionPage={setFileCompressionPage}
+            />
+          )}
           {activeSidebar === 'formatFactory' && (
             <FormatFactoryToolSection
               formatFactoryPage={formatFactoryPage}
