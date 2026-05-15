@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface PerformanceSnapshot {
@@ -77,6 +77,8 @@ interface MetricCardProps {
 }
 
 const REFRESH_INTERVAL_MS = 2000;
+const START_FETCH_DELAY_MS = 200;
+let cachedPerformanceSnapshot: PerformanceSnapshot | null = null;
 
 function clampPercent(value: number | null | undefined): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
@@ -144,17 +146,26 @@ function MetricCard({ label, value, valueText, detail, temperature, accent }: Me
  */
 export function PerformanceMonitorTab(): React.ReactElement {
   const { t } = useTranslation();
-  const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(null);
+  const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(() => cachedPerformanceSnapshot);
   const [failed, setFailed] = useState(false);
+  const snapshotRef = useRef<PerformanceSnapshot | null>(snapshot);
+
+  useEffect(() => {
+    snapshotRef.current = snapshot;
+    if (snapshot) cachedPerformanceSnapshot = snapshot;
+  }, [snapshot]);
 
   useEffect(() => {
     let cancelled = false;
-    let timer: number | undefined;
+    let delayTimer: number | undefined;
+    let intervalTimer: number | undefined;
     const loadSnapshot = (): void => {
       window.api.getPerformanceSnapshot()
         .then((data) => {
           if (cancelled) return;
-          setSnapshot(data as PerformanceSnapshot);
+          const nextSnapshot = data as PerformanceSnapshot;
+          cachedPerformanceSnapshot = nextSnapshot;
+          setSnapshot(nextSnapshot);
           setFailed(false);
         })
         .catch(() => {
@@ -162,11 +173,15 @@ export function PerformanceMonitorTab(): React.ReactElement {
           setFailed(true);
         });
     };
-    loadSnapshot();
-    timer = window.setInterval(loadSnapshot, REFRESH_INTERVAL_MS);
+    delayTimer = window.setTimeout(() => {
+      loadSnapshot();
+      intervalTimer = window.setInterval(loadSnapshot, REFRESH_INTERVAL_MS);
+    }, START_FETCH_DELAY_MS);
     return () => {
       cancelled = true;
-      if (timer !== undefined) window.clearInterval(timer);
+      if (snapshotRef.current) cachedPerformanceSnapshot = snapshotRef.current;
+      if (delayTimer !== undefined) window.clearTimeout(delayTimer);
+      if (intervalTimer !== undefined) window.clearInterval(intervalTimer);
     };
   }, []);
 
