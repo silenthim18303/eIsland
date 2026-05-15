@@ -188,11 +188,14 @@ export function PerformanceMonitorTab(): React.ReactElement {
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
-        <div className="pm-panel-wrap">
+        <div className="pm-panel-wrap pm-panel-loading">
           <div className="pm-loading">
-            {failed
-              ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
-              : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
+            {!failed && <span className="pm-loading-spinner" aria-hidden="true" />}
+            <span className="pm-loading-text">
+              {failed
+                ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
+                : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
+            </span>
           </div>
         </div>
       </div>
