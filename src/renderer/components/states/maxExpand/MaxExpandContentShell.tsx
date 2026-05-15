@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file MaxExpandContentShell.tsx
+ * @description MaxExpand 内容壳组件，承载导航、滚轮切换与通用加载态。
+ * @author 鸡哥
+ */
+
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
@@ -33,6 +59,9 @@ export interface MaxExpandContentShellProps {
   deferContent?: boolean;
 }
 
+/**
+ * 渲染 MaxExpand 通用壳层，负责导航与内容切换控制。
+ */
 export function MaxExpandContentShell({ renderActiveTab, deferContent = true }: MaxExpandContentShellProps): React.ReactElement {
   const { t } = useTranslation();
   const { setExpanded, maxExpandTab: activeTab, setMaxExpandTab: setActiveTab } = useIslandStore();

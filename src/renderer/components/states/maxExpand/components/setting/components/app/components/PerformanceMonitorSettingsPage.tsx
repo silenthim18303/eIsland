@@ -144,6 +144,9 @@ function HardwareSelectDropdown({
   );
 }
 
+/**
+ * 渲染性能监控设置页面。
+ */
 export function PerformanceMonitorSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [colors, setColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
