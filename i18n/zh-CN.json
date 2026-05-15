@@ -422,12 +422,27 @@
       "switchToPage": "切换到{{label}}页面"
     },
     "performanceMonitor": {
+      "title": "系统性能",
+      "subtitle": "实时硬件状态与温度",
       "loading": "正在读取系统性能数据...",
-      "legend": {
+      "error": "系统性能数据暂不可用",
+      "updated": "更新 {{time}}",
+      "labels": {
         "cpu": "CPU",
         "gpu": "GPU",
         "memory": "内存",
-        "disk": "磁盘"
+        "disk": "磁盘",
+        "available": "可用",
+        "host": "主机",
+        "os": "系统",
+        "cpuModel": "处理器",
+        "gpuModel": "显卡",
+        "uptime": "运行",
+        "network": "网络"
+      },
+      "status": {
+        "unavailable": "不可用",
+        "noGpu": "未检测到显卡"
       }
     }
   },

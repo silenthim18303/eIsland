@@ -56,6 +56,51 @@ export interface RunningWindowInfo {
   iconDataUrl: string | null;
 }
 
+export interface PerformanceSnapshot {
+  timestamp: number;
+  host: {
+    hostname: string;
+    platform: string;
+    release: string;
+    arch: string;
+    uptimeSeconds: number;
+  };
+  cpu: {
+    manufacturer: string;
+    brand: string;
+    cores: number;
+    physicalCores: number;
+    speedGhz: number | null;
+    speedMaxGhz: number | null;
+    loadPercent: number;
+    temperatureCelsius: number | null;
+  };
+  memory: {
+    totalBytes: number;
+    usedBytes: number;
+    availableBytes: number;
+    usagePercent: number;
+  };
+  gpu: {
+    vendor: string;
+    model: string;
+    vramTotalMb: number | null;
+    loadPercent: number | null;
+    temperatureCelsius: number | null;
+  } | null;
+  disk: {
+    totalBytes: number;
+    usedBytes: number;
+    usagePercent: number;
+    temperatureCelsius: number | null;
+  };
+  network: {
+    iface: string;
+    rxBytesPerSecond: number;
+    txBytesPerSecond: number;
+  };
+}
+
 declare global {
   interface Window {
     electron: ElectronAPI;
@@ -164,6 +209,7 @@ declare global {
       screenshot: () => Promise<string | null>;
       startRegionScreenshot: () => Promise<boolean>;
       openTaskManager: () => void;
+      getPerformanceSnapshot: () => Promise<PerformanceSnapshot>;
       getPathForFile: (file: File) => string;
       getFileIcon: (filePath: string) => Promise<string | null>;
       openFile: (filePath: string) => Promise<boolean>;

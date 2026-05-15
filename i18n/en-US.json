@@ -422,12 +422,27 @@
       "switchToPage": "Switch to {{label}} page"
     },
     "performanceMonitor": {
+      "title": "System Performance",
+      "subtitle": "Live hardware status and temperatures",
       "loading": "Loading system performance data...",
-      "legend": {
+      "error": "System performance data is unavailable",
+      "updated": "Updated {{time}}",
+      "labels": {
         "cpu": "CPU",
         "gpu": "GPU",
         "memory": "Memory",
-        "disk": "Disk"
+        "disk": "Disk",
+        "available": "Available",
+        "host": "Host",
+        "os": "OS",
+        "cpuModel": "Processor",
+        "gpuModel": "GPU",
+        "uptime": "Uptime",
+        "network": "Network"
+      },
+      "status": {
+        "unavailable": "Unavailable",
+        "noGpu": "No GPU detected"
       }
     }
   },
