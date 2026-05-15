@@ -1267,6 +1267,7 @@
       "autostart": "Utilities",
       "sound": "Sound Settings",
       "notification": "Notification Settings",
+      "performance-monitor": "Performance Monitor",
       "network": "Network",
       "mail": "Mail",
       "weather": "Weather",
@@ -1392,6 +1393,10 @@
     },
     "app": {
       "pagination": "App settings pagination",
+      "performanceMonitor": {
+        "title": "Performance Monitor",
+        "hint": "Configure performance monitor display and hardware status."
+      },
       "notifications": {
         "configChanged": {
           "title": "Configuration Changed",

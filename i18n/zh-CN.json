@@ -1267,6 +1267,7 @@
       "autostart": "实用工具",
       "sound": "声音设置",
       "notification": "通知设置",
+      "performance-monitor": "性能监控",
       "network": "网络配置",
       "mail": "邮箱配置",
       "weather": "天气配置",
@@ -1392,6 +1393,10 @@
     },
     "app": {
       "pagination": "软件设置分页",
+      "performanceMonitor": {
+        "title": "性能监控",
+        "hint": "性能监控展示与硬件状态配置。"
+      },
       "notifications": {
         "configChanged": {
           "title": "配置变更",

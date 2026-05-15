@@ -42,6 +42,7 @@ import { AutostartSettingsPage } from './components/AutostartSettingsPage';
 import { AlbumSettingsPage } from './components/AlbumSettingsPage';
 import { SoundSettingsPage } from './components/SoundSettingsPage';
 import { NotificationSettingsPage } from './components/NotificationSettingsPage';
+import { PerformanceMonitorSettingsPage } from './components/PerformanceMonitorSettingsPage';
 import { AppSettingsPageDots } from './components/AppSettingsPageDots';
 import type { AppSettingsSectionProps } from './components/types';
 
@@ -308,6 +309,8 @@ export function AppSettingsSection({
         return <SoundSettingsPage />;
       case 'notification':
         return <NotificationSettingsPage />;
+      case 'performance-monitor':
+        return <PerformanceMonitorSettingsPage />;
       default:
         return null;
     }
