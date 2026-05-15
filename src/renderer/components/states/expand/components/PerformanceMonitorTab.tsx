@@ -65,11 +65,6 @@ interface PerformanceSnapshot {
     usagePercent: number;
     temperatureCelsius: number | null;
   };
-  network: {
-    iface: string;
-    rxBytesPerSecond: number;
-    txBytesPerSecond: number;
-  };
 }
 
 interface MetricCardProps {
@@ -103,11 +98,6 @@ function formatBytes(bytes: number | null | undefined): string {
     index += 1;
   }
   return `${value >= 10 || index === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[index]}`;
-}
-
-function formatRate(bytesPerSecond: number): string {
-  const formatted = formatBytes(bytesPerSecond);
-  return formatted === '--' ? '--' : `${formatted}/s`;
 }
 
 function formatTemp(value: number | null | undefined): string {
@@ -253,7 +243,6 @@ export function PerformanceMonitorTab(): React.ReactElement {
     { label: t('expanded.performanceMonitor.labels.cpuModel', { defaultValue: '处理器' }), value: cpuName },
     { label: t('expanded.performanceMonitor.labels.gpuModel', { defaultValue: '显卡' }), value: gpuName },
     { label: t('expanded.performanceMonitor.labels.uptime', { defaultValue: '运行' }), value: formatUptime(snapshot.host.uptimeSeconds) },
-    { label: t('expanded.performanceMonitor.labels.network', { defaultValue: '网络' }), value: snapshot.network.iface || '--' },
   ];
 
   return (
@@ -263,10 +252,6 @@ export function PerformanceMonitorTab(): React.ReactElement {
           <div className="pm-title-group">
             <span className="pm-title">{t('expanded.performanceMonitor.title', { defaultValue: '系统性能' })}</span>
             <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
-          </div>
-          <div className="pm-network-pill">
-            <span>↓ {formatRate(snapshot.network.rxBytesPerSecond)}</span>
-            <span>↑ {formatRate(snapshot.network.txBytesPerSecond)}</span>
           </div>
           <span className="pm-updated">{t('expanded.performanceMonitor.updated', { defaultValue: '更新 {{time}}', time: updatedTime })}</span>
         </div>

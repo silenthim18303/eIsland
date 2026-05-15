@@ -50,7 +50,7 @@
 
 .pm-dashboard-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   min-height: 24px;
@@ -76,20 +76,6 @@
   font-size: 9px;
   color: rgba(var(--color-text-rgb), 0.38);
   text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pm-network-pill {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 7px;
-  border: 1px solid rgba(var(--color-text-rgb), 0.08);
-  border-radius: 999px;
-  background: rgba(var(--color-text-rgb), 0.05);
-  color: rgba(var(--color-text-rgb), 0.72);
-  font-size: 9px;
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -123,12 +109,6 @@
   min-width: 0;
   min-height: 0;
   padding: 7px 8px;
-  border: 1px solid rgba(var(--color-text-rgb), 0.08);
-  border-radius: 14px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
-    rgba(var(--color-text-rgb), 0.035);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   overflow: hidden;
 }
 
@@ -210,17 +190,11 @@
 
 .pm-info-panel {
   display: grid;
-  grid-template-rows: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(5, minmax(0, 1fr));
   gap: 4px;
   min-width: 0;
   min-height: 0;
   padding: 6px;
-  border: 1px solid rgba(var(--color-text-rgb), 0.08);
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 20% 10%, rgba(94, 234, 212, 0.12), transparent 36%),
-    radial-gradient(circle at 100% 0, rgba(147, 197, 253, 0.1), transparent 32%),
-    rgba(var(--color-text-rgb), 0.03);
   overflow: hidden;
 }
 
@@ -231,8 +205,6 @@
   gap: 6px;
   min-height: 0;
   padding: 0 4px;
-  border-radius: 8px;
-  background: rgba(var(--color-text-rgb), 0.025);
 }
 
 .pm-info-label {

@@ -68,11 +68,6 @@ interface PerformanceSnapshot {
     usagePercent: number;
     temperatureCelsius: number | null;
   };
-  network: {
-    iface: string;
-    rxBytesPerSecond: number;
-    txBytesPerSecond: number;
-  };
 }
 
 interface RunningProcessInfo {
@@ -120,7 +115,6 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
     graphics,
     fsSizes,
     diskLayouts,
-    networkStats,
   ] = await Promise.all([
     si.cpu().catch(() => null),
     si.currentLoad().catch(() => null),
@@ -129,7 +123,6 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
     si.graphics().catch(() => null),
     si.fsSize().catch(() => []),
     si.diskLayout().catch(() => []),
-    si.networkStats().catch(() => []),
   ]);
 
   const gpu = graphics?.controllers?.find((controller) => Boolean(controller.model || controller.vendor)) ?? null;
@@ -137,10 +130,6 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
     totalBytes: acc.totalBytes + Math.max(0, item.size || 0),
     usedBytes: acc.usedBytes + Math.max(0, item.used || 0),
   }), { totalBytes: 0, usedBytes: 0 });
-  const network = networkStats.find((item) => (item.rx_sec || item.tx_sec) && item.operstate === 'up')
-    ?? networkStats.find((item) => item.operstate === 'up')
-    ?? networkStats[0]
-    ?? null;
   const diskTemperature = diskLayouts
     .map((item) => positiveNumber(item.temperature))
     .find((value): value is number => value !== null) ?? null;
@@ -187,11 +176,6 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
       usedBytes: diskTotals.usedBytes,
       usagePercent: diskTotals.totalBytes > 0 ? clampPercent((diskTotals.usedBytes / diskTotals.totalBytes) * 100) : 0,
       temperatureCelsius: diskTemperature,
-    },
-    network: {
-      iface: network?.iface || '',
-      rxBytesPerSecond: Math.max(0, network?.rx_sec || 0),
-      txBytesPerSecond: Math.max(0, network?.tx_sec || 0),
     },
   };
 }

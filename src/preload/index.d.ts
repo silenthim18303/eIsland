@@ -94,11 +94,6 @@ export interface PerformanceSnapshot {
     usagePercent: number;
     temperatureCelsius: number | null;
   };
-  network: {
-    iface: string;
-    rxBytesPerSecond: number;
-    txBytesPerSecond: number;
-  };
 }
 
 declare global {
