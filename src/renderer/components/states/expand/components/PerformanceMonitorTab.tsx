@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface PerformanceSnapshot {
@@ -170,15 +170,6 @@ export function PerformanceMonitorTab(): React.ReactElement {
     };
   }, []);
 
-  const updatedTime = useMemo(() => {
-    if (!snapshot) return '--';
-    return new Date(snapshot.timestamp).toLocaleTimeString(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  }, [snapshot]);
-
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
@@ -253,20 +244,19 @@ export function PerformanceMonitorTab(): React.ReactElement {
             <span className="pm-title">{t('expanded.performanceMonitor.title', { defaultValue: '系统性能' })}</span>
             <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
           </div>
-          <span className="pm-updated">{t('expanded.performanceMonitor.updated', { defaultValue: '更新 {{time}}', time: updatedTime })}</span>
         </div>
         <div className="pm-dashboard-body">
-          <div className="pm-metrics-grid">
-            {metrics.map((metric) => (
-              <MetricCard key={metric.label} {...metric} />
-            ))}
-          </div>
           <div className="pm-info-panel">
             {infoItems.map((item) => (
               <div className="pm-info-row" key={item.label}>
                 <span className="pm-info-label">{item.label}</span>
                 <span className="pm-info-value">{item.value}</span>
               </div>
+            ))}
+          </div>
+          <div className="pm-metrics-grid">
+            {metrics.map((metric) => (
+              <MetricCard key={metric.label} {...metric} />
             ))}
           </div>
         </div>

@@ -426,7 +426,6 @@
       "subtitle": "实时硬件状态与温度",
       "loading": "正在读取系统性能数据...",
       "error": "系统性能数据暂不可用",
-      "updated": "更新 {{time}}",
       "labels": {
         "cpu": "CPU",
         "gpu": "GPU",
@@ -437,8 +436,7 @@
         "os": "系统",
         "cpuModel": "处理器",
         "gpuModel": "显卡",
-        "uptime": "运行",
-        "network": "网络"
+        "uptime": "运行"
       },
       "status": {
         "unavailable": "不可用",

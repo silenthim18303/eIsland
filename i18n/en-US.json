@@ -426,7 +426,6 @@
       "subtitle": "Live hardware status and temperatures",
       "loading": "Loading system performance data...",
       "error": "System performance data is unavailable",
-      "updated": "Updated {{time}}",
       "labels": {
         "cpu": "CPU",
         "gpu": "GPU",
@@ -437,8 +436,7 @@
         "os": "OS",
         "cpuModel": "Processor",
         "gpuModel": "GPU",
-        "uptime": "Uptime",
-        "network": "Network"
+        "uptime": "Uptime"
       },
       "status": {
         "unavailable": "Unavailable",
