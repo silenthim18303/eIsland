@@ -26,6 +26,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import useIslandStore from '../../../../store/slices';
 import {
   DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS,
   DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION,
@@ -37,6 +38,8 @@ import {
   normalizePerformanceMonitorChartColors,
   normalizePerformanceMonitorHardwareSelection,
 } from '../../../../utils/performanceMonitorColors';
+
+const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
 interface PerformanceSnapshot {
   timestamp: number;
@@ -158,6 +161,7 @@ function MetricCard({ label, value, valueText, detail, temperature, accent }: Me
  */
 export function PerformanceMonitorTab(): React.ReactElement {
   const { t } = useTranslation();
+  const { setMaxExpand, setMaxExpandTab } = useIslandStore();
   const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(() => cachedPerformanceSnapshot);
   const [failed, setFailed] = useState(false);
   const [chartColors, setChartColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
@@ -293,6 +297,13 @@ export function PerformanceMonitorTab(): React.ReactElement {
     { label: t('expanded.performanceMonitor.labels.uptime', { defaultValue: '运行' }), value: formatUptime(snapshot.host.uptimeSeconds) },
   ];
 
+  const openHardwareSettings = (): void => {
+    window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'performance-monitor' }));
+    window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, 'performance-monitor').catch(() => {});
+    setMaxExpandTab('settings');
+    setMaxExpand();
+  };
+
   return (
     <div className="expand-tab-panel pm-tab-panel">
       <div className="pm-panel-wrap">
@@ -301,6 +312,9 @@ export function PerformanceMonitorTab(): React.ReactElement {
             <span className="pm-title">{t('expanded.performanceMonitor.title', { defaultValue: '系统性能' })}</span>
             <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
           </div>
+          <button className="pm-hardware-settings-link" type="button" onClick={openHardwareSettings}>
+            {t('expanded.performanceMonitor.hardwareSettingsLink', { defaultValue: '和您的硬件不一样？点击前往调整' })}
+          </button>
         </div>
         <div className="pm-dashboard-body">
           <div className="pm-info-panel">

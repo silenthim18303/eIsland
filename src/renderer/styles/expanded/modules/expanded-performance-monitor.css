@@ -79,7 +79,7 @@
 
 .pm-dashboard-head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   min-height: 24px;
@@ -106,6 +106,22 @@
   color: rgba(var(--color-text-rgb), 0.38);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pm-hardware-settings-link {
+  justify-self: end;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.45);
+  font-size: 9px;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pm-hardware-settings-link:hover {
+  color: rgba(var(--color-text-rgb), 0.78);
 }
 
 .pm-dashboard-body {

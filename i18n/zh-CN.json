@@ -424,6 +424,7 @@
     "performanceMonitor": {
       "title": "系统性能",
       "subtitle": "实时硬件状态与温度",
+      "hardwareSettingsLink": "和您的硬件不一样？点击前往调整",
       "loading": "正在读取系统性能数据...",
       "error": "系统性能数据暂不可用",
       "labels": {

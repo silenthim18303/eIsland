@@ -424,6 +424,7 @@
     "performanceMonitor": {
       "title": "System Performance",
       "subtitle": "Live hardware status and temperatures",
+      "hardwareSettingsLink": "Hardware looks different? Click to adjust",
       "loading": "Loading system performance data...",
       "error": "System performance data is unavailable",
       "labels": {

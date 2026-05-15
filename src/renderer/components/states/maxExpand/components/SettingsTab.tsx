@@ -132,7 +132,7 @@ const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 const ISLAND_AUTO_DIM_ENABLED_STORE_KEY = 'island-auto-dim-enabled';
 const ISLAND_AUTO_DIM_DELAY_STORE_KEY = 'island-auto-dim-delay';
 const DEFAULT_AUTO_DIM_DELAY_SEC = 10;
-type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail';
+type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail' | 'performance-monitor';
 let _lastSettingsSidebarTab: SettingsSidebarTabKey = 'index';
 
 type IslandBgMediaType = 'image' | 'video';
@@ -1217,6 +1217,10 @@ export function SettingsTab(): ReactElement {
       if (value === 'ai') {
         setActiveTab('ai');
       }
+      if (value === 'performance-monitor') {
+        setActiveTab('app');
+        setAppSettingsPage('performance-monitor');
+      }
       if (value) {
         window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
@@ -1553,6 +1557,11 @@ export function SettingsTab(): ReactElement {
       }
       if (intent === 'ai') {
         setActiveTab('ai');
+        window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
+      }
+      if (intent === 'performance-monitor') {
+        setActiveTab('app');
+        setAppSettingsPage('performance-monitor');
         window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
     }).catch(() => {});
