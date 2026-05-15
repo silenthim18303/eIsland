@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -34,6 +34,7 @@ import {
   PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY,
   PERFORMANCE_MONITOR_METRIC_KEYS,
   type PerformanceMonitorChartColors,
+  type PerformanceMonitorHardwareOption,
   type PerformanceMonitorHardwareOptions,
   type PerformanceMonitorHardwareSelection,
   type PerformanceMonitorMetricKey,
@@ -54,6 +55,76 @@ const DEFAULT_HARDWARE_OPTIONS: PerformanceMonitorHardwareOptions = {
   gpu: [{ id: 'auto', label: 'Auto GPU' }],
   disk: [{ id: 'all', label: 'All Disks' }],
 };
+
+function HardwareSelectDropdown({
+  options,
+  value,
+  onChange,
+  resolveLabel,
+}: {
+  options: PerformanceMonitorHardwareOption[];
+  value: string;
+  onChange: (value: string) => void;
+  resolveLabel: (id: string, label: string) => string;
+}): ReactElement {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const selectedOption = options.find((option) => option.id === value) ?? options[0];
+  const selectedLabel = selectedOption ? resolveLabel(selectedOption.id, selectedOption.label) : value;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent): void => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="settings-performance-monitor-hardware-dropdown" ref={wrapperRef}>
+      <button
+        className="settings-performance-monitor-hardware-dropdown-trigger"
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span className="settings-performance-monitor-hardware-dropdown-label">{selectedLabel}</span>
+        <span className="settings-performance-monitor-hardware-dropdown-arrow">▾</span>
+      </button>
+      {open && (
+        <div className="settings-performance-monitor-hardware-dropdown-menu">
+          <div
+            className="settings-performance-monitor-hardware-dropdown-scroll"
+            onWheelCapture={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              event.currentTarget.scrollTop += event.deltaY;
+              event.currentTarget.scrollLeft += event.deltaX;
+            }}
+          >
+            {options.map((option) => {
+              const label = resolveLabel(option.id, option.label);
+              return (
+                <button
+                  className={`settings-performance-monitor-hardware-dropdown-item ${option.id === value ? 'active' : ''}`}
+                  key={option.id}
+                  type="button"
+                  onClick={() => {
+                    onChange(option.id);
+                    setOpen(false);
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function PerformanceMonitorSettingsPage(): ReactElement {
   const { t } = useTranslation();
@@ -130,17 +201,12 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
                 <span className="settings-field-label">{t(`settings.app.performanceMonitor.hardware.${key}`, {
                   defaultValue: key === 'cpu' ? 'CPU' : key === 'gpu' ? 'GPU' : '磁盘',
                 })}</span>
-                <select
-                  className="settings-field-input"
+                <HardwareSelectDropdown
+                  options={hardwareOptions[key]}
                   value={hardwareSelection[key]}
-                  onChange={(event) => updateHardwareSelection(key, event.target.value)}
-                >
-                  {hardwareOptions[key].map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {getHardwareOptionLabel(key, option.id, option.label)}
-                    </option>
-                  ))}
-                </select>
+                  onChange={(value) => updateHardwareSelection(key, value)}
+                  resolveLabel={(id, label) => getHardwareOptionLabel(key, id, label)}
+                />
               </label>
             ))}
           </div>
