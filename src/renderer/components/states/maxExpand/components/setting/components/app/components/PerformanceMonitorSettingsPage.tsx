@@ -29,12 +29,17 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS,
+  DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION,
   PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY,
+  PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY,
   PERFORMANCE_MONITOR_METRIC_KEYS,
   type PerformanceMonitorChartColors,
+  type PerformanceMonitorHardwareOptions,
+  type PerformanceMonitorHardwareSelection,
   type PerformanceMonitorMetricKey,
   isPerformanceMonitorColor,
   normalizePerformanceMonitorChartColors,
+  normalizePerformanceMonitorHardwareSelection,
 } from '../../../../../../../../utils/performanceMonitorColors';
 
 const COLOR_LABEL_KEYS: Record<PerformanceMonitorMetricKey, string> = {
@@ -44,9 +49,17 @@ const COLOR_LABEL_KEYS: Record<PerformanceMonitorMetricKey, string> = {
   disk: 'settings.app.performanceMonitor.colors.disk',
 };
 
+const DEFAULT_HARDWARE_OPTIONS: PerformanceMonitorHardwareOptions = {
+  cpu: [{ id: 'all', label: 'All CPU' }],
+  gpu: [{ id: 'auto', label: 'Auto GPU' }],
+  disk: [{ id: 'all', label: 'All Disks' }],
+};
+
 export function PerformanceMonitorSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [colors, setColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
+  const [hardwareSelection, setHardwareSelection] = useState<PerformanceMonitorHardwareSelection>(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION);
+  const [hardwareOptions, setHardwareOptions] = useState<PerformanceMonitorHardwareOptions>(DEFAULT_HARDWARE_OPTIONS);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +67,20 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
       if (cancelled) return;
       setColors(normalizePerformanceMonitorChartColors(value));
     }).catch(() => {});
+    window.api.storeRead(PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      const nextSelection = normalizePerformanceMonitorHardwareSelection(value);
+      setHardwareSelection(nextSelection);
+      window.api.getPerformanceSnapshot(nextSelection).then((snapshot) => {
+        if (cancelled) return;
+        setHardwareOptions(snapshot.hardwareOptions);
+      }).catch(() => {});
+    }).catch(() => {
+      window.api.getPerformanceSnapshot(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION).then((snapshot) => {
+        if (cancelled) return;
+        setHardwareOptions(snapshot.hardwareOptions);
+      }).catch(() => {});
+    });
     return () => { cancelled = true; };
   }, []);
 
@@ -72,9 +99,53 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
     window.api.settingsPreview(`store:${PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY}`, next).catch(() => {});
   };
 
+  const updateHardwareSelection = (key: keyof PerformanceMonitorHardwareSelection, value: string): void => {
+    const next = { ...hardwareSelection, [key]: value };
+    setHardwareSelection(next);
+    window.api.storeWrite(PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY, next).catch(() => {});
+    window.api.settingsPreview(`store:${PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY}`, next).catch(() => {});
+    window.api.getPerformanceSnapshot(next).then((snapshot) => {
+      setHardwareOptions(snapshot.hardwareOptions);
+    }).catch(() => {});
+  };
+
+  const getHardwareOptionLabel = (type: keyof PerformanceMonitorHardwareSelection, id: string, label: string): string => {
+    if (type === 'cpu' && id === 'all') return t('settings.app.performanceMonitor.hardwareOptions.allCpu', { defaultValue: '全部 CPU' });
+    if (type === 'gpu' && id === 'auto') return t('settings.app.performanceMonitor.hardwareOptions.autoGpu', { defaultValue: '自动选择 GPU' });
+    if (type === 'disk' && id === 'all') return t('settings.app.performanceMonitor.hardwareOptions.allDisks', { defaultValue: '全部磁盘' });
+    return label;
+  };
+
   return (
     <div className="max-expand-settings-section settings-performance-monitor-page-panel">
       <div className="settings-cards">
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-card-title">{t('settings.app.performanceMonitor.hardwareTitle', { defaultValue: '监控硬件' })}</div>
+            <div className="settings-card-subtitle">{t('settings.app.performanceMonitor.hardwareHint', { defaultValue: '选择性能监控图表读取的 CPU、GPU 和磁盘目标。' })}</div>
+          </div>
+          <div className="settings-performance-monitor-hardware-grid">
+            {(['cpu', 'gpu', 'disk'] as Array<keyof PerformanceMonitorHardwareSelection>).map((key) => (
+              <label className="settings-field settings-performance-monitor-hardware-field" key={key}>
+                <span className="settings-field-label">{t(`settings.app.performanceMonitor.hardware.${key}`, {
+                  defaultValue: key === 'cpu' ? 'CPU' : key === 'gpu' ? 'GPU' : '磁盘',
+                })}</span>
+                <select
+                  className="settings-field-input"
+                  value={hardwareSelection[key]}
+                  onChange={(event) => updateHardwareSelection(key, event.target.value)}
+                >
+                  {hardwareOptions[key].map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {getHardwareOptionLabel(key, option.id, option.label)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+        </div>
+
         <div className="settings-card">
           <div className="settings-card-header">
             <div className="settings-card-title">{t('settings.app.performanceMonitor.colorsTitle', { defaultValue: '图表颜色' })}</div>

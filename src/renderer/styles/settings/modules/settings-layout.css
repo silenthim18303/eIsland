@@ -2617,6 +2617,16 @@
   color: rgba(var(--color-text-rgb), 0.78);
 }
 
+.settings-performance-monitor-hardware-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.settings-performance-monitor-hardware-field {
+  min-width: 0;
+}
+
 .settings-performance-monitor-color-row {
   display: flex;
   align-items: flex-end;

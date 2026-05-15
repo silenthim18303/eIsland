@@ -28,9 +28,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS,
+  DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION,
   PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY,
+  PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY,
   type PerformanceMonitorChartColors,
+  type PerformanceMonitorHardwareOptions,
+  type PerformanceMonitorHardwareSelection,
   normalizePerformanceMonitorChartColors,
+  normalizePerformanceMonitorHardwareSelection,
 } from '../../../../utils/performanceMonitorColors';
 
 interface PerformanceSnapshot {
@@ -71,6 +76,7 @@ interface PerformanceSnapshot {
     usagePercent: number;
     temperatureCelsius: number | null;
   };
+  hardwareOptions: PerformanceMonitorHardwareOptions;
 }
 
 interface MetricCardProps {
@@ -155,6 +161,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
   const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(() => cachedPerformanceSnapshot);
   const [failed, setFailed] = useState(false);
   const [chartColors, setChartColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
+  const [hardwareSelection, setHardwareSelection] = useState<PerformanceMonitorHardwareSelection>(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION);
   const snapshotRef = useRef<PerformanceSnapshot | null>(snapshot);
 
   useEffect(() => {
@@ -167,7 +174,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
     let delayTimer: number | undefined;
     let intervalTimer: number | undefined;
     const loadSnapshot = (): void => {
-      window.api.getPerformanceSnapshot()
+      window.api.getPerformanceSnapshot(hardwareSelection)
         .then((data) => {
           if (cancelled) return;
           const nextSnapshot = data as PerformanceSnapshot;
@@ -190,7 +197,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
       if (delayTimer !== undefined) window.clearTimeout(delayTimer);
       if (intervalTimer !== undefined) window.clearInterval(intervalTimer);
     };
-  }, []);
+  }, [hardwareSelection]);
 
   useEffect(() => {
     let cancelled = false;
@@ -198,10 +205,17 @@ export function PerformanceMonitorTab(): React.ReactElement {
       if (cancelled) return;
       setChartColors(normalizePerformanceMonitorChartColors(value));
     }).catch(() => {});
+    window.api.storeRead(PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      setHardwareSelection(normalizePerformanceMonitorHardwareSelection(value));
+    }).catch(() => {});
     const unsubscribe = window.api.onSettingsChanged((channel: string, value: unknown) => {
       if (cancelled) return;
       if (channel === `store:${PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY}`) {
         setChartColors(normalizePerformanceMonitorChartColors(value));
+      }
+      if (channel === `store:${PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY}`) {
+        setHardwareSelection(normalizePerformanceMonitorHardwareSelection(value));
       }
     });
     return () => {

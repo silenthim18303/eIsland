@@ -56,6 +56,23 @@ export interface RunningWindowInfo {
   iconDataUrl: string | null;
 }
 
+export interface PerformanceHardwareSelection {
+  cpu?: string;
+  gpu?: string;
+  disk?: string;
+}
+
+export interface PerformanceHardwareOption {
+  id: string;
+  label: string;
+}
+
+export interface PerformanceHardwareOptions {
+  cpu: PerformanceHardwareOption[];
+  gpu: PerformanceHardwareOption[];
+  disk: PerformanceHardwareOption[];
+}
+
 export interface PerformanceSnapshot {
   timestamp: number;
   host: {
@@ -94,6 +111,7 @@ export interface PerformanceSnapshot {
     usagePercent: number;
     temperatureCelsius: number | null;
   };
+  hardwareOptions: PerformanceHardwareOptions;
 }
 
 declare global {
@@ -204,7 +222,7 @@ declare global {
       screenshot: () => Promise<string | null>;
       startRegionScreenshot: () => Promise<boolean>;
       openTaskManager: () => void;
-      getPerformanceSnapshot: () => Promise<PerformanceSnapshot>;
+      getPerformanceSnapshot: (selection?: PerformanceHardwareSelection) => Promise<PerformanceSnapshot>;
       getPathForFile: (file: File) => string;
       getFileIcon: (filePath: string) => Promise<string | null>;
       openFile: (filePath: string) => Promise<boolean>;

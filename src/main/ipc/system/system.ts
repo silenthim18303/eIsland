@@ -68,6 +68,24 @@ interface PerformanceSnapshot {
     usagePercent: number;
     temperatureCelsius: number | null;
   };
+  hardwareOptions: PerformanceHardwareOptions;
+}
+
+interface PerformanceHardwareOption {
+  id: string;
+  label: string;
+}
+
+interface PerformanceHardwareOptions {
+  cpu: PerformanceHardwareOption[];
+  gpu: PerformanceHardwareOption[];
+  disk: PerformanceHardwareOption[];
+}
+
+interface PerformanceHardwareSelection {
+  cpu?: string;
+  gpu?: string;
+  disk?: string;
 }
 
 interface RunningProcessInfo {
@@ -106,7 +124,23 @@ function clampPercent(value: unknown): number {
   return Math.max(0, Math.min(100, numeric));
 }
 
-async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
+function indexedId(prefix: string, index: number): string {
+  return `${prefix}:${index}`;
+}
+
+function parseIndexedId(value: unknown, prefix: string, total: number): number | null {
+  if (typeof value !== 'string') return null;
+  const match = value.match(new RegExp(`^${prefix}:(\\d+)$`));
+  if (!match) return null;
+  const index = Number(match[1]);
+  return Number.isInteger(index) && index >= 0 && index < total ? index : null;
+}
+
+function safeHardwareLabel(value: unknown, fallback: string): string {
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+async function collectPerformanceSnapshot(selection: PerformanceHardwareSelection = {}): Promise<PerformanceSnapshot> {
   const [
     cpu,
     load,
@@ -125,11 +159,45 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
     si.diskLayout().catch(() => []),
   ]);
 
-  const gpu = graphics?.controllers?.find((controller) => Boolean(controller.model || controller.vendor)) ?? null;
-  const diskTotals = fsSizes.reduce((acc, item) => ({
+  const cpuLoadItems = Array.isArray(load?.cpus) ? load.cpus : [];
+  const selectedCpuIndex = parseIndexedId(selection.cpu, 'cpu', cpuLoadItems.length);
+  const cpuOptions: PerformanceHardwareOption[] = [
+    { id: 'all', label: 'All CPU' },
+    ...cpuLoadItems.map((_, index) => ({
+      id: indexedId('cpu', index),
+      label: `CPU ${index + 1} · ${safeHardwareLabel(os.cpus()[index]?.model, 'Unknown CPU')}`,
+    })),
+  ];
+  const selectedCpuLoad = selectedCpuIndex === null ? load?.currentLoad : cpuLoadItems[selectedCpuIndex]?.load;
+  const cpuTemperatureCores = Array.isArray(cpuTemperature?.cores) ? cpuTemperature.cores : [];
+  const selectedCpuTemperature = selectedCpuIndex === null ? null : positiveNumber(cpuTemperatureCores[selectedCpuIndex]);
+
+  const gpuControllers = (graphics?.controllers ?? []).filter((controller) => Boolean(controller.model || controller.vendor));
+  const selectedGpuIndex = parseIndexedId(selection.gpu, 'gpu', gpuControllers.length);
+  const gpu = selectedGpuIndex === null ? (gpuControllers[0] ?? null) : gpuControllers[selectedGpuIndex];
+  const gpuOptions: PerformanceHardwareOption[] = [
+    { id: 'auto', label: 'Auto GPU' },
+    ...gpuControllers.map((controller, index) => ({
+      id: indexedId('gpu', index),
+      label: [controller.vendor, controller.model].filter(Boolean).join(' ') || `GPU ${index + 1}`,
+    })),
+  ];
+
+  const fsItems = fsSizes.filter((item) => positiveNumber(item.size) !== null);
+  const selectedFsIndex = parseIndexedId(selection.disk, 'fs', fsItems.length);
+  const selectedFsItems = selectedFsIndex === null ? fsItems : [fsItems[selectedFsIndex]];
+  const diskOptions: PerformanceHardwareOption[] = [
+    { id: 'all', label: 'All Disks' },
+    ...fsItems.map((item, index) => ({
+      id: indexedId('fs', index),
+      label: [item.mount, item.fs].filter(Boolean).join(' · ') || `Disk ${index + 1}`,
+    })),
+  ];
+  const diskTotals = selectedFsItems.reduce((acc, item) => ({
     totalBytes: acc.totalBytes + Math.max(0, item.size || 0),
     usedBytes: acc.usedBytes + Math.max(0, item.used || 0),
   }), { totalBytes: 0, usedBytes: 0 });
+  const selectedDiskTemperature = selectedFsIndex === null ? null : positiveNumber(diskLayouts[selectedFsIndex]?.temperature);
   const diskTemperature = diskLayouts
     .map((item) => positiveNumber(item.temperature))
     .find((value): value is number => value !== null) ?? null;
@@ -153,8 +221,8 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
       physicalCores: cpu?.physicalCores || cpu?.cores || os.cpus().length,
       speedGhz: positiveNumber(cpu?.speed),
       speedMaxGhz: positiveNumber(cpu?.speedMax),
-      loadPercent: clampPercent(load?.currentLoad),
-      temperatureCelsius: positiveNumber(cpuTemperature?.main) ?? positiveNumber(cpuTemperature?.max),
+      loadPercent: clampPercent(selectedCpuLoad),
+      temperatureCelsius: selectedCpuTemperature ?? positiveNumber(cpuTemperature?.main) ?? positiveNumber(cpuTemperature?.max),
     },
     memory: {
       totalBytes: memoryTotal,
@@ -175,7 +243,12 @@ async function collectPerformanceSnapshot(): Promise<PerformanceSnapshot> {
       totalBytes: diskTotals.totalBytes,
       usedBytes: diskTotals.usedBytes,
       usagePercent: diskTotals.totalBytes > 0 ? clampPercent((diskTotals.usedBytes / diskTotals.totalBytes) * 100) : 0,
-      temperatureCelsius: diskTemperature,
+      temperatureCelsius: selectedDiskTemperature ?? diskTemperature,
+    },
+    hardwareOptions: {
+      cpu: cpuOptions,
+      gpu: gpuOptions,
+      disk: diskOptions,
     },
   };
 }
@@ -216,8 +289,8 @@ export function registerSystemIpcHandlers(options: RegisterSystemIpcHandlersOpti
     return options.queryFocusedWindow();
   });
 
-  ipcMain.handle('system:performance-snapshot:get', async () => {
-    return collectPerformanceSnapshot();
+  ipcMain.handle('system:performance-snapshot:get', async (_event, selection?: PerformanceHardwareSelection) => {
+    return collectPerformanceSnapshot(selection);
   });
 
 }

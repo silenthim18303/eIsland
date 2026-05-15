@@ -1396,6 +1396,18 @@
       "performanceMonitor": {
         "title": "性能监控",
         "hint": "性能监控展示与硬件状态配置。",
+        "hardwareTitle": "监控硬件",
+        "hardwareHint": "选择性能监控图表读取的 CPU、GPU 和磁盘目标。",
+        "hardware": {
+          "cpu": "CPU",
+          "gpu": "GPU",
+          "disk": "磁盘"
+        },
+        "hardwareOptions": {
+          "allCpu": "全部 CPU",
+          "autoGpu": "自动选择 GPU",
+          "allDisks": "全部磁盘"
+        },
         "colorsTitle": "图表颜色",
         "colorsHint": "调整 Expand 性能监控中 CPU、GPU、内存和磁盘图表颜色。",
         "resetColors": "恢复默认颜色",

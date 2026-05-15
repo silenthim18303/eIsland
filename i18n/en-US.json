@@ -1396,6 +1396,18 @@
       "performanceMonitor": {
         "title": "Performance Monitor",
         "hint": "Configure performance monitor display and hardware status.",
+        "hardwareTitle": "Monitored Hardware",
+        "hardwareHint": "Choose which CPU, GPU, and disk targets the performance monitor charts should read.",
+        "hardware": {
+          "cpu": "CPU",
+          "gpu": "GPU",
+          "disk": "Disk"
+        },
+        "hardwareOptions": {
+          "allCpu": "All CPU",
+          "autoGpu": "Auto GPU",
+          "allDisks": "All Disks"
+        },
         "colorsTitle": "Chart Colors",
         "colorsHint": "Adjust CPU, GPU, memory, and disk chart colors in the Expand performance monitor.",
         "resetColors": "Restore Default Colors",
