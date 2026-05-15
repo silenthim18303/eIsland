@@ -382,7 +382,9 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   // ── 软件设置 > 通知设置 ──
   { label: '通知设置', desc: '配置灵动岛通知提醒与展示行为。', labelKey: 'settings.notification.pageTitle', descKey: 'settings.notification.pageHint', tab: 'app', appPage: 'notification' },
   { label: '通知音效', desc: '通知触发时播放一次提示音。', labelKey: 'settings.notification.sound.title', descKey: 'settings.notification.sound.hint', tab: 'app', appPage: 'notification' },
+  // ── 软件设置 > 性能监控 ──
   { label: '性能监控', desc: '性能监控展示与硬件状态配置。', labelKey: 'settings.app.performanceMonitor.title', descKey: 'settings.app.performanceMonitor.hint', tab: 'app', appPage: 'performance-monitor' },
+  { label: '图表颜色', desc: '调整 Expand 性能监控中 CPU、GPU、内存和磁盘图表颜色。', labelKey: 'settings.app.performanceMonitor.colorsTitle', descKey: 'settings.app.performanceMonitor.colorsHint', tab: 'app', appPage: 'performance-monitor' },
   // ── 网络配置 ──
   { label: '请求超时时间', desc: '设置网络请求的最长等待时间，网络较差时可适当增大', labelKey: 'settings.network.timeout.title', descKey: 'settings.network.timeout.hint', tab: 'network' },
   { label: '静态资源节点', desc: '所有用户默认使用 R2，PRO 用户可选择 R2/COS/OSS。', labelKey: 'settings.network.staticAssetNode.title', descKey: 'settings.network.staticAssetNode.hint', tab: 'network' },

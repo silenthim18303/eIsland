@@ -26,6 +26,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS,
+  PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY,
+  type PerformanceMonitorChartColors,
+  normalizePerformanceMonitorChartColors,
+} from '../../../../utils/performanceMonitorColors';
 
 interface PerformanceSnapshot {
   timestamp: number;
@@ -148,6 +154,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
   const { t } = useTranslation();
   const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(() => cachedPerformanceSnapshot);
   const [failed, setFailed] = useState(false);
+  const [chartColors, setChartColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
   const snapshotRef = useRef<PerformanceSnapshot | null>(snapshot);
 
   useEffect(() => {
@@ -185,6 +192,24 @@ export function PerformanceMonitorTab(): React.ReactElement {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      setChartColors(normalizePerformanceMonitorChartColors(value));
+    }).catch(() => {});
+    const unsubscribe = window.api.onSettingsChanged((channel: string, value: unknown) => {
+      if (cancelled) return;
+      if (channel === `store:${PERFORMANCE_MONITOR_CHART_COLORS_STORE_KEY}`) {
+        setChartColors(normalizePerformanceMonitorChartColors(value));
+      }
+    });
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, []);
+
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
@@ -219,7 +244,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
       valueText: formatPercent(snapshot.cpu.loadPercent),
       detail: `${snapshot.cpu.physicalCores}P / ${snapshot.cpu.cores}T · ${speedText}`,
       temperature: formatTemp(snapshot.cpu.temperatureCelsius),
-      accent: '#5eead4',
+      accent: chartColors.cpu,
     },
     {
       label: t('expanded.performanceMonitor.labels.gpu', { defaultValue: 'GPU' }),
@@ -227,7 +252,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
       valueText: formatPercent(snapshot.gpu?.loadPercent ?? null),
       detail: snapshot.gpu?.vramTotalMb ? `${Math.round(snapshot.gpu.vramTotalMb)} MB VRAM` : gpuName,
       temperature: formatTemp(snapshot.gpu?.temperatureCelsius ?? null),
-      accent: '#93c5fd',
+      accent: chartColors.gpu,
     },
     {
       label: t('expanded.performanceMonitor.labels.memory', { defaultValue: '内存' }),
@@ -235,7 +260,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
       valueText: formatPercent(snapshot.memory.usagePercent),
       detail: `${formatBytes(snapshot.memory.usedBytes)} / ${formatBytes(snapshot.memory.totalBytes)}`,
       temperature: t('expanded.performanceMonitor.labels.available', { defaultValue: '可用' }) + ` ${formatBytes(snapshot.memory.availableBytes)}`,
-      accent: '#c084fc',
+      accent: chartColors.memory,
     },
     {
       label: t('expanded.performanceMonitor.labels.disk', { defaultValue: '磁盘' }),
@@ -243,7 +268,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
       valueText: formatPercent(snapshot.disk.usagePercent),
       detail: `${formatBytes(snapshot.disk.usedBytes)} / ${formatBytes(snapshot.disk.totalBytes)}`,
       temperature: formatTemp(snapshot.disk.temperatureCelsius),
-      accent: '#fbbf24',
+      accent: chartColors.disk,
     },
   ];
   const infoItems = [

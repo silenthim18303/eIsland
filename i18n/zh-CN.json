@@ -1395,7 +1395,16 @@
       "pagination": "软件设置分页",
       "performanceMonitor": {
         "title": "性能监控",
-        "hint": "性能监控展示与硬件状态配置。"
+        "hint": "性能监控展示与硬件状态配置。",
+        "colorsTitle": "图表颜色",
+        "colorsHint": "调整 Expand 性能监控中 CPU、GPU、内存和磁盘图表颜色。",
+        "resetColors": "恢复默认颜色",
+        "colors": {
+          "cpu": "CPU",
+          "gpu": "GPU",
+          "memory": "内存",
+          "disk": "磁盘"
+        }
       },
       "notifications": {
         "configChanged": {

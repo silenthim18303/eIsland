@@ -2617,6 +2617,71 @@
   color: rgba(var(--color-text-rgb), 0.78);
 }
 
+.settings-performance-monitor-color-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
+.settings-performance-monitor-color-grid {
+  display: flex;
+  align-items: flex-end;
+  flex: 1 1 auto;
+  gap: 12px;
+  min-width: 0;
+}
+
+.settings-performance-monitor-color-field {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 6px;
+  min-width: 0;
+}
+
+.settings-performance-monitor-color-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-performance-monitor-color-input {
+  width: 28px;
+  height: 24px;
+  flex: 0 0 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.settings-performance-monitor-color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.settings-performance-monitor-color-input::-webkit-color-swatch {
+  border: 0;
+  border-radius: 8px;
+}
+
+.settings-performance-monitor-color-value {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.46);
+  font-variant-numeric: tabular-nums;
+  text-transform: uppercase;
+}
+
+.settings-performance-monitor-color-row .settings-hotkey-btn {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
 .download-task-card {
   padding: 10px;
   border: 1px solid rgba(var(--color-text-rgb), 0.12);

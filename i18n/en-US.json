@@ -1395,7 +1395,16 @@
       "pagination": "App settings pagination",
       "performanceMonitor": {
         "title": "Performance Monitor",
-        "hint": "Configure performance monitor display and hardware status."
+        "hint": "Configure performance monitor display and hardware status.",
+        "colorsTitle": "Chart Colors",
+        "colorsHint": "Adjust CPU, GPU, memory, and disk chart colors in the Expand performance monitor.",
+        "resetColors": "Restore Default Colors",
+        "colors": {
+          "cpu": "CPU",
+          "gpu": "GPU",
+          "memory": "Memory",
+          "disk": "Disk"
+        }
       },
       "notifications": {
         "configChanged": {
