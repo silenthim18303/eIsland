@@ -2726,6 +2726,10 @@
         "label": "Performance Settings",
         "desc": "Performance-related configuration."
       },
+      "performance-monitor": {
+        "label": "Performance Monitor",
+        "desc": "Configure performance monitor display and hardware status."
+      },
       "network": {
         "label": "Network",
         "desc": "Request timeout and network behavior settings"
