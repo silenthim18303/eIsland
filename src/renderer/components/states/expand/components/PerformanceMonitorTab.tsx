@@ -40,6 +40,9 @@ import {
 } from '../../../../utils/performanceMonitorColors';
 
 const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
+const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
+const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
+const STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
 
 interface PerformanceSnapshot {
   timestamp: number;
@@ -298,10 +301,28 @@ export function PerformanceMonitorTab(): React.ReactElement {
   ];
 
   const openHardwareSettings = (): void => {
-    window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'performance-monitor' }));
-    window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, 'performance-monitor').catch(() => {});
-    setMaxExpandTab('settings');
-    setMaxExpand();
+    void window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, 'performance-monitor')
+      .then(() => window.api.storeRead(STANDALONE_WINDOW_MODE_STORE_KEY))
+      .then((mode) => {
+        if (mode === 'standalone' || mode === 'integrated') return mode;
+        return window.api.storeRead(LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY).catch(() => null);
+      })
+      .then((mode) => {
+        if (mode === 'standalone') {
+          return window.api.storeWrite(STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY, 'settings')
+            .then(() => window.api.openStandaloneWindow())
+            .catch(() => {});
+        }
+        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'performance-monitor' }));
+        setMaxExpandTab('settings');
+        setMaxExpand();
+        return undefined;
+      })
+      .catch(() => {
+        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'performance-monitor' }));
+        setMaxExpandTab('settings');
+        setMaxExpand();
+      });
   };
 
   return (
