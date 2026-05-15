@@ -1269,6 +1269,7 @@
       "autostart": "实用工具",
       "sound": "声音设置",
       "notification": "通知设置",
+      "performance": "性能设置",
       "performance-monitor": "性能监控",
       "network": "网络配置",
       "mail": "邮箱配置",
@@ -1395,6 +1396,10 @@
     },
     "app": {
       "pagination": "软件设置分页",
+      "performance": {
+        "title": "性能设置",
+        "hint": "性能相关配置。"
+      },
       "performanceMonitor": {
         "title": "性能监控",
         "hint": "性能监控展示与硬件状态配置。",
@@ -2708,6 +2713,10 @@
       "notification": {
         "label": "通知设置",
         "desc": "配置灵动岛通知提醒与展示行为。"
+      },
+      "performance": {
+        "label": "性能设置",
+        "desc": "性能相关配置。"
       },
       "network": {
         "label": "网络配置",

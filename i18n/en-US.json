@@ -1269,6 +1269,7 @@
       "autostart": "Utilities",
       "sound": "Sound Settings",
       "notification": "Notification Settings",
+      "performance": "Performance Settings",
       "performance-monitor": "Performance Monitor",
       "network": "Network",
       "mail": "Mail",
@@ -1395,6 +1396,10 @@
     },
     "app": {
       "pagination": "App settings pagination",
+      "performance": {
+        "title": "Performance Settings",
+        "hint": "Performance-related configuration."
+      },
       "performanceMonitor": {
         "title": "Performance Monitor",
         "hint": "Configure performance monitor display and hardware status.",
@@ -2713,6 +2718,10 @@
       "notification": {
         "label": "Notification Settings",
         "desc": "Configure Dynamic Island notification alerts and display behavior."
+      },
+      "performance": {
+        "label": "Performance Settings",
+        "desc": "Performance-related configuration."
       },
       "network": {
         "label": "Network",
