@@ -2779,10 +2779,46 @@
 
 .settings-performance-monitor-color-grid {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   flex: 1 1 auto;
   gap: 12px;
   min-width: 0;
+}
+
+.settings-performance-monitor-color-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-performance-monitor-reset-icon-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0.58;
+  transition: opacity 0.15s ease;
+}
+
+.settings-performance-monitor-reset-icon-btn:hover {
+  opacity: 0.9;
+}
+
+.settings-performance-monitor-reset-icon {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  display: block;
+}
+
+[data-theme='light'] .settings-performance-monitor-reset-icon {
+  filter: brightness(0) invert(0);
 }
 
 .settings-performance-monitor-color-field {

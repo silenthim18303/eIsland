@@ -42,6 +42,7 @@ import {
   normalizePerformanceMonitorChartColors,
   normalizePerformanceMonitorHardwareSelection,
 } from '../../../../../../../../utils/performanceMonitorColors';
+import { SvgIcon } from '../../../../../../../../utils/SvgIcon/eisland-icon';
 
 const COLOR_LABEL_KEYS: Record<PerformanceMonitorMetricKey, string> = {
   cpu: 'settings.app.performanceMonitor.colors.cpu',
@@ -226,29 +227,35 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
 
         <div className="settings-card">
           <div className="settings-card-header">
-            <div className="settings-card-title">{t('settings.app.performanceMonitor.colorsTitle', { defaultValue: '图表颜色' })}</div>
+            <div className="settings-performance-monitor-color-title-row">
+              <div className="settings-card-title">{t('settings.app.performanceMonitor.colorsTitle', { defaultValue: '图表颜色' })}</div>
+              <button
+                className="settings-performance-monitor-reset-icon-btn"
+                type="button"
+                onClick={resetColors}
+                title={t('settings.app.performanceMonitor.resetColors', { defaultValue: '恢复默认颜色' })}
+                aria-label={t('settings.app.performanceMonitor.resetColors', { defaultValue: '恢复默认颜色' })}
+              >
+                <img src={SvgIcon.REVERT} alt="" className="settings-performance-monitor-reset-icon" />
+              </button>
+            </div>
             <div className="settings-card-subtitle">{t('settings.app.performanceMonitor.colorsHint', { defaultValue: '调整 Expand 性能监控中 CPU、GPU、内存和磁盘图表颜色。' })}</div>
           </div>
-          <div className="settings-performance-monitor-color-row">
-            <div className="settings-performance-monitor-color-grid">
-              {PERFORMANCE_MONITOR_METRIC_KEYS.map((key) => (
-                <label className="settings-performance-monitor-color-field" key={key}>
-                  <span className="settings-field-label">{t(COLOR_LABEL_KEYS[key], { defaultValue: key.toUpperCase() })}</span>
-                  <span className="settings-performance-monitor-color-control">
-                    <input
-                      className="settings-performance-monitor-color-input"
-                      type="color"
-                      value={colors[key]}
-                      onChange={(event) => updateColor(key, event.target.value)}
-                    />
-                    <span className="settings-performance-monitor-color-value">{colors[key]}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-            <button className="settings-hotkey-btn" type="button" onClick={resetColors}>
-              {t('settings.app.performanceMonitor.resetColors', { defaultValue: '恢复默认颜色' })}
-            </button>
+          <div className="settings-performance-monitor-color-grid">
+            {PERFORMANCE_MONITOR_METRIC_KEYS.map((key) => (
+              <label className="settings-performance-monitor-color-field" key={key}>
+                <span className="settings-field-label">{t(COLOR_LABEL_KEYS[key], { defaultValue: key.toUpperCase() })}</span>
+                <span className="settings-performance-monitor-color-control">
+                  <input
+                    className="settings-performance-monitor-color-input"
+                    type="color"
+                    value={colors[key]}
+                    onChange={(event) => updateColor(key, event.target.value)}
+                  />
+                  <span className="settings-performance-monitor-color-value">{colors[key]}</span>
+                </span>
+              </label>
+            ))}
           </div>
         </div>
       </div>
