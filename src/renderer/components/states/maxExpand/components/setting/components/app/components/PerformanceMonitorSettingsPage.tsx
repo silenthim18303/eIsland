@@ -56,6 +56,23 @@ const DEFAULT_HARDWARE_OPTIONS: PerformanceMonitorHardwareOptions = {
   disk: [{ id: 'all', label: 'All Disks' }],
 };
 
+let cachedHardwareOptions: PerformanceMonitorHardwareOptions | null = null;
+let cachedHardwareOptionsPromise: Promise<PerformanceMonitorHardwareOptions> | null = null;
+
+function loadHardwareOptions(selection: PerformanceMonitorHardwareSelection): Promise<PerformanceMonitorHardwareOptions> {
+  if (cachedHardwareOptions) return Promise.resolve(cachedHardwareOptions);
+  if (cachedHardwareOptionsPromise) return cachedHardwareOptionsPromise;
+  cachedHardwareOptionsPromise = window.api.getPerformanceSnapshot(selection)
+    .then((snapshot) => {
+      cachedHardwareOptions = snapshot.hardwareOptions;
+      return snapshot.hardwareOptions;
+    })
+    .finally(() => {
+      cachedHardwareOptionsPromise = null;
+    });
+  return cachedHardwareOptionsPromise;
+}
+
 function HardwareSelectDropdown({
   options,
   value,
@@ -130,7 +147,7 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [colors, setColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
   const [hardwareSelection, setHardwareSelection] = useState<PerformanceMonitorHardwareSelection>(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION);
-  const [hardwareOptions, setHardwareOptions] = useState<PerformanceMonitorHardwareOptions>(DEFAULT_HARDWARE_OPTIONS);
+  const [hardwareOptions, setHardwareOptions] = useState<PerformanceMonitorHardwareOptions>(() => cachedHardwareOptions ?? DEFAULT_HARDWARE_OPTIONS);
 
   useEffect(() => {
     let cancelled = false;
@@ -138,20 +155,18 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
       if (cancelled) return;
       setColors(normalizePerformanceMonitorChartColors(value));
     }).catch(() => {});
-    window.api.storeRead(PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY).then((value) => {
+    const hydrateHardwareOptions = (value: unknown): void => {
       if (cancelled) return;
       const nextSelection = normalizePerformanceMonitorHardwareSelection(value);
       setHardwareSelection(nextSelection);
-      window.api.getPerformanceSnapshot(nextSelection).then((snapshot) => {
+      loadHardwareOptions(nextSelection).then((nextOptions) => {
         if (cancelled) return;
-        setHardwareOptions(snapshot.hardwareOptions);
+        setHardwareOptions(nextOptions);
       }).catch(() => {});
-    }).catch(() => {
-      window.api.getPerformanceSnapshot(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION).then((snapshot) => {
-        if (cancelled) return;
-        setHardwareOptions(snapshot.hardwareOptions);
-      }).catch(() => {});
-    });
+    };
+    window.api.storeRead(PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY)
+      .then(hydrateHardwareOptions)
+      .catch(() => hydrateHardwareOptions(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION));
     return () => { cancelled = true; };
   }, []);
 
@@ -175,9 +190,6 @@ export function PerformanceMonitorSettingsPage(): ReactElement {
     setHardwareSelection(next);
     window.api.storeWrite(PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY, next).catch(() => {});
     window.api.settingsPreview(`store:${PERFORMANCE_MONITOR_HARDWARE_SELECTION_STORE_KEY}`, next).catch(() => {});
-    window.api.getPerformanceSnapshot(next).then((snapshot) => {
-      setHardwareOptions(snapshot.hardwareOptions);
-    }).catch(() => {});
   };
 
   const getHardwareOptionLabel = (type: keyof PerformanceMonitorHardwareSelection, id: string, label: string): string => {
