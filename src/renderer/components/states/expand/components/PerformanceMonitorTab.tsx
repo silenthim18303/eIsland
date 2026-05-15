@@ -348,7 +348,15 @@ export function PerformanceMonitorTab(): React.ReactElement {
           </div>
           <div className="pm-metrics-grid">
             {metrics.map((metric) => (
-              <MetricCard key={metric.label} {...metric} />
+              <MetricCard
+                key={metric.label}
+                label={metric.label}
+                value={metric.value}
+                valueText={metric.valueText}
+                detail={metric.detail}
+                temperature={metric.temperature}
+                accent={metric.accent}
+              />
             ))}
           </div>
         </div>

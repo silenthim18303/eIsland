@@ -1,23 +1,24 @@
-import React from 'react';
+import { Suspense, lazy } from 'react';
+import type { ReactElement } from 'react';
 import type { MaxExpandTab } from '../../../store/types';
 import { MaxExpandContentShell } from './MaxExpandContentShell';
 
-const AiChatTab = React.lazy(() => import('./components/AiChatTab').then((module) => ({ default: module.AiChatTab })));
-const TodoTab = React.lazy(() => import('./components/TodoTab').then((module) => ({ default: module.TodoTab })));
-const UrlFavoritesTab = React.lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
-const LocalFileSearchTab = React.lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
-const ClipboardHistoryTab = React.lazy(() => import('./components/ClipboardHistoryTab').then((module) => ({ default: module.ClipboardHistoryTab })));
-const AlbumTab = React.lazy(() => import('./components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
-const MailTab = React.lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));
-const SettingsTab = React.lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
-const CountdownTab = React.lazy(() => import('./components/CountdownTab').then((module) => ({ default: module.CountdownTab })));
-const MemoTab = React.lazy(() => import('./components/MemoTab').then((module) => ({ default: module.MemoTab })));
-const AlarmTab = React.lazy(() => import('./components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
-const ToolboxTab = React.lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));
+const AiChatTab = lazy(() => import('./components/AiChatTab').then((module) => ({ default: module.AiChatTab })));
+const TodoTab = lazy(() => import('./components/TodoTab').then((module) => ({ default: module.TodoTab })));
+const UrlFavoritesTab = lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
+const LocalFileSearchTab = lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
+const ClipboardHistoryTab = lazy(() => import('./components/ClipboardHistoryTab').then((module) => ({ default: module.ClipboardHistoryTab })));
+const AlbumTab = lazy(() => import('./components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
+const MailTab = lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));
+const SettingsTab = lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
+const CountdownTab = lazy(() => import('./components/CountdownTab').then((module) => ({ default: module.CountdownTab })));
+const MemoTab = lazy(() => import('./components/MemoTab').then((module) => ({ default: module.MemoTab })));
+const AlarmTab = lazy(() => import('./components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
+const ToolboxTab = lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));
 
-function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: React.ReactElement, contentReady: boolean): React.ReactElement | null {
+function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElement, contentReady: boolean): ReactElement | null {
   if (!contentReady) return loadingFallback;
-  let content: React.ReactElement | null = null;
+  let content: ReactElement | null = null;
   if (activeTab === 'aiChat') content = <AiChatTab />;
   if (activeTab === 'todo') content = <TodoTab />;
   if (activeTab === 'urlFavorites') content = <UrlFavoritesTab />;
@@ -30,9 +31,9 @@ function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: React.Rea
   if (activeTab === 'alarm') content = <AlarmTab />;
   if (activeTab === 'toolbox') content = <ToolboxTab />;
   if (activeTab === 'settings') content = <SettingsTab />;
-  return <React.Suspense fallback={loadingFallback}>{content}</React.Suspense>;
+  return <Suspense fallback={loadingFallback}>{content}</Suspense>;
 }
 
-export function MaxExpandContentLazy(): React.ReactElement {
+export function MaxExpandContentLazy(): ReactElement {
   return <MaxExpandContentShell renderActiveTab={renderLazyActiveTab} />;
 }
