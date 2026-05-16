@@ -906,6 +906,11 @@
       "confirm": "Confirm"
     }
   },
+  "miniGameTab": {
+    "placeholder": "Stay tuned",
+    "title": "Mini game feature in development",
+    "subtitle": "Stay tuned"
+  },
   "maxExpand": {
     "loading": "Loading max expand view...",
     "nav": {
