@@ -26,11 +26,11 @@ vi.mock('fs', () => ({
   writeFileSync: writeFileSyncMock,
 }));
 
-vi.mock('../../utils/broadcast', () => ({
+vi.mock('../../../utils/broadcast', () => ({
   broadcastSettingChange: broadcastSettingChangeMock,
 }));
 
-import { registerThemeIpcHandlers } from './theme';
+import { registerThemeIpcHandlers } from '../theme';
 
 describe('registerThemeIpcHandlers', () => {
   const handlers = new Map<string, (...args: any[]) => any>();
