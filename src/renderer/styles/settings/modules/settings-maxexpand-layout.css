@@ -28,14 +28,20 @@
 .maxexpand-layout-preview-wrap {
   display: flex;
   justify-content: center;
+  width: 100%;
   padding: 16px 0 8px;
 }
 
 .maxexpand-layout-preview-dots {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 10px 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: min(100%, fit-content);
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
   border-radius: 20px;
   background: rgba(var(--color-text-rgb), 0.06);
   border: 1px solid rgba(var(--color-text-rgb), 0.08);
