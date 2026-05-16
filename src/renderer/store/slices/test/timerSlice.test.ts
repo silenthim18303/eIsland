@@ -1,19 +1,18 @@
+import type { StateCreator } from 'zustand';
 import { describe, expect, it } from 'vitest';
-import { createTimerSlice } from './timerSlice';
+import { createTimerSlice } from '../timerSlice';
 
 type TimerState = ReturnType<typeof createTimerSlice>;
 
-function createSliceState(): { getState: () => TimerState } {
+function createSliceState(creator: StateCreator<TimerState, [], [], TimerState>): { getState: () => TimerState } {
   let state = {} as TimerState;
 
-  const setState = (updater: TimerState | ((prev: TimerState) => Partial<TimerState>)) => {
-    const patch = typeof updater === 'function'
-      ? updater(state)
-      : updater;
+  const setState = (updater: Partial<TimerState> | ((prev: TimerState) => Partial<TimerState>)) => {
+    const patch = typeof updater === 'function' ? updater(state) : updater;
     state = { ...state, ...patch };
   };
 
-  state = createTimerSlice(setState as never, (() => state) as never, {} as never);
+  state = creator(setState as never, (() => state) as never, {} as never);
 
   return {
     getState: () => state,
@@ -22,7 +21,7 @@ function createSliceState(): { getState: () => TimerState } {
 
 describe('createTimerSlice', () => {
   it('merges countdown fields when setCountdown is called', () => {
-    const store = createSliceState();
+    const store = createSliceState(createTimerSlice);
     const before = store.getState();
 
     before.setCountdown({
@@ -37,7 +36,7 @@ describe('createTimerSlice', () => {
   });
 
   it('partially updates timerData and keeps untouched fields', () => {
-    const store = createSliceState();
+    const store = createSliceState(createTimerSlice);
 
     store.getState().setTimerData({
       state: 'running',
