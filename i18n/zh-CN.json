@@ -907,9 +907,9 @@
     }
   },
   "miniGameTab": {
-    "placeholder": "尽情期待",
+    "placeholder": "敬请期待",
     "title": "小游戏功能开发中",
-    "subtitle": "尽情期待"
+    "subtitle": "敬请期待"
   },
   "maxExpand": {
     "loading": "正在加载最大展开界面...",
