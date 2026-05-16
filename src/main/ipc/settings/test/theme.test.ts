@@ -86,6 +86,7 @@ describe('registerThemeIpcHandlers', () => {
   it('returns false when persisting throws', () => {
     const setHandler = handlers.get('theme:mode:set');
     const event = { sender: { id: 1 } };
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     writeFileSyncMock.mockImplementation(() => {
       throw new Error('write failed');
@@ -93,6 +94,7 @@ describe('registerThemeIpcHandlers', () => {
 
     const result = setHandler?.(event, 'light');
     expect(result).toBe(false);
+    consoleErrorSpy.mockRestore();
   });
 
   it('returns dark for invalid persisted value', () => {
