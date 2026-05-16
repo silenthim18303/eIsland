@@ -39,6 +39,7 @@ import { CountdownTab } from './components/CountdownTab';
 import { MemoTab } from './components/MemoTab';
 import { AlarmTab } from './components/AlarmTab';
 import { ToolboxTab } from './components/ToolboxTab';
+import { MiniGameTab } from './components/MiniGameTab';
 
 function renderEagerActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElement, contentReady: boolean): ReactElement | null {
   if (!contentReady) return loadingFallback;
@@ -53,6 +54,7 @@ function renderEagerActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactEle
   if (activeTab === 'countdown') return <CountdownTab />;
   if (activeTab === 'alarm') return <AlarmTab />;
   if (activeTab === 'toolbox') return <ToolboxTab />;
+  if (activeTab === 'miniGame') return <MiniGameTab />;
   if (activeTab === 'settings') return <SettingsTab />;
   return null;
 }

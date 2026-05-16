@@ -921,6 +921,7 @@
       "countdown": "Countdown",
       "alarm": "Alarm",
       "toolbox": "Toolbox",
+      "miniGame": "Mini Game",
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
     },
@@ -1503,7 +1504,8 @@
           "memo": "Memo",
           "countdown": "Countdown",
           "alarm": "Alarm",
-          "toolbox": "Toolbox"
+          "toolbox": "Toolbox",
+          "miniGame": "Mini Game"
         }
       },
       "hideProcess": {

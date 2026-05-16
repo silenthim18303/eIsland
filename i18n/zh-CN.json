@@ -921,6 +921,7 @@
       "countdown": "倒数日",
       "alarm": "闹钟",
       "toolbox": "工具箱",
+      "miniGame": "小游戏",
       "settings": "设置",
       "switchTo": "切换到{{label}}"
     },
@@ -1503,7 +1504,8 @@
           "memo": "备忘录",
           "countdown": "倒数日",
           "alarm": "闹钟",
-          "toolbox": "工具箱"
+          "toolbox": "工具箱",
+          "miniGame": "小游戏"
         }
       },
       "hideProcess": {
