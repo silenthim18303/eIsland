@@ -39,14 +39,18 @@ import type { FileCompressionPageKey } from './tools/config/fileCompressionToolC
 import type { FormatFactoryPageKey } from './tools/config/formatFactoryToolConfig';
 import type { ToolboxSidebarKey } from './tools/config/commonToolboxConfig';
 
-const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }> = [
+const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string; sidebarLabelKey?: string }> = [
   { key: 'download', labelKey: 'maxExpand.toolbox.sidebar.download' },
   { key: 'software', labelKey: 'maxExpand.toolbox.sidebar.software' },
   { key: 'translate', labelKey: 'maxExpand.toolbox.sidebar.translate' },
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
   { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
   { key: 'networkService', labelKey: 'maxExpand.toolbox.sidebar.networkService' },
-  { key: 'fileCompression', labelKey: 'maxExpand.toolbox.sidebar.fileCompression' },
+  {
+    key: 'fileCompression',
+    labelKey: 'maxExpand.toolbox.sidebar.fileCompression',
+    sidebarLabelKey: 'maxExpand.toolbox.sidebar.fileCompressionShort',
+  },
   { key: 'formatFactory', labelKey: 'maxExpand.toolbox.sidebar.formatFactory' },
 ];
 
@@ -82,7 +86,7 @@ export function ToolboxTab(): ReactElement {
               type="button"
             >
               <span className="sidebar-dot" />
-              {t(item.labelKey)}
+              {t(item.sidebarLabelKey ?? item.labelKey)}
             </button>
           ))}
         </div>

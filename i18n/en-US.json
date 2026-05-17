@@ -939,6 +939,7 @@
         "encodingService": "Encoding Svc",
         "networkService": "Network Svc",
         "fileCompression": "File Compression",
+        "fileCompressionShort": "Compress",
         "formatFactory": "Format Factory"
       },
       "software": {
