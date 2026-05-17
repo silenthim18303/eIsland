@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDownloadTasks } from '../hooks/useDownloadTasks';
 import {
@@ -47,6 +47,9 @@ export function DownloadToolSection({
   setDownloadPage,
 }: DownloadToolSectionProps): ReactElement {
   const { t } = useTranslation();
+  const pageRef = useRef<DownloadPageKey>(downloadPage);
+  pageRef.current = downloadPage;
+  const layoutRef = useRef<HTMLDivElement | null>(null);
   const [url, setUrl] = useState('');
   const [savePath, setSavePath] = useState('');
   const [threads, setThreads] = useState('8');
@@ -163,8 +166,28 @@ export function DownloadToolSection({
     history: t('maxExpand.toolbox.download.pages.history'),
   };
 
+  useEffect(() => {
+    const el = layoutRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent): void => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest('.settings-app-page-dots')) return;
+      const idx = DOWNLOAD_PAGES.indexOf(pageRef.current);
+      if (idx < 0) return;
+      const next = e.deltaY > 0
+        ? Math.min(idx + 1, DOWNLOAD_PAGES.length - 1)
+        : Math.max(idx - 1, 0);
+      if (next !== idx) {
+        e.preventDefault();
+        setDownloadPage(DOWNLOAD_PAGES[next]);
+      }
+    };
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [setDownloadPage]);
+
   return (
-    <div className="settings-app-pages-layout">
+    <div className="settings-app-pages-layout" ref={layoutRef}>
       <div className="settings-app-page-main">
         {downloadPage === 'create' && (
           <div className="settings-cards">
