@@ -90,6 +90,7 @@ export function DownloadToolSection({
         return;
       }
       setStatusMessage(t('maxExpand.toolbox.download.messages.started'));
+      setDownloadPage('history');
     }).catch((error: unknown) => {
       const message = error instanceof Error ? error.message : String(error);
       setStatusMessage(message || t('maxExpand.toolbox.download.messages.startFailed'));
