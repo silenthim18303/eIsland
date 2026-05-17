@@ -64,7 +64,11 @@ export function ToolboxTab(): ReactElement {
   const [fileCompressionPage, setFileCompressionPage] = useState<FileCompressionPageKey>('imageCompression');
   const [formatFactoryPage, setFormatFactoryPage] = useState<FormatFactoryPageKey>('image');
   const downloadPageLabel = activeSidebar === 'download'
-    ? t(`maxExpand.toolbox.download.pages.${downloadPage}`)
+    ? t(`maxExpand.toolbox.download.pages.${downloadPage}`, {
+      defaultValue: downloadPage === 'history'
+        ? t('maxExpand.toolbox.download.tasks.title')
+        : t('maxExpand.toolbox.download.title'),
+    })
     : '';
   const fileCompressionPageLabel = activeSidebar === 'fileCompression'
     ? t(`maxExpand.toolbox.fileCompression.pages.${fileCompressionPage}`)
@@ -91,7 +95,9 @@ export function ToolboxTab(): ReactElement {
               type="button"
             >
               <span className="sidebar-dot" />
-              {t(item.sidebarLabelKey ?? item.labelKey)}
+              {item.sidebarLabelKey
+                ? t(item.sidebarLabelKey, { defaultValue: t(item.labelKey) })
+                : t(item.labelKey)}
             </button>
           ))}
         </div>
