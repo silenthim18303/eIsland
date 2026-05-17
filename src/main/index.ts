@@ -158,6 +158,7 @@ function showAgentVoiceInputWindow(): void {
     y: targetDisplay.bounds.y,
     width,
     height,
+    fullscreen: true,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -175,7 +176,7 @@ function showAgentVoiceInputWindow(): void {
   });
 
   agentVoiceInputWindow.setIgnoreMouseEvents(true);
-  agentVoiceInputWindow.setAlwaysOnTop(true, 'floating');
+  agentVoiceInputWindow.setAlwaysOnTop(true, 'screen-saver');
   agentVoiceInputWindow.removeMenu();
 
   if (app.isPackaged) {
