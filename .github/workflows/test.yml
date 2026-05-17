@@ -57,7 +57,7 @@ jobs:
         run: |
           set +e
           START=$(date +%s)
-          npm run test:preload 2>&1 | tee preload-test.log
+          FORCE_COLOR=0 NO_COLOR=1 npm run test:preload 2>&1 | tee preload-test.log
           EXIT_CODE=${PIPESTATUS[0]}
           END=$(date +%s)
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
@@ -70,7 +70,7 @@ jobs:
         run: |
           set +e
           START=$(date +%s)
-          npm run test 2>&1 | tee full-test.log
+          FORCE_COLOR=0 NO_COLOR=1 npm run test 2>&1 | tee full-test.log
           EXIT_CODE=${PIPESTATUS[0]}
           END=$(date +%s)
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
