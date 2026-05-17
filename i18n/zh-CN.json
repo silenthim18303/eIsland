@@ -456,9 +456,9 @@
     "delete": "删除",
     "drop": {
       "releaseToAdd": "松开添加",
-      "onlyExe": "仅支持 .exe 文件",
+      "onlyExe": "仅支持 .exe 或 .lnk 文件",
       "duplicate": "已存在该应用",
-      "dragExe": "拖入 .exe"
+      "dragExe": "拖入 .exe 或 .lnk"
     }
   },
   "overview": {

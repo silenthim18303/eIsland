@@ -456,9 +456,9 @@
     "delete": "Delete",
     "drop": {
       "releaseToAdd": "Release to add",
-      "onlyExe": "Only .exe files are supported",
+      "onlyExe": "Only .exe or .lnk files are supported",
       "duplicate": "App already exists",
-      "dragExe": "Drag .exe here"
+      "dragExe": "Drag .exe or .lnk here"
     }
   },
   "overview": {

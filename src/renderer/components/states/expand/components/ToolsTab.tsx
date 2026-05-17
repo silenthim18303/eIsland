@@ -107,11 +107,11 @@ export function ToolsTab(): React.ReactElement {
     for (let i = 0; i < files.length; i++) {
       const filePath = window.api.getPathForFile(files[i]);
       if (!filePath) continue;
-      if (!filePath.toLowerCase().endsWith('.exe')) { hasInvalid = true; continue; }
+      if (!/\.(exe|lnk)$/i.test(filePath)) { hasInvalid = true; continue; }
       if (apps.some(a => a.path === filePath)) { hasDuplicate = true; continue; }
       if (apps.length >= MAX_APPS) break;
       hasValid = true;
-      const name = filePath.split('\\').pop()?.replace(/\.exe$/i, '') || t('toolsTab.defaultAppName', { defaultValue: 'App' });
+      const name = filePath.split('\\').pop()?.replace(/\.(exe|lnk)$/i, '') || t('toolsTab.defaultAppName', { defaultValue: 'App' });
       try {
         const iconBase64 = await window.api.getFileIcon(filePath);
         setApps(prev => [...prev, { id: Date.now() + Math.random(), name, path: filePath, iconBase64 }]);
@@ -189,13 +189,13 @@ export function ToolsTab(): React.ReactElement {
           {dragOver ? (
             <span className="tools-drop-zone-hint active">{t('toolsTab.drop.releaseToAdd', { defaultValue: '松开添加' })}</span>
           ) : dropError ? (
-            <span className="tools-drop-zone-hint error">{t('toolsTab.drop.onlyExe', { defaultValue: '仅支持 .exe 文件' })}</span>
+            <span className="tools-drop-zone-hint error">{t('toolsTab.drop.onlyExe', { defaultValue: '仅支持 .exe 或 .lnk 文件' })}</span>
           ) : dropDuplicate ? (
             <span className="tools-drop-zone-hint duplicate">{t('toolsTab.drop.duplicate', { defaultValue: '已存在该应用' })}</span>
           ) : (
             <>
               <span className="tools-drop-zone-icon">+</span>
-              <span className="tools-drop-zone-hint">{t('toolsTab.drop.dragExe', { defaultValue: '拖入 .exe' })}</span>
+              <span className="tools-drop-zone-hint">{t('toolsTab.drop.dragExe', { defaultValue: '拖入 .exe 或 .lnk' })}</span>
             </>
           )}
         </div>
