@@ -160,6 +160,7 @@ export function FileCompressionToolSection({
           total: nextResults.length,
         }),
       );
+      setSelectedImages([]);
     }).catch(() => {
       setStatusMessage(t('maxExpand.toolbox.fileCompression.messages.startFailed'));
     }).finally(() => {
@@ -277,7 +278,7 @@ export function FileCompressionToolSection({
                 </div>
               </div>
               <div className="settings-card-body">
-                {selectedImages.length > 0 && (
+                {compressing && selectedImages.length > 0 && (
                   <div className="settings-card-subgroup">
                     <div className="settings-card-subgroup-title">{t('maxExpand.toolbox.fileCompression.pendingListTitle')}</div>
                     <div className="file-compression-path-list">
