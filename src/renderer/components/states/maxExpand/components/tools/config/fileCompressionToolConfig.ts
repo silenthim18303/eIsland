@@ -24,5 +24,5 @@
  * @author 鸡哥
  */
 
-export const FILE_COMPRESSION_PAGES = ['imageCompression'] as const;
+export const FILE_COMPRESSION_PAGES = ['imageCompression', 'history'] as const;
 export type FileCompressionPageKey = (typeof FILE_COMPRESSION_PAGES)[number];

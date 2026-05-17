@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FILE_COMPRESSION_PAGES,
@@ -78,6 +78,10 @@ export function FileCompressionToolSection({
   setFileCompressionPage,
 }: FileCompressionToolSectionProps): ReactElement {
   const { t } = useTranslation();
+  const pageRef = useRef<FileCompressionPageKey>(fileCompressionPage);
+  pageRef.current = fileCompressionPage;
+  const layoutRef = useRef<HTMLDivElement | null>(null);
+
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [outputDir, setOutputDir] = useState('');
   const [quality, setQuality] = useState(80);
@@ -87,6 +91,7 @@ export function FileCompressionToolSection({
 
   const pageLabels: Record<FileCompressionPageKey, string> = {
     imageCompression: t('maxExpand.toolbox.fileCompression.pages.imageCompression'),
+    history: t('maxExpand.toolbox.fileCompression.pages.history'),
   };
 
   const successfulCount = useMemo(() => tasks.filter((item) => item.success).length, [tasks]);
@@ -113,6 +118,26 @@ export function FileCompressionToolSection({
       off();
     };
   }, []);
+
+  useEffect(() => {
+    const el = layoutRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent): void => {
+      const target = e.target as HTMLElement | null;
+      if (!target?.closest('.settings-app-page-dots')) return;
+      const idx = FILE_COMPRESSION_PAGES.indexOf(pageRef.current);
+      if (idx < 0) return;
+      const next = e.deltaY > 0
+        ? Math.min(idx + 1, FILE_COMPRESSION_PAGES.length - 1)
+        : Math.max(idx - 1, 0);
+      if (next !== idx) {
+        e.preventDefault();
+        setFileCompressionPage(FILE_COMPRESSION_PAGES[next]);
+      }
+    };
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [setFileCompressionPage]);
 
   const handlePickImages = (): void => {
     window.api.imageCompressionPickImages().then((paths) => {
@@ -146,6 +171,7 @@ export function FileCompressionToolSection({
         setStatusMessage(result.message || t('maxExpand.toolbox.fileCompression.messages.startFailed'));
         return;
       }
+
       const nextResults = result.results || [];
       setTasks((prev) => {
         const map = new Map<string, ImageCompressionTask>();
@@ -153,6 +179,7 @@ export function FileCompressionToolSection({
         nextResults.forEach((item) => map.set(item.id, item));
         return Array.from(map.values()).sort((a, b) => b.createdAt - a.createdAt);
       });
+
       const successCount = nextResults.filter((item) => item.success).length;
       setStatusMessage(
         t('maxExpand.toolbox.fileCompression.messages.done', {
@@ -187,7 +214,7 @@ export function FileCompressionToolSection({
   };
 
   return (
-    <div className="settings-app-pages-layout">
+    <div className="settings-app-pages-layout" ref={layoutRef}>
       <div className="settings-app-page-main">
         {fileCompressionPage === 'imageCompression' && (
           <div className="settings-cards settings-file-compression-page-panel">
@@ -198,11 +225,7 @@ export function FileCompressionToolSection({
               </div>
               <div className="settings-card-body">
                 <div className="settings-hotkey-row">
-                  <button
-                    className="settings-lyrics-source-btn"
-                    type="button"
-                    onClick={handlePickImages}
-                  >
+                  <button className="settings-lyrics-source-btn" type="button" onClick={handlePickImages}>
                     {t('maxExpand.toolbox.fileCompression.pickImages')}
                   </button>
                   <span className="settings-music-hint">
@@ -222,11 +245,7 @@ export function FileCompressionToolSection({
                       value={outputDir}
                       onChange={(event) => setOutputDir(event.target.value)}
                     />
-                    <button
-                      className="settings-lyrics-source-btn"
-                      type="button"
-                      onClick={handlePickOutputDir}
-                    >
+                    <button className="settings-lyrics-source-btn" type="button" onClick={handlePickOutputDir}>
                       {t('maxExpand.toolbox.fileCompression.pickOutputDir')}
                     </button>
                   </div>
@@ -261,23 +280,6 @@ export function FileCompressionToolSection({
                   </button>
                 </div>
 
-                {!!statusMessage && <div className="settings-music-hint">{statusMessage}</div>}
-              </div>
-            </div>
-
-            <div className="settings-card">
-              <div className="settings-card-header">
-                <div className="settings-card-title">
-                  {t('maxExpand.toolbox.fileCompression.resultsTitle')}
-                </div>
-                <div className="settings-card-subtitle">
-                  {t('maxExpand.toolbox.fileCompression.resultsSubtitle', {
-                    success: successfulCount,
-                    total: tasks.length,
-                  })}
-                </div>
-              </div>
-              <div className="settings-card-body">
                 {compressing && selectedImages.length > 0 && (
                   <div className="settings-card-subgroup">
                     <div className="settings-card-subgroup-title">{t('maxExpand.toolbox.fileCompression.pendingListTitle')}</div>
@@ -289,6 +291,25 @@ export function FileCompressionToolSection({
                   </div>
                 )}
 
+                {!!statusMessage && <div className="settings-music-hint">{statusMessage}</div>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {fileCompressionPage === 'history' && (
+          <div className="settings-cards settings-file-compression-page-panel">
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title">{t('maxExpand.toolbox.fileCompression.resultsTitle')}</div>
+                <div className="settings-card-subtitle">
+                  {t('maxExpand.toolbox.fileCompression.resultsSubtitle', {
+                    success: successfulCount,
+                    total: tasks.length,
+                  })}
+                </div>
+              </div>
+              <div className="settings-card-body">
                 {tasks.length === 0 && (
                   <div className="settings-music-hint">{t('maxExpand.toolbox.fileCompression.resultsEmpty')}</div>
                 )}
@@ -343,6 +364,7 @@ export function FileCompressionToolSection({
           </div>
         )}
       </div>
+
       <div className="settings-app-page-dots">
         {FILE_COMPRESSION_PAGES.map((page) => (
           <button

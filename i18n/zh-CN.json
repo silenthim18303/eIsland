@@ -1100,7 +1100,8 @@
       "fileCompression": {
         "title": "文件压缩",
         "pages": {
-          "imageCompression": "图像压缩"
+          "imageCompression": "图像压缩",
+          "history": "历史任务"
         },
         "subtitle": "选择图片并配置输出目录，输出格式与原图一致。",
         "pickImages": "选择图片",

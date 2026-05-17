@@ -1101,7 +1101,8 @@
       "fileCompression": {
         "title": "File Compression",
         "pages": {
-          "imageCompression": "Image Compression"
+          "imageCompression": "Image Compression",
+          "history": "History"
         },
         "subtitle": "Select images and output directory. Output format stays the same as source.",
         "pickImages": "Select Images",
