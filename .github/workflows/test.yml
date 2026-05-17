@@ -28,7 +28,10 @@ permissions:
 
 jobs:
   vitest:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
     outputs:
       preload_exit_code: ${{ steps.preload_test.outputs.exit_code }}
       preload_duration_seconds: ${{ steps.preload_test.outputs.duration_seconds }}

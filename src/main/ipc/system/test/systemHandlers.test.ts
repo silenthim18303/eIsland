@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { handleMock, onMock } = vi.hoisted(() => ({
   handleMock: vi.fn(),
@@ -58,6 +58,7 @@ import { registerSystemIpcHandlers } from '../system';
 describe('system ipc handlers', () => {
   const handleHandlers = new Map<string, (...args: unknown[]) => unknown>();
   const onHandlers = new Map<string, (...args: unknown[]) => unknown>();
+  const originalPlatformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform');
   type PerformanceSnapshotAssertShape = {
     cpu: { loadPercent: number };
     memory: { totalBytes: number };
@@ -66,6 +67,11 @@ describe('system ipc handlers', () => {
   };
 
   beforeEach(() => {
+    Object.defineProperty(process, 'platform', {
+      value: 'win32',
+      configurable: true,
+    });
+
     handleHandlers.clear();
     onHandlers.clear();
     handleMock.mockReset();
@@ -78,6 +84,14 @@ describe('system ipc handlers', () => {
     onMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       onHandlers.set(channel, handler);
     });
+  });
+
+  afterAll(() => {
+    if (originalPlatformDescriptor) {
+      Object.defineProperty(process, 'platform', originalPlatformDescriptor);
+      return;
+    }
+    Reflect.deleteProperty(process, 'platform');
   });
 
   it('registers handlers and delegates process/window queries', async () => {
