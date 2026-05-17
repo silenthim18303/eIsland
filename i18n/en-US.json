@@ -957,6 +957,10 @@
       "download": {
         "title": "Multi-Thread Download",
         "subtitle": "Supports multi-threaded downloads with custom save path and real-time progress.",
+        "pages": {
+          "create": "Create",
+          "history": "History"
+        },
         "form": {
           "urlLabel": "Download URL",
           "urlPlaceholder": "Enter file URL, e.g. https://example.com/file.zip",

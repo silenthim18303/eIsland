@@ -26,6 +26,9 @@
 
 export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
 
+export const DOWNLOAD_PAGES = ['create', 'history'] as const;
+export type DownloadPageKey = (typeof DOWNLOAD_PAGES)[number];
+
 export interface DownloadTaskSnapshot {
   id: string;
   url: string;

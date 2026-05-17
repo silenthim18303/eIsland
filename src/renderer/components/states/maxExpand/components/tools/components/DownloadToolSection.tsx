@@ -27,13 +27,25 @@
 import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDownloadTasks } from '../hooks/useDownloadTasks';
-import type { DownloadTaskStatus } from '../config/downloadToolConfig';
+import {
+  DOWNLOAD_PAGES,
+  type DownloadPageKey,
+  type DownloadTaskStatus,
+} from '../config/downloadToolConfig';
 import { formatBytes, formatDurationMs, inferSuggestedName } from '../utils/downloadFormatters';
+
+interface DownloadToolSectionProps {
+  downloadPage: DownloadPageKey;
+  setDownloadPage: (page: DownloadPageKey) => void;
+}
 
 /**
  * 下载工具模块主视图。
  */
-export function DownloadToolSection(): ReactElement {
+export function DownloadToolSection({
+  downloadPage,
+  setDownloadPage,
+}: DownloadToolSectionProps): ReactElement {
   const { t } = useTranslation();
   const [url, setUrl] = useState('');
   const [savePath, setSavePath] = useState('');
@@ -146,167 +158,194 @@ export function DownloadToolSection(): ReactElement {
     return t('maxExpand.toolbox.download.status.downloading');
   };
 
+  const pageLabels: Record<DownloadPageKey, string> = {
+    create: t('maxExpand.toolbox.download.pages.create'),
+    history: t('maxExpand.toolbox.download.pages.history'),
+  };
+
   return (
-    <div className="settings-cards">
-      <div className="settings-card">
-        <div className="settings-card-header">
-          <div className="settings-card-title">{t('maxExpand.toolbox.download.title')}</div>
-          <div className="settings-card-subtitle">{t('maxExpand.toolbox.download.subtitle')}</div>
-        </div>
-        <div className="settings-card-body">
-          <label className="settings-field">
-            <span className="settings-field-label">{t('maxExpand.toolbox.download.form.urlLabel')}</span>
-            <input
-              className="settings-field-input"
-              type="text"
-              placeholder={t('maxExpand.toolbox.download.form.urlPlaceholder')}
-              value={url}
-              onChange={(event) => setUrl(event.target.value)}
-            />
-          </label>
+    <div className="settings-app-pages-layout">
+      <div className="settings-app-page-main">
+        {downloadPage === 'create' && (
+          <div className="settings-cards">
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title">{t('maxExpand.toolbox.download.title')}</div>
+                <div className="settings-card-subtitle">{t('maxExpand.toolbox.download.subtitle')}</div>
+              </div>
+              <div className="settings-card-body">
+                <label className="settings-field">
+                  <span className="settings-field-label">{t('maxExpand.toolbox.download.form.urlLabel')}</span>
+                  <input
+                    className="settings-field-input"
+                    type="text"
+                    placeholder={t('maxExpand.toolbox.download.form.urlPlaceholder')}
+                    value={url}
+                    onChange={(event) => setUrl(event.target.value)}
+                  />
+                </label>
 
-          <label className="settings-field">
-            <div className="download-field-title-row">
-              <span className="settings-field-label">{t('maxExpand.toolbox.download.form.savePathLabel')}</span>
-              <span className="settings-field-label download-threads-title-inline">{t('maxExpand.toolbox.download.form.threadsLabel')}</span>
-            </div>
-            <div className="settings-hotkey-row download-path-row">
-              <input
-                className="settings-hotkey-input download-save-path-input"
-                type="text"
-                placeholder={defaultDir || t('maxExpand.toolbox.download.form.savePathPlaceholder')}
-                value={savePath}
-                disabled={!hasDownloadUrl}
-                onChange={(event) => setSavePath(event.target.value)}
-              />
-              <button
-                className={`settings-lyrics-source-btn ${!hasDownloadUrl ? 'disabled' : ''}`}
-                type="button"
-                disabled={!hasDownloadUrl}
-                onClick={handlePickSavePath}
-              >
-                {t('maxExpand.toolbox.download.form.pickPath')}
-              </button>
-              <label className="download-threads-inline">
-                <input
-                  className="settings-field-input download-threads-inline-input"
-                  type="number"
-                  min="1"
-                  max="16"
-                  step="1"
-                  value={threads}
-                  onChange={(event) => setThreads(event.target.value)}
-                />
-              </label>
-            </div>
-            <span className="settings-field-hint">
-              {t('maxExpand.toolbox.download.form.defaultDirHint', { dir: defaultDir || '-' })}
-            </span>
-          </label>
-
-          <div className="settings-hotkey-row">
-            <button
-              className={`settings-lyrics-source-btn download-start-btn-full ${loading ? 'disabled' : ''}`}
-              type="button"
-              disabled={loading}
-              onClick={handleStartDownload}
-            >
-              {loading ? t('maxExpand.toolbox.download.form.starting') : t('maxExpand.toolbox.download.form.start')}
-            </button>
-          </div>
-
-          {activeTask && (
-            <div className="settings-hotkey-row download-cancel-row">
-              <button
-                className="settings-lyrics-source-btn download-start-btn-full"
-                type="button"
-                onClick={() => handleCancelTask(activeTask.id)}
-              >
-                {t('maxExpand.toolbox.download.form.cancelCurrent')}
-              </button>
-            </div>
-          )}
-
-          {!!statusMessage && (
-            <div className="settings-music-hint">{statusMessage}</div>
-          )}
-        </div>
-      </div>
-
-      <div className="settings-card">
-        <div className="settings-card-header">
-          <div className="settings-card-title">{t('maxExpand.toolbox.download.tasks.title')}</div>
-          <div className="settings-card-subtitle">{t('maxExpand.toolbox.download.tasks.subtitle')}</div>
-        </div>
-        <div className="settings-card-body">
-          {tasks.length === 0 && (
-            <div className="settings-music-hint">{t('maxExpand.toolbox.download.tasks.empty')}</div>
-          )}
-          {tasks.map((task) => {
-            const percentText = `${(task.progress * 100).toFixed(1)}%`;
-            const progressWidth = `${Math.max(0, Math.min(100, task.progress * 100))}%`;
-            return (
-              <div key={task.id} className="settings-card-subgroup download-task-card">
-                <div className="download-task-card-header">
-                  <div className="settings-card-subgroup-title">{task.fileName || task.url}</div>
-                  <div className="settings-hotkey-row download-task-actions">
-                    {task.status === 'downloading' && (
-                      <button
-                        className="settings-lyrics-source-btn"
-                        type="button"
-                        onClick={() => handlePauseTask(task.id)}
-                      >
-                        {t('maxExpand.toolbox.download.tasks.pause')}
-                      </button>
-                    )}
-                    {task.status === 'paused' && (
-                      <button
-                        className="settings-lyrics-source-btn"
-                        type="button"
-                        onClick={() => handleResumeTask(task.id)}
-                      >
-                        {t('maxExpand.toolbox.download.tasks.resume')}
-                      </button>
-                    )}
-                    {task.status !== 'downloading' && (
-                      <button
-                        className="settings-lyrics-source-btn"
-                        type="button"
-                        onClick={() => handleRemoveTask(task.id)}
-                      >
-                        {t('maxExpand.toolbox.download.tasks.delete')}
-                      </button>
-                    )}
-                    {task.status === 'completed' && (
-                      <button
-                        className="settings-lyrics-source-btn"
-                        type="button"
-                        onClick={() => handleOpenTaskFolder(task.savePath)}
-                      >
-                        {t('maxExpand.toolbox.download.tasks.openFolder')}
-                      </button>
-                    )}
+                <label className="settings-field">
+                  <div className="download-field-title-row">
+                    <span className="settings-field-label">{t('maxExpand.toolbox.download.form.savePathLabel')}</span>
+                    <span className="settings-field-label download-threads-title-inline">{t('maxExpand.toolbox.download.form.threadsLabel')}</span>
                   </div>
+                  <div className="settings-hotkey-row download-path-row">
+                    <input
+                      className="settings-hotkey-input download-save-path-input"
+                      type="text"
+                      placeholder={defaultDir || t('maxExpand.toolbox.download.form.savePathPlaceholder')}
+                      value={savePath}
+                      disabled={!hasDownloadUrl}
+                      onChange={(event) => setSavePath(event.target.value)}
+                    />
+                    <button
+                      className={`settings-lyrics-source-btn ${!hasDownloadUrl ? 'disabled' : ''}`}
+                      type="button"
+                      disabled={!hasDownloadUrl}
+                      onClick={handlePickSavePath}
+                    >
+                      {t('maxExpand.toolbox.download.form.pickPath')}
+                    </button>
+                    <label className="download-threads-inline">
+                      <input
+                        className="settings-field-input download-threads-inline-input"
+                        type="number"
+                        min="1"
+                        max="16"
+                        step="1"
+                        value={threads}
+                        onChange={(event) => setThreads(event.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <span className="settings-field-hint">
+                    {t('maxExpand.toolbox.download.form.defaultDirHint', { dir: defaultDir || '-' })}
+                  </span>
+                </label>
+
+                <div className="settings-hotkey-row">
+                  <button
+                    className={`settings-lyrics-source-btn download-start-btn-full ${loading ? 'disabled' : ''}`}
+                    type="button"
+                    disabled={loading}
+                    onClick={handleStartDownload}
+                  >
+                    {loading ? t('maxExpand.toolbox.download.form.starting') : t('maxExpand.toolbox.download.form.start')}
+                  </button>
                 </div>
-                <div className="settings-music-hint">
-                  {getStatusText(task.status)} · {percentText} · {formatBytes(task.downloadedBytes)} / {task.totalBytes > 0 ? formatBytes(task.totalBytes) : '?'} · {formatBytes(task.speedBytesPerSecond)}/s · {task.threads}T
-                </div>
-                <div className="download-task-progress">
-                  <div className="download-task-progress-fill" style={{ width: progressWidth }} />
-                </div>
-                <div className="settings-music-hint">
-                  {(task.status === 'completed' || task.status === 'paused' || task.status === 'failed' || task.status === 'canceled')
-                    ? `${t('maxExpand.toolbox.download.tasks.elapsedLabel')}: ${formatDurationMs(task.updatedAt - task.createdAt)}`
-                    : `${t('maxExpand.toolbox.download.tasks.remainingLabel')}: ${formatDurationMs((task.estimatedFinishAt || 0) - nowMs)}`}
-                </div>
-                <div className="settings-music-hint">{task.savePath}</div>
-                {task.errorMessage && (
-                  <div className="settings-music-hint">{task.errorMessage}</div>
+
+                {activeTask && (
+                  <div className="settings-hotkey-row download-cancel-row">
+                    <button
+                      className="settings-lyrics-source-btn download-start-btn-full"
+                      type="button"
+                      onClick={() => handleCancelTask(activeTask.id)}
+                    >
+                      {t('maxExpand.toolbox.download.form.cancelCurrent')}
+                    </button>
+                  </div>
+                )}
+
+                {!!statusMessage && (
+                  <div className="settings-music-hint">{statusMessage}</div>
                 )}
               </div>
-            );
-          })}
-        </div>
+            </div>
+          </div>
+        )}
+
+        {downloadPage === 'history' && (
+          <div className="settings-cards">
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title">{t('maxExpand.toolbox.download.tasks.title')}</div>
+                <div className="settings-card-subtitle">{t('maxExpand.toolbox.download.tasks.subtitle')}</div>
+              </div>
+              <div className="settings-card-body">
+                {tasks.length === 0 && (
+                  <div className="settings-music-hint">{t('maxExpand.toolbox.download.tasks.empty')}</div>
+                )}
+                {tasks.map((task) => {
+                  const percentText = `${(task.progress * 100).toFixed(1)}%`;
+                  const progressWidth = `${Math.max(0, Math.min(100, task.progress * 100))}%`;
+                  return (
+                    <div key={task.id} className="settings-card-subgroup download-task-card">
+                      <div className="download-task-card-header">
+                        <div className="settings-card-subgroup-title">{task.fileName || task.url}</div>
+                        <div className="settings-hotkey-row download-task-actions">
+                          {task.status === 'downloading' && (
+                            <button
+                              className="settings-lyrics-source-btn"
+                              type="button"
+                              onClick={() => handlePauseTask(task.id)}
+                            >
+                              {t('maxExpand.toolbox.download.tasks.pause')}
+                            </button>
+                          )}
+                          {task.status === 'paused' && (
+                            <button
+                              className="settings-lyrics-source-btn"
+                              type="button"
+                              onClick={() => handleResumeTask(task.id)}
+                            >
+                              {t('maxExpand.toolbox.download.tasks.resume')}
+                            </button>
+                          )}
+                          {task.status !== 'downloading' && (
+                            <button
+                              className="settings-lyrics-source-btn"
+                              type="button"
+                              onClick={() => handleRemoveTask(task.id)}
+                            >
+                              {t('maxExpand.toolbox.download.tasks.delete')}
+                            </button>
+                          )}
+                          {task.status === 'completed' && (
+                            <button
+                              className="settings-lyrics-source-btn"
+                              type="button"
+                              onClick={() => handleOpenTaskFolder(task.savePath)}
+                            >
+                              {t('maxExpand.toolbox.download.tasks.openFolder')}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div className="settings-music-hint">
+                        {getStatusText(task.status)} · {percentText} · {formatBytes(task.downloadedBytes)} / {task.totalBytes > 0 ? formatBytes(task.totalBytes) : '?'} · {formatBytes(task.speedBytesPerSecond)}/s · {task.threads}T
+                      </div>
+                      <div className="download-task-progress">
+                        <div className="download-task-progress-fill" style={{ width: progressWidth }} />
+                      </div>
+                      <div className="settings-music-hint">
+                        {(task.status === 'completed' || task.status === 'paused' || task.status === 'failed' || task.status === 'canceled')
+                          ? `${t('maxExpand.toolbox.download.tasks.elapsedLabel')}: ${formatDurationMs(task.updatedAt - task.createdAt)}`
+                          : `${t('maxExpand.toolbox.download.tasks.remainingLabel')}: ${formatDurationMs((task.estimatedFinishAt || 0) - nowMs)}`}
+                      </div>
+                      <div className="settings-music-hint">{task.savePath}</div>
+                      {task.errorMessage && (
+                        <div className="settings-music-hint">{task.errorMessage}</div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="settings-app-page-dots">
+        {DOWNLOAD_PAGES.map((page) => (
+          <button
+            key={page}
+            className={`settings-app-page-dot ${downloadPage === page ? 'active' : ''}`}
+            data-label={pageLabels[page]}
+            type="button"
+            onClick={() => setDownloadPage(page)}
+          />
+        ))}
       </div>
     </div>
   );

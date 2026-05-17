@@ -956,6 +956,10 @@
       "download": {
         "title": "多线程下载",
         "subtitle": "支持多线程下载，可自定义保存位置并查看实时进度。",
+        "pages": {
+          "create": "创建下载",
+          "history": "历史任务"
+        },
         "form": {
           "urlLabel": "下载地址",
           "urlPlaceholder": "输入下载 URL，例如 https://example.com/file.zip",
