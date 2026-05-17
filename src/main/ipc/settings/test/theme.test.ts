@@ -59,7 +59,7 @@ vi.mock('../../../utils/broadcast', () => ({
 import { registerThemeIpcHandlers } from '../theme';
 
 describe('registerThemeIpcHandlers', () => {
-  const handlers = new Map<string, (...args: any[]) => any>();
+  const handlers = new Map<string, (...args: unknown[]) => unknown>();
 
   beforeEach(() => {
     handlers.clear();
@@ -69,7 +69,7 @@ describe('registerThemeIpcHandlers', () => {
     writeFileSyncMock.mockReset();
     broadcastSettingChangeMock.mockReset();
 
-    handleMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handlers.set(channel, handler);
     });
 

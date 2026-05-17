@@ -33,7 +33,7 @@ describe('applyChromiumPerformanceFlags', () => {
 
     applyChromiumPerformanceFlags({
       commandLine: { appendSwitch },
-    } as any);
+    } as unknown as Parameters<typeof applyChromiumPerformanceFlags>[0]);
 
     expect(appendSwitch).toHaveBeenCalledWith('disable-software-rasterizer');
     expect(appendSwitch).toHaveBeenCalledWith('disable-gpu-shader-disk-cache');

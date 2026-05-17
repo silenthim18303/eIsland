@@ -26,6 +26,21 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+type TestWindow = {
+  location?: { hostname: string };
+  api?: {
+    netFetch: ReturnType<typeof vi.fn>;
+  };
+};
+
+const setTestWindow = (value: TestWindow): void => {
+  Object.defineProperty(globalThis, 'window', {
+    value,
+    configurable: true,
+    writable: true,
+  });
+};
+
 describe('versionApi', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -48,10 +63,10 @@ describe('versionApi', () => {
       }),
     }));
 
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: { netFetch },
-    };
+    });
 
     const { fetchVersion } = await import('../update/versionApi');
     const result = await fetchVersion();
@@ -70,10 +85,10 @@ describe('versionApi', () => {
       body: JSON.stringify({ code: 200 }),
     }));
 
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: { netFetch },
-    };
+    });
 
     const { reportUpdateDownloadCount } = await import('../update/versionApi');
     const success = await reportUpdateDownloadCount(' 1.2.3 ');
@@ -90,10 +105,10 @@ describe('versionApi', () => {
 
   it('returns false when reporting with empty version', async () => {
     const netFetch = vi.fn();
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: { netFetch },
-    };
+    });
 
     const { reportUpdateDownloadCount } = await import('../update/versionApi');
     const success = await reportUpdateDownloadCount('   ');

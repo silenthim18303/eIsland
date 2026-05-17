@@ -38,6 +38,7 @@ vi.mock('electron', () => ({
 import { registerAppLifecycleHandlers } from '../appLifecycle';
 
 describe('registerAppLifecycleHandlers', () => {
+  type MainWindow = Exclude<ReturnType<Parameters<typeof registerAppLifecycleHandlers>[0]['getMainWindow']>, null>;
   const handlers = new Map<string, () => void>();
 
   beforeEach(() => {
@@ -58,7 +59,7 @@ describe('registerAppLifecycleHandlers', () => {
         isMinimized: () => true,
         restore,
         focus,
-      } as any),
+      } as unknown as MainWindow),
       onWillQuit: vi.fn(),
       onWindowAllClosed: vi.fn(),
     });

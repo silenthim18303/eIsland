@@ -37,6 +37,30 @@ type PreloadSetup = {
   handlerMap: Map<string, (...args: unknown[]) => void>;
 };
 
+type TestWindow = {
+  electron?: unknown;
+  api?: ExposedApi;
+};
+
+type ExposedApi = {
+  enableMousePassthrough: () => void;
+  getMousePosition: () => Promise<unknown>;
+  onNowPlayingInfo: (callback: (payload: unknown) => void) => () => void;
+  getPathForFile: (file: File) => string;
+  windowClose: () => void;
+};
+
+const installTestWindow = (): TestWindow => {
+  const current = (globalThis as { window?: unknown }).window;
+  if (current && typeof current === 'object') return current as TestWindow;
+  Object.defineProperty(globalThis, 'window', {
+    value: {},
+    configurable: true,
+    writable: true,
+  });
+  return (globalThis as { window: unknown }).window as TestWindow;
+};
+
 const originalContextIsolated = Object.getOwnPropertyDescriptor(process, 'contextIsolated');
 
 async function loadPreloadWithContextIsolation(contextIsolated: boolean): Promise<PreloadSetup> {
@@ -75,9 +99,7 @@ async function loadPreloadWithContextIsolation(contextIsolated: boolean): Promis
     configurable: true,
   });
 
-  if (!(globalThis as any).window) {
-    (globalThis as any).window = {};
-  }
+  installTestWindow();
 
   await import('./index');
 
@@ -95,7 +117,7 @@ async function loadPreloadWithContextIsolation(contextIsolated: boolean): Promis
 
 describe('preload bridge', () => {
   beforeEach(() => {
-    (globalThis as any).window = {};
+    installTestWindow();
   });
 
   afterAll(() => {
@@ -114,7 +136,7 @@ describe('preload bridge', () => {
     const apiCall = setup.exposeInMainWorldMock.mock.calls.find(([name]) => name === 'api');
     expect(apiCall).toBeTruthy();
 
-    const api = apiCall?.[1] as Record<string, (...args: any[]) => any>;
+    const api = apiCall?.[1] as ExposedApi;
 
     api.enableMousePassthrough();
     expect(setup.sendMock).toHaveBeenCalledWith('window:enable-mouse-passthrough');
@@ -138,12 +160,12 @@ describe('preload bridge', () => {
 
   it('assigns electron and api to window in non-isolated mode', async () => {
     const setup = await loadPreloadWithContextIsolation(false);
-    const exposedWindow = (globalThis as any).window;
+    const exposedWindow = installTestWindow();
 
     expect(exposedWindow.electron).toBe(setup.electronAPI);
     expect(typeof exposedWindow.api).toBe('object');
 
-    exposedWindow.api.windowClose();
+    exposedWindow.api?.windowClose();
     expect(setup.sendMock).toHaveBeenCalledWith('window:close');
     expect(setup.exposeInMainWorldMock).not.toHaveBeenCalled();
   });

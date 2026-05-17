@@ -39,7 +39,7 @@ vi.mock('electron', () => ({
 import { initUpdaterService } from '../updaterService';
 
 describe('initUpdaterService', () => {
-  const listeners = new Map<string, (...args: any[]) => void>();
+  const listeners = new Map<string, (...args: unknown[]) => void>();
   const send = vi.fn();
 
   const createUpdater = () => ({
@@ -48,7 +48,7 @@ describe('initUpdaterService', () => {
     allowPrerelease: true,
     forceDevUpdateConfig: false,
     logger: null,
-    on: vi.fn((event: string, handler: (...args: any[]) => void) => {
+    on: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
       listeners.set(event, handler);
     }),
   });
@@ -68,7 +68,7 @@ describe('initUpdaterService', () => {
     const updater = createUpdater();
 
     initUpdaterService({
-      updater: updater as any,
+      updater: updater as unknown as Parameters<typeof initUpdaterService>[0]['updater'],
       getMainWindow: () => null,
       getAppPath: () => '/app',
       isPackaged: () => true,
@@ -110,7 +110,7 @@ describe('initUpdaterService', () => {
     const updater = createUpdater();
 
     initUpdaterService({
-      updater: updater as any,
+      updater: updater as unknown as Parameters<typeof initUpdaterService>[0]['updater'],
       getMainWindow: () => null,
       getAppPath: () => '/app',
       isPackaged: () => false,

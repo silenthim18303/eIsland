@@ -26,24 +26,48 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+type TestWindow = {
+  api?: {
+    netFetch: ReturnType<typeof vi.fn>;
+  };
+};
+
+const setTestWindow = (value: TestWindow): void => {
+  Object.defineProperty(globalThis, 'window', {
+    value,
+    configurable: true,
+    writable: true,
+  });
+};
+
+const setTestLocalStorage = (value: Storage): void => {
+  Object.defineProperty(globalThis, 'localStorage', {
+    value,
+    configurable: true,
+    writable: true,
+  });
+};
+
 describe('siteMetaApi', () => {
   beforeEach(() => {
     vi.resetModules();
     const store = new Map<string, string>();
-    (globalThis as any).localStorage = {
+    setTestLocalStorage({
       getItem: (key: string) => (store.has(key) ? store.get(key)! : null),
       setItem: (key: string, value: string) => { store.set(key, value); },
       removeItem: (key: string) => { store.delete(key); },
       clear: () => { store.clear(); },
-    };
+      key: () => null,
+      length: 0,
+    });
   });
 
   it('parses html title and favicon candidates', async () => {
-    (globalThis as any).window = {
+    setTestWindow({
       api: {
         netFetch: vi.fn(),
       },
-    };
+    });
     const { parseHtmlTitle, getWebsiteFaviconUrls } = await import('../site/siteMetaApi');
 
     expect(parseHtmlTitle('<html><title> A &amp; B </title></html>')).toBe('A & B');
@@ -53,11 +77,11 @@ describe('siteMetaApi', () => {
   });
 
   it('stores and reads authorization policy by hostname', async () => {
-    (globalThis as any).window = {
+    setTestWindow({
       api: {
         netFetch: vi.fn(),
       },
-    };
+    });
     const { setWebsiteAuthorizationPolicy, getWebsiteAuthorizationPolicy } = await import('../site/siteMetaApi');
 
     setWebsiteAuthorizationPolicy('https://EXAMPLE.com/a', 'allow');
@@ -73,7 +97,7 @@ describe('siteMetaApi', () => {
       .mockResolvedValueOnce({ ok: false, status: 404, body: '' })
       .mockResolvedValueOnce({ ok: true, status: 200, body: '' });
 
-    (globalThis as any).window = { api: { netFetch } };
+    setTestWindow({ api: { netFetch } });
 
     const { getWebsitePreferredFaviconUrl } = await import('../site/siteMetaApi');
     const url = await getWebsitePreferredFaviconUrl('https://example.com/page', 1000);

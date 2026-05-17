@@ -2366,15 +2366,16 @@ export function registerAppIpcHandlers(): void {
           // ignore
         }
       }
-      for (const iconPath of iconPaths) {
+      return iconPaths.reduce<Promise<string | null>>(async (resolvedIconPromise, iconPath) => {
+        const resolvedIcon = await resolvedIconPromise;
+        if (resolvedIcon) return resolvedIcon;
         try {
           const icon = await app.getFileIcon(iconPath, { size: 'large' });
-          if (!icon.isEmpty()) return icon.toPNG().toString('base64');
+          return icon.isEmpty() ? null : icon.toPNG().toString('base64');
         } catch {
-          // try next candidate
+          return null;
         }
-      }
-      return null;
+      }, Promise.resolve(null));
     } catch (err) {
       console.error('[App] get-file-icon error:', err);
       return null;

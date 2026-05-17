@@ -26,6 +26,21 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+type TestWindow = {
+  location?: { hostname: string };
+  api?: {
+    netFetch: ReturnType<typeof vi.fn>;
+  };
+};
+
+const setTestWindow = (value: TestWindow): void => {
+  Object.defineProperty(globalThis, 'window', {
+    value,
+    configurable: true,
+    writable: true,
+  });
+};
+
 describe('toolbox apis', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -41,10 +56,10 @@ describe('toolbox apis', () => {
       }),
     }));
 
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: { netFetch },
-    };
+    });
 
     const { fetchToolboxSoftwareList } = await import('../tools/toolboxSoftwareApi');
     const list = await fetchToolboxSoftwareList();
@@ -60,10 +75,10 @@ describe('toolbox apis', () => {
       body: JSON.stringify({ code: 500, message: 'failed' }),
     }));
 
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: '127.0.0.1' },
       api: { netFetch },
-    };
+    });
 
     const { fetchTranslate } = await import('../tools/toolboxTranslateApi');
     const result = await fetchTranslate('token', 'hello', 'en', 'zh');
@@ -91,10 +106,10 @@ describe('toolbox apis', () => {
       }),
     }));
 
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: { netFetch },
-    };
+    });
 
     const { fetchTranslate } = await import('../tools/toolboxTranslateApi');
     const result = await fetchTranslate('token', 'hello', 'en', 'zh');

@@ -82,7 +82,7 @@ import { registerClipboardIpcHandlers } from '../clipboard';
 import { registerIslandIpcHandlers } from '../island';
 
 describe('settings ipc handlers', () => {
-  const handlers = new Map<string, (...args: any[]) => any>();
+  const handlers = new Map<string, (...args: unknown[]) => unknown>();
 
   beforeEach(() => {
     handlers.clear();
@@ -95,7 +95,7 @@ describe('settings ipc handlers', () => {
     readFileSyncMock.mockReset();
     broadcastSettingChangeMock.mockReset();
 
-    handleMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handlers.set(channel, handler);
     });
   });

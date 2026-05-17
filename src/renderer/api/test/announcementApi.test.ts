@@ -26,6 +26,23 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+type TestWindow = {
+  location?: { hostname: string };
+  api?: {
+    storeRead: ReturnType<typeof vi.fn>;
+    storeWrite: ReturnType<typeof vi.fn>;
+    netFetch: ReturnType<typeof vi.fn>;
+  };
+};
+
+const setTestWindow = (value: TestWindow): void => {
+  Object.defineProperty(globalThis, 'window', {
+    value,
+    configurable: true,
+    writable: true,
+  });
+};
+
 describe('announcementApi', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -34,10 +51,10 @@ describe('announcementApi', () => {
   it('reads and writes announcement show mode via store', async () => {
     const storeRead = vi.fn(async () => 'always');
     const storeWrite = vi.fn(async () => {});
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: { storeRead, storeWrite, netFetch: vi.fn() },
-    };
+    });
 
     const { readAnnouncementShowMode, writeAnnouncementShowMode } = await import('../announcement/announcementApi');
 
@@ -53,14 +70,14 @@ describe('announcementApi', () => {
       body: JSON.stringify({ code: 200, data: { title: 't', content: 'c', updatedAt: '2026' } }),
     }));
 
-    (globalThis as any).window = {
+    setTestWindow({
       location: { hostname: 'localhost' },
       api: {
         storeRead: vi.fn(),
         storeWrite: vi.fn(),
         netFetch,
       },
-    };
+    });
 
     const { fetchCurrentAnnouncement } = await import('../announcement/announcementApi');
     const data = await fetchCurrentAnnouncement();

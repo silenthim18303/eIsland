@@ -94,7 +94,7 @@ describe('createHotkeyService', () => {
       hide,
       setAlwaysOnTop,
     };
-    options.getMainWindow.mockReturnValue(win as any);
+    options.getMainWindow.mockReturnValue(win as unknown as ReturnType<typeof options.getMainWindow>);
 
     const service = createHotkeyService(options);
     expect(service.registerHideHotkey('Ctrl+Shift+H')).toBe(true);

@@ -56,8 +56,14 @@ vi.mock('systeminformation', () => ({
 import { registerSystemIpcHandlers } from '../system';
 
 describe('system ipc handlers', () => {
-  const handleHandlers = new Map<string, (...args: any[]) => any>();
-  const onHandlers = new Map<string, (...args: any[]) => any>();
+  const handleHandlers = new Map<string, (...args: unknown[]) => unknown>();
+  const onHandlers = new Map<string, (...args: unknown[]) => unknown>();
+  type PerformanceSnapshotAssertShape = {
+    cpu: { loadPercent: number };
+    memory: { totalBytes: number };
+    gpu?: { model?: string };
+    disk: { totalBytes: number };
+  };
 
   beforeEach(() => {
     handleHandlers.clear();
@@ -66,10 +72,10 @@ describe('system ipc handlers', () => {
     onMock.mockReset();
     execMock.mockReset();
 
-    handleMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handleHandlers.set(channel, handler);
     });
-    onMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    onMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       onHandlers.set(channel, handler);
     });
   });
@@ -101,7 +107,7 @@ describe('system ipc handlers', () => {
       queryFocusedWindow: vi.fn(async () => null),
     });
 
-    const snapshot = await handleHandlers.get('system:performance-snapshot:get')?.({}, { cpu: 'cpu:0', gpu: 'gpu:0', disk: 'fs:0' });
+    const snapshot = await handleHandlers.get('system:performance-snapshot:get')?.({}, { cpu: 'cpu:0', gpu: 'gpu:0', disk: 'fs:0' }) as PerformanceSnapshotAssertShape;
 
     expect(snapshot.cpu.loadPercent).toBeGreaterThanOrEqual(0);
     expect(snapshot.memory.totalBytes).toBe(1000);

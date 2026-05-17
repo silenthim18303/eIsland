@@ -341,7 +341,9 @@ export function registerImageCompressionIpcHandlers(): void {
 
     const results: ImageCompressionTaskResult[] = [];
 
-    for (const inputPath of inputPaths) {
+    await inputPaths.reduce<Promise<void>>(async (previousTaskPromise, inputPath) => {
+      await previousTaskPromise;
+
       const createdAt = Date.now();
       const id = buildTaskId();
       const fileName = basename(inputPath);
@@ -366,7 +368,7 @@ export function registerImageCompressionIpcHandlers(): void {
         };
         results.push(failedTask);
         emitToRenderer(failedTask);
-        continue;
+        return;
       }
 
       const ext = extname(inputPath).toLowerCase().replace('.', '');
@@ -388,7 +390,7 @@ export function registerImageCompressionIpcHandlers(): void {
         };
         results.push(failedTask);
         emitToRenderer(failedTask);
-        continue;
+        return;
       }
 
       const outputPath = createOutputPath(inputPath, outputDir);
@@ -411,7 +413,7 @@ export function registerImageCompressionIpcHandlers(): void {
         };
         results.push(failedTask);
         emitToRenderer(failedTask);
-        continue;
+        return;
       }
 
       let compressedBytes = 0;
@@ -435,7 +437,7 @@ export function registerImageCompressionIpcHandlers(): void {
         };
         results.push(failedTask);
         emitToRenderer(failedTask);
-        continue;
+        return;
       }
 
       const ratio = originalBytes > 0 ? (originalBytes - compressedBytes) / originalBytes : 0;
@@ -455,7 +457,7 @@ export function registerImageCompressionIpcHandlers(): void {
       };
       results.push(successTask);
       emitToRenderer(successTask);
-    }
+    }, Promise.resolve());
 
     return {
       ok: true,

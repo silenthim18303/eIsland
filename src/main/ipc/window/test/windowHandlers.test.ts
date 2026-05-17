@@ -55,8 +55,8 @@ vi.mock('../../../utils/broadcast', () => ({
 import { registerWindowIpcHandlers, toggleMousePassthroughLock } from '../window';
 
 describe('window ipc handlers', () => {
-  const handleHandlers = new Map<string, (...args: any[]) => any>();
-  const onHandlers = new Map<string, (...args: any[]) => any>();
+  const handleHandlers = new Map<string, (...args: unknown[]) => unknown>();
+  const onHandlers = new Map<string, (...args: unknown[]) => unknown>();
   const win = {
     isDestroyed: vi.fn(() => false),
     setIgnoreMouseEvents: vi.fn(),
@@ -81,10 +81,10 @@ describe('window ipc handlers', () => {
     win.hide.mockReset();
     win.webContents.send.mockReset();
 
-    handleMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handleHandlers.set(channel, handler);
     });
-    onMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    onMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       onHandlers.set(channel, handler);
     });
   });

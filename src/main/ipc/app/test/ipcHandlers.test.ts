@@ -64,8 +64,8 @@ import { registerStoreIpcHandlers } from '../store';
 import { registerLogIpcHandlers } from '../log';
 
 describe('app ipc handlers', () => {
-  const handleHandlers = new Map<string, (...args: any[]) => any>();
-  const onHandlers = new Map<string, (...args: any[]) => any>();
+  const handleHandlers = new Map<string, (...args: unknown[]) => unknown>();
+  const onHandlers = new Map<string, (...args: unknown[]) => unknown>();
 
   beforeEach(() => {
     handleHandlers.clear();
@@ -77,10 +77,10 @@ describe('app ipc handlers', () => {
     writeFileSyncMock.mockReset();
     broadcastSettingChangeMock.mockReset();
 
-    handleMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handleHandlers.set(channel, handler);
     });
-    onMock.mockImplementation((channel: string, handler: (...args: any[]) => any) => {
+    onMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       onHandlers.set(channel, handler);
     });
   });
