@@ -1098,12 +1098,31 @@
         "pages": {
           "imageCompression": "图像压缩"
         },
-        "subtitle": "选择文件并配置输出路径后进行压缩，当前版本先提供界面入口。",
-        "pickFile": "选择文件",
-        "noFile": "未选择文件",
-        "outputPlaceholder": "输出路径配置即将开放",
+        "subtitle": "选择图片并配置输出目录，输出格式与原图一致。",
+        "pickImages": "选择图片",
+        "selectedCount": "已选择 {{count}} 张图片",
+        "noImages": "未选择图片",
+        "outputDir": "输出目录",
+        "outputDirPlaceholder": "不填写时默认输出到首张图片所在目录",
+        "pickOutputDir": "选择目录",
+        "quality": "压缩质量",
+        "qualityHint": "可选范围 10-100，数值越高质量越高",
         "startBtn": "开始压缩",
-        "comingSoon": "文件压缩能力开发中，敬请期待。"
+        "compressing": "压缩中...",
+        "resultsTitle": "压缩结果",
+        "resultsSubtitle": "成功 {{success}} / 共 {{total}}",
+        "pendingListTitle": "待处理文件",
+        "resultsEmpty": "暂无压缩结果",
+        "openOutput": "打开位置",
+        "resultSuccess": "{{before}} → {{after}} · 压缩率 {{ratio}}",
+        "resultFailed": "压缩失败：{{reason}}",
+        "messages": {
+          "pickFailed": "选择图片失败",
+          "pickOutputDirFailed": "选择输出目录失败",
+          "startFailed": "启动压缩失败，请稍后重试",
+          "done": "压缩完成：成功 {{success}} / {{total}}",
+          "openFolderFailed": "打开输出位置失败"
+        }
       },
       "formatFactory": {
         "pages": {

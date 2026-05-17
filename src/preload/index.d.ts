@@ -234,6 +234,25 @@ declare global {
         fileName: string;
         fileSize: number;
       } | null>;
+      imageCompressionPickImages: () => Promise<string[]>;
+      imageCompressionPickOutputDir: () => Promise<string | null>;
+      imageCompressionStart: (payload: {
+        inputPaths: string[];
+        outputDir?: string;
+        quality?: number;
+      }) => Promise<{
+        ok: boolean;
+        results?: Array<{
+          inputPath: string;
+          outputPath: string;
+          success: boolean;
+          originalBytes: number;
+          compressedBytes: number;
+          ratio: number;
+          error?: string;
+        }>;
+        message?: string;
+      }>;
       saveImageAs: (sourcePath: string) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
       resolveShortcut: (lnkPath: string) => Promise<{ target: string; name: string } | null>;
       openImageDialog: () => Promise<string | null>;

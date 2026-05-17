@@ -41,6 +41,7 @@ import { registerAppIpcHandlers } from './ipc/app/app';
 import { registerSystemIpcHandlers } from './ipc/system/system';
 import { registerUpdaterIpcHandlers } from './ipc/app/updater';
 import { registerDownloadIpcHandlers } from './ipc/app/download';
+import { registerImageCompressionIpcHandlers } from './ipc/app/imageCompression';
 import { registerWallpaperIpcHandlers } from './ipc/window/wallpaper';
 import { registerWallpaperVideoIpcHandlers } from './ipc/media/wallpaperVideo';
 import { registerFormatFactoryIpcHandlers } from './ipc/app/formatFactory';
@@ -572,6 +573,7 @@ function registerIpcHandlers(): void {
   registerWallpaperIpcHandlers();
   registerWallpaperVideoIpcHandlers();
   registerFormatFactoryIpcHandlers();
+  registerImageCompressionIpcHandlers();
 
   registerAppIpcHandlers();
 

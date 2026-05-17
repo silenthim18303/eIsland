@@ -2971,6 +2971,23 @@
   margin-top: 8px;
 }
 
+.settings-file-compression-page-panel .settings-card {
+  min-height: 0;
+}
+
+.settings-slider {
+  width: 100%;
+  accent-color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.file-compression-path-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 140px;
+  overflow: auto;
+}
+
 .software-list {
   display: flex;
   flex-direction: column;

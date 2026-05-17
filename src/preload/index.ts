@@ -514,6 +514,40 @@ const api = {
     return ipcRenderer.invoke('app:compute-file-hash', filePath, algorithm);
   },
   /**
+   * 选择待压缩图片（支持多选）
+   */
+  imageCompressionPickImages: (): Promise<string[]> => {
+    return ipcRenderer.invoke('image-compression:pick-images');
+  },
+  /**
+   * 选择图片压缩输出目录
+   */
+  imageCompressionPickOutputDir: (): Promise<string | null> => {
+    return ipcRenderer.invoke('image-compression:pick-output-dir');
+  },
+  /**
+   * 启动图片压缩任务（输出格式与原格式一致）
+   */
+  imageCompressionStart: (payload: {
+    inputPaths: string[];
+    outputDir?: string;
+    quality?: number;
+  }): Promise<{
+    ok: boolean;
+    results?: Array<{
+      inputPath: string;
+      outputPath: string;
+      success: boolean;
+      originalBytes: number;
+      compressedBytes: number;
+      ratio: number;
+      error?: string;
+    }>;
+    message?: string;
+  }> => {
+    return ipcRenderer.invoke('image-compression:start', payload);
+  },
+  /**
    * 将图片另存到用户指定路径
    * @param sourcePath - 源图片绝对路径
    * @returns 保存结果（ok/canceled/filePath）

@@ -1099,12 +1099,31 @@
         "pages": {
           "imageCompression": "Image Compression"
         },
-        "subtitle": "Select a file and configure output path for compression. This version currently provides the UI entry first.",
-        "pickFile": "Select File",
-        "noFile": "No file selected",
-        "outputPlaceholder": "Output path configuration will be available soon",
+        "subtitle": "Select images and output directory. Output format stays the same as source.",
+        "pickImages": "Select Images",
+        "selectedCount": "{{count}} image(s) selected",
+        "noImages": "No images selected",
+        "outputDir": "Output Directory",
+        "outputDirPlaceholder": "Leave empty to use the first image folder",
+        "pickOutputDir": "Choose Folder",
+        "quality": "Compression Quality",
+        "qualityHint": "Range 10-100. Higher value means better quality",
         "startBtn": "Start Compression",
-        "comingSoon": "File compression capability is under development."
+        "compressing": "Compressing...",
+        "resultsTitle": "Compression Results",
+        "resultsSubtitle": "Success {{success}} / {{total}}",
+        "pendingListTitle": "Pending Files",
+        "resultsEmpty": "No compression results yet",
+        "openOutput": "Open Location",
+        "resultSuccess": "{{before}} → {{after}} · Saved {{ratio}}",
+        "resultFailed": "Compression failed: {{reason}}",
+        "messages": {
+          "pickFailed": "Failed to select images",
+          "pickOutputDirFailed": "Failed to select output directory",
+          "startFailed": "Failed to start compression. Please try again later",
+          "done": "Compression finished: {{success}} / {{total}}",
+          "openFolderFailed": "Failed to open output location"
+        }
       },
       "formatFactory": {
         "pages": {
