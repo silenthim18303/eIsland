@@ -10,6 +10,8 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "test": "vitest run",
+    "test:preload": "vitest run src/preload/index.test.ts",
+    "test:coverage": "vitest run --coverage",
     "postinstall": "electron-builder install-app-deps",
     "package": "electron-vite build && electron-builder",
     "changelog:generate": "node --experimental-strip-types scripts/generate-changelog.ts -o docs/CHANGE_LOG.md",
