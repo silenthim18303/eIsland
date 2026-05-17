@@ -2357,17 +2357,25 @@ export function registerAppIpcHandlers(): void {
 
   ipcMain.handle('app:get-file-icon', async (_event, filePath: string) => {
     try {
-      let iconPath = filePath;
+      const iconPaths = [filePath];
       if (process.platform === 'win32' && filePath.toLowerCase().endsWith('.lnk')) {
         try {
           const result = shell.readShortcutLink(filePath);
-          if (result.target) iconPath = result.target;
+          iconPaths.unshift(...[result.icon, result.target].filter((path): path is string => !!path));
         } catch {
           // ignore
         }
       }
-      const icon = await app.getFileIcon(iconPath, { size: 'large' });
-      return icon.toPNG().toString('base64');
+      return iconPaths.reduce<Promise<string | null>>(async (resolvedIconPromise, iconPath) => {
+        const resolvedIcon = await resolvedIconPromise;
+        if (resolvedIcon) return resolvedIcon;
+        try {
+          const icon = await app.getFileIcon(iconPath, { size: 'large' });
+          return icon.isEmpty() ? null : icon.toPNG().toString('base64');
+        } catch {
+          return null;
+        }
+      }, Promise.resolve(null));
     } catch (err) {
       console.error('[App] get-file-icon error:', err);
       return null;

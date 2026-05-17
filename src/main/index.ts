@@ -41,6 +41,7 @@ import { registerAppIpcHandlers } from './ipc/app/app';
 import { registerSystemIpcHandlers } from './ipc/system/system';
 import { registerUpdaterIpcHandlers } from './ipc/app/updater';
 import { registerDownloadIpcHandlers } from './ipc/app/download';
+import { registerImageCompressionIpcHandlers } from './ipc/app/imageCompression';
 import { registerWallpaperIpcHandlers } from './ipc/window/wallpaper';
 import { registerWallpaperVideoIpcHandlers } from './ipc/media/wallpaperVideo';
 import { registerFormatFactoryIpcHandlers } from './ipc/app/formatFactory';
@@ -158,6 +159,7 @@ function showAgentVoiceInputWindow(): void {
     y: targetDisplay.bounds.y,
     width,
     height,
+    fullscreen: true,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
@@ -175,7 +177,7 @@ function showAgentVoiceInputWindow(): void {
   });
 
   agentVoiceInputWindow.setIgnoreMouseEvents(true);
-  agentVoiceInputWindow.setAlwaysOnTop(true, 'floating');
+  agentVoiceInputWindow.setAlwaysOnTop(true, 'screen-saver');
   agentVoiceInputWindow.removeMenu();
 
   if (app.isPackaged) {
@@ -571,6 +573,7 @@ function registerIpcHandlers(): void {
   registerWallpaperIpcHandlers();
   registerWallpaperVideoIpcHandlers();
   registerFormatFactoryIpcHandlers();
+  registerImageCompressionIpcHandlers();
 
   registerAppIpcHandlers();
 

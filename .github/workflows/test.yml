@@ -1,0 +1,197 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vitest.config.ts'
+      - 'tsconfig*.json'
+      - '.github/workflows/test.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vitest.config.ts'
+      - 'tsconfig*.json'
+      - '.github/workflows/test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  vitest:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      preload_exit_code: ${{ steps.preload_test.outputs.exit_code }}
+      preload_duration_seconds: ${{ steps.preload_test.outputs.duration_seconds }}
+      full_exit_code: ${{ steps.full_test.outputs.exit_code }}
+      full_duration_seconds: ${{ steps.full_test.outputs.duration_seconds }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run preload tests
+        id: preload_test
+        continue-on-error: true
+        run: |
+          set +e
+          START=$(date +%s)
+          FORCE_COLOR=0 NO_COLOR=1 npm run test:preload 2>&1 | tee preload-test.log
+          EXIT_CODE=${PIPESTATUS[0]}
+          END=$(date +%s)
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          echo "duration_seconds=$((END - START))" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Run full test suite
+        id: full_test
+        continue-on-error: true
+        run: |
+          set +e
+          START=$(date +%s)
+          FORCE_COLOR=0 NO_COLOR=1 npm run test 2>&1 | tee full-test.log
+          EXIT_CODE=${PIPESTATUS[0]}
+          END=$(date +%s)
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          echo "duration_seconds=$((END - START))" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-logs
+          path: |
+            preload-test.log
+            full-test.log
+          if-no-files-found: warn
+
+      - name: Fail workflow when tests fail
+        if: always()
+        run: |
+          if [ "${{ steps.preload_test.outputs.exit_code }}" != "0" ] || [ "${{ steps.full_test.outputs.exit_code }}" != "0" ]; then
+            echo "Tests failed. preload=${{ steps.preload_test.outputs.exit_code }}, full=${{ steps.full_test.outputs.exit_code }}"
+            exit 1
+          fi
+
+  comment-test-report:
+    if: always() && github.event_name == 'pull_request'
+    needs: vitest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download test logs
+        uses: actions/download-artifact@v4
+        with:
+          name: test-logs
+          path: .
+
+      - name: Comment test results on PR
+        uses: actions/github-script@v7
+        env:
+          PRELOAD_EXIT_CODE: ${{ needs.vitest.outputs.preload_exit_code }}
+          PRELOAD_DURATION_SECONDS: ${{ needs.vitest.outputs.preload_duration_seconds }}
+          FULL_EXIT_CODE: ${{ needs.vitest.outputs.full_exit_code }}
+          FULL_DURATION_SECONDS: ${{ needs.vitest.outputs.full_duration_seconds }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('node:fs');
+            const marker = '<!-- test-workflow-report -->';
+
+            const readLog = (path) => {
+              try {
+                const content = fs.readFileSync(path, 'utf8').trim();
+                if (!content) return '(empty output)';
+                return content.length > 6000 ? `${content.slice(0, 6000)}\n... (truncated)` : content;
+              } catch {
+                return '(log file not found)';
+              }
+            };
+
+            const preloadCode = process.env.PRELOAD_EXIT_CODE || '1';
+            const fullCode = process.env.FULL_EXIT_CODE || '1';
+            const preloadDuration = process.env.PRELOAD_DURATION_SECONDS || '-';
+            const fullDuration = process.env.FULL_DURATION_SECONDS || '-';
+            const preloadStatus = preloadCode === '0' ? '✅ PASS' : '❌ FAIL';
+            const fullStatus = fullCode === '0' ? '✅ PASS' : '❌ FAIL';
+            const overallStatus = preloadCode === '0' && fullCode === '0' ? '✅ All tests passed' : '❌ Test failures detected';
+            const shortSha = (context.sha || '').slice(0, 7) || 'unknown';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            const body = `${marker}
+            ## Automated Test Report
+
+            **Overall:** ${overallStatus}
+            - Commit: \`${shortSha}\`
+            - Preload tests: ${preloadStatus} (${preloadDuration}s)
+            - Full test suite: ${fullStatus} (${fullDuration}s)
+
+            <details>
+            <summary>Preload test output</summary>
+
+            \`\`\`
+            ${readLog('preload-test.log')}
+            \`\`\`
+            </details>
+
+            <details>
+            <summary>Full test output</summary>
+
+            \`\`\`
+            ${readLog('full-test.log')}
+            \`\`\`
+            </details>
+
+            [View workflow run](${runUrl})`;
+
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const existing = comments.find((comment) =>
+              comment.user?.type === 'Bot' && comment.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body,
+              });
+            }

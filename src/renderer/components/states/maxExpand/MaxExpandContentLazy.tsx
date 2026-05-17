@@ -41,6 +41,7 @@ const CountdownTab = lazy(() => import('./components/CountdownTab').then((module
 const MemoTab = lazy(() => import('./components/MemoTab').then((module) => ({ default: module.MemoTab })));
 const AlarmTab = lazy(() => import('./components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
 const ToolboxTab = lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));
+const MiniGameTab = lazy(() => import('./components/MiniGameTab').then((module) => ({ default: module.MiniGameTab })));
 
 function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElement, contentReady: boolean): ReactElement | null {
   if (!contentReady) return loadingFallback;
@@ -56,6 +57,7 @@ function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElem
   if (activeTab === 'countdown') content = <CountdownTab />;
   if (activeTab === 'alarm') content = <AlarmTab />;
   if (activeTab === 'toolbox') content = <ToolboxTab />;
+  if (activeTab === 'miniGame') content = <MiniGameTab />;
   if (activeTab === 'settings') content = <SettingsTab />;
   return <Suspense fallback={loadingFallback}>{content}</Suspense>;
 }

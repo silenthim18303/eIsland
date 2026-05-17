@@ -234,6 +234,62 @@ declare global {
         fileName: string;
         fileSize: number;
       } | null>;
+      imageCompressionPickImages: () => Promise<string[]>;
+      imageCompressionPickOutputDir: () => Promise<string | null>;
+      imageCompressionStart: (payload: {
+        inputPaths: string[];
+        outputDir?: string;
+        quality?: number;
+      }) => Promise<{
+        ok: boolean;
+        results?: Array<{
+          id: string;
+          fileName: string;
+          inputPath: string;
+          outputPath: string;
+          quality: number;
+          status: 'completed' | 'failed';
+          success: boolean;
+          originalBytes: number;
+          compressedBytes: number;
+          ratio: number;
+          error?: string;
+          createdAt: number;
+          updatedAt: number;
+        }>;
+        message?: string;
+      }>;
+      imageCompressionList: () => Promise<Array<{
+        id: string;
+        fileName: string;
+        inputPath: string;
+        outputPath: string;
+        quality: number;
+        status: 'completed' | 'failed';
+        success: boolean;
+        originalBytes: number;
+        compressedBytes: number;
+        ratio: number;
+        error?: string;
+        createdAt: number;
+        updatedAt: number;
+      }>>;
+      imageCompressionRemove: (taskId: string) => Promise<boolean>;
+      onImageCompressionTaskUpdated: (callback: (task: {
+        id: string;
+        fileName: string;
+        inputPath: string;
+        outputPath: string;
+        quality: number;
+        status: 'completed' | 'failed';
+        success: boolean;
+        originalBytes: number;
+        compressedBytes: number;
+        ratio: number;
+        error?: string;
+        createdAt: number;
+        updatedAt: number;
+      }) => void) => () => void;
       saveImageAs: (sourcePath: string) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
       resolveShortcut: (lnkPath: string) => Promise<{ target: string; name: string } | null>;
       openImageDialog: () => Promise<string | null>;

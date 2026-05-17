@@ -19,10 +19,16 @@
  */
 
 /**
- * @file fileCompressionToolConfig.ts
- * @description 工具箱文件压缩模块分页配置
+ * @file vitest.config.ts
+ * @description Vitest 测试配置文件
  * @author 鸡哥
  */
 
-export const FILE_COMPRESSION_PAGES = ['imageCompression', 'history'] as const;
-export type FileCompressionPageKey = (typeof FILE_COMPRESSION_PAGES)[number];
+export default {
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+    clearMocks: true,
+    restoreMocks: true,
+  },
+};

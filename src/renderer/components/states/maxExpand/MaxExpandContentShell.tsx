@@ -37,7 +37,7 @@ import '../../../styles/settings/settings.css';
 
 type NavDotId = MaxExpandTab | 'expanded';
 
-const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'settings']);
+const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'miniGame', 'settings']);
 
 let _startupMode: 'integrated' | 'standalone' = 'integrated';
 let _startupModeResolved = false;
@@ -179,6 +179,8 @@ export function MaxExpandContentShell({ renderActiveTab, deferContent = true }: 
                 ? '闹钟'
               : id === 'toolbox'
                 ? '工具箱'
+              : id === 'miniGame'
+                ? '小游戏'
                 : '设置',
     });
     if (countdownMode === 'standalone') {

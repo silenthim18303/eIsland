@@ -456,9 +456,9 @@
     "delete": "Delete",
     "drop": {
       "releaseToAdd": "Release to add",
-      "onlyExe": "Only .exe files are supported",
+      "onlyExe": "Only .exe or .lnk files are supported",
       "duplicate": "App already exists",
-      "dragExe": "Drag .exe here"
+      "dragExe": "Drag .exe or .lnk here"
     }
   },
   "overview": {
@@ -906,6 +906,11 @@
       "confirm": "Confirm"
     }
   },
+  "miniGameTab": {
+    "placeholder": "Stay tuned",
+    "title": "Mini game feature in development",
+    "subtitle": "Stay tuned"
+  },
   "maxExpand": {
     "loading": "Loading max expand view...",
     "nav": {
@@ -921,6 +926,7 @@
       "countdown": "Countdown",
       "alarm": "Alarm",
       "toolbox": "Toolbox",
+      "miniGame": "Mini Game",
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
     },
@@ -933,6 +939,7 @@
         "encodingService": "Encoding Svc",
         "networkService": "Network Svc",
         "fileCompression": "File Compression",
+        "fileCompressionShort": "Compress",
         "formatFactory": "Format Factory"
       },
       "software": {
@@ -950,6 +957,10 @@
       "download": {
         "title": "Multi-Thread Download",
         "subtitle": "Supports multi-threaded downloads with custom save path and real-time progress.",
+        "pages": {
+          "create": "Create",
+          "history": "History"
+        },
         "form": {
           "urlLabel": "Download URL",
           "urlPlaceholder": "Enter file URL, e.g. https://example.com/file.zip",
@@ -1090,14 +1101,45 @@
       "fileCompression": {
         "title": "File Compression",
         "pages": {
-          "imageCompression": "Image Compression"
+          "imageCompression": "Image Compression",
+          "history": "History"
         },
-        "subtitle": "Select a file and configure output path for compression. This version currently provides the UI entry first.",
-        "pickFile": "Select File",
-        "noFile": "No file selected",
-        "outputPlaceholder": "Output path configuration will be available soon",
+        "subtitle": "Select images and output directory. Output format stays the same as source.",
+        "pickImages": "Select Images",
+        "pickFile": "Select Images",
+        "selectedCount": "{{count}} image(s) selected",
+        "noImages": "No images selected",
+        "noFile": "No images selected",
+        "outputDir": "Output Directory",
+        "outputDirPlaceholder": "Leave empty to use the first image folder",
+        "outputPlaceholder": "Leave empty to use the first image folder",
+        "pickOutputDir": "Choose Folder",
+        "quality": "Compression Quality",
+        "qualityHint": "Range 10-100. Higher value means better quality",
         "startBtn": "Start Compression",
-        "comingSoon": "File compression capability is under development."
+        "compressing": "Compressing...",
+        "comingSoon": "File compression is available.",
+        "resultsTitle": "Compression Results",
+        "resultsSubtitle": "Success {{success}} / {{total}}",
+        "pendingListTitle": "Pending Files",
+        "resultsEmpty": "No compression results yet",
+        "openOutput": "Open Location",
+        "removeTask": "Delete Task",
+        "resultSuccess": "{{before}} → {{after}} · Saved {{ratio}}",
+        "resultFailed": "Compression failed: {{reason}}",
+        "taskMeta": "Status: {{status}} · Quality: {{quality}}",
+        "status": {
+          "completed": "Completed",
+          "failed": "Failed"
+        },
+        "messages": {
+          "pickFailed": "Failed to select images",
+          "pickOutputDirFailed": "Failed to select output directory",
+          "startFailed": "Failed to start compression. Please try again later",
+          "done": "Compression finished: {{success}} / {{total}}",
+          "openFolderFailed": "Failed to open output location",
+          "removeFailed": "Failed to remove task"
+        }
       },
       "formatFactory": {
         "pages": {
@@ -1503,7 +1545,8 @@
           "memo": "Memo",
           "countdown": "Countdown",
           "alarm": "Alarm",
-          "toolbox": "Toolbox"
+          "toolbox": "Toolbox",
+          "miniGame": "Mini Game"
         }
       },
       "hideProcess": {

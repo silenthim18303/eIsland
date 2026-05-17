@@ -35,18 +35,23 @@ import { NetworkServiceToolSection } from './tools/components/NetworkServiceTool
 import { SoftwareToolSection } from './tools/components/SoftwareToolSection';
 import { FormatFactoryToolSection } from './tools/components/FormatFactoryToolSection';
 import { TranslateToolSection } from './tools/components/TranslateToolSection';
+import type { DownloadPageKey } from './tools/config/downloadToolConfig';
 import type { FileCompressionPageKey } from './tools/config/fileCompressionToolConfig';
 import type { FormatFactoryPageKey } from './tools/config/formatFactoryToolConfig';
 import type { ToolboxSidebarKey } from './tools/config/commonToolboxConfig';
 
-const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string }> = [
+const TOOLBOX_SIDEBAR_ITEMS: Array<{ key: ToolboxSidebarKey; labelKey: string; sidebarLabelKey?: string }> = [
   { key: 'download', labelKey: 'maxExpand.toolbox.sidebar.download' },
   { key: 'software', labelKey: 'maxExpand.toolbox.sidebar.software' },
   { key: 'translate', labelKey: 'maxExpand.toolbox.sidebar.translate' },
   { key: 'fileService', labelKey: 'maxExpand.toolbox.sidebar.fileService' },
   { key: 'encodingService', labelKey: 'maxExpand.toolbox.sidebar.encodingService' },
   { key: 'networkService', labelKey: 'maxExpand.toolbox.sidebar.networkService' },
-  { key: 'fileCompression', labelKey: 'maxExpand.toolbox.sidebar.fileCompression' },
+  {
+    key: 'fileCompression',
+    labelKey: 'maxExpand.toolbox.sidebar.fileCompression',
+    sidebarLabelKey: 'maxExpand.toolbox.sidebar.fileCompressionShort',
+  },
   { key: 'formatFactory', labelKey: 'maxExpand.toolbox.sidebar.formatFactory' },
 ];
 
@@ -55,8 +60,16 @@ export function ToolboxTab(): ReactElement {
   const { t } = useTranslation();
   const { setMaxExpandTab } = useIslandStore();
   const [activeSidebar, setActiveSidebar] = useState<ToolboxSidebarKey>('download');
+  const [downloadPage, setDownloadPage] = useState<DownloadPageKey>('create');
   const [fileCompressionPage, setFileCompressionPage] = useState<FileCompressionPageKey>('imageCompression');
   const [formatFactoryPage, setFormatFactoryPage] = useState<FormatFactoryPageKey>('image');
+  const downloadPageLabel = activeSidebar === 'download'
+    ? t(`maxExpand.toolbox.download.pages.${downloadPage}`, {
+      defaultValue: downloadPage === 'history'
+        ? t('maxExpand.toolbox.download.tasks.title')
+        : t('maxExpand.toolbox.download.title'),
+    })
+    : '';
   const fileCompressionPageLabel = activeSidebar === 'fileCompression'
     ? t(`maxExpand.toolbox.fileCompression.pages.${fileCompressionPage}`)
     : '';
@@ -82,7 +95,9 @@ export function ToolboxTab(): ReactElement {
               type="button"
             >
               <span className="sidebar-dot" />
-              {t(item.labelKey)}
+              {item.sidebarLabelKey
+                ? t(item.sidebarLabelKey, { defaultValue: t(item.labelKey) })
+                : t(item.labelKey)}
             </button>
           ))}
         </div>
@@ -90,6 +105,9 @@ export function ToolboxTab(): ReactElement {
         <div className="max-expand-settings-panel">
           <div className="max-expand-settings-title toolbox-panel-title settings-app-title-line">
             <span>{activeSidebarItem ? t(activeSidebarItem.labelKey) : ''}</span>
+            {activeSidebar === 'download' && downloadPageLabel && (
+              <span className="settings-app-title-sub">- {downloadPageLabel}</span>
+            )}
             {activeSidebar === 'fileCompression' && fileCompressionPageLabel && (
               <span className="settings-app-title-sub">- {fileCompressionPageLabel}</span>
             )}
@@ -97,7 +115,12 @@ export function ToolboxTab(): ReactElement {
               <span className="settings-app-title-sub">- {formatFactoryPageLabel}</span>
             )}
           </div>
-          {activeSidebar === 'download' && <DownloadToolSection />}
+          {activeSidebar === 'download' && (
+            <DownloadToolSection
+              downloadPage={downloadPage}
+              setDownloadPage={setDownloadPage}
+            />
+          )}
           {activeSidebar === 'translate' && <TranslateToolSection />}
           {activeSidebar === 'software' && (
             <SoftwareToolSection onFeedbackNavigate={handleSoftwareFeedbackNavigate} />
