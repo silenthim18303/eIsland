@@ -535,17 +535,80 @@ const api = {
   }): Promise<{
     ok: boolean;
     results?: Array<{
+      id: string;
+      fileName: string;
       inputPath: string;
       outputPath: string;
+      quality: number;
+      status: 'completed' | 'failed';
       success: boolean;
       originalBytes: number;
       compressedBytes: number;
       ratio: number;
       error?: string;
+      createdAt: number;
+      updatedAt: number;
     }>;
     message?: string;
   }> => {
     return ipcRenderer.invoke('image-compression:start', payload);
+  },
+  imageCompressionList: (): Promise<Array<{
+    id: string;
+    fileName: string;
+    inputPath: string;
+    outputPath: string;
+    quality: number;
+    status: 'completed' | 'failed';
+    success: boolean;
+    originalBytes: number;
+    compressedBytes: number;
+    ratio: number;
+    error?: string;
+    createdAt: number;
+    updatedAt: number;
+  }>> => {
+    return ipcRenderer.invoke('image-compression:list');
+  },
+  imageCompressionRemove: (taskId: string): Promise<boolean> => {
+    return ipcRenderer.invoke('image-compression:remove', taskId);
+  },
+  onImageCompressionTaskUpdated: (callback: (task: {
+    id: string;
+    fileName: string;
+    inputPath: string;
+    outputPath: string;
+    quality: number;
+    status: 'completed' | 'failed';
+    success: boolean;
+    originalBytes: number;
+    compressedBytes: number;
+    ratio: number;
+    error?: string;
+    createdAt: number;
+    updatedAt: number;
+  }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, task: {
+      id: string;
+      fileName: string;
+      inputPath: string;
+      outputPath: string;
+      quality: number;
+      status: 'completed' | 'failed';
+      success: boolean;
+      originalBytes: number;
+      compressedBytes: number;
+      ratio: number;
+      error?: string;
+      createdAt: number;
+      updatedAt: number;
+    }): void => {
+      callback(task);
+    };
+    ipcRenderer.on('image-compression:task-updated', handler);
+    return () => {
+      ipcRenderer.removeListener('image-compression:task-updated', handler);
+    };
   },
   /**
    * 将图片另存到用户指定路径

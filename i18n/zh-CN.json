@@ -1114,14 +1114,21 @@
         "pendingListTitle": "待处理文件",
         "resultsEmpty": "暂无压缩结果",
         "openOutput": "打开位置",
+        "removeTask": "删除任务",
         "resultSuccess": "{{before}} → {{after}} · 压缩率 {{ratio}}",
         "resultFailed": "压缩失败：{{reason}}",
+        "taskMeta": "状态：{{status}} · 质量：{{quality}}",
+        "status": {
+          "completed": "已完成",
+          "failed": "失败"
+        },
         "messages": {
           "pickFailed": "选择图片失败",
           "pickOutputDirFailed": "选择输出目录失败",
           "startFailed": "启动压缩失败，请稍后重试",
           "done": "压缩完成：成功 {{success}} / {{total}}",
-          "openFolderFailed": "打开输出位置失败"
+          "openFolderFailed": "打开输出位置失败",
+          "removeFailed": "删除任务失败"
         }
       },
       "formatFactory": {

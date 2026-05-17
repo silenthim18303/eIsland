@@ -1115,14 +1115,21 @@
         "pendingListTitle": "Pending Files",
         "resultsEmpty": "No compression results yet",
         "openOutput": "Open Location",
+        "removeTask": "Delete Task",
         "resultSuccess": "{{before}} → {{after}} · Saved {{ratio}}",
         "resultFailed": "Compression failed: {{reason}}",
+        "taskMeta": "Status: {{status}} · Quality: {{quality}}",
+        "status": {
+          "completed": "Completed",
+          "failed": "Failed"
+        },
         "messages": {
           "pickFailed": "Failed to select images",
           "pickOutputDirFailed": "Failed to select output directory",
           "startFailed": "Failed to start compression. Please try again later",
           "done": "Compression finished: {{success}} / {{total}}",
-          "openFolderFailed": "Failed to open output location"
+          "openFolderFailed": "Failed to open output location",
+          "removeFailed": "Failed to remove task"
         }
       },
       "formatFactory": {

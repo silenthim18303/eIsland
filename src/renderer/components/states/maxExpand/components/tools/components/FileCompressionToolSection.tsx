@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   FILE_COMPRESSION_PAGES,
@@ -36,14 +36,20 @@ interface FileCompressionToolSectionProps {
   setFileCompressionPage: (page: FileCompressionPageKey) => void;
 }
 
-interface ImageCompressionResult {
+interface ImageCompressionTask {
+  id: string;
+  fileName: string;
   inputPath: string;
   outputPath: string;
+  quality: number;
+  status: 'completed' | 'failed';
   success: boolean;
   originalBytes: number;
   compressedBytes: number;
   ratio: number;
   error?: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 function formatBytes(bytes: number): string {
@@ -77,19 +83,41 @@ export function FileCompressionToolSection({
   const [quality, setQuality] = useState(80);
   const [compressing, setCompressing] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
-  const [results, setResults] = useState<ImageCompressionResult[]>([]);
+  const [tasks, setTasks] = useState<ImageCompressionTask[]>([]);
 
   const pageLabels: Record<FileCompressionPageKey, string> = {
     imageCompression: t('maxExpand.toolbox.fileCompression.pages.imageCompression'),
   };
 
-  const successfulCount = useMemo(() => results.filter((item) => item.success).length, [results]);
+  const successfulCount = useMemo(() => tasks.filter((item) => item.success).length, [tasks]);
+
+  useEffect(() => {
+    let disposed = false;
+    window.api.imageCompressionList().then((list) => {
+      if (disposed) return;
+      setTasks((list || []).slice().sort((a, b) => b.createdAt - a.createdAt));
+    }).catch(() => {});
+
+    const off = window.api.onImageCompressionTaskUpdated((task) => {
+      setTasks((prev) => {
+        const exists = prev.some((item) => item.id === task.id);
+        const next = exists
+          ? prev.map((item) => (item.id === task.id ? task : item))
+          : [task, ...prev];
+        return next.slice().sort((a, b) => b.createdAt - a.createdAt);
+      });
+    });
+
+    return () => {
+      disposed = true;
+      off();
+    };
+  }, []);
 
   const handlePickImages = (): void => {
     window.api.imageCompressionPickImages().then((paths) => {
       if (!paths || paths.length === 0) return;
       setSelectedImages(paths);
-      setResults([]);
       setStatusMessage('');
     }).catch(() => {
       setStatusMessage(t('maxExpand.toolbox.fileCompression.messages.pickFailed'));
@@ -109,7 +137,6 @@ export function FileCompressionToolSection({
     if (selectedImages.length === 0 || compressing) return;
     setCompressing(true);
     setStatusMessage('');
-    setResults([]);
     window.api.imageCompressionStart({
       inputPaths: selectedImages,
       outputDir: outputDir.trim() || undefined,
@@ -120,7 +147,12 @@ export function FileCompressionToolSection({
         return;
       }
       const nextResults = result.results || [];
-      setResults(nextResults);
+      setTasks((prev) => {
+        const map = new Map<string, ImageCompressionTask>();
+        prev.forEach((item) => map.set(item.id, item));
+        nextResults.forEach((item) => map.set(item.id, item));
+        return Array.from(map.values()).sort((a, b) => b.createdAt - a.createdAt);
+      });
       const successCount = nextResults.filter((item) => item.success).length;
       setStatusMessage(
         t('maxExpand.toolbox.fileCompression.messages.done', {
@@ -138,6 +170,18 @@ export function FileCompressionToolSection({
   const handleOpenPath = (path: string): void => {
     window.api.openInExplorer(path).catch(() => {
       setStatusMessage(t('maxExpand.toolbox.fileCompression.messages.openFolderFailed'));
+    });
+  };
+
+  const handleRemoveTask = (taskId: string): void => {
+    window.api.imageCompressionRemove(taskId).then((ok) => {
+      if (!ok) {
+        setStatusMessage(t('maxExpand.toolbox.fileCompression.messages.removeFailed'));
+        return;
+      }
+      setTasks((prev) => prev.filter((item) => item.id !== taskId));
+    }).catch(() => {
+      setStatusMessage(t('maxExpand.toolbox.fileCompression.messages.removeFailed'));
     });
   };
 
@@ -228,7 +272,7 @@ export function FileCompressionToolSection({
                 <div className="settings-card-subtitle">
                   {t('maxExpand.toolbox.fileCompression.resultsSubtitle', {
                     success: successfulCount,
-                    total: results.length,
+                    total: tasks.length,
                   })}
                 </div>
               </div>
@@ -244,23 +288,32 @@ export function FileCompressionToolSection({
                   </div>
                 )}
 
-                {results.length === 0 && (
+                {tasks.length === 0 && (
                   <div className="settings-music-hint">{t('maxExpand.toolbox.fileCompression.resultsEmpty')}</div>
                 )}
 
-                {results.map((item) => (
-                  <div key={`${item.inputPath}-${item.outputPath}`} className="settings-card-subgroup download-task-card">
+                {tasks.map((item) => (
+                  <div key={item.id} className="settings-card-subgroup download-task-card">
                     <div className="download-task-card-header">
-                      <div className="settings-card-subgroup-title">{getFileName(item.inputPath)}</div>
-                      {item.success && (
+                      <div className="settings-card-subgroup-title">{item.fileName || getFileName(item.inputPath)}</div>
+                      <div className="settings-hotkey-row download-task-actions">
+                        {item.success && (
+                          <button
+                            className="settings-lyrics-source-btn"
+                            type="button"
+                            onClick={() => handleOpenPath(item.outputPath)}
+                          >
+                            {t('maxExpand.toolbox.fileCompression.openOutput')}
+                          </button>
+                        )}
                         <button
                           className="settings-lyrics-source-btn"
                           type="button"
-                          onClick={() => handleOpenPath(item.outputPath)}
+                          onClick={() => handleRemoveTask(item.id)}
                         >
-                          {t('maxExpand.toolbox.fileCompression.openOutput')}
+                          {t('maxExpand.toolbox.fileCompression.removeTask')}
                         </button>
-                      )}
+                      </div>
                     </div>
                     <div className="settings-music-hint">
                       {item.success
@@ -272,6 +325,14 @@ export function FileCompressionToolSection({
                         : t('maxExpand.toolbox.fileCompression.resultFailed', {
                           reason: item.error || '-',
                         })}
+                    </div>
+                    <div className="settings-music-hint">
+                      {t('maxExpand.toolbox.fileCompression.taskMeta', {
+                        status: item.status === 'completed'
+                          ? t('maxExpand.toolbox.fileCompression.status.completed')
+                          : t('maxExpand.toolbox.fileCompression.status.failed'),
+                        quality: item.quality,
+                      })}
                     </div>
                     {!!item.outputPath && <div className="settings-music-hint">{item.outputPath}</div>}
                   </div>

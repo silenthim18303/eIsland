@@ -24,9 +24,9 @@
  * @author 鸡哥
  */
 
-import { BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { spawn } from 'child_process';
-import { existsSync, mkdirSync, statSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, dirname, extname, join } from 'path';
 import { getFfmpegBinary } from '../../utils/ffmpegPath';
 
@@ -36,14 +36,86 @@ interface ImageCompressionStartPayload {
   quality?: unknown;
 }
 
+function sortTasks(tasks: ImageCompressionTaskResult[]): ImageCompressionTaskResult[] {
+  return tasks.slice().sort((a, b) => b.createdAt - a.createdAt);
+}
+
+function toPersistableTask(raw: unknown): ImageCompressionTaskResult | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const row = raw as Record<string, unknown>;
+  if (
+    typeof row.id !== 'string'
+    || typeof row.fileName !== 'string'
+    || typeof row.inputPath !== 'string'
+    || typeof row.outputPath !== 'string'
+    || typeof row.quality !== 'number'
+    || (row.status !== 'completed' && row.status !== 'failed')
+    || typeof row.success !== 'boolean'
+    || typeof row.originalBytes !== 'number'
+    || typeof row.compressedBytes !== 'number'
+    || typeof row.ratio !== 'number'
+    || typeof row.createdAt !== 'number'
+    || typeof row.updatedAt !== 'number'
+  ) {
+    return null;
+  }
+  return {
+    id: row.id,
+    fileName: row.fileName,
+    inputPath: row.inputPath,
+    outputPath: row.outputPath,
+    quality: row.quality,
+    status: row.status,
+    success: row.success,
+    originalBytes: row.originalBytes,
+    compressedBytes: row.compressedBytes,
+    ratio: row.ratio,
+    error: typeof row.error === 'string' ? row.error : undefined,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+  };
+}
+
+function loadPersistedTasks(storePath: string): ImageCompressionTaskResult[] {
+  try {
+    if (!existsSync(storePath)) return [];
+    const content = readFileSync(storePath, 'utf-8');
+    if (!content.trim()) return [];
+    const parsed = JSON.parse(content);
+    if (!Array.isArray(parsed)) return [];
+    const list = parsed
+      .map((item) => toPersistableTask(item))
+      .filter((item): item is ImageCompressionTaskResult => Boolean(item));
+    return sortTasks(list).slice(0, MAX_PERSISTED_TASKS);
+  } catch (error) {
+    console.error('[ImageCompression] load persisted tasks error:', error);
+    return [];
+  }
+}
+
+function savePersistedTasks(storePath: string, tasks: ImageCompressionTaskResult[]): void {
+  try {
+    mkdirSync(dirname(storePath), { recursive: true });
+    writeFileSync(storePath, JSON.stringify(sortTasks(tasks).slice(0, MAX_PERSISTED_TASKS), null, 2), 'utf-8');
+  } catch (error) {
+    console.error('[ImageCompression] save persisted tasks error:', error);
+  }
+}
+
 interface ImageCompressionTaskResult {
+  id: string;
+  fileName: string;
   inputPath: string;
   outputPath: string;
+  quality: number;
+  status: 'completed' | 'failed';
   success: boolean;
   originalBytes: number;
   compressedBytes: number;
   ratio: number;
   error?: string;
+  createdAt: number;
+  updatedAt: number;
 }
 
 interface ImageCompressionStartResult {
@@ -53,6 +125,13 @@ interface ImageCompressionStartResult {
 }
 
 const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp', 'bmp']);
+const MAX_PERSISTED_TASKS = 200;
+const PERSIST_DEBOUNCE_MS = 500;
+let registered = false;
+
+function buildTaskId(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 function sanitizeQuality(raw: unknown): number {
   if (typeof raw !== 'number' || !Number.isFinite(raw)) return 80;
@@ -164,6 +243,49 @@ async function compressImage(inputPath: string, outputPath: string, quality: num
  * 注册图片压缩模块 IPC
  */
 export function registerImageCompressionIpcHandlers(): void {
+  if (registered) return;
+  registered = true;
+
+  const taskStorePath = join(app.getPath('userData'), 'eIsland_store', 'image-compression-tasks.json');
+  const taskSnapshotMap = new Map<string, ImageCompressionTaskResult>();
+  loadPersistedTasks(taskStorePath).forEach((task) => {
+    taskSnapshotMap.set(task.id, task);
+  });
+
+  let persistTimer: NodeJS.Timeout | null = null;
+  const persistSnapshots = (): void => {
+    const tasks = Array.from(taskSnapshotMap.values());
+    savePersistedTasks(taskStorePath, tasks);
+  };
+  const schedulePersist = (): void => {
+    if (persistTimer) clearTimeout(persistTimer);
+    persistTimer = setTimeout(() => {
+      persistTimer = null;
+      persistSnapshots();
+    }, PERSIST_DEBOUNCE_MS);
+  };
+
+  const upsertTaskSnapshot = (task: ImageCompressionTaskResult): void => {
+    taskSnapshotMap.set(task.id, task);
+    if (taskSnapshotMap.size <= MAX_PERSISTED_TASKS) return;
+    const trimmed = sortTasks(Array.from(taskSnapshotMap.values())).slice(0, MAX_PERSISTED_TASKS);
+    taskSnapshotMap.clear();
+    trimmed.forEach((item) => taskSnapshotMap.set(item.id, item));
+  };
+
+  const emitToRenderer = (task: ImageCompressionTaskResult): void => {
+    upsertTaskSnapshot(task);
+    schedulePersist();
+    BrowserWindow.getAllWindows().forEach((win) => {
+      if (win.isDestroyed()) return;
+      try {
+        win.webContents.send('image-compression:task-updated', task);
+      } catch {
+        // ignore
+      }
+    });
+  };
+
   ipcMain.handle('image-compression:pick-images', async (event) => {
     try {
       const win = BrowserWindow.fromWebContents(event.sender) ?? BrowserWindow.getFocusedWindow();
@@ -220,48 +342,75 @@ export function registerImageCompressionIpcHandlers(): void {
     const results: ImageCompressionTaskResult[] = [];
 
     for (const inputPath of inputPaths) {
+      const createdAt = Date.now();
+      const id = buildTaskId();
+      const fileName = basename(inputPath);
       let originalBytes = 0;
       try {
         originalBytes = statSync(inputPath).size;
       } catch {
-        results.push({
+        const failedTask: ImageCompressionTaskResult = {
+          id,
+          fileName,
           inputPath,
           outputPath: '',
+          quality,
+          status: 'failed',
           success: false,
           originalBytes: 0,
           compressedBytes: 0,
           ratio: 0,
           error: 'source file not found',
-        });
+          createdAt,
+          updatedAt: Date.now(),
+        };
+        results.push(failedTask);
+        emitToRenderer(failedTask);
         continue;
       }
 
       const ext = extname(inputPath).toLowerCase().replace('.', '');
       if (!IMAGE_EXTENSIONS.has(ext)) {
-        results.push({
+        const failedTask: ImageCompressionTaskResult = {
+          id,
+          fileName,
           inputPath,
           outputPath: '',
+          quality,
+          status: 'failed',
           success: false,
           originalBytes,
           compressedBytes: 0,
           ratio: 0,
           error: 'unsupported image format',
-        });
+          createdAt,
+          updatedAt: Date.now(),
+        };
+        results.push(failedTask);
+        emitToRenderer(failedTask);
         continue;
       }
 
       const outputPath = createOutputPath(inputPath, outputDir);
       const compressed = await compressImage(inputPath, outputPath, quality);
       if (!compressed.success) {
-        results.push({
+        const failedTask: ImageCompressionTaskResult = {
+          id,
+          fileName,
           inputPath,
           outputPath,
+          quality,
+          status: 'failed',
           success: false,
           originalBytes,
           compressedBytes: 0,
           ratio: 0,
           error: compressed.error || 'compression failed',
-        });
+          createdAt,
+          updatedAt: Date.now(),
+        };
+        results.push(failedTask);
+        emitToRenderer(failedTask);
         continue;
       }
 
@@ -269,32 +418,61 @@ export function registerImageCompressionIpcHandlers(): void {
       try {
         compressedBytes = statSync(outputPath).size;
       } catch {
-        results.push({
+        const failedTask: ImageCompressionTaskResult = {
+          id,
+          fileName,
           inputPath,
           outputPath,
+          quality,
+          status: 'failed',
           success: false,
           originalBytes,
           compressedBytes: 0,
           ratio: 0,
           error: 'output file not found',
-        });
+          createdAt,
+          updatedAt: Date.now(),
+        };
+        results.push(failedTask);
+        emitToRenderer(failedTask);
         continue;
       }
 
       const ratio = originalBytes > 0 ? (originalBytes - compressedBytes) / originalBytes : 0;
-      results.push({
+      const successTask: ImageCompressionTaskResult = {
+        id,
+        fileName,
         inputPath,
         outputPath,
+        quality,
+        status: 'completed',
         success: true,
         originalBytes,
         compressedBytes,
         ratio,
-      });
+        createdAt,
+        updatedAt: Date.now(),
+      };
+      results.push(successTask);
+      emitToRenderer(successTask);
     }
 
     return {
       ok: true,
       results,
     };
+  });
+
+  ipcMain.handle('image-compression:list', () => {
+    return sortTasks(Array.from(taskSnapshotMap.values()));
+  });
+
+  ipcMain.handle('image-compression:remove', (_event, taskId: unknown) => {
+    const id = typeof taskId === 'string' ? taskId.trim() : '';
+    if (!id) return false;
+    const existed = taskSnapshotMap.delete(id);
+    if (!existed) return false;
+    schedulePersist();
+    return true;
   });
 }
