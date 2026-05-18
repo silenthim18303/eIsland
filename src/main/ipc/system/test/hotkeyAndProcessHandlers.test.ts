@@ -1,0 +1,268 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+const { handleMock } = vi.hoisted(() => ({
+  handleMock: vi.fn(),
+}));
+
+const { writeFileSyncMock } = vi.hoisted(() => ({
+  writeFileSyncMock: vi.fn(),
+}));
+
+vi.mock('electron', () => ({
+  ipcMain: {
+    handle: handleMock,
+  },
+}));
+
+vi.mock('fs', () => ({
+  writeFileSync: writeFileSyncMock,
+}));
+
+import { registerHotkeyIpcHandlers } from '../hotkey';
+import { registerScreenshotHotkeyIpcHandlers } from '../screenshotHotkey';
+import { registerHideProcessIpcHandlers } from '../hideProcess';
+
+describe('system hotkey and hide-process ipc handlers', () => {
+  const handlers = new Map<string, (...args: unknown[]) => unknown>();
+
+  const createHotkeyOptions = () => {
+    const registerHideHotkey = vi.fn(() => true);
+    const registerQuitHotkey = vi.fn(() => true);
+    const registerNextSongHotkey = vi.fn(() => true);
+    const registerPlayPauseSongHotkey = vi.fn(() => true);
+    const registerResetPositionHotkey = vi.fn(() => true);
+    const registerToggleTrayHotkey = vi.fn(() => true);
+    const registerShowSettingsWindowHotkey = vi.fn(() => true);
+    const registerOpenClipboardHistoryHotkey = vi.fn(() => true);
+    const registerTogglePassthroughHotkey = vi.fn(() => true);
+    const registerToggleUiLockHotkey = vi.fn(() => true);
+    const registerAgentVoiceInputHotkey = vi.fn(() => true);
+    const suspendIslandHotkeys = vi.fn();
+    const resumeIslandHotkeys = vi.fn();
+
+    return {
+      options: {
+        storeDir: 'C:/store',
+        hideHotkeyStoreKey: 'hide',
+        quitHotkeyStoreKey: 'quit',
+        nextSongHotkeyStoreKey: 'next',
+        playPauseSongHotkeyStoreKey: 'pp',
+        resetPositionHotkeyStoreKey: 'reset',
+        toggleTrayHotkeyStoreKey: 'tray',
+        showSettingsWindowHotkeyStoreKey: 'settings',
+        openClipboardHistoryHotkeyStoreKey: 'clipboard',
+        togglePassthroughHotkeyStoreKey: 'passthrough',
+        toggleUiLockHotkeyStoreKey: 'uilock',
+        agentVoiceInputHotkeyStoreKey: 'agentVoice',
+        getCurrentHideHotkey: () => 'Ctrl+Alt+H',
+        getCurrentQuitHotkey: () => 'Ctrl+Alt+Q',
+        getCurrentScreenshotHotkey: () => 'Ctrl+Shift+S',
+        getCurrentNextSongHotkey: () => 'Ctrl+Alt+N',
+        getCurrentPlayPauseSongHotkey: () => 'Ctrl+Alt+P',
+        getCurrentResetPositionHotkey: () => 'Ctrl+Alt+R',
+        getCurrentToggleTrayHotkey: () => 'Ctrl+Alt+T',
+        getCurrentShowSettingsWindowHotkey: () => 'Ctrl+Alt+W',
+        getCurrentOpenClipboardHistoryHotkey: () => 'Ctrl+Alt+C',
+        getCurrentTogglePassthroughHotkey: () => 'Ctrl+Alt+M',
+        getCurrentToggleUiLockHotkey: () => 'Ctrl+Alt+L',
+        getCurrentAgentVoiceInputHotkey: () => 'Ctrl+Alt+V',
+        readHideHotkeyConfig: () => 'Alt+1',
+        readQuitHotkeyConfig: () => 'Alt+2',
+        readScreenshotHotkeyConfig: () => 'Alt+3',
+        readNextSongHotkeyConfig: () => 'Alt+4',
+        readPlayPauseSongHotkeyConfig: () => 'Alt+5',
+        readResetPositionHotkeyConfig: () => 'Alt+6',
+        readToggleTrayHotkeyConfig: () => 'Alt+7',
+        readShowSettingsWindowHotkeyConfig: () => 'Alt+8',
+        readOpenClipboardHistoryHotkeyConfig: () => 'Alt+9',
+        readTogglePassthroughHotkeyConfig: () => 'Alt+0',
+        readToggleUiLockHotkeyConfig: () => 'Ctrl+Alt+L',
+        readAgentVoiceInputHotkeyConfig: () => 'Ctrl+Alt+V',
+        registerHideHotkey,
+        registerQuitHotkey,
+        registerNextSongHotkey,
+        registerPlayPauseSongHotkey,
+        registerResetPositionHotkey,
+        registerToggleTrayHotkey,
+        registerShowSettingsWindowHotkey,
+        registerOpenClipboardHistoryHotkey,
+        registerTogglePassthroughHotkey,
+        registerToggleUiLockHotkey,
+        registerAgentVoiceInputHotkey,
+        suspendIslandHotkeys,
+        resumeIslandHotkeys,
+      },
+      refs: {
+        registerHideHotkey,
+        registerQuitHotkey,
+        registerNextSongHotkey,
+        registerPlayPauseSongHotkey,
+        registerResetPositionHotkey,
+        registerToggleTrayHotkey,
+        registerShowSettingsWindowHotkey,
+        registerOpenClipboardHistoryHotkey,
+        registerTogglePassthroughHotkey,
+        registerToggleUiLockHotkey,
+        registerAgentVoiceInputHotkey,
+        suspendIslandHotkeys,
+        resumeIslandHotkeys,
+      },
+    };
+  };
+
+  beforeEach(() => {
+    handlers.clear();
+    handleMock.mockReset();
+    writeFileSyncMock.mockReset();
+
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
+      handlers.set(channel, handler);
+    });
+  });
+
+  it('registers hotkey handlers and enforces conflict checks', () => {
+    const { options, refs } = createHotkeyOptions();
+    registerHotkeyIpcHandlers(options);
+
+    expect(handlers.get('hotkey:get')?.({})).toBe('Ctrl+Alt+H');
+
+    const setHide = handlers.get('hotkey:set');
+    expect(setHide?.({}, 'Ctrl+Alt+Q')).toBe(false);
+    expect(refs.registerHideHotkey).not.toHaveBeenCalled();
+
+    expect(setHide?.({}, 'Ctrl+Shift+H')).toBe(true);
+    expect(refs.registerHideHotkey).toHaveBeenCalledWith('Ctrl+Shift+H');
+    expect(writeFileSyncMock).toHaveBeenCalled();
+
+    const setUiLock = handlers.get('toggle-ui-lock-hotkey:set');
+    expect(setUiLock?.({}, 'Ctrl+Alt+M')).toBe(false);
+    expect(refs.registerToggleUiLockHotkey).not.toHaveBeenCalled();
+
+    const setAgentVoice = handlers.get('agent-voice-input-hotkey:set');
+    expect(setAgentVoice?.({}, 'Ctrl+Shift+V')).toBe(true);
+    expect(refs.registerAgentVoiceInputHotkey).toHaveBeenCalledWith('Ctrl+Shift+V');
+
+    expect(handlers.get('hotkey:suspend')?.({})).toBe(true);
+    expect(handlers.get('hotkey:resume')?.({})).toBe(true);
+    expect(refs.suspendIslandHotkeys).toHaveBeenCalledTimes(1);
+    expect(refs.resumeIslandHotkeys).toHaveBeenCalledTimes(1);
+  });
+
+  it('handles additional hotkey channels set/get and non-persist on register failure', () => {
+    const { options, refs } = createHotkeyOptions();
+    registerHotkeyIpcHandlers(options);
+
+    expect(handlers.get('open-clipboard-history-hotkey:get')?.({})).toBe('Ctrl+Alt+C');
+    expect(handlers.get('toggle-tray-hotkey:get')?.({})).toBe('Ctrl+Alt+T');
+
+    const setClipboard = handlers.get('open-clipboard-history-hotkey:set');
+    expect(setClipboard?.({}, 'Ctrl+Alt+H')).toBe(false);
+    expect(refs.registerOpenClipboardHistoryHotkey).not.toHaveBeenCalled();
+
+    expect(setClipboard?.({}, 'Ctrl+Shift+C')).toBe(true);
+    expect(refs.registerOpenClipboardHistoryHotkey).toHaveBeenCalledWith('Ctrl+Shift+C');
+
+    refs.registerToggleTrayHotkey.mockReturnValueOnce(false);
+    const writesBefore = writeFileSyncMock.mock.calls.length;
+    const setTray = handlers.get('toggle-tray-hotkey:set');
+    expect(setTray?.({}, 'Ctrl+Shift+T')).toBe(false);
+    expect(refs.registerToggleTrayHotkey).toHaveBeenCalledWith('Ctrl+Shift+T');
+    expect(writeFileSyncMock.mock.calls.length).toBe(writesBefore);
+
+    const setQuit = handlers.get('quit-hotkey:set');
+    expect(setQuit?.({}, 'Ctrl+Shift+Q')).toBe(true);
+    expect(refs.registerQuitHotkey).toHaveBeenCalledWith('Ctrl+Shift+Q');
+  });
+
+  it('handles screenshot hotkey get/set with reserved guard', () => {
+    const registerScreenshotHotkey = vi.fn(() => true);
+    registerScreenshotHotkeyIpcHandlers({
+      storeDir: 'C:/store',
+      screenshotHotkeyStoreKey: 'screenshot',
+      getCurrentScreenshotHotkey: () => '',
+      readScreenshotHotkeyConfig: () => 'Ctrl+Shift+S',
+      getReservedHotkeys: () => ['Ctrl+Alt+Q', 'Ctrl+Shift+S'],
+      registerScreenshotHotkey,
+    });
+
+    expect(handlers.get('screenshot-hotkey:get')?.({})).toBe('Ctrl+Shift+S');
+
+    const setShot = handlers.get('screenshot-hotkey:set');
+    expect(setShot?.({}, 'Ctrl+Alt+Q')).toBe(false);
+    expect(registerScreenshotHotkey).not.toHaveBeenCalled();
+
+    expect(setShot?.({}, 'Ctrl+Shift+A')).toBe(true);
+    expect(registerScreenshotHotkey).toHaveBeenCalledWith('Ctrl+Shift+A');
+    expect(writeFileSyncMock).toHaveBeenCalled();
+
+    writeFileSyncMock.mockImplementationOnce(() => {
+      throw new Error('disk full');
+    });
+    expect(setShot?.({}, 'Ctrl+Shift+B')).toBe(true);
+  });
+
+  it('prefers current screenshot hotkey over stored config', () => {
+    registerScreenshotHotkeyIpcHandlers({
+      storeDir: 'C:/store',
+      screenshotHotkeyStoreKey: 'screenshot',
+      getCurrentScreenshotHotkey: () => 'Ctrl+Alt+S',
+      readScreenshotHotkeyConfig: () => 'Ctrl+Shift+S',
+      getReservedHotkeys: () => [],
+      registerScreenshotHotkey: vi.fn(() => true),
+    });
+
+    expect(handlers.get('screenshot-hotkey:get')?.({})).toBe('Ctrl+Alt+S');
+  });
+
+  it('handles hide-process list read/set success and error branches', async () => {
+    const setConfiguredHideProcessList = vi.fn();
+    const setAutoHideProcessList = vi.fn();
+    const sanitizeProcessNameList = vi.fn((list: string[]) => list.filter(Boolean).map((x) => x.toLowerCase()));
+    const checkAutoHideProcessList = vi.fn(async () => {});
+
+    registerHideProcessIpcHandlers({
+      storeDir: 'C:/store',
+      hideProcessListStoreKey: 'hideList',
+      getConfiguredHideProcessList: () => ['wechat.exe'],
+      setConfiguredHideProcessList,
+      setAutoHideProcessList,
+      sanitizeProcessNameList,
+      checkAutoHideProcessList,
+    });
+
+    expect(handlers.get('hide-process-list:get')?.({})).toEqual(['wechat.exe']);
+
+    const setList = handlers.get('hide-process-list:set');
+    await expect(setList?.({}, ['A.EXE', '', 'B.EXE'])).resolves.toBe(true);
+    expect(sanitizeProcessNameList).toHaveBeenCalledWith(['A.EXE', '', 'B.EXE']);
+    expect(setAutoHideProcessList).toHaveBeenCalledWith(['a.exe', 'b.exe']);
+    expect(setConfiguredHideProcessList).toHaveBeenCalledWith(['a.exe', 'b.exe']);
+    expect(writeFileSyncMock).toHaveBeenCalled();
+    if (process.platform === 'win32') {
+      expect(checkAutoHideProcessList).toHaveBeenCalled();
+    }
+
+    writeFileSyncMock.mockImplementationOnce(() => {
+      throw new Error('persist failed');
+    });
+    await expect(setList?.({}, ['X.EXE'])).resolves.toBe(false);
+  });
+
+  it('normalizes invalid hide-process payload to empty list', async () => {
+    const sanitizeProcessNameList = vi.fn(() => []);
+
+    registerHideProcessIpcHandlers({
+      storeDir: 'C:/store',
+      hideProcessListStoreKey: 'hideList',
+      getConfiguredHideProcessList: () => [],
+      setConfiguredHideProcessList: vi.fn(),
+      setAutoHideProcessList: vi.fn(),
+      sanitizeProcessNameList,
+      checkAutoHideProcessList: vi.fn(async () => {}),
+    });
+
+    const setList = handlers.get('hide-process-list:set');
+    await expect(setList?.({}, null as never)).resolves.toBe(true);
+    expect(sanitizeProcessNameList).toHaveBeenCalledWith([]);
+  });
+});
