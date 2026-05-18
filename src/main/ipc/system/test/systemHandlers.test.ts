@@ -25,6 +25,7 @@
  */
 
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import * as si from 'systeminformation';
 
 const { handleMock, onMock } = vi.hoisted(() => ({
   handleMock: vi.fn(),
@@ -139,5 +140,88 @@ describe('system ipc handlers', () => {
 
     onHandlers.get('system:open-task-manager')?.();
     expect(execMock).toHaveBeenCalledWith('taskmgr');
+  });
+
+  it('does not open task manager on non-win32 and catches exec errors', () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    registerSystemIpcHandlers({
+      queryRunningNonSystemProcessNames: vi.fn(async () => []),
+      queryRunningNonSystemProcessesWithIcons: vi.fn(async () => []),
+      queryOpenWindowsWithIcons: vi.fn(async () => []),
+      queryFocusedWindow: vi.fn(async () => null),
+    });
+
+    Object.defineProperty(process, 'platform', {
+      value: 'linux',
+      configurable: true,
+    });
+    onHandlers.get('system:open-task-manager')?.();
+    expect(execMock).not.toHaveBeenCalled();
+
+    Object.defineProperty(process, 'platform', {
+      value: 'win32',
+      configurable: true,
+    });
+    execMock.mockImplementationOnce(() => {
+      throw new Error('boom');
+    });
+    onHandlers.get('system:open-task-manager')?.();
+    expect(consoleErrorSpy).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('returns empty process/window payloads on non-win32', async () => {
+    const queryRunningNonSystemProcessNames = vi.fn(async () => ['a.exe']);
+    const queryRunningNonSystemProcessesWithIcons = vi.fn(async () => [{ name: 'a.exe', iconDataUrl: null }]);
+    const queryOpenWindowsWithIcons = vi.fn(async () => [{ id: '1', title: 't', processName: 'a', processPath: null, processId: 1, iconDataUrl: null }]);
+    const queryFocusedWindow = vi.fn(async () => ({
+      id: '1', title: 't', processName: 'a', processPath: null, processId: 1, iconDataUrl: null,
+    }));
+
+    registerSystemIpcHandlers({
+      queryRunningNonSystemProcessNames,
+      queryRunningNonSystemProcessesWithIcons,
+      queryOpenWindowsWithIcons,
+      queryFocusedWindow,
+    });
+
+    Object.defineProperty(process, 'platform', {
+      value: 'linux',
+      configurable: true,
+    });
+
+    await expect(handleHandlers.get('system:running-processes:get')?.()).resolves.toEqual([]);
+    await expect(handleHandlers.get('system:running-processes:with-icons:get')?.()).resolves.toEqual([]);
+    await expect(handleHandlers.get('system:open-windows:with-icons:get')?.()).resolves.toEqual([]);
+    await expect(handleHandlers.get('system:focused-window:get')?.()).resolves.toBeNull();
+
+    expect(queryRunningNonSystemProcessNames).not.toHaveBeenCalled();
+    expect(queryRunningNonSystemProcessesWithIcons).not.toHaveBeenCalled();
+    expect(queryOpenWindowsWithIcons).not.toHaveBeenCalled();
+    expect(queryFocusedWindow).not.toHaveBeenCalled();
+  });
+
+  it('falls back safely when performance providers fail', async () => {
+    registerSystemIpcHandlers({
+      queryRunningNonSystemProcessNames: vi.fn(async () => []),
+      queryRunningNonSystemProcessesWithIcons: vi.fn(async () => []),
+      queryOpenWindowsWithIcons: vi.fn(async () => []),
+      queryFocusedWindow: vi.fn(async () => null),
+    });
+
+    vi.mocked(si.currentLoad).mockRejectedValueOnce(new Error('load fail'));
+    vi.mocked(si.graphics).mockRejectedValueOnce(new Error('gpu fail'));
+    vi.mocked(si.fsSize).mockRejectedValueOnce(new Error('fs fail'));
+
+    const snapshot = await handleHandlers.get('system:performance-snapshot:get')?.({}, {
+      cpu: 'cpu:999',
+      gpu: 'gpu:999',
+      disk: 'fs:999',
+    }) as PerformanceSnapshotAssertShape;
+
+    expect(snapshot.cpu.loadPercent).toBe(0);
+    expect(snapshot.gpu ?? null).toBeNull();
+    expect(snapshot.disk.totalBytes).toBe(0);
   });
 });
