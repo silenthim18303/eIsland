@@ -128,9 +128,16 @@ function indexedId(prefix: string, index: number): string {
   return `${prefix}:${index}`;
 }
 
+const INDEXED_ID_PATTERNS: Record<string, RegExp> = {
+  cpu: /^cpu:(\d+)$/,
+  gpu: /^gpu:(\d+)$/,
+  fs: /^fs:(\d+)$/,
+};
+
 function parseIndexedId(value: unknown, prefix: string, total: number): number | null {
   if (typeof value !== 'string') return null;
-  const match = value.match(new RegExp(`^${prefix}:(\\d+)$`));
+  const pattern = INDEXED_ID_PATTERNS[prefix] ?? new RegExp(`^${prefix}:(\\d+)$`);
+  const match = value.match(pattern);
   if (!match) return null;
   const index = Number(match[1]);
   return Number.isInteger(index) && index >= 0 && index < total ? index : null;
@@ -138,6 +145,71 @@ function parseIndexedId(value: unknown, prefix: string, total: number): number |
 
 function safeHardwareLabel(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+interface ThrottledCache<T> {
+  get(): Promise<T>;
+  reset(): void;
+}
+
+/**
+ * 构造带 TTL 和并发去重的异步缓存
+ * @description 仅在 fetcher 返回非 null/undefined 时延长 TTL；并发调用共享同一次请求
+ */
+function createThrottledCache<T>(fetcher: () => Promise<T>, ttlMs: number): ThrottledCache<T> {
+  let value: T | undefined;
+  let hasValue = false;
+  let expiresAt = 0;
+  let inFlight: Promise<T> | null = null;
+  return {
+    get(): Promise<T> {
+      const now = Date.now();
+      if (hasValue && now < expiresAt) return Promise.resolve(value as T);
+      if (inFlight) return inFlight;
+      const promise = fetcher().then((next) => {
+        value = next;
+        hasValue = true;
+        expiresAt = next === null || next === undefined ? 0 : Date.now() + ttlMs;
+        inFlight = null;
+        return next;
+      }).catch((err) => {
+        inFlight = null;
+        throw err;
+      });
+      inFlight = promise;
+      return promise;
+    },
+    reset(): void {
+      value = undefined;
+      hasValue = false;
+      expiresAt = 0;
+      inFlight = null;
+    },
+  };
+}
+
+const STATIC_TTL_MS = Number.POSITIVE_INFINITY;
+const GRAPHICS_TTL_MS = 4000;
+const CPU_TEMPERATURE_TTL_MS = 5000;
+const FS_SIZE_TTL_MS = 10000;
+const DISK_LAYOUT_TTL_MS = 30000;
+
+const cpuStaticCache = createThrottledCache<si.Systeminformation.CpuData | null>(() => si.cpu().catch(() => null), STATIC_TTL_MS);
+const graphicsCache = createThrottledCache<si.Systeminformation.GraphicsData | null>(() => si.graphics().catch(() => null), GRAPHICS_TTL_MS);
+const cpuTemperatureCache = createThrottledCache<si.Systeminformation.CpuTemperatureData | null>(() => si.cpuTemperature().catch(() => null), CPU_TEMPERATURE_TTL_MS);
+const fsSizeCache = createThrottledCache<si.Systeminformation.FsSizeData[]>(() => si.fsSize().catch(() => []), FS_SIZE_TTL_MS);
+const diskLayoutCache = createThrottledCache<si.Systeminformation.DiskLayoutData[]>(() => si.diskLayout().catch(() => []), DISK_LAYOUT_TTL_MS);
+
+/**
+ * 重置性能快照缓存
+ * @description 仅供测试代码在每个用例前隔离状态，业务代码不应调用
+ */
+export function resetPerformanceCachesForTesting(): void {
+  cpuStaticCache.reset();
+  graphicsCache.reset();
+  cpuTemperatureCache.reset();
+  fsSizeCache.reset();
+  diskLayoutCache.reset();
 }
 
 async function collectPerformanceSnapshot(selection: PerformanceHardwareSelection = {}): Promise<PerformanceSnapshot> {
@@ -150,22 +222,23 @@ async function collectPerformanceSnapshot(selection: PerformanceHardwareSelectio
     fsSizes,
     diskLayouts,
   ] = await Promise.all([
-    si.cpu().catch(() => null),
+    cpuStaticCache.get(),
     si.currentLoad().catch(() => null),
-    si.cpuTemperature().catch(() => null),
+    cpuTemperatureCache.get(),
     si.mem().catch(() => null),
-    si.graphics().catch(() => null),
-    si.fsSize().catch(() => []),
-    si.diskLayout().catch(() => []),
+    graphicsCache.get(),
+    fsSizeCache.get(),
+    diskLayoutCache.get(),
   ]);
 
+  const osCpus = os.cpus();
   const cpuLoadItems = Array.isArray(load?.cpus) ? load.cpus : [];
   const selectedCpuIndex = parseIndexedId(selection.cpu, 'cpu', cpuLoadItems.length);
   const cpuOptions: PerformanceHardwareOption[] = [
     { id: 'all', label: 'All CPU' },
     ...cpuLoadItems.map((_, index) => ({
       id: indexedId('cpu', index),
-      label: `CPU ${index + 1} · ${safeHardwareLabel(os.cpus()[index]?.model, 'Unknown CPU')}`,
+      label: `CPU ${index + 1} · ${safeHardwareLabel(osCpus[index]?.model, 'Unknown CPU')}`,
     })),
   ];
   const selectedCpuLoad = selectedCpuIndex === null ? load?.currentLoad : cpuLoadItems[selectedCpuIndex]?.load;
@@ -216,9 +289,9 @@ async function collectPerformanceSnapshot(selection: PerformanceHardwareSelectio
     },
     cpu: {
       manufacturer: cpu?.manufacturer || '',
-      brand: cpu?.brand || os.cpus()[0]?.model || '',
-      cores: cpu?.cores || os.cpus().length,
-      physicalCores: cpu?.physicalCores || cpu?.cores || os.cpus().length,
+      brand: cpu?.brand || osCpus[0]?.model || '',
+      cores: cpu?.cores || osCpus.length,
+      physicalCores: cpu?.physicalCores || cpu?.cores || osCpus.length,
       speedGhz: positiveNumber(cpu?.speed),
       speedMaxGhz: positiveNumber(cpu?.speedMax),
       loadPercent: clampPercent(selectedCpuLoad),

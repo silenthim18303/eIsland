@@ -180,7 +180,10 @@ export function PerformanceMonitorTab(): React.ReactElement {
     let cancelled = false;
     let delayTimer: number | undefined;
     let intervalTimer: number | undefined;
+    let inFlight = false;
     const loadSnapshot = (): void => {
+      if (cancelled || inFlight) return;
+      inFlight = true;
       window.api.getPerformanceSnapshot(hardwareSelection)
         .then((data) => {
           if (cancelled) return;
@@ -192,17 +195,41 @@ export function PerformanceMonitorTab(): React.ReactElement {
         .catch(() => {
           if (cancelled) return;
           setFailed(true);
+        })
+        .finally(() => {
+          inFlight = false;
         });
     };
-    delayTimer = window.setTimeout(() => {
+    const startPolling = (): void => {
+      if (cancelled || intervalTimer !== undefined) return;
       loadSnapshot();
       intervalTimer = window.setInterval(loadSnapshot, REFRESH_INTERVAL_MS);
+    };
+    const stopPolling = (): void => {
+      if (intervalTimer !== undefined) {
+        window.clearInterval(intervalTimer);
+        intervalTimer = undefined;
+      }
+    };
+    const handleVisibilityChange = (): void => {
+      if (cancelled) return;
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        startPolling();
+      }
+    };
+    delayTimer = window.setTimeout(() => {
+      if (cancelled) return;
+      if (!document.hidden) startPolling();
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }, START_FETCH_DELAY_MS);
     return () => {
       cancelled = true;
       if (snapshotRef.current) cachedPerformanceSnapshot = snapshotRef.current;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (delayTimer !== undefined) window.clearTimeout(delayTimer);
-      if (intervalTimer !== undefined) window.clearInterval(intervalTimer);
+      stopPolling();
     };
   }, [hardwareSelection]);
 

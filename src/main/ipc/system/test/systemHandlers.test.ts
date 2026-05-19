@@ -54,7 +54,7 @@ vi.mock('systeminformation', () => ({
   diskLayout: vi.fn(async () => [{ temperature: 42 }]),
 }));
 
-import { registerSystemIpcHandlers } from '../system';
+import { registerSystemIpcHandlers, resetPerformanceCachesForTesting } from '../system';
 
 describe('system ipc handlers', () => {
   const handleHandlers = new Map<string, (...args: unknown[]) => unknown>();
@@ -73,6 +73,7 @@ describe('system ipc handlers', () => {
       configurable: true,
     });
 
+    resetPerformanceCachesForTesting();
     handleHandlers.clear();
     onHandlers.clear();
     handleMock.mockReset();
