@@ -1,0 +1,179 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+type EventCallback = (...args: unknown[]) => void;
+
+const { handleMock, appGetPathMock } = vi.hoisted(() => ({
+  handleMock: vi.fn(),
+  appGetPathMock: vi.fn(),
+}));
+
+const {
+  existsSyncMock,
+  mkdirSyncMock,
+  readdirSyncMock,
+  statSyncMock,
+  unlinkSyncMock,
+  copyFileSyncMock,
+} = vi.hoisted(() => ({
+  existsSyncMock: vi.fn(),
+  mkdirSyncMock: vi.fn(),
+  readdirSyncMock: vi.fn(),
+  statSyncMock: vi.fn(),
+  unlinkSyncMock: vi.fn(),
+  copyFileSyncMock: vi.fn(),
+}));
+
+const { spawnMock } = vi.hoisted(() => ({
+  spawnMock: vi.fn(),
+}));
+
+const { getFfmpegBinaryMock } = vi.hoisted(() => ({
+  getFfmpegBinaryMock: vi.fn(),
+}));
+
+vi.mock('electron', () => ({
+  ipcMain: {
+    handle: handleMock,
+  },
+  app: {
+    getPath: appGetPathMock,
+  },
+}));
+
+vi.mock('fs', () => ({
+  existsSync: existsSyncMock,
+  mkdirSync: mkdirSyncMock,
+  readdirSync: readdirSyncMock,
+  statSync: statSyncMock,
+  unlinkSync: unlinkSyncMock,
+  copyFileSync: copyFileSyncMock,
+}));
+
+vi.mock('child_process', () => ({
+  spawn: spawnMock,
+}));
+
+vi.mock('../../../utils/ffmpegPath', () => ({
+  getFfmpegBinary: getFfmpegBinaryMock,
+}));
+
+import { registerWallpaperVideoIpcHandlers } from '../wallpaperVideo';
+
+function normalizePath(p: string): string {
+  return p.replace(/\\/g, '/');
+}
+
+function createSpawnProcess(exitCode = 0): {
+  stdout: { on: (event: string, cb: EventCallback) => void };
+  stderr: { on: (event: string, cb: EventCallback) => void };
+  on: (event: string, cb: EventCallback) => void;
+} {
+  const events = new Map<string, EventCallback>();
+  return {
+    stdout: {
+      on: (event, cb) => {
+        events.set(`stdout:${event}`, cb);
+      },
+    },
+    stderr: {
+      on: (event, cb) => {
+        events.set(`stderr:${event}`, cb);
+      },
+    },
+    on: (event, cb) => {
+      events.set(event, cb);
+      if (event === 'close') {
+        queueMicrotask(() => cb(exitCode));
+      }
+    },
+  };
+}
+
+describe('wallpaper video ipc handlers', () => {
+  const handlers = new Map<string, (...args: unknown[]) => unknown>();
+  const existingPaths = new Set<string>();
+
+  beforeEach(() => {
+    handlers.clear();
+    existingPaths.clear();
+
+    handleMock.mockReset();
+    appGetPathMock.mockReset();
+    existsSyncMock.mockReset();
+    mkdirSyncMock.mockReset();
+    readdirSyncMock.mockReset();
+    statSyncMock.mockReset();
+    unlinkSyncMock.mockReset();
+    copyFileSyncMock.mockReset();
+    spawnMock.mockReset();
+    getFfmpegBinaryMock.mockReset();
+
+    handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
+      handlers.set(channel, handler);
+    });
+
+    appGetPathMock.mockReturnValue('C:/user-data');
+    existsSyncMock.mockImplementation((targetPath: string) => existingPaths.has(normalizePath(targetPath)));
+    mkdirSyncMock.mockImplementation(() => undefined);
+    readdirSyncMock.mockReturnValue([]);
+    statSyncMock.mockImplementation(() => ({ isFile: () => false, mtimeMs: Date.now() }));
+    unlinkSyncMock.mockImplementation(() => undefined);
+    spawnMock.mockImplementation(() => createSpawnProcess(0));
+    getFfmpegBinaryMock.mockReturnValue('ffmpeg.exe');
+
+    registerWallpaperVideoIpcHandlers();
+  });
+
+  it('returns null when probe source path is invalid or not found', async () => {
+    const probeHandler = handlers.get('wallpaper:video:probe');
+
+    await expect(probeHandler?.({}, '')).resolves.toBeNull();
+    await expect(probeHandler?.({}, 'C:/in/not-found.mp4')).resolves.toBeNull();
+    expect(spawnMock).not.toHaveBeenCalled();
+  });
+
+  it('extracts cover and returns output path when ffmpeg succeeds', async () => {
+    const coverHandler = handlers.get('wallpaper:video:cover');
+    const sourcePath = 'C:/in/video demo.mp4';
+    existingPaths.add(normalizePath(sourcePath));
+
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(123456);
+    const expectedCoverPath = normalizePath('C:/user-data/wallpapers/video-cover/video_demo-123456.jpg');
+    existingPaths.add(expectedCoverPath);
+
+    await expect(coverHandler?.({}, sourcePath)).resolves.toEqual(expect.stringContaining('video_demo-123456.jpg'));
+
+    expect(spawnMock).toHaveBeenCalledWith(
+      'ffmpeg.exe',
+      expect.arrayContaining(['-i', sourcePath]),
+      expect.objectContaining({ windowsHide: true }),
+    );
+
+    nowSpy.mockRestore();
+  });
+
+  it('clears cache directories and ignores unlink errors', async () => {
+    const clearHandler = handlers.get('wallpaper:video:clear-cache');
+    const videoDir = 'C:/user-data/wallpapers/video';
+    const coverDir = 'C:/user-data/wallpapers/video-cover';
+
+    existingPaths.add(videoDir);
+    existingPaths.add(coverDir);
+
+    readdirSyncMock.mockImplementation((dirPath: string) => {
+      const normalized = normalizePath(dirPath);
+      if (normalized === videoDir) return ['a.mp4'];
+      if (normalized === coverDir) return ['a.jpg'];
+      return [];
+    });
+
+    unlinkSyncMock
+      .mockImplementationOnce(() => {
+        throw new Error('locked');
+      })
+      .mockImplementationOnce(() => undefined);
+
+    await expect(clearHandler?.({})).resolves.toBeUndefined();
+    expect(unlinkSyncMock).toHaveBeenCalledTimes(2);
+  });
+});
