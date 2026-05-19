@@ -205,7 +205,7 @@ describe('app download ipc handlers', () => {
       expect(remove?.({}, 'task-completed')).toBe(true);
       expect(remove?.({}, 'unknown-task')).toBe(false);
 
-      expect(list?.({})).toEqual([completedTask, resumedTask, downloadingTask]);
+      expect(list?.({})).toEqual([downloadingTask, resumedTask]);
       expect(get?.({}, 'task-resume')).toEqual(resumedTask);
       expect(get?.({}, '')).toBeNull();
 
