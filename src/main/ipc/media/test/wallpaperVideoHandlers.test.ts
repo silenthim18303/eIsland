@@ -176,4 +176,68 @@ describe('wallpaper video ipc handlers', () => {
     await expect(clearHandler?.({})).resolves.toBeUndefined();
     expect(unlinkSyncMock).toHaveBeenCalledTimes(2);
   });
+
+  it('falls back to copy mode in prepare when ffprobe is unavailable', async () => {
+    const prepareHandler = handlers.get('wallpaper:video:prepare');
+    const sourcePath = 'C:/in/video.mp4';
+    existingPaths.add(normalizePath(sourcePath));
+
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(777);
+    const expectedPlaybackPath = 'C:/user-data/wallpapers/video/video-777.mp4';
+
+    const result = await prepareHandler?.({}, { sourcePath });
+    expect(normalizePath(String((result as { playbackPath?: unknown }).playbackPath ?? ''))).toBe(expectedPlaybackPath);
+    expect(result).toEqual({
+      ok: true,
+      playbackPath: expect.any(String),
+      coverPath: null,
+      width: 0,
+      height: 0,
+      durationMs: 0,
+      frameRate: null,
+      videoCodec: null,
+      audioCodec: null,
+      container: null,
+      mode: 'copy',
+      ffmpegAvailable: false,
+      message: 'ffmpeg/ffprobe not available, source copied without transcoding',
+    });
+
+    expect(copyFileSyncMock).toHaveBeenCalledTimes(1);
+    const copyDestPath = String(copyFileSyncMock.mock.calls[0]?.[1] ?? '');
+    expect(normalizePath(copyDestPath)).toBe(expectedPlaybackPath);
+    expect(spawnMock).toHaveBeenCalledWith(
+      expect.stringContaining('ffprobe'),
+      expect.arrayContaining(['-show_streams', '-show_format', sourcePath]),
+      expect.objectContaining({ windowsHide: true }),
+    );
+    nowSpy.mockRestore();
+  });
+
+  it('returns failed prepare result when fallback copy throws', async () => {
+    const prepareHandler = handlers.get('wallpaper:video:prepare');
+    const sourcePath = 'C:/in/video.mp4';
+    existingPaths.add(normalizePath(sourcePath));
+
+    vi.spyOn(Date, 'now').mockReturnValue(888);
+    copyFileSyncMock.mockImplementationOnce(() => {
+      throw new Error('copy failed');
+    });
+
+    await expect(prepareHandler?.({}, { sourcePath })).resolves.toEqual({
+      ok: false,
+      playbackPath: null,
+      coverPath: null,
+      width: 0,
+      height: 0,
+      durationMs: 0,
+      frameRate: null,
+      videoCodec: null,
+      audioCodec: null,
+      container: null,
+      mode: 'copy',
+      ffmpegAvailable: false,
+      message: 'copy failed',
+    });
+  });
 });
