@@ -130,4 +130,30 @@ describe('registerThemeIpcHandlers', () => {
     const getHandler = handlers.get('theme:mode:get');
     expect(getHandler?.()).toBe('dark');
   });
+
+  it('returns persisted valid mode and falls back on read error', () => {
+    existsSyncMock.mockReturnValueOnce(true);
+    readFileSyncMock.mockReturnValueOnce(JSON.stringify('system'));
+
+    const getHandler = handlers.get('theme:mode:get');
+    expect(getHandler?.()).toBe('system');
+
+    existsSyncMock.mockReturnValueOnce(true);
+    readFileSyncMock.mockImplementationOnce(() => {
+      throw new Error('read failed');
+    });
+    expect(getHandler?.()).toBe('dark');
+  });
+
+  it('keeps valid mode when set to light', () => {
+    const setHandler = handlers.get('theme:mode:set');
+
+    expect(setHandler?.({ sender: { id: 8 } }, 'light')).toBe(true);
+    expect(writeFileSyncMock).toHaveBeenCalledWith(
+      expect.stringContaining('theme-mode.json'),
+      JSON.stringify('light', null, 2),
+      'utf-8'
+    );
+    expect(broadcastSettingChangeMock).toHaveBeenCalledWith(8, 'theme:mode', 'light');
+  });
 });
