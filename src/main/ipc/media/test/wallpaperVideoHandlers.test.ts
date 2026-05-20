@@ -228,7 +228,7 @@ describe('wallpaper video ipc handlers', () => {
       ok: false,
       playbackPath: null,
       coverPath: null,
-      width: 0,
+      width: 0, 
       height: 0,
       durationMs: 0,
       frameRate: null,
