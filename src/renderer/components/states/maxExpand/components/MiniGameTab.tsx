@@ -227,13 +227,16 @@ export function MiniGameTab(): ReactElement {
                       </div>
                       <div className="mg-score-details">
                         {myScore.bestDurationMs != null && (
-                          <span className="mg-score-detail">{t('miniGameTab.duration')}: {formatDuration(myScore.bestDurationMs)}</span>
+                          <span className="mg-score-detail-item">
+                            <span className="mg-score-detail-value">{formatDuration(myScore.bestDurationMs)}</span>
+                            <span className="mg-score-detail-label">{t('miniGameTab.duration')}</span>
+                          </span>
                         )}
                         {myScore.bestMoves != null && (
-                          <span className="mg-score-detail">{t('miniGameTab.moves')}: {myScore.bestMoves}</span>
-                        )}
-                        {myScore.playsCount != null && (
-                          <span className="mg-score-detail">{t('miniGameTab.plays')}: {myScore.playsCount}</span>
+                          <span className="mg-score-detail-item">
+                            <span className="mg-score-detail-value">{myScore.bestMoves}</span>
+                            <span className="mg-score-detail-label">{t('miniGameTab.moves')}</span>
+                          </span>
                         )}
                       </div>
                     </div>
