@@ -105,7 +105,9 @@ export function MiniGameTab(): ReactElement {
 
   const handleRefresh = (): void => {
     if (selectedGame) {
-      loadData(selectedGame);
+      flushPendingSubmissions().catch(() => {}).finally(() => {
+        loadData(selectedGame);
+      });
     }
   };
 
