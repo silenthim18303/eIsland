@@ -110,13 +110,13 @@ export function MiniGameTab(): ReactElement {
   };
 
   const handleGameEnd = useCallback((payload: Game2048EndPayload) => {
+    const refresh = (): void => { setTimeout(() => loadData(selectedGame), 1500); };
     reportNewBest(selectedGame, {
       score: payload.score,
       durationMs: payload.durationMs,
       moves: payload.moves,
       achievedAt: payload.achievedAt,
-    }).catch(() => {});
-    setTimeout(() => loadData(selectedGame), 500);
+    }).then(refresh, refresh);
   }, [selectedGame, loadData]);
 
   const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
