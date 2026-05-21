@@ -5408,3 +5408,176 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+.mg-panel-game-layout {
+  flex-direction: row !important;
+  gap: 16px;
+}
+
+.mg-game-area {
+  flex-shrink: 0;
+}
+
+.mg-info-sidebar {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+/* ==================== Game 2048 ==================== */
+
+.g2048-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.g2048-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.g2048-scores {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+
+.g2048-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  min-width: 60px;
+}
+
+.g2048-score-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(var(--color-text-rgb), 0.4);
+  letter-spacing: 0.3px;
+}
+
+.g2048-score-val {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(var(--color-text-rgb), 0.85);
+  font-variant-numeric: tabular-nums;
+}
+
+.g2048-new-btn {
+  appearance: none;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.g2048-new-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.g2048-board {
+  position: relative;
+  border-radius: 10px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  outline: none;
+  user-select: none;
+}
+
+.g2048-board:focus {
+  box-shadow: 0 0 0 2px rgba(100, 180, 255, 0.3);
+}
+
+.g2048-cell-bg {
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+}
+
+.g2048-tile {
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 20px;
+  z-index: 1;
+}
+
+.g2048-v2 { background: #eee4da; color: #776e65; }
+.g2048-v4 { background: #ede0c8; color: #776e65; }
+.g2048-v8 { background: #f2b179; color: #f9f6f2; }
+.g2048-v16 { background: #f59563; color: #f9f6f2; }
+.g2048-v32 { background: #f67c5f; color: #f9f6f2; }
+.g2048-v64 { background: #f65e3b; color: #f9f6f2; }
+.g2048-v128 { background: #edcf72; color: #f9f6f2; font-size: 18px; }
+.g2048-v256 { background: #edcc61; color: #f9f6f2; font-size: 18px; }
+.g2048-v512 { background: #edc850; color: #f9f6f2; font-size: 18px; }
+.g2048-v1024 { background: #edc53f; color: #f9f6f2; font-size: 15px; }
+.g2048-v2048 { background: #edc22e; color: #f9f6f2; font-size: 15px; }
+.g2048-v4096 { background: #3c3a32; color: #f9f6f2; font-size: 15px; }
+.g2048-v8192 { background: #3c3a32; color: #f9f6f2; font-size: 15px; }
+
+.g2048-pop {
+  animation: g2048Pop 0.15s ease;
+}
+
+.g2048-appear {
+  animation: g2048Appear 0.15s ease;
+}
+
+@keyframes g2048Pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes g2048Appear {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.g2048-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: rgba(238, 228, 218, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.g2048-overlay-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #776e65;
+}
+
+.g2048-footer {
+  width: 100%;
+}
+
+.g2048-hint {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.3);
+}

@@ -31,9 +31,11 @@ import {
   getMyScore,
   getLeaderboard,
   flushPendingSubmissions,
+  reportNewBest,
   type MiniGameScoreData,
   type MiniGameLeaderboardEntry,
 } from '../../../../api/miniGame/miniGameScoreApi';
+import { Game2048, type Game2048EndPayload } from './games/Game2048';
 
 interface GameEntry {
   id: string;
@@ -42,7 +44,7 @@ interface GameEntry {
 }
 
 const GAME_LIST: GameEntry[] = [
-  { id: '2048', labelKey: 'miniGameTab.games.2048', available: false },
+  { id: '2048', labelKey: 'miniGameTab.games.2048', available: true },
 ];
 
 /**
@@ -103,6 +105,16 @@ export function MiniGameTab(): ReactElement {
     }
   };
 
+  const handleGameEnd = useCallback((payload: Game2048EndPayload) => {
+    reportNewBest(selectedGame, {
+      score: payload.score,
+      durationMs: payload.durationMs,
+      moves: payload.moves,
+      achievedAt: payload.achievedAt,
+    }).catch(() => {});
+    setTimeout(() => loadData(selectedGame), 500);
+  }, [selectedGame, loadData]);
+
   const selectedEntry = GAME_LIST.find((g) => g.id === selectedGame);
 
   return (
@@ -132,90 +144,100 @@ export function MiniGameTab(): ReactElement {
             )}
           </div>
 
-          <div className="mg-panel-body">
-            {/* 未登录提示 */}
-            {!loggedIn && (
-              <div className="mg-notice">
-                <span className="mg-notice-text">{t('miniGameTab.loginRequired')}</span>
+          <div className="mg-panel-body mg-panel-game-layout">
+            {/* 游戏区域 */}
+            {selectedEntry?.available && selectedGame === '2048' && (
+              <div className="mg-game-area">
+                <Game2048 onGameEnd={handleGameEnd} />
               </div>
             )}
 
-            {/* 加载态 */}
-            {loggedIn && loading && (
-              <div className="mg-notice">
-                <span className="mg-notice-text">{t('miniGameTab.loading')}</span>
-              </div>
-            )}
+            {/* 信息侧栏 */}
+            <div className="mg-info-sidebar">
+              {/* 未登录提示 */}
+              {!loggedIn && (
+                <div className="mg-notice">
+                  <span className="mg-notice-text">{t('miniGameTab.loginRequired')}</span>
+                </div>
+              )}
 
-            {/* 错误态 */}
-            {loggedIn && !loading && error && (
-              <div className="mg-notice">
-                <span className="mg-notice-text">{error}</span>
-                <button className="settings-lyrics-source-btn" type="button" onClick={handleRefresh}>
-                  {t('miniGameTab.retry')}
-                </button>
-              </div>
-            )}
+              {/* 加载态 */}
+              {loggedIn && loading && (
+                <div className="mg-notice">
+                  <span className="mg-notice-text">{t('miniGameTab.loading')}</span>
+                </div>
+              )}
 
-            {/* 个人最高分卡片 */}
-            {loggedIn && !loading && !error && (
-              <div className="mg-section">
-                <div className="mg-section-header">
-                  <span className="mg-section-title">{t('miniGameTab.myBest')}</span>
-                  <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')}>
-                    ↻
+              {/* 错误态 */}
+              {loggedIn && !loading && error && (
+                <div className="mg-notice">
+                  <span className="mg-notice-text">{error}</span>
+                  <button className="settings-lyrics-source-btn" type="button" onClick={handleRefresh}>
+                    {t('miniGameTab.retry')}
                   </button>
                 </div>
-                {myScore ? (
-                  <div className="mg-score-card">
-                    <div className="mg-score-main">
-                      <span className="mg-score-value">{myScore.highScore.toLocaleString()}</span>
-                      <span className="mg-score-label">{t('miniGameTab.highScore')}</span>
-                    </div>
-                    <div className="mg-score-details">
-                      {myScore.bestDurationMs != null && (
-                        <span className="mg-score-detail">{t('miniGameTab.duration')}: {formatDuration(myScore.bestDurationMs)}</span>
-                      )}
-                      {myScore.bestMoves != null && (
-                        <span className="mg-score-detail">{t('miniGameTab.moves')}: {myScore.bestMoves}</span>
-                      )}
-                      {myScore.playsCount != null && (
-                        <span className="mg-score-detail">{t('miniGameTab.plays')}: {myScore.playsCount}</span>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mg-empty-hint">{t('miniGameTab.noRecord')}</div>
-                )}
-              </div>
-            )}
+              )}
 
-            {/* 排行榜 */}
-            {loggedIn && !loading && !error && (
-              <div className="mg-section">
-                <div className="mg-section-header">
-                  <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
-                </div>
-                {leaderboard.length > 0 ? (
-                  <div className="mg-leaderboard">
-                    <div className="mg-lb-header-row">
-                      <span className="mg-lb-rank">#</span>
-                      <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
-                      <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
-                    </div>
-                    {leaderboard.map((entry) => (
-                      <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
-                        <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
-                        <span className="mg-lb-user">{entry.userId}</span>
-                        <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
-                      </div>
-                    ))}
+              {/* 个人最高分卡片 */}
+              {loggedIn && !loading && !error && (
+                <div className="mg-section">
+                  <div className="mg-section-header">
+                    <span className="mg-section-title">{t('miniGameTab.myBest')}</span>
+                    <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')}>
+                      ↻
+                    </button>
                   </div>
-                ) : (
-                  <div className="mg-empty-hint">{t('miniGameTab.lbEmpty')}</div>
-                )}
-              </div>
-            )}
+                  {myScore ? (
+                    <div className="mg-score-card">
+                      <div className="mg-score-main">
+                        <span className="mg-score-value">{myScore.highScore.toLocaleString()}</span>
+                        <span className="mg-score-label">{t('miniGameTab.highScore')}</span>
+                      </div>
+                      <div className="mg-score-details">
+                        {myScore.bestDurationMs != null && (
+                          <span className="mg-score-detail">{t('miniGameTab.duration')}: {formatDuration(myScore.bestDurationMs)}</span>
+                        )}
+                        {myScore.bestMoves != null && (
+                          <span className="mg-score-detail">{t('miniGameTab.moves')}: {myScore.bestMoves}</span>
+                        )}
+                        {myScore.playsCount != null && (
+                          <span className="mg-score-detail">{t('miniGameTab.plays')}: {myScore.playsCount}</span>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mg-empty-hint">{t('miniGameTab.noRecord')}</div>
+                  )}
+                </div>
+              )}
+
+              {/* 排行榜 */}
+              {loggedIn && !loading && !error && (
+                <div className="mg-section">
+                  <div className="mg-section-header">
+                    <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
+                  </div>
+                  {leaderboard.length > 0 ? (
+                    <div className="mg-leaderboard">
+                      <div className="mg-lb-header-row">
+                        <span className="mg-lb-rank">#</span>
+                        <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
+                        <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
+                      </div>
+                      {leaderboard.map((entry) => (
+                        <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
+                          <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
+                          <span className="mg-lb-user">{entry.userId}</span>
+                          <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mg-empty-hint">{t('miniGameTab.lbEmpty')}</div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

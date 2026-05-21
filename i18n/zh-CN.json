@@ -925,7 +925,15 @@
     "leaderboard": "排行榜",
     "lbUser": "用户",
     "lbScore": "分数",
-    "lbEmpty": "暂无排行数据"
+    "lbEmpty": "暂无排行数据",
+    "game2048": {
+      "score": "分数",
+      "best": "最高",
+      "newGame": "新游戏",
+      "gameOver": "游戏结束",
+      "tryAgain": "再来一局",
+      "hint": "使用方向键或 WASD 滑动方块"
+    }
   },
   "maxExpand": {
     "loading": "正在加载最大展开界面...",

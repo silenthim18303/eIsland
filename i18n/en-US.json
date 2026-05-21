@@ -925,7 +925,15 @@
     "leaderboard": "Leaderboard",
     "lbUser": "User",
     "lbScore": "Score",
-    "lbEmpty": "No leaderboard data yet"
+    "lbEmpty": "No leaderboard data yet",
+    "game2048": {
+      "score": "Score",
+      "best": "Best",
+      "newGame": "New Game",
+      "gameOver": "Game Over",
+      "tryAgain": "Try Again",
+      "hint": "Use arrow keys or WASD to slide tiles"
+    }
   },
   "maxExpand": {
     "loading": "Loading max expand view...",
