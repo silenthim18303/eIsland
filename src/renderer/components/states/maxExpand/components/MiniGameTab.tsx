@@ -59,7 +59,6 @@ export function MiniGameTab(): ReactElement {
   const [leaderboard, setLeaderboard] = useState<MiniGameLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [gameState, setGameState] = useState<Game2048State>({ score: 0, best: 0, over: false, moveCount: 0 });
   const gameRef = useRef<Game2048Handle>(null);
 
@@ -229,33 +228,29 @@ export function MiniGameTab(): ReactElement {
                 </div>
               )}
 
-              {/* 排行榜（按钮切换显隐） */}
+              {/* 排行榜（始终显示） */}
               {loggedIn && !loading && !error && (
-                <div className="mg-section">
+                <div className="mg-section mg-section-scroll">
                   <div className="mg-section-header">
-                    <button className="mg-toggle-btn" type="button" onClick={() => setShowLeaderboard(v => !v)}>
-                      {t('miniGameTab.leaderboard')} {showLeaderboard ? '▾' : '▸'}
-                    </button>
+                    <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
                   </div>
-                  {showLeaderboard && (
-                    leaderboard.length > 0 ? (
-                      <div className="mg-leaderboard">
-                        <div className="mg-lb-header-row">
-                          <span className="mg-lb-rank">#</span>
-                          <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
-                          <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
-                        </div>
-                        {leaderboard.map((entry) => (
-                          <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
-                            <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
-                            <span className="mg-lb-user">{entry.userId}</span>
-                            <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
-                          </div>
-                        ))}
+                  {leaderboard.length > 0 ? (
+                    <div className="mg-leaderboard">
+                      <div className="mg-lb-header-row">
+                        <span className="mg-lb-rank">#</span>
+                        <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
+                        <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
                       </div>
-                    ) : (
-                      <div className="mg-empty-hint">{t('miniGameTab.lbEmpty')}</div>
-                    )
+                      {leaderboard.map((entry) => (
+                        <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
+                          <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
+                          <span className="mg-lb-user">{entry.userId}</span>
+                          <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mg-empty-hint">{t('miniGameTab.lbEmpty')}</div>
                   )}
                 </div>
               )}

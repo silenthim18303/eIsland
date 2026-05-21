@@ -5428,27 +5428,14 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;
+  overflow: hidden;
   max-height: 100%;
-  justify-content: center;
-  padding-left: 16px;
 }
 
-.mg-toggle-btn {
-  appearance: none;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(var(--color-text-rgb), 0.55);
-  padding: 2px 0;
-  transition: color 0.15s;
-  font-family: inherit;
-}
-
-.mg-toggle-btn:hover {
-  color: rgba(var(--color-text-rgb), 0.85);
+.mg-section-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* ==================== Game 2048 ==================== */
