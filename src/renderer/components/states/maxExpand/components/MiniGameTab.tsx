@@ -122,6 +122,7 @@ export function MiniGameTab(): ReactElement {
   }, [selectedGame, loadData]);
 
   const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
+  const myRank = myScore ? (leaderboard.find((entry) => entry.userId === myScore.userId)?.rank ?? null) : null;
 
   const selectedEntry = GAME_LIST.find((g) => g.id === selectedGame);
   const gameAvailable = selectedEntry?.available && selectedGame === '2048';
@@ -253,6 +254,7 @@ export function MiniGameTab(): ReactElement {
                 <div className="mg-section mg-section-scroll">
                   <div className="mg-section-header">
                     <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
+                    <span className="mg-my-rank">{t('miniGameTab.myRank')}: {myRank ?? t('miniGameTab.rankUnavailable')}</span>
                   </div>
                   {leaderboard.length > 0 ? (
                     <div className="mg-leaderboard">
@@ -261,7 +263,7 @@ export function MiniGameTab(): ReactElement {
                         <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
                         <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
                       </div>
-                      {leaderboard.map((entry) => (
+                      {leaderboard.slice(0, 3).map((entry) => (
                         <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
                           <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
                           <span className="mg-lb-user">

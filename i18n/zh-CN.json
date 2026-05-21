@@ -923,6 +923,8 @@
     "plays": "游玩次数",
     "noRecord": "暂无记录",
     "leaderboard": "排行榜",
+    "myRank": "您的排名",
+    "rankUnavailable": "未上榜",
     "lbUser": "用户",
     "lbScore": "分数",
     "lbEmpty": "暂无排行数据",

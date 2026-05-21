@@ -923,6 +923,8 @@
     "plays": "Plays",
     "noRecord": "No records yet",
     "leaderboard": "Leaderboard",
+    "myRank": "Your Rank",
+    "rankUnavailable": "Unranked",
     "lbUser": "User",
     "lbScore": "Score",
     "lbEmpty": "No leaderboard data yet",
