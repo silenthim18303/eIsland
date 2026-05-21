@@ -264,7 +264,14 @@ export function MiniGameTab(): ReactElement {
                       {leaderboard.map((entry) => (
                         <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
                           <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
-                          <span className="mg-lb-user">{entry.userId}</span>
+                          <span className="mg-lb-user">
+                            <span className="mg-lb-user-meta">
+                              {entry.avatar
+                                ? <img className="mg-lb-user-avatar" src={entry.avatar} alt={entry.username ?? String(entry.userId)} />
+                                : <span className="mg-lb-user-avatar-placeholder">{(entry.username || String(entry.userId)).slice(0, 1)}</span>}
+                              <span className="mg-lb-user-name">{entry.username ?? entry.userId}</span>
+                            </span>
+                          </span>
                           <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
                         </div>
                       ))}

@@ -41,6 +41,8 @@ export interface MiniGameScoreData {
 export interface MiniGameLeaderboardEntry {
   rank: number;
   userId: number;
+  username?: string;
+  avatar?: string | null;
   highScore: number;
   bestDurationMs?: number;
   bestMoves?: number;
