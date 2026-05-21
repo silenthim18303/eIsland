@@ -5568,7 +5568,16 @@
 .g2048-overlay-text {
   font-size: 18px;
   font-weight: 700;
-  color: #776e65;
+  color: #000;
+}
+
+.g2048-overlay .settings-lyrics-source-btn {
+  color: #000;
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.g2048-overlay .settings-lyrics-source-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .g2048-footer {
