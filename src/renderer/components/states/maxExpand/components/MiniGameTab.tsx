@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
 import {
@@ -35,7 +35,7 @@ import {
   type MiniGameScoreData,
   type MiniGameLeaderboardEntry,
 } from '../../../../api/miniGame/miniGameScoreApi';
-import { Game2048, type Game2048EndPayload } from './games/Game2048';
+import { Game2048, type Game2048EndPayload, type Game2048Handle, type Game2048State } from './games/Game2048';
 
 interface GameEntry {
   id: string;
@@ -59,6 +59,9 @@ export function MiniGameTab(): ReactElement {
   const [leaderboard, setLeaderboard] = useState<MiniGameLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [gameState, setGameState] = useState<Game2048State>({ score: 0, best: 0, over: false, moveCount: 0 });
+  const gameRef = useRef<Game2048Handle>(null);
 
   const loadData = useCallback(async (gameId: string) => {
     const token = readLocalToken();
@@ -115,7 +118,10 @@ export function MiniGameTab(): ReactElement {
     setTimeout(() => loadData(selectedGame), 500);
   }, [selectedGame, loadData]);
 
+  const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
+
   const selectedEntry = GAME_LIST.find((g) => g.id === selectedGame);
+  const gameAvailable = selectedEntry?.available && selectedGame === '2048';
 
   return (
     <div className="max-expand-settings toolbox-tab-container">
@@ -145,15 +151,27 @@ export function MiniGameTab(): ReactElement {
           </div>
 
           <div className="mg-panel-body mg-panel-game-layout">
-            {/* 游戏区域 */}
-            {selectedEntry?.available && selectedGame === '2048' && (
+            {/* 游戏棋盘（纯净，无上下控件） */}
+            {gameAvailable && (
               <div className="mg-game-area">
-                <Game2048 onGameEnd={handleGameEnd} />
+                <Game2048 ref={gameRef} onGameEnd={handleGameEnd} onStateChange={handleGameState} />
               </div>
             )}
 
-            {/* 信息侧栏 */}
+            {/* 右侧信息面板 */}
             <div className="mg-info-sidebar">
+              {/* 游戏说明 + 分数 + 新游戏（同行） */}
+              {gameAvailable && (
+                <div className="mg-section">
+                  <span className="g2048-hint">{t('miniGameTab.game2048.hint')}</span>
+                  <div className="g2048-score-row">
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.score')}</span><span className="g2048-score-val">{gameState.score}</span></div>
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.best')}</span><span className="g2048-score-val">{gameState.best}</span></div>
+                    <button className="g2048-new-btn" type="button" onClick={() => gameRef.current?.newGame()}>{t('miniGameTab.game2048.newGame')}</button>
+                  </div>
+                </div>
+              )}
+
               {/* 未登录提示 */}
               {!loggedIn && (
                 <div className="mg-notice">
@@ -211,29 +229,33 @@ export function MiniGameTab(): ReactElement {
                 </div>
               )}
 
-              {/* 排行榜 */}
+              {/* 排行榜（按钮切换显隐） */}
               {loggedIn && !loading && !error && (
                 <div className="mg-section">
                   <div className="mg-section-header">
-                    <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
+                    <button className="mg-toggle-btn" type="button" onClick={() => setShowLeaderboard(v => !v)}>
+                      {t('miniGameTab.leaderboard')} {showLeaderboard ? '▾' : '▸'}
+                    </button>
                   </div>
-                  {leaderboard.length > 0 ? (
-                    <div className="mg-leaderboard">
-                      <div className="mg-lb-header-row">
-                        <span className="mg-lb-rank">#</span>
-                        <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
-                        <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
-                      </div>
-                      {leaderboard.map((entry) => (
-                        <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
-                          <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
-                          <span className="mg-lb-user">{entry.userId}</span>
-                          <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
+                  {showLeaderboard && (
+                    leaderboard.length > 0 ? (
+                      <div className="mg-leaderboard">
+                        <div className="mg-lb-header-row">
+                          <span className="mg-lb-rank">#</span>
+                          <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
+                          <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="mg-empty-hint">{t('miniGameTab.lbEmpty')}</div>
+                        {leaderboard.map((entry) => (
+                          <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
+                            <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
+                            <span className="mg-lb-user">{entry.userId}</span>
+                            <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mg-empty-hint">{t('miniGameTab.lbEmpty')}</div>
+                    )
                   )}
                 </div>
               )}

@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const SIZE = 4;
@@ -40,7 +40,9 @@ interface MoveResult { tiles: TileData[]; merges: MergeInfo[]; scoreGained: numb
 type Dir = 'left' | 'right' | 'up' | 'down';
 
 export interface Game2048EndPayload { score: number; durationMs: number; moves: number; achievedAt: number; }
-export interface Game2048Props { onGameEnd?: (payload: Game2048EndPayload) => void; }
+export interface Game2048State { score: number; best: number; over: boolean; moveCount: number; }
+export interface Game2048Handle { newGame: () => void; }
+export interface Game2048Props { onGameEnd?: (payload: Game2048EndPayload) => void; onStateChange?: (state: Game2048State) => void; }
 
 let tileSeq = 1;
 
@@ -117,7 +119,7 @@ function initTiles(): TileData[] {
   return arr;
 }
 
-export function Game2048({ onGameEnd }: Game2048Props): ReactElement {
+export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2048({ onGameEnd, onStateChange }, fwdRef): ReactElement {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [tiles, setTiles] = useState<TileData[]>(initTiles);
@@ -139,8 +141,11 @@ export function Game2048({ onGameEnd }: Game2048Props): ReactElement {
     setNewId(null);
     setMoveCount(0);
     startRef.current = 0;
+    onStateChange?.({ score: 0, best, over: false, moveCount: 0 });
     ref.current?.focus();
-  }, []);
+  }, [best, onStateChange]);
+
+  useImperativeHandle(fwdRef, () => ({ newGame }), [newGame]);
 
   const doMove = useCallback((dir: Dir) => {
     if (movingRef.current || over) return;
@@ -160,12 +165,16 @@ export function Game2048({ onGameEnd }: Game2048Props): ReactElement {
       setTiles(resolved);
       const ns = score + result.scoreGained;
       setScore(ns);
+      const nm = moveCount + 1;
       setMoveCount(c => c + 1);
+      const nb = Math.max(ns, best);
       if (ns > best) setBest(ns);
-      if (!canMove(resolved)) {
+      const isOver = !canMove(resolved);
+      if (isOver) {
         setOver(true);
-        onGameEnd?.({ score: ns, durationMs: Date.now() - startRef.current, moves: moveCount + 1, achievedAt: Date.now() });
+        onGameEnd?.({ score: ns, durationMs: Date.now() - startRef.current, moves: nm, achievedAt: Date.now() });
       }
+      onStateChange?.({ score: ns, best: nb, over: isOver, moveCount: nm });
       setTimeout(() => { setMergedIds(new Set()); setNewId(null); movingRef.current = false; }, 150);
     }, SLIDE_MS);
   }, [tiles, score, best, over, moveCount, onGameEnd]);
@@ -186,37 +195,25 @@ export function Game2048({ onGameEnd }: Game2048Props): ReactElement {
   const pos = (row: number, col: number) => ({ left: PAD + col * (CELL + GAP), top: PAD + row * (CELL + GAP) });
 
   return (
-    <div className="g2048-wrap">
-      <div className="g2048-header">
-        <div className="g2048-scores">
-          <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.score')}</span><span className="g2048-score-val">{score}</span></div>
-          <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.best')}</span><span className="g2048-score-val">{best}</span></div>
+    <div className="g2048-board" ref={ref} tabIndex={0} style={{ width: BOARD, height: BOARD }}>
+      {Array.from({ length: SIZE * SIZE }, (_, i) => (
+        <div key={`bg${i}`} className="g2048-cell-bg" style={{ ...pos(Math.floor(i / SIZE), i % SIZE), width: CELL, height: CELL, position: 'absolute' }} />
+      ))}
+      {tiles.map(tile => (
+        <div
+          key={tile.id}
+          className={`g2048-tile g2048-v${Math.min(tile.value, 8192)}${mergedIds.has(tile.id) ? ' g2048-pop' : ''}${tile.id === newId ? ' g2048-appear' : ''}`}
+          style={{ ...pos(tile.row, tile.col), width: CELL, height: CELL, position: 'absolute', transition: `top ${SLIDE_MS}ms ease, left ${SLIDE_MS}ms ease` }}
+        >
+          {tile.value}
         </div>
-        <button className="g2048-new-btn" type="button" onClick={newGame}>{t('miniGameTab.game2048.newGame')}</button>
-      </div>
-      <div className="g2048-board" ref={ref} tabIndex={0} style={{ width: BOARD, height: BOARD }}>
-        {Array.from({ length: SIZE * SIZE }, (_, i) => (
-          <div key={`bg${i}`} className="g2048-cell-bg" style={{ ...pos(Math.floor(i / SIZE), i % SIZE), width: CELL, height: CELL, position: 'absolute' }} />
-        ))}
-        {tiles.map(tile => (
-          <div
-            key={tile.id}
-            className={`g2048-tile g2048-v${Math.min(tile.value, 8192)}${mergedIds.has(tile.id) ? ' g2048-pop' : ''}${tile.id === newId ? ' g2048-appear' : ''}`}
-            style={{ ...pos(tile.row, tile.col), width: CELL, height: CELL, position: 'absolute', transition: `top ${SLIDE_MS}ms ease, left ${SLIDE_MS}ms ease` }}
-          >
-            {tile.value}
-          </div>
-        ))}
-        {over && (
-          <div className="g2048-overlay">
-            <span className="g2048-overlay-text">{t('miniGameTab.game2048.gameOver')}</span>
-            <button className="settings-lyrics-source-btn" type="button" onClick={newGame}>{t('miniGameTab.game2048.tryAgain')}</button>
-          </div>
-        )}
-      </div>
-      <div className="g2048-footer">
-        <span className="g2048-hint">{t('miniGameTab.game2048.hint')}</span>
-      </div>
+      ))}
+      {over && (
+        <div className="g2048-overlay">
+          <span className="g2048-overlay-text">{t('miniGameTab.game2048.gameOver')}</span>
+          <button className="settings-lyrics-source-btn" type="button" onClick={newGame}>{t('miniGameTab.game2048.tryAgain')}</button>
+        </div>
+      )}
     </div>
   );
-}
+});
