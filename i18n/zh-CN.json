@@ -926,6 +926,12 @@
     "lbUser": "用户",
     "lbScore": "分数",
     "lbEmpty": "暂无排行数据",
+    "auth": {
+      "entryTitle": "登录后查看排行榜与个人成绩",
+      "gotoLogin": "前往登录",
+      "gotoRegister": "前往注册",
+      "hint": "登录后可同步游戏成绩、查看排行榜并与其他玩家竞争。"
+    },
     "game2048": {
       "score": "分数",
       "best": "最高",

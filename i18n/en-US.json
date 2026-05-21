@@ -926,6 +926,12 @@
     "lbUser": "User",
     "lbScore": "Score",
     "lbEmpty": "No leaderboard data yet",
+    "auth": {
+      "entryTitle": "Log in to view leaderboard and scores",
+      "gotoLogin": "Log In",
+      "gotoRegister": "Register",
+      "hint": "Log in to sync your scores, view the leaderboard, and compete with other players."
+    },
     "game2048": {
       "score": "Score",
       "best": "Best",

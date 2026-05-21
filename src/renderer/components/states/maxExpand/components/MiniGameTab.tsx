@@ -26,6 +26,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useIslandStore } from '../../../../store/index';
 import { readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
 import {
   getMyScore,
@@ -53,6 +54,7 @@ const GAME_LIST: GameEntry[] = [
  */
 export function MiniGameTab(): ReactElement {
   const { t } = useTranslation();
+  const { setLogin, setRegister } = useIslandStore();
   const [selectedGame, setSelectedGame] = useState<string>(GAME_LIST[0]?.id ?? '');
   const [loggedIn, setLoggedIn] = useState<boolean>(() => Boolean(readLocalToken()));
   const [myScore, setMyScore] = useState<MiniGameScoreData | null>(null);
@@ -173,8 +175,21 @@ export function MiniGameTab(): ReactElement {
 
               {/* 未登录提示 */}
               {!loggedIn && (
-                <div className="mg-notice">
-                  <span className="mg-notice-text">{t('miniGameTab.loginRequired')}</span>
+                <div className="settings-user-auth">
+                  <div className="settings-user-auth-entry-title">
+                    {t('miniGameTab.auth.entryTitle')}
+                  </div>
+                  <div className="settings-user-auth-entry-actions">
+                    <button type="button" className="settings-user-primary-btn" onClick={() => setLogin()}>
+                      {t('miniGameTab.auth.gotoLogin')}
+                    </button>
+                    <button type="button" className="settings-user-secondary-btn" onClick={() => setRegister()}>
+                      {t('miniGameTab.auth.gotoRegister')}
+                    </button>
+                  </div>
+                  <div className="settings-user-auth-hint">
+                    {t('miniGameTab.auth.hint')}
+                  </div>
                 </div>
               )}
 
