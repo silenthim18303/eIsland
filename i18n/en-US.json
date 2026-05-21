@@ -907,9 +907,25 @@
     }
   },
   "miniGameTab": {
-    "placeholder": "Stay tuned",
-    "title": "Mini game feature in development",
-    "subtitle": "Stay tuned"
+    "games": {
+      "2048": "2048"
+    },
+    "comingSoon": "Coming Soon",
+    "loginRequired": "Please log in to view scores and leaderboard",
+    "loading": "Loading...",
+    "loadError": "Failed to load data",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "myBest": "My Best",
+    "highScore": "High Score",
+    "duration": "Duration",
+    "moves": "Moves",
+    "plays": "Plays",
+    "noRecord": "No records yet",
+    "leaderboard": "Leaderboard",
+    "lbUser": "User",
+    "lbScore": "Score",
+    "lbEmpty": "No leaderboard data yet"
   },
   "maxExpand": {
     "loading": "Loading max expand view...",

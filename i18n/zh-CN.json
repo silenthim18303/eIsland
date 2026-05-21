@@ -907,9 +907,25 @@
     }
   },
   "miniGameTab": {
-    "placeholder": "敬请期待",
-    "title": "小游戏功能开发中",
-    "subtitle": "敬请期待"
+    "games": {
+      "2048": "2048"
+    },
+    "comingSoon": "即将上线",
+    "loginRequired": "请先登录以查看成绩与排行榜",
+    "loading": "加载中...",
+    "loadError": "数据加载失败",
+    "retry": "重试",
+    "refresh": "刷新",
+    "myBest": "个人最高分",
+    "highScore": "最高分",
+    "duration": "用时",
+    "moves": "步数",
+    "plays": "游玩次数",
+    "noRecord": "暂无记录",
+    "leaderboard": "排行榜",
+    "lbUser": "用户",
+    "lbScore": "分数",
+    "lbEmpty": "暂无排行数据"
   },
   "maxExpand": {
     "loading": "正在加载最大展开界面...",
