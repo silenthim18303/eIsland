@@ -46,6 +46,35 @@ export interface Game2048Props { onGameEnd?: (payload: Game2048EndPayload) => vo
 
 let tileSeq = 1;
 
+const STORAGE_KEY = 'island_game_2048_state';
+
+interface SavedState {
+  tiles: TileData[];
+  score: number;
+  best: number;
+  moveCount: number;
+  startTime: number;
+  tileSeq: number;
+}
+
+function saveState(s: SavedState): void {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /* ignore */ }
+}
+
+function loadState(): SavedState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as SavedState;
+    if (!Array.isArray(s.tiles) || s.tiles.length === 0) return null;
+    return s;
+  } catch { return null; }
+}
+
+function clearState(): void {
+  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+}
+
 function emptyPos(tiles: TileData[]): Array<[number, number]> {
   const used = new Set(tiles.map(t => `${t.row},${t.col}`));
   const r: Array<[number, number]> = [];
@@ -119,18 +148,34 @@ function initTiles(): TileData[] {
   return arr;
 }
 
+function loadOrInit(): { tiles: TileData[]; score: number; best: number; moveCount: number; startTime: number } {
+  const saved = loadState();
+  if (saved) {
+    tileSeq = saved.tileSeq;
+    return { tiles: saved.tiles, score: saved.score, best: saved.best, moveCount: saved.moveCount, startTime: saved.startTime };
+  }
+  return { tiles: initTiles(), score: 0, best: 0, moveCount: 0, startTime: 0 };
+}
+
 export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2048({ onGameEnd, onStateChange }, fwdRef): ReactElement {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
-  const [tiles, setTiles] = useState<TileData[]>(initTiles);
-  const [score, setScore] = useState(0);
-  const [best, setBest] = useState(0);
+  const [initial] = useState(loadOrInit);
+  const [tiles, setTiles] = useState<TileData[]>(initial.tiles);
+  const [score, setScore] = useState(initial.score);
+  const [best, setBest] = useState(initial.best);
   const [over, setOver] = useState(false);
   const [mergedIds, setMergedIds] = useState<Set<number>>(new Set());
   const [newId, setNewId] = useState<number | null>(null);
-  const [moveCount, setMoveCount] = useState(0);
-  const startRef = useRef(0);
+  const [moveCount, setMoveCount] = useState(initial.moveCount);
+  const startRef = useRef(initial.startTime);
   const movingRef = useRef(false);
+
+  useEffect(() => {
+    if (initial.score > 0) {
+      onStateChange?.({ score: initial.score, best: initial.best, over: false, moveCount: initial.moveCount });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const newGame = useCallback(() => {
     const t = initTiles();
@@ -141,6 +186,7 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
     setNewId(null);
     setMoveCount(0);
     startRef.current = 0;
+    clearState();
     onStateChange?.({ score: 0, best, over: false, moveCount: 0 });
     ref.current?.focus();
   }, [best, onStateChange]);
@@ -172,7 +218,10 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
       const isOver = !canMove(resolved);
       if (isOver) {
         setOver(true);
+        clearState();
         onGameEnd?.({ score: ns, durationMs: Date.now() - startRef.current, moves: nm, achievedAt: Date.now() });
+      } else {
+        saveState({ tiles: resolved, score: ns, best: nb, moveCount: nm, startTime: startRef.current, tileSeq });
       }
       onStateChange?.({ score: ns, best: nb, over: isOver, moveCount: nm });
       setTimeout(() => { setMergedIds(new Set()); setNewId(null); movingRef.current = false; }, 150);
