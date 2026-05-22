@@ -5270,11 +5270,22 @@
 }
 
 .mg-my-rank {
-  margin-left: auto;
-  margin-right: 6px;
+  margin-right: 2px;
   font-size: 10px;
   color: rgba(var(--color-text-rgb), 0.45);
   text-align: right;
+}
+
+.mg-section-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mg-refresh-icon {
+  width: 12px;
+  height: 12px;
+  display: block;
 }
 
 .mg-refresh-btn {

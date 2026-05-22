@@ -28,6 +28,7 @@ import { useCallback, useEffect, useRef, useState, type ReactElement } from 'rea
 import { useTranslation } from 'react-i18next';
 import { useIslandStore } from '../../../../store/index';
 import { readLocalProfile, readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
+import { SvgIcon } from '../../../../utils/SvgIcon';
 import {
   getMyScore,
   getLeaderboard,
@@ -260,7 +261,12 @@ export function MiniGameTab(): ReactElement {
                 <div className="mg-section mg-section-scroll">
                   <div className="mg-section-header">
                     <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
-                    <span className="mg-my-rank">{t('miniGameTab.myRank')}: {myRank ?? t('miniGameTab.rankUnavailable')}</span>
+                    <div className="mg-section-header-actions">
+                      <span className="mg-my-rank">{t('miniGameTab.myRank')}: {myRank ?? t('miniGameTab.rankUnavailable')}</span>
+                      <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')} aria-label={t('miniGameTab.refresh')}>
+                        <img className="mg-refresh-icon" src={SvgIcon.REVERT} alt="" aria-hidden="true" />
+                      </button>
+                    </div>
                   </div>
                   {leaderboard.length > 0 ? (
                     <div className="mg-leaderboard">
