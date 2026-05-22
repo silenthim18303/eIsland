@@ -190,30 +190,11 @@ export function MiniGameTab(): ReactElement {
               {gameAvailable && (
                 <div className="mg-section mg-section-top-score">
                   <span className="g2048-hint">{t('miniGameTab.game2048.hint')}</span>
-                  <div className="g2048-score-row">
+                  <div className="g2048-score-row g2048-score-cards">
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.score')}</span><span className="g2048-score-val">{gameState.score}</span></div>
-                    {loggedIn && !loading && !error && myScore && (
-                      <div className="mg-score-card mg-score-card-embedded">
-                        <div className="mg-score-main">
-                          <span className="mg-score-value">{myScore.highScore.toLocaleString()}</span>
-                          <span className="mg-score-label">{t('miniGameTab.highScore')}</span>
-                        </div>
-                        <div className="mg-score-details">
-                          {myScore.bestDurationMs != null && (
-                            <span className="mg-score-detail-item">
-                              <span className="mg-score-detail-value">{formatDuration(myScore.bestDurationMs)}</span>
-                              <span className="mg-score-detail-label">{t('miniGameTab.duration')}</span>
-                            </span>
-                          )}
-                          {myScore.bestMoves != null && (
-                            <span className="mg-score-detail-item">
-                              <span className="mg-score-detail-value">{myScore.bestMoves}</span>
-                              <span className="mg-score-detail-label">{t('miniGameTab.moves')}</span>
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.highScore')}</span><span className="g2048-score-val">{myScore?.highScore?.toLocaleString() ?? '--'}</span></div>
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.duration')}</span><span className="g2048-score-val">{myScore?.bestDurationMs != null ? formatDuration(myScore.bestDurationMs) : '--'}</span></div>
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.moves')}</span><span className="g2048-score-val">{myScore?.bestMoves != null ? myScore.bestMoves : '--'}</span></div>
                   </div>
                   <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={() => gameRef.current?.newGame()}>{t('miniGameTab.game2048.newGame')}</button>
                 </div>
