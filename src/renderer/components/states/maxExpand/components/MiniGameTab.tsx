@@ -27,7 +27,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIslandStore } from '../../../../store/index';
-import { readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
+import { readLocalProfile, readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
 import {
   getMyScore,
   getLeaderboard,
@@ -123,6 +123,27 @@ export function MiniGameTab(): ReactElement {
 
   const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
   const myRank = myScore ? (leaderboard.find((entry) => entry.userId === myScore.userId)?.rank ?? null) : null;
+  const localProfile = readLocalProfile();
+
+  const resolveEntryName = useCallback((entry: MiniGameLeaderboardEntry): string => {
+    if (entry.username && entry.username.trim()) {
+      return entry.username;
+    }
+    if (myScore && entry.userId === myScore.userId && localProfile?.username) {
+      return localProfile.username;
+    }
+    return t('miniGameTab.unknownUser', { defaultValue: '未知用户' });
+  }, [localProfile?.username, myScore, t]);
+
+  const resolveEntryAvatar = useCallback((entry: MiniGameLeaderboardEntry): string | null => {
+    if (entry.avatar && entry.avatar.trim()) {
+      return entry.avatar;
+    }
+    if (myScore && entry.userId === myScore.userId) {
+      return localProfile?.avatar ?? null;
+    }
+    return null;
+  }, [localProfile?.avatar, myScore]);
 
   const selectedEntry = GAME_LIST.find((g) => g.id === selectedGame);
   const gameAvailable = selectedEntry?.available && selectedGame === '2048';
@@ -268,10 +289,10 @@ export function MiniGameTab(): ReactElement {
                           <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
                           <span className="mg-lb-user">
                             <span className="mg-lb-user-meta">
-                              {entry.avatar
-                                ? <img className="mg-lb-user-avatar" src={entry.avatar} alt={entry.username ?? String(entry.userId)} />
-                                : <span className="mg-lb-user-avatar-placeholder">{(entry.username || String(entry.userId)).slice(0, 1)}</span>}
-                              <span className="mg-lb-user-name">{entry.username ?? entry.userId}</span>
+                              {resolveEntryAvatar(entry)
+                                ? <img className="mg-lb-user-avatar" src={resolveEntryAvatar(entry) ?? ''} alt={resolveEntryName(entry)} />
+                                : <span className="mg-lb-user-avatar-placeholder">{resolveEntryName(entry).slice(0, 1)}</span>}
+                              <span className="mg-lb-user-name">{resolveEntryName(entry)}</span>
                             </span>
                           </span>
                           <span className="mg-lb-score">{entry.highScore.toLocaleString()}</span>
