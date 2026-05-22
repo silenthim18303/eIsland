@@ -256,7 +256,7 @@ export function MiniGameTab(): ReactElement {
                         <span className="mg-lb-user">{t('miniGameTab.lbUser')}</span>
                         <span className="mg-lb-score">{t('miniGameTab.lbScore')}</span>
                       </div>
-                      {leaderboard.slice(0, 3).map((entry) => (
+                      {leaderboard.slice(0, 4).map((entry) => (
                         <div key={entry.rank} className={`mg-lb-row ${entry.rank <= 3 ? 'mg-lb-top' : ''}`}>
                           <span className={`mg-lb-rank ${entry.rank <= 3 ? `mg-lb-rank-${entry.rank}` : ''}`}>{entry.rank}</span>
                           <span className="mg-lb-user">
