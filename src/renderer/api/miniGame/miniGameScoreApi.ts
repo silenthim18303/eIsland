@@ -53,6 +53,14 @@ export interface MiniGameSubmitPayload {
   durationMs: number;
   moves: number;
   achievedAt: number;
+  sessionId?: string;
+  moveTrace?: string;
+}
+
+export interface MiniGameSessionData {
+  sessionId: string;
+  seed: number;
+  startedAt: number;
 }
 
 interface PendingSubmission {
@@ -87,9 +95,21 @@ export function submitScore(
       durationMs: payload.durationMs,
       moves: payload.moves,
       achievedAt: payload.achievedAt,
+      sessionId: payload.sessionId,
+      moveTrace: payload.moveTrace,
       clientVersion: clientVersion ?? undefined,
       traceId: traceId ?? undefined,
     },
+  });
+}
+
+export function startGameSession(
+  token: string,
+  gameId: string,
+): Promise<UserAccountResult<MiniGameSessionData>> {
+  return request<MiniGameSessionData>(`/v1/mini-game/score/${encodeURIComponent(gameId)}/session/start`, {
+    method: 'POST',
+    auth: token,
   });
 }
 

@@ -39,40 +39,43 @@ interface MergeInfo { survivorId: number; absorbedId: number; newValue: number; 
 interface MoveResult { tiles: TileData[]; merges: MergeInfo[]; scoreGained: number; moved: boolean; }
 type Dir = 'left' | 'right' | 'up' | 'down';
 
-export interface Game2048EndPayload { score: number; durationMs: number; moves: number; achievedAt: number; }
+export interface Game2048Session { sessionId: string; seed: number; startedAt: number; }
+export interface Game2048EndPayload {
+  score: number;
+  durationMs: number;
+  moves: number;
+  achievedAt: number;
+  sessionId?: string;
+  moveTrace?: string;
+}
 export interface Game2048State { score: number; best: number; over: boolean; moveCount: number; }
-export interface Game2048Handle { newGame: () => void; }
-export interface Game2048Props { onGameEnd?: (payload: Game2048EndPayload) => void; onStateChange?: (state: Game2048State) => void; }
+export interface Game2048Handle { newGame: (session?: Game2048Session | null) => void; }
+export interface Game2048Props {
+  onGameEnd?: (payload: Game2048EndPayload) => void;
+  onStateChange?: (state: Game2048State) => void;
+  activeSession?: Game2048Session | null;
+}
 
 let tileSeq = 1;
 
-const STORAGE_KEY = 'island_game_2048_state';
+class DeterministicRandom {
+  private state: number;
 
-interface SavedState {
-  tiles: TileData[];
-  score: number;
-  best: number;
-  moveCount: number;
-  startTime: number;
-  tileSeq: number;
-}
+  constructor(seed: number) {
+    const normalized = (seed >>> 0) || 1;
+    this.state = normalized;
+  }
 
-function saveState(s: SavedState): void {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /* ignore */ }
-}
+  nextInt(bound: number): number {
+    if (bound <= 1) return 0;
+    this.state = (Math.imul(this.state, 1664525) + 1013904223) >>> 0;
+    return this.state % bound;
+  }
 
-function loadState(): SavedState | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const s = JSON.parse(raw) as SavedState;
-    if (!Array.isArray(s.tiles) || s.tiles.length === 0) return null;
-    return s;
-  } catch { return null; }
-}
-
-function clearState(): void {
-  try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
+  nextDouble(): number {
+    this.state = (Math.imul(this.state, 1664525) + 1013904223) >>> 0;
+    return this.state / 4294967296;
+  }
 }
 
 function emptyPos(tiles: TileData[]): Array<[number, number]> {
@@ -82,11 +85,11 @@ function emptyPos(tiles: TileData[]): Array<[number, number]> {
   return r;
 }
 
-function spawn(tiles: TileData[]): TileData | null {
+function spawn(tiles: TileData[], random: DeterministicRandom): TileData | null {
   const e = emptyPos(tiles);
   if (!e.length) return null;
-  const [row, col] = e[Math.floor(Math.random() * e.length)];
-  return { id: tileSeq++, value: Math.random() < 0.9 ? 2 : 4, row, col };
+  const [row, col] = e[random.nextInt(e.length)];
+  return { id: tileSeq++, value: random.nextDouble() < 0.9 ? 2 : 4, row, col };
 }
 
 function computeMove(tiles: TileData[], dir: Dir): MoveResult {
@@ -139,28 +142,24 @@ function canMove(tiles: TileData[]): boolean {
   return false;
 }
 
-function initTiles(): TileData[] {
+function initTiles(random: DeterministicRandom): TileData[] {
   tileSeq = 1;
-  const t1 = spawn([])!;
+  const t1 = spawn([], random)!;
   const arr = [t1];
-  const t2 = spawn(arr);
+  const t2 = spawn(arr, random);
   if (t2) arr.push(t2);
   return arr;
 }
 
-function loadOrInit(): { tiles: TileData[]; score: number; best: number; moveCount: number; startTime: number } {
-  const saved = loadState();
-  if (saved) {
-    tileSeq = saved.tileSeq;
-    return { tiles: saved.tiles, score: saved.score, best: saved.best, moveCount: saved.moveCount, startTime: saved.startTime };
-  }
-  return { tiles: initTiles(), score: 0, best: 0, moveCount: 0, startTime: 0 };
+function createInitial(): { tiles: TileData[]; score: number; best: number; moveCount: number; startTime: number } {
+  const random = new DeterministicRandom(1);
+  return { tiles: initTiles(random), score: 0, best: 0, moveCount: 0, startTime: 0 };
 }
 
-export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2048({ onGameEnd, onStateChange }, fwdRef): ReactElement {
+export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2048({ onGameEnd, onStateChange, activeSession }, fwdRef): ReactElement {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
-  const [initial] = useState(loadOrInit);
+  const [initial] = useState(createInitial);
   const [tiles, setTiles] = useState<TileData[]>(initial.tiles);
   const [score, setScore] = useState(initial.score);
   const [best, setBest] = useState(initial.best);
@@ -170,6 +169,29 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
   const [moveCount, setMoveCount] = useState(initial.moveCount);
   const startRef = useRef(initial.startTime);
   const movingRef = useRef(false);
+  const randomRef = useRef<DeterministicRandom>(new DeterministicRandom(1));
+  const sessionRef = useRef<Game2048Session | null>(activeSession ?? null);
+  const appliedSessionIdRef = useRef<string | null>(null);
+  const moveTraceRef = useRef('');
+
+  const startRound = useCallback((session?: Game2048Session | null) => {
+    const selectedSession = session ?? activeSession ?? null;
+    const seed = selectedSession?.seed ?? Date.now();
+    randomRef.current = new DeterministicRandom(seed);
+    sessionRef.current = selectedSession;
+    moveTraceRef.current = '';
+
+    const t = initTiles(randomRef.current);
+    setTiles(t);
+    setScore(0);
+    setOver(false);
+    setMergedIds(new Set());
+    setNewId(null);
+    setMoveCount(0);
+    startRef.current = selectedSession?.startedAt ?? 0;
+    onStateChange?.({ score: 0, best, over: false, moveCount: 0 });
+    ref.current?.focus();
+  }, [activeSession, best, onStateChange]);
 
   useEffect(() => {
     if (initial.score > 0) {
@@ -177,21 +199,18 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const newGame = useCallback(() => {
-    const t = initTiles();
-    setTiles(t);
-    setScore(0);
-    setOver(false);
-    setMergedIds(new Set());
-    setNewId(null);
-    setMoveCount(0);
-    startRef.current = 0;
-    clearState();
-    onStateChange?.({ score: 0, best, over: false, moveCount: 0 });
-    ref.current?.focus();
-  }, [best, onStateChange]);
+  const newGame = useCallback((session?: Game2048Session | null) => {
+    startRound(session);
+  }, [startRound]);
 
   useImperativeHandle(fwdRef, () => ({ newGame }), [newGame]);
+
+  useEffect(() => {
+    if (!activeSession?.sessionId) return;
+    if (appliedSessionIdRef.current === activeSession.sessionId) return;
+    appliedSessionIdRef.current = activeSession.sessionId;
+    startRound(activeSession);
+  }, [activeSession, startRound]);
 
   const doMove = useCallback((dir: Dir) => {
     if (movingRef.current || over) return;
@@ -205,7 +224,7 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
       for (const m of result.merges) {
         resolved = resolved.filter(t => t.id !== m.absorbedId).map(t => t.id === m.survivorId ? { ...t, value: m.newValue } : t);
       }
-      const nt = spawn(resolved);
+      const nt = spawn(resolved, randomRef.current);
       if (nt) { resolved = [...resolved, nt]; setNewId(nt.id); }
       setMergedIds(new Set(result.merges.map(m => m.survivorId)));
       setTiles(resolved);
@@ -213,15 +232,22 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
       setScore(ns);
       const nm = moveCount + 1;
       setMoveCount(c => c + 1);
+      moveTraceRef.current += dir === 'left' ? 'L' : dir === 'right' ? 'R' : dir === 'up' ? 'U' : 'D';
       const nb = Math.max(ns, best);
       if (ns > best) setBest(ns);
       const isOver = !canMove(resolved);
       if (isOver) {
         setOver(true);
-        clearState();
-        onGameEnd?.({ score: ns, durationMs: Date.now() - startRef.current, moves: nm, achievedAt: Date.now() });
-      } else {
-        saveState({ tiles: resolved, score: ns, best: nb, moveCount: nm, startTime: startRef.current, tileSeq });
+        const achievedAt = Date.now();
+        const duration = startRef.current > 0 ? Math.max(1, achievedAt - startRef.current) : 1;
+        onGameEnd?.({
+          score: ns,
+          durationMs: duration,
+          moves: nm,
+          achievedAt,
+          sessionId: sessionRef.current?.sessionId,
+          moveTrace: moveTraceRef.current,
+        });
       }
       onStateChange?.({ score: ns, best: nb, over: isOver, moveCount: nm });
       setTimeout(() => { setMergedIds(new Set()); setNewId(null); movingRef.current = false; }, 150);
@@ -260,7 +286,7 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
       {over && (
         <div className="g2048-overlay">
           <span className="g2048-overlay-text">{t('miniGameTab.game2048.gameOver')}</span>
-          <button className="settings-lyrics-source-btn" type="button" onClick={newGame}>{t('miniGameTab.game2048.tryAgain')}</button>
+          <button className="settings-lyrics-source-btn" type="button" onClick={() => newGame()}>{t('miniGameTab.game2048.tryAgain')}</button>
         </div>
       )}
     </div>

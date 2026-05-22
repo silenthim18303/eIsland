@@ -34,10 +34,18 @@ import {
   getLeaderboard,
   flushPendingSubmissions,
   reportNewBest,
+  startGameSession,
   type MiniGameScoreData,
   type MiniGameLeaderboardEntry,
+  type MiniGameSessionData,
 } from '../../../../api/miniGame/miniGameScoreApi';
-import { Game2048, type Game2048EndPayload, type Game2048Handle, type Game2048State } from './games/Game2048';
+import {
+  Game2048,
+  type Game2048EndPayload,
+  type Game2048Handle,
+  type Game2048Session,
+  type Game2048State,
+} from './games/Game2048';
 
 interface GameEntry {
   id: string;
@@ -63,7 +71,24 @@ export function MiniGameTab(): ReactElement {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gameState, setGameState] = useState<Game2048State>({ score: 0, best: 0, over: false, moveCount: 0 });
+  const [activeSession, setActiveSession] = useState<Game2048Session | null>(null);
   const gameRef = useRef<Game2048Handle>(null);
+
+  const fetchSession = useCallback(async (gameId: string): Promise<Game2048Session | null> => {
+    if (gameId !== '2048') return null;
+    const token = readLocalToken();
+    if (!token) return null;
+    const result = await startGameSession(token, gameId);
+    if (!result.ok || !result.data) return null;
+    const data = result.data as MiniGameSessionData;
+    const session: Game2048Session = {
+      sessionId: data.sessionId,
+      seed: data.seed,
+      startedAt: data.startedAt,
+    };
+    setActiveSession(session);
+    return session;
+  }, []);
 
   const loadData = useCallback(async (gameId: string) => {
     const token = readLocalToken();
@@ -95,14 +120,18 @@ export function MiniGameTab(): ReactElement {
       if (hasToken && selectedGame) {
         flushPendingSubmissions().catch(() => {});
         loadData(selectedGame);
+        fetchSession(selectedGame).catch(() => {
+          setActiveSession(null);
+        });
       } else {
         setMyScore(null);
         setLeaderboard([]);
+        setActiveSession(null);
       }
     };
     syncLogin();
     return subscribeUserAccountSessionChanged(syncLogin);
-  }, [selectedGame, loadData]);
+  }, [selectedGame, loadData, fetchSession]);
 
   const handleRefresh = (): void => {
     if (selectedGame) {
@@ -114,13 +143,29 @@ export function MiniGameTab(): ReactElement {
 
   const handleGameEnd = useCallback((payload: Game2048EndPayload) => {
     const refresh = (): void => { setTimeout(() => loadData(selectedGame), 1500); };
+    if (!payload.sessionId || !payload.moveTrace) {
+      refresh();
+      return;
+    }
     reportNewBest(selectedGame, {
       score: payload.score,
       durationMs: payload.durationMs,
       moves: payload.moves,
       achievedAt: payload.achievedAt,
+      sessionId: payload.sessionId,
+      moveTrace: payload.moveTrace,
     }).then(refresh, refresh);
   }, [selectedGame, loadData]);
+
+  const handleStartNewGame = useCallback((): void => {
+    fetchSession(selectedGame)
+      .then((session) => {
+        gameRef.current?.newGame(session);
+      })
+      .catch(() => {
+        gameRef.current?.newGame(null);
+      });
+  }, [fetchSession, selectedGame]);
 
   const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
   const myRank = myScore ? (leaderboard.find((entry) => entry.userId === myScore.userId)?.rank ?? null) : null;
@@ -180,7 +225,7 @@ export function MiniGameTab(): ReactElement {
             {/* 游戏棋盘（纯净，无上下控件） */}
             {gameAvailable && (
               <div className="mg-game-area">
-                <Game2048 ref={gameRef} onGameEnd={handleGameEnd} onStateChange={handleGameState} />
+                <Game2048 ref={gameRef} onGameEnd={handleGameEnd} onStateChange={handleGameState} activeSession={activeSession} />
               </div>
             )}
 
@@ -196,7 +241,7 @@ export function MiniGameTab(): ReactElement {
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.duration')}</span><span className="g2048-score-val">{myScore?.bestDurationMs != null ? formatDuration(myScore.bestDurationMs) : '--'}</span></div>
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.moves')}</span><span className="g2048-score-val">{myScore?.bestMoves != null ? myScore.bestMoves : '--'}</span></div>
                   </div>
-                  <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={() => gameRef.current?.newGame()}>{t('miniGameTab.game2048.newGame')}</button>
+                  <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={handleStartNewGame}>{t('miniGameTab.game2048.newGame')}</button>
                 </div>
               )}
 
