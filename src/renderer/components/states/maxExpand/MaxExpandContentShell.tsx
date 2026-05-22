@@ -37,7 +37,7 @@ import '../../../styles/settings/settings.css';
 
 type NavDotId = MaxExpandTab | 'expanded';
 
-const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'miniGame', 'settings']);
+const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set(['todo', 'countdown', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'settings']);
 
 let _startupMode: 'integrated' | 'standalone' = 'integrated';
 let _startupModeResolved = false;

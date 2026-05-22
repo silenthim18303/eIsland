@@ -191,7 +191,7 @@ export type MaxExpandNavLayoutConfig = MaxExpandNavItem[];
 
 export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox', 'miniGame'];
 
-export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat']);
+export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat', 'miniGame']);
 
 export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
   todo: '待办事项',
@@ -233,7 +233,9 @@ export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLay
 
   return MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({
     id,
-    visible: merged.has(id) ? (merged.get(id) === true) : true,
+    visible: MAXEXPAND_ALWAYS_VISIBLE_TABS.has(id)
+      ? true
+      : (merged.has(id) ? (merged.get(id) === true) : true),
   }));
 }
 
