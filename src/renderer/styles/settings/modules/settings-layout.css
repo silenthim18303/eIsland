@@ -5515,14 +5515,19 @@
 
 .g2048-score-row {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
+}
+
+.mg-section-top-score {
+  gap: 6px;
 }
 
 .g2048-score-box {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   padding: 4px 12px;
   border-radius: 6px;
   background: rgba(var(--color-text-rgb), 0.05);
@@ -5561,6 +5566,18 @@
 .g2048-new-btn:hover {
   background: rgba(var(--color-text-rgb), 0.08);
   color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.g2048-new-btn-block {
+  width: 100%;
+  margin-top: 2px;
+}
+
+.mg-score-card-embedded {
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  padding: 8px 10px;
 }
 
 .g2048-board {

@@ -187,13 +187,34 @@ export function MiniGameTab(): ReactElement {
             <div className="mg-info-sidebar">
               {/* 游戏说明 + 分数 + 新游戏（同行） */}
               {gameAvailable && (
-                <div className="mg-section">
+                <div className="mg-section mg-section-top-score">
                   <span className="g2048-hint">{t('miniGameTab.game2048.hint')}</span>
                   <div className="g2048-score-row">
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.score')}</span><span className="g2048-score-val">{gameState.score}</span></div>
-                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.best')}</span><span className="g2048-score-val">{gameState.best}</span></div>
-                    <button className="g2048-new-btn" type="button" onClick={() => gameRef.current?.newGame()}>{t('miniGameTab.game2048.newGame')}</button>
+                    {loggedIn && !loading && !error && myScore && (
+                      <div className="mg-score-card mg-score-card-embedded">
+                        <div className="mg-score-main">
+                          <span className="mg-score-value">{myScore.highScore.toLocaleString()}</span>
+                          <span className="mg-score-label">{t('miniGameTab.highScore')}</span>
+                        </div>
+                        <div className="mg-score-details">
+                          {myScore.bestDurationMs != null && (
+                            <span className="mg-score-detail-item">
+                              <span className="mg-score-detail-value">{formatDuration(myScore.bestDurationMs)}</span>
+                              <span className="mg-score-detail-label">{t('miniGameTab.duration')}</span>
+                            </span>
+                          )}
+                          {myScore.bestMoves != null && (
+                            <span className="mg-score-detail-item">
+                              <span className="mg-score-detail-value">{myScore.bestMoves}</span>
+                              <span className="mg-score-detail-label">{t('miniGameTab.moves')}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
+                  <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={() => gameRef.current?.newGame()}>{t('miniGameTab.game2048.newGame')}</button>
                 </div>
               )}
 
@@ -231,42 +252,6 @@ export function MiniGameTab(): ReactElement {
                   <button className="settings-lyrics-source-btn" type="button" onClick={handleRefresh}>
                     {t('miniGameTab.retry')}
                   </button>
-                </div>
-              )}
-
-              {/* 个人最高分卡片 */}
-              {loggedIn && !loading && !error && (
-                <div className="mg-section">
-                  <div className="mg-section-header">
-                    <span className="mg-section-title">{t('miniGameTab.myBest')}</span>
-                    <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')}>
-                      ↻
-                    </button>
-                  </div>
-                  {myScore ? (
-                    <div className="mg-score-card">
-                      <div className="mg-score-main">
-                        <span className="mg-score-value">{myScore.highScore.toLocaleString()}</span>
-                        <span className="mg-score-label">{t('miniGameTab.highScore')}</span>
-                      </div>
-                      <div className="mg-score-details">
-                        {myScore.bestDurationMs != null && (
-                          <span className="mg-score-detail-item">
-                            <span className="mg-score-detail-value">{formatDuration(myScore.bestDurationMs)}</span>
-                            <span className="mg-score-detail-label">{t('miniGameTab.duration')}</span>
-                          </span>
-                        )}
-                        {myScore.bestMoves != null && (
-                          <span className="mg-score-detail-item">
-                            <span className="mg-score-detail-value">{myScore.bestMoves}</span>
-                            <span className="mg-score-detail-label">{t('miniGameTab.moves')}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mg-empty-hint">{t('miniGameTab.noRecord')}</div>
-                  )}
                 </div>
               )}
 
