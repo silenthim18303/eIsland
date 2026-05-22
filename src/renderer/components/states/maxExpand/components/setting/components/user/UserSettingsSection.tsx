@@ -1462,7 +1462,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
                   </button>
                 </div>
               </label>
-              <div className="settings-user-actions-row">
+              <div className="settings-user-actions-row--adaptive">
                 <button
                   type="button"
                   className="settings-user-danger-btn"
