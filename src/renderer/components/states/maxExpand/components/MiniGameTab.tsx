@@ -120,9 +120,6 @@ export function MiniGameTab(): ReactElement {
       if (hasToken && selectedGame) {
         flushPendingSubmissions().catch(() => {});
         loadData(selectedGame);
-        fetchSession(selectedGame).catch(() => {
-          setActiveSession(null);
-        });
       } else {
         setMyScore(null);
         setLeaderboard([]);
@@ -131,7 +128,7 @@ export function MiniGameTab(): ReactElement {
     };
     syncLogin();
     return subscribeUserAccountSessionChanged(syncLogin);
-  }, [selectedGame, loadData, fetchSession]);
+  }, [selectedGame, loadData]);
 
   const handleRefresh = (): void => {
     if (selectedGame) {

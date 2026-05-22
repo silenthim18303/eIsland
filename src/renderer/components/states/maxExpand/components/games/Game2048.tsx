@@ -57,6 +57,18 @@ export interface Game2048Props {
 }
 
 let tileSeq = 1;
+const STORAGE_KEY = 'island_game_2048_state';
+
+interface SavedState {
+  tiles: TileData[];
+  score: number;
+  best: number;
+  moveCount: number;
+  startTime: number;
+  tileSeq: number;
+  moveTrace: string;
+  randomState: number;
+}
 
 class DeterministicRandom {
   private state: number;
@@ -75,6 +87,41 @@ class DeterministicRandom {
   nextDouble(): number {
     this.state = (Math.imul(this.state, 1664525) + 1013904223) >>> 0;
     return this.state / 4294967296;
+  }
+
+  getState(): number {
+    return this.state;
+  }
+}
+
+function saveState(s: SavedState): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch {
+    // ignore
+  }
+}
+
+function loadState(): SavedState | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw) as SavedState;
+    if (!Array.isArray(s.tiles)) return null;
+    if (typeof s.score !== 'number' || typeof s.best !== 'number') return null;
+    if (typeof s.moveCount !== 'number' || typeof s.startTime !== 'number') return null;
+    if (typeof s.tileSeq !== 'number' || typeof s.randomState !== 'number') return null;
+    return s;
+  } catch {
+    return null;
+  }
+}
+
+function clearState(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // ignore
   }
 }
 
@@ -151,9 +198,30 @@ function initTiles(random: DeterministicRandom): TileData[] {
   return arr;
 }
 
-function createInitial(): { tiles: TileData[]; score: number; best: number; moveCount: number; startTime: number } {
+function createInitial(): { tiles: TileData[]; score: number; best: number; moveCount: number; startTime: number; moveTrace: string; randomState: number } {
+  const saved = loadState();
+  if (saved) {
+    tileSeq = saved.tileSeq;
+    return {
+      tiles: saved.tiles,
+      score: saved.score,
+      best: saved.best,
+      moveCount: saved.moveCount,
+      startTime: saved.startTime,
+      moveTrace: saved.moveTrace ?? '',
+      randomState: saved.randomState >>> 0,
+    };
+  }
   const random = new DeterministicRandom(1);
-  return { tiles: initTiles(random), score: 0, best: 0, moveCount: 0, startTime: 0 };
+  return {
+    tiles: initTiles(random),
+    score: 0,
+    best: 0,
+    moveCount: 0,
+    startTime: 0,
+    moveTrace: '',
+    randomState: random.getState(),
+  };
 }
 
 export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2048({ onGameEnd, onStateChange, activeSession }, fwdRef): ReactElement {
@@ -169,10 +237,10 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
   const [moveCount, setMoveCount] = useState(initial.moveCount);
   const startRef = useRef(initial.startTime);
   const movingRef = useRef(false);
-  const randomRef = useRef<DeterministicRandom>(new DeterministicRandom(1));
+  const randomRef = useRef<DeterministicRandom>(new DeterministicRandom(initial.randomState));
   const sessionRef = useRef<Game2048Session | null>(activeSession ?? null);
   const appliedSessionIdRef = useRef<string | null>(null);
-  const moveTraceRef = useRef('');
+  const moveTraceRef = useRef(initial.moveTrace);
 
   const startRound = useCallback((session?: Game2048Session | null) => {
     const selectedSession = session ?? activeSession ?? null;
@@ -189,6 +257,7 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
     setNewId(null);
     setMoveCount(0);
     startRef.current = selectedSession?.startedAt ?? 0;
+    clearState();
     onStateChange?.({ score: 0, best, over: false, moveCount: 0 });
     ref.current?.focus();
   }, [activeSession, best, onStateChange]);
@@ -238,6 +307,7 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
       const isOver = !canMove(resolved);
       if (isOver) {
         setOver(true);
+        clearState();
         const achievedAt = Date.now();
         const duration = startRef.current > 0 ? Math.max(1, achievedAt - startRef.current) : 1;
         onGameEnd?.({
@@ -247,6 +317,17 @@ export const Game2048 = forwardRef<Game2048Handle, Game2048Props>(function Game2
           achievedAt,
           sessionId: sessionRef.current?.sessionId,
           moveTrace: moveTraceRef.current,
+        });
+      } else {
+        saveState({
+          tiles: resolved,
+          score: ns,
+          best: nb,
+          moveCount: nm,
+          startTime: startRef.current,
+          tileSeq,
+          moveTrace: moveTraceRef.current,
+          randomState: randomRef.current.getState(),
         });
       }
       onStateChange?.({ score: ns, best: nb, over: isOver, moveCount: nm });
