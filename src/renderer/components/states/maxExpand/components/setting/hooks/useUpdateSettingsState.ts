@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { fetchUpdateSourceUrl } from '../../../../../../api/user/userAccountApi';
-import { writeAnnouncementShowMode, type AnnouncementShowMode } from '../../../../../../api/announcement/announcementApi';
+import {
+  readAnnouncementShowMode,
+  writeAnnouncementShowMode,
+  type AnnouncementShowMode,
+} from '../../../../../../api/announcement/announcementApi';
 import {
   UPDATE_SOURCE_STORE_KEY,
   UPDATE_AUTO_PROMPT_STORE_KEY,
@@ -84,6 +88,98 @@ export function useUpdateSettingsState({ t, isProUser, sessionToken }: UseUpdate
     void writeAnnouncementShowMode(mode);
   };
 
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(UPDATE_SOURCE_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : 'cloudflare-r2');
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(UPDATE_AUTO_PROMPT_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      setUpdateAutoPromptEnabled(typeof value === 'boolean' ? value : true);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    readAnnouncementShowMode().then((mode) => {
+      if (cancelled) return;
+      setAnnouncementShowMode(mode);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const unsub = window.api.onUpdaterProgress?.((progress) => {
+      setDownloadProgress(progress);
+      setUpdateStatus((prev) => (prev === 'downloading' ? prev : 'downloading'));
+    });
+    return () => { unsub?.(); };
+  }, []);
+
+  useEffect(() => {
+    const unsub = window.api.onUpdaterAvailable?.((data) => {
+      if (!updateAutoPromptEnabled) return;
+      setUpdateVersion(data.version);
+      setUpdateStatus((prev) => {
+        if (prev === 'downloading' || prev === 'ready') return prev;
+        return 'available';
+      });
+      setUpdateError('');
+    });
+    return () => { unsub?.(); };
+  }, [updateAutoPromptEnabled]);
+
+  const handleCheckUpdate = async (): Promise<void> => {
+    setUpdateStatus('checking');
+    setUpdateError('');
+    setDownloadProgress(null);
+    try {
+      const resolvedUrl = await resolveUpdateSourceUrl(updateSource);
+      const result = await window.api.updaterCheck(updateSource, resolvedUrl);
+      if (result.error) {
+        setUpdateStatus('error');
+        setUpdateError(result.error);
+      } else if (result.available && result.version) {
+        setUpdateStatus('available');
+        setUpdateVersion(result.version);
+      } else {
+        setUpdateStatus('latest');
+      }
+    } catch (err) {
+      setUpdateStatus('error');
+      setUpdateError(`检查更新失败: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  const handleDownloadUpdate = async (): Promise<void> => {
+    setUpdateStatus('downloading');
+    setDownloadProgress(null);
+    try {
+      const resolvedUrl = await resolveUpdateSourceUrl(updateSource);
+      const ok = await window.api.updaterDownload(updateSource, resolvedUrl);
+      if (ok) {
+        setUpdateStatus('ready');
+      } else {
+        setUpdateStatus('error');
+        setUpdateError('下载失败，请稍后重试');
+      }
+    } catch (err) {
+      setUpdateStatus('error');
+      setUpdateError(`下载失败: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
+
+  const handleInstallUpdate = (): void => {
+    window.api.updaterInstall().catch(() => {});
+  };
+
   return {
     updateStatus,
     setUpdateStatus,
@@ -103,6 +199,9 @@ export function useUpdateSettingsState({ t, isProUser, sessionToken }: UseUpdate
     handleUpdateSourceChange,
     handleUpdateAutoPromptEnabledChange,
     handleAnnouncementShowModeChange,
+    handleCheckUpdate,
+    handleDownloadUpdate,
+    handleInstallUpdate,
     resolveUpdateSourceUrl,
   };
 }

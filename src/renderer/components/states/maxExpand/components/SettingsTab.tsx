@@ -84,7 +84,6 @@ import {
 } from './setting/utils/settingsConfig';
 import {
   CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY,
-  LOCAL_ISLAND_BG_SYNC_EVENT,
   ISLAND_BG_MEDIA_STORE_KEY,
   ISLAND_BG_IMAGE_STORE_KEY,
   ISLAND_BG_VIDEO_FIT_STORE_KEY,
@@ -97,7 +96,6 @@ import {
   STANDALONE_WINDOW_MAC_CONTROLS_STORE_KEY,
   ISLAND_DISPLAY_STORE_KEY,
   UPDATE_SOURCE_STORE_KEY,
-  UPDATE_AUTO_PROMPT_STORE_KEY,
   WEATHER_ALERT_ENABLED_STORE_KEY,
   MAIL_CONFIG_STORE_KEY,
   MAIL_ACCOUNTS_STORE_KEY,
@@ -109,19 +107,18 @@ import {
   UPDATE_SOURCES,
   PLUGIN_MARKET_PAGES,
   generateMailAccountId,
-  isDirectBgMediaUrl,
   normalizeBgMediaConfig,
   resolveBgMediaPreviewUrl,
   applyIslandOpacity,
   getRoleFromToken,
   type SettingsOpenTabIntent,
-  type IslandBgMediaConfig,
   type MailAccountConfig,
   type RunningWindowItem,
   type PluginMarketPageKey,
 } from './setting/config/settingsTabConfig';
 import { useSettingsSidebarTabState, useUserSessionState } from './setting/hooks/useSettingsTabState';
 import { useUpdateSettingsState } from './setting/hooks/useUpdateSettingsState';
+import { useBackgroundMediaSettingsState } from './setting/hooks/useBackgroundMediaSettingsState';
 import { UpdateSettingsSection } from './setting/components/update/UpdateSettingsSection';
 import { IndexSettingsSection } from './setting/components/index/IndexSettingsSection';
 import { AppSettingsSection } from './setting/components/app/AppSettingsSection';
@@ -140,9 +137,6 @@ import { WallpaperEditSection } from './setting/components/pluginMarket/Wallpape
 
 import { resolveDistrictLocationByKeyword } from '../../../../api/weather/adcodeApi';
 import { request as requestUserAccountApi } from '../../../../api/user/userAccountApi.client';
-import {
-  readAnnouncementShowMode,
-} from '../../../../api/announcement/announcementApi';
 
 import { setThemeMode as applyThemeMode, getThemeMode, type ThemeMode } from '../../../../utils/theme';
 import { getLanguage, setLanguage, type AppLanguage } from '../../../../i18n';
@@ -372,19 +366,53 @@ export function SettingsTab(): ReactElement {
   const [islandOpacity, setIslandOpacity] = useState<number>(100);
   const [autoDimEnabled, setAutoDimEnabled] = useState<boolean>(false);
   const [autoDimDelaySec, setAutoDimDelaySec] = useState<number>(DEFAULT_AUTO_DIM_DELAY_SEC);
-  const [bgMedia, setBgMedia] = useState<IslandBgMediaConfig | null>(null);
-  const [bgMediaPreviewUrl, setBgMediaPreviewUrl] = useState<string | null>(null);
-  const [bgVideoFit, setBgVideoFit] = useState<'cover' | 'contain'>('cover');
-  const [bgVideoMuted, setBgVideoMuted] = useState<boolean>(true);
-  const [bgVideoLoop, setBgVideoLoop] = useState<boolean>(true);
-  const [bgVideoVolume, setBgVideoVolume] = useState<number>(0.6);
-  const [bgVideoRate, setBgVideoRate] = useState<number>(1);
-  const [bgVideoHwDecode, setBgVideoHwDecode] = useState<boolean>(true);
-  const [syncDesktopWallpaperOnBackgroundChange, setSyncDesktopWallpaperOnBackgroundChange] = useState<boolean>(false);
-  const [bgImageOpacity, setBgImageOpacity] = useState<number>(30);
-  const [bgImageBlur, setBgImageBlur] = useState<number>(0);
-  const bgOpacitySaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bgBlurSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const {
+    bgMedia,
+    setBgMedia,
+    bgMediaPreviewUrl,
+    setBgMediaPreviewUrl,
+    bgVideoFit,
+    setBgVideoFit,
+    bgVideoMuted,
+    setBgVideoMuted,
+    bgVideoLoop,
+    setBgVideoLoop,
+    bgVideoVolume,
+    setBgVideoVolume,
+    bgVideoRate,
+    setBgVideoRate,
+    bgVideoHwDecode,
+    setBgVideoHwDecode,
+    syncDesktopWallpaperOnBackgroundChange,
+    setSyncDesktopWallpaperOnBackgroundChange,
+    bgImageOpacity,
+    setBgImageOpacity,
+    bgImageBlur,
+    setBgImageBlur,
+    bgOpacitySaveTimerRef,
+    bgBlurSaveTimerRef,
+    applyBgOpacity,
+    applyBgBlur,
+    applyBgVideoFit,
+    applyBgVideoMuted,
+    applyBgVideoLoop,
+    applyBgVideoVolume,
+    applyBgVideoRate,
+    applyBgVideoHwDecode,
+    persistBgVideoFit,
+    persistBgVideoMuted,
+    persistBgVideoLoop,
+    persistBgVideoVolume,
+    persistBgVideoRate,
+    persistBgVideoHwDecode,
+    persistBgOpacity,
+    persistBgBlur,
+    handleSelectBgImage,
+    handleSelectBgVideo,
+    handleClearBgImage,
+    handleSelectBuiltinBgImage,
+    handleApplyMarketplaceWallpaper,
+  } = useBackgroundMediaSettingsState();
   const [islandPositionOffset, setIslandPositionOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [islandPositionInput, setIslandPositionInput] = useState<{ x: string; y: string }>({ x: '0', y: '0' });
   const [islandDisplaySelection, setIslandDisplaySelection] = useState<string>('primary');
@@ -395,24 +423,20 @@ export function SettingsTab(): ReactElement {
 
   const {
     updateStatus,
-    setUpdateStatus,
     updateVersion,
-    setUpdateVersion,
     updateError,
-    setUpdateError,
     downloadProgress,
-    setDownloadProgress,
     updateAutoPromptEnabled,
-    setUpdateAutoPromptEnabled,
     announcementShowMode,
-    setAnnouncementShowMode,
     updateSource,
     setUpdateSource,
     currentSourceLabel,
     handleUpdateSourceChange,
     handleUpdateAutoPromptEnabledChange,
     handleAnnouncementShowModeChange,
-    resolveUpdateSourceUrl,
+    handleCheckUpdate,
+    handleDownloadUpdate,
+    handleInstallUpdate,
   } = useUpdateSettingsState({
     t,
     isProUser,
@@ -436,221 +460,6 @@ export function SettingsTab(): ReactElement {
     window.api.storeWrite(ISLAND_AUTO_DIM_DELAY_STORE_KEY, safe).catch(() => {});
     window.api.settingsPreview(`store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`, safe).catch(() => {});
     window.dispatchEvent(new CustomEvent('island-auto-dim-local-sync', { detail: { autoDimDelaySec: safe } }));
-  };
-
-  const applyBgMedia = (media: IslandBgMediaConfig | null, previewUrl: string | null): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (el) {
-      if (media?.type === 'image' && previewUrl) {
-        el.style.backgroundImage = `url(${previewUrl})`;
-        el.style.opacity = String(bgImageOpacity / 100);
-        el.style.filter = `blur(${bgImageBlur}px)`;
-      } else if (media?.type === 'video' && previewUrl) {
-        el.style.backgroundImage = '';
-        el.style.opacity = String(bgImageOpacity / 100);
-        el.style.filter = `blur(${bgImageBlur}px)`;
-      } else {
-        el.style.backgroundImage = '';
-        el.style.opacity = '0';
-        el.style.filter = 'none';
-      }
-    }
-    setBgMedia(media);
-    setBgMediaPreviewUrl(previewUrl);
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: {
-        media,
-        previewUrl,
-        image: media?.type === 'image' ? previewUrl : null,
-      },
-    }));
-  };
-
-  const applyBgOpacity = (value: number): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (el) el.style.opacity = String(value / 100);
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { opacity: value },
-    }));
-  };
-
-  const applyBgBlur = (value: number): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (el) {
-      el.style.filter = value > 0 ? `blur(${value}px)` : 'none';
-    }
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { blur: value },
-    }));
-  };
-
-  const applyBgVideoFit = (value: 'cover' | 'contain'): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoFit: value },
-    }));
-  };
-
-  const applyBgVideoMuted = (value: boolean): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoMuted: value },
-    }));
-  };
-
-  const applyBgVideoLoop = (value: boolean): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoLoop: value },
-    }));
-  };
-
-  const applyBgVideoVolume = (value: number): void => {
-    const safe = Math.max(0, Math.min(1, value));
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoVolume: safe },
-    }));
-  };
-
-  const applyBgVideoRate = (value: number): void => {
-    const safe = Math.max(0.25, Math.min(3, value));
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoRate: safe },
-    }));
-  };
-
-  const applyBgVideoHwDecode = (value: boolean): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoHwDecode: value },
-    }));
-  };
-
-  const persistBgMedia = (media: IslandBgMediaConfig | null): void => {
-    window.api.storeWrite(ISLAND_BG_MEDIA_STORE_KEY, media).catch(() => {});
-    const legacyImage = media?.type === 'image' ? media.source : null;
-    window.api.storeWrite(ISLAND_BG_IMAGE_STORE_KEY, legacyImage).catch(() => {});
-  };
-
-  const persistBgVideoFit = (value: 'cover' | 'contain'): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_FIT_STORE_KEY, value).catch(() => {});
-  };
-
-  const persistBgVideoMuted = (value: boolean): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_MUTED_STORE_KEY, value).catch(() => {});
-  };
-
-  const persistBgVideoLoop = (value: boolean): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_LOOP_STORE_KEY, value).catch(() => {});
-  };
-
-  const persistBgVideoVolume = (value: number): void => {
-    const safe = Math.max(0, Math.min(1, value));
-    window.api.storeWrite(ISLAND_BG_VIDEO_VOLUME_STORE_KEY, safe).catch(() => {});
-  };
-
-  const persistBgVideoRate = (value: number): void => {
-    const safe = Math.max(0.25, Math.min(3, value));
-    window.api.storeWrite(ISLAND_BG_VIDEO_RATE_STORE_KEY, safe).catch(() => {});
-  };
-
-  const persistBgVideoHwDecode = (value: boolean): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY, value).catch(() => {});
-  };
-
-  const resolveDesktopWallpaperPreviewUrl = (previewUrl: string | null): string | null => {
-    if (!previewUrl) return null;
-    const trimmed = previewUrl.trim();
-    if (!trimmed) return null;
-    if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('file://')) {
-      return trimmed;
-    }
-    try {
-      return new URL(trimmed, window.location.href).toString();
-    } catch {
-      return trimmed;
-    }
-  };
-
-  const syncSystemDesktopWallpaperIfNeeded = async (
-    media: IslandBgMediaConfig | null,
-    previewUrl: string | null,
-  ): Promise<void> => {
-    if (!syncDesktopWallpaperOnBackgroundChange) return;
-    if (!media) return;
-
-    if (media.type === 'video') {
-      const sourcePath = !isDirectBgMediaUrl(media.source) ? media.source : null;
-      if (sourcePath) {
-        const coverPath = await window.api.wallpaperVideoCover(sourcePath).catch(() => null);
-        if (coverPath) {
-          await window.api.setSystemDesktopWallpaper({ sourcePath: coverPath, previewUrl: coverPath }).catch(() => false);
-          return;
-        }
-      }
-    }
-
-    const sourcePath = !isDirectBgMediaUrl(media.source) ? media.source : null;
-    const normalizedPreview = resolveDesktopWallpaperPreviewUrl(previewUrl);
-    await window.api.setSystemDesktopWallpaper({ sourcePath, previewUrl: normalizedPreview }).catch(() => false);
-  };
-
-  const persistBgOpacity = (value: number): void => {
-    window.api.storeWrite('island-bg-opacity', value).catch(() => {});
-  };
-
-  const persistBgBlur = (value: number): void => {
-    window.api.storeWrite('island-bg-blur', value).catch(() => {});
-  };
-
-  const handleSelectBgImage = async (): Promise<void> => {
-    const filePath = await window.api.openImageDialog();
-    if (!filePath) return;
-    const dataUrl = await window.api.loadWallpaperFile(filePath);
-    if (!dataUrl) return;
-    const media: IslandBgMediaConfig = { type: 'image', source: filePath };
-    applyBgMedia(media, dataUrl);
-    persistBgMedia(media);
-    void syncSystemDesktopWallpaperIfNeeded(media, dataUrl);
-  };
-
-  const handleSelectBgVideo = async (): Promise<void> => {
-    const filePath = await window.api.openVideoDialog();
-    if (!filePath) return;
-    const media: IslandBgMediaConfig = { type: 'video', source: filePath };
-    const previewUrl = await resolveBgMediaPreviewUrl(media);
-    if (!previewUrl) return;
-    applyBgMedia(media, previewUrl);
-    persistBgMedia(media);
-    void syncSystemDesktopWallpaperIfNeeded(media, previewUrl);
-  };
-
-  const handleClearBgImage = (): void => {
-    applyBgMedia(null, null);
-    persistBgMedia(null);
-    window.api.storeWrite(ISLAND_BG_IMAGE_STORE_KEY, null).catch(() => {});
-    window.api.settingsPreview('store:island-bg-image', null).catch(() => {});
-    window.api.setSystemDesktopWallpaper({ clear: true }).catch(() => false);
-    window.api.clearWallpaperCache?.().catch(() => {});
-  };
-
-  const handleSelectBuiltinBgImage = (src: string, defaultOpacity: number): void => {
-    const media: IslandBgMediaConfig = { type: 'image', source: src };
-    setBgImageOpacity(defaultOpacity);
-    applyBgMedia(media, src);
-    applyBgOpacity(defaultOpacity);
-    persistBgMedia(media);
-    persistBgOpacity(defaultOpacity);
-    void syncSystemDesktopWallpaperIfNeeded(media, src);
-  };
-
-  const handleApplyMarketplaceWallpaper = (mediaUrl: string, options?: { type?: 'image' | 'video' }): void => {
-    if (!mediaUrl) return;
-    const mediaType: 'image' | 'video' = options?.type === 'video' ? 'video' : 'image';
-    const media: IslandBgMediaConfig = { type: mediaType, source: mediaUrl };
-    applyBgMedia(media, mediaUrl);
-    persistBgMedia(media);
-    void syncSystemDesktopWallpaperIfNeeded(media, mediaUrl);
-    if (mediaType === 'image') {
-      window.api.settingsPreview('store:island-bg-image', mediaUrl).catch(() => {});
-    }
-    window.api.settingsPreview('store:island-bg-media', media).catch(() => {});
   };
 
   const visibleCards = useMemo(() => {
@@ -1415,93 +1224,6 @@ export function SettingsTab(): ReactElement {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(UPDATE_AUTO_PROMPT_STORE_KEY).then((value) => {
-      if (cancelled) return;
-      setUpdateAutoPromptEnabled(typeof value === 'boolean' ? value : true);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    readAnnouncementShowMode().then((mode) => {
-      if (cancelled) return;
-      setAnnouncementShowMode(mode);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  /** 监听下载进度 */
-  useEffect(() => {
-    const unsub = window.api.onUpdaterProgress?.((progress) => {
-      setDownloadProgress(progress);
-      setUpdateStatus((prev) => (prev === 'downloading' ? prev : 'downloading'));
-    });
-    return () => { unsub?.(); };
-  }, []);
-
-  useEffect(() => {
-    const unsub = window.api.onUpdaterAvailable?.((data) => {
-      if (!updateAutoPromptEnabled) return;
-      setUpdateVersion(data.version);
-      setUpdateStatus((prev) => {
-        if (prev === 'downloading' || prev === 'ready') return prev;
-        return 'available';
-      });
-      setUpdateError('');
-    });
-    return () => { unsub?.(); };
-  }, [updateAutoPromptEnabled]);
-
-  /** 检查更新（通过 electron-updater） */
-  const handleCheckUpdate = async (): Promise<void> => {
-    setUpdateStatus('checking');
-    setUpdateError('');
-    setDownloadProgress(null);
-    try {
-      const resolvedUrl = await resolveUpdateSourceUrl(updateSource);
-      const result = await window.api.updaterCheck(updateSource, resolvedUrl);
-      if (result.error) {
-        setUpdateStatus('error');
-        setUpdateError(result.error);
-      } else if (result.available && result.version) {
-        setUpdateStatus('available');
-        setUpdateVersion(result.version);
-      } else {
-        setUpdateStatus('latest');
-      }
-    } catch (err) {
-      setUpdateStatus('error');
-      setUpdateError(`检查更新失败: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  /** 下载更新 */
-  const handleDownloadUpdate = async (): Promise<void> => {
-    setUpdateStatus('downloading');
-    setDownloadProgress(null);
-    try {
-      const resolvedUrl = await resolveUpdateSourceUrl(updateSource);
-      const ok = await window.api.updaterDownload(updateSource, resolvedUrl);
-      if (ok) {
-        setUpdateStatus('ready');
-      } else {
-        setUpdateStatus('error');
-        setUpdateError('下载失败，请稍后重试');
-      }
-    } catch (err) {
-      setUpdateStatus('error');
-      setUpdateError(`下载失败: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  /** 安装更新 */
-  const handleInstallUpdate = (): void => {
-    window.api.updaterInstall().catch(() => {});
-  };
 
   const updateLayout = (side: 'left' | 'right', value: OverviewWidgetType): void => {
     const updated = { ...layoutConfig, [side]: value };
