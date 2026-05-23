@@ -5478,6 +5478,12 @@
   background: rgba(var(--color-text-rgb), 0.08);
 }
 
+.mg-lb-pro-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 .mg-lb-user-name {
   min-width: 0;
   overflow: hidden;

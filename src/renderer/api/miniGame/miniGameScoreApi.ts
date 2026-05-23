@@ -43,6 +43,7 @@ export interface MiniGameLeaderboardEntry {
   userId: number;
   username?: string;
   avatar?: string | null;
+  isPro?: boolean;
   highScore: number;
   bestDurationMs?: number;
   bestMoves?: number;

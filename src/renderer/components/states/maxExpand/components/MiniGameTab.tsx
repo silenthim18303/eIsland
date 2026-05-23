@@ -306,6 +306,7 @@ export function MiniGameTab(): ReactElement {
                               {resolveEntryAvatar(entry)
                                 ? <img className="mg-lb-user-avatar" src={resolveEntryAvatar(entry) ?? ''} alt={resolveEntryName(entry)} />
                                 : <span className="mg-lb-user-avatar-placeholder">{resolveEntryName(entry).slice(0, 1)}</span>}
+                              {entry.isPro ? <img className="mg-lb-pro-icon" src={SvgIcon.PRO} alt="PRO" /> : null}
                               <span className="mg-lb-user-name">{resolveEntryName(entry)}</span>
                             </span>
                           </span>
