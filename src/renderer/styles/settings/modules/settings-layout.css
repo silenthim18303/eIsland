@@ -5376,6 +5376,8 @@
   width: 12px;
   height: 12px;
   display: block;
+  opacity: 0.78;
+  filter: invert(calc(1 - var(--icon-invert)));
 }
 
 .mg-refresh-btn {
@@ -5395,10 +5397,18 @@
   background: rgba(var(--color-text-rgb), 0.06);
 }
 
+.mg-refresh-btn:hover .mg-refresh-icon {
+  opacity: 0.96;
+}
+
 .mg-refresh-btn:disabled {
   cursor: not-allowed;
   opacity: 0.45;
   background: transparent;
+}
+
+.mg-refresh-btn:disabled .mg-refresh-icon {
+  opacity: 0.45;
 }
 
 .mg-badge-coming-soon {
