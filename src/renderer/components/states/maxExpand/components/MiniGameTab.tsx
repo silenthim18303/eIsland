@@ -31,6 +31,7 @@ import { readLocalProfile, readLocalToken, subscribeUserAccountSessionChanged } 
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
 import { SvgIcon } from '../../../../utils/SvgIcon';
 import {
+  checkLeaderboardRefreshCaptcha,
   getMyScore,
   getLeaderboard,
   flushPendingSubmissions,
@@ -65,9 +66,6 @@ interface RuntimeLeaderboardSnapshot {
 
 const runtimeLeaderboardCache = new Map<string, RuntimeLeaderboardSnapshot>();
 const runtimeLeaderboardLoadedKeys = new Set<string>();
-const refreshClickTracker = new Map<string, number[]>();
-const REFRESH_WINDOW_MS = 60_000;
-const REFRESH_CAPTCHA_THRESHOLD = 5;
 
 function resolveLeaderboardCacheKey(gameId: string): string {
   const profile = readLocalProfile();
@@ -75,14 +73,6 @@ function resolveLeaderboardCacheKey(gameId: string): string {
     ? profile.username.trim()
     : (readLocalToken() ? 'token-user' : 'guest');
   return `${userKey}:${gameId}`;
-}
-
-function shouldRequireRefreshCaptcha(trackerKey: string, now = Date.now()): boolean {
-  const history = refreshClickTracker.get(trackerKey) ?? [];
-  const validHistory = history.filter((ts) => now - ts <= REFRESH_WINDOW_MS);
-  validHistory.push(now);
-  refreshClickTracker.set(trackerKey, validHistory);
-  return validHistory.length > REFRESH_CAPTCHA_THRESHOLD;
 }
 
 /**
@@ -179,9 +169,11 @@ export function MiniGameTab(): ReactElement {
     if (!selectedGame) return;
     const profile = readLocalProfile();
     const account = profile?.email?.trim() || profile?.username?.trim() || 'mini-game-leaderboard-refresh';
-    const trackerKey = `${account}:${selectedGame}`;
     const run = async (): Promise<void> => {
-      if (shouldRequireRefreshCaptcha(trackerKey)) {
+      const token = readLocalToken();
+      if (!token) return;
+      const checkRes = await checkLeaderboardRefreshCaptcha(token, selectedGame);
+      if (checkRes.ok && checkRes.data?.requireCaptcha) {
         const captcha = await runSliderCaptcha(account);
         if (!captcha) return;
       }

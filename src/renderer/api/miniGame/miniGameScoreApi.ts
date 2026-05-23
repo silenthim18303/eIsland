@@ -64,6 +64,10 @@ export interface MiniGameSessionData {
   startedAt: number;
 }
 
+export interface LeaderboardRefreshCheckData {
+  requireCaptcha: boolean;
+}
+
 interface PendingSubmission {
   submitId: string;
   gameId: string;
@@ -139,6 +143,16 @@ export function getLeaderboard(
   return request<MiniGameLeaderboardEntry[]>(
     `/v1/mini-game/score/${encodeURIComponent(gameId)}/leaderboard?limit=${safeLimit}`,
     { method: 'GET', auth: token },
+  );
+}
+
+export function checkLeaderboardRefreshCaptcha(
+  token: string,
+  gameId: string,
+): Promise<UserAccountResult<LeaderboardRefreshCheckData>> {
+  return request<LeaderboardRefreshCheckData>(
+    `/v1/mini-game/score/${encodeURIComponent(gameId)}/leaderboard/refresh-check`,
+    { method: 'POST', auth: token },
   );
 }
 
