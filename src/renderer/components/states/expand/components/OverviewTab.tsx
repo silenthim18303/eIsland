@@ -353,7 +353,6 @@ export function OverviewTab(): React.ReactElement {
       <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`}>
         <span className="ov-dash-date">{t('overview.time.date', { defaultValue: '{{yyyy}}年{{month}}月{{day}}日 {{dayName}}', yyyy, month, day, dayName })}</span>
         <span className="ov-dash-clock">{hh}:{mm}:{ss}</span>
-        {layoutConfig.clockStyle === 'gradient' && <span className="ov-dash-time-accent" aria-hidden="true" />}
         <span className="ov-dash-lunar">{getLunarDate(now)}</span>
         <div className="ov-dash-yiji">
           <div className="ov-dash-yiji-row">

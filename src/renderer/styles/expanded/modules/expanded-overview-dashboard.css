@@ -211,14 +211,6 @@
   margin-top: 1px;
 }
 
-.ov-dash-time-accent {
-  width: 86px;
-  height: 2px;
-  border-radius: 999px;
-  margin: 1px 0;
-  background: linear-gradient(90deg, rgba(123, 228, 255, 0.35), rgba(141, 168, 255, 0.38), rgba(255, 210, 138, 0.35));
-}
-
 .ov-dash-yiji {
   display: flex;
   flex-direction: column;
