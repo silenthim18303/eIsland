@@ -1529,7 +1529,8 @@
         "gradientEnd": "End",
         "clockStyleNames": {
           "classic": "Classic",
-          "gradient": "Gradient"
+          "gradient": "Gradient",
+          "minimal": "Minimal Art"
         },
         "widgetNames": {
           "shortcuts": "Shortcuts",

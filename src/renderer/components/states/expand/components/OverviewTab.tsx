@@ -53,7 +53,7 @@ import {
 export type OverviewWidgetType = 'shortcuts' | 'todo' | 'song' | 'countdown' | 'pomodoro' | 'urlFavorites' | 'album' | 'mokugyo' | 'breakReminder';
 
 /** 中间时钟样式类型 */
-export type OverviewClockStyle = 'classic' | 'gradient';
+export type OverviewClockStyle = 'classic' | 'gradient' | 'minimal';
 
 /** 控件选项列表 */
 export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string }[] = [
@@ -72,6 +72,7 @@ export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string
 export const OVERVIEW_CLOCK_STYLE_OPTIONS: { value: OverviewClockStyle; label: string }[] = [
   { value: 'classic', label: '经典样式' },
   { value: 'gradient', label: '渐变样式' },
+  { value: 'minimal', label: '极简艺术' },
 ];
 
 export interface OverviewGradientColors {
@@ -396,18 +397,20 @@ export function OverviewTab(): React.ReactElement {
       {/* ========== 中区：时间（始终居中） ========== */}
       <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`} style={gradientClockVars}>
         <span className="ov-dash-date">{t('overview.time.date', { defaultValue: '{{yyyy}}年{{month}}月{{day}}日 {{dayName}}', yyyy, month, day, dayName })}</span>
-        <span className="ov-dash-clock">{hh}:{mm}:{ss}</span>
+        <span className="ov-dash-clock">{layoutConfig.clockStyle === 'minimal' ? `${hh}:${mm}` : `${hh}:${mm}:${ss}`}</span>
         <span className="ov-dash-lunar">{getLunarDate(now)}</span>
-        <div className="ov-dash-yiji">
-          <div className="ov-dash-yiji-row">
-            <span className="ov-dash-yiji-label yi">{t('overview.time.yi', { defaultValue: '宜' })}</span>
-            <span className="ov-dash-yiji-items">{getDayYi(now).slice(0, 3).join(' · ')}</span>
+        {layoutConfig.clockStyle !== 'minimal' && (
+          <div className="ov-dash-yiji">
+            <div className="ov-dash-yiji-row">
+              <span className="ov-dash-yiji-label yi">{t('overview.time.yi', { defaultValue: '宜' })}</span>
+              <span className="ov-dash-yiji-items">{getDayYi(now).slice(0, 3).join(' · ')}</span>
+            </div>
+            <div className="ov-dash-yiji-row">
+              <span className="ov-dash-yiji-label ji">{t('overview.time.ji', { defaultValue: '忌' })}</span>
+              <span className="ov-dash-yiji-items">{getDayJi(now).slice(0, 3).join(' · ')}</span>
+            </div>
           </div>
-          <div className="ov-dash-yiji-row">
-            <span className="ov-dash-yiji-label ji">{t('overview.time.ji', { defaultValue: '忌' })}</span>
-            <span className="ov-dash-yiji-items">{getDayJi(now).slice(0, 3).join(' · ')}</span>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* ========== 右区 ========== */}

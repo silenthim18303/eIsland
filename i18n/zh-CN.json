@@ -1528,7 +1528,8 @@
         "gradientEnd": "结束色",
         "clockStyleNames": {
           "classic": "经典样式",
-          "gradient": "渐变样式"
+          "gradient": "渐变样式",
+          "minimal": "极简艺术"
         },
         "widgetNames": {
           "shortcuts": "快捷启动",

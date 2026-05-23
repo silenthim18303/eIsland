@@ -204,6 +204,7 @@ export function SettingsTab(): ReactElement {
     const labelKeyMap: Record<OverviewClockStyle, string> = {
       classic: 'settings.app.layout.clockStyleNames.classic',
       gradient: 'settings.app.layout.clockStyleNames.gradient',
+      minimal: 'settings.app.layout.clockStyleNames.minimal',
     };
     return OVERVIEW_CLOCK_STYLE_OPTIONS.map((option) => ({
       ...option,

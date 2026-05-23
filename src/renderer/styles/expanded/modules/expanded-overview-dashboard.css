@@ -204,6 +204,25 @@
   filter: saturate(1.06);
 }
 
+.ov-dash-time--minimal {
+  gap: 0;
+  justify-content: center;
+}
+
+.ov-dash-time--minimal .ov-dash-clock {
+  font-size: 56px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  line-height: 1;
+  color: rgba(var(--color-text-rgb), 0.88);
+  font-style: italic;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 0 rgba(var(--color-text-rgb), 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.12);
+  font-variant-numeric: tabular-nums;
+}
+
 .ov-dash-date {
   font-size: 11px;
   color: rgba(var(--color-text-rgb), 0.45);
