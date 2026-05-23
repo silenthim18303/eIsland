@@ -1523,8 +1523,7 @@
         "clockStyleHint": "Choose the center clock style in Overview. Changes are saved automatically.",
         "clockStyleNames": {
           "classic": "Classic",
-          "minimal": "Minimal",
-          "split": "Split"
+          "gradient": "Gradient"
         },
         "widgetNames": {
           "shortcuts": "Shortcuts",

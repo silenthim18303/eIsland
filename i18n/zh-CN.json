@@ -1522,8 +1522,7 @@
         "clockStyleHint": "选择总览中间时钟区域样式，切换后自动保存。",
         "clockStyleNames": {
           "classic": "经典样式",
-          "minimal": "极简样式",
-          "split": "分体样式"
+          "gradient": "渐变样式"
         },
         "widgetNames": {
           "shortcuts": "快捷启动",

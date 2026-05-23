@@ -182,19 +182,20 @@
   line-height: 1.15;
 }
 
-.ov-dash-clock-split-wrap {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
+.ov-dash-time--gradient {
+  gap: 1px;
 }
 
-.ov-dash-clock-seconds {
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(var(--color-text-rgb), 0.56);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  transform: translateY(-1px);
+.ov-dash-time--gradient .ov-dash-clock {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 2.3px;
+  line-height: 1.1;
+  background: linear-gradient(90deg, #7be4ff 0%, #8da8ff 45%, #ffd28a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px rgba(123, 228, 255, 0.28);
 }
 
 .ov-dash-date {
@@ -207,7 +208,15 @@
 .ov-dash-lunar {
   font-size: 10px;
   color: rgba(var(--color-text-rgb), 0.28);
-  margin-top: 2px;
+  margin-top: 1px;
+}
+
+.ov-dash-time-accent {
+  width: 86px;
+  height: 2px;
+  border-radius: 999px;
+  margin: 1px 0;
+  background: linear-gradient(90deg, rgba(123, 228, 255, 0.35), rgba(141, 168, 255, 0.38), rgba(255, 210, 138, 0.35));
 }
 
 .ov-dash-yiji {
@@ -249,35 +258,6 @@
 .ov-dash-yiji-items {
   font-size: 9px;
   color: rgba(var(--color-text-rgb), 0.32);
-}
-
-.ov-dash-time--minimal {
-  gap: 2px;
-}
-
-.ov-dash-time--minimal .ov-dash-date {
-  font-size: 10px;
-  letter-spacing: 0.4px;
-  color: rgba(var(--color-text-rgb), 0.42);
-}
-
-.ov-dash-time--minimal .ov-dash-clock {
-  font-size: 36px;
-  letter-spacing: 2.8px;
-  color: rgba(var(--color-text-rgb), 0.94);
-}
-
-.ov-dash-time--split {
-  gap: 1px;
-}
-
-.ov-dash-time--split .ov-dash-date {
-  margin-bottom: 0;
-}
-
-.ov-dash-time--split .ov-dash-clock {
-  font-size: 34px;
-  letter-spacing: 2.4px;
 }
 
 /** 右区：待办事项 */

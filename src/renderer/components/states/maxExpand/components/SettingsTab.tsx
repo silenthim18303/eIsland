@@ -203,8 +203,7 @@ export function SettingsTab(): ReactElement {
   const translatedOverviewClockStyleOptions = useMemo(() => {
     const labelKeyMap: Record<OverviewClockStyle, string> = {
       classic: 'settings.app.layout.clockStyleNames.classic',
-      minimal: 'settings.app.layout.clockStyleNames.minimal',
-      split: 'settings.app.layout.clockStyleNames.split',
+      gradient: 'settings.app.layout.clockStyleNames.gradient',
     };
     return OVERVIEW_CLOCK_STYLE_OPTIONS.map((option) => ({
       ...option,
