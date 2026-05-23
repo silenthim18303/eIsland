@@ -74,7 +74,6 @@ import {
   NAV_CARDS,
   DEFAULT_NAV_ORDER,
   NAV_CARDS_MAP,
-  type SettingsSidebarTabKey,
   type AppSettingsPageKey,
   type WeatherSettingsPageKey,
   type MailSettingsPageKey,
@@ -83,6 +82,46 @@ import {
   type SettingsTabLabelKey,
   type NavCardDef,
 } from './setting/utils/settingsConfig';
+import {
+  CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY,
+  LOCAL_ISLAND_BG_SYNC_EVENT,
+  ISLAND_BG_MEDIA_STORE_KEY,
+  ISLAND_BG_IMAGE_STORE_KEY,
+  ISLAND_BG_VIDEO_FIT_STORE_KEY,
+  ISLAND_BG_VIDEO_MUTED_STORE_KEY,
+  ISLAND_BG_VIDEO_LOOP_STORE_KEY,
+  ISLAND_BG_VIDEO_VOLUME_STORE_KEY,
+  ISLAND_BG_VIDEO_RATE_STORE_KEY,
+  ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY,
+  ISLAND_BG_SYNC_SYSTEM_WALLPAPER_STORE_KEY,
+  STANDALONE_WINDOW_MAC_CONTROLS_STORE_KEY,
+  ISLAND_DISPLAY_STORE_KEY,
+  UPDATE_SOURCE_STORE_KEY,
+  UPDATE_AUTO_PROMPT_STORE_KEY,
+  WEATHER_ALERT_ENABLED_STORE_KEY,
+  MAIL_CONFIG_STORE_KEY,
+  MAIL_ACCOUNTS_STORE_KEY,
+  MAIL_FETCH_LIMIT_STORE_KEY,
+  SETTINGS_OPEN_TAB_STORE_KEY,
+  ISLAND_AUTO_DIM_ENABLED_STORE_KEY,
+  ISLAND_AUTO_DIM_DELAY_STORE_KEY,
+  DEFAULT_AUTO_DIM_DELAY_SEC,
+  UPDATE_SOURCES,
+  PLUGIN_MARKET_PAGES,
+  generateMailAccountId,
+  isDirectBgMediaUrl,
+  normalizeBgMediaConfig,
+  resolveBgMediaPreviewUrl,
+  applyIslandOpacity,
+  getRoleFromToken,
+  type SettingsOpenTabIntent,
+  type IslandBgMediaConfig,
+  type MailAccountConfig,
+  type RunningWindowItem,
+  type PluginMarketPageKey,
+} from './setting/config/settingsTabConfig';
+import { useSettingsSidebarTabState, useUserSessionState } from './setting/hooks/useSettingsTabState';
+import { useUpdateSettingsState } from './setting/hooks/useUpdateSettingsState';
 import { UpdateSettingsSection } from './setting/components/update/UpdateSettingsSection';
 import { IndexSettingsSection } from './setting/components/index/IndexSettingsSection';
 import { AppSettingsSection } from './setting/components/app/AppSettingsSection';
@@ -100,125 +139,15 @@ import { WallpaperContributionSection } from './setting/components/pluginMarket/
 import { WallpaperEditSection } from './setting/components/pluginMarket/WallpaperEditSection';
 
 import { resolveDistrictLocationByKeyword } from '../../../../api/weather/adcodeApi';
-import { fetchUpdateSourceUrl } from '../../../../api/user/userAccountApi';
 import { request as requestUserAccountApi } from '../../../../api/user/userAccountApi.client';
 import {
   readAnnouncementShowMode,
-  writeAnnouncementShowMode,
-  type AnnouncementShowMode,
 } from '../../../../api/announcement/announcementApi';
 
 import { setThemeMode as applyThemeMode, getThemeMode, type ThemeMode } from '../../../../utils/theme';
 import { getLanguage, setLanguage, type AppLanguage } from '../../../../i18n';
-import { readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
+import { readLocalToken } from '../../../../utils/userAccount';
 import { SvgIcon } from '../../../../utils/SvgIcon';
-
-const CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY = 'clipboard-url-suppress-in-url-favorites';
-const LOCAL_ISLAND_BG_SYNC_EVENT = 'island-bg-local-sync';
-const ISLAND_BG_MEDIA_STORE_KEY = 'island-bg-media';
-const ISLAND_BG_IMAGE_STORE_KEY = 'island-bg-image';
-const ISLAND_BG_VIDEO_FIT_STORE_KEY = 'island-bg-video-fit';
-const ISLAND_BG_VIDEO_MUTED_STORE_KEY = 'island-bg-video-muted';
-const ISLAND_BG_VIDEO_LOOP_STORE_KEY = 'island-bg-video-loop';
-const ISLAND_BG_VIDEO_VOLUME_STORE_KEY = 'island-bg-video-volume';
-const ISLAND_BG_VIDEO_RATE_STORE_KEY = 'island-bg-video-rate';
-const ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY = 'island-bg-video-hw-decode';
-const ISLAND_BG_SYNC_SYSTEM_WALLPAPER_STORE_KEY = 'island-bg-sync-system-wallpaper';
-const STANDALONE_WINDOW_MAC_CONTROLS_STORE_KEY = 'standalone-window-mac-controls';
-const ISLAND_DISPLAY_STORE_KEY = 'island-display-id';
-const UPDATE_SOURCE_STORE_KEY = 'update-source';
-const UPDATE_AUTO_PROMPT_STORE_KEY = 'update-auto-prompt-enabled';
-const WEATHER_ALERT_ENABLED_STORE_KEY = 'weather-alert-enabled';
-const MAIL_CONFIG_STORE_KEY = 'mail-account-config';
-const MAIL_ACCOUNTS_STORE_KEY = 'mail-accounts-config';
-const MAIL_FETCH_LIMIT_STORE_KEY = 'mail-fetch-limit';
-const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
-const ISLAND_AUTO_DIM_ENABLED_STORE_KEY = 'island-auto-dim-enabled';
-const ISLAND_AUTO_DIM_DELAY_STORE_KEY = 'island-auto-dim-delay';
-const DEFAULT_AUTO_DIM_DELAY_SEC = 10;
-type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail' | 'performance-monitor';
-let _lastSettingsSidebarTab: SettingsSidebarTabKey = 'index';
-
-type IslandBgMediaType = 'image' | 'video';
-
-interface IslandBgMediaConfig {
-  type: IslandBgMediaType;
-  source: string;
-}
-
-interface MailAccountConfig {
-  id: string;
-  label: string;
-  emailAddress: string;
-  imapHost: string;
-  imapPort: string;
-  imapSecure: boolean;
-  authUser: string;
-  authSecret: string;
-}
-
-function generateMailAccountId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-
-
-function isDirectBgMediaUrl(source: string): boolean {
-  return source.startsWith('data:')
-    || source.startsWith('http://')
-    || source.startsWith('https://')
-    || source.startsWith('blob:')
-    || source.startsWith('file:')
-    || source.startsWith('/')
-    || source.startsWith('./')
-    || source.startsWith('../')
-    || source.startsWith('assets/');
-}
-
-function toMediaUrl(path: string): string {
-  const normalized = path.replace(/\\/g, '/');
-  return `eisland-media://local/${encodeURIComponent(normalized)}`;
-}
-
-function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | null {
-  if (typeof value === 'string') {
-    const source = value.trim();
-    return source ? { type: 'image', source } : null;
-  }
-  if (!value || typeof value !== 'object') return null;
-
-  const candidate = value as { type?: unknown; source?: unknown; image?: unknown; url?: unknown };
-  const sourceRaw = typeof candidate.source === 'string'
-    ? candidate.source
-    : typeof candidate.image === 'string'
-      ? candidate.image
-      : typeof candidate.url === 'string'
-        ? candidate.url
-        : null;
-  if (!sourceRaw) return null;
-
-  const source = sourceRaw.trim();
-  if (!source) return null;
-
-  if (candidate.type === 'video') {
-    return { type: 'video', source };
-  }
-  return { type: 'image', source };
-}
-
-async function resolveBgMediaPreviewUrl(media: IslandBgMediaConfig): Promise<string | null> {
-  if (media.type === 'image') {
-    if (isDirectBgMediaUrl(media.source)) return media.source;
-    return window.api.loadWallpaperFile?.(media.source) ?? null;
-  }
-  if (isDirectBgMediaUrl(media.source)) return media.source;
-  return toMediaUrl(media.source);
-}
-
-function applyIslandOpacity(opacity: number): void {
-  const safe = Math.max(10, Math.min(100, Math.round(opacity)));
-  document.documentElement.style.setProperty('--island-opacity', String(safe));
-}
 
 /** 单行配置项 */
 function SettingsField({
@@ -253,45 +182,6 @@ function SettingsField({
  * @description 最大展开模式下的设置面板
  */
 
-interface RunningWindowItem {
-  id: string;
-  title: string;
-  processName: string;
-  processPath: string | null;
-  processId: number | null;
-  iconDataUrl: string | null;
-}
-
-type PluginMarketPageKey = 'wallpaper' | 'plugin' | 'contribution' | 'edit';
-type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
-
-const PRO_UPDATE_SOURCE_SET: ReadonlySet<UpdateSourceKey> = new Set<UpdateSourceKey>(['tencent-cos', 'aliyun-oss']);
-
-const normalizeRoleValue = (value: string): string => {
-  return value.trim().toLowerCase().replace(/^role_/, '');
-};
-
-const getRoleFromToken = (token: string | null | undefined): string | null => {
-  if (!token) return null;
-  const rawToken = token.trim().replace(/^bearer\s+/i, '');
-  const parts = rawToken.split('.');
-  if (parts.length < 2) return null;
-  try {
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const normalizedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
-    const decoded = JSON.parse(atob(normalizedPayload)) as { role?: unknown };
-    return typeof decoded.role === 'string' ? normalizeRoleValue(decoded.role) : null;
-  } catch {
-    return null;
-  }
-};
-
-const isProOnlyUpdateSource = (source: UpdateSourceKey): boolean => {
-  return PRO_UPDATE_SOURCE_SET.has(source);
-};
-
-const PLUGIN_MARKET_PAGES: PluginMarketPageKey[] = ['wallpaper', 'plugin', 'contribution', 'edit'];
-
 /**
  * 渲染设置面板主视图
  * @description 提供应用设置、AI 配置与关于软件三类设置入口
@@ -317,9 +207,8 @@ export function SettingsTab(): ReactElement {
     }));
   }, [t]);
   const opacitySaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [activeTab, setActiveTab] = useState<SettingsSidebarTabKey>(() => _lastSettingsSidebarTab);
-  const [sessionToken, setSessionToken] = useState<string | null>(() => readLocalToken());
-  const [hasLoginSession, setHasLoginSession] = useState<boolean>(() => Boolean(readLocalToken()));
+  const [activeTab, setActiveTab] = useSettingsSidebarTabState();
+  const { sessionToken, hasLoginSession } = useUserSessionState();
   const [appSettingsPage, setAppSettingsPage] = useState<AppSettingsPageKey>('layout-preview');
   const [weatherSettingsPage, setWeatherSettingsPage] = useState<WeatherSettingsPageKey>('location');
   const [mailSettingsPage, setMailSettingsPage] = useState<MailSettingsPageKey>('account');
@@ -334,10 +223,6 @@ export function SettingsTab(): ReactElement {
   const activeTabRef = useRef(activeTab);
   activeTabRef.current = activeTab;
   useEffect(() => {
-    _lastSettingsSidebarTab = activeTab;
-  }, [activeTab]);
-
-  useEffect(() => {
     if (activeTab !== 'user') {
       setUserInitialProfilePage('info');
     }
@@ -348,16 +233,6 @@ export function SettingsTab(): ReactElement {
       setAboutInitialPage('development');
     }
   }, [activeTab]);
-
-  useEffect(() => {
-    const applySession = (): void => {
-      const token = readLocalToken();
-      setSessionToken(token);
-      setHasLoginSession(Boolean(token));
-    };
-    applySession();
-    return subscribeUserAccountSessionChanged(applySession);
-  }, []);
 
   /** 加载独立窗口控制按钮样式配置 */
   useEffect(() => {
@@ -518,73 +393,31 @@ export function SettingsTab(): ReactElement {
   ]);
   const [aboutVersion, setAboutVersion] = useState<string>('');
 
-  /** 自动更新相关状态 */
-  const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'available' | 'downloading' | 'ready' | 'error' | 'latest'>('idle');
-  const [updateVersion, setUpdateVersion] = useState<string>('');
-  const [updateError, setUpdateError] = useState<string>('');
-  const [downloadProgress, setDownloadProgress] = useState<{ percent: number; transferred: number; total: number; bytesPerSecond: number } | null>(null);
-  const [updateAutoPromptEnabled, setUpdateAutoPromptEnabled] = useState<boolean>(true);
-  const [announcementShowMode, setAnnouncementShowMode] = useState<AnnouncementShowMode>('version-update-only');
-  const [updateSource, setUpdateSource] = useState<UpdateSourceKey>('cloudflare-r2');
-  const UPDATE_SOURCES: { key: UpdateSourceKey; label: string; proOnly?: boolean }[] = [
-    { key: 'cloudflare-r2', label: 'Cloudflare R2' },
-    { key: 'tencent-cos', label: 'Tencent COS', proOnly: true },
-    { key: 'aliyun-oss', label: 'Aliyun OSS', proOnly: true },
-    { key: 'github', label: 'GitHub Releases' },
-  ];
-  const currentSourceLabel = UPDATE_SOURCES.find((s) => s.key === updateSource)?.label ?? updateSource;
-
-  const handleUpdateSourceChange = (value: string): void => {
-    const nextSource: UpdateSourceKey = value === 'github'
-      ? 'github'
-      : value === 'tencent-cos'
-        ? 'tencent-cos'
-        : value === 'aliyun-oss'
-          ? 'aliyun-oss'
-        : 'cloudflare-r2';
-    if (isProOnlyUpdateSource(nextSource) && !isProUser) {
-      setUpdateStatus('error');
-      setUpdateError(t('settings.update.proOnlyError', { defaultValue: '该更新源仅 PRO 用户可用' }));
-      return;
-    }
-    setUpdateSource(nextSource);
-    setUpdateError('');
-    window.api.storeWrite(UPDATE_SOURCE_STORE_KEY, nextSource).catch(() => {});
-  };
-
-  useEffect(() => {
-    if (isProUser) return;
-    if (!isProOnlyUpdateSource(updateSource)) return;
-    setUpdateSource('cloudflare-r2');
-    window.api.storeWrite(UPDATE_SOURCE_STORE_KEY, 'cloudflare-r2').catch(() => {});
-  }, [isProUser, updateSource]);
-
-  const resolveUpdateSourceUrl = async (source: UpdateSourceKey): Promise<string | undefined> => {
-    if (!isProOnlyUpdateSource(source)) {
-      return undefined;
-    }
-    if (!isProUser) {
-      throw new Error(t('settings.update.proOnlyError', { defaultValue: '该更新源仅 PRO 用户可用' }));
-    }
-    if (!sessionToken) {
-      throw new Error(t('settings.update.proOnlyNeedLogin', { defaultValue: '请先登录 PRO 账号后再使用该更新源' }));
-    }
-    const result = await fetchUpdateSourceUrl(sessionToken, source);
-    if (!result.ok || !result.data?.url) {
-      throw new Error(result.message || t('settings.update.sourceResolveFailed', { defaultValue: '获取更新源地址失败' }));
-    }
-    return result.data.url;
-  };
-
-  const handleUpdateAutoPromptEnabledChange = (enabled: boolean): void => {
-    setUpdateAutoPromptEnabled(enabled);
-    window.api.storeWrite(UPDATE_AUTO_PROMPT_STORE_KEY, enabled).catch(() => {});
-  };
-
-  const handleAnnouncementShowModeChange = (mode: AnnouncementShowMode): void => {
-    setAnnouncementShowMode(mode);
-    void writeAnnouncementShowMode(mode);
-  };
+  const {
+    updateStatus,
+    setUpdateStatus,
+    updateVersion,
+    setUpdateVersion,
+    updateError,
+    setUpdateError,
+    downloadProgress,
+    setDownloadProgress,
+    updateAutoPromptEnabled,
+    setUpdateAutoPromptEnabled,
+    announcementShowMode,
+    setAnnouncementShowMode,
+    updateSource,
+    setUpdateSource,
+    currentSourceLabel,
+    handleUpdateSourceChange,
+    handleUpdateAutoPromptEnabledChange,
+    handleAnnouncementShowModeChange,
+    resolveUpdateSourceUrl,
+  } = useUpdateSettingsState({
+    t,
+    isProUser,
+    sessionToken,
+  });
 
   const persistIslandOpacity = (opacity: number): void => {
     window.api.islandOpacitySet(opacity).catch(() => {});
