@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file settingsTabConfig.ts
+ * @description 设置页拆分后的配置常量、共享类型与通用工具函数
+ * @author 鸡哥
+ */
+
 import type { SettingsSidebarTabKey } from '../utils/settingsConfig';
 
 export const CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY = 'clipboard-url-suppress-in-url-favorites';
@@ -75,10 +101,19 @@ export const UPDATE_SOURCES: { key: UpdateSourceKey; label: string; proOnly?: bo
   { key: 'github', label: 'GitHub Releases' },
 ];
 
+/**
+ * 生成邮件账户唯一标识。
+ * @returns 基于时间戳与随机片段生成的账户 ID
+ */
 export function generateMailAccountId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+/**
+ * 判断是否为可直接用于预览的背景媒体地址。
+ * @param source - 背景媒体源地址
+ * @returns 是否为无需本地协议转换的直连地址
+ */
 export function isDirectBgMediaUrl(source: string): boolean {
   return source.startsWith('data:')
     || source.startsWith('http://')
@@ -96,6 +131,11 @@ function toMediaUrl(path: string): string {
   return `eisland-media://local/${encodeURIComponent(normalized)}`;
 }
 
+/**
+ * 归一化背景媒体配置，兼容历史字段。
+ * @param value - 持久化读取到的原始配置值
+ * @returns 统一后的背景媒体配置，若无效则返回 null
+ */
 export function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | null {
   if (typeof value === 'string') {
     const source = value.trim();
@@ -122,6 +162,11 @@ export function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | nu
   return { type: 'image', source };
 }
 
+/**
+ * 解析背景媒体预览地址。
+ * @param media - 背景媒体配置
+ * @returns 可用于渲染层预览的 URL
+ */
 export async function resolveBgMediaPreviewUrl(media: IslandBgMediaConfig): Promise<string | null> {
   if (media.type === 'image') {
     if (isDirectBgMediaUrl(media.source)) return media.source;
@@ -131,6 +176,10 @@ export async function resolveBgMediaPreviewUrl(media: IslandBgMediaConfig): Prom
   return toMediaUrl(media.source);
 }
 
+/**
+ * 应用岛屿透明度到全局样式变量。
+ * @param opacity - 透明度百分比
+ */
 export function applyIslandOpacity(opacity: number): void {
   const safe = Math.max(10, Math.min(100, Math.round(opacity)));
   document.documentElement.style.setProperty('--island-opacity', String(safe));
@@ -140,6 +189,11 @@ const normalizeRoleValue = (value: string): string => {
   return value.trim().toLowerCase().replace(/^role_/, '');
 };
 
+/**
+ * 从 JWT Token 中解析角色字段。
+ * @param token - 本地会话 Token
+ * @returns 归一化后的角色名，解析失败时返回 null
+ */
 export const getRoleFromToken = (token: string | null | undefined): string | null => {
   if (!token) return null;
   const rawToken = token.trim().replace(/^bearer\s+/i, '');
@@ -155,6 +209,11 @@ export const getRoleFromToken = (token: string | null | undefined): string | nul
   }
 };
 
+/**
+ * 判断更新源是否仅 PRO 可用。
+ * @param source - 更新源标识
+ * @returns 是否为 PRO 专属更新源
+ */
 export const isProOnlyUpdateSource = (source: UpdateSourceKey): boolean => {
   return PRO_UPDATE_SOURCE_SET.has(source);
 };

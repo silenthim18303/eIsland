@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file useBackgroundMediaSettingsState.ts
+ * @description 设置页背景媒体状态 Hook，统一管理背景预览、持久化与桌面壁纸同步
+ * @author 鸡哥
+ */
+
 import { useRef, useState } from 'react';
 import {
   LOCAL_ISLAND_BG_SYNC_EVENT,
@@ -14,7 +40,11 @@ import {
   type IslandBgMediaConfig,
 } from '../config/settingsTabConfig';
 
-export function useBackgroundMediaSettingsState() {
+/**
+ * 管理背景媒体配置状态与相关操作。
+ * @returns 背景媒体状态、持久化方法、预览应用方法与用户交互处理函数
+ */
+export default function useBackgroundMediaSettingsState() {
   const [bgMedia, setBgMedia] = useState<IslandBgMediaConfig | null>(null);
   const [bgMediaPreviewUrl, setBgMediaPreviewUrl] = useState<string | null>(null);
   const [bgVideoFit, setBgVideoFit] = useState<'cover' | 'contain'>('cover');

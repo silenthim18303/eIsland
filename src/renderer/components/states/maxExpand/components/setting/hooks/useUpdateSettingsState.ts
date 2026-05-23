@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file useUpdateSettingsState.ts
+ * @description 设置页更新模块状态 Hook，负责更新源、自动更新提示与更新流程控制
+ * @author 鸡哥
+ */
+
 import { useEffect, useState } from 'react';
 import type { TFunction } from 'i18next';
 import { fetchUpdateSourceUrl } from '../../../../../../api/user/userAccountApi';
@@ -22,7 +48,15 @@ interface UseUpdateSettingsStateArgs {
   sessionToken: string | null;
 }
 
-export function useUpdateSettingsState({ t, isProUser, sessionToken }: UseUpdateSettingsStateArgs) {
+/**
+ * 管理设置页更新相关状态与行为。
+ * @param args - 更新状态 Hook 初始化参数
+ * @param args.t - i18n 翻译函数
+ * @param args.isProUser - 当前用户是否为 PRO
+ * @param args.sessionToken - 当前登录会话 Token
+ * @returns 更新模块状态与操作方法集合
+ */
+export default function useUpdateSettingsState({ t, isProUser, sessionToken }: UseUpdateSettingsStateArgs) {
   const [updateStatus, setUpdateStatus] = useState<UpdateStatus>('idle');
   const [updateVersion, setUpdateVersion] = useState<string>('');
   const [updateError, setUpdateError] = useState<string>('');

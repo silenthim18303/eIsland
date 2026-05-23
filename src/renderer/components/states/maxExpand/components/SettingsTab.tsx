@@ -117,8 +117,8 @@ import {
   type PluginMarketPageKey,
 } from './setting/config/settingsTabConfig';
 import { useSettingsSidebarTabState, useUserSessionState } from './setting/hooks/useSettingsTabState';
-import { useUpdateSettingsState } from './setting/hooks/useUpdateSettingsState';
-import { useBackgroundMediaSettingsState } from './setting/hooks/useBackgroundMediaSettingsState';
+import useUpdateSettingsState from './setting/hooks/useUpdateSettingsState';
+import useBackgroundMediaSettingsState from './setting/hooks/useBackgroundMediaSettingsState';
 import { UpdateSettingsSection } from './setting/components/update/UpdateSettingsSection';
 import { IndexSettingsSection } from './setting/components/index/IndexSettingsSection';
 import { AppSettingsSection } from './setting/components/app/AppSettingsSection';
