@@ -1519,6 +1519,13 @@
         "widgetPickerHint": "Pick the widget for each side. Changes are saved automatically.",
         "leftWidget": "Left Widget",
         "rightWidget": "Right Widget",
+        "clockStyleTitle": "Center Clock Style",
+        "clockStyleHint": "Choose the center clock style in Overview. Changes are saved automatically.",
+        "clockStyleNames": {
+          "classic": "Classic",
+          "minimal": "Minimal",
+          "split": "Split"
+        },
         "widgetNames": {
           "shortcuts": "Shortcuts",
           "todo": "Todo",

@@ -26,7 +26,7 @@
 
 import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import type { AppSettingsPageKey, ExpandNavLayoutConfig, MaxExpandNavLayoutConfig } from '../../../utils/settingsConfig';
-import type { OverviewLayoutConfig, OverviewWidgetType } from '../../../../../../expand/components/OverviewTab';
+import type { OverviewClockStyle, OverviewLayoutConfig, OverviewWidgetType } from '../../../../../../expand/components/OverviewTab';
 
 /**
  * 运行中窗口信息
@@ -74,7 +74,9 @@ export interface AppSettingsSectionProps {
   layoutConfig: OverviewLayoutConfig;
   OverviewPreviewComponent: ({ layoutConfig }: { layoutConfig: OverviewLayoutConfig }) => ReactElement;
   overviewWidgetOptions: { value: OverviewWidgetType; label: string }[];
+  overviewClockStyleOptions: { value: OverviewClockStyle; label: string }[];
   updateLayout: (side: 'left' | 'right', value: OverviewWidgetType) => void;
+  updateClockStyle: (value: OverviewClockStyle) => void;
   expandNavLayout: ExpandNavLayoutConfig;
   updateExpandNavLayout: (layout: ExpandNavLayoutConfig) => void;
   maxExpandNavLayout: MaxExpandNavLayoutConfig;

@@ -28,8 +28,8 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import type { KeyboardEvent, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
-import type { OverviewWidgetType, OverviewLayoutConfig } from '../../expand/components/OverviewTab';
-import { OVERVIEW_WIDGET_OPTIONS } from '../../expand/components/OverviewTab';
+import type { OverviewClockStyle, OverviewWidgetType, OverviewLayoutConfig } from '../../expand/components/OverviewTab';
+import { OVERVIEW_CLOCK_STYLE_OPTIONS, OVERVIEW_WIDGET_OPTIONS, normalizeOverviewLayoutConfig } from '../../expand/components/OverviewTab';
 import {
   loadNetworkConfig,
   saveNetworkConfig,
@@ -196,6 +196,17 @@ export function SettingsTab(): ReactElement {
       breakReminder: 'settings.app.layout.widgetNames.breakReminder',
     };
     return OVERVIEW_WIDGET_OPTIONS.map((option) => ({
+      ...option,
+      label: t(labelKeyMap[option.value], { defaultValue: option.label }),
+    }));
+  }, [t]);
+  const translatedOverviewClockStyleOptions = useMemo(() => {
+    const labelKeyMap: Record<OverviewClockStyle, string> = {
+      classic: 'settings.app.layout.clockStyleNames.classic',
+      minimal: 'settings.app.layout.clockStyleNames.minimal',
+      split: 'settings.app.layout.clockStyleNames.split',
+    };
+    return OVERVIEW_CLOCK_STYLE_OPTIONS.map((option) => ({
       ...option,
       label: t(labelKeyMap[option.value], { defaultValue: option.label }),
     }));
@@ -1090,9 +1101,7 @@ export function SettingsTab(): ReactElement {
     let cancelled = false;
     window.api.storeRead(LAYOUT_STORE_KEY).then((data) => {
       if (cancelled) return;
-      if (data && typeof data === 'object' && 'left' in (data as object) && 'right' in (data as object)) {
-        setLayoutConfig(data as OverviewLayoutConfig);
-      }
+      setLayoutConfig(normalizeOverviewLayoutConfig(data));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -1227,6 +1236,12 @@ export function SettingsTab(): ReactElement {
 
   const updateLayout = (side: 'left' | 'right', value: OverviewWidgetType): void => {
     const updated = { ...layoutConfig, [side]: value };
+    setLayoutConfig(updated);
+    window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
+  };
+
+  const updateClockStyle = (value: OverviewClockStyle): void => {
+    const updated = { ...layoutConfig, clockStyle: value };
     setLayoutConfig(updated);
     window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
   };
@@ -2284,7 +2299,9 @@ export function SettingsTab(): ReactElement {
               layoutConfig={layoutConfig}
               OverviewPreviewComponent={OverviewPreview}
               overviewWidgetOptions={translatedOverviewWidgetOptions}
+              overviewClockStyleOptions={translatedOverviewClockStyleOptions}
               updateLayout={updateLayout}
+              updateClockStyle={updateClockStyle}
               expandNavLayout={expandNavLayout}
               updateExpandNavLayout={updateExpandNavLayout}
               maxExpandNavLayout={maxExpandNavLayout}

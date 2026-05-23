@@ -59,7 +59,9 @@ export function AppSettingsSection({
   layoutConfig,
   OverviewPreviewComponent,
   overviewWidgetOptions,
+  overviewClockStyleOptions,
   updateLayout,
+  updateClockStyle,
   expandNavLayout,
   updateExpandNavLayout,
   maxExpandNavLayout,
@@ -174,7 +176,9 @@ export function AppSettingsSection({
             layoutConfig={layoutConfig}
             OverviewPreviewComponent={OverviewPreviewComponent}
             overviewWidgetOptions={overviewWidgetOptions}
+            overviewClockStyleOptions={overviewClockStyleOptions}
             updateLayout={updateLayout}
+            updateClockStyle={updateClockStyle}
           />
         );
       case 'maxexpand-layout':

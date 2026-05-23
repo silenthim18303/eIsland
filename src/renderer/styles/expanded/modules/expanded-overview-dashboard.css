@@ -182,6 +182,21 @@
   line-height: 1.15;
 }
 
+.ov-dash-clock-split-wrap {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.ov-dash-clock-seconds {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.56);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
 .ov-dash-date {
   font-size: 11px;
   color: rgba(var(--color-text-rgb), 0.45);
@@ -234,6 +249,35 @@
 .ov-dash-yiji-items {
   font-size: 9px;
   color: rgba(var(--color-text-rgb), 0.32);
+}
+
+.ov-dash-time--minimal {
+  gap: 2px;
+}
+
+.ov-dash-time--minimal .ov-dash-date {
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  color: rgba(var(--color-text-rgb), 0.42);
+}
+
+.ov-dash-time--minimal .ov-dash-clock {
+  font-size: 36px;
+  letter-spacing: 2.8px;
+  color: rgba(var(--color-text-rgb), 0.94);
+}
+
+.ov-dash-time--split {
+  gap: 1px;
+}
+
+.ov-dash-time--split .ov-dash-date {
+  margin-bottom: 0;
+}
+
+.ov-dash-time--split .ov-dash-clock {
+  font-size: 34px;
+  letter-spacing: 2.4px;
 }
 
 /** 右区：待办事项 */

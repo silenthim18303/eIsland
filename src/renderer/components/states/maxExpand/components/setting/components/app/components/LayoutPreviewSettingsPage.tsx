@@ -28,21 +28,25 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AppSettingsSectionProps } from './types';
 
-type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfig' | 'OverviewPreviewComponent' | 'overviewWidgetOptions' | 'updateLayout'>;
+type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfig' | 'OverviewPreviewComponent' | 'overviewWidgetOptions' | 'overviewClockStyleOptions' | 'updateLayout' | 'updateClockStyle'>;
 
 /**
  * 渲染软件设置中的总览布局配置页面
  * @param layoutConfig - 当前总览布局配置
  * @param OverviewPreviewComponent - 总览预览组件
  * @param overviewWidgetOptions - 左右控件可选项
+ * @param overviewClockStyleOptions - 中间时钟样式可选项
  * @param updateLayout - 更新左右控件布局方法
+ * @param updateClockStyle - 更新时钟样式方法
  * @returns 总览布局设置页面
  */
 export function LayoutPreviewSettingsPage({
   layoutConfig,
   OverviewPreviewComponent,
   overviewWidgetOptions,
+  overviewClockStyleOptions,
   updateLayout,
+  updateClockStyle,
 }: LayoutPreviewSettingsPageProps): ReactElement {
   const { t } = useTranslation();
   const OverviewPreview = OverviewPreviewComponent;
@@ -97,6 +101,24 @@ export function LayoutPreviewSettingsPage({
                   </button>
                 ))}
               </div>
+            </div>
+            <div className="settings-layout-control">
+              <span className="settings-layout-control-label">{t('settings.app.layout.clockStyleTitle', { defaultValue: '中间时钟样式' })}</span>
+              <div className="settings-layout-options">
+                {overviewClockStyleOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    className={`settings-layout-btn ${layoutConfig.clockStyle === opt.value ? 'active' : ''}`}
+                    type="button"
+                    onClick={() => updateClockStyle(opt.value)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <span className="settings-layout-control-label" style={{ marginTop: 8, opacity: 0.7 }}>
+                {t('settings.app.layout.clockStyleHint', { defaultValue: '选择总览中间时钟区域样式，切换后自动保存。' })}
+              </span>
             </div>
           </div>
         </div>

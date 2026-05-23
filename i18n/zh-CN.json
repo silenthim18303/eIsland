@@ -1518,6 +1518,13 @@
         "widgetPickerHint": "分别选择左右两侧展示的控件，切换后自动保存。",
         "leftWidget": "左侧控件",
         "rightWidget": "右侧控件",
+        "clockStyleTitle": "中间时钟样式",
+        "clockStyleHint": "选择总览中间时钟区域样式，切换后自动保存。",
+        "clockStyleNames": {
+          "classic": "经典样式",
+          "minimal": "极简样式",
+          "split": "分体样式"
+        },
         "widgetNames": {
           "shortcuts": "快捷启动",
           "todo": "待办事项",

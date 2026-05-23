@@ -365,11 +365,18 @@ export function OverviewPreview({ layoutConfig }: { layoutConfig: OverviewLayout
       <div className="ov-dash-slot ov-dash-slot-left">
         {renderWidget(layoutConfig.left)}
       </div>
-      <div className="ov-dash-time">
+      <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`}>
         <span className="ov-dash-date">{t('settings.app.layout.previewMock.date', { defaultValue: '2026年01月01日 星期四' })}</span>
-        <span className="ov-dash-clock">12:00:00</span>
-        <span className="ov-dash-lunar">{t('settings.app.layout.previewMock.lunar', { defaultValue: '乙巳年 腊月十二' })}</span>
-        <div className="ov-dash-yiji">
+        {layoutConfig.clockStyle === 'split' ? (
+          <div className="ov-dash-clock-split-wrap">
+            <span className="ov-dash-clock">12:00</span>
+            <span className="ov-dash-clock-seconds">00</span>
+          </div>
+        ) : (
+          <span className="ov-dash-clock">12:00:00</span>
+        )}
+        {layoutConfig.clockStyle !== 'minimal' && <span className="ov-dash-lunar">{t('settings.app.layout.previewMock.lunar', { defaultValue: '乙巳年 腊月十二' })}</span>}
+        <div className="ov-dash-yiji" hidden={layoutConfig.clockStyle === 'minimal'}>
           <div className="ov-dash-yiji-row">
             <span className="ov-dash-yiji-label yi">{t('overview.time.yi', { defaultValue: '宜' })}</span>
             <span className="ov-dash-yiji-items">{t('settings.app.layout.previewMock.yiItems', { defaultValue: '祈福 · 出行 · 开市' })}</span>

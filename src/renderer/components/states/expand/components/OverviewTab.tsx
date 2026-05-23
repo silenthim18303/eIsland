@@ -52,6 +52,9 @@ import {
 /** 总览控件类型 */
 export type OverviewWidgetType = 'shortcuts' | 'todo' | 'song' | 'countdown' | 'pomodoro' | 'urlFavorites' | 'album' | 'mokugyo' | 'breakReminder';
 
+/** 中间时钟样式类型 */
+export type OverviewClockStyle = 'classic' | 'minimal' | 'split';
+
 /** 控件选项列表 */
 export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string }[] = [
   { value: 'shortcuts', label: '快捷启动' },
@@ -65,14 +68,43 @@ export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string
   { value: 'breakReminder', label: '休息提醒' },
 ];
 
+/** 时钟样式选项 */
+export const OVERVIEW_CLOCK_STYLE_OPTIONS: { value: OverviewClockStyle; label: string }[] = [
+  { value: 'classic', label: '经典样式' },
+  { value: 'minimal', label: '极简样式' },
+  { value: 'split', label: '分体样式' },
+];
+
 /** 总览布局配置 */
 export interface OverviewLayoutConfig {
   left: OverviewWidgetType;
   right: OverviewWidgetType;
+  clockStyle: OverviewClockStyle;
 }
 
 const LAYOUT_STORE_KEY = 'overview-layout';
-const DEFAULT_LAYOUT: OverviewLayoutConfig = { left: 'shortcuts', right: 'todo' };
+const DEFAULT_LAYOUT: OverviewLayoutConfig = { left: 'shortcuts', right: 'todo', clockStyle: 'classic' };
+
+export function normalizeOverviewLayoutConfig(raw: unknown): OverviewLayoutConfig {
+  if (!raw || typeof raw !== 'object') {
+    return DEFAULT_LAYOUT;
+  }
+  const candidate = raw as { left?: unknown; right?: unknown; clockStyle?: unknown };
+  const widgetValues = new Set<OverviewWidgetType>(OVERVIEW_WIDGET_OPTIONS.map((item) => item.value));
+  const clockStyleValues = new Set<OverviewClockStyle>(OVERVIEW_CLOCK_STYLE_OPTIONS.map((item) => item.value));
+
+  return {
+    left: typeof candidate.left === 'string' && widgetValues.has(candidate.left as OverviewWidgetType)
+      ? candidate.left as OverviewWidgetType
+      : DEFAULT_LAYOUT.left,
+    right: typeof candidate.right === 'string' && widgetValues.has(candidate.right as OverviewWidgetType)
+      ? candidate.right as OverviewWidgetType
+      : DEFAULT_LAYOUT.right,
+    clockStyle: typeof candidate.clockStyle === 'string' && clockStyleValues.has(candidate.clockStyle as OverviewClockStyle)
+      ? candidate.clockStyle as OverviewClockStyle
+      : DEFAULT_LAYOUT.clockStyle,
+  };
+}
 
 /**
  * 总览 Tab
@@ -115,17 +147,13 @@ export function OverviewTab(): React.ReactElement {
     let cancelled = false;
     window.api.storeRead(LAYOUT_STORE_KEY).then((data) => {
       if (cancelled) return;
-      if (data && typeof data === 'object' && 'left' in (data as object) && 'right' in (data as object)) {
-        setLayoutConfig(data as OverviewLayoutConfig);
-      }
+      setLayoutConfig(normalizeOverviewLayoutConfig(data));
     }).catch(() => {});
 
     const unsub = window.api.onSettingsChanged((channel: string, value: unknown) => {
       if (cancelled) return;
       if (channel === `store:${LAYOUT_STORE_KEY}`) {
-        if (value && typeof value === 'object' && 'left' in (value as object) && 'right' in (value as object)) {
-          setLayoutConfig(value as OverviewLayoutConfig);
-        }
+        setLayoutConfig(normalizeOverviewLayoutConfig(value));
       }
     });
 
@@ -323,11 +351,18 @@ export function OverviewTab(): React.ReactElement {
       </div>
 
       {/* ========== 中区：时间（始终居中） ========== */}
-      <div className="ov-dash-time">
+      <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`}>
         <span className="ov-dash-date">{t('overview.time.date', { defaultValue: '{{yyyy}}年{{month}}月{{day}}日 {{dayName}}', yyyy, month, day, dayName })}</span>
-        <span className="ov-dash-clock">{hh}:{mm}:{ss}</span>
-        <span className="ov-dash-lunar">{getLunarDate(now)}</span>
-        <div className="ov-dash-yiji">
+        {layoutConfig.clockStyle === 'split' ? (
+          <div className="ov-dash-clock-split-wrap">
+            <span className="ov-dash-clock">{hh}:{mm}</span>
+            <span className="ov-dash-clock-seconds">{ss}</span>
+          </div>
+        ) : (
+          <span className="ov-dash-clock">{hh}:{mm}:{ss}</span>
+        )}
+        {layoutConfig.clockStyle !== 'minimal' && <span className="ov-dash-lunar">{getLunarDate(now)}</span>}
+        <div className="ov-dash-yiji" hidden={layoutConfig.clockStyle === 'minimal'}>
           <div className="ov-dash-yiji-row">
             <span className="ov-dash-yiji-label yi">{t('overview.time.yi', { defaultValue: '宜' })}</span>
             <span className="ov-dash-yiji-items">{getDayYi(now).slice(0, 3).join(' · ')}</span>
