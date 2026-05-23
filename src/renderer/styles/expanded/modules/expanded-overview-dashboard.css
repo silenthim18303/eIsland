@@ -190,17 +190,18 @@
   font-size: 34px;
   font-weight: 800;
   letter-spacing: 2.3px;
-  line-height: 1.1;
+  line-height: 1.08;
   background: linear-gradient(
     90deg,
     var(--ov-clock-gradient-start, #7be4ff) 0%,
-    var(--ov-clock-gradient-middle, #8da8ff) 45%,
+    var(--ov-clock-gradient-middle, #8da8ff) 50%,
     var(--ov-clock-gradient-end, #ffd28a) 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 12px rgba(123, 228, 255, 0.28);
+  text-shadow: 0 2px 12px rgba(123, 228, 255, 0.24), 0 0 20px rgba(141, 168, 255, 0.18);
+  filter: saturate(1.06);
 }
 
 .ov-dash-date {

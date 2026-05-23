@@ -1251,13 +1251,36 @@ export function SettingsTab(): ReactElement {
       return;
     }
     const hex = match[1];
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    const toHex = (n: number): string => n.toString(16).padStart(2, '0');
-    const mix = (channel: number, target: number, amount: number): number => Math.round(channel * (1 - amount) + target * amount);
-    const start = `#${toHex(mix(r, 255, 0.28))}${toHex(mix(g, 255, 0.28))}${toHex(mix(b, 255, 0.28))}`;
-    const end = `#${toHex(mix(r, 0, 0.18))}${toHex(mix(g, 0, 0.18))}${toHex(mix(b, 0, 0.18))}`;
+    const ri = parseInt(hex.slice(0, 2), 16) / 255;
+    const gi = parseInt(hex.slice(2, 4), 16) / 255;
+    const bi = parseInt(hex.slice(4, 6), 16) / 255;
+    const max = Math.max(ri, gi, bi), min = Math.min(ri, gi, bi);
+    let h = 0;
+    const l = (max + min) / 2;
+    const s = max === min ? 0 : (l > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min));
+    if (max !== min) {
+      const d = max - min;
+      if (max === ri) h = ((gi - bi) / d + (gi < bi ? 6 : 0)) * 60;
+      else if (max === gi) h = ((bi - ri) / d + 2) * 60;
+      else h = ((ri - gi) / d + 4) * 60;
+    }
+    const hslToHex = (hue: number, sat: number, lit: number): string => {
+      const hh = ((hue % 360) + 360) % 360;
+      const c = (1 - Math.abs(2 * lit - 1)) * sat;
+      const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+      const m = lit - c / 2;
+      let rr: number, gg: number, bb: number;
+      if (hh < 60) { rr = c; gg = x; bb = 0; }
+      else if (hh < 120) { rr = x; gg = c; bb = 0; }
+      else if (hh < 180) { rr = 0; gg = c; bb = x; }
+      else if (hh < 240) { rr = 0; gg = x; bb = c; }
+      else if (hh < 300) { rr = x; gg = 0; bb = c; }
+      else { rr = c; gg = 0; bb = x; }
+      const toH = (n: number): string => Math.max(0, Math.min(255, Math.round((n + m) * 255))).toString(16).padStart(2, '0');
+      return `#${toH(rr)}${toH(gg)}${toH(bb)}`;
+    };
+    const start = hslToHex(h - 50, Math.min(1, s * 1.15), Math.min(0.82, l + 0.15));
+    const end = hslToHex(h + 50, Math.min(1, s * 1.1), Math.max(0.25, l - 0.1));
 
     const updated = {
       ...layoutConfig,

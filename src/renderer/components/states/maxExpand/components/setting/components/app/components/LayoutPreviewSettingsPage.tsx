@@ -119,7 +119,7 @@ export function LayoutPreviewSettingsPage({
                 ))}
               </div>
               <div className="settings-layout-gradient-editor">
-                <span className="settings-layout-control-label">
+                <span className="settings-layout-control-label settings-layout-gradient-title">
                   {t('settings.app.layout.gradientEditorTitle', { defaultValue: '渐变颜色编辑' })}
                 </span>
                 <div className="settings-layout-gradient-pickers">

@@ -1480,6 +1480,11 @@
   gap: 6px;
 }
 
+.settings-layout-gradient-title {
+  width: 100%;
+  text-align: center;
+}
+
 .settings-layout-gradient-pickers {
   display: flex;
   align-items: center;
