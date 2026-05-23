@@ -210,17 +210,28 @@
 }
 
 .ov-dash-time--minimal .ov-dash-clock {
-  font-size: 56px;
-  font-weight: 900;
-  letter-spacing: 6px;
-  line-height: 1;
+  font-size: 72px;
+  font-weight: 950;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
   color: rgba(var(--color-text-rgb), 0.88);
-  font-style: italic;
   text-transform: uppercase;
   text-shadow:
-    0 1px 0 rgba(var(--color-text-rgb), 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.12);
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    0 4px 12px rgba(0, 0, 0, 0.15);
   font-variant-numeric: tabular-nums;
+}
+
+.ov-dash-time--minimal.ov-dash-time--minimal .ov-dash-clock {
+  background: linear-gradient(
+    90deg,
+    var(--ov-clock-gradient-start, rgba(var(--color-text-rgb), 0.88)) 0%,
+    var(--ov-clock-gradient-middle, rgba(var(--color-text-rgb), 0.88)) 50%,
+    var(--ov-clock-gradient-end, rgba(var(--color-text-rgb), 0.88)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .ov-dash-date {

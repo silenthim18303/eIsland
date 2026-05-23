@@ -289,7 +289,7 @@ export function OverviewTab(): React.ReactElement {
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
   const ss = now.getSeconds().toString().padStart(2, '0');
-  const gradientClockVars = layoutConfig.clockStyle === 'gradient'
+  const gradientClockVars = (layoutConfig.clockStyle === 'gradient' || layoutConfig.clockStyle === 'minimal')
     ? {
       '--ov-clock-gradient-start': layoutConfig.gradientColors.start,
       '--ov-clock-gradient-middle': layoutConfig.gradientColors.middle,

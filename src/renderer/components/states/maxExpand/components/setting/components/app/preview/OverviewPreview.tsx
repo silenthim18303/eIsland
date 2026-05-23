@@ -56,7 +56,7 @@ function previewDiffDays(targetStr: string): number {
 export function OverviewPreview({ layoutConfig }: { layoutConfig: OverviewLayoutConfig }): ReactElement {
   const { t } = useTranslation();
   const [cdItems, setCdItems] = useState<PreviewCountdownItem[]>([]);
-  const gradientClockVars = layoutConfig.clockStyle === 'gradient'
+  const gradientClockVars = (layoutConfig.clockStyle === 'gradient' || layoutConfig.clockStyle === 'minimal')
     ? {
       '--ov-clock-gradient-start': layoutConfig.gradientColors.start,
       '--ov-clock-gradient-middle': layoutConfig.gradientColors.middle,
