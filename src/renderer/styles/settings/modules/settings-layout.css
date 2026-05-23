@@ -5425,6 +5425,38 @@
   background: rgba(var(--color-text-rgb), 0.03);
 }
 
+.mg-lb-row-pro {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(125deg, rgba(242, 203, 81, 0.22) 0%, rgba(242, 203, 81, 0.07) 36%, rgba(var(--color-text-rgb), 0.02) 72%),
+    linear-gradient(135deg, rgba(var(--color-text-rgb), 0.08), rgba(var(--color-text-rgb), 0.03));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 239, 184, 0.35);
+}
+
+.mg-lb-row-pro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(112deg, rgba(242, 203, 81, 0.28) 0%, rgba(242, 203, 81, 0.08) 24%, rgba(242, 203, 81, 0) 58%);
+  opacity: 0.9;
+}
+
+.mg-lb-row-pro .mg-lb-rank,
+.mg-lb-row-pro .mg-lb-user,
+.mg-lb-row-pro .mg-lb-score {
+  position: relative;
+  z-index: 1;
+}
+
+.mg-lb-row-pro .mg-lb-pro-icon {
+  filter: drop-shadow(0 0 4px rgba(242, 203, 81, 0.4));
+}
+
 .mg-lb-top {
   font-weight: 500;
 }
