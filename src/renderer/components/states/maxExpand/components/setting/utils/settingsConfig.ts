@@ -181,7 +181,16 @@ export const NETWORK_TIMEOUT_OPTIONS = [
 ];
 
 export const LAYOUT_STORE_KEY = 'overview-layout';
-export const DEFAULT_LAYOUT: OverviewLayoutConfig = { left: 'shortcuts', right: 'todo', clockStyle: 'classic' };
+export const DEFAULT_LAYOUT: OverviewLayoutConfig = {
+  left: 'shortcuts',
+  right: 'todo',
+  clockStyle: 'classic',
+  gradientColors: {
+    start: '#7be4ff',
+    middle: '#8da8ff',
+    end: '#ffd28a',
+  },
+};
 
 export const MAXEXPAND_NAV_LAYOUT_STORE_KEY = 'maxexpand-nav-layout';
 
@@ -391,6 +400,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '总览布局预览', desc: '实时显示左右控件组合后的 Expand 态灵动岛样式，切换下方控件可即时预览。', labelKey: 'settings.app.layout.previewTitle', descKey: 'settings.app.layout.previewHint', tab: 'app', appPage: 'layout-preview' },
   { label: '控件组合', desc: '分别选择左右两侧展示的控件，切换后自动保存。', labelKey: 'settings.app.layout.widgetPickerTitle', descKey: 'settings.app.layout.widgetPickerHint', tab: 'app', appPage: 'layout-preview' },
   { label: '中间时钟样式', desc: '选择总览中间时钟区域样式，切换后自动保存。', labelKey: 'settings.app.layout.clockStyleTitle', descKey: 'settings.app.layout.clockStyleHint', tab: 'app', appPage: 'layout-preview' },
+  { label: '渐变颜色编辑', desc: '选择一个基准色，自动生成渐变时钟字体。', labelKey: 'settings.app.layout.gradientEditorTitle', descKey: 'settings.app.layout.gradientEditorHint', tab: 'app', appPage: 'layout-preview' },
   // ── 软件设置 > 展开布局 ──
   { label: '展开导航预览', desc: '预览展开态底部导航点顺序，灰色表示已隐藏页面。', labelKey: 'settings.app.expandLayout.previewTitle', descKey: 'settings.app.expandLayout.previewHint', tab: 'app', appPage: 'expand-layout' },
   { label: '页面排序与可见性（展开）', desc: '拖拽调整展开态页面顺序，点击开关切换是否显示。', labelKey: 'settings.app.expandLayout.orderTitle', descKey: 'settings.app.expandLayout.orderHintStatic', tab: 'app', appPage: 'expand-layout' },

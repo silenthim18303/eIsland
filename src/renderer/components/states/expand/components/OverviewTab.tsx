@@ -74,23 +74,55 @@ export const OVERVIEW_CLOCK_STYLE_OPTIONS: { value: OverviewClockStyle; label: s
   { value: 'gradient', label: '渐变样式' },
 ];
 
+export interface OverviewGradientColors {
+  start: string;
+  middle: string;
+  end: string;
+}
+
+export const DEFAULT_OVERVIEW_GRADIENT_COLORS: OverviewGradientColors = {
+  start: '#7be4ff',
+  middle: '#8da8ff',
+  end: '#ffd28a',
+};
+
 /** 总览布局配置 */
 export interface OverviewLayoutConfig {
   left: OverviewWidgetType;
   right: OverviewWidgetType;
   clockStyle: OverviewClockStyle;
+  gradientColors: OverviewGradientColors;
 }
 
 const LAYOUT_STORE_KEY = 'overview-layout';
-const DEFAULT_LAYOUT: OverviewLayoutConfig = { left: 'shortcuts', right: 'todo', clockStyle: 'classic' };
+const DEFAULT_LAYOUT: OverviewLayoutConfig = {
+  left: 'shortcuts',
+  right: 'todo',
+  clockStyle: 'classic',
+  gradientColors: DEFAULT_OVERVIEW_GRADIENT_COLORS,
+};
+
+function isHexColor(value: unknown): value is string {
+  return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
+}
 
 export function normalizeOverviewLayoutConfig(raw: unknown): OverviewLayoutConfig {
   if (!raw || typeof raw !== 'object') {
     return DEFAULT_LAYOUT;
   }
-  const candidate = raw as { left?: unknown; right?: unknown; clockStyle?: unknown };
+  const candidate = raw as {
+    left?: unknown;
+    right?: unknown;
+    clockStyle?: unknown;
+    gradientColors?: {
+      start?: unknown;
+      middle?: unknown;
+      end?: unknown;
+    };
+  };
   const widgetValues = new Set<OverviewWidgetType>(OVERVIEW_WIDGET_OPTIONS.map((item) => item.value));
   const clockStyleValues = new Set<OverviewClockStyle>(OVERVIEW_CLOCK_STYLE_OPTIONS.map((item) => item.value));
+  const gradientColorsRaw = candidate.gradientColors;
 
   return {
     left: typeof candidate.left === 'string' && widgetValues.has(candidate.left as OverviewWidgetType)
@@ -102,6 +134,11 @@ export function normalizeOverviewLayoutConfig(raw: unknown): OverviewLayoutConfi
     clockStyle: typeof candidate.clockStyle === 'string' && clockStyleValues.has(candidate.clockStyle as OverviewClockStyle)
       ? candidate.clockStyle as OverviewClockStyle
       : DEFAULT_LAYOUT.clockStyle,
+    gradientColors: {
+      start: isHexColor(gradientColorsRaw?.start) ? gradientColorsRaw.start : DEFAULT_OVERVIEW_GRADIENT_COLORS.start,
+      middle: isHexColor(gradientColorsRaw?.middle) ? gradientColorsRaw.middle : DEFAULT_OVERVIEW_GRADIENT_COLORS.middle,
+      end: isHexColor(gradientColorsRaw?.end) ? gradientColorsRaw.end : DEFAULT_OVERVIEW_GRADIENT_COLORS.end,
+    },
   };
 }
 
@@ -251,6 +288,13 @@ export function OverviewTab(): React.ReactElement {
   const hh = now.getHours().toString().padStart(2, '0');
   const mm = now.getMinutes().toString().padStart(2, '0');
   const ss = now.getSeconds().toString().padStart(2, '0');
+  const gradientClockVars = layoutConfig.clockStyle === 'gradient'
+    ? {
+      '--ov-clock-gradient-start': layoutConfig.gradientColors.start,
+      '--ov-clock-gradient-middle': layoutConfig.gradientColors.middle,
+      '--ov-clock-gradient-end': layoutConfig.gradientColors.end,
+    } as React.CSSProperties
+    : undefined;
 
   const yyyy = now.getFullYear();
   const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -350,7 +394,7 @@ export function OverviewTab(): React.ReactElement {
       </div>
 
       {/* ========== 中区：时间（始终居中） ========== */}
-      <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`}>
+      <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`} style={gradientClockVars}>
         <span className="ov-dash-date">{t('overview.time.date', { defaultValue: '{{yyyy}}年{{month}}月{{day}}日 {{dayName}}', yyyy, month, day, dayName })}</span>
         <span className="ov-dash-clock">{hh}:{mm}:{ss}</span>
         <span className="ov-dash-lunar">{getLunarDate(now)}</span>

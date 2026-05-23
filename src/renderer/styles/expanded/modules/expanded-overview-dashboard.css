@@ -191,7 +191,12 @@
   font-weight: 800;
   letter-spacing: 2.3px;
   line-height: 1.1;
-  background: linear-gradient(90deg, #7be4ff 0%, #8da8ff 45%, #ffd28a 100%);
+  background: linear-gradient(
+    90deg,
+    var(--ov-clock-gradient-start, #7be4ff) 0%,
+    var(--ov-clock-gradient-middle, #8da8ff) 45%,
+    var(--ov-clock-gradient-end, #ffd28a) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

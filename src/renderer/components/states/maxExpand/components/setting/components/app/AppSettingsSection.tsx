@@ -62,6 +62,7 @@ export function AppSettingsSection({
   overviewClockStyleOptions,
   updateLayout,
   updateClockStyle,
+  updateGradientColor,
   expandNavLayout,
   updateExpandNavLayout,
   maxExpandNavLayout,
@@ -179,6 +180,7 @@ export function AppSettingsSection({
             overviewClockStyleOptions={overviewClockStyleOptions}
             updateLayout={updateLayout}
             updateClockStyle={updateClockStyle}
+            updateGradientColor={updateGradientColor}
           />
         );
       case 'maxexpand-layout':

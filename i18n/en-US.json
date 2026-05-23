@@ -1521,6 +1521,12 @@
         "rightWidget": "Right Widget",
         "clockStyleTitle": "Center Clock Style",
         "clockStyleHint": "Choose the center clock style in Overview. Changes are saved automatically.",
+        "gradientEditorTitle": "Gradient Color Editor",
+        "gradientEditorHint": "Pick one base color to auto-generate the gradient clock text.",
+        "gradientBaseColor": "Base Color",
+        "gradientStart": "Start",
+        "gradientMiddle": "Middle",
+        "gradientEnd": "End",
         "clockStyleNames": {
           "classic": "Classic",
           "gradient": "Gradient"

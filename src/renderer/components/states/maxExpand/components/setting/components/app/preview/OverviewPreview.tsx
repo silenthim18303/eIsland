@@ -25,7 +25,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import type { ReactElement, ReactNode } from 'react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OverviewLayoutConfig, OverviewWidgetType } from '../../../../../../expand/components/OverviewTab';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
@@ -56,6 +56,13 @@ function previewDiffDays(targetStr: string): number {
 export function OverviewPreview({ layoutConfig }: { layoutConfig: OverviewLayoutConfig }): ReactElement {
   const { t } = useTranslation();
   const [cdItems, setCdItems] = useState<PreviewCountdownItem[]>([]);
+  const gradientClockVars = layoutConfig.clockStyle === 'gradient'
+    ? {
+      '--ov-clock-gradient-start': layoutConfig.gradientColors.start,
+      '--ov-clock-gradient-middle': layoutConfig.gradientColors.middle,
+      '--ov-clock-gradient-end': layoutConfig.gradientColors.end,
+    } as CSSProperties
+    : undefined;
 
   useEffect(() => {
     let cancelled = false;
@@ -365,7 +372,7 @@ export function OverviewPreview({ layoutConfig }: { layoutConfig: OverviewLayout
       <div className="ov-dash-slot ov-dash-slot-left">
         {renderWidget(layoutConfig.left)}
       </div>
-      <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`}>
+      <div className={`ov-dash-time ov-dash-time--${layoutConfig.clockStyle}`} style={gradientClockVars}>
         <span className="ov-dash-date">{t('settings.app.layout.previewMock.date', { defaultValue: '2026年01月01日 星期四' })}</span>
         <span className="ov-dash-clock">12:00:00</span>
         <span className="ov-dash-lunar">{t('settings.app.layout.previewMock.lunar', { defaultValue: '乙巳年 腊月十二' })}</span>

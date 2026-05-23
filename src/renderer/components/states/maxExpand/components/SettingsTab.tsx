@@ -1245,6 +1245,32 @@ export function SettingsTab(): ReactElement {
     window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
   };
 
+  const updateGradientColor = (value: string): void => {
+    const match = /^#([0-9a-fA-F]{6})$/.exec(value);
+    if (!match) {
+      return;
+    }
+    const hex = match[1];
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const toHex = (n: number): string => n.toString(16).padStart(2, '0');
+    const mix = (channel: number, target: number, amount: number): number => Math.round(channel * (1 - amount) + target * amount);
+    const start = `#${toHex(mix(r, 255, 0.28))}${toHex(mix(g, 255, 0.28))}${toHex(mix(b, 255, 0.28))}`;
+    const end = `#${toHex(mix(r, 0, 0.18))}${toHex(mix(g, 0, 0.18))}${toHex(mix(b, 0, 0.18))}`;
+
+    const updated = {
+      ...layoutConfig,
+      gradientColors: {
+        start,
+        middle: value,
+        end,
+      },
+    };
+    setLayoutConfig(updated);
+    window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
+  };
+
   const updateExpandNavLayout = (layout: ExpandNavLayoutConfig): void => {
     const normalized = normalizeExpandNavLayoutConfig(layout);
     setExpandNavLayout(normalized);
@@ -2301,6 +2327,7 @@ export function SettingsTab(): ReactElement {
               overviewClockStyleOptions={translatedOverviewClockStyleOptions}
               updateLayout={updateLayout}
               updateClockStyle={updateClockStyle}
+              updateGradientColor={updateGradientColor}
               expandNavLayout={expandNavLayout}
               updateExpandNavLayout={updateExpandNavLayout}
               maxExpandNavLayout={maxExpandNavLayout}

@@ -28,7 +28,7 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AppSettingsSectionProps } from './types';
 
-type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfig' | 'OverviewPreviewComponent' | 'overviewWidgetOptions' | 'overviewClockStyleOptions' | 'updateLayout' | 'updateClockStyle'>;
+type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfig' | 'OverviewPreviewComponent' | 'overviewWidgetOptions' | 'overviewClockStyleOptions' | 'updateLayout' | 'updateClockStyle' | 'updateGradientColor'>;
 
 /**
  * 渲染软件设置中的总览布局配置页面
@@ -38,6 +38,7 @@ type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfi
  * @param overviewClockStyleOptions - 中间时钟样式可选项
  * @param updateLayout - 更新左右控件布局方法
  * @param updateClockStyle - 更新时钟样式方法
+ * @param updateGradientColor - 更新渐变色方法
  * @returns 总览布局设置页面
  */
 export function LayoutPreviewSettingsPage({
@@ -47,6 +48,7 @@ export function LayoutPreviewSettingsPage({
   overviewClockStyleOptions,
   updateLayout,
   updateClockStyle,
+  updateGradientColor,
 }: LayoutPreviewSettingsPageProps): ReactElement {
   const { t } = useTranslation();
   const OverviewPreview = OverviewPreviewComponent;
@@ -116,9 +118,21 @@ export function LayoutPreviewSettingsPage({
                   </button>
                 ))}
               </div>
-              <span className="settings-layout-control-label" style={{ marginTop: 8, opacity: 0.7 }}>
-                {t('settings.app.layout.clockStyleHint', { defaultValue: '选择总览中间时钟区域样式，切换后自动保存。' })}
-              </span>
+              <div className="settings-layout-gradient-editor">
+                <span className="settings-layout-control-label">
+                  {t('settings.app.layout.gradientEditorTitle', { defaultValue: '渐变颜色编辑' })}
+                </span>
+                <div className="settings-layout-gradient-pickers">
+                  <label className="settings-layout-gradient-item">
+                    <span>{t('settings.app.layout.gradientBaseColor', { defaultValue: '基准色' })}</span>
+                    <input
+                      type="color"
+                      value={layoutConfig.gradientColors.middle}
+                      onChange={(e) => updateGradientColor(e.target.value)}
+                    />
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
