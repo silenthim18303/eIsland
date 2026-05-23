@@ -5234,6 +5234,21 @@
   flex: 1;
   overflow-y: auto;
   padding-bottom: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.12) transparent;
+}
+
+.mg-panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mg-panel-body::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.12);
+  border-radius: 2px;
+}
+
+.mg-panel-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.22);
 }
 
 .mg-notice {
@@ -5584,6 +5599,21 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.12) transparent;
+}
+
+.mg-section-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mg-section-scroll::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.12);
+  border-radius: 2px;
+}
+
+.mg-section-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.22);
 }
 
 /* ==================== Game 2048 ==================== */
