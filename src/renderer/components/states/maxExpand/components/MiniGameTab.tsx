@@ -57,6 +57,22 @@ const GAME_LIST: GameEntry[] = [
   { id: '2048', labelKey: 'miniGameTab.games.2048', available: true },
 ];
 
+interface RuntimeLeaderboardSnapshot {
+  myScore: MiniGameScoreData | null;
+  leaderboard: MiniGameLeaderboardEntry[];
+}
+
+const runtimeLeaderboardCache = new Map<string, RuntimeLeaderboardSnapshot>();
+const runtimeLeaderboardLoadedKeys = new Set<string>();
+
+function resolveLeaderboardCacheKey(gameId: string): string {
+  const profile = readLocalProfile();
+  const userKey = profile?.username?.trim()
+    ? profile.username.trim()
+    : (readLocalToken() ? 'token-user' : 'guest');
+  return `${userKey}:${gameId}`;
+}
+
 /**
  * 迷你游戏 Tab 内容
  * @returns React 元素
@@ -104,8 +120,16 @@ export function MiniGameTab(): ReactElement {
         getMyScore(token, gameId),
         getLeaderboard(token, gameId, 20),
       ]);
-      setMyScore(scoreRes.ok ? (scoreRes.data ?? null) : null);
-      setLeaderboard(lbRes.ok && lbRes.data ? lbRes.data : []);
+      const nextMyScore = scoreRes.ok ? (scoreRes.data ?? null) : null;
+      const nextLeaderboard = lbRes.ok && lbRes.data ? lbRes.data : [];
+      setMyScore(nextMyScore);
+      setLeaderboard(nextLeaderboard);
+      const cacheKey = resolveLeaderboardCacheKey(gameId);
+      runtimeLeaderboardCache.set(cacheKey, {
+        myScore: nextMyScore,
+        leaderboard: nextLeaderboard,
+      });
+      runtimeLeaderboardLoadedKeys.add(cacheKey);
     } catch {
       setError(t('miniGameTab.loadError'));
     } finally {
@@ -119,7 +143,16 @@ export function MiniGameTab(): ReactElement {
       setLoggedIn(hasToken);
       if (hasToken && selectedGame) {
         flushPendingSubmissions().catch(() => {});
-        loadData(selectedGame);
+        const cacheKey = resolveLeaderboardCacheKey(selectedGame);
+        const cached = runtimeLeaderboardCache.get(cacheKey);
+        if (cached) {
+          setMyScore(cached.myScore);
+          setLeaderboard(cached.leaderboard);
+          setError(null);
+        }
+        if (!runtimeLeaderboardLoadedKeys.has(cacheKey)) {
+          loadData(selectedGame);
+        }
       } else {
         setMyScore(null);
         setLeaderboard([]);
