@@ -1327,6 +1327,7 @@
       "index": "快速导航",
       "app": "软件设置",
       "layout-preview": "布局预览",
+      "expand-layout": "展开布局",
       "maxexpand-layout": "全展开布局",
       "album": "相册配置",
       "hide-process-list": "隐藏窗口管理",
@@ -1549,6 +1550,25 @@
           "lunar": "乙巳年 腊月十二",
           "yiItems": "祈福 · 出行 · 开市",
           "jiItems": "动土 · 安葬 · 破土"
+        }
+      },
+      "expandLayout": {
+        "previewTitle": "展开导航预览",
+        "previewHint": "预览展开态底部导航点顺序，灰色表示已隐藏页面。",
+        "orderTitle": "页面排序与可见性（展开）",
+        "orderHint": "拖拽调整展开态页面顺序，点击开关切换是否显示。当前显示 {{count}} / {{total}} 个页面。",
+        "orderHintStatic": "拖拽调整展开态页面顺序，点击开关切换是否显示。",
+        "moveUp": "上移",
+        "moveDown": "下移",
+        "hideTab": "隐藏此页面",
+        "showTab": "显示此页面",
+        "alwaysVisible": "此页面不可隐藏",
+        "resetDefault": "恢复默认",
+        "tabLabels": {
+          "overview": "总览",
+          "song": "歌曲",
+          "tools": "工具",
+          "performanceMonitor": "性能监控"
         }
       },
       "maxExpandLayout": {
@@ -2730,6 +2750,10 @@
       "layout-preview": {
         "label": "布局预览",
         "desc": "进入布局预览并调整左右控件展示。"
+      },
+      "expand-layout": {
+        "label": "展开布局",
+        "desc": "调整展开界面页面顺序与显示开关。"
       },
       "maxexpand-layout": {
         "label": "全展开布局",

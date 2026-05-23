@@ -25,7 +25,7 @@
  */
 
 import type { Dispatch, ReactElement, SetStateAction } from 'react';
-import type { AppSettingsPageKey, MaxExpandNavLayoutConfig } from '../../../utils/settingsConfig';
+import type { AppSettingsPageKey, ExpandNavLayoutConfig, MaxExpandNavLayoutConfig } from '../../../utils/settingsConfig';
 import type { OverviewLayoutConfig, OverviewWidgetType } from '../../../../../../expand/components/OverviewTab';
 
 /**
@@ -75,6 +75,8 @@ export interface AppSettingsSectionProps {
   OverviewPreviewComponent: ({ layoutConfig }: { layoutConfig: OverviewLayoutConfig }) => ReactElement;
   overviewWidgetOptions: { value: OverviewWidgetType; label: string }[];
   updateLayout: (side: 'left' | 'right', value: OverviewWidgetType) => void;
+  expandNavLayout: ExpandNavLayoutConfig;
+  updateExpandNavLayout: (layout: ExpandNavLayoutConfig) => void;
   maxExpandNavLayout: MaxExpandNavLayoutConfig;
   updateMaxExpandNavLayout: (layout: MaxExpandNavLayoutConfig) => void;
   hideProcessFilter: string;

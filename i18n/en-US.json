@@ -1328,6 +1328,7 @@
       "index": "Navigation",
       "app": "App Settings",
       "layout-preview": "Layout Preview",
+      "expand-layout": "Expand Layout",
       "maxexpand-layout": "MaxExpand Layout",
       "album": "Album Settings",
       "hide-process-list": "Hidden Window List",
@@ -1550,6 +1551,25 @@
           "lunar": "Yisi Year, Twelfth Lunar Month",
           "yiItems": "Pray · Travel · Open Market",
           "jiItems": "Groundbreaking · Burial · Soil Breaking"
+        }
+      },
+      "expandLayout": {
+        "previewTitle": "Expand Navigation Preview",
+        "previewHint": "Preview bottom navigation order in Expand state. Dimmed items are hidden.",
+        "orderTitle": "Page Order & Visibility (Expand)",
+        "orderHint": "Drag to reorder Expand pages and use the toggle to show/hide them. Currently visible: {{count}} / {{total}}.",
+        "orderHintStatic": "Drag to reorder Expand pages and use the toggle to show/hide them.",
+        "moveUp": "Move Up",
+        "moveDown": "Move Down",
+        "hideTab": "Hide this page",
+        "showTab": "Show this page",
+        "alwaysVisible": "This page cannot be hidden",
+        "resetDefault": "Restore Defaults",
+        "tabLabels": {
+          "overview": "Overview",
+          "song": "Music",
+          "tools": "Tools",
+          "performanceMonitor": "Performance Monitor"
         }
       },
       "maxExpandLayout": {
@@ -2736,6 +2756,10 @@
       "layout-preview": {
         "label": "Layout Preview",
         "desc": "Adjust left and right widgets in layout preview."
+      },
+      "expand-layout": {
+        "label": "Expand Layout",
+        "desc": "Adjust page order and visibility in Expand view."
       },
       "maxexpand-layout": {
         "label": "MaxExpand Layout",

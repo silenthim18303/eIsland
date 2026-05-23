@@ -54,6 +54,10 @@ import {
   NETWORK_TIMEOUT_OPTIONS,
   LAYOUT_STORE_KEY,
   DEFAULT_LAYOUT,
+  EXPAND_NAV_LAYOUT_STORE_KEY,
+  DEFAULT_EXPAND_NAV_LAYOUT,
+  normalizeExpandNavLayoutConfig,
+  type ExpandNavLayoutConfig,
   MAXEXPAND_NAV_LAYOUT_STORE_KEY,
   DEFAULT_MAXEXPAND_NAV_LAYOUT,
   normalizeMaxExpandNavLayoutConfig,
@@ -367,6 +371,16 @@ export function SettingsTab(): ReactElement {
     return () => { cancelled = true; };
   }, []);
 
+  /** 加载展开导航布局配置 */
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(EXPAND_NAV_LAYOUT_STORE_KEY).then((data) => {
+      if (cancelled) return;
+      setExpandNavLayout(normalizeExpandNavLayoutConfig(data));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   const isProUser = useMemo(() => getRoleFromToken(sessionToken) === 'pro', [sessionToken]);
 
   const getSettingsLabel = (key: SettingsTabLabelKey): string => {
@@ -425,6 +439,7 @@ export function SettingsTab(): ReactElement {
   }), [t]);
 
   const [layoutConfig, setLayoutConfig] = useState<OverviewLayoutConfig>(DEFAULT_LAYOUT);
+  const [expandNavLayout, setExpandNavLayout] = useState<ExpandNavLayoutConfig>(DEFAULT_EXPAND_NAV_LAYOUT);
   const [maxExpandNavLayout, setMaxExpandNavLayout] = useState<MaxExpandNavLayoutConfig>(DEFAULT_MAXEXPAND_NAV_LAYOUT);
 
   /** 歌曲设置相关状态 */
@@ -1661,6 +1676,13 @@ export function SettingsTab(): ReactElement {
     window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
   };
 
+  const updateExpandNavLayout = (layout: ExpandNavLayoutConfig): void => {
+    const normalized = normalizeExpandNavLayoutConfig(layout);
+    setExpandNavLayout(normalized);
+    window.api.storeWrite(EXPAND_NAV_LAYOUT_STORE_KEY, normalized).catch(() => {});
+    window.dispatchEvent(new CustomEvent('expand-nav-layout-changed', { detail: normalized }));
+  };
+
   const updateMaxExpandNavLayout = (layout: MaxExpandNavLayoutConfig): void => {
     const normalized = normalizeMaxExpandNavLayoutConfig(layout);
     setMaxExpandNavLayout(normalized);
@@ -2708,6 +2730,8 @@ export function SettingsTab(): ReactElement {
               OverviewPreviewComponent={OverviewPreview}
               overviewWidgetOptions={translatedOverviewWidgetOptions}
               updateLayout={updateLayout}
+              expandNavLayout={expandNavLayout}
+              updateExpandNavLayout={updateExpandNavLayout}
               maxExpandNavLayout={maxExpandNavLayout}
               updateMaxExpandNavLayout={updateMaxExpandNavLayout}
               hideProcessFilter={hideProcessFilter}
