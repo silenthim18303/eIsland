@@ -1279,8 +1279,8 @@ export function SettingsTab(): ReactElement {
       const toH = (n: number): string => Math.max(0, Math.min(255, Math.round((n + m) * 255))).toString(16).padStart(2, '0');
       return `#${toH(rr)}${toH(gg)}${toH(bb)}`;
     };
-    const start = hslToHex(h - 50, Math.min(1, s * 1.15), Math.min(0.82, l + 0.15));
-    const end = hslToHex(h + 50, Math.min(1, s * 1.1), Math.max(0.25, l - 0.1));
+    const start = hslToHex(h - 25, Math.min(1, s * 1.08), Math.min(0.78, l + 0.1));
+    const end = hslToHex(h + 25, Math.min(1, s * 1.05), Math.max(0.3, l - 0.06));
 
     const updated = {
       ...layoutConfig,
