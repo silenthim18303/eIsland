@@ -5282,6 +5282,26 @@
   gap: 4px;
 }
 
+.mg-refresh-error {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(255, 92, 92, 0.08);
+  border: 1px solid rgba(255, 92, 92, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.mg-refresh-error-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  color: rgba(255, 92, 92, 0.92);
+}
+
 .mg-refresh-icon {
   width: 12px;
   height: 12px;
@@ -5303,6 +5323,12 @@
 .mg-refresh-btn:hover {
   color: rgba(var(--color-text-rgb), 0.8);
   background: rgba(var(--color-text-rgb), 0.06);
+}
+
+.mg-refresh-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  background: transparent;
 }
 
 .mg-badge-coming-soon {

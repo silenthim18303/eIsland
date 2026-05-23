@@ -170,17 +170,26 @@ export function MiniGameTab(): ReactElement {
     const profile = readLocalProfile();
     const account = profile?.email?.trim() || profile?.username?.trim() || 'mini-game-leaderboard-refresh';
     const run = async (): Promise<void> => {
-      const token = readLocalToken();
-      if (!token) return;
-      const checkRes = await checkLeaderboardRefreshCaptcha(token, selectedGame);
-      if (checkRes.ok && checkRes.data?.requireCaptcha) {
-        const captcha = await runSliderCaptcha(account);
-        if (!captcha) return;
+      try {
+        const token = readLocalToken();
+        if (!token) return;
+        const checkRes = await checkLeaderboardRefreshCaptcha(token, selectedGame);
+        if (!checkRes.ok) {
+          setError(checkRes.message || t('miniGameTab.loadError'));
+          return;
+        }
+        if (checkRes.data?.requireCaptcha) {
+          const captcha = await runSliderCaptcha(account);
+          if (!captcha) return;
+        }
+        setError(null);
+        await flushPendingSubmissions().catch(() => {});
+        await loadData(selectedGame);
+      } catch (err) {
+        setError(err instanceof Error && err.message ? err.message : t('miniGameTab.loadError'));
       }
-      await flushPendingSubmissions().catch(() => {});
-      await loadData(selectedGame);
     };
-    run().catch(() => {});
+    run();
   };
 
   const handleGameEnd = useCallback((payload: Game2048EndPayload) => {
@@ -314,28 +323,23 @@ export function MiniGameTab(): ReactElement {
                 </div>
               )}
 
-              {/* 错误态 */}
-              {loggedIn && !loading && error && (
-                <div className="mg-notice">
-                  <span className="mg-notice-text">{error}</span>
-                  <button className="settings-lyrics-source-btn" type="button" onClick={handleRefresh}>
-                    {t('miniGameTab.retry')}
-                  </button>
-                </div>
-              )}
-
               {/* 排行榜（始终显示） */}
-              {loggedIn && !loading && !error && (
+              {loggedIn && !loading && (
                 <div className="mg-section mg-section-scroll">
                   <div className="mg-section-header">
                     <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
                     <div className="mg-section-header-actions">
                       <span className="mg-my-rank">{t('miniGameTab.myRank')}: {myRank ?? t('miniGameTab.rankUnavailable')}</span>
-                      <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')} aria-label={t('miniGameTab.refresh')}>
+                      <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')} aria-label={t('miniGameTab.refresh')} disabled={Boolean(error)}>
                         <img className="mg-refresh-icon" src={SvgIcon.REVERT} alt="" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
+                  {error && (
+                    <div className="mg-refresh-error">
+                      <span className="mg-refresh-error-text">{error}</span>
+                    </div>
+                  )}
                   {leaderboard.length > 0 ? (
                     <div className="mg-leaderboard">
                       <div className="mg-lb-header-row">
