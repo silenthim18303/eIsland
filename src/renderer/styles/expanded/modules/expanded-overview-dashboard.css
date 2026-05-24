@@ -200,7 +200,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 12px rgba(123, 228, 255, 0.24), 0 0 20px rgba(141, 168, 255, 0.18);
   filter: saturate(1.06);
 }
 
@@ -216,9 +215,6 @@
   line-height: 1.15;
   color: rgba(var(--color-text-rgb), 0.88);
   text-transform: uppercase;
-  text-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.25),
-    0 4px 12px rgba(0, 0, 0, 0.15);
   font-variant-numeric: tabular-nums;
 }
 
