@@ -68,129 +68,36 @@ import {
   type ToolEventPayload,
 } from './agent/utils/chatTypes';
 import { resolveSessionCardState } from './agent/utils/sessionUtils';
+import {
+  AGENT_MODES,
+  ATTACHMENT_ACCEPT_EXTENSIONS,
+  ATTACHMENT_MAX_COUNT,
+  ATTACHMENT_MAX_SIZE_BYTES,
+  CONTEXT_LIMIT_OPTIONS,
+  EMPTY_GREETING_DEFAULTS,
+  LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY,
+  SETTINGS_ABOUT_FEEDBACK_PREFILL_STORE_KEY,
+  SETTINGS_OPEN_TAB_STORE_KEY,
+  STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY,
+  STANDALONE_WINDOW_MODE_STORE_KEY,
+  STREAM_UI_FLUSH_INTERVAL_MS,
+  VISIBLE_CHAT_WINDOW_SIZE_DEFAULT,
+  VISIBLE_CHAT_WINDOW_SIZE_R1PXC,
+  VISIBLE_CHAT_WINDOW_STEP_DEFAULT,
+  VISIBLE_CHAT_WINDOW_STEP_R1PXC,
+  isAcceptedAttachmentFile,
+  isClientLocalToolName,
+  isHighRiskLocalToolName,
+  loadAgentMode,
+  saveAgentMode,
+  type AgentMode,
+} from './agent/config/chatConstants';
+import { useClickOutside } from './agent/hooks/useClickOutside';
 
 const SESSION_ABORT_CONTROLLERS = new Map<string, AbortController>();
 const SESSION_STREAMING_IDS = new Set<string>();
-const CONTEXT_LIMIT_OPTIONS = [
-  { value: 200_000 as const, label: '200K', proOnly: false },
-  { value: 400_000 as const, label: '400K', proOnly: false },
-  { value: 1_000_000 as const, label: '1M', proOnly: true },
-] as const;
 let cachedAiLocalToolAccessPrompt: AiLocalToolAccessPrompt | null = null;
 let cachedAiLocalToolAccessResolveError = '';
-const STREAM_UI_FLUSH_INTERVAL_MS = 90;
-const VISIBLE_CHAT_WINDOW_SIZE_DEFAULT = 4;
-const VISIBLE_CHAT_WINDOW_SIZE_R1PXC = 25;
-const VISIBLE_CHAT_WINDOW_STEP_DEFAULT = 4;
-const VISIBLE_CHAT_WINDOW_STEP_R1PXC = 25;
-const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
-const SETTINGS_ABOUT_FEEDBACK_PREFILL_STORE_KEY = 'settings-about-feedback-prefill';
-const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
-const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
-const STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
-const ATTACHMENT_MAX_SIZE_BYTES = 102400;
-const ATTACHMENT_MAX_COUNT = 5;
-const ATTACHMENT_ACCEPT_EXTENSIONS = '.txt,.md,.json,.log,.csv,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.env,.sh,.bat,.ps1,.py,.js,.ts,.jsx,.tsx,.html,.css,.scss,.less,.sql,.c,.cpp,.h,.hpp,.java,.kt,.swift,.go,.rs,.rb,.php,.lua,.diff,.patch';
-const ATTACHMENT_ACCEPT_EXT_SET = new Set(
-  ATTACHMENT_ACCEPT_EXTENSIONS
-    .split(',')
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean),
-);
-const EMPTY_GREETING_DEFAULTS = [
-  '你好呀，今天想一起处理点什么？',
-  '嗨，我在这儿，随时可以帮你。',
-  '欢迎回来，先聊聊你现在最想解决的问题吧。',
-  '今天也一起高效一点，你想从哪件事开始？',
-] as const;
-type AgentMode = 'mihtnelis' | 'r1pxc' | 'edoc';
-const AGENT_MODES: ReadonlyArray<{ id: AgentMode; label: string; desc: string; icon: string; noFilter?: boolean; badgeIcon?: string }> = [
-  { id: 'mihtnelis', label: 'mihtnelis', desc: '全能', icon: SvgIcon.AI },
-  { id: 'r1pxc', label: 'r1pxc', desc: '女友', icon: SvgIcon.LOVER, noFilter: true, badgeIcon: SvgIcon.VERIFIED },
-  { id: 'edoc', label: 'edoc', desc: 'coding', icon: SvgIcon.CODING },
-] as const;
-const AGENT_MODE_STORAGE_KEY = 'eIsland_agentMode';
-function loadAgentMode(): AgentMode {
-  try {
-    const raw = localStorage.getItem(AGENT_MODE_STORAGE_KEY);
-    if (raw && AGENT_MODES.some((m) => m.id === raw)) return raw as AgentMode;
-  } catch { /* ignore */ }
-  return 'mihtnelis';
-}
-function saveAgentMode(mode: AgentMode): void {
-  try { localStorage.setItem(AGENT_MODE_STORAGE_KEY, mode); } catch { /* ignore */ }
-}
-const CLIENT_LOCAL_TOOL_PREFIXES = [
-  'file.',
-  'cmd.',
-  'sys.',
-  'win.',
-  'clipboard.',
-  'notification.',
-  'net.',
-  'monitor.',
-  'volume.',
-  'brightness.',
-  'display.',
-  'power.',
-  'wifi.',
-  'registry.',
-  'service.',
-  'schedule.',
-  'firewall.',
-  'defender.',
-  'island.',
-  'alarm.',
-  'todolist.',
-] as const;
-const CLIENT_LOCAL_TOOL_EXACT_NAMES = new Set(['web.search']);
-const HIGH_RISK_LOCAL_TOOL_PREFIXES = [
-  'file.delete',
-  'file.rename',
-  'file.trash',
-  'cmd.exec',
-  'cmd.powershell',
-  'win.close',
-  'win.minimize',
-  'win.maximize',
-  'win.restore',
-  'power.',
-  'registry.write',
-  'registry.delete',
-  'service.start',
-  'service.stop',
-  'service.restart',
-  'schedule.task.create',
-  'net.proxy',
-  'net.hosts',
-  'defender.scan',
-  'island.settings.write',
-  'island.theme.set',
-  'island.opacity.set',
-  'island.restart',
-  'alarm.delete',
-  'todolist.delete',
-] as const;
-
-function isClientLocalToolName(tool: string): boolean {
-  const normalized = tool.trim().toLowerCase();
-  return CLIENT_LOCAL_TOOL_EXACT_NAMES.has(normalized)
-    || CLIENT_LOCAL_TOOL_PREFIXES.some(prefix => normalized.startsWith(prefix));
-}
-
-function isHighRiskLocalToolName(tool: string): boolean {
-  const normalized = tool.trim().toLowerCase();
-  return HIGH_RISK_LOCAL_TOOL_PREFIXES.some(prefix => normalized.startsWith(prefix));
-}
-
-
-function isAcceptedAttachmentFile(fileName: string): boolean {
-  const lowerName = (fileName ?? '').toLowerCase();
-  if (!lowerName) {
-    return false;
-  }
-  return Array.from(ATTACHMENT_ACCEPT_EXT_SET).some((ext) => lowerName.endsWith(ext));
-}
 
 const MARKDOWN_REMARK_PLUGINS = [remarkGfm];
 const MARKDOWN_COMPONENTS: import('react-markdown').Components = {
@@ -429,39 +336,17 @@ export function AiChatTab(): React.ReactElement {
     cachedAiLocalToolAccessResolveError = aiLocalToolAccessResolveError;
   }, [aiLocalToolAccessPrompt, aiLocalToolAccessResolveError]);
 
-  useEffect(() => {
-    if (!showAgentModeDropdown) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      const target = e.target as Node;
-      if (agentModeDropdownRef.current?.contains(target)) return;
-      if (agentModeTriggerRef.current?.contains(target)) return;
-      setShowAgentModeDropdown(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showAgentModeDropdown]);
+  useClickOutside([agentModeDropdownRef, agentModeTriggerRef], () => {
+    setShowAgentModeDropdown(false);
+  }, showAgentModeDropdown);
 
-  useEffect(() => {
-    if (!showModelDropdown) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modelDropdownRef.current && !modelDropdownRef.current.contains(e.target as Node)) {
-        setShowModelDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showModelDropdown]);
+  useClickOutside([modelDropdownRef], () => {
+    setShowModelDropdown(false);
+  }, showModelDropdown);
 
-  useEffect(() => {
-    if (!showContextDropdown) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (contextDropdownRef.current && !contextDropdownRef.current.contains(e.target as Node)) {
-        setShowContextDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showContextDropdown]);
+  useClickOutside([contextDropdownRef], () => {
+    setShowContextDropdown(false);
+  }, showContextDropdown);
 
   const executeAndSubmitLocalToolResult = useCallback(async (params: {
     token: string;
