@@ -908,7 +908,7 @@
   },
   "miniGameTab": {
     "sidebar": {
-      "index": "Quick Nav"
+      "index": "Navigation"
     },
     "index": {
       "title": "Quick Navigation",
@@ -989,7 +989,7 @@
     },
     "toolbox": {
       "sidebar": {
-        "index": "Quick Nav",
+        "index": "Navigation",
         "download": "MT Download",
         "software": "Software",
         "translate": "Translate",
