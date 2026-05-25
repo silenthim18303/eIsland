@@ -32,6 +32,30 @@ export function useGameGomokuEngine({
   const [scale, setScale] = useState(1);
   const [stateReady, setStateReady] = useState(false);
   const lastReportedRef = useRef<string>('');
+  const moveSoundRef = useRef<HTMLAudioElement | null>(null);
+
+  const playMoveSound = useCallback(() => {
+    if (!moveSoundRef.current) {
+      moveSoundRef.current = new Audio('./audio/GOMOKU.wav');
+      moveSoundRef.current.preload = 'auto';
+      moveSoundRef.current.loop = false;
+    }
+    const audio = moveSoundRef.current;
+    try {
+      audio.currentTime = 0;
+    } catch {
+      // noop
+    }
+    audio.play().catch(() => {
+      audio.src = '/audio/GOMOKU.wav';
+      try {
+        audio.currentTime = 0;
+      } catch {
+        // noop
+      }
+      void audio.play().catch(() => {});
+    });
+  }, []);
 
   useEffect(() => {
     if (!storageKey) {
@@ -115,6 +139,7 @@ export function useGameGomokuEngine({
 
     setBoard(nextBoard);
     setMoves(nextMoves);
+    playMoveSound();
 
     if (isGomokuWin(nextBoard, row, col, piece)) {
       setWinner(piece);
@@ -126,7 +151,7 @@ export function useGameGomokuEngine({
     }
 
     setTurn(piece === 1 ? 2 : 1);
-  }, [aiDifficulty, board, moves, turn, winner]);
+  }, [aiDifficulty, board, moves, playMoveSound, turn, winner]);
 
   useEffect(() => {
     if (!aiDifficulty || winner !== 0 || turn !== 2 || moves >= GOMOKU_SIZE * GOMOKU_SIZE) {
@@ -150,6 +175,7 @@ export function useGameGomokuEngine({
 
       setBoard(nextBoard);
       setMoves(nextMoves);
+      playMoveSound();
 
       if (isGomokuWin(nextBoard, row, col, piece)) {
         setWinner(piece);
@@ -166,7 +192,7 @@ export function useGameGomokuEngine({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [aiDifficulty, board, moves, turn, winner]);
+  }, [aiDifficulty, board, moves, playMoveSound, turn, winner]);
 
   const onBoardWheel = useCallback((event: WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
