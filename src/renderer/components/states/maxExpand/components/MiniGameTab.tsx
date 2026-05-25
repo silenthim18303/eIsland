@@ -71,6 +71,7 @@ interface MiniGameNavCard {
 
 const MINI_GAME_NAV_ORDER_STORE_KEY = 'mini-game-nav-order';
 const MINI_GAME_HIDDEN_NAV_ORDER_STORE_KEY = 'mini-game-hidden-nav-order';
+const MINI_GAME_GOMOKU_STATE_STORE_KEY = 'mini-game-gomoku-state';
 const MINI_GAME_NAV_CARDS: MiniGameNavCard[] = [
   {
     id: 'game-2048',
@@ -95,6 +96,14 @@ interface RuntimeLeaderboardSnapshot {
   leaderboard: MiniGameLeaderboardEntry[];
 }
 
+interface GomokuStoredState {
+  board: number[][];
+  turn: 1 | 2;
+  winner: 1 | 2 | 0;
+  moves: number;
+  scale: number;
+}
+
 const runtimeLeaderboardCache = new Map<string, RuntimeLeaderboardSnapshot>();
 const runtimeLeaderboardLoadedKeys = new Set<string>();
 
@@ -108,6 +117,49 @@ function resolveLeaderboardCacheKey(gameId: string): string {
 
 function createGomokuBoard(): number[][] {
   return Array.from({ length: GOMOKU_SIZE }, () => Array.from({ length: GOMOKU_SIZE }, () => 0));
+}
+
+function normalizeGomokuStoredState(raw: unknown): GomokuStoredState | null {
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+  const candidate = raw as Partial<GomokuStoredState>;
+  if (!Array.isArray(candidate.board) || candidate.board.length !== GOMOKU_SIZE) {
+    return null;
+  }
+  const board = candidate.board.map((row) => {
+    if (!Array.isArray(row) || row.length !== GOMOKU_SIZE) {
+      return null;
+    }
+    const normalizedRow = row.map((cell) => {
+      if (cell === 1 || cell === 2) return cell;
+      if (cell === 0) return 0;
+      return null;
+    });
+    if (normalizedRow.some((cell) => cell === null)) {
+      return null;
+    }
+    return normalizedRow as number[];
+  });
+  if (board.some((row) => row === null)) {
+    return null;
+  }
+
+  const turn = candidate.turn === 2 ? 2 : 1;
+  const winner = candidate.winner === 1 || candidate.winner === 2 ? candidate.winner : 0;
+  const moves = Number.isInteger(candidate.moves)
+    ? Math.min(GOMOKU_SIZE * GOMOKU_SIZE, Math.max(0, Number(candidate.moves)))
+    : 0;
+  const scaleRaw = typeof candidate.scale === 'number' ? candidate.scale : 1;
+  const scale = Math.min(1.8, Math.max(1, Number(scaleRaw.toFixed(2))));
+
+  return {
+    board: board as number[][],
+    turn,
+    winner,
+    moves,
+    scale,
+  };
 }
 
 function isRankedGame(gameId: string): boolean {
@@ -166,6 +218,7 @@ export function MiniGameTab(): ReactElement {
   const [gomokuWinner, setGomokuWinner] = useState<1 | 2 | 0>(0);
   const [gomokuMoves, setGomokuMoves] = useState(0);
   const [gomokuScale, setGomokuScale] = useState(1);
+  const [gomokuStateReady, setGomokuStateReady] = useState(false);
 
   const visibleCards = useMemo(() => {
     const seen = new Set<MiniGameIndexCardId>();
@@ -254,6 +307,40 @@ export function MiniGameTab(): ReactElement {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MINI_GAME_GOMOKU_STATE_STORE_KEY).then((savedState) => {
+      if (cancelled) return;
+      const normalized = normalizeGomokuStoredState(savedState);
+      if (normalized) {
+        setGomokuBoard(normalized.board);
+        setGomokuTurn(normalized.turn);
+        setGomokuWinner(normalized.winner);
+        setGomokuMoves(normalized.moves);
+        setGomokuScale(normalized.scale);
+      }
+      setGomokuStateReady(true);
+    }).catch(() => {
+      if (cancelled) return;
+      setGomokuStateReady(true);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!gomokuStateReady) {
+      return;
+    }
+    const payload: GomokuStoredState = {
+      board: gomokuBoard,
+      turn: gomokuTurn,
+      winner: gomokuWinner,
+      moves: gomokuMoves,
+      scale: gomokuScale,
+    };
+    window.api.storeWrite(MINI_GAME_GOMOKU_STATE_STORE_KEY, payload).catch(() => {});
+  }, [gomokuBoard, gomokuMoves, gomokuScale, gomokuStateReady, gomokuTurn, gomokuWinner]);
 
   const fetchSession = useCallback(async (gameId: string): Promise<Game2048Session | null> => {
     if (gameId !== '2048') return null;
