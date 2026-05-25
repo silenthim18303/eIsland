@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type WheelEvent } from 'react';
-import type { GameGomokuState } from '../config/types';
+import type { GameGomokuState, GomokuAIDifficulty } from '../config/types';
 import { GOMOKU_SIZE } from '../config/types';
 import { createGomokuBoard, isGomokuWin } from '../utils/board';
+import { selectGomokuAIMove } from '../utils/ai';
 import { normalizeGomokuStoredState } from '../utils/storage';
 
 interface UseGameGomokuEngineParams {
   storageKey?: string;
   onStateChange?: (state: GameGomokuState) => void;
+  aiDifficulty?: GomokuAIDifficulty;
 }
 
 interface UseGameGomokuEngineResult {
@@ -21,6 +23,7 @@ interface UseGameGomokuEngineResult {
 export function useGameGomokuEngine({
   storageKey,
   onStateChange,
+  aiDifficulty,
 }: UseGameGomokuEngineParams): UseGameGomokuEngineResult {
   const [board, setBoard] = useState<number[][]>(() => createGomokuBoard());
   const [turn, setTurn] = useState<1 | 2>(1);
@@ -101,6 +104,10 @@ export function useGameGomokuEngine({
       return;
     }
 
+    if (aiDifficulty && turn === 2) {
+      return;
+    }
+
     const piece = turn;
     const nextBoard = board.map((line) => [...line]);
     nextBoard[row][col] = piece;
@@ -119,7 +126,47 @@ export function useGameGomokuEngine({
     }
 
     setTurn(piece === 1 ? 2 : 1);
-  }, [board, moves, turn, winner]);
+  }, [aiDifficulty, board, moves, turn, winner]);
+
+  useEffect(() => {
+    if (!aiDifficulty || winner !== 0 || turn !== 2 || moves >= GOMOKU_SIZE * GOMOKU_SIZE) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      const nextMove = selectGomokuAIMove(board, aiDifficulty, 2);
+      if (!nextMove) {
+        return;
+      }
+      const [row, col] = nextMove;
+      if (board[row]?.[col] !== 0) {
+        return;
+      }
+
+      const piece: 1 | 2 = 2;
+      const nextBoard = board.map((line) => [...line]);
+      nextBoard[row][col] = piece;
+      const nextMoves = moves + 1;
+
+      setBoard(nextBoard);
+      setMoves(nextMoves);
+
+      if (isGomokuWin(nextBoard, row, col, piece)) {
+        setWinner(piece);
+        return;
+      }
+
+      if (nextMoves >= GOMOKU_SIZE * GOMOKU_SIZE) {
+        return;
+      }
+
+      setTurn(1);
+    }, 180);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [aiDifficulty, board, moves, turn, winner]);
 
   const onBoardWheel = useCallback((event: WheelEvent<HTMLDivElement>) => {
     event.preventDefault();

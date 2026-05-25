@@ -1,5 +1,7 @@
 export const GOMOKU_SIZE = 15;
 
+export type GomokuAIDifficulty = 'novice' | 'easy';
+
 export interface GameGomokuState {
   board: number[][];
   turn: 1 | 2;
@@ -15,6 +17,7 @@ export interface GameGomokuHandle {
 export interface GameGomokuProps {
   storageKey?: string;
   onStateChange?: (state: GameGomokuState) => void;
+  aiDifficulty?: GomokuAIDifficulty;
   boardAriaLabel: string;
   getCellAriaLabel: (row: number, col: number) => string;
 }

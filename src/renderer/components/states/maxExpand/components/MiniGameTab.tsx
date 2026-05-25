@@ -51,6 +51,7 @@ import {
 import {
   GameGomoku,
   GOMOKU_SIZE,
+  type GomokuAIDifficulty,
   type GameGomokuHandle,
   type GameGomokuState,
 } from './games/GameGomoku';
@@ -151,6 +152,7 @@ export function MiniGameTab(): ReactElement {
   const gameRef = useRef<Game2048Handle>(null);
   const gomokuRef = useRef<GameGomokuHandle>(null);
   const [gomokuState, setGomokuState] = useState<GameGomokuState>(() => createEmptyGomokuState());
+  const [gomokuDifficulty, setGomokuDifficulty] = useState<GomokuAIDifficulty>('novice');
 
   const visibleCards = useMemo(() => {
     const seen = new Set<MiniGameIndexCardId>();
@@ -652,6 +654,7 @@ export function MiniGameTab(): ReactElement {
                 <GameGomoku
                   ref={gomokuRef}
                   storageKey={MINI_GAME_GOMOKU_STATE_STORE_KEY}
+                  aiDifficulty={gomokuDifficulty}
                   onStateChange={handleGomokuStateChange}
                   boardAriaLabel={t('miniGameTab.gomoku.boardAria')}
                   getCellAriaLabel={(row, col) => t('miniGameTab.gomoku.cellAria', { row, col })}
@@ -675,6 +678,23 @@ export function MiniGameTab(): ReactElement {
               )}
               {gomokuAvailable && (
                 <div className="mg-section mg-section-top-score">
+                  <div className="g2048-score-row">
+                    <div className="g2048-score-box gomoku-status-box">
+                      <span className="g2048-score-label">{t('miniGameTab.gomoku.difficulty', { defaultValue: '难度' })}</span>
+                      <select
+                        className="settings-select"
+                        value={gomokuDifficulty}
+                        onChange={(event) => {
+                          const nextDifficulty: GomokuAIDifficulty = event.target.value === 'easy' ? 'easy' : 'novice';
+                          setGomokuDifficulty(nextDifficulty);
+                          gomokuRef.current?.restart();
+                        }}
+                      >
+                        <option value="novice">{t('miniGameTab.gomoku.difficultyNovice', { defaultValue: '新手' })}</option>
+                        <option value="easy">{t('miniGameTab.gomoku.difficultyEasy', { defaultValue: '简单' })}</option>
+                      </select>
+                    </div>
+                  </div>
                   <div className="g2048-score-row">
                     <div className="g2048-score-box gomoku-status-box">
                       <span className="g2048-score-label">{t('miniGameTab.gomoku.status')}</span>

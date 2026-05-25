@@ -6,6 +6,7 @@ import { GameGomokuBoard } from './GameGomokuBoard';
 export const GameGomoku = forwardRef<GameGomokuHandle, GameGomokuProps>(function GameGomoku({
   storageKey,
   onStateChange,
+  aiDifficulty,
   boardAriaLabel,
   getCellAriaLabel,
 }, fwdRef): ReactElement {
@@ -16,7 +17,7 @@ export const GameGomoku = forwardRef<GameGomokuHandle, GameGomokuProps>(function
     onCellClick,
     onBoardWheel,
     restart,
-  } = useGameGomokuEngine({ storageKey, onStateChange });
+  } = useGameGomokuEngine({ storageKey, onStateChange, aiDifficulty });
 
   useImperativeHandle(fwdRef, () => ({ restart }), [restart]);
 

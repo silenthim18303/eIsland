@@ -27,6 +27,7 @@
 export { GameGomoku } from './gomoku';
 export { GOMOKU_SIZE } from './gomoku';
 export type {
+  GomokuAIDifficulty,
   GameGomokuHandle,
   GameGomokuProps,
   GameGomokuState,
