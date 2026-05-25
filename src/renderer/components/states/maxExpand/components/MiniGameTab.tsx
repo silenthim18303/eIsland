@@ -68,6 +68,7 @@ const GAME_LIST: GameEntry[] = [
 ];
 
 type MiniGameIndexCardId = 'game-2048' | 'game-gomoku';
+type GomokuMatchMode = 'pve' | 'pvp';
 
 interface MiniGameNavCard {
   id: MiniGameIndexCardId;
@@ -152,6 +153,7 @@ export function MiniGameTab(): ReactElement {
   const gameRef = useRef<Game2048Handle>(null);
   const gomokuRef = useRef<GameGomokuHandle>(null);
   const [gomokuState, setGomokuState] = useState<GameGomokuState>(() => createEmptyGomokuState());
+  const [gomokuMode, setGomokuMode] = useState<GomokuMatchMode>('pve');
   const [gomokuDifficulty, setGomokuDifficulty] = useState<GomokuAIDifficulty>('novice');
 
   const visibleCards = useMemo(() => {
@@ -420,6 +422,7 @@ export function MiniGameTab(): ReactElement {
       ? 'miniGameTab.gomoku.hint'
       : null;
   const showRankedPanel = isRankedGame(selectedGame);
+  const gomokuSettingsLocked = gomokuState.moves > 0;
   const gomokuStatusText = gomokuState.winner === 1
     ? t('miniGameTab.gomoku.winnerBlack')
     : gomokuState.winner === 2
@@ -654,7 +657,7 @@ export function MiniGameTab(): ReactElement {
                 <GameGomoku
                   ref={gomokuRef}
                   storageKey={MINI_GAME_GOMOKU_STATE_STORE_KEY}
-                  aiDifficulty={gomokuDifficulty}
+                  aiDifficulty={gomokuMode === 'pve' ? gomokuDifficulty : undefined}
                   onStateChange={handleGomokuStateChange}
                   boardAriaLabel={t('miniGameTab.gomoku.boardAria')}
                   getCellAriaLabel={(row, col) => t('miniGameTab.gomoku.cellAria', { row, col })}
@@ -680,10 +683,30 @@ export function MiniGameTab(): ReactElement {
                 <div className="mg-section mg-section-top-score">
                   <div className="g2048-score-row">
                     <div className="g2048-score-box gomoku-status-box">
+                      <span className="g2048-score-label">{t('miniGameTab.gomoku.mode', { defaultValue: '对战模式' })}</span>
+                      <select
+                        className="settings-select"
+                        value={gomokuMode}
+                        disabled={gomokuSettingsLocked}
+                        onChange={(event) => {
+                          const nextMode: GomokuMatchMode = event.target.value === 'pvp' ? 'pvp' : 'pve';
+                          setGomokuMode(nextMode);
+                          gomokuRef.current?.restart();
+                        }}
+                      >
+                        <option value="pve">{t('miniGameTab.gomoku.modePve', { defaultValue: '人机对战' })}</option>
+                        <option value="pvp">{t('miniGameTab.gomoku.modePvp', { defaultValue: '人人对战' })}</option>
+                      </select>
+                    </div>
+                  </div>
+                  {gomokuMode === 'pve' && (
+                    <div className="g2048-score-row">
+                      <div className="g2048-score-box gomoku-status-box">
                       <span className="g2048-score-label">{t('miniGameTab.gomoku.difficulty', { defaultValue: '难度' })}</span>
                       <select
                         className="settings-select"
                         value={gomokuDifficulty}
+                        disabled={gomokuSettingsLocked}
                         onChange={(event) => {
                           const nextDifficulty: GomokuAIDifficulty = event.target.value === 'easy' ? 'easy' : 'novice';
                           setGomokuDifficulty(nextDifficulty);
@@ -694,7 +717,8 @@ export function MiniGameTab(): ReactElement {
                         <option value="easy">{t('miniGameTab.gomoku.difficultyEasy', { defaultValue: '简单' })}</option>
                       </select>
                     </div>
-                  </div>
+                    </div>
+                  )}
                   <div className="g2048-score-row">
                     <div className="g2048-score-box gomoku-status-box">
                       <span className="g2048-score-label">{t('miniGameTab.gomoku.status')}</span>
