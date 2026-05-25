@@ -681,22 +681,35 @@ export function MiniGameTab(): ReactElement {
               )}
               {gomokuAvailable && (
                 <div className="mg-section mg-section-top-score">
-                  <div className="g2048-score-row">
-                    <div className="g2048-score-box gomoku-status-box">
-                      <span className="g2048-score-label">{t('miniGameTab.gomoku.mode', { defaultValue: '对战模式' })}</span>
-                      <select
-                        className="settings-select"
-                        value={gomokuMode}
-                        disabled={gomokuSettingsLocked}
-                        onChange={(event) => {
-                          const nextMode: GomokuMatchMode = event.target.value === 'pvp' ? 'pvp' : 'pve';
-                          setGomokuMode(nextMode);
-                          gomokuRef.current?.restart();
-                        }}
-                      >
-                        <option value="pve">{t('miniGameTab.gomoku.modePve', { defaultValue: '人机对战' })}</option>
-                        <option value="pvp">{t('miniGameTab.gomoku.modePvp', { defaultValue: '人人对战' })}</option>
-                      </select>
+                  <div className="g2048-score-row g2048-score-box gomoku-status-box">
+                    <span className="g2048-score-label">{t('miniGameTab.gomoku.mode', { defaultValue: '对战模式' })}</span>
+                    <div className="settings-card-inline-row">
+                      <label className="settings-card-check">
+                        <input
+                          type="radio"
+                          name="gomoku-match-mode"
+                          checked={gomokuMode === 'pve'}
+                          disabled={gomokuSettingsLocked}
+                          onChange={() => {
+                            setGomokuMode('pve');
+                            gomokuRef.current?.restart();
+                          }}
+                        />
+                        {t('miniGameTab.gomoku.modePve', { defaultValue: '人机对战' })}
+                      </label>
+                      <label className="settings-card-check">
+                        <input
+                          type="radio"
+                          name="gomoku-match-mode"
+                          checked={gomokuMode === 'pvp'}
+                          disabled={gomokuSettingsLocked}
+                          onChange={() => {
+                            setGomokuMode('pvp');
+                            gomokuRef.current?.restart();
+                          }}
+                        />
+                        {t('miniGameTab.gomoku.modePvp', { defaultValue: '人人对战' })}
+                      </label>
                     </div>
                   </div>
                   {gomokuMode === 'pve' && (
