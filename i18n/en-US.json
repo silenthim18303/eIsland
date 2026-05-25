@@ -975,6 +975,12 @@
     },
     "gomoku": {
       "hint": "Black and white take turns; connect five to win.",
+      "mode": "Match Mode",
+      "modePve": "Human vs AI",
+      "modePvp": "Human vs Human",
+      "difficulty": "Select Match Difficulty",
+      "difficultyNovice": "Novice",
+      "difficultyEasy": "Easy",
       "status": "Status",
       "turnBlack": "Black to move",
       "turnWhite": "White to move",

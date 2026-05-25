@@ -975,6 +975,12 @@
     },
     "gomoku": {
       "hint": "黑白双方轮流落子，先连成五子者获胜。",
+      "mode": "对战模式",
+      "modePve": "人机对战",
+      "modePvp": "人人对战",
+      "difficulty": "选择对局难度",
+      "difficultyNovice": "新手",
+      "difficultyEasy": "简单",
       "status": "当前状态",
       "turnBlack": "黑棋回合",
       "turnWhite": "白棋回合",
