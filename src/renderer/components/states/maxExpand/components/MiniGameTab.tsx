@@ -105,7 +105,7 @@ export function MiniGameTab(): ReactElement {
   const { t, i18n } = useTranslation();
   const { setLogin, setRegister } = useIslandStore();
   const [selectedGame, setSelectedGame] = useState<string>(GAME_LIST[0]?.id ?? '');
-  const [activeSidebar, setActiveSidebar] = useState<string>(GAME_LIST[0]?.id ?? 'index');
+  const [activeSidebar, setActiveSidebar] = useState<string>('index');
   const [navOrder, setNavOrder] = useState<MiniGameIndexCardId[]>(DEFAULT_MINI_GAME_NAV_ORDER);
   const [hiddenNavOrder, setHiddenNavOrder] = useState<MiniGameIndexCardId[]>([]);
   const [navEditMode, setNavEditMode] = useState(false);
