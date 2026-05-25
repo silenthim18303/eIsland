@@ -1560,19 +1560,15 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
                 ))}
               </ul>
             </div>
-            {isProUser ? (
-              <button type="button" className="settings-user-primary-btn" disabled>
-                {t('settings.user.actions.proActivated', { defaultValue: '已开通 Pro' })}
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="settings-user-primary-btn settings-user-pro-buy-link"
-                onClick={() => setPayment()}
-              >
-                {t('settings.user.actions.buyPro', { defaultValue: '购买 Pro' })}
-              </button>
-            )}
+            <button
+              type="button"
+              className="settings-user-primary-btn settings-user-pro-buy-link"
+              onClick={() => setPayment()}
+            >
+              {isProUser
+                ? t('settings.user.actions.renewPro', { defaultValue: '前往续费' })
+                : t('settings.user.actions.buyPro', { defaultValue: '购买 Pro' })}
+            </button>
           </div>
         </div>
             </>
