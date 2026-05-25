@@ -930,10 +930,15 @@
       "game-2048": {
         "label": "2048",
         "desc": "经典数字合并小游戏，支持成绩与排行榜。"
+      },
+      "game-gomoku": {
+        "label": "五子棋",
+        "desc": "本地双人五子棋对战，先连成五子获胜。"
       }
     },
     "games": {
-      "2048": "2048"
+      "2048": "2048",
+      "gomoku": "五子棋"
     },
     "comingSoon": "即将上线",
     "loginRequired": "请先登录以查看成绩与排行榜",
@@ -967,6 +972,19 @@
       "gameOver": "游戏结束",
       "tryAgain": "再来一局",
       "hint": "使用方向键或 WASD 滑动方块"
+    },
+    "gomoku": {
+      "hint": "黑白双方轮流落子，先连成五子者获胜。",
+      "status": "当前状态",
+      "turnBlack": "黑棋回合",
+      "turnWhite": "白棋回合",
+      "winnerBlack": "黑棋获胜",
+      "winnerWhite": "白棋获胜",
+      "draw": "平局",
+      "restart": "重新开始",
+      "unrankedHint": "五子棋暂不接入在线排行榜。",
+      "boardAria": "五子棋棋盘",
+      "cellAria": "第 {{row}} 行第 {{col}} 列"
     }
   },
   "maxExpand": {

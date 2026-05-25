@@ -930,10 +930,15 @@
       "game-2048": {
         "label": "2048",
         "desc": "Classic merge-number mini game with score and leaderboard support."
+      },
+      "game-gomoku": {
+        "label": "Gomoku",
+        "desc": "Local two-player gomoku match; connect five to win."
       }
     },
     "games": {
-      "2048": "2048"
+      "2048": "2048",
+      "gomoku": "Gomoku"
     },
     "comingSoon": "Coming Soon",
     "loginRequired": "Please log in to view scores and leaderboard",
@@ -967,6 +972,19 @@
       "gameOver": "Game Over",
       "tryAgain": "Try Again",
       "hint": "Use arrow keys or WASD to slide tiles"
+    },
+    "gomoku": {
+      "hint": "Black and white take turns; connect five to win.",
+      "status": "Status",
+      "turnBlack": "Black to move",
+      "turnWhite": "White to move",
+      "winnerBlack": "Black wins",
+      "winnerWhite": "White wins",
+      "draw": "Draw",
+      "restart": "Restart",
+      "unrankedHint": "Gomoku is not connected to online leaderboard yet.",
+      "boardAria": "Gomoku board",
+      "cellAria": "Row {{row}}, column {{col}}"
     }
   },
   "maxExpand": {

@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement, type WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIslandStore } from '../../../../store/index';
 import { readLocalProfile, readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
@@ -57,9 +57,10 @@ interface GameEntry {
 
 const GAME_LIST: GameEntry[] = [
   { id: '2048', labelKey: 'miniGameTab.games.2048', available: true },
+  { id: 'gomoku', labelKey: 'miniGameTab.games.gomoku', available: true },
 ];
 
-type MiniGameIndexCardId = 'game-2048';
+type MiniGameIndexCardId = 'game-2048' | 'game-gomoku';
 
 interface MiniGameNavCard {
   id: MiniGameIndexCardId;
@@ -77,9 +78,17 @@ const MINI_GAME_NAV_CARDS: MiniGameNavCard[] = [
     descKey: 'miniGameTab.nav.game-2048.desc',
     gameId: '2048',
   },
+  {
+    id: 'game-gomoku',
+    labelKey: 'miniGameTab.nav.game-gomoku.label',
+    descKey: 'miniGameTab.nav.game-gomoku.desc',
+    gameId: 'gomoku',
+  },
 ];
 const DEFAULT_MINI_GAME_NAV_ORDER: MiniGameIndexCardId[] = MINI_GAME_NAV_CARDS.map((card) => card.id);
 const MINI_GAME_NAV_CARD_MAP = new Map(MINI_GAME_NAV_CARDS.map((card) => [card.id, card]));
+const RANKED_GAME_IDS = new Set<string>(['2048']);
+const GOMOKU_SIZE = 15;
 
 interface RuntimeLeaderboardSnapshot {
   myScore: MiniGameScoreData | null;
@@ -95,6 +104,38 @@ function resolveLeaderboardCacheKey(gameId: string): string {
     ? profile.username.trim()
     : (readLocalToken() ? 'token-user' : 'guest');
   return `${userKey}:${gameId}`;
+}
+
+function createGomokuBoard(): number[][] {
+  return Array.from({ length: GOMOKU_SIZE }, () => Array.from({ length: GOMOKU_SIZE }, () => 0));
+}
+
+function isRankedGame(gameId: string): boolean {
+  return RANKED_GAME_IDS.has(gameId);
+}
+
+function isGomokuWin(board: number[][], row: number, col: number, piece: 1 | 2): boolean {
+  const dirs: Array<[number, number]> = [[1, 0], [0, 1], [1, 1], [1, -1]];
+  return dirs.some(([dx, dy]) => {
+    let count = 1;
+    for (let step = 1; step < 5; step += 1) {
+      const nr = row + dx * step;
+      const nc = col + dy * step;
+      if (nr < 0 || nr >= GOMOKU_SIZE || nc < 0 || nc >= GOMOKU_SIZE || board[nr][nc] !== piece) {
+        break;
+      }
+      count += 1;
+    }
+    for (let step = 1; step < 5; step += 1) {
+      const nr = row - dx * step;
+      const nc = col - dy * step;
+      if (nr < 0 || nr >= GOMOKU_SIZE || nc < 0 || nc >= GOMOKU_SIZE || board[nr][nc] !== piece) {
+        break;
+      }
+      count += 1;
+    }
+    return count >= 5;
+  });
 }
 
 /**
@@ -120,6 +161,11 @@ export function MiniGameTab(): ReactElement {
   const [gameState, setGameState] = useState<Game2048State>({ score: 0, best: 0, over: false, moveCount: 0 });
   const [activeSession, setActiveSession] = useState<Game2048Session | null>(null);
   const gameRef = useRef<Game2048Handle>(null);
+  const [gomokuBoard, setGomokuBoard] = useState<number[][]>(() => createGomokuBoard());
+  const [gomokuTurn, setGomokuTurn] = useState<1 | 2>(1);
+  const [gomokuWinner, setGomokuWinner] = useState<1 | 2 | 0>(0);
+  const [gomokuMoves, setGomokuMoves] = useState(0);
+  const [gomokuScale, setGomokuScale] = useState(1);
 
   const visibleCards = useMemo(() => {
     const seen = new Set<MiniGameIndexCardId>();
@@ -226,6 +272,13 @@ export function MiniGameTab(): ReactElement {
   }, []);
 
   const loadData = useCallback(async (gameId: string) => {
+    if (!isRankedGame(gameId)) {
+      setLoading(false);
+      setError(null);
+      setMyScore(null);
+      setLeaderboard([]);
+      return;
+    }
     const token = readLocalToken();
     if (!token) {
       setMyScore(null);
@@ -260,7 +313,7 @@ export function MiniGameTab(): ReactElement {
     const syncLogin = (): void => {
       const hasToken = Boolean(readLocalToken());
       setLoggedIn(hasToken);
-      if (hasToken && selectedGame) {
+      if (hasToken && selectedGame && isRankedGame(selectedGame)) {
         flushPendingSubmissions().catch(() => {});
         const cacheKey = resolveLeaderboardCacheKey(selectedGame);
         const cached = runtimeLeaderboardCache.get(cacheKey);
@@ -275,6 +328,8 @@ export function MiniGameTab(): ReactElement {
       } else {
         setMyScore(null);
         setLeaderboard([]);
+        setLoading(false);
+        setError(null);
         setActiveSession(null);
       }
     };
@@ -283,7 +338,7 @@ export function MiniGameTab(): ReactElement {
   }, [selectedGame, loadData]);
 
   const handleRefresh = (): void => {
-    if (!selectedGame) return;
+    if (!selectedGame || !isRankedGame(selectedGame)) return;
     const profile = readLocalProfile();
     const account = profile?.email?.trim() || profile?.username?.trim() || 'mini-game-leaderboard-refresh';
     const run = async (): Promise<void> => {
@@ -310,6 +365,9 @@ export function MiniGameTab(): ReactElement {
   };
 
   const handleGameEnd = useCallback((payload: Game2048EndPayload) => {
+    if (!isRankedGame(selectedGame)) {
+      return;
+    }
     const refresh = (): void => { setTimeout(() => loadData(selectedGame), 1500); };
     if (!payload.sessionId || !payload.moveTrace) {
       refresh();
@@ -336,6 +394,49 @@ export function MiniGameTab(): ReactElement {
   }, [fetchSession, selectedGame]);
 
   const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
+
+  const handleStartGomoku = useCallback(() => {
+    setGomokuBoard(createGomokuBoard());
+    setGomokuTurn(1);
+    setGomokuWinner(0);
+    setGomokuMoves(0);
+  }, []);
+
+  const handleGomokuCellClick = useCallback((row: number, col: number) => {
+    if (selectedGame !== 'gomoku' || gomokuWinner !== 0 || gomokuBoard[row][col] !== 0) {
+      return;
+    }
+
+    const piece = gomokuTurn;
+    const nextBoard = gomokuBoard.map((line) => [...line]);
+    nextBoard[row][col] = piece;
+    const nextMoves = gomokuMoves + 1;
+
+    setGomokuBoard(nextBoard);
+    setGomokuMoves(nextMoves);
+
+    if (isGomokuWin(nextBoard, row, col, piece)) {
+      setGomokuWinner(piece);
+      return;
+    }
+
+    if (nextMoves >= GOMOKU_SIZE * GOMOKU_SIZE) {
+      return;
+    }
+
+    setGomokuTurn(piece === 1 ? 2 : 1);
+  }, [gomokuBoard, gomokuMoves, gomokuTurn, gomokuWinner, selectedGame]);
+
+  const handleGomokuBoardWheel = useCallback((event: WheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const delta = event.deltaY < 0 ? 0.08 : -0.08;
+    setGomokuScale((prev) => {
+      const next = prev + delta;
+      return Math.min(1.8, Math.max(1, Number(next.toFixed(2))));
+    });
+  }, []);
+
+  const gomokuDraw = gomokuWinner === 0 && gomokuMoves >= GOMOKU_SIZE * GOMOKU_SIZE;
   const myRank = myScore ? (leaderboard.find((entry) => entry.userId === myScore.userId)?.rank ?? null) : null;
   const localProfile = readLocalProfile();
 
@@ -360,7 +461,18 @@ export function MiniGameTab(): ReactElement {
   }, [localProfile?.avatar, myScore]);
 
   const selectedEntry = GAME_LIST.find((g) => g.id === selectedGame);
-  const gameAvailable = selectedEntry?.available && selectedGame === '2048';
+  const game2048Available = selectedEntry?.available && selectedGame === '2048';
+  const gomokuAvailable = selectedEntry?.available && selectedGame === 'gomoku';
+  const showRankedPanel = isRankedGame(selectedGame);
+  const gomokuStatusText = gomokuWinner === 1
+    ? t('miniGameTab.gomoku.winnerBlack')
+    : gomokuWinner === 2
+      ? t('miniGameTab.gomoku.winnerWhite')
+      : gomokuDraw
+        ? t('miniGameTab.gomoku.draw')
+        : gomokuTurn === 1
+          ? t('miniGameTab.gomoku.turnBlack')
+          : t('miniGameTab.gomoku.turnWhite');
 
   return (
     <div className="max-expand-settings toolbox-tab-container">
@@ -571,18 +683,49 @@ export function MiniGameTab(): ReactElement {
           )}
 
           {activeSidebar !== 'index' && (
-            <div className="mg-panel-body mg-panel-game-layout">
+            <div className={`mg-panel-body mg-panel-game-layout${gomokuAvailable ? ' mg-panel-gomoku' : ''}`}>
             {/* 游戏棋盘（纯净，无上下控件） */}
-            {gameAvailable && (
+            {game2048Available && (
               <div className="mg-game-area">
                 <Game2048 ref={gameRef} onGameEnd={handleGameEnd} onStateChange={handleGameState} activeSession={activeSession} />
+              </div>
+            )}
+            {gomokuAvailable && (
+              <div className="mg-game-area">
+                <div className="gomoku-board-zoom" onWheel={handleGomokuBoardWheel}>
+                  <div
+                    className="gomoku-board"
+                    role="grid"
+                    aria-label={t('miniGameTab.gomoku.boardAria')}
+                    style={{
+                      transform: `scale(${gomokuScale})`,
+                      transformOrigin: 'top left',
+                    }}
+                  >
+                    {gomokuBoard.map((row, rowIdx) => row.map((cell, colIdx) => (
+                      <button
+                        key={`${rowIdx}-${colIdx}`}
+                        type="button"
+                        className={`gomoku-cell${cell === 1 ? ' black' : ''}${cell === 2 ? ' white' : ''}`}
+                        onClick={() => handleGomokuCellClick(rowIdx, colIdx)}
+                        disabled={cell !== 0 || gomokuWinner !== 0}
+                        aria-label={t('miniGameTab.gomoku.cellAria', {
+                          row: rowIdx + 1,
+                          col: colIdx + 1,
+                        })}
+                      >
+                        <span className="gomoku-piece" />
+                      </button>
+                    )))}
+                  </div>
+                </div>
               </div>
             )}
 
             {/* 右侧信息面板 */}
             <div className="mg-info-sidebar">
               {/* 游戏说明 + 分数 + 新游戏（同行） */}
-              {gameAvailable && (
+              {game2048Available && (
                 <div className="mg-section mg-section-top-score">
                   <span className="g2048-hint">{t('miniGameTab.game2048.hint')}</span>
                   <div className="g2048-score-row g2048-score-cards">
@@ -594,9 +737,22 @@ export function MiniGameTab(): ReactElement {
                   <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={handleStartNewGame}>{t('miniGameTab.game2048.newGame')}</button>
                 </div>
               )}
+              {gomokuAvailable && (
+                <div className="mg-section mg-section-top-score">
+                  <span className="g2048-hint">{t('miniGameTab.gomoku.hint')}</span>
+                  <div className="g2048-score-row">
+                    <div className="g2048-score-box gomoku-status-box">
+                      <span className="g2048-score-label">{t('miniGameTab.gomoku.status')}</span>
+                      <span className="g2048-score-val">{gomokuStatusText}</span>
+                    </div>
+                  </div>
+                  <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={handleStartGomoku}>{t('miniGameTab.gomoku.restart')}</button>
+                  <div className="mg-empty-hint gomoku-unranked-hint">{t('miniGameTab.gomoku.unrankedHint')}</div>
+                </div>
+              )}
 
               {/* 未登录提示 */}
-              {!loggedIn && (
+              {showRankedPanel && !loggedIn && (
                 <div className="settings-user-auth">
                   <div className="settings-user-auth-entry-title">
                     {t('miniGameTab.auth.entryTitle')}
@@ -616,14 +772,14 @@ export function MiniGameTab(): ReactElement {
               )}
 
               {/* 加载态 */}
-              {loggedIn && loading && (
+              {showRankedPanel && loggedIn && loading && (
                 <div className="mg-notice">
                   <span className="mg-notice-text">{t('miniGameTab.loading')}</span>
                 </div>
               )}
 
               {/* 排行榜（始终显示） */}
-              {loggedIn && !loading && (
+              {showRankedPanel && loggedIn && !loading && (
                 <div className="mg-section mg-section-scroll">
                   <div className="mg-section-header">
                     <div className="mg-section-title-wrap">
