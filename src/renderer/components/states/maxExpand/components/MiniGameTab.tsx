@@ -717,7 +717,7 @@ export function MiniGameTab(): ReactElement {
                       <div className="g2048-score-box gomoku-status-box">
                       <span className="g2048-score-label">{t('miniGameTab.gomoku.difficulty', { defaultValue: '难度' })}</span>
                       <select
-                        className="settings-select"
+                        className="gomoku-difficulty-select"
                         value={gomokuDifficulty}
                         disabled={gomokuSettingsLocked}
                         onChange={(event) => {
