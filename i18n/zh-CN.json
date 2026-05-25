@@ -949,6 +949,7 @@
     "noRecord": "暂无记录",
     "leaderboard": "排行榜",
     "myRank": "您的排名",
+    "leaderboardRestartHint": "重启后进行的对局成绩不会计入排行榜，请保持当前会话完成游戏。",
     "rankUnavailable": "未上榜",
     "lbUser": "用户",
     "lbScore": "分数",

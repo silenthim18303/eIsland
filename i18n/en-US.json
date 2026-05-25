@@ -949,6 +949,7 @@
     "noRecord": "No records yet",
     "leaderboard": "Leaderboard",
     "myRank": "Your Rank",
+    "leaderboardRestartHint": "Scores from games started after a restart will not be counted on the leaderboard.",
     "rankUnavailable": "Unranked",
     "lbUser": "User",
     "lbScore": "Score",

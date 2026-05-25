@@ -626,7 +626,17 @@ export function MiniGameTab(): ReactElement {
               {loggedIn && !loading && (
                 <div className="mg-section mg-section-scroll">
                   <div className="mg-section-header">
-                    <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
+                    <div className="mg-section-title-wrap">
+                      <span className="mg-section-title">{t('miniGameTab.leaderboard')}</span>
+                      <button
+                        className="mg-refresh-btn mg-leaderboard-hint-btn"
+                        type="button"
+                        title={t('miniGameTab.leaderboardRestartHint')}
+                        aria-label={t('miniGameTab.leaderboardRestartHint')}
+                      >
+                        ?
+                      </button>
+                    </div>
                     <div className="mg-section-header-actions">
                       <span className="mg-my-rank">{t('miniGameTab.myRank')}: {myRank ?? t('miniGameTab.rankUnavailable')}</span>
                       <button className="mg-refresh-btn" type="button" onClick={handleRefresh} title={t('miniGameTab.refresh')} aria-label={t('miniGameTab.refresh')} disabled={Boolean(error)}>
