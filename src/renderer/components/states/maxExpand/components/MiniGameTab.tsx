@@ -80,6 +80,7 @@ interface MiniGameNavCard {
 const MINI_GAME_NAV_ORDER_STORE_KEY = 'mini-game-nav-order';
 const MINI_GAME_HIDDEN_NAV_ORDER_STORE_KEY = 'mini-game-hidden-nav-order';
 const MINI_GAME_GOMOKU_STATE_STORE_KEY = 'mini-game-gomoku-state';
+const MINI_GAME_GOMOKU_SETTINGS_STORE_KEY = 'mini-game-gomoku-settings';
 const MINI_GAME_NAV_CARDS: MiniGameNavCard[] = [
   {
     id: 'game-2048',
@@ -111,6 +112,11 @@ function createEmptyGomokuState(): GameGomokuState {
 interface RuntimeLeaderboardSnapshot {
   myScore: MiniGameScoreData | null;
   leaderboard: MiniGameLeaderboardEntry[];
+}
+
+interface GomokuSettingsStoredState {
+  mode?: GomokuMatchMode;
+  difficulty?: GomokuAIDifficulty;
 }
 
 const runtimeLeaderboardCache = new Map<string, RuntimeLeaderboardSnapshot>();
@@ -155,6 +161,7 @@ export function MiniGameTab(): ReactElement {
   const [gomokuState, setGomokuState] = useState<GameGomokuState>(() => createEmptyGomokuState());
   const [gomokuMode, setGomokuMode] = useState<GomokuMatchMode>('pve');
   const [gomokuDifficulty, setGomokuDifficulty] = useState<GomokuAIDifficulty>('novice');
+  const [gomokuSettingsReady, setGomokuSettingsReady] = useState(false);
 
   const visibleCards = useMemo(() => {
     const seen = new Set<MiniGameIndexCardId>();
@@ -243,6 +250,40 @@ export function MiniGameTab(): ReactElement {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MINI_GAME_GOMOKU_SETTINGS_STORE_KEY).then((raw) => {
+      if (cancelled) return;
+      if (raw && typeof raw === 'object') {
+        const settings = raw as GomokuSettingsStoredState;
+        if (settings.mode === 'pvp' || settings.mode === 'pve') {
+          setGomokuMode(settings.mode);
+        }
+        if (settings.difficulty === 'easy' || settings.difficulty === 'novice') {
+          setGomokuDifficulty(settings.difficulty);
+        }
+      }
+      setGomokuSettingsReady(true);
+    }).catch(() => {
+      if (cancelled) return;
+      setGomokuSettingsReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!gomokuSettingsReady) {
+      return;
+    }
+    const payload: GomokuSettingsStoredState = {
+      mode: gomokuMode,
+      difficulty: gomokuDifficulty,
+    };
+    window.api.storeWrite(MINI_GAME_GOMOKU_SETTINGS_STORE_KEY, payload).catch(() => {});
+  }, [gomokuDifficulty, gomokuMode, gomokuSettingsReady]);
 
   const fetchSession = useCallback(async (gameId: string): Promise<Game2048Session | null> => {
     if (gameId !== '2048') return null;
