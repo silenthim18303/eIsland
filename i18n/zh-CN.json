@@ -964,6 +964,7 @@
     },
     "toolbox": {
       "sidebar": {
+        "index": "快速导航",
         "download": "多线程下载",
         "software": "常用软件",
         "translate": "文本翻译",
@@ -971,7 +972,74 @@
         "encodingService": "编码服务",
         "networkService": "网络服务",
         "fileCompression": "文件压缩",
+        "fileCompressionShort": "压缩",
         "formatFactory": "格式工厂"
+      },
+      "index": {
+        "title": "快速导航",
+        "reset": "恢复默认",
+        "edit": "编辑",
+        "done": "完成",
+        "searchPlaceholder": "搜索工具项...",
+        "searchClear": "清空搜索",
+        "searchEmpty": "没有找到匹配的工具项",
+        "hintEdit": "拖拽卡片可调整排列顺序，点击「完成」保存。",
+        "hintView": "点击卡片可快速跳转到对应工具页。",
+        "ariaNav": "工具箱快速导航",
+        "removeCard": "删除 {{label}}",
+        "ariaAddPanel": "可添加导航卡片",
+        "addableTitle": "可添加卡片",
+        "emptyAddable": "当前没有可添加的卡片"
+      },
+      "nav": {
+        "download-create": {
+          "label": "创建下载",
+          "desc": "配置下载地址、保存路径和线程参数并启动任务。"
+        },
+        "download-history": {
+          "label": "下载历史",
+          "desc": "查看下载任务进度、状态并执行暂停/继续等操作。"
+        },
+        "software": {
+          "label": "常用软件",
+          "desc": "快速访问常用软件下载入口与反馈通道。"
+        },
+        "translate": {
+          "label": "文本翻译",
+          "desc": "输入文本并在多语言间进行翻译。"
+        },
+        "fileService-hash": {
+          "label": "文件哈希校验",
+          "desc": "计算并比对文件哈希值，校验文件完整性。"
+        },
+        "encodingService-json": {
+          "label": "JSON 编解码",
+          "desc": "对文本执行 JSON 编码与解码转换。"
+        },
+        "encodingService-base64": {
+          "label": "Base64 编解码",
+          "desc": "对文本执行 Base64 编码与解码转换。"
+        },
+        "networkService": {
+          "label": "网络服务",
+          "desc": "查询 IP 信息与网络相关工具结果。"
+        },
+        "fileCompression-imageCompression": {
+          "label": "图像压缩",
+          "desc": "批量压缩图片并设置输出目录与质量。"
+        },
+        "fileCompression-history": {
+          "label": "压缩历史",
+          "desc": "查看压缩任务结果并快速打开输出目录。"
+        },
+        "formatFactory-image": {
+          "label": "图片转换",
+          "desc": "将图片转换为目标格式并调整输出参数。"
+        },
+        "formatFactory-video": {
+          "label": "视频转换",
+          "desc": "对视频执行转封装、转码或音轨提取。"
+        }
       },
       "software": {
         "title": "常用软件",

@@ -964,6 +964,7 @@
     },
     "toolbox": {
       "sidebar": {
+        "index": "Quick Nav",
         "download": "MT Download",
         "software": "Software",
         "translate": "Translate",
@@ -973,6 +974,72 @@
         "fileCompression": "File Compression",
         "fileCompressionShort": "Compress",
         "formatFactory": "Format Factory"
+      },
+      "index": {
+        "title": "Quick Navigation",
+        "reset": "Reset",
+        "edit": "Edit",
+        "done": "Done",
+        "searchPlaceholder": "Search tool items...",
+        "searchClear": "Clear search",
+        "searchEmpty": "No matching tool items",
+        "hintEdit": "Drag cards to reorder, then click Done to save.",
+        "hintView": "Click a card to jump to the corresponding tool page.",
+        "ariaNav": "Toolbox quick navigation",
+        "removeCard": "Remove {{label}}",
+        "ariaAddPanel": "Addable navigation cards",
+        "addableTitle": "Addable cards",
+        "emptyAddable": "No cards available to add"
+      },
+      "nav": {
+        "download-create": {
+          "label": "Create Download",
+          "desc": "Configure URL, save path, and thread settings to start a task."
+        },
+        "download-history": {
+          "label": "Download History",
+          "desc": "View task progress and status, and perform pause/resume actions."
+        },
+        "software": {
+          "label": "Software",
+          "desc": "Quickly access common software downloads and feedback entry."
+        },
+        "translate": {
+          "label": "Text Translation",
+          "desc": "Translate text between multiple languages."
+        },
+        "fileService-hash": {
+          "label": "File Hash Check",
+          "desc": "Calculate and compare file hashes for integrity verification."
+        },
+        "encodingService-json": {
+          "label": "JSON Encode/Decode",
+          "desc": "Encode and decode text as JSON."
+        },
+        "encodingService-base64": {
+          "label": "Base64 Encode/Decode",
+          "desc": "Encode and decode text as Base64."
+        },
+        "networkService": {
+          "label": "Network Service",
+          "desc": "Query IP details and inspect network-related results."
+        },
+        "fileCompression-imageCompression": {
+          "label": "Image Compression",
+          "desc": "Batch-compress images with output directory and quality settings."
+        },
+        "fileCompression-history": {
+          "label": "Compression History",
+          "desc": "Review compression tasks and quickly open output locations."
+        },
+        "formatFactory-image": {
+          "label": "Image Conversion",
+          "desc": "Convert images to target formats with output options."
+        },
+        "formatFactory-video": {
+          "label": "Video Conversion",
+          "desc": "Remux, transcode, or extract tracks from videos."
+        }
       },
       "software": {
         "title": "Common Software",
