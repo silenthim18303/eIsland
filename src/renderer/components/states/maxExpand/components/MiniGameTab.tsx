@@ -681,6 +681,12 @@ export function MiniGameTab(): ReactElement {
               )}
               {gomokuAvailable && (
                 <div className="mg-section mg-section-top-score">
+                  <div className="g2048-score-row">
+                    <div className="g2048-score-box gomoku-status-box">
+                      <span className="g2048-score-label">{t('miniGameTab.gomoku.status')}</span>
+                      <span className="g2048-score-val">{gomokuStatusText}</span>
+                    </div>
+                  </div>
                   <div className="g2048-score-row g2048-score-box gomoku-status-box">
                     <span className="g2048-score-label">{t('miniGameTab.gomoku.mode', { defaultValue: '对战模式' })}</span>
                     <div className="settings-card-inline-row">
@@ -732,12 +738,6 @@ export function MiniGameTab(): ReactElement {
                     </div>
                     </div>
                   )}
-                  <div className="g2048-score-row">
-                    <div className="g2048-score-box gomoku-status-box">
-                      <span className="g2048-score-label">{t('miniGameTab.gomoku.status')}</span>
-                      <span className="g2048-score-val">{gomokuStatusText}</span>
-                    </div>
-                  </div>
                   <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={handleStartGomoku}>{t('miniGameTab.gomoku.restart')}</button>
                   <div className="mg-empty-hint gomoku-unranked-hint">{t('miniGameTab.gomoku.unrankedHint')}</div>
                 </div>
