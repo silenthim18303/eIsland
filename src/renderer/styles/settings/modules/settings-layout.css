@@ -699,6 +699,11 @@
   color: rgba(var(--color-text-rgb), 0.52);
 }
 
+.mg-main-title-subtitle {
+  margin-left: 0;
+  text-align: left;
+}
+
 .settings-app-title-refresh-btn {
   appearance: none;
   width: 20px;
@@ -5331,6 +5336,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.mg-game-header {
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.mg-game-subtitle {
+  flex: 1;
+  text-align: right;
+  line-height: 1.4;
 }
 
 .mg-section-title {

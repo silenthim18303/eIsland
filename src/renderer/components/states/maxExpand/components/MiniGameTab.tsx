@@ -463,6 +463,11 @@ export function MiniGameTab(): ReactElement {
   const selectedEntry = GAME_LIST.find((g) => g.id === selectedGame);
   const game2048Available = selectedEntry?.available && selectedGame === '2048';
   const gomokuAvailable = selectedEntry?.available && selectedGame === 'gomoku';
+  const selectedGameHintKey = selectedGame === '2048'
+    ? 'miniGameTab.game2048.hint'
+    : selectedGame === 'gomoku'
+      ? 'miniGameTab.gomoku.hint'
+      : null;
   const showRankedPanel = isRankedGame(selectedGame);
   const gomokuStatusText = gomokuWinner === 1
     ? t('miniGameTab.gomoku.winnerBlack')
@@ -508,6 +513,9 @@ export function MiniGameTab(): ReactElement {
           {activeSidebar !== 'index' && (
             <div className="max-expand-settings-title settings-app-title-line">
               <span>{selectedEntry ? t(selectedEntry.labelKey, { defaultValue: selectedEntry.id }) : ''}</span>
+              {selectedEntry?.available && selectedGameHintKey && (
+                <span className="settings-app-title-sub mg-main-title-subtitle"> - {t(selectedGameHintKey)}</span>
+              )}
               {selectedEntry && !selectedEntry.available && (
                 <span className="mg-badge-coming-soon">{t('miniGameTab.comingSoon')}</span>
               )}
@@ -728,7 +736,6 @@ export function MiniGameTab(): ReactElement {
               {/* 游戏说明 + 分数 + 新游戏（同行） */}
               {game2048Available && (
                 <div className="mg-section mg-section-top-score">
-                  <span className="g2048-hint">{t('miniGameTab.game2048.hint')}</span>
                   <div className="g2048-score-row g2048-score-cards">
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.score')}</span><span className="g2048-score-val">{gameState.score}</span></div>
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.highScore')}</span><span className="g2048-score-val">{myScore?.highScore?.toLocaleString() ?? '--'}</span></div>
@@ -740,7 +747,6 @@ export function MiniGameTab(): ReactElement {
               )}
               {gomokuAvailable && (
                 <div className="mg-section mg-section-top-score">
-                  <span className="g2048-hint">{t('miniGameTab.gomoku.hint')}</span>
                   <div className="g2048-score-row">
                     <div className="g2048-score-box gomoku-status-box">
                       <span className="g2048-score-label">{t('miniGameTab.gomoku.status')}</span>
