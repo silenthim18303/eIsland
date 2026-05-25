@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement, type WheelEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIslandStore } from '../../../../store/index';
 import { readLocalProfile, readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
@@ -48,6 +48,12 @@ import {
   type Game2048Session,
   type Game2048State,
 } from './games/Game2048';
+import {
+  GameGomoku,
+  GOMOKU_SIZE,
+  type GameGomokuHandle,
+  type GameGomokuState,
+} from './games/GameGomoku';
 
 interface GameEntry {
   id: string;
@@ -89,19 +95,20 @@ const MINI_GAME_NAV_CARDS: MiniGameNavCard[] = [
 const DEFAULT_MINI_GAME_NAV_ORDER: MiniGameIndexCardId[] = MINI_GAME_NAV_CARDS.map((card) => card.id);
 const MINI_GAME_NAV_CARD_MAP = new Map(MINI_GAME_NAV_CARDS.map((card) => [card.id, card]));
 const RANKED_GAME_IDS = new Set<string>(['2048']);
-const GOMOKU_SIZE = 15;
+
+function createEmptyGomokuState(): GameGomokuState {
+  return {
+    board: Array.from({ length: GOMOKU_SIZE }, () => Array.from({ length: GOMOKU_SIZE }, () => 0)),
+    turn: 1,
+    winner: 0,
+    moves: 0,
+    scale: 1,
+  };
+}
 
 interface RuntimeLeaderboardSnapshot {
   myScore: MiniGameScoreData | null;
   leaderboard: MiniGameLeaderboardEntry[];
-}
-
-interface GomokuStoredState {
-  board: number[][];
-  turn: 1 | 2;
-  winner: 1 | 2 | 0;
-  moves: number;
-  scale: number;
 }
 
 const runtimeLeaderboardCache = new Map<string, RuntimeLeaderboardSnapshot>();
@@ -115,79 +122,8 @@ function resolveLeaderboardCacheKey(gameId: string): string {
   return `${userKey}:${gameId}`;
 }
 
-function createGomokuBoard(): number[][] {
-  return Array.from({ length: GOMOKU_SIZE }, () => Array.from({ length: GOMOKU_SIZE }, () => 0));
-}
-
-function normalizeGomokuStoredState(raw: unknown): GomokuStoredState | null {
-  if (!raw || typeof raw !== 'object') {
-    return null;
-  }
-  const candidate = raw as Partial<GomokuStoredState>;
-  if (!Array.isArray(candidate.board) || candidate.board.length !== GOMOKU_SIZE) {
-    return null;
-  }
-  const board = candidate.board.map((row) => {
-    if (!Array.isArray(row) || row.length !== GOMOKU_SIZE) {
-      return null;
-    }
-    const normalizedRow = row.map((cell) => {
-      if (cell === 1 || cell === 2) return cell;
-      if (cell === 0) return 0;
-      return null;
-    });
-    if (normalizedRow.some((cell) => cell === null)) {
-      return null;
-    }
-    return normalizedRow as number[];
-  });
-  if (board.some((row) => row === null)) {
-    return null;
-  }
-
-  const turn = candidate.turn === 2 ? 2 : 1;
-  const winner = candidate.winner === 1 || candidate.winner === 2 ? candidate.winner : 0;
-  const moves = Number.isInteger(candidate.moves)
-    ? Math.min(GOMOKU_SIZE * GOMOKU_SIZE, Math.max(0, Number(candidate.moves)))
-    : 0;
-  const scaleRaw = typeof candidate.scale === 'number' ? candidate.scale : 1;
-  const scale = Math.min(1.8, Math.max(1, Number(scaleRaw.toFixed(2))));
-
-  return {
-    board: board as number[][],
-    turn,
-    winner,
-    moves,
-    scale,
-  };
-}
-
 function isRankedGame(gameId: string): boolean {
   return RANKED_GAME_IDS.has(gameId);
-}
-
-function isGomokuWin(board: number[][], row: number, col: number, piece: 1 | 2): boolean {
-  const dirs: Array<[number, number]> = [[1, 0], [0, 1], [1, 1], [1, -1]];
-  return dirs.some(([dx, dy]) => {
-    let count = 1;
-    for (let step = 1; step < 5; step += 1) {
-      const nr = row + dx * step;
-      const nc = col + dy * step;
-      if (nr < 0 || nr >= GOMOKU_SIZE || nc < 0 || nc >= GOMOKU_SIZE || board[nr][nc] !== piece) {
-        break;
-      }
-      count += 1;
-    }
-    for (let step = 1; step < 5; step += 1) {
-      const nr = row - dx * step;
-      const nc = col - dy * step;
-      if (nr < 0 || nr >= GOMOKU_SIZE || nc < 0 || nc >= GOMOKU_SIZE || board[nr][nc] !== piece) {
-        break;
-      }
-      count += 1;
-    }
-    return count >= 5;
-  });
 }
 
 /**
@@ -213,12 +149,8 @@ export function MiniGameTab(): ReactElement {
   const [gameState, setGameState] = useState<Game2048State>({ score: 0, best: 0, over: false, moveCount: 0 });
   const [activeSession, setActiveSession] = useState<Game2048Session | null>(null);
   const gameRef = useRef<Game2048Handle>(null);
-  const [gomokuBoard, setGomokuBoard] = useState<number[][]>(() => createGomokuBoard());
-  const [gomokuTurn, setGomokuTurn] = useState<1 | 2>(1);
-  const [gomokuWinner, setGomokuWinner] = useState<1 | 2 | 0>(0);
-  const [gomokuMoves, setGomokuMoves] = useState(0);
-  const [gomokuScale, setGomokuScale] = useState(1);
-  const [gomokuStateReady, setGomokuStateReady] = useState(false);
+  const gomokuRef = useRef<GameGomokuHandle>(null);
+  const [gomokuState, setGomokuState] = useState<GameGomokuState>(() => createEmptyGomokuState());
 
   const visibleCards = useMemo(() => {
     const seen = new Set<MiniGameIndexCardId>();
@@ -307,40 +239,6 @@ export function MiniGameTab(): ReactElement {
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(MINI_GAME_GOMOKU_STATE_STORE_KEY).then((savedState) => {
-      if (cancelled) return;
-      const normalized = normalizeGomokuStoredState(savedState);
-      if (normalized) {
-        setGomokuBoard(normalized.board);
-        setGomokuTurn(normalized.turn);
-        setGomokuWinner(normalized.winner);
-        setGomokuMoves(normalized.moves);
-        setGomokuScale(normalized.scale);
-      }
-      setGomokuStateReady(true);
-    }).catch(() => {
-      if (cancelled) return;
-      setGomokuStateReady(true);
-    });
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    if (!gomokuStateReady) {
-      return;
-    }
-    const payload: GomokuStoredState = {
-      board: gomokuBoard,
-      turn: gomokuTurn,
-      winner: gomokuWinner,
-      moves: gomokuMoves,
-      scale: gomokuScale,
-    };
-    window.api.storeWrite(MINI_GAME_GOMOKU_STATE_STORE_KEY, payload).catch(() => {});
-  }, [gomokuBoard, gomokuMoves, gomokuScale, gomokuStateReady, gomokuTurn, gomokuWinner]);
 
   const fetchSession = useCallback(async (gameId: string): Promise<Game2048Session | null> => {
     if (gameId !== '2048') return null;
@@ -481,49 +379,13 @@ export function MiniGameTab(): ReactElement {
   }, [fetchSession, selectedGame]);
 
   const handleGameState = useCallback((s: Game2048State) => setGameState(s), []);
+  const handleGomokuStateChange = useCallback((s: GameGomokuState) => setGomokuState(s), []);
 
   const handleStartGomoku = useCallback(() => {
-    setGomokuBoard(createGomokuBoard());
-    setGomokuTurn(1);
-    setGomokuWinner(0);
-    setGomokuMoves(0);
+    gomokuRef.current?.restart();
   }, []);
 
-  const handleGomokuCellClick = useCallback((row: number, col: number) => {
-    if (selectedGame !== 'gomoku' || gomokuWinner !== 0 || gomokuBoard[row][col] !== 0) {
-      return;
-    }
-
-    const piece = gomokuTurn;
-    const nextBoard = gomokuBoard.map((line) => [...line]);
-    nextBoard[row][col] = piece;
-    const nextMoves = gomokuMoves + 1;
-
-    setGomokuBoard(nextBoard);
-    setGomokuMoves(nextMoves);
-
-    if (isGomokuWin(nextBoard, row, col, piece)) {
-      setGomokuWinner(piece);
-      return;
-    }
-
-    if (nextMoves >= GOMOKU_SIZE * GOMOKU_SIZE) {
-      return;
-    }
-
-    setGomokuTurn(piece === 1 ? 2 : 1);
-  }, [gomokuBoard, gomokuMoves, gomokuTurn, gomokuWinner, selectedGame]);
-
-  const handleGomokuBoardWheel = useCallback((event: WheelEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const delta = event.deltaY < 0 ? 0.08 : -0.08;
-    setGomokuScale((prev) => {
-      const next = prev + delta;
-      return Math.min(1.8, Math.max(1, Number(next.toFixed(2))));
-    });
-  }, []);
-
-  const gomokuDraw = gomokuWinner === 0 && gomokuMoves >= GOMOKU_SIZE * GOMOKU_SIZE;
+  const gomokuDraw = gomokuState.winner === 0 && gomokuState.moves >= GOMOKU_SIZE * GOMOKU_SIZE;
   const myRank = myScore ? (leaderboard.find((entry) => entry.userId === myScore.userId)?.rank ?? null) : null;
   const localProfile = readLocalProfile();
 
@@ -556,13 +418,13 @@ export function MiniGameTab(): ReactElement {
       ? 'miniGameTab.gomoku.hint'
       : null;
   const showRankedPanel = isRankedGame(selectedGame);
-  const gomokuStatusText = gomokuWinner === 1
+  const gomokuStatusText = gomokuState.winner === 1
     ? t('miniGameTab.gomoku.winnerBlack')
-    : gomokuWinner === 2
+    : gomokuState.winner === 2
       ? t('miniGameTab.gomoku.winnerWhite')
       : gomokuDraw
         ? t('miniGameTab.gomoku.draw')
-        : gomokuTurn === 1
+        : gomokuState.turn === 1
           ? t('miniGameTab.gomoku.turnBlack')
           : t('miniGameTab.gomoku.turnWhite');
 
@@ -787,34 +649,13 @@ export function MiniGameTab(): ReactElement {
             )}
             {gomokuAvailable && (
               <div className="mg-game-area">
-                <div className="gomoku-board-zoom" onWheel={handleGomokuBoardWheel}>
-                  <div
-                    className="gomoku-board"
-                    role="grid"
-                    aria-label={t('miniGameTab.gomoku.boardAria')}
-                    style={{
-                      transform: `scale(${gomokuScale})`,
-                      transformOrigin: 'top left',
-                    }}
-                  >
-                    {gomokuBoard.map((row, rowIdx) => row.map((cell, colIdx) => (
-                      <button
-                        key={`${rowIdx}-${colIdx}`}
-                        type="button"
-                        className={`gomoku-cell${(rowIdx === 3 || rowIdx === 7 || rowIdx === 11) && (colIdx === 3 || colIdx === 7 || colIdx === 11) ? ' star' : ''}${rowIdx === 0 ? ' edge-top' : ''}${rowIdx === GOMOKU_SIZE - 1 ? ' edge-bottom' : ''}${colIdx === 0 ? ' edge-left' : ''}${colIdx === GOMOKU_SIZE - 1 ? ' edge-right' : ''}${cell === 1 ? ' black' : ''}${cell === 2 ? ' white' : ''}`}
-                        onClick={() => handleGomokuCellClick(rowIdx, colIdx)}
-                        disabled={cell !== 0 || gomokuWinner !== 0}
-                        aria-label={t('miniGameTab.gomoku.cellAria', {
-                          row: rowIdx + 1,
-                          col: colIdx + 1,
-                        })}
-                      >
-                        <span className="gomoku-star" aria-hidden="true" />
-                        <span className="gomoku-piece" />
-                      </button>
-                    )))}
-                  </div>
-                </div>
+                <GameGomoku
+                  ref={gomokuRef}
+                  storageKey={MINI_GAME_GOMOKU_STATE_STORE_KEY}
+                  onStateChange={handleGomokuStateChange}
+                  boardAriaLabel={t('miniGameTab.gomoku.boardAria')}
+                  getCellAriaLabel={(row, col) => t('miniGameTab.gomoku.cellAria', { row, col })}
+                />
               </div>
             )}
 
