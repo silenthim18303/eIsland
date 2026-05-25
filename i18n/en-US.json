@@ -1026,7 +1026,7 @@
         },
         "fileCompression-imageCompression": {
           "label": "Image Compression",
-          "desc": "Batch-compress images with output directory and quality settings."
+          "desc": "Batch-compress images quickly."
         },
         "fileCompression-history": {
           "label": "Compression History",
