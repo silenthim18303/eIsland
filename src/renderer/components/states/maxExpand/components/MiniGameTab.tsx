@@ -706,7 +706,7 @@ export function MiniGameTab(): ReactElement {
                       <button
                         key={`${rowIdx}-${colIdx}`}
                         type="button"
-                        className={`gomoku-cell${cell === 1 ? ' black' : ''}${cell === 2 ? ' white' : ''}`}
+                        className={`gomoku-cell${(rowIdx === 3 || rowIdx === 7 || rowIdx === 11) && (colIdx === 3 || colIdx === 7 || colIdx === 11) ? ' star' : ''}${rowIdx === 0 ? ' edge-top' : ''}${rowIdx === GOMOKU_SIZE - 1 ? ' edge-bottom' : ''}${colIdx === 0 ? ' edge-left' : ''}${colIdx === GOMOKU_SIZE - 1 ? ' edge-right' : ''}${cell === 1 ? ' black' : ''}${cell === 2 ? ' white' : ''}`}
                         onClick={() => handleGomokuCellClick(rowIdx, colIdx)}
                         disabled={cell !== 0 || gomokuWinner !== 0}
                         aria-label={t('miniGameTab.gomoku.cellAria', {
@@ -714,6 +714,7 @@ export function MiniGameTab(): ReactElement {
                           col: colIdx + 1,
                         })}
                       >
+                        <span className="gomoku-star" aria-hidden="true" />
                         <span className="gomoku-piece" />
                       </button>
                     )))}
