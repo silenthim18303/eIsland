@@ -907,6 +907,31 @@
     }
   },
   "miniGameTab": {
+    "sidebar": {
+      "index": "Quick Nav"
+    },
+    "index": {
+      "title": "Quick Navigation",
+      "reset": "Reset",
+      "edit": "Edit",
+      "done": "Done",
+      "searchPlaceholder": "Search game items...",
+      "searchClear": "Clear search",
+      "searchEmpty": "No matching game items",
+      "hintEdit": "Drag cards to reorder, then click Done to save.",
+      "hintView": "Click a card to jump to the corresponding game.",
+      "ariaNav": "Mini game quick navigation",
+      "removeCard": "Remove {{label}}",
+      "ariaAddPanel": "Addable navigation cards",
+      "addableTitle": "Addable cards",
+      "emptyAddable": "No cards available to add"
+    },
+    "nav": {
+      "game-2048": {
+        "label": "2048",
+        "desc": "Classic merge-number mini game with score and leaderboard support."
+      }
+    },
     "games": {
       "2048": "2048"
     },

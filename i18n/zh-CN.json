@@ -907,6 +907,31 @@
     }
   },
   "miniGameTab": {
+    "sidebar": {
+      "index": "快速导航"
+    },
+    "index": {
+      "title": "快速导航",
+      "reset": "恢复默认",
+      "edit": "编辑",
+      "done": "完成",
+      "searchPlaceholder": "搜索游戏项...",
+      "searchClear": "清空搜索",
+      "searchEmpty": "没有找到匹配的游戏项",
+      "hintEdit": "拖拽卡片可调整排列顺序，点击「完成」保存。",
+      "hintView": "点击卡片可快速跳转到对应游戏。",
+      "ariaNav": "小游戏快速导航",
+      "removeCard": "删除 {{label}}",
+      "ariaAddPanel": "可添加导航卡片",
+      "addableTitle": "可添加卡片",
+      "emptyAddable": "当前没有可添加的卡片"
+    },
+    "nav": {
+      "game-2048": {
+        "label": "2048",
+        "desc": "经典数字合并小游戏，支持成绩与排行榜。"
+      }
+    },
     "games": {
       "2048": "2048"
     },

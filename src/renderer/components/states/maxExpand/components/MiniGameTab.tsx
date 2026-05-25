@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIslandStore } from '../../../../store/index';
 import { readLocalProfile, readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
@@ -59,6 +59,28 @@ const GAME_LIST: GameEntry[] = [
   { id: '2048', labelKey: 'miniGameTab.games.2048', available: true },
 ];
 
+type MiniGameIndexCardId = 'game-2048';
+
+interface MiniGameNavCard {
+  id: MiniGameIndexCardId;
+  labelKey: string;
+  descKey: string;
+  gameId: string;
+}
+
+const MINI_GAME_NAV_ORDER_STORE_KEY = 'mini-game-nav-order';
+const MINI_GAME_HIDDEN_NAV_ORDER_STORE_KEY = 'mini-game-hidden-nav-order';
+const MINI_GAME_NAV_CARDS: MiniGameNavCard[] = [
+  {
+    id: 'game-2048',
+    labelKey: 'miniGameTab.nav.game-2048.label',
+    descKey: 'miniGameTab.nav.game-2048.desc',
+    gameId: '2048',
+  },
+];
+const DEFAULT_MINI_GAME_NAV_ORDER: MiniGameIndexCardId[] = MINI_GAME_NAV_CARDS.map((card) => card.id);
+const MINI_GAME_NAV_CARD_MAP = new Map(MINI_GAME_NAV_CARDS.map((card) => [card.id, card]));
+
 interface RuntimeLeaderboardSnapshot {
   myScore: MiniGameScoreData | null;
   leaderboard: MiniGameLeaderboardEntry[];
@@ -80,9 +102,16 @@ function resolveLeaderboardCacheKey(gameId: string): string {
  * @returns React 元素
  */
 export function MiniGameTab(): ReactElement {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { setLogin, setRegister } = useIslandStore();
   const [selectedGame, setSelectedGame] = useState<string>(GAME_LIST[0]?.id ?? '');
+  const [activeSidebar, setActiveSidebar] = useState<string>(GAME_LIST[0]?.id ?? 'index');
+  const [navOrder, setNavOrder] = useState<MiniGameIndexCardId[]>(DEFAULT_MINI_GAME_NAV_ORDER);
+  const [hiddenNavOrder, setHiddenNavOrder] = useState<MiniGameIndexCardId[]>([]);
+  const [navEditMode, setNavEditMode] = useState(false);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const dragIdxRef = useRef<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loggedIn, setLoggedIn] = useState<boolean>(() => Boolean(readLocalToken()));
   const [myScore, setMyScore] = useState<MiniGameScoreData | null>(null);
   const [leaderboard, setLeaderboard] = useState<MiniGameLeaderboardEntry[]>([]);
@@ -91,6 +120,94 @@ export function MiniGameTab(): ReactElement {
   const [gameState, setGameState] = useState<Game2048State>({ score: 0, best: 0, over: false, moveCount: 0 });
   const [activeSession, setActiveSession] = useState<Game2048Session | null>(null);
   const gameRef = useRef<Game2048Handle>(null);
+
+  const visibleCards = useMemo(() => {
+    const seen = new Set<MiniGameIndexCardId>();
+    return navOrder.reduce<typeof MINI_GAME_NAV_CARDS>((ordered, id) => {
+      if (seen.has(id)) return ordered;
+      const card = MINI_GAME_NAV_CARD_MAP.get(id);
+      if (card) {
+        ordered.push(card);
+        seen.add(id);
+      }
+      return ordered;
+    }, []);
+  }, [navOrder]);
+
+  const hiddenCards = useMemo(() => {
+    const visibleSet = new Set(visibleCards.map((card) => card.id));
+    const seen = new Set<MiniGameIndexCardId>();
+
+    const fromHidden = hiddenNavOrder.reduce<typeof MINI_GAME_NAV_CARDS>((acc, id) => {
+      if (seen.has(id) || visibleSet.has(id)) return acc;
+      const card = MINI_GAME_NAV_CARD_MAP.get(id);
+      if (card) {
+        acc.push(card);
+        seen.add(id);
+      }
+      return acc;
+    }, []);
+
+    const remaining = MINI_GAME_NAV_CARDS.filter((card) => !visibleSet.has(card.id) && !seen.has(card.id));
+    return [...fromHidden, ...remaining];
+  }, [hiddenNavOrder, visibleCards]);
+
+  const searchResults = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return null;
+    return MINI_GAME_NAV_CARDS
+      .map((card) => {
+        const localizedLabel = t(card.labelKey);
+        const localizedDesc = t(card.descKey);
+        return { ...card, localizedLabel, localizedDesc };
+      })
+      .filter((card) => card.localizedLabel.toLowerCase().includes(q) || card.localizedDesc.toLowerCase().includes(q));
+  }, [searchQuery, i18n.language, t]);
+
+  const persistMiniGameNavConfig = (visibleOrder: MiniGameIndexCardId[], hiddenOrder: MiniGameIndexCardId[]): void => {
+    window.api.storeWrite(MINI_GAME_NAV_ORDER_STORE_KEY, visibleOrder).catch(() => {});
+    window.api.storeWrite(MINI_GAME_HIDDEN_NAV_ORDER_STORE_KEY, hiddenOrder).catch(() => {});
+  };
+
+  const resetMiniGameNavConfig = (): void => {
+    const nextVisible = [...DEFAULT_MINI_GAME_NAV_ORDER];
+    const nextHidden: MiniGameIndexCardId[] = [];
+    setNavOrder(nextVisible);
+    setHiddenNavOrder(nextHidden);
+    persistMiniGameNavConfig(nextVisible, nextHidden);
+  };
+
+  const navigateByCard = (cardId: MiniGameIndexCardId): void => {
+    const card = MINI_GAME_NAV_CARD_MAP.get(cardId);
+    if (!card) return;
+    setSelectedGame(card.gameId);
+    setActiveSidebar(card.gameId);
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(MINI_GAME_NAV_ORDER_STORE_KEY).then((savedVisible) => {
+      if (cancelled) return;
+      const visibleRaw = Array.isArray(savedVisible) ? savedVisible : [];
+      window.api.storeRead(MINI_GAME_HIDDEN_NAV_ORDER_STORE_KEY).then((savedHidden) => {
+        if (cancelled) return;
+        const hiddenRaw = Array.isArray(savedHidden) ? savedHidden : [];
+        const validVisible = visibleRaw
+          .filter((id): id is MiniGameIndexCardId => typeof id === 'string' && MINI_GAME_NAV_CARD_MAP.has(id as MiniGameIndexCardId))
+          .filter((id, idx, arr) => arr.indexOf(id) === idx);
+        const mergedVisible = validVisible.length > 0
+          ? [...validVisible, ...DEFAULT_MINI_GAME_NAV_ORDER.filter((id) => !validVisible.includes(id))]
+          : [...DEFAULT_MINI_GAME_NAV_ORDER];
+        const validHidden = hiddenRaw
+          .filter((id): id is MiniGameIndexCardId => typeof id === 'string' && MINI_GAME_NAV_CARD_MAP.has(id as MiniGameIndexCardId))
+          .filter((id, idx, arr) => arr.indexOf(id) === idx)
+          .filter((id) => !mergedVisible.includes(id));
+        setNavOrder(mergedVisible);
+        setHiddenNavOrder(validHidden);
+      }).catch(() => {});
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const fetchSession = useCallback(async (gameId: string): Promise<Game2048Session | null> => {
     if (gameId !== '2048') return null;
@@ -248,13 +365,24 @@ export function MiniGameTab(): ReactElement {
   return (
     <div className="max-expand-settings toolbox-tab-container">
       <div className="max-expand-settings-layout">
-        {/* 侧栏：游戏列表 */}
+        {/* 侧栏：快速导航 + 游戏列表 */}
         <div className="max-expand-settings-sidebar">
+          <button
+            className={`max-expand-settings-sidebar-item ${activeSidebar === 'index' ? 'active' : ''}`}
+            onClick={() => setActiveSidebar('index')}
+            type="button"
+          >
+            <span className="sidebar-dot" />
+            {t('miniGameTab.sidebar.index')}
+          </button>
           {GAME_LIST.map((game) => (
             <button
               key={game.id}
-              className={`max-expand-settings-sidebar-item ${selectedGame === game.id ? 'active' : ''}`}
-              onClick={() => setSelectedGame(game.id)}
+              className={`max-expand-settings-sidebar-item ${activeSidebar === game.id ? 'active' : ''}`}
+              onClick={() => {
+                setSelectedGame(game.id);
+                setActiveSidebar(game.id);
+              }}
               type="button"
             >
               <span className="sidebar-dot" />
@@ -265,14 +393,185 @@ export function MiniGameTab(): ReactElement {
 
         {/* 主面板 */}
         <div className="max-expand-settings-panel">
-          <div className="max-expand-settings-title settings-app-title-line">
-            <span>{selectedEntry ? t(selectedEntry.labelKey, { defaultValue: selectedEntry.id }) : ''}</span>
-            {selectedEntry && !selectedEntry.available && (
-              <span className="mg-badge-coming-soon">{t('miniGameTab.comingSoon')}</span>
-            )}
-          </div>
+          {activeSidebar !== 'index' && (
+            <div className="max-expand-settings-title settings-app-title-line">
+              <span>{selectedEntry ? t(selectedEntry.labelKey, { defaultValue: selectedEntry.id }) : ''}</span>
+              {selectedEntry && !selectedEntry.available && (
+                <span className="mg-badge-coming-soon">{t('miniGameTab.comingSoon')}</span>
+              )}
+            </div>
+          )}
 
-          <div className="mg-panel-body mg-panel-game-layout">
+          {activeSidebar === 'index' && (
+            <div className="max-expand-settings-section settings-index-section">
+              <div className="settings-index-header">
+                <div className="max-expand-settings-title">
+                  {t('miniGameTab.index.title')}
+                  <button className="settings-nav-edit-btn" type="button" onClick={resetMiniGameNavConfig}>
+                    {t('miniGameTab.index.reset')}
+                  </button>
+                  <button
+                    className={`settings-nav-edit-btn ${navEditMode ? 'active' : ''}`}
+                    type="button"
+                    onClick={() => {
+                      if (navEditMode) {
+                        persistMiniGameNavConfig(navOrder, hiddenNavOrder);
+                      }
+                      setNavEditMode(!navEditMode);
+                    }}
+                  >
+                    {navEditMode ? t('miniGameTab.index.done') : t('miniGameTab.index.edit')}
+                  </button>
+                  <div className="settings-index-search-wrap">
+                    <span className="settings-index-search-icon" aria-hidden="true">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                    <input
+                      className="settings-index-search-input"
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t('miniGameTab.index.searchPlaceholder')}
+                    />
+                    {searchQuery && (
+                      <button
+                        className="settings-index-search-clear"
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        aria-label={t('miniGameTab.index.searchClear')}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    )}
+                    {searchResults && (
+                      <div className="settings-index-search-dropdown">
+                        {searchResults.length === 0 ? (
+                          <div className="settings-index-search-dropdown-empty">{t('miniGameTab.index.searchEmpty')}</div>
+                        ) : (
+                          searchResults.map((card) => (
+                            <button
+                              key={card.id}
+                              className="settings-index-search-dropdown-item"
+                              type="button"
+                              onClick={() => {
+                                navigateByCard(card.id);
+                                setSearchQuery('');
+                              }}
+                            >
+                              <div className="settings-index-search-dropdown-text">
+                                <span className="settings-index-search-dropdown-title">{card.localizedLabel}</span>
+                                <span className="settings-index-search-dropdown-desc">{card.localizedDesc}</span>
+                              </div>
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="settings-music-hint settings-index-hint">
+                  {navEditMode
+                    ? t('miniGameTab.index.hintEdit')
+                    : t('miniGameTab.index.hintView')}
+                </div>
+              </div>
+              <div className="settings-index-cards" aria-label={t('miniGameTab.index.ariaNav')}>
+                {visibleCards.map((card, idx) => (
+                  navEditMode ? (
+                    <div
+                      key={card.id}
+                      className={`settings-index-card editing${dragOverIdx === idx ? ' drag-over' : ''}`}
+                      draggable
+                      onDragStart={(e) => {
+                        dragIdxRef.current = idx;
+                        e.dataTransfer.effectAllowed = 'move';
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOverIdx(idx);
+                      }}
+                      onDragLeave={() => setDragOverIdx(null)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setDragOverIdx(null);
+                        const from = dragIdxRef.current;
+                        if (from === null || from === idx) return;
+                        const nextOrder = visibleCards.map((item) => item.id);
+                        const [moved] = nextOrder.splice(from, 1);
+                        nextOrder.splice(idx, 0, moved);
+                        setNavOrder(nextOrder);
+                      }}
+                      onDragEnd={() => {
+                        dragIdxRef.current = null;
+                        setDragOverIdx(null);
+                      }}
+                    >
+                      <span className="settings-index-card-drag-handle">⠿</span>
+                      <button
+                        className="settings-index-card-remove"
+                        type="button"
+                        onClick={() => {
+                          const nextVisible = navOrder.filter((id) => id !== card.id);
+                          const nextHidden = hiddenNavOrder.includes(card.id)
+                            ? hiddenNavOrder
+                            : [...hiddenNavOrder, card.id];
+                          setNavOrder(nextVisible);
+                          setHiddenNavOrder(nextHidden);
+                        }}
+                        aria-label={t('miniGameTab.index.removeCard', { label: t(card.labelKey) })}
+                      >
+                        −
+                      </button>
+                      <span className="settings-index-card-title">{t(card.labelKey)}</span>
+                      <span className="settings-index-card-desc">{t(card.descKey)}</span>
+                    </div>
+                  ) : (
+                    <button
+                      key={card.id}
+                      className="settings-index-card"
+                      type="button"
+                      onClick={() => navigateByCard(card.id)}
+                    >
+                      <span className="settings-index-card-title">{t(card.labelKey)}</span>
+                      <span className="settings-index-card-desc">{t(card.descKey)}</span>
+                    </button>
+                  )
+                ))}
+              </div>
+              {navEditMode && (
+                <div className="settings-nav-add-panel" aria-label={t('miniGameTab.index.ariaAddPanel')}>
+                  <div className="settings-music-label">{t('miniGameTab.index.addableTitle')}</div>
+                  {hiddenCards.length === 0 ? (
+                    <div className="settings-music-hint">{t('miniGameTab.index.emptyAddable')}</div>
+                  ) : (
+                    <div className="settings-nav-add-list">
+                      {hiddenCards.map((card) => (
+                        <button
+                          key={card.id}
+                          className="settings-nav-add-item"
+                          type="button"
+                          onClick={() => {
+                            const nextVisible = navOrder.includes(card.id)
+                              ? navOrder
+                              : [...navOrder, card.id];
+                            const nextHidden = hiddenNavOrder.filter((id) => id !== card.id);
+                            setNavOrder(nextVisible);
+                            setHiddenNavOrder(nextHidden);
+                          }}
+                        >
+                          <span>{t(card.labelKey)}</span>
+                          <span className="settings-nav-add-plus">+</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeSidebar !== 'index' && (
+            <div className="mg-panel-body mg-panel-game-layout">
             {/* 游戏棋盘（纯净，无上下控件） */}
             {gameAvailable && (
               <div className="mg-game-area">
@@ -370,6 +669,7 @@ export function MiniGameTab(): ReactElement {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>
