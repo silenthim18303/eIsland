@@ -5731,6 +5731,26 @@
   height: 315px;
   overflow: auto;
   padding: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.2) transparent;
+}
+
+.gomoku-board-zoom::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.gomoku-board-zoom::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gomoku-board-zoom::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.2);
+}
+
+.gomoku-board-zoom::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.32);
 }
 
 .mg-panel-gomoku .mg-game-area {
