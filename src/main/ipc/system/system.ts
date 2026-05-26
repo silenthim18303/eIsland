@@ -189,10 +189,10 @@ function createThrottledCache<T>(fetcher: () => Promise<T>, ttlMs: number): Thro
 }
 
 const STATIC_TTL_MS = Number.POSITIVE_INFINITY;
-const GRAPHICS_TTL_MS = 4000;
-const CPU_TEMPERATURE_TTL_MS = 5000;
+const GRAPHICS_TTL_MS = 15000;
+const CPU_TEMPERATURE_TTL_MS = 15000;
 const FS_SIZE_TTL_MS = 10000;
-const DISK_LAYOUT_TTL_MS = 30000;
+const DISK_LAYOUT_TTL_MS = 60000;
 
 const cpuStaticCache = createThrottledCache<si.Systeminformation.CpuData | null>(() => si.cpu().catch(() => null), STATIC_TTL_MS);
 const graphicsCache = createThrottledCache<si.Systeminformation.GraphicsData | null>(() => si.graphics().catch(() => null), GRAPHICS_TTL_MS);
