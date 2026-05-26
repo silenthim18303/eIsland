@@ -43,6 +43,7 @@ const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
 const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
 const STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
+const EXPAND_NAV_LAYOUT_STORE_KEY = 'expand-nav-layout';
 
 interface PerformanceSnapshot {
   timestamp: number;
@@ -274,6 +275,76 @@ export function PerformanceMonitorTab(): React.ReactElement {
     cachedPerformanceSnapshot = null;
   };
 
+  const hidePerformanceMonitorInExpandLayout = (): void => {
+    const normalizeHiddenLayout = (value: unknown): Array<{ id: string; visible: boolean }> => {
+      const defaults = ['overview', 'song', 'tools', 'performanceMonitor'].map((id) => ({
+        id,
+        visible: id !== 'performanceMonitor',
+      }));
+      if (!Array.isArray(value) || value.length === 0) return defaults;
+
+      const known = new Set(defaults.map((item) => item.id));
+      const merged = new Map<string, boolean>();
+      value.forEach((item) => {
+        if (!item || typeof item !== 'object') return;
+        const candidate = item as { id?: unknown; visible?: unknown };
+        if (typeof candidate.id !== 'string' || !known.has(candidate.id)) return;
+        merged.set(candidate.id, candidate.visible !== false);
+      });
+
+      return defaults.map((item) => {
+        if (item.id === 'overview') return { ...item, visible: true };
+        if (item.id === 'performanceMonitor') return { ...item, visible: false };
+        return {
+          ...item,
+          visible: merged.has(item.id) ? merged.get(item.id) === true : item.visible,
+        };
+      });
+    };
+
+    void window.api.storeRead(EXPAND_NAV_LAYOUT_STORE_KEY)
+      .then((value) => {
+        const nextLayout = normalizeHiddenLayout(value);
+        return window.api.storeWrite(EXPAND_NAV_LAYOUT_STORE_KEY, nextLayout).then(() => nextLayout);
+      })
+      .then((nextLayout) => {
+        window.api.settingsPreview(`store:${EXPAND_NAV_LAYOUT_STORE_KEY}`, nextLayout).catch(() => {});
+        window.dispatchEvent(new CustomEvent('expand-nav-layout-changed', { detail: nextLayout }));
+      })
+      .catch(() => {});
+  };
+
+  const openExpandLayoutSettings = (): void => {
+    void window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, 'expand-layout')
+      .then(() => window.api.storeRead(STANDALONE_WINDOW_MODE_STORE_KEY))
+      .then((mode) => {
+        if (mode === 'standalone' || mode === 'integrated') return mode;
+        return window.api.storeRead(LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY).catch(() => null);
+      })
+      .then((mode) => {
+        if (mode === 'standalone') {
+          return window.api.storeWrite(STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY, 'settings')
+            .then(() => window.api.openStandaloneWindow())
+            .catch(() => {});
+        }
+        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'expand-layout' }));
+        setMaxExpandTab('settings');
+        setMaxExpand();
+        return undefined;
+      })
+      .catch(() => {
+        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'expand-layout' }));
+        setMaxExpandTab('settings');
+        setMaxExpand();
+      });
+  };
+
+  const handleHidePage = (): void => {
+    stopMonitoring();
+    hidePerformanceMonitorInExpandLayout();
+    openExpandLayoutSettings();
+  };
+
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
@@ -288,9 +359,14 @@ export function PerformanceMonitorTab(): React.ReactElement {
                   : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
             </span>
             {!monitoringEnabled && (
-              <button className="pm-start-monitor-btn" type="button" onClick={startMonitoring}>
-                {t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
-              </button>
+              <div className="pm-start-actions">
+                <button className="pm-start-monitor-btn" type="button" onClick={startMonitoring}>
+                  {t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
+                </button>
+                <button className="pm-start-monitor-btn pm-start-monitor-btn--secondary" type="button" onClick={handleHidePage}>
+                  {t('expanded.performanceMonitor.hidePage', { defaultValue: '隐藏本页面' })}
+                </button>
+              </div>
             )}
           </div>
         </div>

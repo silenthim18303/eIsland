@@ -889,6 +889,10 @@ export function SettingsTab(): ReactElement {
         setActiveTab('app');
         setAppSettingsPage('performance-monitor');
       }
+      if (value === 'expand-layout') {
+        setActiveTab('app');
+        setAppSettingsPage('expand-layout');
+      }
       if (value) {
         window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
@@ -1228,6 +1232,11 @@ export function SettingsTab(): ReactElement {
       if (intent === 'performance-monitor') {
         setActiveTab('app');
         setAppSettingsPage('performance-monitor');
+        window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
+      }
+      if (intent === 'expand-layout') {
+        setActiveTab('app');
+        setAppSettingsPage('expand-layout');
         window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
     }).catch(() => {});

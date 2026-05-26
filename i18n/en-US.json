@@ -427,6 +427,7 @@
       "hardwareSettingsLink": "Hardware looks different? Click to adjust",
       "startMonitor": "Start Monitoring",
       "stopMonitor": "Stop Monitoring",
+      "hidePage": "Hide This Page",
       "startHint": "Click Start Monitoring on first entry",
       "loading": "Loading system performance data...",
       "error": "System performance data is unavailable",

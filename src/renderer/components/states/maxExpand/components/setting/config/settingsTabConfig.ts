@@ -50,7 +50,7 @@ export const ISLAND_AUTO_DIM_ENABLED_STORE_KEY = 'island-auto-dim-enabled';
 export const ISLAND_AUTO_DIM_DELAY_STORE_KEY = 'island-auto-dim-delay';
 export const DEFAULT_AUTO_DIM_DELAY_SEC = 10;
 
-export type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail' | 'performance-monitor';
+export type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail' | 'performance-monitor' | 'expand-layout';
 
 export type IslandBgMediaType = 'image' | 'video';
 

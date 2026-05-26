@@ -86,6 +86,23 @@
   color: rgba(var(--color-text-rgb), 0.92);
 }
 
+.pm-start-monitor-btn--secondary {
+  color: rgba(var(--color-text-rgb), 0.65);
+  background: rgba(var(--color-text-rgb), 0.05);
+}
+
+.pm-start-monitor-btn--secondary:hover {
+  color: rgba(var(--color-text-rgb), 0.82);
+  background: rgba(var(--color-text-rgb), 0.1);
+}
+
+.pm-start-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .pm-loading-spinner {
   width: 13px;
   height: 13px;
