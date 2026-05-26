@@ -10,6 +10,7 @@ export interface GameGomokuState {
   moves: number;
   scale: number;
   lastMove: GomokuMovePosition | null;
+  aiThinking?: boolean;
 }
 
 export interface GameGomokuHandle {

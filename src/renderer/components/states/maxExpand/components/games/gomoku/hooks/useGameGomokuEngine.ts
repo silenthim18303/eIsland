@@ -31,6 +31,7 @@ export function useGameGomokuEngine({
   const [moves, setMoves] = useState(0);
   const [scale, setScale] = useState(1);
   const [lastMove, setLastMove] = useState<[number, number] | null>(null);
+  const [aiThinking, setAiThinking] = useState(false);
   const [stateReady, setStateReady] = useState(false);
   const lastReportedRef = useRef<string>('');
   const moveSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -111,14 +112,15 @@ export function useGameGomokuEngine({
       moves,
       scale,
       lastMove,
+      aiThinking,
     };
-    const signature = `${turn}-${winner}-${moves}-${scale}-${lastMove ? `${lastMove[0]}-${lastMove[1]}` : 'none'}`;
+    const signature = `${turn}-${winner}-${moves}-${scale}-${lastMove ? `${lastMove[0]}-${lastMove[1]}` : 'none'}-${aiThinking ? 'thinking' : 'idle'}`;
     if (lastReportedRef.current === signature) {
       return;
     }
     lastReportedRef.current = signature;
     onStateChange(snapshot);
-  }, [board, lastMove, moves, onStateChange, scale, turn, winner]);
+  }, [aiThinking, board, lastMove, moves, onStateChange, scale, turn, winner]);
 
   const restart = useCallback(() => {
     setBoard(createGomokuBoard());
@@ -126,6 +128,7 @@ export function useGameGomokuEngine({
     setWinner(0);
     setMoves(0);
     setLastMove(null);
+    setAiThinking(false);
   }, []);
 
   const onCellClick = useCallback((row: number, col: number) => {
@@ -145,6 +148,7 @@ export function useGameGomokuEngine({
     setBoard(nextBoard);
     setMoves(nextMoves);
     setLastMove([row, col]);
+    setAiThinking(false);
     playMoveSound();
 
     if (isGomokuWin(nextBoard, row, col, piece)) {
@@ -161,16 +165,24 @@ export function useGameGomokuEngine({
 
   useEffect(() => {
     if (!aiDifficulty || winner !== 0 || turn !== 2 || moves >= GOMOKU_SIZE * GOMOKU_SIZE) {
+      setAiThinking(false);
       return;
     }
 
+    let cancelled = false;
+    setAiThinking(true);
     const timer = window.setTimeout(() => {
+      if (cancelled) {
+        return;
+      }
       const nextMove = selectGomokuAIMove(board, aiDifficulty, 2);
       if (!nextMove) {
+        setAiThinking(false);
         return;
       }
       const [row, col] = nextMove;
       if (board[row]?.[col] !== 0) {
+        setAiThinking(false);
         return;
       }
 
@@ -182,6 +194,7 @@ export function useGameGomokuEngine({
       setBoard(nextBoard);
       setMoves(nextMoves);
       setLastMove([row, col]);
+      setAiThinking(false);
       playMoveSound();
 
       if (isGomokuWin(nextBoard, row, col, piece)) {
@@ -197,6 +210,7 @@ export function useGameGomokuEngine({
     }, 180);
 
     return () => {
+      cancelled = true;
       window.clearTimeout(timer);
     };
   }, [aiDifficulty, board, moves, playMoveSound, turn, winner]);

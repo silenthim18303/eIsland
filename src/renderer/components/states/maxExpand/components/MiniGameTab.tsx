@@ -107,6 +107,7 @@ function createEmptyGomokuState(): GameGomokuState {
     moves: 0,
     scale: 1,
     lastMove: null,
+    aiThinking: false,
   };
 }
 
@@ -479,7 +480,9 @@ export function MiniGameTab(): ReactElement {
       : null;
   const showRankedPanel = isRankedGame(selectedGame);
   const gomokuSettingsLocked = gomokuState.moves > 0;
-  const gomokuStatusText = gomokuState.winner === 1
+  const gomokuStatusText = (gomokuMode === 'pve' && gomokuState.turn === 2 && gomokuState.aiThinking && gomokuState.winner === 0)
+    ? t('miniGameTab.gomoku.thinking', { defaultValue: '正在思考' })
+    : gomokuState.winner === 1
     ? t('miniGameTab.gomoku.winnerBlack')
     : gomokuState.winner === 2
       ? t('miniGameTab.gomoku.winnerWhite')

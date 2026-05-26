@@ -985,6 +985,7 @@
       "difficultyExpert": "Expert",
       "difficultyMaster": "Master",
       "status": "Status",
+      "thinking": "Thinking...",
       "turnBlack": "Black to move",
       "turnWhite": "White to move",
       "winnerBlack": "Black wins",
