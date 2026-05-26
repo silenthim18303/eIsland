@@ -184,7 +184,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
     const loadSnapshot = (): void => {
       if (cancelled || inFlight) return;
       inFlight = true;
-      window.api.getPerformanceSnapshot(hardwareSelection)
+      window.api.getPerformanceSnapshot(hardwareSelection, false)
         .then((data) => {
           if (cancelled) return;
           const nextSnapshot = data as PerformanceSnapshot;

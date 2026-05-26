@@ -222,7 +222,10 @@ declare global {
       screenshot: () => Promise<string | null>;
       startRegionScreenshot: () => Promise<boolean>;
       openTaskManager: () => void;
-      getPerformanceSnapshot: (selection?: PerformanceHardwareSelection) => Promise<PerformanceSnapshot>;
+      getPerformanceSnapshot: (
+        selection?: PerformanceHardwareSelection,
+        includeHardwareOptions?: boolean,
+      ) => Promise<PerformanceSnapshot>;
       getPathForFile: (file: File) => string;
       getFileIcon: (filePath: string) => Promise<string | null>;
       openFile: (filePath: string) => Promise<boolean>;

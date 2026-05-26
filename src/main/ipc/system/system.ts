@@ -212,7 +212,10 @@ export function resetPerformanceCachesForTesting(): void {
   diskLayoutCache.reset();
 }
 
-async function collectPerformanceSnapshot(selection: PerformanceHardwareSelection = {}): Promise<PerformanceSnapshot> {
+async function collectPerformanceSnapshot(
+  selection: PerformanceHardwareSelection = {},
+  includeHardwareOptions = true,
+): Promise<PerformanceSnapshot> {
   const [
     cpu,
     load,
@@ -234,13 +237,15 @@ async function collectPerformanceSnapshot(selection: PerformanceHardwareSelectio
   const osCpus = os.cpus();
   const cpuLoadItems = Array.isArray(load?.cpus) ? load.cpus : [];
   const selectedCpuIndex = parseIndexedId(selection.cpu, 'cpu', cpuLoadItems.length);
-  const cpuOptions: PerformanceHardwareOption[] = [
-    { id: 'all', label: 'All CPU' },
-    ...cpuLoadItems.map((_, index) => ({
-      id: indexedId('cpu', index),
-      label: `CPU ${index + 1} · ${safeHardwareLabel(osCpus[index]?.model, 'Unknown CPU')}`,
-    })),
-  ];
+  const cpuOptions: PerformanceHardwareOption[] = includeHardwareOptions
+    ? [
+      { id: 'all', label: 'All CPU' },
+      ...cpuLoadItems.map((_, index) => ({
+        id: indexedId('cpu', index),
+        label: `CPU ${index + 1} · ${safeHardwareLabel(osCpus[index]?.model, 'Unknown CPU')}`,
+      })),
+    ]
+    : [];
   const selectedCpuLoad = selectedCpuIndex === null ? load?.currentLoad : cpuLoadItems[selectedCpuIndex]?.load;
   const cpuTemperatureCores = Array.isArray(cpuTemperature?.cores) ? cpuTemperature.cores : [];
   const selectedCpuTemperature = selectedCpuIndex === null ? null : positiveNumber(cpuTemperatureCores[selectedCpuIndex]);
@@ -248,24 +253,28 @@ async function collectPerformanceSnapshot(selection: PerformanceHardwareSelectio
   const gpuControllers = (graphics?.controllers ?? []).filter((controller) => Boolean(controller.model || controller.vendor));
   const selectedGpuIndex = parseIndexedId(selection.gpu, 'gpu', gpuControllers.length);
   const gpu = selectedGpuIndex === null ? (gpuControllers[0] ?? null) : gpuControllers[selectedGpuIndex];
-  const gpuOptions: PerformanceHardwareOption[] = [
-    { id: 'auto', label: 'Auto GPU' },
-    ...gpuControllers.map((controller, index) => ({
-      id: indexedId('gpu', index),
-      label: [controller.vendor, controller.model].filter(Boolean).join(' ') || `GPU ${index + 1}`,
-    })),
-  ];
+  const gpuOptions: PerformanceHardwareOption[] = includeHardwareOptions
+    ? [
+      { id: 'auto', label: 'Auto GPU' },
+      ...gpuControllers.map((controller, index) => ({
+        id: indexedId('gpu', index),
+        label: [controller.vendor, controller.model].filter(Boolean).join(' ') || `GPU ${index + 1}`,
+      })),
+    ]
+    : [];
 
   const fsItems = fsSizes.filter((item) => positiveNumber(item.size) !== null);
   const selectedFsIndex = parseIndexedId(selection.disk, 'fs', fsItems.length);
   const selectedFsItems = selectedFsIndex === null ? fsItems : [fsItems[selectedFsIndex]];
-  const diskOptions: PerformanceHardwareOption[] = [
-    { id: 'all', label: 'All Disks' },
-    ...fsItems.map((item, index) => ({
-      id: indexedId('fs', index),
-      label: [item.mount, item.fs].filter(Boolean).join(' · ') || `Disk ${index + 1}`,
-    })),
-  ];
+  const diskOptions: PerformanceHardwareOption[] = includeHardwareOptions
+    ? [
+      { id: 'all', label: 'All Disks' },
+      ...fsItems.map((item, index) => ({
+        id: indexedId('fs', index),
+        label: [item.mount, item.fs].filter(Boolean).join(' · ') || `Disk ${index + 1}`,
+      })),
+    ]
+    : [];
   const diskTotals = selectedFsItems.reduce((acc, item) => ({
     totalBytes: acc.totalBytes + Math.max(0, item.size || 0),
     usedBytes: acc.usedBytes + Math.max(0, item.used || 0),
@@ -362,8 +371,11 @@ export function registerSystemIpcHandlers(options: RegisterSystemIpcHandlersOpti
     return options.queryFocusedWindow();
   });
 
-  ipcMain.handle('system:performance-snapshot:get', async (_event, selection?: PerformanceHardwareSelection) => {
-    return collectPerformanceSnapshot(selection);
-  });
+  ipcMain.handle(
+    'system:performance-snapshot:get',
+    async (_event, selection?: PerformanceHardwareSelection, includeHardwareOptions = true) => {
+      return collectPerformanceSnapshot(selection, includeHardwareOptions);
+    },
+  );
 
 }
