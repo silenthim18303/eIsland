@@ -1,6 +1,6 @@
 export const GOMOKU_SIZE = 15;
 
-export type GomokuAIDifficulty = 'novice' | 'easy';
+export type GomokuAIDifficulty = 'novice' | 'easy' | 'hard' | 'expert' | 'master';
 export type GomokuMovePosition = [number, number];
 
 export interface GameGomokuState {

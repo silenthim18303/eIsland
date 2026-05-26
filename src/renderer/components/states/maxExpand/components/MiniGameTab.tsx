@@ -262,7 +262,13 @@ export function MiniGameTab(): ReactElement {
         if (settings.mode === 'pvp' || settings.mode === 'pve') {
           setGomokuMode(settings.mode);
         }
-        if (settings.difficulty === 'easy' || settings.difficulty === 'novice') {
+        if (
+          settings.difficulty === 'novice'
+          || settings.difficulty === 'easy'
+          || settings.difficulty === 'hard'
+          || settings.difficulty === 'expert'
+          || settings.difficulty === 'master'
+        ) {
           setGomokuDifficulty(settings.difficulty);
         }
       }
@@ -787,13 +793,25 @@ export function MiniGameTab(): ReactElement {
                         value={gomokuDifficulty}
                         disabled={gomokuSettingsLocked}
                         onChange={(event) => {
-                          const nextDifficulty: GomokuAIDifficulty = event.target.value === 'easy' ? 'easy' : 'novice';
+                          const raw = event.target.value;
+                          const nextDifficulty: GomokuAIDifficulty = raw === 'master'
+                            ? 'master'
+                            : raw === 'expert'
+                              ? 'expert'
+                              : raw === 'hard'
+                                ? 'hard'
+                                : raw === 'easy'
+                                  ? 'easy'
+                                  : 'novice';
                           setGomokuDifficulty(nextDifficulty);
                           gomokuRef.current?.restart();
                         }}
                       >
                         <option value="novice">{t('miniGameTab.gomoku.difficultyNovice', { defaultValue: '新手' })}</option>
                         <option value="easy">{t('miniGameTab.gomoku.difficultyEasy', { defaultValue: '简单' })}</option>
+                        <option value="hard">{t('miniGameTab.gomoku.difficultyHard', { defaultValue: '困难' })}</option>
+                        <option value="expert">{t('miniGameTab.gomoku.difficultyExpert', { defaultValue: '专家' })}</option>
+                        <option value="master">{t('miniGameTab.gomoku.difficultyMaster', { defaultValue: '大师' })}</option>
                       </select>
                     </div>
                     </div>
