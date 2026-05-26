@@ -34,6 +34,17 @@ export function normalizeGomokuStoredState(raw: unknown): GameGomokuState | null
     : 0;
   const scaleRaw = typeof candidate.scale === 'number' ? candidate.scale : 1;
   const scale = Math.min(1.8, Math.max(1, Number(scaleRaw.toFixed(2))));
+  const rawLastMove = candidate.lastMove;
+  const lastMove = Array.isArray(rawLastMove)
+    && rawLastMove.length === 2
+    && Number.isInteger(rawLastMove[0])
+    && Number.isInteger(rawLastMove[1])
+    && Number(rawLastMove[0]) >= 0
+    && Number(rawLastMove[0]) < GOMOKU_SIZE
+    && Number(rawLastMove[1]) >= 0
+    && Number(rawLastMove[1]) < GOMOKU_SIZE
+    ? [Number(rawLastMove[0]), Number(rawLastMove[1])] as [number, number]
+    : null;
 
   return {
     board: board as number[][],
@@ -41,5 +52,6 @@ export function normalizeGomokuStoredState(raw: unknown): GameGomokuState | null
     winner,
     moves,
     scale,
+    lastMove,
   };
 }

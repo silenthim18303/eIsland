@@ -30,6 +30,7 @@ export function useGameGomokuEngine({
   const [winner, setWinner] = useState<1 | 2 | 0>(0);
   const [moves, setMoves] = useState(0);
   const [scale, setScale] = useState(1);
+  const [lastMove, setLastMove] = useState<[number, number] | null>(null);
   const [stateReady, setStateReady] = useState(false);
   const lastReportedRef = useRef<string>('');
   const moveSoundRef = useRef<HTMLAudioElement | null>(null);
@@ -72,6 +73,7 @@ export function useGameGomokuEngine({
         setWinner(normalized.winner);
         setMoves(normalized.moves);
         setScale(normalized.scale);
+        setLastMove(normalized.lastMove);
       }
       setStateReady(true);
     }).catch(() => {
@@ -93,9 +95,10 @@ export function useGameGomokuEngine({
       winner,
       moves,
       scale,
+      lastMove,
     };
     window.api.storeWrite(storageKey, payload).catch(() => {});
-  }, [board, moves, scale, stateReady, storageKey, turn, winner]);
+  }, [board, lastMove, moves, scale, stateReady, storageKey, turn, winner]);
 
   useEffect(() => {
     if (!onStateChange) {
@@ -107,20 +110,22 @@ export function useGameGomokuEngine({
       winner,
       moves,
       scale,
+      lastMove,
     };
-    const signature = `${turn}-${winner}-${moves}-${scale}`;
+    const signature = `${turn}-${winner}-${moves}-${scale}-${lastMove ? `${lastMove[0]}-${lastMove[1]}` : 'none'}`;
     if (lastReportedRef.current === signature) {
       return;
     }
     lastReportedRef.current = signature;
     onStateChange(snapshot);
-  }, [board, moves, onStateChange, scale, turn, winner]);
+  }, [board, lastMove, moves, onStateChange, scale, turn, winner]);
 
   const restart = useCallback(() => {
     setBoard(createGomokuBoard());
     setTurn(1);
     setWinner(0);
     setMoves(0);
+    setLastMove(null);
   }, []);
 
   const onCellClick = useCallback((row: number, col: number) => {
@@ -139,6 +144,7 @@ export function useGameGomokuEngine({
 
     setBoard(nextBoard);
     setMoves(nextMoves);
+    setLastMove([row, col]);
     playMoveSound();
 
     if (isGomokuWin(nextBoard, row, col, piece)) {
@@ -175,6 +181,7 @@ export function useGameGomokuEngine({
 
       setBoard(nextBoard);
       setMoves(nextMoves);
+      setLastMove([row, col]);
       playMoveSound();
 
       if (isGomokuWin(nextBoard, row, col, piece)) {

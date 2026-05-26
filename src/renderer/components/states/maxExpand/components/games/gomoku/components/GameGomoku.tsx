@@ -7,6 +7,8 @@ export const GameGomoku = forwardRef<GameGomokuHandle, GameGomokuProps>(function
   storageKey,
   onStateChange,
   aiDifficulty,
+  highlightMove,
+  highlightPulse,
   boardAriaLabel,
   getCellAriaLabel,
 }, fwdRef): ReactElement {
@@ -26,6 +28,8 @@ export const GameGomoku = forwardRef<GameGomokuHandle, GameGomokuProps>(function
       board={board}
       winner={winner}
       scale={scale}
+      highlightMove={highlightMove}
+      highlightPulse={highlightPulse}
       boardAriaLabel={boardAriaLabel}
       getCellAriaLabel={getCellAriaLabel}
       onCellClick={onCellClick}

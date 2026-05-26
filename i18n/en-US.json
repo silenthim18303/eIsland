@@ -988,6 +988,7 @@
       "winnerWhite": "White wins",
       "draw": "Draw",
       "restart": "Restart",
+      "highlightLastMove": "Highlight Last Move",
       "unrankedHint": "Gomoku is not connected to online leaderboard yet.",
       "boardAria": "Gomoku board",
       "cellAria": "Row {{row}}, column {{col}}"

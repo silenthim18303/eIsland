@@ -1,6 +1,7 @@
 export const GOMOKU_SIZE = 15;
 
 export type GomokuAIDifficulty = 'novice' | 'easy';
+export type GomokuMovePosition = [number, number];
 
 export interface GameGomokuState {
   board: number[][];
@@ -8,6 +9,7 @@ export interface GameGomokuState {
   winner: 1 | 2 | 0;
   moves: number;
   scale: number;
+  lastMove: GomokuMovePosition | null;
 }
 
 export interface GameGomokuHandle {
@@ -18,6 +20,8 @@ export interface GameGomokuProps {
   storageKey?: string;
   onStateChange?: (state: GameGomokuState) => void;
   aiDifficulty?: GomokuAIDifficulty;
+  highlightMove?: GomokuMovePosition | null;
+  highlightPulse?: number;
   boardAriaLabel: string;
   getCellAriaLabel: (row: number, col: number) => string;
 }

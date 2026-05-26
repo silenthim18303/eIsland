@@ -106,6 +106,7 @@ function createEmptyGomokuState(): GameGomokuState {
     winner: 0,
     moves: 0,
     scale: 1,
+    lastMove: null,
   };
 }
 
@@ -162,6 +163,7 @@ export function MiniGameTab(): ReactElement {
   const [gomokuMode, setGomokuMode] = useState<GomokuMatchMode>('pve');
   const [gomokuDifficulty, setGomokuDifficulty] = useState<GomokuAIDifficulty>('novice');
   const [gomokuSettingsReady, setGomokuSettingsReady] = useState(false);
+  const [gomokuHighlightPulse, setGomokuHighlightPulse] = useState(0);
 
   const visibleCards = useMemo(() => {
     const seen = new Set<MiniGameIndexCardId>();
@@ -429,6 +431,13 @@ export function MiniGameTab(): ReactElement {
   const handleStartGomoku = useCallback(() => {
     gomokuRef.current?.restart();
   }, []);
+
+  const handleHighlightLastGomokuMove = useCallback(() => {
+    if (!gomokuState.lastMove) {
+      return;
+    }
+    setGomokuHighlightPulse((prev) => prev + 1);
+  }, [gomokuState.lastMove]);
 
   const gomokuDraw = gomokuState.winner === 0 && gomokuState.moves >= GOMOKU_SIZE * GOMOKU_SIZE;
   const myRank = myScore ? (leaderboard.find((entry) => entry.userId === myScore.userId)?.rank ?? null) : null;
@@ -699,6 +708,8 @@ export function MiniGameTab(): ReactElement {
                   ref={gomokuRef}
                   storageKey={MINI_GAME_GOMOKU_STATE_STORE_KEY}
                   aiDifficulty={gomokuMode === 'pve' ? gomokuDifficulty : undefined}
+                  highlightMove={gomokuState.lastMove}
+                  highlightPulse={gomokuHighlightPulse}
                   onStateChange={handleGomokuStateChange}
                   boardAriaLabel={t('miniGameTab.gomoku.boardAria')}
                   getCellAriaLabel={(row, col) => t('miniGameTab.gomoku.cellAria', { row, col })}
@@ -780,6 +791,14 @@ export function MiniGameTab(): ReactElement {
                     </div>
                   )}
                   <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={handleStartGomoku}>{t('miniGameTab.gomoku.restart')}</button>
+                  <button
+                    className="g2048-new-btn g2048-new-btn-block"
+                    type="button"
+                    onClick={handleHighlightLastGomokuMove}
+                    disabled={!gomokuState.lastMove}
+                  >
+                    {t('miniGameTab.gomoku.highlightLastMove', { defaultValue: '高亮上一手' })}
+                  </button>
                   <div className="mg-empty-hint gomoku-unranked-hint">{t('miniGameTab.gomoku.unrankedHint')}</div>
                 </div>
               )}

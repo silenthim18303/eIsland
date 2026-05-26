@@ -5871,6 +5871,48 @@
   border: 1px solid rgba(0, 0, 0, 0.18);
 }
 
+@keyframes gomoku-last-move-blink-a {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(var(--color-text-rgb), 0);
+  }
+
+  40% {
+    transform: scale(1.24);
+    box-shadow: 0 0 0 5px rgba(var(--color-text-rgb), 0.2);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(var(--color-text-rgb), 0);
+  }
+}
+
+@keyframes gomoku-last-move-blink-b {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(var(--color-text-rgb), 0);
+  }
+
+  40% {
+    transform: scale(1.24);
+    box-shadow: 0 0 0 5px rgba(var(--color-text-rgb), 0.2);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(var(--color-text-rgb), 0);
+  }
+}
+
+.gomoku-cell.gomoku-last-move-highlight-0 .gomoku-piece {
+  animation: gomoku-last-move-blink-a 0.58s ease;
+}
+
+.gomoku-cell.gomoku-last-move-highlight-1 .gomoku-piece {
+  animation: gomoku-last-move-blink-b 0.58s ease;
+}
+
 .gomoku-status-box {
   width: 100%;
   align-items: flex-start;

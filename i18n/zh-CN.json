@@ -988,6 +988,7 @@
       "winnerWhite": "白棋获胜",
       "draw": "平局",
       "restart": "重新开始",
+      "highlightLastMove": "高亮上一手",
       "unrankedHint": "五子棋暂不接入在线排行榜。",
       "boardAria": "五子棋棋盘",
       "cellAria": "第 {{row}} 行第 {{col}} 列"
