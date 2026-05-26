@@ -269,18 +269,16 @@ export function PerformanceMonitorTab(): React.ReactElement {
 
   const stopMonitoring = (): void => {
     setMonitoringEnabled(false);
+    setSnapshot(null);
+    setFailed(false);
+    cachedPerformanceSnapshot = null;
   };
 
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
         <div className="pm-panel-wrap pm-panel-loading">
-          <div className="pm-loading">
-            {!monitoringEnabled && (
-              <button className="pm-start-monitor-btn" type="button" onClick={startMonitoring}>
-                {t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
-              </button>
-            )}
+          <div className={`pm-loading${monitoringEnabled ? '' : ' pm-loading--idle'}`}>
             {monitoringEnabled && !failed && <span className="pm-loading-spinner" aria-hidden="true" />}
             <span className="pm-loading-text">
               {!monitoringEnabled
@@ -289,6 +287,11 @@ export function PerformanceMonitorTab(): React.ReactElement {
                   ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
                   : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
             </span>
+            {!monitoringEnabled && (
+              <button className="pm-start-monitor-btn" type="button" onClick={startMonitoring}>
+                {t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
+              </button>
+            )}
           </div>
         </div>
       </div>
