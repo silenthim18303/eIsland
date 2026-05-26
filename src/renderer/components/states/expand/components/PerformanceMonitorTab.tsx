@@ -43,6 +43,7 @@ const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
 const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
 const STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY = 'standalone-window-active-tab';
+const EXPAND_NAV_LAYOUT_STORE_KEY = 'expand-nav-layout';
 
 interface PerformanceSnapshot {
   timestamp: number;
@@ -97,6 +98,7 @@ interface MetricCardProps {
 const REFRESH_INTERVAL_MS = 2000;
 const START_FETCH_DELAY_MS = 200;
 let cachedPerformanceSnapshot: PerformanceSnapshot | null = null;
+let hasStartedMonitoringThisSession = false;
 
 function clampPercent(value: number | null | undefined): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
@@ -166,6 +168,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
   const { t } = useTranslation();
   const { setMaxExpand, setMaxExpandTab } = useIslandStore();
   const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(() => cachedPerformanceSnapshot);
+  const [monitoringEnabled, setMonitoringEnabled] = useState<boolean>(() => hasStartedMonitoringThisSession);
   const [failed, setFailed] = useState(false);
   const [chartColors, setChartColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
   const [hardwareSelection, setHardwareSelection] = useState<PerformanceMonitorHardwareSelection>(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION);
@@ -177,11 +180,15 @@ export function PerformanceMonitorTab(): React.ReactElement {
   }, [snapshot]);
 
   useEffect(() => {
+    if (!monitoringEnabled) return;
     let cancelled = false;
     let delayTimer: number | undefined;
     let intervalTimer: number | undefined;
+    let inFlight = false;
     const loadSnapshot = (): void => {
-      window.api.getPerformanceSnapshot(hardwareSelection)
+      if (cancelled || inFlight) return;
+      inFlight = true;
+      window.api.getPerformanceSnapshot(hardwareSelection, false)
         .then((data) => {
           if (cancelled) return;
           const nextSnapshot = data as PerformanceSnapshot;
@@ -192,19 +199,43 @@ export function PerformanceMonitorTab(): React.ReactElement {
         .catch(() => {
           if (cancelled) return;
           setFailed(true);
+        })
+        .finally(() => {
+          inFlight = false;
         });
     };
-    delayTimer = window.setTimeout(() => {
+    const startPolling = (): void => {
+      if (cancelled || intervalTimer !== undefined) return;
       loadSnapshot();
       intervalTimer = window.setInterval(loadSnapshot, REFRESH_INTERVAL_MS);
+    };
+    const stopPolling = (): void => {
+      if (intervalTimer !== undefined) {
+        window.clearInterval(intervalTimer);
+        intervalTimer = undefined;
+      }
+    };
+    const handleVisibilityChange = (): void => {
+      if (cancelled) return;
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        startPolling();
+      }
+    };
+    delayTimer = window.setTimeout(() => {
+      if (cancelled) return;
+      if (!document.hidden) startPolling();
+      document.addEventListener('visibilitychange', handleVisibilityChange);
     }, START_FETCH_DELAY_MS);
     return () => {
       cancelled = true;
       if (snapshotRef.current) cachedPerformanceSnapshot = snapshotRef.current;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       if (delayTimer !== undefined) window.clearTimeout(delayTimer);
-      if (intervalTimer !== undefined) window.clearInterval(intervalTimer);
+      stopPolling();
     };
-  }, [hardwareSelection]);
+  }, [hardwareSelection, monitoringEnabled]);
 
   useEffect(() => {
     let cancelled = false;
@@ -231,17 +262,112 @@ export function PerformanceMonitorTab(): React.ReactElement {
     };
   }, []);
 
+  const startMonitoring = (): void => {
+    hasStartedMonitoringThisSession = true;
+    setMonitoringEnabled(true);
+    setFailed(false);
+  };
+
+  const stopMonitoring = (): void => {
+    setMonitoringEnabled(false);
+    setSnapshot(null);
+    setFailed(false);
+    cachedPerformanceSnapshot = null;
+  };
+
+  const hidePerformanceMonitorInExpandLayout = (): void => {
+    const normalizeHiddenLayout = (value: unknown): Array<{ id: string; visible: boolean }> => {
+      const defaults = ['overview', 'song', 'tools', 'performanceMonitor'].map((id) => ({
+        id,
+        visible: id !== 'performanceMonitor',
+      }));
+      if (!Array.isArray(value) || value.length === 0) return defaults;
+
+      const known = new Set(defaults.map((item) => item.id));
+      const merged = new Map<string, boolean>();
+      value.forEach((item) => {
+        if (!item || typeof item !== 'object') return;
+        const candidate = item as { id?: unknown; visible?: unknown };
+        if (typeof candidate.id !== 'string' || !known.has(candidate.id)) return;
+        merged.set(candidate.id, candidate.visible !== false);
+      });
+
+      return defaults.map((item) => {
+        if (item.id === 'overview') return { ...item, visible: true };
+        if (item.id === 'performanceMonitor') return { ...item, visible: false };
+        return {
+          ...item,
+          visible: merged.has(item.id) ? merged.get(item.id) === true : item.visible,
+        };
+      });
+    };
+
+    void window.api.storeRead(EXPAND_NAV_LAYOUT_STORE_KEY)
+      .then((value) => {
+        const nextLayout = normalizeHiddenLayout(value);
+        return window.api.storeWrite(EXPAND_NAV_LAYOUT_STORE_KEY, nextLayout).then(() => nextLayout);
+      })
+      .then((nextLayout) => {
+        window.api.settingsPreview(`store:${EXPAND_NAV_LAYOUT_STORE_KEY}`, nextLayout).catch(() => {});
+        window.dispatchEvent(new CustomEvent('expand-nav-layout-changed', { detail: nextLayout }));
+      })
+      .catch(() => {});
+  };
+
+  const openExpandLayoutSettings = (): void => {
+    void window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, 'expand-layout')
+      .then(() => window.api.storeRead(STANDALONE_WINDOW_MODE_STORE_KEY))
+      .then((mode) => {
+        if (mode === 'standalone' || mode === 'integrated') return mode;
+        return window.api.storeRead(LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY).catch(() => null);
+      })
+      .then((mode) => {
+        if (mode === 'standalone') {
+          return window.api.storeWrite(STANDALONE_WINDOW_ACTIVE_TAB_STORE_KEY, 'settings')
+            .then(() => window.api.openStandaloneWindow())
+            .catch(() => {});
+        }
+        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'expand-layout' }));
+        setMaxExpandTab('settings');
+        setMaxExpand();
+        return undefined;
+      })
+      .catch(() => {
+        window.dispatchEvent(new CustomEvent('settings-open-tab-intent', { detail: 'expand-layout' }));
+        setMaxExpandTab('settings');
+        setMaxExpand();
+      });
+  };
+
+  const handleHidePage = (): void => {
+    stopMonitoring();
+    hidePerformanceMonitorInExpandLayout();
+    openExpandLayoutSettings();
+  };
+
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
         <div className="pm-panel-wrap pm-panel-loading">
-          <div className="pm-loading">
-            {!failed && <span className="pm-loading-spinner" aria-hidden="true" />}
+          <div className={`pm-loading${monitoringEnabled ? '' : ' pm-loading--idle'}`}>
+            {monitoringEnabled && !failed && <span className="pm-loading-spinner" aria-hidden="true" />}
             <span className="pm-loading-text">
-              {failed
-                ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
-                : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
+              {!monitoringEnabled
+                ? t('expanded.performanceMonitor.startHint', { defaultValue: '首次进入请点击开始监控' })
+                : failed
+                  ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
+                  : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
             </span>
+            {!monitoringEnabled && (
+              <div className="pm-start-actions">
+                <button className="pm-start-monitor-btn" type="button" onClick={startMonitoring}>
+                  {t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
+                </button>
+                <button className="pm-start-monitor-btn pm-start-monitor-btn--secondary" type="button" onClick={handleHidePage}>
+                  {t('expanded.performanceMonitor.hidePage', { defaultValue: '隐藏本页面' })}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -331,7 +457,18 @@ export function PerformanceMonitorTab(): React.ReactElement {
         <div className="pm-dashboard-head">
           <div className="pm-title-group">
             <span className="pm-title">{t('expanded.performanceMonitor.title', { defaultValue: '系统性能' })}</span>
-            <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
+            <div className="pm-subtitle-row">
+              <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
+              <button
+                className={`pm-monitor-toggle-btn${monitoringEnabled ? ' pm-monitor-toggle-btn--stop' : ''}`}
+                type="button"
+                onClick={monitoringEnabled ? stopMonitoring : startMonitoring}
+              >
+                {monitoringEnabled
+                  ? t('expanded.performanceMonitor.stopMonitor', { defaultValue: '停止监控' })
+                  : t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
+              </button>
+            </div>
           </div>
           <button className="pm-hardware-settings-link" type="button" onClick={openHardwareSettings}>
             {t('expanded.performanceMonitor.hardwareSettingsLink', { defaultValue: '和您的硬件不一样？点击前往调整' })}

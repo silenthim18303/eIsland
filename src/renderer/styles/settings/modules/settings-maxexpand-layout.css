@@ -126,6 +126,28 @@
   opacity: 0.6;
 }
 
+.maxexpand-layout-reset-btn-icon,
+.maxexpand-layout-item-handle-icon,
+.maxexpand-layout-item-btn-icon {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='light'] .maxexpand-layout-reset-btn-icon,
+[data-theme='light'] .maxexpand-layout-item-handle-icon,
+[data-theme='light'] .maxexpand-layout-item-btn-icon {
+  filter: brightness(0) invert(0);
+}
+
+.maxexpand-layout-reset-btn-icon.no-filter,
+.maxexpand-layout-item-handle-icon.no-filter,
+.maxexpand-layout-item-btn-icon.no-filter,
+[data-theme='light'] .maxexpand-layout-reset-btn-icon.no-filter,
+[data-theme='light'] .maxexpand-layout-item-handle-icon.no-filter,
+[data-theme='light'] .maxexpand-layout-item-btn-icon.no-filter {
+  filter: none;
+  opacity: 1;
+}
+
 /* ─── 排序列表 ─── */
 
 .maxexpand-layout-list {

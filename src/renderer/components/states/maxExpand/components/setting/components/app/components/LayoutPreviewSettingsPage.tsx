@@ -28,21 +28,27 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AppSettingsSectionProps } from './types';
 
-type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfig' | 'OverviewPreviewComponent' | 'overviewWidgetOptions' | 'updateLayout'>;
+type LayoutPreviewSettingsPageProps = Pick<AppSettingsSectionProps, 'layoutConfig' | 'OverviewPreviewComponent' | 'overviewWidgetOptions' | 'overviewClockStyleOptions' | 'updateLayout' | 'updateClockStyle' | 'updateGradientColor'>;
 
 /**
  * 渲染软件设置中的总览布局配置页面
  * @param layoutConfig - 当前总览布局配置
  * @param OverviewPreviewComponent - 总览预览组件
  * @param overviewWidgetOptions - 左右控件可选项
+ * @param overviewClockStyleOptions - 中间时钟样式可选项
  * @param updateLayout - 更新左右控件布局方法
+ * @param updateClockStyle - 更新时钟样式方法
+ * @param updateGradientColor - 更新渐变色方法
  * @returns 总览布局设置页面
  */
 export function LayoutPreviewSettingsPage({
   layoutConfig,
   OverviewPreviewComponent,
   overviewWidgetOptions,
+  overviewClockStyleOptions,
   updateLayout,
+  updateClockStyle,
+  updateGradientColor,
 }: LayoutPreviewSettingsPageProps): ReactElement {
   const { t } = useTranslation();
   const OverviewPreview = OverviewPreviewComponent;
@@ -96,6 +102,36 @@ export function LayoutPreviewSettingsPage({
                     {opt.label}
                   </button>
                 ))}
+              </div>
+            </div>
+            <div className="settings-layout-control">
+              <span className="settings-layout-control-label">{t('settings.app.layout.clockStyleTitle', { defaultValue: '中间时钟样式' })}</span>
+              <div className="settings-layout-options">
+                {overviewClockStyleOptions.map((opt) => (
+                  <button
+                    key={opt.value}
+                    className={`settings-layout-btn ${layoutConfig.clockStyle === opt.value ? 'active' : ''}`}
+                    type="button"
+                    onClick={() => updateClockStyle(opt.value)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <div className="settings-layout-gradient-editor">
+                <span className="settings-layout-control-label settings-layout-gradient-title">
+                  {t('settings.app.layout.gradientEditorTitle', { defaultValue: '渐变颜色编辑' })}
+                </span>
+                <div className="settings-layout-gradient-pickers">
+                  <label className="settings-layout-gradient-item">
+                    <span>{t('settings.app.layout.gradientBaseColor', { defaultValue: '基准色' })}</span>
+                    <input
+                      type="color"
+                      value={layoutConfig.gradientColors.middle}
+                      onChange={(e) => updateGradientColor(e.target.value)}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           </div>

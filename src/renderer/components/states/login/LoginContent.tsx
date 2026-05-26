@@ -156,6 +156,11 @@ export function LoginContent(): ReactElement {
   };
 
   const navigateToUserCenter = async (): Promise<void> => {
+    const { authReturnState } = useIslandStore.getState();
+    if (authReturnState && authReturnState !== 'login' && authReturnState !== 'register') {
+      returnFromAuth();
+      return;
+    }
     const mode = await readStandaloneWindowMode();
     if (mode === 'standalone') {
       setMaxExpandTab('settings');

@@ -57,6 +57,52 @@
   color: rgba(var(--color-text-rgb), 0.62);
 }
 
+.pm-loading--idle {
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pm-start-monitor-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 4px 12px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.18);
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.8);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.pm-start-monitor-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+  color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.pm-start-monitor-btn--secondary {
+  color: rgba(var(--color-text-rgb), 0.65);
+  background: rgba(var(--color-text-rgb), 0.05);
+}
+
+.pm-start-monitor-btn--secondary:hover {
+  color: rgba(var(--color-text-rgb), 0.82);
+  background: rgba(var(--color-text-rgb), 0.1);
+}
+
+.pm-start-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
 .pm-loading-spinner {
   width: 13px;
   height: 13px;
@@ -106,6 +152,50 @@
   color: rgba(var(--color-text-rgb), 0.38);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pm-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pm-monitor-toggle-btn {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 3px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.18);
+  border-radius: 999px;
+  font-size: 9px;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+  font-weight: 600;
+  font-family: inherit;
+  color: rgba(var(--color-text-rgb), 0.8);
+  background: rgba(var(--color-text-rgb), 0.08);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.pm-monitor-toggle-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+  color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.pm-monitor-toggle-btn--stop {
+  color: rgba(255, 122, 122, 0.95);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.pm-monitor-toggle-btn--stop:hover {
+  color: rgba(255, 144, 144, 1);
+  border-color: rgba(239, 68, 68, 0.45);
+  background: rgba(239, 68, 68, 0.2);
 }
 
 .pm-hardware-settings-link {

@@ -34,10 +34,12 @@ const {
   clipboardReadTextMock,
   clipboardWriteTextMock,
   shellOpenExternalMock,
+  appSetLoginItemSettingsMock,
 } = vi.hoisted(() => ({
   clipboardReadTextMock: vi.fn(),
   clipboardWriteTextMock: vi.fn(),
   shellOpenExternalMock: vi.fn(),
+  appSetLoginItemSettingsMock: vi.fn(),
 }));
 
 const {
@@ -64,7 +66,7 @@ vi.mock('electron', () => ({
     openExternal: shellOpenExternalMock,
   },
   app: {
-    setLoginItemSettings: vi.fn(),
+    setLoginItemSettings: appSetLoginItemSettingsMock,
   },
 }));
 
@@ -90,6 +92,7 @@ describe('settings ipc handlers', () => {
     clipboardReadTextMock.mockReset();
     clipboardWriteTextMock.mockReset();
     shellOpenExternalMock.mockReset();
+    appSetLoginItemSettingsMock.mockReset();
     writeFileSyncMock.mockReset();
     existsSyncMock.mockReset();
     readFileSyncMock.mockReset();
@@ -191,5 +194,50 @@ describe('settings ipc handlers', () => {
 
     readFileSyncMock.mockReturnValue(JSON.stringify(['a', 'b']));
     expect(getNav?.()).toEqual({ visibleOrder: ['a', 'b'], hiddenOrder: [] });
+  });
+
+  it('handles island autostart modes and nav-order set sanitize/failure branches', () => {
+    registerIslandIpcHandlers({
+      storeDir: 'C:/store',
+      islandOpacityStoreKey: 'op',
+      expandMouseleaveIdleStoreKey: 'exp',
+      maxExpandMouseleaveIdleStoreKey: 'max',
+      idleClickExpandStoreKey: 'idle',
+      autostartModeStoreKey: 'auto',
+      navOrderStoreKey: 'nav',
+    });
+
+    const getAutostart = handlers.get('island:autostart:get');
+    const setAutostart = handlers.get('island:autostart:set');
+    const setNav = handlers.get('island:nav-order:set');
+
+    existsSyncMock.mockReturnValueOnce(false);
+    expect(getAutostart?.()).toBe('disabled');
+
+    existsSyncMock.mockReturnValueOnce(true);
+    readFileSyncMock.mockReturnValueOnce(JSON.stringify('enabled'));
+    expect(getAutostart?.()).toBe('enabled');
+
+    expect(setAutostart?.({ sender: { id: 9 } }, 'invalid-mode')).toBe(true);
+    expect(appSetLoginItemSettingsMock).toHaveBeenNthCalledWith(1, { openAtLogin: false });
+    expect(broadcastSettingChangeMock).toHaveBeenCalledWith(9, 'island:autostart', 'disabled');
+
+    expect(setAutostart?.({ sender: { id: 9 } }, 'high-priority')).toBe(true);
+    expect(appSetLoginItemSettingsMock).toHaveBeenNthCalledWith(2, {
+      openAtLogin: true,
+      args: ['--high-priority'],
+    });
+
+    expect(setNav?.({}, { visibleOrder: ['a', 1, 'b'], hiddenOrder: ['x', null] })).toBe(true);
+    expect(writeFileSyncMock).toHaveBeenCalledWith(
+      expect.stringContaining('nav.json'),
+      JSON.stringify({ visibleOrder: ['a', 'b'], hiddenOrder: ['x'] }, null, 2),
+      'utf-8',
+    );
+
+    writeFileSyncMock.mockImplementationOnce(() => {
+      throw new Error('disk full');
+    });
+    expect(setNav?.({}, { visibleOrder: ['a'] })).toBe(false);
   });
 });

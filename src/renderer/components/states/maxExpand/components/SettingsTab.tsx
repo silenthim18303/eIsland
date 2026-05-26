@@ -28,8 +28,8 @@ import { useState, useRef, useEffect, useMemo } from 'react';
 import type { KeyboardEvent, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
-import type { OverviewWidgetType, OverviewLayoutConfig } from '../../expand/components/OverviewTab';
-import { OVERVIEW_WIDGET_OPTIONS } from '../../expand/components/OverviewTab';
+import type { OverviewClockStyle, OverviewWidgetType, OverviewLayoutConfig } from '../../expand/components/OverviewTab';
+import { OVERVIEW_CLOCK_STYLE_OPTIONS, OVERVIEW_WIDGET_OPTIONS, normalizeOverviewLayoutConfig } from '../../expand/components/OverviewTab';
 import {
   loadNetworkConfig,
   saveNetworkConfig,
@@ -54,6 +54,10 @@ import {
   NETWORK_TIMEOUT_OPTIONS,
   LAYOUT_STORE_KEY,
   DEFAULT_LAYOUT,
+  EXPAND_NAV_LAYOUT_STORE_KEY,
+  DEFAULT_EXPAND_NAV_LAYOUT,
+  normalizeExpandNavLayoutConfig,
+  type ExpandNavLayoutConfig,
   MAXEXPAND_NAV_LAYOUT_STORE_KEY,
   DEFAULT_MAXEXPAND_NAV_LAYOUT,
   normalizeMaxExpandNavLayoutConfig,
@@ -70,7 +74,6 @@ import {
   NAV_CARDS,
   DEFAULT_NAV_ORDER,
   NAV_CARDS_MAP,
-  type SettingsSidebarTabKey,
   type AppSettingsPageKey,
   type WeatherSettingsPageKey,
   type MailSettingsPageKey,
@@ -79,6 +82,43 @@ import {
   type SettingsTabLabelKey,
   type NavCardDef,
 } from './setting/utils/settingsConfig';
+import {
+  CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY,
+  ISLAND_BG_MEDIA_STORE_KEY,
+  ISLAND_BG_IMAGE_STORE_KEY,
+  ISLAND_BG_VIDEO_FIT_STORE_KEY,
+  ISLAND_BG_VIDEO_MUTED_STORE_KEY,
+  ISLAND_BG_VIDEO_LOOP_STORE_KEY,
+  ISLAND_BG_VIDEO_VOLUME_STORE_KEY,
+  ISLAND_BG_VIDEO_RATE_STORE_KEY,
+  ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY,
+  ISLAND_BG_SYNC_SYSTEM_WALLPAPER_STORE_KEY,
+  STANDALONE_WINDOW_MAC_CONTROLS_STORE_KEY,
+  ISLAND_DISPLAY_STORE_KEY,
+  UPDATE_SOURCE_STORE_KEY,
+  WEATHER_ALERT_ENABLED_STORE_KEY,
+  MAIL_CONFIG_STORE_KEY,
+  MAIL_ACCOUNTS_STORE_KEY,
+  MAIL_FETCH_LIMIT_STORE_KEY,
+  SETTINGS_OPEN_TAB_STORE_KEY,
+  ISLAND_AUTO_DIM_ENABLED_STORE_KEY,
+  ISLAND_AUTO_DIM_DELAY_STORE_KEY,
+  DEFAULT_AUTO_DIM_DELAY_SEC,
+  UPDATE_SOURCES,
+  PLUGIN_MARKET_PAGES,
+  generateMailAccountId,
+  normalizeBgMediaConfig,
+  resolveBgMediaPreviewUrl,
+  applyIslandOpacity,
+  getRoleFromToken,
+  type SettingsOpenTabIntent,
+  type MailAccountConfig,
+  type RunningWindowItem,
+  type PluginMarketPageKey,
+} from './setting/config/settingsTabConfig';
+import { useSettingsSidebarTabState, useUserSessionState } from './setting/hooks/useSettingsTabState';
+import useUpdateSettingsState from './setting/hooks/useUpdateSettingsState';
+import useBackgroundMediaSettingsState from './setting/hooks/useBackgroundMediaSettingsState';
 import { UpdateSettingsSection } from './setting/components/update/UpdateSettingsSection';
 import { IndexSettingsSection } from './setting/components/index/IndexSettingsSection';
 import { AppSettingsSection } from './setting/components/app/AppSettingsSection';
@@ -96,125 +136,12 @@ import { WallpaperContributionSection } from './setting/components/pluginMarket/
 import { WallpaperEditSection } from './setting/components/pluginMarket/WallpaperEditSection';
 
 import { resolveDistrictLocationByKeyword } from '../../../../api/weather/adcodeApi';
-import { fetchUpdateSourceUrl } from '../../../../api/user/userAccountApi';
 import { request as requestUserAccountApi } from '../../../../api/user/userAccountApi.client';
-import {
-  readAnnouncementShowMode,
-  writeAnnouncementShowMode,
-  type AnnouncementShowMode,
-} from '../../../../api/announcement/announcementApi';
 
 import { setThemeMode as applyThemeMode, getThemeMode, type ThemeMode } from '../../../../utils/theme';
 import { getLanguage, setLanguage, type AppLanguage } from '../../../../i18n';
-import { readLocalToken, subscribeUserAccountSessionChanged } from '../../../../utils/userAccount';
+import { readLocalToken } from '../../../../utils/userAccount';
 import { SvgIcon } from '../../../../utils/SvgIcon';
-
-const CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY = 'clipboard-url-suppress-in-url-favorites';
-const LOCAL_ISLAND_BG_SYNC_EVENT = 'island-bg-local-sync';
-const ISLAND_BG_MEDIA_STORE_KEY = 'island-bg-media';
-const ISLAND_BG_IMAGE_STORE_KEY = 'island-bg-image';
-const ISLAND_BG_VIDEO_FIT_STORE_KEY = 'island-bg-video-fit';
-const ISLAND_BG_VIDEO_MUTED_STORE_KEY = 'island-bg-video-muted';
-const ISLAND_BG_VIDEO_LOOP_STORE_KEY = 'island-bg-video-loop';
-const ISLAND_BG_VIDEO_VOLUME_STORE_KEY = 'island-bg-video-volume';
-const ISLAND_BG_VIDEO_RATE_STORE_KEY = 'island-bg-video-rate';
-const ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY = 'island-bg-video-hw-decode';
-const ISLAND_BG_SYNC_SYSTEM_WALLPAPER_STORE_KEY = 'island-bg-sync-system-wallpaper';
-const STANDALONE_WINDOW_MAC_CONTROLS_STORE_KEY = 'standalone-window-mac-controls';
-const ISLAND_DISPLAY_STORE_KEY = 'island-display-id';
-const UPDATE_SOURCE_STORE_KEY = 'update-source';
-const UPDATE_AUTO_PROMPT_STORE_KEY = 'update-auto-prompt-enabled';
-const WEATHER_ALERT_ENABLED_STORE_KEY = 'weather-alert-enabled';
-const MAIL_CONFIG_STORE_KEY = 'mail-account-config';
-const MAIL_ACCOUNTS_STORE_KEY = 'mail-accounts-config';
-const MAIL_FETCH_LIMIT_STORE_KEY = 'mail-fetch-limit';
-const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
-const ISLAND_AUTO_DIM_ENABLED_STORE_KEY = 'island-auto-dim-enabled';
-const ISLAND_AUTO_DIM_DELAY_STORE_KEY = 'island-auto-dim-delay';
-const DEFAULT_AUTO_DIM_DELAY_SEC = 10;
-type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail' | 'performance-monitor';
-let _lastSettingsSidebarTab: SettingsSidebarTabKey = 'index';
-
-type IslandBgMediaType = 'image' | 'video';
-
-interface IslandBgMediaConfig {
-  type: IslandBgMediaType;
-  source: string;
-}
-
-interface MailAccountConfig {
-  id: string;
-  label: string;
-  emailAddress: string;
-  imapHost: string;
-  imapPort: string;
-  imapSecure: boolean;
-  authUser: string;
-  authSecret: string;
-}
-
-function generateMailAccountId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-
-
-function isDirectBgMediaUrl(source: string): boolean {
-  return source.startsWith('data:')
-    || source.startsWith('http://')
-    || source.startsWith('https://')
-    || source.startsWith('blob:')
-    || source.startsWith('file:')
-    || source.startsWith('/')
-    || source.startsWith('./')
-    || source.startsWith('../')
-    || source.startsWith('assets/');
-}
-
-function toMediaUrl(path: string): string {
-  const normalized = path.replace(/\\/g, '/');
-  return `eisland-media://local/${encodeURIComponent(normalized)}`;
-}
-
-function normalizeBgMediaConfig(value: unknown): IslandBgMediaConfig | null {
-  if (typeof value === 'string') {
-    const source = value.trim();
-    return source ? { type: 'image', source } : null;
-  }
-  if (!value || typeof value !== 'object') return null;
-
-  const candidate = value as { type?: unknown; source?: unknown; image?: unknown; url?: unknown };
-  const sourceRaw = typeof candidate.source === 'string'
-    ? candidate.source
-    : typeof candidate.image === 'string'
-      ? candidate.image
-      : typeof candidate.url === 'string'
-        ? candidate.url
-        : null;
-  if (!sourceRaw) return null;
-
-  const source = sourceRaw.trim();
-  if (!source) return null;
-
-  if (candidate.type === 'video') {
-    return { type: 'video', source };
-  }
-  return { type: 'image', source };
-}
-
-async function resolveBgMediaPreviewUrl(media: IslandBgMediaConfig): Promise<string | null> {
-  if (media.type === 'image') {
-    if (isDirectBgMediaUrl(media.source)) return media.source;
-    return window.api.loadWallpaperFile?.(media.source) ?? null;
-  }
-  if (isDirectBgMediaUrl(media.source)) return media.source;
-  return toMediaUrl(media.source);
-}
-
-function applyIslandOpacity(opacity: number): void {
-  const safe = Math.max(10, Math.min(100, Math.round(opacity)));
-  document.documentElement.style.setProperty('--island-opacity', String(safe));
-}
 
 /** 单行配置项 */
 function SettingsField({
@@ -249,45 +176,6 @@ function SettingsField({
  * @description 最大展开模式下的设置面板
  */
 
-interface RunningWindowItem {
-  id: string;
-  title: string;
-  processName: string;
-  processPath: string | null;
-  processId: number | null;
-  iconDataUrl: string | null;
-}
-
-type PluginMarketPageKey = 'wallpaper' | 'plugin' | 'contribution' | 'edit';
-type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
-
-const PRO_UPDATE_SOURCE_SET: ReadonlySet<UpdateSourceKey> = new Set<UpdateSourceKey>(['tencent-cos', 'aliyun-oss']);
-
-const normalizeRoleValue = (value: string): string => {
-  return value.trim().toLowerCase().replace(/^role_/, '');
-};
-
-const getRoleFromToken = (token: string | null | undefined): string | null => {
-  if (!token) return null;
-  const rawToken = token.trim().replace(/^bearer\s+/i, '');
-  const parts = rawToken.split('.');
-  if (parts.length < 2) return null;
-  try {
-    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-    const normalizedPayload = payload + '='.repeat((4 - payload.length % 4) % 4);
-    const decoded = JSON.parse(atob(normalizedPayload)) as { role?: unknown };
-    return typeof decoded.role === 'string' ? normalizeRoleValue(decoded.role) : null;
-  } catch {
-    return null;
-  }
-};
-
-const isProOnlyUpdateSource = (source: UpdateSourceKey): boolean => {
-  return PRO_UPDATE_SOURCE_SET.has(source);
-};
-
-const PLUGIN_MARKET_PAGES: PluginMarketPageKey[] = ['wallpaper', 'plugin', 'contribution', 'edit'];
-
 /**
  * 渲染设置面板主视图
  * @description 提供应用设置、AI 配置与关于软件三类设置入口
@@ -312,10 +200,20 @@ export function SettingsTab(): ReactElement {
       label: t(labelKeyMap[option.value], { defaultValue: option.label }),
     }));
   }, [t]);
+  const translatedOverviewClockStyleOptions = useMemo(() => {
+    const labelKeyMap: Record<OverviewClockStyle, string> = {
+      classic: 'settings.app.layout.clockStyleNames.classic',
+      gradient: 'settings.app.layout.clockStyleNames.gradient',
+      minimal: 'settings.app.layout.clockStyleNames.minimal',
+    };
+    return OVERVIEW_CLOCK_STYLE_OPTIONS.map((option) => ({
+      ...option,
+      label: t(labelKeyMap[option.value], { defaultValue: option.label }),
+    }));
+  }, [t]);
   const opacitySaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [activeTab, setActiveTab] = useState<SettingsSidebarTabKey>(() => _lastSettingsSidebarTab);
-  const [sessionToken, setSessionToken] = useState<string | null>(() => readLocalToken());
-  const [hasLoginSession, setHasLoginSession] = useState<boolean>(() => Boolean(readLocalToken()));
+  const [activeTab, setActiveTab] = useSettingsSidebarTabState();
+  const { sessionToken, hasLoginSession } = useUserSessionState();
   const [appSettingsPage, setAppSettingsPage] = useState<AppSettingsPageKey>('layout-preview');
   const [weatherSettingsPage, setWeatherSettingsPage] = useState<WeatherSettingsPageKey>('location');
   const [mailSettingsPage, setMailSettingsPage] = useState<MailSettingsPageKey>('account');
@@ -330,10 +228,6 @@ export function SettingsTab(): ReactElement {
   const activeTabRef = useRef(activeTab);
   activeTabRef.current = activeTab;
   useEffect(() => {
-    _lastSettingsSidebarTab = activeTab;
-  }, [activeTab]);
-
-  useEffect(() => {
     if (activeTab !== 'user') {
       setUserInitialProfilePage('info');
     }
@@ -345,16 +239,6 @@ export function SettingsTab(): ReactElement {
     }
   }, [activeTab]);
 
-  useEffect(() => {
-    const applySession = (): void => {
-      const token = readLocalToken();
-      setSessionToken(token);
-      setHasLoginSession(Boolean(token));
-    };
-    applySession();
-    return subscribeUserAccountSessionChanged(applySession);
-  }, []);
-
   /** 加载独立窗口控制按钮样式配置 */
   useEffect(() => {
     let cancelled = false;
@@ -363,6 +247,16 @@ export function SettingsTab(): ReactElement {
       if (typeof value === 'boolean') {
         setStandaloneMacControls(value);
       }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  /** 加载展开导航布局配置 */
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(EXPAND_NAV_LAYOUT_STORE_KEY).then((data) => {
+      if (cancelled) return;
+      setExpandNavLayout(normalizeExpandNavLayoutConfig(data));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -425,6 +319,7 @@ export function SettingsTab(): ReactElement {
   }), [t]);
 
   const [layoutConfig, setLayoutConfig] = useState<OverviewLayoutConfig>(DEFAULT_LAYOUT);
+  const [expandNavLayout, setExpandNavLayout] = useState<ExpandNavLayoutConfig>(DEFAULT_EXPAND_NAV_LAYOUT);
   const [maxExpandNavLayout, setMaxExpandNavLayout] = useState<MaxExpandNavLayoutConfig>(DEFAULT_MAXEXPAND_NAV_LAYOUT);
 
   /** 歌曲设置相关状态 */
@@ -482,19 +377,53 @@ export function SettingsTab(): ReactElement {
   const [islandOpacity, setIslandOpacity] = useState<number>(100);
   const [autoDimEnabled, setAutoDimEnabled] = useState<boolean>(false);
   const [autoDimDelaySec, setAutoDimDelaySec] = useState<number>(DEFAULT_AUTO_DIM_DELAY_SEC);
-  const [bgMedia, setBgMedia] = useState<IslandBgMediaConfig | null>(null);
-  const [bgMediaPreviewUrl, setBgMediaPreviewUrl] = useState<string | null>(null);
-  const [bgVideoFit, setBgVideoFit] = useState<'cover' | 'contain'>('cover');
-  const [bgVideoMuted, setBgVideoMuted] = useState<boolean>(true);
-  const [bgVideoLoop, setBgVideoLoop] = useState<boolean>(true);
-  const [bgVideoVolume, setBgVideoVolume] = useState<number>(0.6);
-  const [bgVideoRate, setBgVideoRate] = useState<number>(1);
-  const [bgVideoHwDecode, setBgVideoHwDecode] = useState<boolean>(true);
-  const [syncDesktopWallpaperOnBackgroundChange, setSyncDesktopWallpaperOnBackgroundChange] = useState<boolean>(false);
-  const [bgImageOpacity, setBgImageOpacity] = useState<number>(30);
-  const [bgImageBlur, setBgImageBlur] = useState<number>(0);
-  const bgOpacitySaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const bgBlurSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const {
+    bgMedia,
+    setBgMedia,
+    bgMediaPreviewUrl,
+    setBgMediaPreviewUrl,
+    bgVideoFit,
+    setBgVideoFit,
+    bgVideoMuted,
+    setBgVideoMuted,
+    bgVideoLoop,
+    setBgVideoLoop,
+    bgVideoVolume,
+    setBgVideoVolume,
+    bgVideoRate,
+    setBgVideoRate,
+    bgVideoHwDecode,
+    setBgVideoHwDecode,
+    syncDesktopWallpaperOnBackgroundChange,
+    setSyncDesktopWallpaperOnBackgroundChange,
+    bgImageOpacity,
+    setBgImageOpacity,
+    bgImageBlur,
+    setBgImageBlur,
+    bgOpacitySaveTimerRef,
+    bgBlurSaveTimerRef,
+    applyBgOpacity,
+    applyBgBlur,
+    applyBgVideoFit,
+    applyBgVideoMuted,
+    applyBgVideoLoop,
+    applyBgVideoVolume,
+    applyBgVideoRate,
+    applyBgVideoHwDecode,
+    persistBgVideoFit,
+    persistBgVideoMuted,
+    persistBgVideoLoop,
+    persistBgVideoVolume,
+    persistBgVideoRate,
+    persistBgVideoHwDecode,
+    persistBgOpacity,
+    persistBgBlur,
+    handleSelectBgImage,
+    handleSelectBgVideo,
+    handleClearBgImage,
+    handleSelectBuiltinBgImage,
+    handleApplyMarketplaceWallpaper,
+  } = useBackgroundMediaSettingsState();
   const [islandPositionOffset, setIslandPositionOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [islandPositionInput, setIslandPositionInput] = useState<{ x: string; y: string }>({ x: '0', y: '0' });
   const [islandDisplaySelection, setIslandDisplaySelection] = useState<string>('primary');
@@ -503,73 +432,27 @@ export function SettingsTab(): ReactElement {
   ]);
   const [aboutVersion, setAboutVersion] = useState<string>('');
 
-  /** 自动更新相关状态 */
-  const [updateStatus, setUpdateStatus] = useState<'idle' | 'checking' | 'available' | 'downloading' | 'ready' | 'error' | 'latest'>('idle');
-  const [updateVersion, setUpdateVersion] = useState<string>('');
-  const [updateError, setUpdateError] = useState<string>('');
-  const [downloadProgress, setDownloadProgress] = useState<{ percent: number; transferred: number; total: number; bytesPerSecond: number } | null>(null);
-  const [updateAutoPromptEnabled, setUpdateAutoPromptEnabled] = useState<boolean>(true);
-  const [announcementShowMode, setAnnouncementShowMode] = useState<AnnouncementShowMode>('version-update-only');
-  const [updateSource, setUpdateSource] = useState<UpdateSourceKey>('cloudflare-r2');
-  const UPDATE_SOURCES: { key: UpdateSourceKey; label: string; proOnly?: boolean }[] = [
-    { key: 'cloudflare-r2', label: 'Cloudflare R2' },
-    { key: 'tencent-cos', label: 'Tencent COS', proOnly: true },
-    { key: 'aliyun-oss', label: 'Aliyun OSS', proOnly: true },
-    { key: 'github', label: 'GitHub Releases' },
-  ];
-  const currentSourceLabel = UPDATE_SOURCES.find((s) => s.key === updateSource)?.label ?? updateSource;
-
-  const handleUpdateSourceChange = (value: string): void => {
-    const nextSource: UpdateSourceKey = value === 'github'
-      ? 'github'
-      : value === 'tencent-cos'
-        ? 'tencent-cos'
-        : value === 'aliyun-oss'
-          ? 'aliyun-oss'
-        : 'cloudflare-r2';
-    if (isProOnlyUpdateSource(nextSource) && !isProUser) {
-      setUpdateStatus('error');
-      setUpdateError(t('settings.update.proOnlyError', { defaultValue: '该更新源仅 PRO 用户可用' }));
-      return;
-    }
-    setUpdateSource(nextSource);
-    setUpdateError('');
-    window.api.storeWrite(UPDATE_SOURCE_STORE_KEY, nextSource).catch(() => {});
-  };
-
-  useEffect(() => {
-    if (isProUser) return;
-    if (!isProOnlyUpdateSource(updateSource)) return;
-    setUpdateSource('cloudflare-r2');
-    window.api.storeWrite(UPDATE_SOURCE_STORE_KEY, 'cloudflare-r2').catch(() => {});
-  }, [isProUser, updateSource]);
-
-  const resolveUpdateSourceUrl = async (source: UpdateSourceKey): Promise<string | undefined> => {
-    if (!isProOnlyUpdateSource(source)) {
-      return undefined;
-    }
-    if (!isProUser) {
-      throw new Error(t('settings.update.proOnlyError', { defaultValue: '该更新源仅 PRO 用户可用' }));
-    }
-    if (!sessionToken) {
-      throw new Error(t('settings.update.proOnlyNeedLogin', { defaultValue: '请先登录 PRO 账号后再使用该更新源' }));
-    }
-    const result = await fetchUpdateSourceUrl(sessionToken, source);
-    if (!result.ok || !result.data?.url) {
-      throw new Error(result.message || t('settings.update.sourceResolveFailed', { defaultValue: '获取更新源地址失败' }));
-    }
-    return result.data.url;
-  };
-
-  const handleUpdateAutoPromptEnabledChange = (enabled: boolean): void => {
-    setUpdateAutoPromptEnabled(enabled);
-    window.api.storeWrite(UPDATE_AUTO_PROMPT_STORE_KEY, enabled).catch(() => {});
-  };
-
-  const handleAnnouncementShowModeChange = (mode: AnnouncementShowMode): void => {
-    setAnnouncementShowMode(mode);
-    void writeAnnouncementShowMode(mode);
-  };
+  const {
+    updateStatus,
+    updateVersion,
+    updateError,
+    downloadProgress,
+    updateAutoPromptEnabled,
+    announcementShowMode,
+    updateSource,
+    setUpdateSource,
+    currentSourceLabel,
+    handleUpdateSourceChange,
+    handleUpdateAutoPromptEnabledChange,
+    handleAnnouncementShowModeChange,
+    handleCheckUpdate,
+    handleDownloadUpdate,
+    handleInstallUpdate,
+  } = useUpdateSettingsState({
+    t,
+    isProUser,
+    sessionToken,
+  });
 
   const persistIslandOpacity = (opacity: number): void => {
     window.api.islandOpacitySet(opacity).catch(() => {});
@@ -588,221 +471,6 @@ export function SettingsTab(): ReactElement {
     window.api.storeWrite(ISLAND_AUTO_DIM_DELAY_STORE_KEY, safe).catch(() => {});
     window.api.settingsPreview(`store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`, safe).catch(() => {});
     window.dispatchEvent(new CustomEvent('island-auto-dim-local-sync', { detail: { autoDimDelaySec: safe } }));
-  };
-
-  const applyBgMedia = (media: IslandBgMediaConfig | null, previewUrl: string | null): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (el) {
-      if (media?.type === 'image' && previewUrl) {
-        el.style.backgroundImage = `url(${previewUrl})`;
-        el.style.opacity = String(bgImageOpacity / 100);
-        el.style.filter = `blur(${bgImageBlur}px)`;
-      } else if (media?.type === 'video' && previewUrl) {
-        el.style.backgroundImage = '';
-        el.style.opacity = String(bgImageOpacity / 100);
-        el.style.filter = `blur(${bgImageBlur}px)`;
-      } else {
-        el.style.backgroundImage = '';
-        el.style.opacity = '0';
-        el.style.filter = 'none';
-      }
-    }
-    setBgMedia(media);
-    setBgMediaPreviewUrl(previewUrl);
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: {
-        media,
-        previewUrl,
-        image: media?.type === 'image' ? previewUrl : null,
-      },
-    }));
-  };
-
-  const applyBgOpacity = (value: number): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (el) el.style.opacity = String(value / 100);
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { opacity: value },
-    }));
-  };
-
-  const applyBgBlur = (value: number): void => {
-    const el = document.getElementById('island-bg-layer');
-    if (el) {
-      el.style.filter = value > 0 ? `blur(${value}px)` : 'none';
-    }
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { blur: value },
-    }));
-  };
-
-  const applyBgVideoFit = (value: 'cover' | 'contain'): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoFit: value },
-    }));
-  };
-
-  const applyBgVideoMuted = (value: boolean): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoMuted: value },
-    }));
-  };
-
-  const applyBgVideoLoop = (value: boolean): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoLoop: value },
-    }));
-  };
-
-  const applyBgVideoVolume = (value: number): void => {
-    const safe = Math.max(0, Math.min(1, value));
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoVolume: safe },
-    }));
-  };
-
-  const applyBgVideoRate = (value: number): void => {
-    const safe = Math.max(0.25, Math.min(3, value));
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoRate: safe },
-    }));
-  };
-
-  const applyBgVideoHwDecode = (value: boolean): void => {
-    window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-      detail: { videoHwDecode: value },
-    }));
-  };
-
-  const persistBgMedia = (media: IslandBgMediaConfig | null): void => {
-    window.api.storeWrite(ISLAND_BG_MEDIA_STORE_KEY, media).catch(() => {});
-    const legacyImage = media?.type === 'image' ? media.source : null;
-    window.api.storeWrite(ISLAND_BG_IMAGE_STORE_KEY, legacyImage).catch(() => {});
-  };
-
-  const persistBgVideoFit = (value: 'cover' | 'contain'): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_FIT_STORE_KEY, value).catch(() => {});
-  };
-
-  const persistBgVideoMuted = (value: boolean): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_MUTED_STORE_KEY, value).catch(() => {});
-  };
-
-  const persistBgVideoLoop = (value: boolean): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_LOOP_STORE_KEY, value).catch(() => {});
-  };
-
-  const persistBgVideoVolume = (value: number): void => {
-    const safe = Math.max(0, Math.min(1, value));
-    window.api.storeWrite(ISLAND_BG_VIDEO_VOLUME_STORE_KEY, safe).catch(() => {});
-  };
-
-  const persistBgVideoRate = (value: number): void => {
-    const safe = Math.max(0.25, Math.min(3, value));
-    window.api.storeWrite(ISLAND_BG_VIDEO_RATE_STORE_KEY, safe).catch(() => {});
-  };
-
-  const persistBgVideoHwDecode = (value: boolean): void => {
-    window.api.storeWrite(ISLAND_BG_VIDEO_HW_DECODE_STORE_KEY, value).catch(() => {});
-  };
-
-  const resolveDesktopWallpaperPreviewUrl = (previewUrl: string | null): string | null => {
-    if (!previewUrl) return null;
-    const trimmed = previewUrl.trim();
-    if (!trimmed) return null;
-    if (trimmed.startsWith('data:') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('file://')) {
-      return trimmed;
-    }
-    try {
-      return new URL(trimmed, window.location.href).toString();
-    } catch {
-      return trimmed;
-    }
-  };
-
-  const syncSystemDesktopWallpaperIfNeeded = async (
-    media: IslandBgMediaConfig | null,
-    previewUrl: string | null,
-  ): Promise<void> => {
-    if (!syncDesktopWallpaperOnBackgroundChange) return;
-    if (!media) return;
-
-    if (media.type === 'video') {
-      const sourcePath = !isDirectBgMediaUrl(media.source) ? media.source : null;
-      if (sourcePath) {
-        const coverPath = await window.api.wallpaperVideoCover(sourcePath).catch(() => null);
-        if (coverPath) {
-          await window.api.setSystemDesktopWallpaper({ sourcePath: coverPath, previewUrl: coverPath }).catch(() => false);
-          return;
-        }
-      }
-    }
-
-    const sourcePath = !isDirectBgMediaUrl(media.source) ? media.source : null;
-    const normalizedPreview = resolveDesktopWallpaperPreviewUrl(previewUrl);
-    await window.api.setSystemDesktopWallpaper({ sourcePath, previewUrl: normalizedPreview }).catch(() => false);
-  };
-
-  const persistBgOpacity = (value: number): void => {
-    window.api.storeWrite('island-bg-opacity', value).catch(() => {});
-  };
-
-  const persistBgBlur = (value: number): void => {
-    window.api.storeWrite('island-bg-blur', value).catch(() => {});
-  };
-
-  const handleSelectBgImage = async (): Promise<void> => {
-    const filePath = await window.api.openImageDialog();
-    if (!filePath) return;
-    const dataUrl = await window.api.loadWallpaperFile(filePath);
-    if (!dataUrl) return;
-    const media: IslandBgMediaConfig = { type: 'image', source: filePath };
-    applyBgMedia(media, dataUrl);
-    persistBgMedia(media);
-    void syncSystemDesktopWallpaperIfNeeded(media, dataUrl);
-  };
-
-  const handleSelectBgVideo = async (): Promise<void> => {
-    const filePath = await window.api.openVideoDialog();
-    if (!filePath) return;
-    const media: IslandBgMediaConfig = { type: 'video', source: filePath };
-    const previewUrl = await resolveBgMediaPreviewUrl(media);
-    if (!previewUrl) return;
-    applyBgMedia(media, previewUrl);
-    persistBgMedia(media);
-    void syncSystemDesktopWallpaperIfNeeded(media, previewUrl);
-  };
-
-  const handleClearBgImage = (): void => {
-    applyBgMedia(null, null);
-    persistBgMedia(null);
-    window.api.storeWrite(ISLAND_BG_IMAGE_STORE_KEY, null).catch(() => {});
-    window.api.settingsPreview('store:island-bg-image', null).catch(() => {});
-    window.api.setSystemDesktopWallpaper({ clear: true }).catch(() => false);
-    window.api.clearWallpaperCache?.().catch(() => {});
-  };
-
-  const handleSelectBuiltinBgImage = (src: string, defaultOpacity: number): void => {
-    const media: IslandBgMediaConfig = { type: 'image', source: src };
-    setBgImageOpacity(defaultOpacity);
-    applyBgMedia(media, src);
-    applyBgOpacity(defaultOpacity);
-    persistBgMedia(media);
-    persistBgOpacity(defaultOpacity);
-    void syncSystemDesktopWallpaperIfNeeded(media, src);
-  };
-
-  const handleApplyMarketplaceWallpaper = (mediaUrl: string, options?: { type?: 'image' | 'video' }): void => {
-    if (!mediaUrl) return;
-    const mediaType: 'image' | 'video' = options?.type === 'video' ? 'video' : 'image';
-    const media: IslandBgMediaConfig = { type: mediaType, source: mediaUrl };
-    applyBgMedia(media, mediaUrl);
-    persistBgMedia(media);
-    void syncSystemDesktopWallpaperIfNeeded(media, mediaUrl);
-    if (mediaType === 'image') {
-      window.api.settingsPreview('store:island-bg-image', mediaUrl).catch(() => {});
-    }
-    window.api.settingsPreview('store:island-bg-media', media).catch(() => {});
   };
 
   const visibleCards = useMemo(() => {
@@ -1221,6 +889,10 @@ export function SettingsTab(): ReactElement {
         setActiveTab('app');
         setAppSettingsPage('performance-monitor');
       }
+      if (value === 'expand-layout') {
+        setActiveTab('app');
+        setAppSettingsPage('expand-layout');
+      }
       if (value) {
         window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
@@ -1433,9 +1105,7 @@ export function SettingsTab(): ReactElement {
     let cancelled = false;
     window.api.storeRead(LAYOUT_STORE_KEY).then((data) => {
       if (cancelled) return;
-      if (data && typeof data === 'object' && 'left' in (data as object) && 'right' in (data as object)) {
-        setLayoutConfig(data as OverviewLayoutConfig);
-      }
+      setLayoutConfig(normalizeOverviewLayoutConfig(data));
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -1564,101 +1234,81 @@ export function SettingsTab(): ReactElement {
         setAppSettingsPage('performance-monitor');
         window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(UPDATE_AUTO_PROMPT_STORE_KEY).then((value) => {
-      if (cancelled) return;
-      setUpdateAutoPromptEnabled(typeof value === 'boolean' ? value : true);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    readAnnouncementShowMode().then((mode) => {
-      if (cancelled) return;
-      setAnnouncementShowMode(mode);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  /** 监听下载进度 */
-  useEffect(() => {
-    const unsub = window.api.onUpdaterProgress?.((progress) => {
-      setDownloadProgress(progress);
-      setUpdateStatus((prev) => (prev === 'downloading' ? prev : 'downloading'));
-    });
-    return () => { unsub?.(); };
-  }, []);
-
-  useEffect(() => {
-    const unsub = window.api.onUpdaterAvailable?.((data) => {
-      if (!updateAutoPromptEnabled) return;
-      setUpdateVersion(data.version);
-      setUpdateStatus((prev) => {
-        if (prev === 'downloading' || prev === 'ready') return prev;
-        return 'available';
-      });
-      setUpdateError('');
-    });
-    return () => { unsub?.(); };
-  }, [updateAutoPromptEnabled]);
-
-  /** 检查更新（通过 electron-updater） */
-  const handleCheckUpdate = async (): Promise<void> => {
-    setUpdateStatus('checking');
-    setUpdateError('');
-    setDownloadProgress(null);
-    try {
-      const resolvedUrl = await resolveUpdateSourceUrl(updateSource);
-      const result = await window.api.updaterCheck(updateSource, resolvedUrl);
-      if (result.error) {
-        setUpdateStatus('error');
-        setUpdateError(result.error);
-      } else if (result.available && result.version) {
-        setUpdateStatus('available');
-        setUpdateVersion(result.version);
-      } else {
-        setUpdateStatus('latest');
+      if (intent === 'expand-layout') {
+        setActiveTab('app');
+        setAppSettingsPage('expand-layout');
+        window.api.storeWrite(SETTINGS_OPEN_TAB_STORE_KEY, null).catch(() => {});
       }
-    } catch (err) {
-      setUpdateStatus('error');
-      setUpdateError(`检查更新失败: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  /** 下载更新 */
-  const handleDownloadUpdate = async (): Promise<void> => {
-    setUpdateStatus('downloading');
-    setDownloadProgress(null);
-    try {
-      const resolvedUrl = await resolveUpdateSourceUrl(updateSource);
-      const ok = await window.api.updaterDownload(updateSource, resolvedUrl);
-      if (ok) {
-        setUpdateStatus('ready');
-      } else {
-        setUpdateStatus('error');
-        setUpdateError('下载失败，请稍后重试');
-      }
-    } catch (err) {
-      setUpdateStatus('error');
-      setUpdateError(`下载失败: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  };
-
-  /** 安装更新 */
-  const handleInstallUpdate = (): void => {
-    window.api.updaterInstall().catch(() => {});
-  };
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const updateLayout = (side: 'left' | 'right', value: OverviewWidgetType): void => {
     const updated = { ...layoutConfig, [side]: value };
     setLayoutConfig(updated);
     window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
+  };
+
+  const updateClockStyle = (value: OverviewClockStyle): void => {
+    const updated = { ...layoutConfig, clockStyle: value };
+    setLayoutConfig(updated);
+    window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
+  };
+
+  const updateGradientColor = (value: string): void => {
+    const match = /^#([0-9a-fA-F]{6})$/.exec(value);
+    if (!match) {
+      return;
+    }
+    const hex = match[1];
+    const ri = parseInt(hex.slice(0, 2), 16) / 255;
+    const gi = parseInt(hex.slice(2, 4), 16) / 255;
+    const bi = parseInt(hex.slice(4, 6), 16) / 255;
+    const max = Math.max(ri, gi, bi), min = Math.min(ri, gi, bi);
+    let h = 0;
+    const l = (max + min) / 2;
+    const s = max === min ? 0 : (l > 0.5 ? (max - min) / (2 - max - min) : (max - min) / (max + min));
+    if (max !== min) {
+      const d = max - min;
+      if (max === ri) h = ((gi - bi) / d + (gi < bi ? 6 : 0)) * 60;
+      else if (max === gi) h = ((bi - ri) / d + 2) * 60;
+      else h = ((ri - gi) / d + 4) * 60;
+    }
+    const hslToHex = (hue: number, sat: number, lit: number): string => {
+      const hh = ((hue % 360) + 360) % 360;
+      const c = (1 - Math.abs(2 * lit - 1)) * sat;
+      const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+      const m = lit - c / 2;
+      let rr: number, gg: number, bb: number;
+      if (hh < 60) { rr = c; gg = x; bb = 0; }
+      else if (hh < 120) { rr = x; gg = c; bb = 0; }
+      else if (hh < 180) { rr = 0; gg = c; bb = x; }
+      else if (hh < 240) { rr = 0; gg = x; bb = c; }
+      else if (hh < 300) { rr = x; gg = 0; bb = c; }
+      else { rr = c; gg = 0; bb = x; }
+      const toH = (n: number): string => Math.max(0, Math.min(255, Math.round((n + m) * 255))).toString(16).padStart(2, '0');
+      return `#${toH(rr)}${toH(gg)}${toH(bb)}`;
+    };
+    const start = hslToHex(h - 25, Math.min(1, s * 1.08), Math.min(0.78, l + 0.1));
+    const end = hslToHex(h + 25, Math.min(1, s * 1.05), Math.max(0.3, l - 0.06));
+
+    const updated = {
+      ...layoutConfig,
+      gradientColors: {
+        start,
+        middle: value,
+        end,
+      },
+    };
+    setLayoutConfig(updated);
+    window.api.storeWrite(LAYOUT_STORE_KEY, updated).catch(() => {});
+  };
+
+  const updateExpandNavLayout = (layout: ExpandNavLayoutConfig): void => {
+    const normalized = normalizeExpandNavLayoutConfig(layout);
+    setExpandNavLayout(normalized);
+    window.api.storeWrite(EXPAND_NAV_LAYOUT_STORE_KEY, normalized).catch(() => {});
+    window.dispatchEvent(new CustomEvent('expand-nav-layout-changed', { detail: normalized }));
   };
 
   const updateMaxExpandNavLayout = (layout: MaxExpandNavLayoutConfig): void => {
@@ -2707,7 +2357,12 @@ export function SettingsTab(): ReactElement {
               layoutConfig={layoutConfig}
               OverviewPreviewComponent={OverviewPreview}
               overviewWidgetOptions={translatedOverviewWidgetOptions}
+              overviewClockStyleOptions={translatedOverviewClockStyleOptions}
               updateLayout={updateLayout}
+              updateClockStyle={updateClockStyle}
+              updateGradientColor={updateGradientColor}
+              expandNavLayout={expandNavLayout}
+              updateExpandNavLayout={updateExpandNavLayout}
               maxExpandNavLayout={maxExpandNavLayout}
               updateMaxExpandNavLayout={updateMaxExpandNavLayout}
               hideProcessFilter={hideProcessFilter}

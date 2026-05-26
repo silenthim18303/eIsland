@@ -425,6 +425,10 @@
       "title": "系统性能",
       "subtitle": "实时硬件状态与温度",
       "hardwareSettingsLink": "和您的硬件不一样？点击前往调整",
+      "startMonitor": "开始监控",
+      "stopMonitor": "停止监控",
+      "hidePage": "隐藏本页面",
+      "startHint": "首次进入请点击开始监控",
       "loading": "正在读取系统性能数据...",
       "error": "系统性能数据暂不可用",
       "labels": {
@@ -907,9 +911,98 @@
     }
   },
   "miniGameTab": {
-    "placeholder": "敬请期待",
-    "title": "小游戏功能开发中",
-    "subtitle": "敬请期待"
+    "sidebar": {
+      "index": "快速导航"
+    },
+    "index": {
+      "title": "快速导航",
+      "reset": "恢复默认",
+      "edit": "编辑",
+      "done": "完成",
+      "searchPlaceholder": "搜索游戏项...",
+      "searchClear": "清空搜索",
+      "searchEmpty": "没有找到匹配的游戏项",
+      "hintEdit": "拖拽卡片可调整排列顺序，点击「完成」保存。",
+      "hintView": "点击卡片可快速跳转到对应游戏。",
+      "ariaNav": "小游戏快速导航",
+      "removeCard": "删除 {{label}}",
+      "ariaAddPanel": "可添加导航卡片",
+      "addableTitle": "可添加卡片",
+      "emptyAddable": "当前没有可添加的卡片"
+    },
+    "nav": {
+      "game-2048": {
+        "label": "2048",
+        "desc": "经典数字合并小游戏，支持成绩与排行榜。"
+      },
+      "game-gomoku": {
+        "label": "五子棋",
+        "desc": "本地双人五子棋对战，先连成五子获胜。"
+      }
+    },
+    "games": {
+      "2048": "2048",
+      "gomoku": "五子棋"
+    },
+    "comingSoon": "即将上线",
+    "loginRequired": "请先登录以查看成绩与排行榜",
+    "loading": "加载中...",
+    "loadError": "数据加载失败",
+    "retry": "重试",
+    "refresh": "刷新",
+    "myBest": "个人最高分",
+    "highScore": "最高分",
+    "duration": "用时",
+    "moves": "步数",
+    "plays": "游玩次数",
+    "noRecord": "暂无记录",
+    "leaderboard": "排行榜",
+    "myRank": "您的排名",
+    "leaderboardRestartHint": "重启后进行的对局成绩不会计入排行榜，请保持当前会话完成游戏。",
+    "rankUnavailable": "未上榜",
+    "lbUser": "用户",
+    "lbScore": "分数",
+    "lbEmpty": "暂无排行数据",
+    "auth": {
+      "entryTitle": "登录后查看排行榜与个人成绩",
+      "gotoLogin": "前往登录",
+      "gotoRegister": "前往注册",
+      "hint": "登录后可同步游戏成绩、查看排行榜并与其他玩家竞争。"
+    },
+    "game2048": {
+      "score": "分数",
+      "best": "最高",
+      "newGame": "新游戏",
+      "gameOver": "游戏结束",
+      "tryAgain": "再来一局",
+      "hint": "使用方向键或 WASD 滑动方块"
+    },
+    "gomoku": {
+      "hint": "黑白双方轮流落子，先连成五子者获胜。",
+      "mode": "对战模式",
+      "modePve": "人机对战",
+      "modePvp": "人人对战",
+      "difficulty": "选择对局难度",
+      "difficultyNovice": "新手",
+      "difficultyEasy": "简单",
+      "difficultyHard": "困难",
+      "difficultyExpert": "专家",
+      "difficultyMaster": "大师",
+      "status": "当前状态",
+      "thinking": "正在思考",
+      "turnBlack": "黑棋回合",
+      "turnWhite": "白棋回合",
+      "winnerBlack": "黑棋获胜",
+      "winnerWhite": "白棋获胜",
+      "victory": "胜利",
+      "defeat": "失败",
+      "draw": "平局",
+      "restart": "重新开始",
+      "highlightLastMove": "高亮上一手",
+      "unrankedHint": "五子棋暂不接入在线排行榜。",
+      "boardAria": "五子棋棋盘",
+      "cellAria": "第 {{row}} 行第 {{col}} 列"
+    }
   },
   "maxExpand": {
     "loading": "正在加载最大展开界面...",
@@ -932,6 +1025,7 @@
     },
     "toolbox": {
       "sidebar": {
+        "index": "快速导航",
         "download": "多线程下载",
         "software": "常用软件",
         "translate": "文本翻译",
@@ -939,7 +1033,74 @@
         "encodingService": "编码服务",
         "networkService": "网络服务",
         "fileCompression": "文件压缩",
+        "fileCompressionShort": "压缩",
         "formatFactory": "格式工厂"
+      },
+      "index": {
+        "title": "快速导航",
+        "reset": "恢复默认",
+        "edit": "编辑",
+        "done": "完成",
+        "searchPlaceholder": "搜索工具项...",
+        "searchClear": "清空搜索",
+        "searchEmpty": "没有找到匹配的工具项",
+        "hintEdit": "拖拽卡片可调整排列顺序，点击「完成」保存。",
+        "hintView": "点击卡片可快速跳转到对应工具页。",
+        "ariaNav": "工具箱快速导航",
+        "removeCard": "删除 {{label}}",
+        "ariaAddPanel": "可添加导航卡片",
+        "addableTitle": "可添加卡片",
+        "emptyAddable": "当前没有可添加的卡片"
+      },
+      "nav": {
+        "download-create": {
+          "label": "创建下载",
+          "desc": "配置下载地址、保存路径和线程参数并启动任务。"
+        },
+        "download-history": {
+          "label": "下载历史",
+          "desc": "查看下载任务进度、状态并执行暂停/继续等操作。"
+        },
+        "software": {
+          "label": "常用软件",
+          "desc": "快速访问常用软件下载入口与反馈通道。"
+        },
+        "translate": {
+          "label": "文本翻译",
+          "desc": "输入文本并在多语言间进行翻译。"
+        },
+        "fileService-hash": {
+          "label": "文件哈希校验",
+          "desc": "计算并比对文件哈希值，校验文件完整性。"
+        },
+        "encodingService-json": {
+          "label": "JSON 编解码",
+          "desc": "对文本执行 JSON 编码与解码转换。"
+        },
+        "encodingService-base64": {
+          "label": "Base64 编解码",
+          "desc": "对文本执行 Base64 编码与解码转换。"
+        },
+        "networkService": {
+          "label": "网络服务",
+          "desc": "查询 IP 信息与网络相关工具结果。"
+        },
+        "fileCompression-imageCompression": {
+          "label": "图像压缩",
+          "desc": "批量压缩图片并设置输出目录与质量。"
+        },
+        "fileCompression-history": {
+          "label": "压缩历史",
+          "desc": "查看压缩任务结果并快速打开输出目录。"
+        },
+        "formatFactory-image": {
+          "label": "图片转换",
+          "desc": "将图片转换为目标格式并调整输出参数。"
+        },
+        "formatFactory-video": {
+          "label": "视频转换",
+          "desc": "对视频执行转封装、转码或音轨提取。"
+        }
       },
       "software": {
         "title": "常用软件",
@@ -1295,6 +1456,7 @@
       "index": "快速导航",
       "app": "软件设置",
       "layout-preview": "布局预览",
+      "expand-layout": "展开布局",
       "maxexpand-layout": "全展开布局",
       "album": "相册配置",
       "hide-process-list": "隐藏窗口管理",
@@ -1485,6 +1647,19 @@
         "widgetPickerHint": "分别选择左右两侧展示的控件，切换后自动保存。",
         "leftWidget": "左侧控件",
         "rightWidget": "右侧控件",
+        "clockStyleTitle": "中间时钟样式",
+        "clockStyleHint": "选择总览中间时钟区域样式，切换后自动保存。",
+        "gradientEditorTitle": "渐变颜色编辑",
+        "gradientEditorHint": "选择一个基准色，自动生成渐变时钟字体。",
+        "gradientBaseColor": "基准色",
+        "gradientStart": "起始色",
+        "gradientMiddle": "中间色",
+        "gradientEnd": "结束色",
+        "clockStyleNames": {
+          "classic": "经典样式",
+          "gradient": "渐变样式",
+          "minimal": "极简艺术"
+        },
         "widgetNames": {
           "shortcuts": "快捷启动",
           "todo": "待办事项",
@@ -1517,6 +1692,25 @@
           "lunar": "乙巳年 腊月十二",
           "yiItems": "祈福 · 出行 · 开市",
           "jiItems": "动土 · 安葬 · 破土"
+        }
+      },
+      "expandLayout": {
+        "previewTitle": "展开导航预览",
+        "previewHint": "预览展开态底部导航点顺序，灰色表示已隐藏页面。",
+        "orderTitle": "页面排序与可见性（展开）",
+        "orderHint": "拖拽调整展开态页面顺序，点击开关切换是否显示。当前显示 {{count}} / {{total}} 个页面。",
+        "orderHintStatic": "拖拽调整展开态页面顺序，点击开关切换是否显示。",
+        "moveUp": "上移",
+        "moveDown": "下移",
+        "hideTab": "隐藏此页面",
+        "showTab": "显示此页面",
+        "alwaysVisible": "此页面不可隐藏",
+        "resetDefault": "恢复默认",
+        "tabLabels": {
+          "overview": "总览",
+          "song": "歌曲",
+          "tools": "工具",
+          "performanceMonitor": "性能监控"
         }
       },
       "maxExpandLayout": {
@@ -2647,6 +2841,7 @@
         "reportIssue": "报告问题",
         "currentPlan": "当前可用",
         "buyPro": "购买 Pro",
+        "renewPro": "前往续费",
         "proActivated": "已开通 Pro"
       },
       "danger": {
@@ -2698,6 +2893,10 @@
       "layout-preview": {
         "label": "布局预览",
         "desc": "进入布局预览并调整左右控件展示。"
+      },
+      "expand-layout": {
+        "label": "展开布局",
+        "desc": "调整展开界面页面顺序与显示开关。"
       },
       "maxexpand-layout": {
         "label": "全展开布局",

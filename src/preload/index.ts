@@ -458,8 +458,11 @@ const api = {
   openTaskManager: (): void => {
     ipcRenderer.send('system:open-task-manager');
   },
-  getPerformanceSnapshot: (selection?: { cpu?: string; gpu?: string; disk?: string }) => {
-    return ipcRenderer.invoke('system:performance-snapshot:get', selection);
+  getPerformanceSnapshot: (
+    selection?: { cpu?: string; gpu?: string; disk?: string },
+    includeHardwareOptions = true,
+  ) => {
+    return ipcRenderer.invoke('system:performance-snapshot:get', selection, includeHardwareOptions);
   },
   /**
    * 获取拖拽文件的本地路径（contextIsolation 下 file.path 不可用）

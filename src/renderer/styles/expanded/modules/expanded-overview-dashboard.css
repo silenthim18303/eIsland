@@ -182,6 +182,54 @@
   line-height: 1.15;
 }
 
+.ov-dash-time--gradient {
+  gap: 1px;
+}
+
+.ov-dash-time--gradient .ov-dash-clock {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 2.3px;
+  line-height: 1.08;
+  background: linear-gradient(
+    90deg,
+    var(--ov-clock-gradient-start, #7be4ff) 0%,
+    var(--ov-clock-gradient-middle, #8da8ff) 50%,
+    var(--ov-clock-gradient-end, #ffd28a) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: saturate(1.06);
+}
+
+.ov-dash-time--minimal {
+  gap: 0;
+  justify-content: center;
+}
+
+.ov-dash-time--minimal .ov-dash-clock {
+  font-size: 72px;
+  font-weight: 950;
+  letter-spacing: 0.5px;
+  line-height: 1.15;
+  color: rgba(var(--color-text-rgb), 0.88);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+.ov-dash-time--minimal.ov-dash-time--minimal .ov-dash-clock {
+  background: linear-gradient(
+    90deg,
+    var(--ov-clock-gradient-start, rgba(var(--color-text-rgb), 0.88)) 0%,
+    var(--ov-clock-gradient-middle, rgba(var(--color-text-rgb), 0.88)) 50%,
+    var(--ov-clock-gradient-end, rgba(var(--color-text-rgb), 0.88)) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .ov-dash-date {
   font-size: 11px;
   color: rgba(var(--color-text-rgb), 0.45);
@@ -192,7 +240,7 @@
 .ov-dash-lunar {
   font-size: 10px;
   color: rgba(var(--color-text-rgb), 0.28);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .ov-dash-yiji {

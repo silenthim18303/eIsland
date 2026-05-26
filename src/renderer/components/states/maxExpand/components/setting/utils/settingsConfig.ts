@@ -50,7 +50,7 @@ export const WEATHER_LOCATION_PRIORITY_OPTIONS: Array<{ value: WeatherLocationPr
 
 export const SETTINGS_TABS = ['index', 'app', 'network', 'mail', 'weather', 'music', 'ai', 'shortcut', 'user', 'update', 'pluginMarket', 'about'] as const;
 export type SettingsSidebarTabKey = (typeof SETTINGS_TABS)[number];
-export type AppSettingsPageKey = 'layout-preview' | 'maxexpand-layout' | 'album' | 'hide-process-list' | 'position' | 'theme' | 'language' | 'behavior' | 'animation' | 'url-parser' | 'clipboard-history' | 'alarm' | 'break-reminder' | 'autostart' | 'sound' | 'notification' | 'performance' | 'performance-monitor';
+export type AppSettingsPageKey = 'layout-preview' | 'expand-layout' | 'maxexpand-layout' | 'album' | 'hide-process-list' | 'position' | 'theme' | 'language' | 'behavior' | 'animation' | 'url-parser' | 'clipboard-history' | 'alarm' | 'break-reminder' | 'autostart' | 'sound' | 'notification' | 'performance' | 'performance-monitor';
 export type WeatherSettingsPageKey = 'location' | 'provider';
 export type MailSettingsPageKey = 'account' | 'imap' | 'preferences';
 export type AiSettingsPageKey = 'general' | 'r1pxc' | 'ollama';
@@ -62,6 +62,7 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTabLabelKey, string> = {
   index: '快速导航',
   app: '软件设置',
   'layout-preview': '布局预览',
+  'expand-layout': '展开布局',
   'maxexpand-layout': '全展开布局',
   album: '相册配置',
   'hide-process-list': '隐藏窗口管理',
@@ -100,6 +101,7 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTabLabelKey, string> = {
 export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'index'>, string> = {
   app: '布局预览与隐藏进程规则配置',
   'layout-preview': '进入布局预览并调整左右控件展示。',
+  'expand-layout': '自定义展开界面页面顺序与可见性。',
   'maxexpand-layout': '自定义全展开界面各页面的显示顺序与可见性。',
   album: '相册轮播与相册入口相关配置。',
   'hide-process-list': '管理隐藏窗口名单与自动隐藏规则。',
@@ -137,6 +139,7 @@ export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'ind
 
 export const SETTINGS_TAB_ICONS: Partial<Record<SettingsTabLabelKey, string>> = {
   'layout-preview': SvgIcon.LAYOUT,
+  'expand-layout': SvgIcon.LAYOUT,
   'maxexpand-layout': SvgIcon.LAYOUT,
   album: SvgIcon.PHOTO_ALBUM,
   'hide-process-list': SvgIcon.TASK_MANAGER,
@@ -178,9 +181,80 @@ export const NETWORK_TIMEOUT_OPTIONS = [
 ];
 
 export const LAYOUT_STORE_KEY = 'overview-layout';
-export const DEFAULT_LAYOUT: OverviewLayoutConfig = { left: 'shortcuts', right: 'todo' };
+export const DEFAULT_LAYOUT: OverviewLayoutConfig = {
+  left: 'shortcuts',
+  right: 'todo',
+  clockStyle: 'classic',
+  gradientColors: {
+    start: '#7be4ff',
+    middle: '#8da8ff',
+    end: '#ffd28a',
+  },
+};
 
 export const MAXEXPAND_NAV_LAYOUT_STORE_KEY = 'maxexpand-nav-layout';
+
+export const EXPAND_NAV_LAYOUT_STORE_KEY = 'expand-nav-layout';
+
+export interface ExpandNavItem {
+  id: string;
+  visible: boolean;
+}
+
+export type ExpandNavLayoutConfig = ExpandNavItem[];
+
+export const EXPAND_CONFIGURABLE_TABS: string[] = ['overview', 'song', 'tools', 'performanceMonitor'];
+
+export const EXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['overview']);
+
+export const EXPAND_TAB_LABELS: Record<string, string> = {
+  overview: '总览',
+  song: '歌曲',
+  tools: '工具',
+  performanceMonitor: '性能监控',
+};
+
+export const DEFAULT_EXPAND_NAV_LAYOUT: ExpandNavLayoutConfig = EXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: true }));
+
+/**
+ * 标准化展开导航布局配置。
+ * @param raw - 任意来源的原始配置。
+ * @returns 合法且完整的展开导航布局配置。
+ */
+export function normalizeExpandNavLayoutConfig(raw: unknown): ExpandNavLayoutConfig {
+  const defaults = DEFAULT_EXPAND_NAV_LAYOUT.map((item) => ({ ...item }));
+  if (!Array.isArray(raw) || raw.length === 0) {
+    return defaults;
+  }
+
+  const known = new Set(EXPAND_CONFIGURABLE_TABS);
+  const ordered: ExpandNavLayoutConfig = [];
+  const seen = new Set<string>();
+
+  raw.forEach((item) => {
+    if (!item || typeof item !== 'object') return;
+    const candidate = item as { id?: unknown; visible?: unknown };
+    if (typeof candidate.id !== 'string' || !known.has(candidate.id)) return;
+    if (seen.has(candidate.id)) return;
+    seen.add(candidate.id);
+    ordered.push({
+      id: candidate.id,
+      visible: EXPAND_ALWAYS_VISIBLE_TABS.has(candidate.id) ? true : candidate.visible !== false,
+    });
+  });
+
+  if (ordered.length === 0) {
+    return defaults;
+  }
+
+  EXPAND_CONFIGURABLE_TABS.forEach((id) => {
+    if (!seen.has(id)) {
+      ordered.push({ id, visible: true });
+    }
+  });
+
+  return ordered;
+}
 
 export interface MaxExpandNavItem {
   id: string;
@@ -191,7 +265,7 @@ export type MaxExpandNavLayoutConfig = MaxExpandNavItem[];
 
 export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox', 'miniGame'];
 
-export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat']);
+export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat', 'miniGame']);
 
 export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
   todo: '待办事项',
@@ -233,11 +307,13 @@ export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLay
 
   return MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({
     id,
-    visible: merged.has(id) ? (merged.get(id) === true) : true,
+    visible: MAXEXPAND_ALWAYS_VISIBLE_TABS.has(id)
+      ? true
+      : (merged.has(id) ? (merged.get(id) === true) : true),
   }));
 }
 
-export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart', 'sound', 'notification', 'performance', 'performance-monitor'];
+export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'expand-layout', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart', 'sound', 'notification', 'performance', 'performance-monitor'];
 export const WEATHER_SETTINGS_PAGES: WeatherSettingsPageKey[] = ['location', 'provider'];
 export const WEATHER_SETTINGS_PAGE_LABELS: Record<WeatherSettingsPageKey, string> = {
   location: '定位配置',
@@ -278,6 +354,7 @@ export const NAV_CARDS: NavCardDef[] = [
   { id: 'user-recharge', label: '余额充值', desc: '为 AI 助手对话余额充值', icon: SvgIcon.RECHARGE, tab: 'user', actionId: 'user-recharge' },
   { id: 'user', label: SETTINGS_TAB_LABELS.user, desc: SETTINGS_TAB_DESCRIPTIONS.user, icon: SETTINGS_TAB_ICONS.user, tab: 'user' },
   { id: 'layout-preview', label: SETTINGS_TAB_LABELS['layout-preview'], desc: SETTINGS_TAB_DESCRIPTIONS['layout-preview'], icon: SETTINGS_TAB_ICONS['layout-preview'], tab: 'app', appPage: 'layout-preview' },
+  { id: 'expand-layout', label: SETTINGS_TAB_LABELS['expand-layout'], desc: SETTINGS_TAB_DESCRIPTIONS['expand-layout'], icon: SETTINGS_TAB_ICONS['expand-layout'], tab: 'app', appPage: 'expand-layout' },
   { id: 'maxexpand-layout', label: SETTINGS_TAB_LABELS['maxexpand-layout'], desc: SETTINGS_TAB_DESCRIPTIONS['maxexpand-layout'], icon: SETTINGS_TAB_ICONS['maxexpand-layout'], tab: 'app', appPage: 'maxexpand-layout' },
   { id: 'album', label: SETTINGS_TAB_LABELS.album, desc: SETTINGS_TAB_DESCRIPTIONS.album, icon: SETTINGS_TAB_ICONS.album, tab: 'app', appPage: 'album' },
   { id: 'hide-process-list', label: SETTINGS_TAB_LABELS['hide-process-list'], desc: SETTINGS_TAB_DESCRIPTIONS['hide-process-list'], icon: SETTINGS_TAB_ICONS['hide-process-list'], tab: 'app', appPage: 'hide-process-list' },
@@ -327,6 +404,11 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   // ── 软件设置 > 布局预览 ──
   { label: '总览布局预览', desc: '实时显示左右控件组合后的 Expand 态灵动岛样式，切换下方控件可即时预览。', labelKey: 'settings.app.layout.previewTitle', descKey: 'settings.app.layout.previewHint', tab: 'app', appPage: 'layout-preview' },
   { label: '控件组合', desc: '分别选择左右两侧展示的控件，切换后自动保存。', labelKey: 'settings.app.layout.widgetPickerTitle', descKey: 'settings.app.layout.widgetPickerHint', tab: 'app', appPage: 'layout-preview' },
+  { label: '中间时钟样式', desc: '选择总览中间时钟区域样式，切换后自动保存。', labelKey: 'settings.app.layout.clockStyleTitle', descKey: 'settings.app.layout.clockStyleHint', tab: 'app', appPage: 'layout-preview' },
+  { label: '渐变颜色编辑', desc: '选择一个基准色，自动生成渐变时钟字体。', labelKey: 'settings.app.layout.gradientEditorTitle', descKey: 'settings.app.layout.gradientEditorHint', tab: 'app', appPage: 'layout-preview' },
+  // ── 软件设置 > 展开布局 ──
+  { label: '展开导航预览', desc: '预览展开态底部导航点顺序，灰色表示已隐藏页面。', labelKey: 'settings.app.expandLayout.previewTitle', descKey: 'settings.app.expandLayout.previewHint', tab: 'app', appPage: 'expand-layout' },
+  { label: '页面排序与可见性（展开）', desc: '拖拽调整展开态页面顺序，点击开关切换是否显示。', labelKey: 'settings.app.expandLayout.orderTitle', descKey: 'settings.app.expandLayout.orderHintStatic', tab: 'app', appPage: 'expand-layout' },
   // ── 软件设置 > 全展开布局 ──
   { label: '全展开导航预览', desc: '预览底部导航点的排列顺序，灰色表示已隐藏的页面。', labelKey: 'settings.app.maxExpandLayout.previewTitle', descKey: 'settings.app.maxExpandLayout.previewHint', tab: 'app', appPage: 'maxexpand-layout' },
   { label: '页面排序与可见性', desc: '拖拽调整页面顺序，点击开关控制页面显示或隐藏。', labelKey: 'settings.app.maxExpandLayout.orderTitle', descKey: 'settings.app.maxExpandLayout.orderHintStatic', tab: 'app', appPage: 'maxexpand-layout' },
