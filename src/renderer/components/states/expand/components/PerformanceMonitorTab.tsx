@@ -97,6 +97,7 @@ interface MetricCardProps {
 const REFRESH_INTERVAL_MS = 2000;
 const START_FETCH_DELAY_MS = 200;
 let cachedPerformanceSnapshot: PerformanceSnapshot | null = null;
+let hasStartedMonitoringThisSession = false;
 
 function clampPercent(value: number | null | undefined): number {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 0;
@@ -166,6 +167,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
   const { t } = useTranslation();
   const { setMaxExpand, setMaxExpandTab } = useIslandStore();
   const [snapshot, setSnapshot] = useState<PerformanceSnapshot | null>(() => cachedPerformanceSnapshot);
+  const [monitoringEnabled, setMonitoringEnabled] = useState<boolean>(() => hasStartedMonitoringThisSession);
   const [failed, setFailed] = useState(false);
   const [chartColors, setChartColors] = useState<PerformanceMonitorChartColors>(DEFAULT_PERFORMANCE_MONITOR_CHART_COLORS);
   const [hardwareSelection, setHardwareSelection] = useState<PerformanceMonitorHardwareSelection>(DEFAULT_PERFORMANCE_MONITOR_HARDWARE_SELECTION);
@@ -177,6 +179,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
   }, [snapshot]);
 
   useEffect(() => {
+    if (!monitoringEnabled) return;
     let cancelled = false;
     let delayTimer: number | undefined;
     let intervalTimer: number | undefined;
@@ -231,7 +234,7 @@ export function PerformanceMonitorTab(): React.ReactElement {
       if (delayTimer !== undefined) window.clearTimeout(delayTimer);
       stopPolling();
     };
-  }, [hardwareSelection]);
+  }, [hardwareSelection, monitoringEnabled]);
 
   useEffect(() => {
     let cancelled = false;
@@ -258,16 +261,33 @@ export function PerformanceMonitorTab(): React.ReactElement {
     };
   }, []);
 
+  const startMonitoring = (): void => {
+    hasStartedMonitoringThisSession = true;
+    setMonitoringEnabled(true);
+    setFailed(false);
+  };
+
+  const stopMonitoring = (): void => {
+    setMonitoringEnabled(false);
+  };
+
   if (!snapshot) {
     return (
       <div className="expand-tab-panel pm-tab-panel">
         <div className="pm-panel-wrap pm-panel-loading">
           <div className="pm-loading">
-            {!failed && <span className="pm-loading-spinner" aria-hidden="true" />}
+            {!monitoringEnabled && (
+              <button className="pm-start-monitor-btn" type="button" onClick={startMonitoring}>
+                {t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
+              </button>
+            )}
+            {monitoringEnabled && !failed && <span className="pm-loading-spinner" aria-hidden="true" />}
             <span className="pm-loading-text">
-              {failed
-                ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
-                : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
+              {!monitoringEnabled
+                ? t('expanded.performanceMonitor.startHint', { defaultValue: '首次进入请点击开始监控' })
+                : failed
+                  ? t('expanded.performanceMonitor.error', { defaultValue: '系统性能数据暂不可用' })
+                  : t('expanded.performanceMonitor.loading', { defaultValue: '正在读取系统性能数据...' })}
             </span>
           </div>
         </div>
@@ -358,7 +378,18 @@ export function PerformanceMonitorTab(): React.ReactElement {
         <div className="pm-dashboard-head">
           <div className="pm-title-group">
             <span className="pm-title">{t('expanded.performanceMonitor.title', { defaultValue: '系统性能' })}</span>
-            <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
+            <div className="pm-subtitle-row">
+              <span className="pm-subtitle">{t('expanded.performanceMonitor.subtitle', { defaultValue: '实时硬件状态与温度' })}</span>
+              <button
+                className={`pm-monitor-toggle-btn${monitoringEnabled ? ' pm-monitor-toggle-btn--stop' : ''}`}
+                type="button"
+                onClick={monitoringEnabled ? stopMonitoring : startMonitoring}
+              >
+                {monitoringEnabled
+                  ? t('expanded.performanceMonitor.stopMonitor', { defaultValue: '停止监控' })
+                  : t('expanded.performanceMonitor.startMonitor', { defaultValue: '开始监控' })}
+              </button>
+            </div>
           </div>
           <button className="pm-hardware-settings-link" type="button" onClick={openHardwareSettings}>
             {t('expanded.performanceMonitor.hardwareSettingsLink', { defaultValue: '和您的硬件不一样？点击前往调整' })}

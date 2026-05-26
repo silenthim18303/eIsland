@@ -57,6 +57,22 @@
   color: rgba(var(--color-text-rgb), 0.62);
 }
 
+.pm-start-monitor-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(var(--color-island-bg-rgb), 1);
+  background: rgba(var(--color-text-rgb), 0.88);
+  cursor: pointer;
+}
+
+.pm-start-monitor-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.98);
+}
+
 .pm-loading-spinner {
   width: 13px;
   height: 13px;
@@ -106,6 +122,38 @@
   color: rgba(var(--color-text-rgb), 0.38);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.pm-subtitle-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pm-monitor-toggle-btn {
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 9px;
+  line-height: 1;
+  color: rgba(var(--color-text-rgb), 0.8);
+  background: rgba(var(--color-text-rgb), 0.12);
+  cursor: pointer;
+}
+
+.pm-monitor-toggle-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.2);
+}
+
+.pm-monitor-toggle-btn--stop {
+  color: rgba(var(--color-island-bg-rgb), 1);
+  background: rgba(239, 68, 68, 0.9);
+}
+
+.pm-monitor-toggle-btn--stop:hover {
+  background: rgba(239, 68, 68, 1);
 }
 
 .pm-hardware-settings-link {

@@ -425,6 +425,9 @@
       "title": "System Performance",
       "subtitle": "Live hardware status and temperatures",
       "hardwareSettingsLink": "Hardware looks different? Click to adjust",
+      "startMonitor": "Start Monitoring",
+      "stopMonitor": "Stop Monitoring",
+      "startHint": "Click Start Monitoring on first entry",
       "loading": "Loading system performance data...",
       "error": "System performance data is unavailable",
       "labels": {
