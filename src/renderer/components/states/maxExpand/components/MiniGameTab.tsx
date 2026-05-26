@@ -742,8 +742,8 @@ export function MiniGameTab(): ReactElement {
                   <div className="g2048-score-row g2048-score-cards">
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.game2048.score')}</span><span className="g2048-score-val">{gameState.score}</span></div>
                     <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.highScore')}</span><span className="g2048-score-val">{myScore?.highScore?.toLocaleString() ?? '--'}</span></div>
-                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.duration')}</span><span className="g2048-score-val">{myScore?.bestDurationMs != null ? formatDuration(myScore.bestDurationMs) : '--'}</span></div>
-                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.moves')}</span><span className="g2048-score-val">{myScore?.bestMoves != null ? myScore.bestMoves : '--'}</span></div>
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.duration')}</span><span className="g2048-score-val">{myScore?.bestDurationMs !== null && myScore?.bestDurationMs !== undefined ? formatDuration(myScore.bestDurationMs) : '--'}</span></div>
+                    <div className="g2048-score-box"><span className="g2048-score-label">{t('miniGameTab.moves')}</span><span className="g2048-score-val">{myScore?.bestMoves !== null && myScore?.bestMoves !== undefined ? myScore.bestMoves : '--'}</span></div>
                   </div>
                   <button className="g2048-new-btn g2048-new-btn-block" type="button" onClick={handleStartNewGame}>{t('miniGameTab.game2048.newGame')}</button>
                 </div>

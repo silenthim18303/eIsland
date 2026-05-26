@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file ai.ts
+ * @description 五子棋 AI 选点策略与搜索实现。
+ * @author 鸡哥
+ */
+
 import type { GomokuAIDifficulty } from '../config/types';
 import { GOMOKU_SIZE } from '../config/types';
 import { isGomokuWin } from './board';
@@ -112,10 +138,10 @@ function patternScore(count: number, open: number): number {
 
 function evaluatePoint(board: number[][], row: number, col: number, piece: Piece): number {
   let score = 0;
-  for (const [dx, dy] of DIRECTIONS) {
+  DIRECTIONS.forEach(([dx, dy]) => {
     const line = measureLine(board, row, col, dx, dy, piece);
     score += patternScore(line.count, line.open);
-  }
+  });
   return score;
 }
 
@@ -127,10 +153,10 @@ function evaluateBoard(board: number[][], aiPiece: Piece): number {
   }
   let aiScore = 0;
   let humanScore = 0;
-  for (const [row, col] of candidates) {
+  candidates.forEach(([row, col]) => {
     aiScore += evaluatePoint(board, row, col, aiPiece);
     humanScore += evaluatePoint(board, row, col, humanPiece);
-  }
+  });
   return aiScore * 1.06 - humanScore;
 }
 
@@ -166,12 +192,8 @@ function placeAndCheckWin(board: number[][], move: Move, piece: Piece): boolean 
 }
 
 function findImmediateWinningMove(board: number[][], candidates: Move[], piece: Piece): Move | null {
-  for (const move of candidates) {
-    if (placeAndCheckWin(board, move, piece)) {
-      return move;
-    }
-  }
-  return null;
+  const found = candidates.find((move) => placeAndCheckWin(board, move, piece));
+  return found ?? null;
 }
 
 function findForcedBlockMove(board: number[][], candidates: Move[], aiPiece: Piece): Move | null {
@@ -182,32 +204,34 @@ function findForcedBlockMove(board: number[][], candidates: Move[], aiPiece: Pie
 function pickByRulePriority(board: number[][], candidates: Move[], aiPiece: Piece): Move {
   const humanPiece: Piece = aiPiece === 1 ? 2 : 1;
 
-  for (const [row, col] of candidates) {
+  const winningMove = candidates.find(([row, col]) => {
     const testBoard = board.map((line) => [...line]);
     testBoard[row][col] = aiPiece;
-    if (isGomokuWin(testBoard, row, col, aiPiece)) {
-      return [row, col];
-    }
+    return isGomokuWin(testBoard, row, col, aiPiece);
+  });
+  if (winningMove) {
+    return winningMove;
   }
 
-  for (const [row, col] of candidates) {
+  const blockingMove = candidates.find(([row, col]) => {
     const testBoard = board.map((line) => [...line]);
     testBoard[row][col] = humanPiece;
-    if (isGomokuWin(testBoard, row, col, humanPiece)) {
-      return [row, col];
-    }
+    return isGomokuWin(testBoard, row, col, humanPiece);
+  });
+  if (blockingMove) {
+    return blockingMove;
   }
 
   const center = Math.floor(GOMOKU_SIZE / 2);
   let best: Move | null = null;
   let bestDist = Number.POSITIVE_INFINITY;
-  for (const [row, col] of candidates) {
+  candidates.forEach(([row, col]) => {
     const dist = Math.abs(row - center) + Math.abs(col - center);
     if (dist < bestDist) {
       bestDist = dist;
       best = [row, col];
     }
-  }
+  });
   return best ?? candidates[0];
 }
 
@@ -216,7 +240,7 @@ function pickByScoring(board: number[][], candidates: Array<[number, number]>, a
   let bestScore = Number.NEGATIVE_INFINITY;
   let bestMoves: Array<[number, number]> = [];
 
-  for (const [row, col] of candidates) {
+  candidates.forEach(([row, col]) => {
     const attackScore = evaluatePoint(board, row, col, aiPiece);
     const defendScore = evaluatePoint(board, row, col, humanPiece);
     const centerBias = 20 - (Math.abs(row - 7) + Math.abs(col - 7));
@@ -227,7 +251,7 @@ function pickByScoring(board: number[][], candidates: Array<[number, number]>, a
     } else if (total === bestScore) {
       bestMoves.push([row, col]);
     }
-  }
+  });
 
   return bestMoves[Math.floor(Math.random() * bestMoves.length)] ?? candidates[0];
 }
@@ -265,7 +289,7 @@ function negamax(
   let best = Number.NEGATIVE_INFINITY;
   let nextAlpha = alpha;
 
-  for (const [row, col] of ordered) {
+  ordered.some(([row, col]) => {
     board[row][col] = currentPiece;
     const score = -negamax(
       board,
@@ -288,9 +312,10 @@ function negamax(
       nextAlpha = score;
     }
     if (nextAlpha >= beta) {
-      break;
+      return true;
     }
-  }
+    return false;
+  });
 
   if (best === Number.NEGATIVE_INFINITY) {
     return evaluateBoard(board, aiPiece);
@@ -319,9 +344,9 @@ function pickByNegamax(board: number[][], aiPiece: Piece, depth: number, timeBud
   let bestMove = ordered[0] ?? allCandidates[0];
   let alpha = Number.NEGATIVE_INFINITY;
 
-  for (const [row, col] of ordered) {
+  ordered.some(([row, col]) => {
     if (Date.now() - startTime > timeBudgetMs) {
-      break;
+      return true;
     }
     board[row][col] = aiPiece;
     const score = isGomokuWin(board, row, col, aiPiece)
@@ -347,19 +372,21 @@ function pickByNegamax(board: number[][], aiPiece: Piece, depth: number, timeBud
     if (score > alpha) {
       alpha = score;
     }
-  }
+    return false;
+  });
 
   return bestMove;
 }
 
 function getNodeBestUCTChild(node: MCTSNode): MCTSNode {
   const exploration = 1.35;
+  const unvisitedChild = node.children.find((child) => child.visits === 0);
+  if (unvisitedChild) {
+    return unvisitedChild;
+  }
   let best = node.children[0];
   let bestScore = Number.NEGATIVE_INFINITY;
-  for (const child of node.children) {
-    if (child.visits === 0) {
-      return child;
-    }
+  node.children.forEach((child) => {
     const exploit = child.wins / child.visits;
     const explore = Math.sqrt(Math.log(Math.max(1, node.visits)) / child.visits);
     const score = exploit + exploration * explore;
@@ -367,7 +394,7 @@ function getNodeBestUCTChild(node: MCTSNode): MCTSNode {
       bestScore = score;
       best = child;
     }
-  }
+  });
   return best;
 }
 
@@ -479,7 +506,7 @@ function runMCTS(board: number[][], aiPiece: Piece, timeBudgetMs: number): Move 
   const deepeningDepths = [6, 10, 14, 18];
   const phaseBudget = Math.max(20, Math.floor(timeBudgetMs / deepeningDepths.length));
 
-  for (const rolloutDepth of deepeningDepths) {
+  deepeningDepths.forEach((rolloutDepth) => {
     const phaseStart = Date.now();
     while (Date.now() - startedAt < timeBudgetMs && Date.now() - phaseStart < phaseBudget) {
       let node = root;
@@ -526,7 +553,7 @@ function runMCTS(board: number[][], aiPiece: Piece, timeBudgetMs: number): Move 
         node = node.parent as MCTSNode;
       }
     }
-  }
+  });
 
   if (root.children.length === 0) {
     return rankCandidates(board, initialCandidates, aiPiece, aiPiece, 1)[0] ?? initialCandidates[0];
@@ -544,6 +571,9 @@ function runMCTS(board: number[][], aiPiece: Piece, timeBudgetMs: number): Move 
   return root.children[0]?.move ?? initialCandidates[0];
 }
 
+/**
+ * 根据难度选择五子棋 AI 落点。
+ */
 export function selectGomokuAIMove(board: number[][], difficulty: GomokuAIDifficulty, aiPiece: Piece): [number, number] | null {
   const candidates = collectCandidateCells(board);
   if (candidates.length === 0) {

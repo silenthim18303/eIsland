@@ -107,6 +107,9 @@ function isHexColor(value: unknown): value is string {
   return typeof value === 'string' && /^#[0-9a-fA-F]{6}$/.test(value);
 }
 
+/**
+ * 标准化总览布局配置。
+ */
 export function normalizeOverviewLayoutConfig(raw: unknown): OverviewLayoutConfig {
   if (!raw || typeof raw !== 'object') {
     return DEFAULT_LAYOUT;

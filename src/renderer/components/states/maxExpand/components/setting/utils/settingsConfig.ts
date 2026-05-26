@@ -216,6 +216,11 @@ export const EXPAND_TAB_LABELS: Record<string, string> = {
 
 export const DEFAULT_EXPAND_NAV_LAYOUT: ExpandNavLayoutConfig = EXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: true }));
 
+/**
+ * 标准化展开导航布局配置。
+ * @param raw - 任意来源的原始配置。
+ * @returns 合法且完整的展开导航布局配置。
+ */
 export function normalizeExpandNavLayoutConfig(raw: unknown): ExpandNavLayoutConfig {
   const defaults = DEFAULT_EXPAND_NAV_LAYOUT.map((item) => ({ ...item }));
   if (!Array.isArray(raw) || raw.length === 0) {

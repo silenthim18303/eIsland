@@ -1,3 +1,29 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file useGame2048Engine.ts
+ * @description 2048 游戏状态与移动逻辑 Hook。
+ * @author 鸡哥
+ */
+
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { SLIDE_MS } from '../config/constants';
 import type { Dir, Game2048Props, Game2048Session, TileData } from '../config/types';
@@ -21,6 +47,9 @@ interface UseGame2048EngineResult {
   doMove: (dir: Dir) => void;
 }
 
+/**
+ * 管理 2048 游戏引擎状态与行为。
+ */
 export function useGame2048Engine({
   onGameEnd,
   onStateChange,
@@ -89,11 +118,11 @@ export function useGame2048Engine({
     setTiles(result.tiles);
     setTimeout(() => {
       let resolved = result.tiles;
-      for (const m of result.merges) {
+      result.merges.forEach((m) => {
         resolved = resolved
           .filter((t) => t.id !== m.absorbedId)
           .map((t) => (t.id === m.survivorId ? { ...t, value: m.newValue } : t));
-      }
+      });
       const nt = spawn(resolved, randomRef.current);
       if (nt) {
         resolved = [...resolved, nt];

@@ -108,6 +108,9 @@ export function submitScore(
   });
 }
 
+/**
+ * 启动一局小游戏会话。
+ */
 export function startGameSession(
   token: string,
   gameId: string,
@@ -146,6 +149,9 @@ export function getLeaderboard(
   );
 }
 
+/**
+ * 检查刷新排行榜是否需要验证码。
+ */
 export function checkLeaderboardRefreshCaptcha(
   token: string,
   gameId: string,
@@ -231,7 +237,8 @@ export async function flushPendingSubmissions(): Promise<void> {
 
     const now = Date.now();
     const remaining: PendingSubmission[] = [];
-    for (const entry of queue) {
+    for (let index = 0; index < queue.length; index += 1) {
+      const entry = queue[index];
       if (now - entry.createdAt > MAX_PENDING_AGE_MS) {
         continue;
       }
