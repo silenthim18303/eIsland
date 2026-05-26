@@ -482,6 +482,13 @@ export function MiniGameTab(): ReactElement {
         : gomokuState.turn === 1
           ? t('miniGameTab.gomoku.turnBlack')
           : t('miniGameTab.gomoku.turnWhite');
+  const gomokuResultOverlayText = gomokuState.winner === 1
+    ? (gomokuMode === 'pve' ? t('miniGameTab.gomoku.victory', { defaultValue: '胜利' }) : t('miniGameTab.gomoku.winnerBlack'))
+    : gomokuState.winner === 2
+      ? (gomokuMode === 'pve' ? t('miniGameTab.gomoku.defeat', { defaultValue: '失败' }) : t('miniGameTab.gomoku.winnerWhite'))
+      : gomokuDraw
+        ? t('miniGameTab.gomoku.draw')
+        : null;
 
   return (
     <div className="max-expand-settings toolbox-tab-container">
@@ -710,6 +717,7 @@ export function MiniGameTab(): ReactElement {
                   aiDifficulty={gomokuMode === 'pve' ? gomokuDifficulty : undefined}
                   highlightMove={gomokuState.lastMove}
                   highlightPulse={gomokuHighlightPulse}
+                  resultOverlayText={gomokuResultOverlayText}
                   onStateChange={handleGomokuStateChange}
                   boardAriaLabel={t('miniGameTab.gomoku.boardAria')}
                   getCellAriaLabel={(row, col) => t('miniGameTab.gomoku.cellAria', { row, col })}

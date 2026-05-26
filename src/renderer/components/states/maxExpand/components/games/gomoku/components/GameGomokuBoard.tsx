@@ -8,6 +8,7 @@ interface GameGomokuBoardProps {
   scale: number;
   highlightMove?: GomokuMovePosition | null;
   highlightPulse?: number;
+  resultOverlayText?: string | null;
   boardAriaLabel: string;
   getCellAriaLabel: (row: number, col: number) => string;
   onCellClick: (row: number, col: number) => void;
@@ -20,6 +21,7 @@ export function GameGomokuBoard({
   scale,
   highlightMove,
   highlightPulse,
+  resultOverlayText,
   boardAriaLabel,
   getCellAriaLabel,
   onCellClick,
@@ -63,6 +65,11 @@ export function GameGomokuBoard({
           })()
         )))}
       </div>
+      {resultOverlayText && (
+        <div className="g2048-overlay gomoku-result-overlay">
+          <span className="g2048-overlay-text">{resultOverlayText}</span>
+        </div>
+      )}
     </div>
   );
 }

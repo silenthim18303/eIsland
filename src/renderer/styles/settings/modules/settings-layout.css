@@ -5729,10 +5729,15 @@
 .gomoku-board-zoom {
   width: 420px;
   height: 315px;
+  position: relative;
   overflow: auto;
   padding: 2px;
   scrollbar-width: thin;
   scrollbar-color: rgba(var(--color-text-rgb), 0.2) transparent;
+}
+
+.gomoku-result-overlay {
+  border-radius: 8px;
 }
 
 .gomoku-board-zoom::-webkit-scrollbar {

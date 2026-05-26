@@ -22,6 +22,7 @@ export interface GameGomokuProps {
   aiDifficulty?: GomokuAIDifficulty;
   highlightMove?: GomokuMovePosition | null;
   highlightPulse?: number;
+  resultOverlayText?: string | null;
   boardAriaLabel: string;
   getCellAriaLabel: (row: number, col: number) => string;
 }

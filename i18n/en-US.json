@@ -986,6 +986,8 @@
       "turnWhite": "White to move",
       "winnerBlack": "Black wins",
       "winnerWhite": "White wins",
+      "victory": "Victory",
+      "defeat": "Defeat",
       "draw": "Draw",
       "restart": "Restart",
       "highlightLastMove": "Highlight Last Move",

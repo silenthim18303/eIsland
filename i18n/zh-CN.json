@@ -986,6 +986,8 @@
       "turnWhite": "白棋回合",
       "winnerBlack": "黑棋获胜",
       "winnerWhite": "白棋获胜",
+      "victory": "胜利",
+      "defeat": "失败",
       "draw": "平局",
       "restart": "重新开始",
       "highlightLastMove": "高亮上一手",
