@@ -32,6 +32,7 @@ export const GameGomoku = forwardRef<GameGomokuHandle, GameGomokuProps>(function
       highlightMove={highlightMove}
       highlightPulse={highlightPulse}
       resultOverlayText={resultOverlayText}
+      onRestart={restart}
       boardAriaLabel={boardAriaLabel}
       getCellAriaLabel={getCellAriaLabel}
       onCellClick={onCellClick}

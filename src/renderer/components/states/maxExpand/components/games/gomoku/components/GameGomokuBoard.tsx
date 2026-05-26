@@ -1,4 +1,5 @@
 import type { ReactElement, WheelEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { GomokuMovePosition } from '../config/types';
 import { GOMOKU_SIZE } from '../config/types';
 
@@ -9,6 +10,7 @@ interface GameGomokuBoardProps {
   highlightMove?: GomokuMovePosition | null;
   highlightPulse?: number;
   resultOverlayText?: string | null;
+  onRestart?: () => void;
   boardAriaLabel: string;
   getCellAriaLabel: (row: number, col: number) => string;
   onCellClick: (row: number, col: number) => void;
@@ -22,11 +24,14 @@ export function GameGomokuBoard({
   highlightMove,
   highlightPulse,
   resultOverlayText,
+  onRestart,
   boardAriaLabel,
   getCellAriaLabel,
   onCellClick,
   onBoardWheel,
 }: GameGomokuBoardProps): ReactElement {
+  const { t } = useTranslation();
+
   return (
     <div className="gomoku-board-zoom" onWheel={onBoardWheel}>
       <div
@@ -68,6 +73,9 @@ export function GameGomokuBoard({
       {resultOverlayText && (
         <div className="g2048-overlay gomoku-result-overlay">
           <span className="g2048-overlay-text">{resultOverlayText}</span>
+          <button className="settings-lyrics-source-btn" type="button" onClick={onRestart}>
+            {t('miniGameTab.gomoku.restart')}
+          </button>
         </div>
       )}
     </div>
