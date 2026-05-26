@@ -5730,6 +5730,12 @@
   width: 420px;
   height: 315px;
   position: relative;
+  overflow: hidden;
+}
+
+.gomoku-board-scroll {
+  width: 100%;
+  height: 100%;
   overflow: auto;
   padding: 2px;
   scrollbar-width: thin;
@@ -5740,21 +5746,21 @@
   border-radius: 8px;
 }
 
-.gomoku-board-zoom::-webkit-scrollbar {
+.gomoku-board-scroll::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
 
-.gomoku-board-zoom::-webkit-scrollbar-track {
+.gomoku-board-scroll::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.gomoku-board-zoom::-webkit-scrollbar-thumb {
+.gomoku-board-scroll::-webkit-scrollbar-thumb {
   border-radius: 999px;
   background: rgba(var(--color-text-rgb), 0.2);
 }
 
-.gomoku-board-zoom::-webkit-scrollbar-thumb:hover {
+.gomoku-board-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(var(--color-text-rgb), 0.32);
 }
 

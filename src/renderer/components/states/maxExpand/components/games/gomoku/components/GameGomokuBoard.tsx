@@ -33,42 +33,44 @@ export function GameGomokuBoard({
   const { t } = useTranslation();
 
   return (
-    <div className="gomoku-board-zoom" onWheel={onBoardWheel}>
-      <div
-        className="gomoku-board"
-        role="grid"
-        aria-label={boardAriaLabel}
-        style={{
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-        }}
-      >
-        {board.map((row, rowIdx) => row.map((cell, colIdx) => (
-          (() => {
-            const shouldHighlight = Boolean(
-              highlightMove
-              && highlightPulse
-              && highlightMove[0] === rowIdx
-              && highlightMove[1] === colIdx,
-            );
-            const highlightClass = shouldHighlight
-              ? ` gomoku-last-move-highlight-${highlightPulse! % 2}`
-              : '';
-            return (
-          <button
-            key={`${rowIdx}-${colIdx}`}
-            type="button"
-            className={`gomoku-cell${(rowIdx === 3 || rowIdx === 7 || rowIdx === 11) && (colIdx === 3 || colIdx === 7 || colIdx === 11) ? ' star' : ''}${rowIdx === 0 ? ' edge-top' : ''}${rowIdx === GOMOKU_SIZE - 1 ? ' edge-bottom' : ''}${colIdx === 0 ? ' edge-left' : ''}${colIdx === GOMOKU_SIZE - 1 ? ' edge-right' : ''}${cell === 1 ? ' black' : ''}${cell === 2 ? ' white' : ''}${highlightClass}`}
-            onClick={() => onCellClick(rowIdx, colIdx)}
-            disabled={cell !== 0 || winner !== 0}
-            aria-label={getCellAriaLabel(rowIdx + 1, colIdx + 1)}
-          >
-            <span className="gomoku-star" aria-hidden="true" />
-            <span className="gomoku-piece" />
-          </button>
-            );
-          })()
-        )))}
+    <div className="gomoku-board-zoom">
+      <div className="gomoku-board-scroll" onWheel={onBoardWheel}>
+        <div
+          className="gomoku-board"
+          role="grid"
+          aria-label={boardAriaLabel}
+          style={{
+            transform: `scale(${scale})`,
+            transformOrigin: 'top left',
+          }}
+        >
+          {board.map((row, rowIdx) => row.map((cell, colIdx) => (
+            (() => {
+              const shouldHighlight = Boolean(
+                highlightMove
+                && highlightPulse
+                && highlightMove[0] === rowIdx
+                && highlightMove[1] === colIdx,
+              );
+              const highlightClass = shouldHighlight
+                ? ` gomoku-last-move-highlight-${highlightPulse! % 2}`
+                : '';
+              return (
+                <button
+                  key={`${rowIdx}-${colIdx}`}
+                  type="button"
+                  className={`gomoku-cell${(rowIdx === 3 || rowIdx === 7 || rowIdx === 11) && (colIdx === 3 || colIdx === 7 || colIdx === 11) ? ' star' : ''}${rowIdx === 0 ? ' edge-top' : ''}${rowIdx === GOMOKU_SIZE - 1 ? ' edge-bottom' : ''}${colIdx === 0 ? ' edge-left' : ''}${colIdx === GOMOKU_SIZE - 1 ? ' edge-right' : ''}${cell === 1 ? ' black' : ''}${cell === 2 ? ' white' : ''}${highlightClass}`}
+                  onClick={() => onCellClick(rowIdx, colIdx)}
+                  disabled={cell !== 0 || winner !== 0}
+                  aria-label={getCellAriaLabel(rowIdx + 1, colIdx + 1)}
+                >
+                  <span className="gomoku-star" aria-hidden="true" />
+                  <span className="gomoku-piece" />
+                </button>
+              );
+            })()
+          )))}
+        </div>
       </div>
       {resultOverlayText && (
         <div className="g2048-overlay gomoku-result-overlay">
