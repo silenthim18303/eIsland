@@ -11,7 +11,23 @@ export function useLogin() {
   const { t } = useTranslation();
   const { setRegister, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
   const setResetPassword = (): void => {
-    useIslandStore.setState({ state: 'resetPassword' as never });
+    useIslandStore.setState((prev) => {
+      const prevState = prev.state as string;
+      const standalone = (() => {
+        try {
+          return (window.location?.pathname ?? '').includes('standalone.html');
+        } catch {
+          return false;
+        }
+      })();
+      if (!standalone) {
+        window.api?.expandWindowSettings();
+        window.api?.disableMousePassthrough();
+      }
+      const inAuthFlow = prevState === 'login' || prevState === 'register' || prevState === 'payment' || prevState === 'resetPassword';
+      const nextAuthReturnState = inAuthFlow ? prev.authReturnState : (standalone ? 'maxExpand' : prev.state);
+      return { state: 'resetPassword' as never, authReturnState: nextAuthReturnState };
+    });
   };
   const [account, setAccount] = useState('');
   const [verificationEmail, setVerificationEmail] = useState('');

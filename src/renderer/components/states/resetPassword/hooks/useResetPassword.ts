@@ -7,7 +7,39 @@ import { EMAIL_PATTERN, type Feedback } from '../config/resetPasswordConfig';
 
 export function useResetPassword() {
   const { t } = useTranslation();
-  const { setLogin, setRegister, returnFromAuth } = useIslandStore();
+  const { returnFromAuth } = useIslandStore();
+  const setLogin = (): void => {
+    useIslandStore.setState((prev) => {
+      const standalone = (() => {
+        try {
+          return (window.location?.pathname ?? '').includes('standalone.html');
+        } catch {
+          return false;
+        }
+      })();
+      if (!standalone) {
+        window.api?.expandWindowSettings();
+        window.api?.disableMousePassthrough();
+      }
+      return { state: 'login' as never, authReturnState: prev.authReturnState };
+    });
+  };
+  const setRegister = (): void => {
+    useIslandStore.setState((prev) => {
+      const standalone = (() => {
+        try {
+          return (window.location?.pathname ?? '').includes('standalone.html');
+        } catch {
+          return false;
+        }
+      })();
+      if (!standalone) {
+        window.api?.expandWindowSettings();
+        window.api?.disableMousePassthrough();
+      }
+      return { state: 'register' as never, authReturnState: prev.authReturnState };
+    });
+  };
   const [email, setEmail] = useState('');
   const [emailCode, setEmailCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
