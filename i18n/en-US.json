@@ -2831,6 +2831,8 @@
         "logout": "Sign out",
         "loggingOut": "Signing out…",
         "backToCenter": "Back to Previous Page",
+        "cancelLogin": "Cancel Login",
+        "cancelRegister": "Cancel Registration",
         "unregister": "Delete account",
         "confirmUnregister": "Confirm delete",
         "unregistering": "Deleting…",

@@ -323,7 +323,7 @@ export function RegisterContent(): ReactElement {
             onClick={returnFromAuth}
             disabled={submitting}
           >
-            {t('settings.user.actions.backToCenter', { defaultValue: '返回用户中心' })}
+            {t('settings.user.actions.cancelRegister', { defaultValue: '取消注册' })}
           </button>
         </div>
       </div>

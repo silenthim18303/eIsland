@@ -146,7 +146,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             onClick={returnFromAuth}
             disabled={submitting}
           >
-            {t('settings.user.actions.backToCenter', { defaultValue: '返回用户中心' })}
+            {t('settings.user.actions.cancelLogin', { defaultValue: '取消登录' })}
           </button>
         </div>
       </div>
