@@ -25,7 +25,7 @@
  */
 
 export { IdleContent } from './idle';
-export { HoverContent } from './hover/HoverContent';
+export { HoverContent } from './hover';
 export { ExpandedContent } from './expand/ExpandedContent';
 export { MaxExpandContent } from './maxExpand/MaxExpandContent';
 export { GuideContent } from './guide/GuideContent';

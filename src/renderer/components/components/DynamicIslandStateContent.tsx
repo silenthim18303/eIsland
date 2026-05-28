@@ -27,7 +27,7 @@
 import type { JSX } from 'react';
 import type { NotificationData, WeatherData } from '../../store/types';
 import { IdleContent } from '../states/idle';
-import { HoverContent } from '../states/hover/HoverContent';
+import { HoverContent } from '../states/hover';
 import { NotificationContent } from '../states/notification/NotificationContent';
 import { ExpandedContent } from '../states/expand/ExpandedContent';
 import { MaxExpandContent } from '../states/maxExpand/MaxExpandContent';
