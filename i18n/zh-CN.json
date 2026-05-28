@@ -1033,7 +1033,7 @@
         "encodingService": "编码服务",
         "networkService": "网络服务",
         "fileCompression": "文件压缩",
-        "fileCompressionShort": "压缩",
+        "fileCompressionShort": "文件压缩",
         "formatFactory": "格式工厂"
       },
       "index": {
