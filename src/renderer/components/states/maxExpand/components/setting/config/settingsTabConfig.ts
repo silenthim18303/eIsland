@@ -79,7 +79,7 @@ export interface RunningWindowItem {
   iconDataUrl: string | null;
 }
 
-export type PluginMarketPageKey = 'wallpaper' | 'plugin' | 'contribution' | 'edit';
+export type PluginMarketPageKey = 'wallpaper' | 'contribution' | 'edit';
 export type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
 export type UpdateStatus = 'idle' | 'checking' | 'available' | 'downloading' | 'ready' | 'error' | 'latest';
 
@@ -92,7 +92,7 @@ export interface UpdateDownloadProgress {
 
 const PRO_UPDATE_SOURCE_SET: ReadonlySet<UpdateSourceKey> = new Set<UpdateSourceKey>(['tencent-cos', 'aliyun-oss']);
 
-export const PLUGIN_MARKET_PAGES: PluginMarketPageKey[] = ['wallpaper', 'plugin', 'contribution', 'edit'];
+export const PLUGIN_MARKET_PAGES: PluginMarketPageKey[] = ['wallpaper', 'contribution', 'edit'];
 
 export const UPDATE_SOURCES: { key: UpdateSourceKey; label: string; proOnly?: boolean }[] = [
   { key: 'cloudflare-r2', label: 'Cloudflare R2' },

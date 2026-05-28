@@ -56,7 +56,7 @@
         "title": "账号服务",
         "desc": "现在就登录或注册，开启跨设备同步与账号管理。",
         "tipSync": "登录后可同步账号资料。",
-        "tipMode": "可使用插件市场和壁纸市场功能。"
+        "tipMode": "可使用壁纸市场功能。"
       }
     },
     "interactionCards": {
@@ -1487,7 +1487,7 @@
       "shortcut": "快捷键",
       "user": "用户中心",
       "update": "更新设置",
-      "pluginMarket": "插件市场",
+      "pluginMarket": "壁纸市场",
       "about": "关于软件"
     },
     "mail": {
@@ -2281,14 +2281,13 @@
         "editHint": "查看和编辑你已贡献的壁纸作品，管理审核状态"
       },
       "auth": {
-        "entryTitle": "登录后即可访问插件市场内容",
+        "entryTitle": "登录后即可访问壁纸市场内容",
         "gotoLogin": "前往登录",
         "gotoRegister": "前往注册",
-        "hint": "登录后可浏览壁纸与插件内容。"
+        "hint": "登录后可浏览壁纸内容。"
       },
       "pages": {
         "wallpaper": "壁纸",
-        "plugin": "插件",
         "contribution": "贡献",
         "edit": "修改壁纸"
       },
@@ -2995,8 +2994,8 @@
         "desc": "检查与下载软件更新"
       },
       "pluginMarket": {
-        "label": "插件市场",
-        "desc": "插件市场入口与安装管理"
+        "label": "壁纸市场",
+        "desc": "壁纸市场入口与壁纸管理"
       },
       "user": {
         "label": "用户中心",

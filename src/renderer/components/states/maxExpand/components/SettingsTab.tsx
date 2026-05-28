@@ -286,9 +286,7 @@ export function SettingsTab(): ReactElement {
   const currentPluginMarketPageLabel = t(`settings.pluginMarket.pages.${pluginMarketPage}`, {
     defaultValue: pluginMarketPage === 'wallpaper'
       ? '壁纸'
-      : pluginMarketPage === 'plugin'
-        ? '插件'
-        : pluginMarketPage === 'edit'
+      : pluginMarketPage === 'edit'
           ? '修改壁纸'
           : '贡献',
   });
@@ -2707,7 +2705,7 @@ export function SettingsTab(): ReactElement {
           {activeTab === 'pluginMarket' && (
             <div className="max-expand-settings-section">
               <div className="max-expand-settings-title settings-app-title-line">
-                <span>{t('settings.labels.pluginMarket', { defaultValue: '插件市场' })}</span>
+                <span>{t('settings.labels.pluginMarket', { defaultValue: '壁纸市场' })}</span>
                 {hasLoginSession && <span className="settings-app-title-sub">- {currentPluginMarketPageLabel}</span>}
                 {hasLoginSession && (pluginMarketPage === 'wallpaper' || pluginMarketPage === 'edit') && (
                   <button
@@ -2731,9 +2729,6 @@ export function SettingsTab(): ReactElement {
                         onGoContribution={() => setPluginMarketPage('contribution')}
                       />
                     )}
-                    {pluginMarketPage === 'plugin' && (
-                      <div className="max-expand-settings-section" />
-                    )}
                     {pluginMarketPage === 'contribution' && (
                       <WallpaperContributionSection onGoWallpaper={() => setPluginMarketPage('wallpaper')} />
                     )}
@@ -2751,13 +2746,6 @@ export function SettingsTab(): ReactElement {
                       onClick={() => setPluginMarketPage('wallpaper')}
                       title={t('settings.pluginMarket.pages.wallpaper', { defaultValue: '壁纸' })}
                       aria-label={t('settings.pluginMarket.pages.wallpaper', { defaultValue: '壁纸' })}
-                    />
-                    <button
-                      className={`settings-app-page-dot ${pluginMarketPage === 'plugin' ? 'active' : ''}`}
-                      data-label={t('settings.pluginMarket.pages.plugin', { defaultValue: '插件' })}
-                      onClick={() => setPluginMarketPage('plugin')}
-                      title={t('settings.pluginMarket.pages.plugin', { defaultValue: '插件' })}
-                      aria-label={t('settings.pluginMarket.pages.plugin', { defaultValue: '插件' })}
                     />
                     <button
                       className={`settings-app-page-dot ${pluginMarketPage === 'contribution' ? 'active' : ''}`}
@@ -2778,7 +2766,7 @@ export function SettingsTab(): ReactElement {
               ) : (
                 <div className="settings-user-auth">
                   <div className="settings-user-auth-entry-title">
-                    {t('settings.pluginMarket.auth.entryTitle', { defaultValue: '登录后即可访问插件市场内容' })}
+                    {t('settings.pluginMarket.auth.entryTitle', { defaultValue: '登录后即可访问壁纸市场内容' })}
                   </div>
                   <div className="settings-user-auth-entry-actions">
                     <button

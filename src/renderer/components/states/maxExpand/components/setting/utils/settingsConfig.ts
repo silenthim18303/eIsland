@@ -94,7 +94,7 @@ export const SETTINGS_TAB_LABELS: Record<SettingsTabLabelKey, string> = {
   shortcut: '快捷键',
   user: '用户中心',
   update: '更新设置',
-  pluginMarket: '插件市场',
+  pluginMarket: '壁纸市场',
   about: '关于软件',
 };
 
@@ -133,7 +133,7 @@ export const SETTINGS_TAB_DESCRIPTIONS: Record<Exclude<SettingsTabLabelKey, 'ind
   shortcut: '隐藏、关闭、截图快捷键',
   user: '登录、资料、注销等账号操作',
   update: '检查与下载软件更新',
-  pluginMarket: '插件市场入口与安装管理',
+  pluginMarket: '壁纸市场入口与壁纸管理',
   about: '版本信息与项目链接',
 };
 
