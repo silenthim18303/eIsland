@@ -1,0 +1,1 @@
+export { IdleContent } from './IdleContent';
