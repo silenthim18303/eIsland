@@ -33,7 +33,7 @@ import { ExpandedContent } from '../states/expand/ExpandedContent';
 import { MaxExpandContent } from '../states/maxExpand/MaxExpandContent';
 import { LyricsContent } from '../states/lyrics/LyricsContent';
 import { GuideContent } from '../states/guide/GuideContent';
-import { LoginContent } from '../states/login/LoginContent';
+import { LoginContent } from '../states/login';
 import { RegisterContent } from '../states/register/RegisterContent';
 import { PaymentContent } from '../states/payment/PaymentContent';
 import { AnnouncementContent } from '../states/announcement/AnnouncementContent';

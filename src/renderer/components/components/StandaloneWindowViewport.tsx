@@ -36,7 +36,7 @@ import { SettingsTab } from '../states/maxExpand/components/SettingsTab';
 import { MemoTab } from '../states/maxExpand/components/MemoTab';
 import { AlarmTab } from '../states/maxExpand/components/AlarmTab';
 import { ToolboxTab } from '../states/maxExpand/components/ToolboxTab';
-import { LoginContent } from '../states/login/LoginContent';
+import { LoginContent } from '../states/login';
 import { RegisterContent } from '../states/register/RegisterContent';
 import { PaymentContent } from '../states/payment/PaymentContent';
 import type { WindowTab } from '../config/standaloneWindowConfig';
