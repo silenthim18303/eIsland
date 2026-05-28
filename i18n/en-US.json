@@ -2866,6 +2866,8 @@
         "emailCodeSending": "Sending…",
         "emailCodeSent": "Code sent. Check your inbox",
         "emailCodeSendFailed": "Failed to send code",
+        "resetPasswordFailed": "Failed to reset password",
+        "resetPasswordSuccess": "Password reset successful. Please sign in with your new password",
         "captchaCancelled": "Complete slider verification before sending code",
         "operationFailed": "Operation failed",
         "loginSuccess": "Signed in",

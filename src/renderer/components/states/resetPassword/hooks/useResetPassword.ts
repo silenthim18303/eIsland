@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
-import { sendUserEmailCode } from '../../../../api/user/userAccountApi';
+import { resetUserPassword, sendUserEmailCode } from '../../../../api/user/userAccountApi';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
 import { EMAIL_PATTERN, type Feedback } from '../config/resetPasswordConfig';
 
@@ -101,14 +101,15 @@ export function useResetPassword() {
     setFeedback({ type: 'success', text: t('settings.user.feedback.emailCodeSent', { defaultValue: '验证码已发送，请查收邮箱' }) });
   };
 
-  const handleSubmit = (): void => {
+  const handleSubmit = async (): Promise<void> => {
     if (submitting) return;
     const cleanEmail = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(cleanEmail)) {
       setFeedback({ type: 'error', text: t('settings.user.feedback.emailInvalid', { defaultValue: '请输入有效邮箱地址' }) });
       return;
     }
-    if (!emailCode.trim()) {
+    const cleanEmailCode = emailCode.trim();
+    if (!cleanEmailCode) {
       setFeedback({ type: 'error', text: t('settings.user.feedback.emailCodeRequired', { defaultValue: '请输入邮箱验证码' }) });
       return;
     }
@@ -129,13 +130,23 @@ export function useResetPassword() {
       return;
     }
     setSubmitting(true);
+    const result = await resetUserPassword(cleanEmail, cleanEmailCode, newPassword);
+    if (!result.ok) {
+      setSubmitting(false);
+      setFeedback({
+        type: 'error',
+        text: result.message || t('settings.user.feedback.resetPasswordFailed', { defaultValue: '重置密码失败' }),
+      });
+      return;
+    }
     setFeedback({
-      type: 'info',
-      text: t('settings.user.feedback.resetPasswordGuidance', {
-        defaultValue: '验证码校验流程已就绪，请前往用户中心完成密码修改。',
-      }),
+      type: 'success',
+      text: t('settings.user.feedback.resetPasswordSuccess', { defaultValue: '密码重置成功，请使用新密码登录' }),
     });
     setSubmitting(false);
+    window.setTimeout(() => {
+      setLogin();
+    }, 800);
   };
 
   return {
