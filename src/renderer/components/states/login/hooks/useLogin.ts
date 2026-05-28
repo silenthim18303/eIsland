@@ -10,6 +10,9 @@ import { readStandaloneWindowMode } from '../utils/readStandaloneWindowMode';
 export function useLogin() {
   const { t } = useTranslation();
   const { setRegister, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
+  const setResetPassword = (): void => {
+    useIslandStore.setState({ state: 'resetPassword' as never });
+  };
   const [account, setAccount] = useState('');
   const [verificationEmail, setVerificationEmail] = useState('');
   const [maskedVerificationEmail, setMaskedVerificationEmail] = useState('');
@@ -171,6 +174,7 @@ export function useLogin() {
     handleSendCode,
     handleSubmit,
     setRegister,
+    setResetPassword,
     returnFromAuth,
     t,
   };

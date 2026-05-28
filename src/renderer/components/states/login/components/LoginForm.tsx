@@ -24,6 +24,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
     handleSendCode,
     handleSubmit,
     setRegister,
+    setResetPassword,
     returnFromAuth,
     t,
   } = props;
@@ -130,6 +131,14 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             disabled={submitting}
           >
             {t('settings.user.auth.register', { defaultValue: '注册' })}
+          </button>
+          <button
+            type="button"
+            className="settings-user-secondary-btn"
+            onClick={() => setResetPassword()}
+            disabled={submitting}
+          >
+            {t('settings.user.auth.forgotPassword', { defaultValue: '忘记密码' })}
           </button>
           <button
             type="button"

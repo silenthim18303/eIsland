@@ -171,8 +171,8 @@ export function useIslandStartupAnnouncements(options: UseIslandStartupAnnouncem
   useEffect(() => {
     const unsub = window.api?.onUpdaterNotAvailable?.(() => {
       void (async () => {
-        const current = useIslandStore.getState().state;
-        if (current === 'login' || current === 'register' || current === 'payment') return;
+        const current = useIslandStore.getState().state as string;
+        if (current === 'login' || current === 'register' || current === 'resetPassword' || current === 'payment') return;
 
         const mode = await readAnnouncementShowMode();
         const currentVersion = await window.api?.updaterVersion?.() ?? '';
@@ -206,7 +206,7 @@ export function useIslandStartupAnnouncements(options: UseIslandStartupAnnouncem
 
   useEffect(() => {
     if (!pendingAnnouncementAfterGuideRef.current) return;
-    if (state === 'guide' || state === 'login' || state === 'register' || state === 'payment') return;
+    if (state === 'guide' || state === 'login' || state === 'register' || state === 'resetPassword' || state === 'payment') return;
 
     pendingAnnouncementAfterGuideRef.current = false;
     setAnnouncement();
