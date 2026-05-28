@@ -26,7 +26,6 @@ export function ResetPasswordForm(props: ResetPasswordFormProps): ReactElement {
     handleSubmit,
     setLogin,
     setRegister,
-    returnFromAuth,
     t,
   } = props;
 
@@ -155,7 +154,7 @@ export function ResetPasswordForm(props: ResetPasswordFormProps): ReactElement {
           <button
             type="button"
             className="settings-user-secondary-btn"
-            onClick={returnFromAuth}
+            onClick={() => setLogin()}
             disabled={submitting}
           >
             {t('settings.user.actions.backToCenter', { defaultValue: '返回用户中心' })}
