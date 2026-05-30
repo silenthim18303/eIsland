@@ -56,7 +56,7 @@
         "title": "账号服务",
         "desc": "现在就登录或注册，开启跨设备同步与账号管理。",
         "tipSync": "登录后可同步账号资料。",
-        "tipMode": "可使用插件市场和壁纸市场功能。"
+        "tipMode": "可使用壁纸市场功能。"
       }
     },
     "interactionCards": {
@@ -1033,7 +1033,7 @@
         "encodingService": "编码服务",
         "networkService": "网络服务",
         "fileCompression": "文件压缩",
-        "fileCompressionShort": "压缩",
+        "fileCompressionShort": "文件压缩",
         "formatFactory": "格式工厂"
       },
       "index": {
@@ -1487,7 +1487,7 @@
       "shortcut": "快捷键",
       "user": "用户中心",
       "update": "更新设置",
-      "pluginMarket": "插件市场",
+      "pluginMarket": "壁纸市场",
       "about": "关于软件"
     },
     "mail": {
@@ -2281,14 +2281,13 @@
         "editHint": "查看和编辑你已贡献的壁纸作品，管理审核状态"
       },
       "auth": {
-        "entryTitle": "登录后即可访问插件市场内容",
+        "entryTitle": "登录后即可访问壁纸市场内容",
         "gotoLogin": "前往登录",
         "gotoRegister": "前往注册",
-        "hint": "登录后可浏览壁纸与插件内容。"
+        "hint": "登录后可浏览壁纸内容。"
       },
       "pages": {
         "wallpaper": "壁纸",
-        "plugin": "插件",
         "contribution": "贡献",
         "edit": "修改壁纸"
       },
@@ -2638,7 +2637,11 @@
         "hint": "登录注册服务由 eIsland server 提供",
         "entryTitle": "登录后可管理头像、资料与账号安全设置",
         "gotoLogin": "前往登录",
-        "gotoRegister": "前往注册"
+        "gotoRegister": "前往注册",
+        "forgotPassword": "忘记密码",
+        "resetPassword": "重置密码",
+        "resetPasswordHint": "通过邮箱验证码校验身份后，可继续修改登录密码",
+        "resetPasswordBtn": "重置密码"
       },
       "fields": {
         "username": "用户名",
@@ -2831,6 +2834,8 @@
         "logout": "退出登录",
         "loggingOut": "登出中…",
         "backToCenter": "返回上一页",
+        "cancelLogin": "取消登录",
+        "cancelRegister": "取消注册",
         "unregister": "注销账号",
         "confirmUnregister": "确认注销",
         "unregistering": "注销中…",
@@ -2864,6 +2869,8 @@
         "emailCodeSending": "发送中…",
         "emailCodeSent": "验证码已发送，请查收邮箱",
         "emailCodeSendFailed": "验证码发送失败",
+        "resetPasswordFailed": "重置密码失败",
+        "resetPasswordSuccess": "密码重置成功，请使用新密码登录",
         "captchaCancelled": "请完成滑块验证后再发送验证码",
         "avatarTooLarge": "头像文件不能超过 5MB",
         "avatarNotImage": "仅支持上传图片文件",
@@ -2882,7 +2889,13 @@
         "logoutLocalOnly": "服务端响应异常，已在本地清除登录态",
         "unregisterPasswordRequired": "请输入当前密码以确认注销",
         "unregisterFailed": "注销失败",
-        "unregisterSuccess": "账号已注销"
+        "unregisterSuccess": "账号已注销",
+        "operationFailed": "操作失败",
+        "loginSuccess": "登录成功",
+        "registerSuccess": "注册成功",
+        "passwordConfirmNeedsPassword": "请先输入当前密码",
+        "birthdayInvalid": "请输入有效的生日日期",
+        "emailVerificationRequired": "当前登录风险较高，请先完成邮箱验证"
       }
     },
     "nav": {
@@ -2991,8 +3004,8 @@
         "desc": "检查与下载软件更新"
       },
       "pluginMarket": {
-        "label": "插件市场",
-        "desc": "插件市场入口与安装管理"
+        "label": "壁纸市场",
+        "desc": "壁纸市场入口与壁纸管理"
       },
       "user": {
         "label": "用户中心",

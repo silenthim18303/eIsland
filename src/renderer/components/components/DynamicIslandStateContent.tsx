@@ -26,15 +26,16 @@
 
 import type { JSX } from 'react';
 import type { NotificationData, WeatherData } from '../../store/types';
-import { IdleContent } from '../states/idle/IdleContent';
-import { HoverContent } from '../states/hover/HoverContent';
+import { IdleContent } from '../states/idle';
+import { HoverContent } from '../states/hover';
 import { NotificationContent } from '../states/notification/NotificationContent';
 import { ExpandedContent } from '../states/expand/ExpandedContent';
 import { MaxExpandContent } from '../states/maxExpand/MaxExpandContent';
 import { LyricsContent } from '../states/lyrics/LyricsContent';
 import { GuideContent } from '../states/guide/GuideContent';
-import { LoginContent } from '../states/login/LoginContent';
+import { LoginContent } from '../states/login';
 import { RegisterContent } from '../states/register/RegisterContent';
+import { ResetPasswordContent } from '../states/resetPassword';
 import { PaymentContent } from '../states/payment/PaymentContent';
 import { AnnouncementContent } from '../states/announcement/AnnouncementContent';
 import { AgentVoiceInputContent } from '../states/agentVoiceInput/AgentVoiceInputContent';
@@ -123,6 +124,7 @@ export function DynamicIslandStateContent({
   if (state === 'guide') return <GuideContent />;
   if (state === 'login') return <LoginContent />;
   if (state === 'register') return <RegisterContent />;
+  if (state === 'resetPassword') return <ResetPasswordContent />;
   if (state === 'payment') return <PaymentContent />;
   if (state === 'announcement') return <AnnouncementContent />;
   if (state === 'agentVoiceInput') return <AgentVoiceInputContent />;

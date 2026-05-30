@@ -192,6 +192,28 @@ export function sendUserEmailCode(
 }
 
 /**
+ * 忘记密码重置（未登录）。
+ * @param email - 邮箱。
+ * @param emailCode - 邮箱验证码（RESET_PASSWORD 场景）。
+ * @param password - 新密码。
+ * @returns 重置结果。
+ */
+export function resetUserPassword(
+  email: string,
+  emailCode: string,
+  password: string,
+): Promise<UserAccountResult<unknown>> {
+  return request('/auth/user/password/reset', {
+    method: 'POST',
+    body: {
+      email,
+      emailCode,
+      password,
+    },
+  });
+}
+
+/**
  * 校验邮箱验证码。
  * @param email - 邮箱。
  * @param scene - 验证码使用场景。

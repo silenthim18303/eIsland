@@ -368,6 +368,66 @@
   background: rgba(var(--color-text-rgb), 0.02);
 }
 
+@keyframes auth-control-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.island-shell.login .auth-panel-title,
+.island-shell.login .auth-panel-subtitle,
+.island-shell.login .auth-panel .settings-field,
+.island-shell.login .auth-panel .settings-user-feedback,
+.island-shell.login .auth-panel-actions > button,
+.island-shell.register .auth-panel-title,
+.island-shell.register .auth-panel-subtitle,
+.island-shell.register .auth-panel .settings-field,
+.island-shell.register .auth-panel .settings-user-feedback,
+.island-shell.register .auth-panel-actions > button,
+.island-shell.resetPassword .auth-panel-title,
+.island-shell.resetPassword .auth-panel-subtitle,
+.island-shell.resetPassword .auth-panel .settings-field,
+.island-shell.resetPassword .auth-panel .settings-user-feedback,
+.island-shell.resetPassword .auth-panel-actions > button {
+  opacity: 0;
+  animation: auth-control-enter 0.26s ease-out forwards;
+}
+
+.island-shell.login .auth-panel-title,
+.island-shell.register .auth-panel-title,
+.island-shell.resetPassword .auth-panel-title {
+  animation-delay: 0.02s;
+}
+
+.island-shell.login .auth-panel-subtitle,
+.island-shell.register .auth-panel-subtitle,
+.island-shell.resetPassword .auth-panel-subtitle {
+  animation-delay: 0.05s;
+}
+
+.island-shell.login .auth-panel .settings-field,
+.island-shell.register .auth-panel .settings-field,
+.island-shell.resetPassword .auth-panel .settings-field {
+  animation-delay: 0.08s;
+}
+
+.island-shell.login .auth-panel .settings-user-feedback,
+.island-shell.register .auth-panel .settings-user-feedback,
+.island-shell.resetPassword .auth-panel .settings-user-feedback {
+  animation-delay: 0.12s;
+}
+
+.island-shell.login .auth-panel-actions > button,
+.island-shell.register .auth-panel-actions > button,
+.island-shell.resetPassword .auth-panel-actions > button {
+  animation-delay: 0.15s;
+}
+
 .island-shell.login .auth-state-content,
 .island-shell.register .auth-state-content,
 .island-shell.payment .auth-state-content {

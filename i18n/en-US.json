@@ -56,7 +56,7 @@
         "title": "Account Service",
         "desc": "Log in or register now to enable cross-device sync and account management.",
         "tipSync": "After login, your profile can be synced.",
-        "tipMode": "You can use the Plugin Market and Wallpaper Market features."
+        "tipMode": "You can use the Wallpaper Market feature."
       }
     },
     "interactionCards": {
@@ -1487,7 +1487,7 @@
       "shortcut": "Shortcuts",
       "user": "Account",
       "update": "Updates",
-      "pluginMarket": "Plugin Market",
+      "pluginMarket": "Market",
       "about": "About"
     },
     "mail": {
@@ -2281,14 +2281,13 @@
         "editHint": "View and edit your contributed wallpapers and manage review status"
       },
       "auth": {
-        "entryTitle": "Sign in to access plugin market content",
+        "entryTitle": "Sign in to access wallpaper market content",
         "gotoLogin": "Go to Login",
         "gotoRegister": "Go to Register",
-        "hint": "Sign in to browse wallpapers and plugins."
+        "hint": "Sign in to browse wallpapers."
       },
       "pages": {
         "wallpaper": "Wallpaper",
-        "plugin": "Plugin",
         "contribution": "Contribution",
         "edit": "Edit Wallpapers"
       },
@@ -2638,7 +2637,11 @@
         "hint": "Sign in and registration are powered by eIsland server",
         "entryTitle": "Sign in to manage avatar, profile, and account security settings",
         "gotoLogin": "Go to Sign In",
-        "gotoRegister": "Go to Sign Up"
+        "gotoRegister": "Go to Sign Up",
+        "forgotPassword": "Forgot Password",
+        "resetPassword": "Reset Password",
+        "resetPasswordHint": "Verify your identity with an email code, then set a new password",
+        "resetPasswordBtn": "Reset Password"
       },
       "fields": {
         "username": "Username",
@@ -2831,6 +2834,8 @@
         "logout": "Sign out",
         "loggingOut": "Signing out…",
         "backToCenter": "Back to Previous Page",
+        "cancelLogin": "Cancel Login",
+        "cancelRegister": "Cancel Registration",
         "unregister": "Delete account",
         "confirmUnregister": "Confirm delete",
         "unregistering": "Deleting…",
@@ -2864,6 +2869,8 @@
         "emailCodeSending": "Sending…",
         "emailCodeSent": "Code sent. Check your inbox",
         "emailCodeSendFailed": "Failed to send code",
+        "resetPasswordFailed": "Failed to reset password",
+        "resetPasswordSuccess": "Password reset successful. Please sign in with your new password",
         "captchaCancelled": "Complete slider verification before sending code",
         "operationFailed": "Operation failed",
         "loginSuccess": "Signed in",
@@ -2887,7 +2894,8 @@
         "logoutLocalOnly": "Server response error; signed out locally only",
         "unregisterPasswordRequired": "Enter your current password to confirm",
         "unregisterFailed": "Account deletion failed",
-        "unregisterSuccess": "Account deleted"
+        "unregisterSuccess": "Account deleted",
+        "emailVerificationRequired": "Login risk is high; please verify via email first"
       }
     },
     "nav": {
@@ -2996,8 +3004,8 @@
         "desc": "Check for and download app updates"
       },
       "pluginMarket": {
-        "label": "Plugin Market",
-        "desc": "Plugin market entry and install management"
+        "label": "Wallpaper Market",
+        "desc": "Wallpaper market entry and wallpaper management"
       },
       "user": {
         "label": "Account",

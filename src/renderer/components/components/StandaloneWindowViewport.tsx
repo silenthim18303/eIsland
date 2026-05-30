@@ -36,8 +36,9 @@ import { SettingsTab } from '../states/maxExpand/components/SettingsTab';
 import { MemoTab } from '../states/maxExpand/components/MemoTab';
 import { AlarmTab } from '../states/maxExpand/components/AlarmTab';
 import { ToolboxTab } from '../states/maxExpand/components/ToolboxTab';
-import { LoginContent } from '../states/login/LoginContent';
+import { LoginContent } from '../states/login';
 import { RegisterContent } from '../states/register/RegisterContent';
+import { ResetPasswordContent } from '../states/resetPassword';
 import { PaymentContent } from '../states/payment/PaymentContent';
 import type { WindowTab } from '../config/standaloneWindowConfig';
 
@@ -66,8 +67,9 @@ export function StandaloneWindowViewport({ activeTab, state }: StandaloneWindowV
       {activeTab === 'toolbox' && <ToolboxTab />}
       {activeTab === 'settings' && state === 'login' && <LoginContent />}
       {activeTab === 'settings' && state === 'register' && <RegisterContent />}
+      {activeTab === 'settings' && state === 'resetPassword' && <ResetPasswordContent />}
       {activeTab === 'settings' && state === 'payment' && <PaymentContent />}
-      {activeTab === 'settings' && state !== 'login' && state !== 'register' && state !== 'payment' && <SettingsTab />}
+      {activeTab === 'settings' && state !== 'login' && state !== 'register' && state !== 'resetPassword' && state !== 'payment' && <SettingsTab />}
     </div>
   );
 }

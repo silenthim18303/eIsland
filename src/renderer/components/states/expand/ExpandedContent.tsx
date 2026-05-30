@@ -28,27 +28,16 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import type { ExpandTab } from '../../../store/types';
-import {
-  DEFAULT_EXPAND_NAV_LAYOUT,
-  EXPAND_NAV_LAYOUT_STORE_KEY,
-  normalizeExpandNavLayoutConfig,
-  type ExpandNavLayoutConfig,
-} from '../maxExpand/components/setting/utils/settingsConfig';
-import {
-  MAXEXPAND_PERFORMANCE_MODE_STORE_KEY,
-  cacheMaxExpandPerformanceModeEnabled,
-  normalizeMaxExpandPerformanceModeEnabled,
-  readCachedMaxExpandPerformanceModeEnabled,
-} from '../maxExpand/components/setting/utils/performanceSettings';
-import { preloadMaxExpandContentEager } from '../maxExpand/maxExpandContentEagerLoader';
 import '../../../styles/expanded/expanded.css';
 import { OverviewTab } from './components/OverviewTab';
 import { PerformanceMonitorTab } from './components/PerformanceMonitorTab';
 import { SongTab } from './components/SongTab';
 import { ToolsTab } from './components/ToolsTab';
-
-/** 导航点标识 — 含特殊动作：hover 返回、settings 切换独立状态 */
-type NavDotId = ExpandTab | 'maxExpand';
+import type { NavDotId } from './config/types';
+import { useExpandNavLayout } from './hooks/useExpandNavLayout';
+import { useExpandTabAnimation } from './hooks/useExpandTabAnimation';
+import { useExpandWheelNav } from './hooks/useExpandWheelNav';
+import { getNavLabel } from './utils/getNavLabel';
 
 /**
  * Expanded 状态内容组件
@@ -62,9 +51,9 @@ export function ExpandedContent(): React.ReactElement {
   expandTabRef.current = expandTab;
 
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
-  const [tabAnimation, setTabAnimation] = useState(true);
-  const [maxExpandPerformanceModeEnabled, setMaxExpandPerformanceModeEnabled] = useState(readCachedMaxExpandPerformanceModeEnabled);
-  const [navLayoutConfig, setNavLayoutConfig] = useState<ExpandNavLayoutConfig>(DEFAULT_EXPAND_NAV_LAYOUT);
+
+  const { navLayoutConfig, preloadEagerWhenPerformanceModeDisabled } = useExpandNavLayout();
+  const tabAnimation = useExpandTabAnimation();
 
   const NAV_DOTS: NavDotId[] = useMemo(() => {
     const visibleTabs = navLayoutConfig
@@ -76,57 +65,10 @@ export function ExpandedContent(): React.ReactElement {
   const navDotsRef = useRef(NAV_DOTS);
   navDotsRef.current = NAV_DOTS;
 
-  const preloadEagerWhenPerformanceModeDisabled = useCallback((): void => {
-    if (!maxExpandPerformanceModeEnabled) {
-      preloadMaxExpandContentEager();
-    }
-  }, [maxExpandPerformanceModeEnabled]);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(EXPAND_NAV_LAYOUT_STORE_KEY).then((data: unknown) => {
-      if (cancelled) return;
-      setNavLayoutConfig(normalizeExpandNavLayoutConfig(data));
-    }).catch(() => {});
-    const unsubExpand = window.api.onSettingsChanged((channel: string, value: unknown) => {
-      if (cancelled) return;
-      if (channel === `store:${EXPAND_NAV_LAYOUT_STORE_KEY}`) {
-        setNavLayoutConfig(normalizeExpandNavLayoutConfig(value));
-      }
-    });
-    const handleLocalExpandLayoutChange = (e: Event): void => {
-      if (cancelled) return;
-      const detail = (e as CustomEvent).detail;
-      setNavLayoutConfig(normalizeExpandNavLayoutConfig(detail));
-    };
-    window.addEventListener('expand-nav-layout-changed', handleLocalExpandLayoutChange);
-
-    if (!readCachedMaxExpandPerformanceModeEnabled()) {
-      preloadMaxExpandContentEager();
-    }
-    window.api.storeRead(MAXEXPAND_PERFORMANCE_MODE_STORE_KEY).then((value: unknown) => {
-      if (cancelled) return;
-      const enabled = normalizeMaxExpandPerformanceModeEnabled(value);
-      cacheMaxExpandPerformanceModeEnabled(enabled);
-      setMaxExpandPerformanceModeEnabled(enabled);
-      if (!enabled) preloadMaxExpandContentEager();
-    }).catch(() => {});
-    const unsubscribe = window.api.onSettingsChanged((channel: string, value: unknown) => {
-      if (cancelled) return;
-      if (channel === `store:${MAXEXPAND_PERFORMANCE_MODE_STORE_KEY}`) {
-        const enabled = normalizeMaxExpandPerformanceModeEnabled(value);
-        cacheMaxExpandPerformanceModeEnabled(enabled);
-        setMaxExpandPerformanceModeEnabled(enabled);
-        if (!enabled) preloadMaxExpandContentEager();
-      }
-    });
-    return () => {
-      cancelled = true;
-      unsubscribe();
-      unsubExpand();
-      window.removeEventListener('expand-nav-layout-changed', handleLocalExpandLayoutChange);
-    };
-  }, []);
+  const handleSetMaxExpand = useCallback((): void => {
+    preloadEagerWhenPerformanceModeDisabled();
+    setMaxExpand();
+  }, [preloadEagerWhenPerformanceModeDisabled, setMaxExpand]);
 
   useEffect(() => {
     const isVisible = NAV_DOTS.includes(expandTab);
@@ -135,72 +77,15 @@ export function ExpandedContent(): React.ReactElement {
     }
   }, [NAV_DOTS, expandTab, setExpandTab]);
 
-  const handleSetMaxExpand = useCallback((): void => {
-    preloadEagerWhenPerformanceModeDisabled();
-    setMaxExpand();
-  }, [preloadEagerWhenPerformanceModeDisabled, setMaxExpand]);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead('expand-tab-animation').then((v: unknown) => {
-      if (cancelled) return;
-      if (v === false) setTabAnimation(false);
-    }).catch(() => {});
-    const unsub = window.api.onSettingsChanged((channel: string, value: unknown) => {
-      if (cancelled) return;
-      if (channel === 'settings:expand-tab-animation') setTabAnimation(value !== false);
-    });
-    return () => { cancelled = true; unsub(); };
-  }, []);
-
-  const getNavLabel = (tab: NavDotId): string => t(`expanded.nav.${tab}`, {
-    defaultValue: tab === 'hover'
-      ? '返回'
-      : tab === 'overview'
-        ? '总览'
-        : tab === 'song'
-          ? '歌曲'
-          : tab === 'tools'
-            ? '工具'
-            : tab === 'performanceMonitor'
-              ? '性能监控'
-              : '最大展开',
+  useExpandWheelNav({
+    contentRef,
+    expandTabRef,
+    navDotsRef,
+    setExpandTab,
+    setHover,
+    handleSetMaxExpand,
+    setSlideDir,
   });
-
-  /** 滚轮切换 Tab */
-  useEffect(() => {
-    const el = contentRef.current;
-    if (!el) return;
-
-    const handleWheel = (e: WheelEvent): void => {
-      const target = e.target as HTMLElement;
-      if (target.closest('.ov-dash-todo-list')) return;
-      if (target.closest('.ov-dash-apps')) return;
-      if (target.closest('.ov-dash-url-favorites-list')) return;
-      if (target.closest('.ov-dash-break-reminder-list')) return;
-      if (target.closest('.tools-app-list-body')) return;
-      e.preventDefault();
-      const cur = expandTabRef.current;
-      const dots = navDotsRef.current;
-      const currentIndex = dots.findIndex((d) => d === cur);
-      if (currentIndex < 0) return;
-      let nextId: NavDotId;
-      if (e.deltaY > 0) {
-        nextId = dots[(currentIndex + 1) % dots.length];
-      } else {
-        nextId = dots[(currentIndex - 1 + dots.length) % dots.length];
-      }
-      if (nextId === 'hover') { setHover(); return; }
-      if (nextId === 'maxExpand') { handleSetMaxExpand(); return; }
-      const curIdx = dots.indexOf(expandTabRef.current);
-      const nextIdx = dots.indexOf(nextId);
-      setSlideDir(nextIdx >= curIdx ? 'right' : 'left');
-      setExpandTab(nextId);
-    };
-
-    el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
-  }, [setExpandTab, setHover, handleSetMaxExpand]);
 
   return (
     <div className="expanded-content" ref={contentRef}>
@@ -230,8 +115,8 @@ export function ExpandedContent(): React.ReactElement {
                 setExpandTab(tab);
               }
             }}
-            title={getNavLabel(tab)}
-            aria-label={t('expanded.nav.switchToPage', { defaultValue: '切换到{{label}}页面', label: getNavLabel(tab) })}
+            title={getNavLabel(tab, t)}
+            aria-label={t('expanded.nav.switchToPage', { defaultValue: '切换到{{label}}页面', label: getNavLabel(tab, t) })}
           />
         ))}
       </div>
