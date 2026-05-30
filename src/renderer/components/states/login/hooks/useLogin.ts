@@ -182,7 +182,7 @@ export function useLogin() {
       setVerificationEmail(normalizedVerificationEmail);
       setMaskedVerificationEmail(maskedEmail);
       setForceEmailVerification(true);
-      setFeedback({ type: 'error', text: result.message || '当前登录风险较高，请先完成邮箱验证' });
+      setFeedback({ type: 'error', text: result.message || t('settings.user.feedback.emailVerificationRequired', { defaultValue: '当前登录风险较高，请先完成邮箱验证' }) });
       return;
     }
     if (!result.ok || !result.data) {

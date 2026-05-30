@@ -2637,7 +2637,11 @@
         "hint": "Sign in and registration are powered by eIsland server",
         "entryTitle": "Sign in to manage avatar, profile, and account security settings",
         "gotoLogin": "Go to Sign In",
-        "gotoRegister": "Go to Sign Up"
+        "gotoRegister": "Go to Sign Up",
+        "forgotPassword": "Forgot Password",
+        "resetPassword": "Reset Password",
+        "resetPasswordHint": "Verify your identity with an email code, then set a new password",
+        "resetPasswordBtn": "Reset Password"
       },
       "fields": {
         "username": "Username",
@@ -2890,7 +2894,8 @@
         "logoutLocalOnly": "Server response error; signed out locally only",
         "unregisterPasswordRequired": "Enter your current password to confirm",
         "unregisterFailed": "Account deletion failed",
-        "unregisterSuccess": "Account deleted"
+        "unregisterSuccess": "Account deleted",
+        "emailVerificationRequired": "Login risk is high; please verify via email first"
       }
     },
     "nav": {
