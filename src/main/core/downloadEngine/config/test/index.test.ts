@@ -67,9 +67,9 @@ describe('downloadEngine config constants', () => {
       EMIT_INTERVAL_MS,
       MIN_CHUNK_BYTES,
     ];
-    for (const v of values) {
+    values.forEach((v) => {
       expect(typeof v).toBe('number');
       expect(v).toBeGreaterThan(0);
-    }
+    });
   });
 });

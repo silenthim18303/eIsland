@@ -36,9 +36,9 @@ const { mockNetFetch, mockLoadNetworkConfig, mockI18nT, mockLogger } = vi.hoiste
   mockI18nT: vi.fn((_key: string, opts?: { defaultValue?: string; [k: string]: unknown }) => {
     if (!opts?.defaultValue) return '';
     let result = opts.defaultValue;
-    for (const [k, v] of Object.entries(opts)) {
+    Object.entries(opts).forEach(([k, v]) => {
       if (k !== 'defaultValue') result = result.replace(`{{${k}}}`, String(v));
-    }
+    });
     return result;
   }),
   mockLogger: {

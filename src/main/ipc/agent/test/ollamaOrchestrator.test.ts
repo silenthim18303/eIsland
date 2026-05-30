@@ -25,6 +25,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { OllamaStreamCallbacks } from '../ollamaClient';
 
 const { streamOllamaChatMock } = vi.hoisted(() => ({
   streamOllamaChatMock: vi.fn(),
@@ -57,7 +58,7 @@ describe('orchestrateOllamaChat', () => {
 
   /** Helper: simulate streamOllamaChat calling onChunk + onDone with the given text. */
   function makeStreamResponse(text: string, usage?: { prompt_tokens?: number; completion_tokens?: number }) {
-    return (_req: unknown, cbs: any) => {
+    return (_req: unknown, cbs: OllamaStreamCallbacks) => {
       cbs.onChunk?.(text);
       cbs.onDone?.(text, usage);
       return { abort: vi.fn() };
@@ -124,8 +125,8 @@ describe('orchestrateOllamaChat', () => {
 
   it('emits error event when streamOllamaChat fails', async () => {
     streamOllamaChatMock.mockImplementation(
-      (_req: unknown, cbs: any) => {
-        cbs.onError(new Error('connection refused'));
+      (_req: unknown, cbs: OllamaStreamCallbacks) => {
+        cbs.onError?.(new Error('connection refused'));
         return { abort: vi.fn() };
       },
     );

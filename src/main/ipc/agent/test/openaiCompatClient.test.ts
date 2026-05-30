@@ -195,16 +195,16 @@ describe('streamOpenAIChat', () => {
     const chunk = JSON.stringify({
       choices: [{ index: 0, delta: { content: 'Hi' }, finish_reason: null }],
     });
-    for (const fn of resListeners['data'] ?? []) {
+    (resListeners['data'] ?? []).forEach((fn) => {
       fn(`data: ${chunk}\n`);
-    }
+    });
 
     expect(callbacks.onChunk).toHaveBeenCalledWith('Hi');
 
     // End the stream
-    for (const fn of resListeners['end'] ?? []) {
+    (resListeners['end'] ?? []).forEach((fn) => {
       fn();
-    }
+    });
 
     expect(callbacks.onDone).toHaveBeenCalledWith('Hi', undefined);
   });
@@ -221,12 +221,12 @@ describe('streamOpenAIChat', () => {
     httpsReqMock.mock.calls[0][1](res);
 
     // Simulate error body
-    for (const fn of resListeners['data'] ?? []) {
+    (resListeners['data'] ?? []).forEach((fn) => {
       fn('Unauthorized');
-    }
-    for (const fn of resListeners['end'] ?? []) {
+    });
+    (resListeners['end'] ?? []).forEach((fn) => {
       fn();
-    }
+    });
 
     expect(callbacks.onError).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining('401') }),

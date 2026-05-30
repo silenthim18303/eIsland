@@ -37,7 +37,8 @@ describe('inflateAuto', () => {
 
   beforeEach(() => {
     // Mock DecompressionStream: pass-through TransformStream, or throw per formatGuard
-    (globalThis as any).DecompressionStream = class {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- mock global
+    (globalThis as Record<string, unknown>).DecompressionStream = class {
       readable: ReadableStream<Uint8Array>;
       writable: WritableStream<Uint8Array>;
       constructor(format: string) {
@@ -55,7 +56,7 @@ describe('inflateAuto', () => {
     };
 
     // Mock Blob: stream() emits each ArrayBuffer part as a chunk
-    (globalThis as any).Blob = class {
+    (globalThis as Record<string, unknown>).Blob = class {
       private parts: ArrayBuffer[];
       constructor(parts: ArrayBuffer[]) {
         this.parts = parts;
@@ -64,9 +65,9 @@ describe('inflateAuto', () => {
         const parts = this.parts;
         return new ReadableStream({
           start(controller) {
-            for (const p of parts) {
+            parts.forEach((p) => {
               if (p.byteLength > 0) controller.enqueue(new Uint8Array(p));
-            }
+            });
             controller.close();
           },
         });
@@ -74,7 +75,7 @@ describe('inflateAuto', () => {
     };
 
     // Mock Response: collect stream into a single ArrayBuffer
-    (globalThis as any).Response = class {
+    (globalThis as Record<string, unknown>).Response = class {
       private _stream: ReadableStream;
       constructor(stream: ReadableStream) {
         this._stream = stream;
@@ -90,19 +91,19 @@ describe('inflateAuto', () => {
         const len = chunks.reduce((s, c) => s + c.length, 0);
         const buf = new Uint8Array(len);
         let off = 0;
-        for (const c of chunks) {
+        chunks.forEach((c) => {
           buf.set(c, off);
           off += c.length;
-        }
+        });
         return buf.buffer;
       }
     };
   });
 
   afterEach(() => {
-    (globalThis as any).DecompressionStream = origDS;
-    (globalThis as any).Blob = origBlob;
-    (globalThis as any).Response = origResponse;
+    (globalThis as Record<string, unknown>).DecompressionStream = origDS;
+    (globalThis as Record<string, unknown>).Blob = origBlob;
+    (globalThis as Record<string, unknown>).Response = origResponse;
   });
 
   it('empty input throws because decompressed output is empty', async () => {

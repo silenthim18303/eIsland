@@ -182,11 +182,11 @@ describe('fetchLyricsFromLrclib', () => {
 
     await fetchLyricsFromLrclib('t', 'a');
 
-    for (const call of mockRequestJsonWithLog.mock.calls) {
+    mockRequestJsonWithLog.mock.calls.forEach((call) => {
       expect(call[1]?.headers?.['User-Agent']).toBe(
         'DynamicIsland/1.0 (https://github.com/user/dynamic-island)',
       );
-    }
+    });
   });
 
   it('constructs URL1 with track_name + artist_name', async () => {

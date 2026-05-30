@@ -32,6 +32,30 @@ import '../../../styles/auth/auth.css';
 
 /** 独立重置密码状态内容 */
 export function ResetPasswordContent(): ReactElement {
-  const resetPassword = useResetPassword();
-  return <ResetPasswordForm {...resetPassword} />;
+  const rp = useResetPassword();
+  return (
+    <ResetPasswordForm
+      email={rp.email}
+      setEmail={rp.setEmail}
+      emailCode={rp.emailCode}
+      setEmailCode={rp.setEmailCode}
+      newPassword={rp.newPassword}
+      setNewPassword={rp.setNewPassword}
+      confirmPassword={rp.confirmPassword}
+      setConfirmPassword={rp.setConfirmPassword}
+      newPasswordVisible={rp.newPasswordVisible}
+      setNewPasswordVisible={rp.setNewPasswordVisible}
+      confirmPasswordVisible={rp.confirmPasswordVisible}
+      setConfirmPasswordVisible={rp.setConfirmPasswordVisible}
+      sendingCode={rp.sendingCode}
+      sendCooldownSeconds={rp.sendCooldownSeconds}
+      submitting={rp.submitting}
+      feedback={rp.feedback}
+      handleSendCode={rp.handleSendCode}
+      handleSubmit={rp.handleSubmit}
+      setLogin={rp.setLogin}
+      setRegister={rp.setRegister}
+      t={rp.t}
+    />
+  );
 }

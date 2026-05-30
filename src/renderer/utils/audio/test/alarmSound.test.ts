@@ -99,7 +99,7 @@ describe('ALARM_SOUND_STOP_EVENT', () => {
 describe('SYSTEM_ALARM_RINGTONE_OPTIONS', () => {
   it('has 3 items with correct structure', () => {
     expect(SYSTEM_ALARM_RINGTONE_OPTIONS).toHaveLength(3);
-    for (const option of SYSTEM_ALARM_RINGTONE_OPTIONS) {
+    SYSTEM_ALARM_RINGTONE_OPTIONS.forEach((option) => {
       expect(option).toHaveProperty('value');
       expect(option).toHaveProperty('src');
       expect(option).toHaveProperty('labelKey');
@@ -108,7 +108,7 @@ describe('SYSTEM_ALARM_RINGTONE_OPTIONS', () => {
       expect(typeof option.src).toBe('string');
       expect(typeof option.labelKey).toBe('string');
       expect(typeof option.defaultLabel).toBe('string');
-    }
+    });
     expect(SYSTEM_ALARM_RINGTONE_OPTIONS[0].value).toBe(SystemAlarmRingtone.ALARM_1);
     expect(SYSTEM_ALARM_RINGTONE_OPTIONS[1].value).toBe(SystemAlarmRingtone.ALARM_2);
     expect(SYSTEM_ALARM_RINGTONE_OPTIONS[2].value).toBe(SystemAlarmRingtone.ALARM_3);

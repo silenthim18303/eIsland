@@ -33,5 +33,32 @@ import '../../../styles/shell/shell.css';
 /** Idle 状态内容组件 */
 export function IdleContent(props: IdleContentProps): ReactElement {
   const idle = useIdle(props);
-  return <IdleForm {...idle} />;
+  return (
+    <IdleForm
+      timeStr={idle.timeStr}
+      dayStr={idle.dayStr}
+      weather={idle.weather}
+      timerState={idle.timerState}
+      remainingSeconds={idle.remainingSeconds}
+      pomodoroRunning={idle.pomodoroRunning}
+      pomodoroRemaining={idle.pomodoroRemaining}
+      t={idle.t}
+      isMusicPlaying={idle.isMusicPlaying}
+      coverImage={idle.coverImage}
+      isPlaying={idle.isPlaying}
+      musicOuterGlowEffectEnabled={idle.musicOuterGlowEffectEnabled}
+      isTimerActive={idle.isTimerActive}
+      isPomodoroActive={idle.isPomodoroActive}
+      p0Count={idle.p0Count}
+      h={idle.h}
+      m={idle.m}
+      s={idle.s}
+      pomodoroM={idle.pomodoroM}
+      pomodoroS={idle.pomodoroS}
+      r={idle.r}
+      g={idle.g}
+      b={idle.b}
+      padZero={idle.padZero}
+    />
+  );
 }

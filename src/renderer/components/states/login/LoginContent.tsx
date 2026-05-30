@@ -33,5 +33,29 @@ import '../../../styles/auth/auth.css';
 /** 独立登录状态内容 */
 export function LoginContent(): ReactElement {
   const login = useLogin();
-  return <LoginForm {...login} />;
+  return (
+    <LoginForm
+      account={login.account}
+      setAccount={login.setAccount}
+      maskedVerificationEmail={login.maskedVerificationEmail}
+      emailCode={login.emailCode}
+      setEmailCode={login.setEmailCode}
+      password={login.password}
+      setPassword={login.setPassword}
+      passwordVisible={login.passwordVisible}
+      setPasswordVisible={login.setPasswordVisible}
+      submitting={login.submitting}
+      sendingCode={login.sendingCode}
+      sendCooldownSeconds={login.sendCooldownSeconds}
+      needsEmailVerification={login.needsEmailVerification}
+      isEmailAccount={login.isEmailAccount}
+      feedback={login.feedback}
+      handleSendCode={login.handleSendCode}
+      handleSubmit={login.handleSubmit}
+      setRegister={login.setRegister}
+      setResetPassword={login.setResetPassword}
+      returnFromAuth={login.returnFromAuth}
+      t={login.t}
+    />
+  );
 }

@@ -34,7 +34,7 @@ describe('BUILTIN_WALLPAPERS', () => {
   });
 
   it('each entry should have expected fields', () => {
-    for (const wallpaper of BUILTIN_WALLPAPERS) {
+    BUILTIN_WALLPAPERS.forEach((wallpaper) => {
       expect(wallpaper).toHaveProperty('id');
       expect(wallpaper).toHaveProperty('name');
       expect(wallpaper).toHaveProperty('src');
@@ -47,20 +47,20 @@ describe('BUILTIN_WALLPAPERS', () => {
       expect(typeof wallpaper.src).toBe('string');
       expect(wallpaper.src.length).toBeGreaterThan(0);
       expect(typeof wallpaper.defaultOpacity).toBe('number');
-    }
+    });
   });
 });
 
 describe('resolveBuiltinWallpaper', () => {
   it('should find wallpaper by id', () => {
-    for (const expected of BUILTIN_WALLPAPERS) {
+    BUILTIN_WALLPAPERS.forEach((expected) => {
       const result = resolveBuiltinWallpaper(expected.id);
       expect(result).toBeDefined();
       expect(result!.id).toBe(expected.id);
       expect(result!.name).toBe(expected.name);
       expect(result!.src).toBe(expected.src);
       expect(result!.defaultOpacity).toBe(expected.defaultOpacity);
-    }
+    });
   });
 
   it('should return undefined for unknown id', () => {

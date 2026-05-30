@@ -112,10 +112,10 @@ describe('SvgIcon', () => {
   });
 
   it('all values should be strings starting with ./svg/ and ending with .svg', () => {
-    for (const [key, value] of Object.entries(SvgIcon)) {
+    Object.entries(SvgIcon).forEach(([, value]) => {
       expect(typeof value).toBe('string');
       expect(value).toMatch(/^\.\/svg\/.+\.svg$/);
-    }
+    });
   });
 
   it('VIP and PRO should point to the same SVG path', () => {

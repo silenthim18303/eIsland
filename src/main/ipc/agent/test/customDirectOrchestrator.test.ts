@@ -25,6 +25,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { OpenAIStreamCallbacks } from '../openaiCompatClient';
 
 const { streamOpenAIChatMock } = vi.hoisted(() => ({
   streamOpenAIChatMock: vi.fn(),
@@ -57,7 +58,7 @@ describe('orchestrateCustomDirectChat', () => {
 
   /** Helper: simulate streamOpenAIChat calling onChunk + onDone with the given text. */
   function makeStreamResponse(text: string, usage?: { prompt_tokens?: number; completion_tokens?: number }) {
-    return (_req: unknown, cbs: any) => {
+    return (_req: unknown, cbs: OpenAIStreamCallbacks) => {
       cbs.onChunk?.(text);
       cbs.onDone?.(text, usage);
       return { abort: vi.fn() };
@@ -126,8 +127,8 @@ describe('orchestrateCustomDirectChat', () => {
 
   it('emits error event when streamOpenAIChat fails', async () => {
     streamOpenAIChatMock.mockImplementation(
-      (_req: unknown, cbs: any) => {
-        cbs.onError(new Error('connection refused'));
+      (_req: unknown, cbs: OpenAIStreamCallbacks) => {
+        cbs.onError?.(new Error('connection refused'));
         return { abort: vi.fn() };
       },
     );
@@ -205,7 +206,7 @@ describe('orchestrateCustomDirectChat', () => {
 
   it('handles think tags in streaming response', async () => {
     streamOpenAIChatMock.mockImplementation(
-      (_req: unknown, cbs: any) => {
+      (_req: unknown, cbs: OpenAIStreamCallbacks) => {
         cbs.onThinkChunk?.('Let me think...');
         cbs.onChunk?.('{"type":"final","answer":"Thought about it"}');
         cbs.onDone?.('{"type":"final","answer":"Thought about it"}');

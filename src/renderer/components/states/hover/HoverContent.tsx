@@ -33,5 +33,16 @@ import '../../../styles/hover/hover.css';
 /** Hover 状态内容组件 */
 export function HoverContent(props: HoverContentProps): ReactElement {
   const hover = useHover(props);
-  return <HoverForm {...hover} />;
+  return (
+    <HoverForm
+      fullTimeStr={hover.fullTimeStr}
+      lunarStr={hover.lunarStr}
+      t={hover.t}
+      hoverTab={hover.hoverTab}
+      setHoverTab={hover.setHoverTab}
+      setExpanded={hover.setExpanded}
+      contentRef={hover.contentRef}
+      getDotLabel={hover.getDotLabel}
+    />
+  );
 }

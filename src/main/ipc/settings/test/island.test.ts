@@ -122,9 +122,9 @@ describe('registerIslandIpcHandlers', () => {
       'island:nav-order:set',
     ];
     expect(handleMock).toHaveBeenCalledTimes(expected.length);
-    for (const ch of expected) {
+    expected.forEach((ch) => {
       expect(handlers.has(ch)).toBe(true);
-    }
+    });
   });
 
   // ── Opacity ──

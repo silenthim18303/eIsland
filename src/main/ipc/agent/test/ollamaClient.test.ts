@@ -253,8 +253,8 @@ describe('listOllamaModels', () => {
           ],
         });
         setTimeout(() => {
-          for (const fn of resListeners['data'] ?? []) fn(body);
-          for (const fn of resListeners['end'] ?? []) fn();
+          (resListeners['data'] ?? []).forEach((fn) => fn(body));
+          (resListeners['end'] ?? []).forEach((fn) => fn());
         }, 0);
 
         return req;
@@ -274,8 +274,8 @@ describe('listOllamaModels', () => {
         cb(res);
 
         setTimeout(() => {
-          for (const fn of resListeners['data'] ?? []) fn(JSON.stringify({ models: [] }));
-          for (const fn of resListeners['end'] ?? []) fn();
+          (resListeners['data'] ?? []).forEach((fn) => fn(JSON.stringify({ models: [] })));
+          (resListeners['end'] ?? []).forEach((fn) => fn());
         }, 0);
 
         return req;
@@ -295,8 +295,8 @@ describe('listOllamaModels', () => {
         cb(res);
 
         setTimeout(() => {
-          for (const fn of resListeners['data'] ?? []) fn('not valid json{{{');
-          for (const fn of resListeners['end'] ?? []) fn();
+          (resListeners['data'] ?? []).forEach((fn) => fn('not valid json{{{'));
+          (resListeners['end'] ?? []).forEach((fn) => fn());
         }, 0);
 
         return req;
@@ -418,16 +418,16 @@ describe('streamOllamaChat', () => {
     const chunk = JSON.stringify({
       choices: [{ index: 0, delta: { content: 'Hello' }, finish_reason: null }],
     });
-    for (const fn of resListeners['data'] ?? []) {
+    (resListeners['data'] ?? []).forEach((fn) => {
       fn(`data: ${chunk}\n`);
-    }
+    });
 
     expect(callbacks.onChunk).toHaveBeenCalledWith('Hello');
 
     // End the stream
-    for (const fn of resListeners['end'] ?? []) {
+    (resListeners['end'] ?? []).forEach((fn) => {
       fn();
-    }
+    });
 
     expect(callbacks.onDone).toHaveBeenCalledWith('Hello', undefined);
   });
@@ -454,13 +454,13 @@ describe('streamOllamaChat', () => {
       choices: [{ index: 0, delta: { content: 'there' }, finish_reason: null }],
     });
 
-    for (const fn of resListeners['data'] ?? []) fn(`data: ${chunk1}\ndata: ${chunk2}\n`);
+    (resListeners['data'] ?? []).forEach((fn) => fn(`data: ${chunk1}\ndata: ${chunk2}\n`));
 
     expect(callbacks.onChunk).toHaveBeenCalledTimes(2);
     expect(callbacks.onChunk).toHaveBeenNthCalledWith(1, 'Hi ');
     expect(callbacks.onChunk).toHaveBeenNthCalledWith(2, 'there');
 
-    for (const fn of resListeners['end'] ?? []) fn();
+    (resListeners['end'] ?? []).forEach((fn) => fn());
 
     expect(callbacks.onDone).toHaveBeenCalledWith('Hi there', undefined);
   });
@@ -486,8 +486,8 @@ describe('streamOllamaChat', () => {
       usage,
     });
 
-    for (const fn of resListeners['data'] ?? []) fn(`data: ${chunk}\n`);
-    for (const fn of resListeners['end'] ?? []) fn();
+    (resListeners['data'] ?? []).forEach((fn) => fn(`data: ${chunk}\n`));
+    (resListeners['end'] ?? []).forEach((fn) => fn());
 
     expect(callbacks.onDone).toHaveBeenCalledWith('ok', usage);
   });
@@ -511,10 +511,10 @@ describe('streamOllamaChat', () => {
       choices: [{ index: 0, delta: { content: 'hi' }, finish_reason: null }],
     });
 
-    for (const fn of resListeners['data'] ?? []) {
+    (resListeners['data'] ?? []).forEach((fn) => {
       fn(`data: ${chunk}\ndata: [DONE]\n`);
-    }
-    for (const fn of resListeners['end'] ?? []) fn();
+    });
+    (resListeners['end'] ?? []).forEach((fn) => fn());
 
     expect(callbacks.onChunk).toHaveBeenCalledOnce();
     expect(callbacks.onDone).toHaveBeenCalledWith('hi', undefined);
@@ -531,8 +531,8 @@ describe('streamOllamaChat', () => {
 
     httpReqMock.mock.calls[0][1](res);
 
-    for (const fn of resListeners['data'] ?? []) fn('Internal Server Error');
-    for (const fn of resListeners['end'] ?? []) fn();
+    (resListeners['data'] ?? []).forEach((fn) => fn('Internal Server Error'));
+    (resListeners['end'] ?? []).forEach((fn) => fn());
 
     expect(callbacks.onError).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining('500') }),
@@ -590,8 +590,8 @@ describe('streamOllamaChat', () => {
     const chunk = JSON.stringify({
       choices: [{ index: 0, delta: { content: 'ignored' }, finish_reason: null }],
     });
-    for (const fn of resListeners['data'] ?? []) fn(`data: ${chunk}\n`);
-    for (const fn of resListeners['end'] ?? []) fn();
+    (resListeners['data'] ?? []).forEach((fn) => fn(`data: ${chunk}\n`));
+    (resListeners['end'] ?? []).forEach((fn) => fn());
 
     expect(callbacks.onChunk).not.toHaveBeenCalled();
     expect(callbacks.onDone).not.toHaveBeenCalled();
@@ -633,8 +633,8 @@ describe('chatOllama', () => {
       usage,
     });
 
-    for (const fn of resListeners['data'] ?? []) fn(`data: ${chunk}\n`);
-    for (const fn of resListeners['end'] ?? []) fn();
+    (resListeners['data'] ?? []).forEach((fn) => fn(`data: ${chunk}\n`));
+    (resListeners['end'] ?? []).forEach((fn) => fn());
 
     const result = await promise;
     expect(result.text).toBe('Hi!');

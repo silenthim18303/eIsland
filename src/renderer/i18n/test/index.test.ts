@@ -53,7 +53,7 @@ const { localStorageMock } = vi.hoisted(() => {
       store[key] = val;
     }),
     clear: vi.fn(() => {
-      for (const k of Object.keys(store)) delete store[k];
+      Object.keys(store).forEach((k) => delete store[k]);
     }),
   };
 

@@ -64,15 +64,15 @@ describe('DevIcon', () => {
       'vue', 'svelte', 'angular', 'json', 'yaml', 'xml',
       'bash', 'powershell', 'dockerfile', 'docker', 'sql', 'markdown',
     ];
-    for (const key of expectedKeys) {
+    expectedKeys.forEach((key) => {
       expect(DevIcon).toHaveProperty(key);
-    }
+    });
   });
 
   it('values are SVG path strings', () => {
-    for (const value of Object.values(DevIcon)) {
+    Object.values(DevIcon).forEach((value) => {
       expect(value).toMatch(/^\/svg\/devicons\/.+\.svg$/);
-    }
+    });
   });
 });
 
