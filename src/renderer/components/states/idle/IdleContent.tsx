@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file IdleContent.tsx
+ * @description Idle 状态内容组件
+ * @author 鸡哥
+ */
+
 import type { ReactElement } from 'react';
 import type { IdleContentProps } from './config/idleConfig';
 import { useIdle } from './hooks/useIdle';

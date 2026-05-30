@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file HoverContent.tsx
+ * @description Hover 状态内容组件
+ * @author 鸡哥
+ */
+
 import type { ReactElement } from 'react';
 import type { HoverContentProps } from './config/hoverConfig';
 import { useHover } from './hooks/useHover';

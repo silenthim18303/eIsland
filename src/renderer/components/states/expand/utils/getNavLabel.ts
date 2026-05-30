@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file getNavLabel.ts
+ * @description 获取导航点的 i18n 标签工具函数
+ * @author 鸡哥
+ */
+
 import type { NavDotId } from '../config/types';
 
 /** 获取导航点的 i18n 标签 */

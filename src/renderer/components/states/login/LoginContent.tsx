@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file LoginContent.tsx
+ * @description 独立登录状态内容组件
+ * @author 鸡哥
+ */
+
 import type { ReactElement } from 'react';
 import { useLogin } from './hooks/useLogin';
 import { LoginForm } from './components/LoginForm';

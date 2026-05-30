@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useExpandWheelNav.ts
+ * @description 展开面板滚轮切换 Tab 导航 Hook
+ * @author 鸡哥
+ */
+
 import { type RefObject, useEffect, useRef } from 'react';
 import type { ExpandTab } from '../../../../store/types';
 import type { NavDotId } from '../config/types';

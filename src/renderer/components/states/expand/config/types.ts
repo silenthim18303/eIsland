@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file types.ts
+ * @description 展开状态导航点类型定义
+ * @author 鸡哥
+ */
+
 import type { ExpandTab } from '../../../../store/types';
 
 /** 导航点标识 — 含特殊动作：hover 返回、settings 切换独立状态 */

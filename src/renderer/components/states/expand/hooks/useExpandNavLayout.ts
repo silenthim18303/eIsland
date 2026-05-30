@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useExpandNavLayout.ts
+ * @description 展开导航布局配置与性能模式 Hook
+ * @author 鸡哥
+ */
+
 import { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_EXPAND_NAV_LAYOUT,
