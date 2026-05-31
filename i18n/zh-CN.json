@@ -1,6 +1,9 @@
 {
   "common": {
-    "appName": "eIsland"
+    "appName": "eIsland",
+    "errors": {
+      "rootMountNotFound": "未找到 #root 挂载节点"
+    }
   },
   "standalone": {
     "tabs": {
@@ -343,6 +346,15 @@
     "sunny": "晴天",
     "unknown": "未知"
   },
+  "announcement": {
+    "loading": "正在加载公告…",
+    "empty": "暂无公告内容",
+    "title": "公告",
+    "subtitle": "当前已是最新版本，以下为最新公告内容。",
+    "defaultTitle": "系统公告",
+    "updatedAt": "更新时间：{{time}}",
+    "close": "关闭"
+  },
   "notification": {
     "alarm": {
       "title": "闹钟",
@@ -447,6 +459,9 @@
         "unavailable": "不可用",
         "noGpu": "未检测到显卡"
       }
+    },
+    "settingsTab": {
+      "label": "设置"
     }
   },
   "toolsTab": {
@@ -567,7 +582,8 @@
     },
     "lyrics": {
       "loading": "正在加载歌词",
-      "empty": "暂无歌词"
+      "empty": "暂无歌词",
+      "enjoyMusic": "享受音乐"
     },
     "onboarding": {
       "title": "音乐总览",
@@ -597,6 +613,8 @@
   "aiChat": {
     "title": "mihtnelis Agent",
     "notConfigured": "未配置",
+    "localModelGenerated": "本地模型生成",
+    "customDirectGenerated": "本地直连 LLM 提供商",
     "actions": {
       "clear": "清空",
       "newChat": "新建对话",
@@ -604,7 +622,9 @@
       "loadMoreHistory": "加载更多对话",
       "reportIssue": "报告问题",
       "stop": "停止",
-      "send": "发送"
+      "send": "发送",
+      "quote": "引用",
+      "copy": "复制"
     },
     "session": {
       "historyTitle": "历史会话",
@@ -614,7 +634,11 @@
     "modelCard": {
       "title": "模型选择卡片",
       "focusMode": "专注模式",
-      "contextLimit": "上下文"
+      "contextLimit": "上下文",
+      "customApiMode": "调用模式",
+      "customApiModeTitle": "选择自定义 API 调用模式",
+      "customApiModeRelay": "服务器转发",
+      "customApiModeDirect": "直连"
     },
     "skills": {
       "title": "Skills",
@@ -649,6 +673,7 @@
       "agentError": "mihtnelis agent 返回错误",
       "noModelOutput": "⚠️ 未收到模型输出，请检查 DeepSeek 配置与服务端日志。",
       "noModelOutputOllama": "⚠️ 未收到模型输出，请检查 Ollama 服务是否运行中。",
+      "noModelOutputCustomDirect": "⚠️ 未收到模型输出，请检查自定义 API 端点和密钥是否正确。",
       "localToolExecuteFailed": "本地工具执行失败",
       "localToolSubmitFailed": "本地工具结果提交失败",
       "apiRequestFailed": "API 请求失败 ({{status}}): {{detail}}",
@@ -710,6 +735,12 @@
       "inline": "{{used}} / {{max}} · {{percent}}",
       "tooltip": "上下文使用：{{used}} / {{max}}（{{percent}}）",
       "aria": "上下文使用情况：{{used}} / {{max}}（{{percent}}）"
+    },
+    "agentMode": {
+      "switch": "切换 Agent 模式"
+    },
+    "feedback": {
+      "issueTitle": "Agent输出不符合预期 - {{traceId}}"
     }
   },
   "urlFavoritesTab": {
@@ -739,6 +770,9 @@
   },
   "mailTab": {
     "title": "邮箱",
+    "accounts": {
+      "unnamed": "未命名"
+    },
     "introTitle": "客户端直连邮箱（无服务器）",
     "introDesc": "收信用 IMAP，发信用 SMTP。请先在设置中填写服务器参数与账号认证信息。",
     "goSettings": "前往邮箱设置",
@@ -945,6 +979,7 @@
       "gomoku": "五子棋"
     },
     "comingSoon": "即将上线",
+    "unknownUser": "未知用户",
     "loginRequired": "请先登录以查看成绩与排行榜",
     "loading": "加载中...",
     "loadError": "数据加载失败",
@@ -1002,6 +1037,26 @@
       "unrankedHint": "五子棋暂不接入在线排行榜。",
       "boardAria": "五子棋棋盘",
       "cellAria": "第 {{row}} 行第 {{col}} 列"
+    }
+  },
+  "stt": {
+    "label": "识别结果",
+    "asrQuickAdd": "ASR快速添加",
+    "actions": {
+      "sendToAgent": "发送给Agent",
+      "added": "已添加",
+      "addToMemo": "添加到备忘录",
+      "addTodo": "添加待办",
+      "copied": "已复制",
+      "copy": "复制",
+      "ignore": "忽略"
+    }
+  },
+  "agent": {
+    "actions": {
+      "denyAuth": "不授权",
+      "allowAuth": "授权",
+      "close": "关闭"
     }
   },
   "maxExpand": {
@@ -1639,6 +1694,9 @@
         },
         "windowControlsChanged": {
           "body": "独立窗口控制按钮样式已变更。"
+        },
+        "displayChanged": {
+          "body": "目标显示器已变更，是否立即重启生效？"
         }
       },
       "layout": {
@@ -1830,7 +1888,8 @@
         "autoDimTitle": "闲置自动降低不透明度",
         "autoDimHint": "开启后，灵动岛在指定时间内无鼠标操作时将自动降低不透明度，鼠标移入后恢复",
         "autoDimToggle": "启用闲置自动降低不透明度",
-        "autoDimDelayHint": "无操作多少秒后自动降低（1 - 120 秒）"
+        "autoDimDelayHint": "无操作多少秒后自动降低（1 - 120 秒）",
+        "defaultOpacitySuffix": "（默认透明度 {{opacity}}%）"
       },
       "behavior": {
         "mouseLeaveTitle": "鼠标移开自动收回",
@@ -2143,7 +2202,8 @@
         "placeholder": "输入播放器进程名（如 Spotify.exe）",
         "fetching": "获取中…",
         "fetchSourceProcess": "获取播放进程",
-        "added": "已添加"
+        "added": "已添加",
+        "alreadyExists": "已在白名单中"
       },
       "lyrics": {
         "title": "歌词源",
@@ -2169,9 +2229,18 @@
         "title": "SMTC 自动取消订阅",
         "hint": "用于清理长时间无更新的播放会话，默认永不取消订阅",
         "unsubscribeMs": "取消订阅时间（毫秒）",
-        "neverUnsubscribe": "永不取消订阅"
+        "neverUnsubscribe": "永不取消订阅",
+        "invalidMsValue": "请输入有效毫秒值（>= 1000）或开启「永不取消订阅」",
+        "saveFailed": "保存失败，请稍后重试",
+        "savedNeverUnsubscribe": "已保存：永不自动取消订阅",
+        "savedAutoUnsubscribe": "已保存：{{ms}} ms 自动取消订阅"
       },
       "pagination": "歌曲设置分页"
+    },
+    "hotkey": {
+      "duplicateHotkey": "重复快捷键",
+      "registerFailed": "快捷键注册失败",
+      "registerFailedRetry": "快捷键注册失败，请尝试其他组合"
     },
     "shortcut": {
       "pages": {
@@ -2263,6 +2332,7 @@
       "latestVersion": "最新版本",
       "downloadingFrom": "正在从 {{source}} 下载更新…",
       "preparingDownload": "准备下载…",
+      "downloadFailed": "下载失败，请稍后重试",
       "actions": {
         "check": "检查更新",
         "checking": "检查中…",
@@ -2469,6 +2539,7 @@
       "mimoReasoningEffort": "Mimo 推理强度",
       "ollamaReasoningEffort": "思考强度",
       "customReasoningEffort": "推理强度",
+      "minimaxReasoningEffort": "MiniMax 推理强度",
       "deepseekReasoningEffortOptions": {
         "low": "低 (low)",
         "medium": "中 (medium)",
@@ -2518,7 +2589,8 @@
       "r1pxcAvatarUploadHint": "拖入图片，或点击从文件资源管理器选择",
       "r1pxcAvatarClear": "清除头像",
       "r1pxcAvatarFileTypeError": "请选择图片文件（png/jpg/webp 等）",
-      "r1pxcAvatarReadError": "头像读取失败，请换一张图片重试"
+      "r1pxcAvatarReadError": "头像读取失败，请换一张图片重试",
+      "pagination": "AI 设置分页"
     },
     "about": {
       "pagination": "关于软件分页",
@@ -2604,7 +2676,8 @@
           "openGithubIssueFailed": "打开 GitHub Issue 失败，请稍后重试",
           "submitSuccess": "反馈已提交，感谢你的建议",
           "submitFailed": "反馈提交失败，请稍后重试",
-          "loadFailed": "反馈记录加载失败"
+          "loadFailed": "反馈记录加载失败",
+          "prefilledFromAgent": "已自动填充 Agent 输出，你可以补充复现步骤后直接提交。"
         },
         "history": {
           "title": "我的反馈记录",
@@ -2627,7 +2700,8 @@
         }
       },
       "copyright": "© JNTMTMTM, pyisland.com 版权所有",
-      "slogan": "算法诠释一切 质疑即是认可"
+      "slogan": "算法诠释一切 质疑即是认可",
+      "authorName": "鸡哥"
     },
     "user": {
       "auth": {
@@ -2679,7 +2753,8 @@
       },
       "card": {
         "memberSince": "加入时间",
-        "proExpireAt": "Pro到期时间"
+        "proExpireAt": "Pro到期时间",
+        "balance": "余额"
       },
       "infoNav": {
         "editDesc": "修改性别、生日等基本资料",
@@ -2856,6 +2931,7 @@
       "feedback": {
         "submitting": "处理中…",
         "loadingProfile": "加载账号资料中…",
+        "needLogin": "请先登录后再上传头像",
         "loadFailed": "加载资料失败",
         "sessionExpired": "登录已过期，请重新登录",
         "usernameRequired": "请输入用户名",
@@ -3036,6 +3112,11 @@
         "label": "SMTC",
         "desc": "系统媒体传输控制相关配置。"
       }
+    }
+  },
+  "idle": {
+    "pomodoro": {
+      "label": "番茄钟"
     }
   }
 }
