@@ -84,6 +84,40 @@ After any UI change (new component, new text, modified labels, new feedback mess
 
 Verification: `grep -rn "defaultValue" src/renderer/components/<changed-dir>/` should show `t()` wrappers, not raw strings.
 
+## 7. Comment Standards (Code Change Gate)
+
+**All code must comply with `docs/COMMENT_STANDARDS.md`. No exceptions.**
+
+After any TS/TSX file creation or modification:
+1. **File header required**: Every `.ts`/`.tsx` file must start with GPL-3.0 copyright block + JSDoc `@file`/`@description`/`@author` (author: 鸡哥).
+2. **Exported functions**: Every exported function/class/method must have JSDoc with `@param` and `@returns`.
+3. **Explain "why"**: Comments should explain business logic and design decisions, not restate what the code does.
+4. **No over-commenting**: Don't comment trivial getters, self-explanatory assignments, or simple React skeletons.
+
+Verification: new/changed files must pass the header check (`head -20` shows copyright + JSDoc block).
+
+## 8. Frontend Standards (Code Change Gate)
+
+**All frontend code must comply with `docs/FRONTEND_STANDARDS.md`. No exceptions.**
+
+Key rules enforced on every frontend change:
+
+| Category | Rule | Forbidden | Use instead |
+|----------|------|-----------|-------------|
+| Variables | `const`/`let` only | `var` | `const` / `let` |
+| Types | Strict typing | `any`, `Function`, `Object` | explicit types / `unknown` |
+| Equality | Strict comparison | `==` / `!=` | `===` / `!==` |
+| Strings | Single quotes + template literals | double quotes in JS/TS, `+` concatenation | `'str'` / `` `tmpl` `` |
+| Security | No injection | `eval()`, `innerHTML`, `javascript:` URLs | safe DOM APIs / sanitization |
+| React | No Props spreading | `...props` | explicit prop passing |
+| React | Stable list keys | array index as `key` | unique ID |
+| CSS | No `!important` | `!important` | restructure selectors |
+| CSS | No ID selectors | `#id` in CSS | class selectors |
+| Tailwind | Utility-first | custom classnames | atomic utility classes |
+| Format | 2-space indent, semicolons required | inconsistent formatting | match existing style |
+
+When in doubt, refer to the full document at `docs/FRONTEND_STANDARDS.md`.
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
