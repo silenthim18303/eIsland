@@ -142,7 +142,7 @@ const CHINESE_RE = /[一-鿿]/;
 const SKIP_RE = /^import\s|^export\s|^from\s|^type\s|^interface\s|^const\s+\w+\s*=\s*vi\.|^\/\/|^\/\*|^\s*\*/;
 const JSX_STRING_RE = />\s*[^<]*[一-鿿][^<]*<\//;
 const ATTR_STRING_RE = /(?:title|label|placeholder|alt|aria-label|content)=\{?\s*["'][^"']*[一-鿿][^"']*["']/;
-const T_WRAPPED_RE = /\bt\(\s*['"][^'"]*['"]/;
+const T_WRAPPED_RE = /\bt\(\s*['"][^'"]*['"]|tr\(\s*['"][^'"]*['"]/;
 
 const hardcodedIssues: Issue[] = [];
 
@@ -152,17 +152,50 @@ for (const filePath of sourceFiles) {
   const relPath = relative(ROOT, filePath).replace(/\\/g, '/');
   const lines = content.split('\n');
 
+  // 跟踪多行 t()/tr() 调用的括号深度（使用总括号计数）
+  let insideTCall = false;
+  let tCallDepth = 0;
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
     // 跳过注释行和 import 行
     if (SKIP_RE.test(line.trim())) continue;
 
-    // 跳过已用 t() 包裹的行
-    if (T_WRAPPED_RE.test(line)) continue;
+    const lineOpens = (line.match(/\(/g) ?? []).length;
+    const lineCloses = (line.match(/\)/g) ?? []).length;
 
-    // 跳过包含 t( 调用的行（可能在同一行有 t() 和其他内容）
-    if (/\bt\(/.test(line)) continue;
+    if (!insideTCall) {
+      // 检查是否包含 t()/tr() 调用（包括 T_WRAPPED_RE 匹配的行）
+      if (T_WRAPPED_RE.test(line) || /\bt\(|\btr\(/.test(line)) {
+        if (lineOpens > lineCloses) {
+          insideTCall = true;
+          tCallDepth = lineOpens - lineCloses;
+        }
+        continue;
+      }
+    } else {
+      // 在多行 t()/tr() 调用内部，跟踪括号深度
+      tCallDepth += lineOpens - lineCloses;
+      if (tCallDepth <= 0) {
+        insideTCall = false;
+        tCallDepth = 0;
+      }
+      continue;
+    }
+
+    // 跳过中文仅出现在正则表达式中的行（支持转义斜杠）
+    const lineWithoutRegex = line.replace(/\/(?:[^/\\]|\\.)+\/[gimsuy]*/g, '');
+    if (CHINESE_RE.test(line) && !CHINESE_RE.test(lineWithoutRegex)) continue;
+
+    // 跳过 new Error('中文') 模式（开发者面向的错误信息）
+    if (/new\s+Error\s*\(\s*['"][^'"]*[一-鿿]/.test(line)) continue;
+
+    // 跳过 .includes('中文') 模式（错误信息匹配）
+    if (/\.includes\s*\(\s*['"][^'"]*[一-鿿]/.test(line)) continue;
+
+    // 跳过模板字面量中的数据格式标记（如 markdown 引用前缀 `> 引用:`）
+    if (/`[^`]*[一-鿿][^`]*`/.test(line) && />\s*引用\s*[:：]/.test(line)) continue;
 
     // 检测 JSX 文本内容中的中文
     if (JSX_STRING_RE.test(line)) {

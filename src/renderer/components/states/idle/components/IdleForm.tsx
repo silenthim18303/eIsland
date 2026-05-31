@@ -71,8 +71,8 @@ export function IdleForm(props: IdleFormProps): ReactElement {
       return (
         <div className="flex items-center gap-1.5">
           <span className="flex items-center gap-1 text-xs text-[var(--color-island-text)] opacity-60">
-            <img src={SvgIcon.POMODORO} alt="番茄钟" style={{ width: pomodoroIconSize, height: pomodoroIconSize }} />
-            番茄钟
+            <img src={SvgIcon.POMODORO} alt={t('idle.pomodoro.label', { defaultValue: '番茄钟' })} style={{ width: pomodoroIconSize, height: pomodoroIconSize }} />
+            {t('idle.pomodoro.label', { defaultValue: '番茄钟' })}
           </span>
           <span className="text-sm text-[var(--color-island-text)] font-medium tabular-nums">
             {padZero(pomodoroM)}:{padZero(pomodoroS)}

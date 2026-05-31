@@ -26,6 +26,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import type { SyncedLyricLine, SyncedLyricSyllable } from '../../../store/types';
 import { SvgIcon } from '../../../utils/SvgIcon';
@@ -90,6 +91,7 @@ function KaraokeSyllableLine({
  * @description 鼠标离开 hover 且正在播放音乐时显示，左侧专辑封面+光晕，右侧歌词
  */
 export function LyricsContent(): ReactElement {
+  const { t } = useTranslation();
   const isMusicPlaying = useIslandStore((s) => s.isMusicPlaying);
   const isPlaying = useIslandStore((s) => s.isPlaying);
   const coverImage = useIslandStore((s) => s.coverImage);
@@ -229,7 +231,7 @@ export function LyricsContent(): ReactElement {
             <span className="lyrics-loading-dot" />
             <span className="lyrics-loading-dot" />
             <span className="lyrics-loading-dot" />
-            <span className="lyrics-loading-label">正在加载歌词</span>
+            <span className="lyrics-loading-label">{t('songTab.lyrics.loading')}</span>
           </div>
         ) : isIntro ? (
           <>
@@ -252,7 +254,7 @@ export function LyricsContent(): ReactElement {
             )}
           </span>
         ) : (
-          <span className="lyrics-empty">暂无歌词 享受音乐</span>
+          <span className="lyrics-empty">{t('songTab.lyrics.empty')} {t('songTab.lyrics.enjoyMusic', { defaultValue: '享受音乐' })}</span>
         )}
       </div>
     </div>
