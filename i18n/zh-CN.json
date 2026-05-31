@@ -1255,7 +1255,8 @@
           "ping": "延迟",
           "download": "下载速度",
           "upload": "上传速度",
-          "resultTitle": "测试结果"
+          "resultTitle": "测试结果",
+          "result": "结果"
         }
       },
       "fileCompression": {

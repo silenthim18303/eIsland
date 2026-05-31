@@ -1251,6 +1251,7 @@
           "applyBtn": "Apply URL",
           "testBtn": "Run Speed Test",
           "testing": "Testing...",
+          "failed": "Test failed, please try again",
           "ping": "Ping",
           "download": "Download",
           "upload": "Upload",
