@@ -34,11 +34,11 @@ import { initTheme } from './utils/theme';
 import { bootstrapAuthSession } from './utils/authSession';
 import useIslandStore from './store/slices';
 import type { NowPlayingInfo } from './store/types';
-import './i18n';
+import i18n from './i18n';
 
 const root = document.getElementById('root');
 if (!root) {
-  throw new Error('[StandaloneRenderer] 未找到 #root 挂载节点');
+  throw new Error(`[StandaloneRenderer] ${i18n.t('common.errors.rootMountNotFound', { defaultValue: '未找到 #root 挂载节点' })}`);
 }
 const rootEl = root;
 
