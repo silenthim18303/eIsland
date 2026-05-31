@@ -59,7 +59,7 @@ function loadJson(filePath: string, label: string): Record<string, unknown> {
   try {
     return JSON.parse(readFileSync(filePath, 'utf-8'));
   } catch {
-    console.error(`❌ 无法读取 ${label}: ${filePath}`);
+    console.error(`[ERROR] 无法读取 ${label}: ${filePath}`);
     process.exit(1);
   }
 }
@@ -73,26 +73,26 @@ const enKeys = new Set(flattenKeys(en));
 const missingInEn = [...zhKeys].filter((k) => !enKeys.has(k)).sort();
 const missingInZh = [...enKeys].filter((k) => !zhKeys.has(k)).sort();
 
-console.log(`📊 zh-CN: ${zhKeys.size} keys | en-US: ${enKeys.size} keys`);
+console.log(`[INFO] zh-CN: ${zhKeys.size} keys | en-US: ${enKeys.size} keys`);
 
 if (missingInEn.length === 0 && missingInZh.length === 0) {
-  console.log('✅ 所有翻译键完全一致，无缺失。');
+  console.log('[PASS] 所有翻译键完全一致，无缺失。');
   process.exit(0);
 }
 
 if (missingInEn.length > 0) {
-  console.log(`\n❌ en-US 缺少 ${missingInEn.length} 个翻译键（zh-CN 中存在）:`);
+  console.log(`\n[FAIL] en-US 缺少 ${missingInEn.length} 个翻译键（zh-CN 中存在）:`);
   for (const key of missingInEn) {
-    console.log(`   - ${key}`);
+    console.log(`  - ${key}`);
   }
 }
 
 if (missingInZh.length > 0) {
-  console.log(`\n❌ zh-CN 缺少 ${missingInZh.length} 个翻译键（en-US 中存在）:`);
+  console.log(`\n[FAIL] zh-CN 缺少 ${missingInZh.length} 个翻译键（en-US 中存在）:`);
   for (const key of missingInZh) {
-    console.log(`   - ${key}`);
+    console.log(`  - ${key}`);
   }
 }
 
-console.log(`\n总计缺失: ${missingInEn.length + missingInZh.length} 个`);
+console.log(`\n[SUMMARY] 总计缺失: ${missingInEn.length + missingInZh.length} 个`);
 process.exit(1);

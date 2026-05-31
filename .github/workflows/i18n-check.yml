@@ -81,23 +81,23 @@ jobs:
             };
 
             const exitCode = process.env.EXIT_CODE || '1';
-            const status = exitCode === '0' ? '✅ All translations in sync' : '❌ Missing translations detected';
+            const status = exitCode === '0' ? 'PASS' : 'FAIL';
             const shortSha = (context.sha || '').slice(0, 7) || 'unknown';
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
             const body = `${marker}
-            ## 🌐 i18n Translation Completeness Report
+            ## i18n Translation Completeness Report
 
-            **Status:** ${status}
-            - Commit: \`${shortSha}\`
+            | Item | Value |
+            |------|-------|
+            | Status | ${status} |
+            | Commit | \`${shortSha}\` |
 
-            <details>
-            <summary>Check output</summary>
+            ### Check Output
 
             \`\`\`
             ${readLog('i18n-check.log')}
             \`\`\`
-            </details>
 
             [View workflow run](${runUrl})`;
 
