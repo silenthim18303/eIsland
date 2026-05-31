@@ -20,23 +20,24 @@
 
 /**
  * @file check-i18n-completeness.ts
- * @description 检查 i18n 翻译文件的完整性，确保 zh-CN 和 en-US 的翻译键完全一致
+ * @description 检查 i18n 翻译完整性：翻译文件键对齐、源码 t() 调用有效性、源码硬编码中文检测
  * @author 鸡哥
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative, extname } from 'node:path';
 
 const ROOT = join(import.meta.dirname, '..');
 const ZH_PATH = join(ROOT, 'i18n', 'zh-CN.json');
 const EN_PATH = join(ROOT, 'i18n', 'en-US.json');
+const SRC_DIR = join(ROOT, 'src');
 
-/**
- * 递归展开嵌套对象为点分隔的键路径
- * @param obj - JSON 对象
- * @param prefix - 当前前缀
- * @returns 扁平化的键数组
- */
+const IGNORED_DIRS = new Set(['.git', 'node_modules', 'dist', 'out', 'test', '__tests__']);
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx']);
+
+type Issue = { file: string; line: number; rule: string; message: string };
+
+/** 递归展开嵌套对象为点分隔的键路径 */
 function flattenKeys(obj: Record<string, unknown>, prefix = ''): string[] {
   const keys: string[] = [];
   for (const [k, v] of Object.entries(obj)) {
@@ -50,11 +51,7 @@ function flattenKeys(obj: Record<string, unknown>, prefix = ''): string[] {
   return keys;
 }
 
-/**
- * 读取并解析 JSON 文件
- * @param filePath - 文件路径
- * @param label - 用于错误提示的标签
- */
+/** 读取并解析 JSON 文件 */
 function loadJson(filePath: string, label: string): Record<string, unknown> {
   try {
     return JSON.parse(readFileSync(filePath, 'utf-8'));
@@ -64,35 +61,145 @@ function loadJson(filePath: string, label: string): Record<string, unknown> {
   }
 }
 
+/** 递归收集目录下的源文件 */
+function collectSourceFiles(dir: string): string[] {
+  const files: string[] = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (IGNORED_DIRS.has(entry.name)) continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...collectSourceFiles(full));
+    } else if (SOURCE_EXTENSIONS.has(extname(entry.name))) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+
+// ── Check 1: 翻译文件键对齐 ──
+
 const zh = loadJson(ZH_PATH, 'zh-CN');
 const en = loadJson(EN_PATH, 'en-US');
-
 const zhKeys = new Set(flattenKeys(zh));
 const enKeys = new Set(flattenKeys(en));
+const allKeys = new Set([...zhKeys, ...enKeys]);
 
 const missingInEn = [...zhKeys].filter((k) => !enKeys.has(k)).sort();
 const missingInZh = [...enKeys].filter((k) => !zhKeys.has(k)).sort();
 
 console.log(`[INFO] zh-CN: ${zhKeys.size} keys | en-US: ${enKeys.size} keys`);
 
-if (missingInEn.length === 0 && missingInZh.length === 0) {
-  console.log('[PASS] 所有翻译键完全一致，无缺失。');
-  process.exit(0);
-}
-
 if (missingInEn.length > 0) {
   console.log(`\n[FAIL] en-US 缺少 ${missingInEn.length} 个翻译键（zh-CN 中存在）:`);
-  for (const key of missingInEn) {
-    console.log(`  - ${key}`);
-  }
+  for (const key of missingInEn) console.log(`  - ${key}`);
 }
 
 if (missingInZh.length > 0) {
   console.log(`\n[FAIL] zh-CN 缺少 ${missingInZh.length} 个翻译键（en-US 中存在）:`);
-  for (const key of missingInZh) {
-    console.log(`  - ${key}`);
+  for (const key of missingInZh) console.log(`  - ${key}`);
+}
+
+if (missingInEn.length === 0 && missingInZh.length === 0) {
+  console.log('[PASS] 翻译文件键完全一致。');
+}
+
+// ── Check 2: 源码 t() 调用的键是否存在于翻译文件中 ──
+
+const sourceFiles = collectSourceFiles(SRC_DIR);
+const missingKeyIssues: Issue[] = [];
+
+const T_CALL_RE = /\bt\(\s*['"]([^'"]+)['"]/g;
+
+for (const filePath of sourceFiles) {
+  const content = readFileSync(filePath, 'utf-8');
+  const relPath = relative(ROOT, filePath).replace(/\\/g, '/');
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    let match: RegExpExecArray | null;
+    T_CALL_RE.lastIndex = 0;
+    while ((match = T_CALL_RE.exec(lines[i])) !== null) {
+      const key = match[1];
+      if (!allKeys.has(key)) {
+        missingKeyIssues.push({ file: relPath, line: i + 1, rule: 'missing_key', message: `t('${key}') 键不存在于翻译文件中` });
+      }
+    }
   }
 }
 
-console.log(`\n[SUMMARY] 总计缺失: ${missingInEn.length + missingInZh.length} 个`);
-process.exit(1);
+if (missingKeyIssues.length > 0) {
+  console.log(`\n[FAIL] 源码中 ${missingKeyIssues.length} 处 t() 调用引用了不存在的翻译键:`);
+  for (const issue of missingKeyIssues) {
+    console.log(`  - ${issue.file}:${issue.line} ${issue.message}`);
+  }
+} else {
+  console.log('[PASS] 源码中所有 t() 调用的键均存在于翻译文件中。');
+}
+
+// ── Check 3: TSX 文件中硬编码中文检测 ──
+
+const CHINESE_RE = /[一-鿿]/;
+const SKIP_RE = /^import\s|^export\s|^from\s|^type\s|^interface\s|^const\s+\w+\s*=\s*vi\.|^\/\/|^\/\*|^\s*\*/;
+const JSX_STRING_RE = />\s*[^<]*[一-鿿][^<]*<\//;
+const ATTR_STRING_RE = /(?:title|label|placeholder|alt|aria-label|content)=\{?\s*["'][^"']*[一-鿿][^"']*["']/;
+const T_WRAPPED_RE = /\bt\(\s*['"][^'"]*['"]/;
+
+const hardcodedIssues: Issue[] = [];
+
+for (const filePath of sourceFiles) {
+  if (!filePath.endsWith('.tsx')) continue;
+  const content = readFileSync(filePath, 'utf-8');
+  const relPath = relative(ROOT, filePath).replace(/\\/g, '/');
+  const lines = content.split('\n');
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // 跳过注释行和 import 行
+    if (SKIP_RE.test(line.trim())) continue;
+
+    // 跳过已用 t() 包裹的行
+    if (T_WRAPPED_RE.test(line)) continue;
+
+    // 跳过包含 t( 调用的行（可能在同一行有 t() 和其他内容）
+    if (/\bt\(/.test(line)) continue;
+
+    // 检测 JSX 文本内容中的中文
+    if (JSX_STRING_RE.test(line)) {
+      hardcodedIssues.push({ file: relPath, line: i + 1, rule: 'hardcoded_chinese', message: `JSX 文本中包含硬编码中文` });
+      continue;
+    }
+
+    // 检测属性值中的中文
+    if (ATTR_STRING_RE.test(line)) {
+      hardcodedIssues.push({ file: relPath, line: i + 1, rule: 'hardcoded_chinese', message: `属性值中包含硬编码中文` });
+      continue;
+    }
+
+    // 检测字符串字面量中的中文（排除 import、type 等）
+    if (CHINESE_RE.test(line) && /['"`]/.test(line)) {
+      hardcodedIssues.push({ file: relPath, line: i + 1, rule: 'hardcoded_chinese', message: `字符串中包含硬编码中文` });
+    }
+  }
+}
+
+if (hardcodedIssues.length > 0) {
+  console.log(`\n[FAIL] 检测到 ${hardcodedIssues.length} 处可能的硬编码中文（应使用 t() 包裹）:`);
+  for (const issue of hardcodedIssues) {
+    console.log(`  - ${issue.file}:${issue.line} ${issue.message}`);
+  }
+} else {
+  console.log('[PASS] TSX 文件中未检测到硬编码中文。');
+}
+
+// ── Summary ──
+
+const totalIssues = missingInEn.length + missingInZh.length + missingKeyIssues.length + hardcodedIssues.length;
+
+console.log('\n[SUMMARY]');
+console.log(`  翻译文件缺失键: ${missingInEn.length + missingInZh.length}`);
+console.log(`  t() 引用无效键: ${missingKeyIssues.length}`);
+console.log(`  硬编码中文: ${hardcodedIssues.length}`);
+console.log(`  总计问题: ${totalIssues}`);
+
+process.exit(totalIssues > 0 ? 1 : 0);
