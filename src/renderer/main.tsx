@@ -32,7 +32,7 @@ import useIslandStore from './store/slices';
 import { hydrateWeatherLocationConfigFromStore } from './store/utils/storage';
 import { initTheme } from './utils/theme';
 import { bootstrapAuthSession } from './utils/authSession';
-import './i18n';
+import i18n from './i18n';
 
 function applyIslandOpacity(opacity: number): void {
   const safe = Math.max(10, Math.min(100, Math.round(opacity)));
@@ -41,7 +41,7 @@ function applyIslandOpacity(opacity: number): void {
 
 const root = document.getElementById('root');
 if (!root) {
-  throw new Error('[Renderer] 未找到 #root 挂载节点');
+  throw new Error(`[Renderer] ${i18n.t('common.errors.rootMountNotFound', { defaultValue: '未找到 #root 挂载节点' })}`);
 }
 const rootEl = root;
 
