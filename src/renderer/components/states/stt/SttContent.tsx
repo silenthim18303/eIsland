@@ -24,10 +24,11 @@
  * @author 鸡哥
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/isLandStore';
+import { useSttTextSync } from './hooks/useSttTextSync';
 import '../../../styles/stt/stt.css';
 
 /**
@@ -46,11 +47,7 @@ export function SttContent(): ReactElement {
   const [addedTodo, setAddedTodo] = useState(false);
   const [addedMemo, setAddedMemo] = useState(false);
 
-  useEffect(() => {
-    if (editRef.current && !editing) {
-      editRef.current.textContent = sttText || '...';
-    }
-  }, [sttText, editing]);
+  useSttTextSync(editRef, sttText, editing);
 
   const handleFocus = (): void => {
     setEditing(true);
