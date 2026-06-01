@@ -1,6 +1,7 @@
 /.cursor
 /.windsurf
-/.claude
+/.claude/settings.json
+/.claude/settings.local.json
 /CLAUDE.md
 /test.ts
 /test.tsx
