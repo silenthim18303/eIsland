@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState, type ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import { SvgIcon } from '../../../utils/SvgIcon';
@@ -37,6 +37,7 @@ import type { NotificationContentProps, UrlFavoriteItem, UpdateSourceKey } from 
 import { formatBytes, formatEta, normalizeUrl, resolveNotificationIconUrl, normalizeUpdateSource, isProOnlySource, sanitizeFavorites, persistFavorites } from './utils/notificationHelpers';
 import { useNotificationFavorites } from './hooks/useNotificationFavorites';
 import { useUpdateDownloadProgress } from './hooks/useUpdateDownloadProgress';
+import { useResetOnTypeChange } from './hooks/useResetOnTypeChange';
 import '../../../styles/notification/notification.css';
 
 /**
@@ -103,18 +104,7 @@ export function NotificationContent({
 
   const { favoriteUrlSet, setFavoriteUrlSet } = useNotificationFavorites(type, urls);
   const updateDownloadProgress = useUpdateDownloadProgress(type);
-
-  useEffect(() => {
-    setCurrentUrlIndex(0);
-  }, [type, urls]);
-
-  useEffect(() => {
-    setClipboardFaviconIndex(0);
-  }, [type, currentClipboardUrl]);
-
-  useEffect(() => {
-    setUseClipboardVectorFallbackIcon(false);
-  }, [type, currentClipboardUrl, icon]);
+  useResetOnTypeChange(type, urls, currentClipboardUrl, icon, setCurrentUrlIndex, setClipboardFaviconIndex, setUseClipboardVectorFallbackIcon);
 
   const updateDownloadBody = (() => {
     if (type !== 'update-downloading') return '';
