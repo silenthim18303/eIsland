@@ -191,12 +191,12 @@ jobs:
 
           {
             echo "<!-- pr-auto-comment-report -->"
-            echo "## 🤖 PR 自动检查报告"
+            echo "## PR 自动检查报告"
             echo ""
             echo "- PR: #${{ github.event.pull_request.number }}"
             echo "- 分支: \`${{ github.event.pull_request.head.ref }}\` -> \`${{ github.event.pull_request.base.ref }}\`"
             echo "- 触发提交: \`${{ github.event.pull_request.head.sha }}\`"
-            echo "- 注释规范检查: ${{ steps.comment_check.outputs.passed == 'true' && '✅ 通过' || '❌ 未通过' }}"
+            echo "- 注释规范检查: ${{ steps.comment_check.outputs.passed == 'true' && 'PASS' || 'FAIL' }}"
             echo ""
             echo "### 本次 PR 更新记录"
             cat pr-change-notes.md

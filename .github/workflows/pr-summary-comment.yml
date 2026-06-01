@@ -39,13 +39,13 @@ jobs:
 
             // ========== 3. 按模块分组 ==========
             const moduleRules = [
-              { label: '🖥️ 渲染层 (renderer)',   re: /^src\/renderer\//  },
-              { label: '⚙️ 主进程 (main)',        re: /^src\/main\//     },
-              { label: '🔌 预加载 (preload)',      re: /^src\/preload\//  },
-              { label: '🔧 CI / 工作流',          re: /^\.github\//      },
-              { label: '📦 构建 / 配置',          re: /^(electron\..*|package\.json|tsconfig.*|\.eslintrc.*)$/ },
-              { label: '📝 文档',                 re: /\.(md|txt)$/i     },
-              { label: '🎨 资源文件',             re: /\.(png|jpg|jpeg|gif|svg|webp|ico|css)$/i },
+              { label: '渲染层 (renderer)',   re: /^src\/renderer\//  },
+              { label: '主进程 (main)',        re: /^src\/main\//     },
+              { label: '预加载 (preload)',      re: /^src\/preload\//  },
+              { label: 'CI / 工作流',          re: /^\.github\//      },
+              { label: '构建 / 配置',          re: /^(electron\..*|package\.json|tsconfig.*|\.eslintrc.*)$/ },
+              { label: '文档',                 re: /\.(md|txt)$/i     },
+              { label: '资源文件',             re: /\.(png|jpg|jpeg|gif|svg|webp|ico|css)$/i },
             ];
 
             const groups = {};
@@ -64,7 +64,7 @@ jobs:
               }
               if (!matched) otherFiles.push(f);
             }
-            if (otherFiles.length > 0) groups['📂 其他'] = otherFiles;
+            if (otherFiles.length > 0) groups['其他'] = otherFiles;
 
             // ========== 4. 统计数据 ==========
             let totalAdded = 0, totalDeleted = 0;
@@ -87,15 +87,15 @@ jobs:
             });
 
             // ========== 6. 文件变更详情 ==========
-            const statusEmoji = { added: '🟢', modified: '🟡', removed: '🔴', renamed: '🔵' };
+            const statusLabel = { added: 'ADD', modified: 'MOD', removed: 'DEL', renamed: 'REN' };
             const buildGroupTable = (groupFiles) => {
               const lines = [];
               for (const f of groupFiles) {
-                const emoji = statusEmoji[f.status] || '⚪';
+                const label = statusLabel[f.status] || f.status;
                 const name = sanitizeMentions(f.filename || '');
                 const adds = f.additions || 0;
                 const dels = f.deletions || 0;
-                lines.push(`| ${emoji} ${f.status} | \`${name}\` | +${adds} / -${dels} |`);
+                lines.push(`| ${label} | \`${name}\` | +${adds} / -${dels} |`);
               }
               return lines;
             };
@@ -108,7 +108,7 @@ jobs:
             // ========== 7. 组装评论正文 ==========
             const body = [];
             body.push(marker);
-            body.push('## 📋 PR 内容自动总结');
+            body.push('## PR 内容自动总结');
             body.push('');
 
             // 基本信息
@@ -126,19 +126,19 @@ jobs:
             body.push('');
 
             // 文件操作统计
-            body.push('### 📊 变更统计');
+            body.push('### 变更统计');
             body.push('');
             body.push(`| 操作 | 数量 |`);
             body.push(`| --- | --- |`);
-            if (statusCount.added > 0)    body.push(`| 🟢 新增 | ${statusCount.added} |`);
-            if (statusCount.modified > 0) body.push(`| 🟡 修改 | ${statusCount.modified} |`);
-            if (statusCount.removed > 0)  body.push(`| 🔴 删除 | ${statusCount.removed} |`);
-            if (statusCount.renamed > 0)  body.push(`| 🔵 重命名 | ${statusCount.renamed} |`);
+            if (statusCount.added > 0)    body.push(`| 新增 | ${statusCount.added} |`);
+            if (statusCount.modified > 0) body.push(`| 修改 | ${statusCount.modified} |`);
+            if (statusCount.removed > 0)  body.push(`| 删除 | ${statusCount.removed} |`);
+            if (statusCount.renamed > 0)  body.push(`| 重命名 | ${statusCount.renamed} |`);
             body.push('');
 
             // 影响模块概览
             const affectedModules = Object.keys(groups);
-            body.push('### 🗂️ 影响模块');
+            body.push('### 影响模块');
             body.push('');
             for (const mod of affectedModules) {
               const gf = groups[mod];
@@ -150,7 +150,7 @@ jobs:
 
             // 分组文件详情
             body.push('<details>');
-            body.push('<summary><strong>📁 文件变更详情（点击展开）</strong></summary>');
+            body.push('<summary><strong>文件变更详情（点击展开）</strong></summary>');
             body.push('');
             for (const mod of affectedModules) {
               body.push(`#### ${mod}`);
@@ -165,7 +165,7 @@ jobs:
 
             // 提交记录
             body.push('<details>');
-            body.push(`<summary><strong>📝 提交记录${commits.length > 15 ? `（最近 15 / 共 ${commits.length}）` : `（共 ${commits.length}）`}</strong></summary>`);
+            body.push(`<summary><strong>提交记录${commits.length > 15 ? `（最近 15 / 共 ${commits.length}）` : `（共 ${commits.length}）`}</strong></summary>`);
             body.push('');
             body.push('| SHA | 日期 | 说明 |');
             body.push('| --- | --- | --- |');
@@ -178,16 +178,16 @@ jobs:
             const prBody = sanitizeMentions((pr.body || '').trim());
             if (prBody) {
               body.push('<details>');
-              body.push('<summary><strong>📄 PR 描述原文</strong></summary>');
+              body.push('<summary><strong>PR 描述原文</strong></summary>');
               body.push('');
-              body.push(prBody.length > 3000 ? prBody.slice(0, 3000) + '\n\n> ⚠️ 描述过长，已截断至 3000 字符' : prBody);
+              body.push(prBody.length > 3000 ? prBody.slice(0, 3000) + '\n\n> [WARNING] 描述过长，已截断至 3000 字符' : prBody);
               body.push('');
               body.push('</details>');
               body.push('');
             }
 
             body.push('---');
-            body.push('> 🤖 此评论由 **PR Summary** 工作流自动生成');
+            body.push('> 此评论由 **PR Summary** 工作流自动生成');
 
             const commentBody = body.join('\n');
 
