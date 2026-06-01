@@ -11,6 +11,11 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  */
 
 /**
@@ -20,18 +25,13 @@
  * @author 鸡哥
  */
 
-import { useMemo, useState } from 'react';
-import type { CSSProperties, ReactElement } from 'react';
+import { useState } from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { UserCaptchaChallenge } from '../../../api/user/userAccountApi';
+import type { SliderCaptchaContentProps } from './config/sliderCaptchaTypes';
+import { useSliderCaptchaDerived } from './hooks/useSliderCaptchaDerived';
 import '../../../styles/slider-captcha.css';
 import eislandLogo from '../../../../../resources/icon/eisland.svg';
-
-interface SliderCaptchaContentProps {
-  challenge: UserCaptchaChallenge;
-  onCancel: () => void;
-  onConfirm: (value: number) => void;
-}
 
 /**
  * 渲染滑块验证码弹层组件。
@@ -44,56 +44,21 @@ export function SliderCaptchaContent({ challenge, onCancel, onConfirm }: SliderC
   const { t } = useTranslation();
   const [value, setValue] = useState(challenge.minValue);
   const [closing, setClosing] = useState(false);
-
-  const sliderProgress = useMemo(() => {
-    const range = challenge.maxValue - challenge.minValue;
-    if (range <= 0) {
-      return 0;
-    }
-    const progress = ((value - challenge.minValue) / range) * 100;
-    return Math.max(0, Math.min(100, progress));
-  }, [challenge.maxValue, challenge.minValue, value]);
-
-  const sliderStyle = useMemo(() => ({
-    '--slider-progress': `${sliderProgress}%`,
-  }) as CSSProperties, [sliderProgress]);
-
-  const challengeExpression = useMemo(() => {
-    const target = challenge.targetValue;
-    const left = Math.floor(Math.random() * (target + 1));
-    const right = target - left;
-    return `${left} + ${right}`;
-  }, [challenge.challengeId, challenge.targetValue]);
-
-  const traceCode = useMemo(() => {
-    const challengeId = challenge.challengeId?.trim();
-    if (!challengeId) {
-      return '--';
-    }
-    return challengeId.toUpperCase();
-  }, [challenge.challengeId]);
+  const { sliderStyle, challengeExpression, traceCode } = useSliderCaptchaDerived(challenge, value);
 
   const closeWithAnimation = (handler: () => void): void => {
-    if (closing) {
-      return;
-    }
+    if (closing) return;
     setClosing(true);
-    window.setTimeout(() => {
-      handler();
-    }, 180);
+    window.setTimeout(() => { handler(); }, 180);
   };
 
   return (
     <div
       className={`slider-captcha-overlay${closing ? ' is-closing' : ''}`}
-      onMouseDown={(event) => {
-        event.stopPropagation();
-      }}
+      onMouseDown={(event) => { event.stopPropagation(); }}
       onClick={(event) => {
         event.stopPropagation();
-        if (event.target === event.currentTarget) {
-          closeWithAnimation(onCancel);
-        }
+        if (event.target === event.currentTarget) closeWithAnimation(onCancel);
       }}
     >
       <div className={`slider-captcha-card slider-captcha-card--danger${closing ? ' is-closing' : ''}`}>
