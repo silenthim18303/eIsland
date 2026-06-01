@@ -24,45 +24,19 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import { registerUserWithCode, sendUserEmailCode } from '../../../api/user/userAccountApi';
 import { updateSessionToken } from '../../../utils/authSession';
 import { runSliderCaptcha } from '../../../utils/sliderCaptcha';
+import { USERNAME_ALLOWED_PATTERN, EMAIL_PATTERN, type Feedback } from './config/registerConstants';
+import { readStandaloneWindowMode } from './utils/readStandaloneWindowMode';
+import { useSendCooldown } from './hooks/useSendCooldown';
+import { FeedbackMessage } from './components/FeedbackMessage';
 import '../../../styles/settings/settings.css';
 import '../../../styles/auth/auth.css';
-
-const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
-const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
-
-type FeedbackType = 'success' | 'error' | 'info';
-
-interface Feedback {
-  type: FeedbackType;
-  text: string;
-}
-
-const USERNAME_ALLOWED_PATTERN = /^[A-Za-z0-9\u4E00-\u9FFF]+$/;
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-async function readStandaloneWindowMode(): Promise<'integrated' | 'standalone'> {
-  try {
-    const mode = await window.api.storeRead(STANDALONE_WINDOW_MODE_STORE_KEY);
-    if (mode === 'standalone') return 'standalone';
-    if (mode === 'integrated') return 'integrated';
-  } catch {
-    // ignore
-  }
-  try {
-    const legacyMode = await window.api.storeRead(LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY);
-    if (legacyMode === 'standalone') return 'standalone';
-  } catch {
-    // ignore
-  }
-  return 'integrated';
-}
 
 /** 独立注册状态内容 */
 export function RegisterContent(): ReactElement {
@@ -77,21 +51,11 @@ export function RegisterContent(): ReactElement {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
-  const [sendCooldownSeconds, setSendCooldownSeconds] = useState(0);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-
-  useEffect(() => {
-    if (sendCooldownSeconds <= 0) return;
-    const timer = window.setTimeout(() => {
-      setSendCooldownSeconds((v) => (v > 0 ? v - 1 : 0));
-    }, 1000);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [sendCooldownSeconds]);
+  const { cooldownSeconds, setCooldown } = useSendCooldown();
 
   const handleSendCode = async (): Promise<void> => {
-    if (sendingCode || sendCooldownSeconds > 0) return;
+    if (sendingCode || cooldownSeconds > 0) return;
     const cleanEmail = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(cleanEmail)) {
       setFeedback({ type: 'error', text: t('settings.user.feedback.emailInvalid', { defaultValue: '请输入有效邮箱地址' }) });
@@ -125,14 +89,9 @@ export function RegisterContent(): ReactElement {
     }
     const cooldown = Math.max(0, Number(result.data?.retryAfterSeconds || 60));
     if (cooldown > 0) {
-      setSendCooldownSeconds(cooldown);
+      setCooldown(cooldown);
     }
     setFeedback({ type: 'success', text: t('settings.user.feedback.emailCodeSent', { defaultValue: '验证码已发送，请查收邮箱' }) });
-  };
-
-  const renderFeedback = (): ReactElement | null => {
-    if (!feedback) return null;
-    return <div className={`settings-user-feedback settings-user-feedback--${feedback.type}`}>{feedback.text}</div>;
   };
 
   const navigateToUserCenter = async (): Promise<void> => {
@@ -235,12 +194,12 @@ export function RegisterContent(): ReactElement {
               type="button"
               className="auth-password-toggle"
               onClick={() => void handleSendCode()}
-              disabled={sendingCode || sendCooldownSeconds > 0}
+              disabled={sendingCode || cooldownSeconds > 0}
             >
               {sendingCode
                 ? t('settings.user.feedback.emailCodeSending', { defaultValue: '发送中…' })
-                : sendCooldownSeconds > 0
-                  ? t('settings.user.actions.sendCodeCooldown', { defaultValue: '{{seconds}}s后重试', seconds: sendCooldownSeconds })
+                : cooldownSeconds > 0
+                  ? t('settings.user.actions.sendCodeCooldown', { defaultValue: '{{seconds}}s后重试', seconds: cooldownSeconds })
                   : t('settings.user.actions.sendCode', { defaultValue: '发送验证码' })}
             </button>
           </div>
@@ -296,7 +255,7 @@ export function RegisterContent(): ReactElement {
           </div>
         </label>
 
-        {renderFeedback()}
+        <FeedbackMessage feedback={feedback} />
 
         <div className="auth-panel-actions">
           <button
