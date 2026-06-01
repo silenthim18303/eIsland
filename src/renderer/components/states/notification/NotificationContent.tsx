@@ -32,148 +32,12 @@ import { ALARM_SOUND_STOP_EVENT } from '../../../utils/audio/alarmSound';
 import { getWebsiteFaviconUrl, getWebsiteFaviconUrls, getWebsiteHostname } from '../../../api/site/siteMetaApi';
 import { fetchUpdateSourceUrl } from '../../../api/user/userAccountApi';
 import { readLocalToken } from '../../../utils/userAccount';
+import { URL_FAVORITES_STORE_KEY, URL_FAVORITES_FOCUS_KEY, UPDATE_SOURCE_STORE_KEY, SETTINGS_OPEN_TAB_STORE_KEY } from './config/notificationConstants';
+import type { NotificationContentProps, UrlFavoriteItem, UpdateSourceKey } from './config/notificationTypes';
+import { formatBytes, formatEta, normalizeUrl, resolveNotificationIconUrl, normalizeUpdateSource, isProOnlySource, sanitizeFavorites, persistFavorites } from './utils/notificationHelpers';
+import { useNotificationFavorites } from './hooks/useNotificationFavorites';
+import { useUpdateDownloadProgress } from './hooks/useUpdateDownloadProgress';
 import '../../../styles/notification/notification.css';
-
-interface UrlFavoriteItem {
-  id: number;
-  url: string;
-  title: string;
-  note: string;
-  createdAt: number;
-}
-
-const URL_FAVORITES_STORE_KEY = 'url-favorites';
-const URL_FAVORITES_FOCUS_KEY = 'url-favorites-focus-url';
-const UPDATE_SOURCE_STORE_KEY = 'update-source';
-const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
-
-type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
-
-interface DownloadProgressData {
-  percent: number;
-  transferred: number;
-  total: number;
-  bytesPerSecond: number;
-}
-
-function normalizeUpdateSource(value: unknown): UpdateSourceKey {
-  if (value === 'github') return 'github';
-  if (value === 'tencent-cos') return 'tencent-cos';
-  if (value === 'aliyun-oss') return 'aliyun-oss';
-  return 'cloudflare-r2';
-}
-
-function isProOnlySource(source: UpdateSourceKey): boolean {
-  return source === 'tencent-cos' || source === 'aliyun-oss';
-}
-
-function formatBytes(bytes: number): string {
-  if (!Number.isFinite(bytes) || bytes <= 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let value = bytes;
-  let unitIndex = 0;
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-  const digits = value >= 100 || unitIndex === 0 ? 0 : 1;
-  return `${value.toFixed(digits)} ${units[unitIndex]}`;
-}
-
-function formatEta(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds <= 0) return '00:00';
-  const rounded = Math.max(0, Math.ceil(seconds));
-  const hours = Math.floor(rounded / 3600);
-  const minutes = Math.floor((rounded % 3600) / 60);
-  const secs = rounded % 60;
-  if (hours > 0) return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-}
-
-function resolveNotificationIconUrl(iconValue: string | null | undefined): string {
-  if (!iconValue) return '';
-  const normalized = iconValue.trim();
-  if (!normalized) return '';
-  const lowered = normalized.toLowerCase();
-  if (
-    lowered.startsWith('http://')
-    || lowered.startsWith('https://')
-    || lowered.startsWith('data:')
-    || lowered.startsWith('blob:')
-    || lowered.startsWith('file:')
-    || lowered.startsWith('app:')
-    || lowered.startsWith('chrome:')
-    || lowered.startsWith('//')
-  ) {
-    return normalized;
-  }
-  try {
-    return new URL(normalized, window.location.href).toString();
-  } catch {
-    return normalized;
-  }
-}
-
-function normalizeUrl(raw: string): string {
-  const text = raw.trim();
-  if (!text) return '';
-  if (/^https?:\/\//i.test(text)) return text;
-  return `https://${text}`;
-}
-
-function sanitizeFavorites(data: unknown): UrlFavoriteItem[] {
-  if (!Array.isArray(data)) return [];
-  return data
-    .map((item) => {
-      const row = item as Partial<UrlFavoriteItem>;
-      const url = typeof row.url === 'string' ? normalizeUrl(row.url) : '';
-      if (!url) return null;
-      const title = typeof row.title === 'string' ? row.title.trim() : '';
-      const note = typeof row.note === 'string' ? row.note.trim() : '';
-      const createdAt = typeof row.createdAt === 'number' && Number.isFinite(row.createdAt) ? row.createdAt : Date.now();
-      const id = typeof row.id === 'number' && Number.isFinite(row.id) ? row.id : createdAt;
-      return {
-        id,
-        url,
-        title: title || url,
-        note,
-        createdAt,
-      };
-    })
-    .filter((item): item is UrlFavoriteItem => Boolean(item));
-}
-
-function persistFavorites(items: UrlFavoriteItem[]): void {
-  try { localStorage.setItem('eIsland_url_favorites', JSON.stringify(items)); } catch { /* noop */ }
-  window.api.storeWrite(URL_FAVORITES_STORE_KEY, items).catch(() => {});
-}
-
-interface NotificationContentProps {
-  /** 通知标题 */
-  title: string;
-  /** 通知内容 */
-  body: string;
-  /** 通知图标（可选） */
-  icon?: string;
-  /** 通知类型 */
-  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required';
-  /** 请求切换到的播放源 ID（仅 source-switch） */
-  sourceAppId?: string;
-  /** 更新版本号（用于 update-available / update-ready） */
-  updateVersion?: string;
-  /** 当前更新源展示文案（仅 update-available） */
-  updateSourceLabel?: string;
-  /** 天气预警发布时间文案（仅 weather-alert-startup） */
-  weatherAlertTime?: string;
-  /** 启动自动检查更新时要使用的更新源（仅 weather-alert-startup） */
-  startupUpdateSource?: UpdateSourceKey;
-  /** 启动自动检查更新时解析后的更新源地址（仅 weather-alert-startup） */
-  startupUpdateResolvedUrl?: string;
-  /** 检测到的 URL 列表（仅 clipboard-url） */
-  urls?: string[];
-  /** 休息提醒条目 ID（仅默认通知中由休息提醒触发时使用） */
-  breakReminderItemId?: string;
-}
 
 /**
  * Notification 状态内容组件
@@ -196,9 +60,7 @@ export function NotificationContent({
   const { t } = useTranslation();
   const { setIdle, setLyrics, setNotification, setMaxExpand, setMaxExpandTab } = useIslandStore();
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
-  const [favoriteUrlSet, setFavoriteUrlSet] = useState<Set<string>>(new Set());
   const [useClipboardVectorFallbackIcon, setUseClipboardVectorFallbackIcon] = useState(false);
-  const [updateDownloadProgress, setUpdateDownloadProgress] = useState<DownloadProgressData | null>(null);
   const [clipboardFaviconIndex, setClipboardFaviconIndex] = useState(0);
   const clipboardUrls = type === 'clipboard-url' ? (urls ?? []) : [];
   const hasMultipleClipboardUrls = clipboardUrls.length > 1;
@@ -239,6 +101,9 @@ export function NotificationContent({
   const resolvedDisplayIcon = resolveNotificationIconUrl(effectiveDisplayIcon);
   const isVectorIcon = typeof effectiveDisplayIcon === 'string' && /^\.?\/svg\//i.test(effectiveDisplayIcon);
 
+  const { favoriteUrlSet, setFavoriteUrlSet } = useNotificationFavorites(type, urls);
+  const updateDownloadProgress = useUpdateDownloadProgress(type);
+
   useEffect(() => {
     setCurrentUrlIndex(0);
   }, [type, urls]);
@@ -250,19 +115,6 @@ export function NotificationContent({
   useEffect(() => {
     setUseClipboardVectorFallbackIcon(false);
   }, [type, currentClipboardUrl, icon]);
-
-  useEffect(() => {
-    if (type !== 'update-downloading') {
-      setUpdateDownloadProgress(null);
-      return;
-    }
-    const unsub = window.api?.onUpdaterProgress?.((progress) => {
-      setUpdateDownloadProgress(progress);
-    });
-    return () => {
-      unsub?.();
-    };
-  }, [type]);
 
   const updateDownloadBody = (() => {
     if (type !== 'update-downloading') return '';
@@ -291,38 +143,6 @@ export function NotificationContent({
     if (currentUrlIndex === 0 && body) return body;
     return getWebsiteHostname(currentClipboardUrl) || currentClipboardUrl;
   })();
-
-  useEffect(() => {
-    if (type !== 'clipboard-url') return;
-    let cancelled = false;
-    window.api.storeRead(URL_FAVORITES_STORE_KEY).then((data) => {
-      if (cancelled) return;
-      const items = sanitizeFavorites(data);
-      if (items.length > 0) {
-        setFavoriteUrlSet(new Set(items.map(item => item.url.toLowerCase())));
-        return;
-      }
-      try {
-        const raw = localStorage.getItem('eIsland_url_favorites');
-        const fallbackItems = raw ? sanitizeFavorites(JSON.parse(raw) as unknown[]) : [];
-        setFavoriteUrlSet(new Set(fallbackItems.map(item => item.url.toLowerCase())));
-      } catch {
-        setFavoriteUrlSet(new Set());
-      }
-    }).catch(() => {
-      try {
-        const raw = localStorage.getItem('eIsland_url_favorites');
-        const fallbackItems = raw ? sanitizeFavorites(JSON.parse(raw) as unknown[]) : [];
-        if (!cancelled) setFavoriteUrlSet(new Set(fallbackItems.map(item => item.url.toLowerCase())));
-      } catch {
-        if (!cancelled) setFavoriteUrlSet(new Set());
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [type, urls]);
 
   const isOfficialSite = (() => {
     if (type !== 'clipboard-url' || !currentClipboardUrl) return false;
@@ -421,28 +241,11 @@ export function NotificationContent({
     dismiss();
   };
 
-  const handleComplete = (): void => {
-    dismiss();
-  };
-
-  const handleIgnore = (): void => {
-    dismiss();
-  };
-
-  const handleAcceptSwitch = (): void => {
-    window.api?.mediaAcceptSourceSwitch();
-    dismiss();
-  };
-
-  const handleRejectSwitch = (): void => {
-    window.api?.mediaRejectSourceSwitch();
-    dismiss();
-  };
-
-  const handleInstallUpdate = (): void => {
-    void window.api?.updaterInstall().catch(() => {});
-    dismiss();
-  };
+  const handleComplete = (): void => { dismiss(); };
+  const handleIgnore = (): void => { dismiss(); };
+  const handleAcceptSwitch = (): void => { window.api?.mediaAcceptSourceSwitch(); dismiss(); };
+  const handleRejectSwitch = (): void => { window.api?.mediaRejectSourceSwitch(); dismiss(); };
+  const handleInstallUpdate = (): void => { void window.api?.updaterInstall().catch(() => {}); dismiss(); };
 
   const handleGoToUpdate = (): void => {
     setNotification({
@@ -510,46 +313,28 @@ export function NotificationContent({
     setMaxExpand();
   };
 
-  const handleDismissUpdate = (): void => {
-    dismiss();
-  };
+  const handleDismissUpdate = (): void => { dismiss(); };
 
   const handleCloseWeatherAlertAndContinueUpdateCheck = (): void => {
     void window.api?.updaterCheck(startupUpdateSource, startupUpdateResolvedUrl).catch(() => {});
     dismiss();
   };
 
-  const handleRestartNow = (): void => {
-    void window.api?.restartApp?.().catch(() => {});
-    dismiss();
-  };
-
-  const handleRestartLater = (): void => {
-    dismiss();
-  };
-
-  const handleOpenUrl = (url: string): void => {
-    window.api?.clipboardOpenUrl(url);
-    dismiss();
-  };
+  const handleRestartNow = (): void => { void window.api?.restartApp?.().catch(() => {}); dismiss(); };
+  const handleRestartLater = (): void => { dismiss(); };
+  const handleOpenUrl = (url: string): void => { window.api?.clipboardOpenUrl(url); dismiss(); };
 
   const handleOpenAllUrls = (): void => {
     if (!urls?.length) return;
-    urls.forEach((url) => {
-      window.api?.clipboardOpenUrl(url);
-    });
+    urls.forEach((url) => { window.api?.clipboardOpenUrl(url); });
     dismiss();
   };
 
-  const handleDismissUrl = (): void => {
-    dismiss();
-  };
+  const handleDismissUrl = (): void => { dismiss(); };
 
   const handleAddDomainToBlacklist = (): void => {
     if (!currentClipboardDomain) return;
-    window.api?.clipboardUrlBlacklistAddDomain(currentClipboardDomain).finally(() => {
-      dismiss();
-    });
+    window.api?.clipboardUrlBlacklistAddDomain(currentClipboardDomain).finally(() => { dismiss(); });
   };
 
   const handlePrevUrl = (): void => {
