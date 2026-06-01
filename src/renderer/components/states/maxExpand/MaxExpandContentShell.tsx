@@ -28,7 +28,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import type { MaxExpandTab } from '../../../store/types';
-import type { MaxExpandNavLayoutConfig } from './components/setting/utils/settingsConfig';
 import type { NavDotId } from './config/shellConstants';
 import { STANDALONE_HIDDEN_TABS } from './config/shellConstants';
 import { useNavLayout } from './hooks/useNavLayout';
