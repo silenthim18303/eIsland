@@ -36,11 +36,18 @@ import { useCountdownMode, updateActiveTabRef } from './hooks/useCountdownMode';
 import { useContentReady } from './hooks/useContentReady';
 import { shouldIgnoreWheelEvent } from './hooks/useWheelNavigation';
 import { getDefaultNavLabel } from './utils/getNavLabel';
+import { getAdjacentNavDotId } from './utils/tabNavigation';
 import '../../../styles/settings/settings.css';
 
 export interface MaxExpandContentShellProps {
   renderActiveTab: (activeTab: MaxExpandTab, loadingFallback: React.ReactElement, contentReady: boolean) => React.ReactElement | null;
   deferContent?: boolean;
+}
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tagName = target.tagName.toLowerCase();
+  return target.isContentEditable || tagName === 'input' || tagName === 'textarea' || tagName === 'select';
 }
 
 /**
@@ -119,8 +126,26 @@ export function MaxExpandContentShell({ renderActiveTab, deferContent = true }: 
       navigateTab(nextId);
     };
 
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (e.key !== 'Tab' || e.repeat || e.defaultPrevented) return;
+      if (isEditableTarget(e.target)) return;
+
+      const tabIds = filteredNavDotsRef.current
+        .map((dot) => dot.id)
+        .filter((id): id is MaxExpandTab => id !== 'expanded');
+      const nextId = getAdjacentNavDotId(tabIds, activeTabRef.current, e.shiftKey ? -1 : 1);
+      if (nextId === null) return;
+
+      e.preventDefault();
+      navigateTab(nextId);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
     el.addEventListener('wheel', handleWheel, { passive: false });
-    return () => el.removeEventListener('wheel', handleWheel);
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [navigateTab]);
 
   const handleNavClick = (id: NavDotId): void => {
