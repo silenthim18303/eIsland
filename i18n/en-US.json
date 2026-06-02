@@ -3058,7 +3058,7 @@
       },
       "notification": {
         "label": "Notification Settings",
-        "desc": "Configure Dynamic Island notification alerts and display behavior."
+        "desc": "Dynamic Island notification alerts and display."
       },
       "performance": {
         "label": "Performance Settings",
