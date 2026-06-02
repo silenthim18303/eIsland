@@ -822,11 +822,23 @@
     "actions": {
       "clear": "Clear",
       "save": "Save",
+      "selectAll": "Select all",
+      "deleteSelected": "Delete selected",
+      "clearRange": "Clear range",
+      "rangeAria": "Select cleanup time range",
+      "selectItemAria": "Select this clipboard record",
       "copyTitle": "Copy to clipboard",
       "copyAria": "Copy this record to clipboard",
       "expand": "Expand",
       "collapse": "Collapse",
       "removeAria": "Remove this clipboard record"
+    },
+    "ranges": {
+      "lastHour": "Last hour",
+      "today": "Today",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "olderThan30Days": "Older than 30 days"
     }
   },
   "albumTab": {

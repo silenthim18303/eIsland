@@ -42,6 +42,10 @@ const HISTORY_LIMIT_STORE_KEY = 'clipboard-history-limit';
 const EXIT_MAX_EXPAND_ON_COPY_STORE_KEY = 'clipboard-history-exit-max-expand-on-copy';
 const DEFAULT_HISTORY_LIMIT = 10;
 const POLL_INTERVAL_MS = 1000;
+const MS_PER_HOUR = 60 * 60 * 1000;
+const MS_PER_DAY = 24 * MS_PER_HOUR;
+
+type ClipboardCleanupRange = 'lastHour' | 'today' | 'last7Days' | 'last30Days' | 'olderThan30Days';
 
 function normalizeClipboardText(text: string): string {
   return text.replace(/\r\n/g, '\n').trim();
@@ -77,6 +81,20 @@ function getPreviewText(text: string): string {
   return `${oneLine.slice(0, 72)}…`;
 }
 
+function isSameLocalDay(left: Date, right: Date): boolean {
+  return left.getFullYear() === right.getFullYear()
+    && left.getMonth() === right.getMonth()
+    && left.getDate() === right.getDate();
+}
+
+function isItemInCleanupRange(item: ClipboardHistoryItem, range: ClipboardCleanupRange, now: number): boolean {
+  if (range === 'lastHour') return now - item.createdAt <= MS_PER_HOUR;
+  if (range === 'today') return isSameLocalDay(new Date(item.createdAt), new Date(now));
+  if (range === 'last7Days') return now - item.createdAt <= 7 * MS_PER_DAY;
+  if (range === 'last30Days') return now - item.createdAt <= 30 * MS_PER_DAY;
+  return now - item.createdAt > 30 * MS_PER_DAY;
+}
+
 /**
  * 渲染最大展开态的剪贴板历史标签页
  * @returns 剪贴板历史标签页
@@ -92,6 +110,8 @@ export function ClipboardHistoryTab(): React.ReactElement {
   const [loaded, setLoaded] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [cleanupRange, setCleanupRange] = useState<ClipboardCleanupRange>('today');
   const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const copyFeedbackTimerRef = useRef<number | null>(null);
 
@@ -162,6 +182,11 @@ export function ClipboardHistoryTab(): React.ReactElement {
   }, [historyLimit]);
 
   useEffect(() => {
+    const itemIds = new Set(items.map((item) => item.id));
+    setSelectedIds((prev) => prev.filter((id) => itemIds.has(id)));
+  }, [items]);
+
+  useEffect(() => {
     if (!loaded) return;
     persistHistory(items);
   }, [items, loaded]);
@@ -208,6 +233,13 @@ export function ClipboardHistoryTab(): React.ReactElement {
   }, [historyEnabled, historyLimit]);
 
   const totalCount = items.length;
+  const selectedCount = selectedIds.length;
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const allSelected = totalCount > 0 && selectedCount === totalCount;
+  const cleanupMatchedCount = useMemo(() => {
+    const now = Date.now();
+    return items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).length;
+  }, [items, cleanupRange]);
   const countLabel = useMemo(
     () => t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount }),
     [t, totalCount],
@@ -215,13 +247,50 @@ export function ClipboardHistoryTab(): React.ReactElement {
 
   const handleClear = (): void => {
     setItems([]);
+    setSelectedIds([]);
     setExpandedId(null);
     setEditText('');
   };
 
   const handleRemove = (id: number): void => {
     setItems((prev) => prev.filter((item) => item.id !== id));
+    setSelectedIds((prev) => prev.filter((selectedId) => selectedId !== id));
     if (expandedId === id) {
+      setExpandedId(null);
+      setEditText('');
+    }
+  };
+
+  const handleToggleSelect = (id: number): void => {
+    setSelectedIds((prev) => (
+      prev.includes(id)
+        ? prev.filter((selectedId) => selectedId !== id)
+        : [...prev, id]
+    ));
+  };
+
+  const handleToggleSelectAll = (): void => {
+    setSelectedIds(allSelected ? [] : items.map((item) => item.id));
+  };
+
+  const handleRemoveSelected = (): void => {
+    if (selectedIds.length === 0) return;
+    const nextSelectedIds = new Set(selectedIds);
+    setItems((prev) => prev.filter((item) => !nextSelectedIds.has(item.id)));
+    setSelectedIds([]);
+    if (expandedId !== null && nextSelectedIds.has(expandedId)) {
+      setExpandedId(null);
+      setEditText('');
+    }
+  };
+
+  const handleClearByRange = (): void => {
+    const now = Date.now();
+    const removedIds = new Set(items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
+    if (removedIds.size === 0) return;
+    setItems((prev) => prev.filter((item) => !removedIds.has(item.id)));
+    setSelectedIds((prev) => prev.filter((id) => !removedIds.has(id)));
+    if (expandedId !== null && removedIds.has(expandedId)) {
       setExpandedId(null);
       setEditText('');
     }
@@ -305,6 +374,48 @@ export function ClipboardHistoryTab(): React.ReactElement {
         </div>
       </div>
 
+      <div className="clipboard-history-bulk-bar">
+        <label className="clipboard-history-select-all">
+          <input
+            type="checkbox"
+            checked={allSelected}
+            disabled={totalCount === 0}
+            onChange={handleToggleSelectAll}
+          />
+          <span>{t('clipboardHistoryTab.actions.selectAll', { defaultValue: '全选' })}</span>
+        </label>
+        <button
+          className="clipboard-history-bulk-delete"
+          type="button"
+          onClick={handleRemoveSelected}
+          disabled={selectedCount === 0}
+        >
+          {t('clipboardHistoryTab.actions.deleteSelected', { defaultValue: '删除已选' })}
+          {selectedCount > 0 ? ` (${selectedCount})` : ''}
+        </button>
+        <select
+          className="clipboard-history-range-select"
+          value={cleanupRange}
+          onChange={(e) => setCleanupRange(e.target.value as ClipboardCleanupRange)}
+          aria-label={t('clipboardHistoryTab.actions.rangeAria', { defaultValue: '选择清理时间范围' })}
+        >
+          <option value="lastHour">{t('clipboardHistoryTab.ranges.lastHour', { defaultValue: '最近 1 小时' })}</option>
+          <option value="today">{t('clipboardHistoryTab.ranges.today', { defaultValue: '今天' })}</option>
+          <option value="last7Days">{t('clipboardHistoryTab.ranges.last7Days', { defaultValue: '最近 7 天' })}</option>
+          <option value="last30Days">{t('clipboardHistoryTab.ranges.last30Days', { defaultValue: '最近 30 天' })}</option>
+          <option value="olderThan30Days">{t('clipboardHistoryTab.ranges.olderThan30Days', { defaultValue: '30 天前' })}</option>
+        </select>
+        <button
+          className="clipboard-history-range-clear"
+          type="button"
+          onClick={handleClearByRange}
+          disabled={cleanupMatchedCount === 0}
+        >
+          {t('clipboardHistoryTab.actions.clearRange', { defaultValue: '清理范围' })}
+          {cleanupMatchedCount > 0 ? ` (${cleanupMatchedCount})` : ''}
+        </button>
+      </div>
+
       {copyFeedback ? (
         <div className={`clipboard-history-feedback clipboard-history-feedback--${copyFeedback.type}`} role="status" aria-live="polite">
           {copyFeedback.text}
@@ -323,9 +434,18 @@ export function ClipboardHistoryTab(): React.ReactElement {
           </div>
         ) : items.map((item) => {
           const expanded = expandedId === item.id;
+          const selected = selectedIdSet.has(item.id);
           return (
-            <div key={item.id} className="clipboard-history-item">
+            <div key={item.id} className={`clipboard-history-item${selected ? ' clipboard-history-item--selected' : ''}`}>
               <div className="clipboard-history-summary-row">
+                <label className="clipboard-history-item-check">
+                  <input
+                    type="checkbox"
+                    checked={selected}
+                    onChange={() => handleToggleSelect(item.id)}
+                    aria-label={t('clipboardHistoryTab.actions.selectItemAria', { defaultValue: '选择该剪贴板记录' })}
+                  />
+                </label>
                 <button
                   className="clipboard-history-copy"
                   type="button"

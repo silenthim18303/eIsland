@@ -364,6 +364,74 @@
   cursor: not-allowed;
 }
 
+.clipboard-history-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.clipboard-history-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  color: rgba(var(--color-text-rgb), 0.68);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.clipboard-history-select-all input,
+.clipboard-history-item-check input {
+  width: 13px;
+  height: 13px;
+  accent-color: rgba(105, 192, 255, 0.9);
+}
+
+.clipboard-history-select-all:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clipboard-history-bulk-delete,
+.clipboard-history-range-clear {
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.78);
+  background: rgba(var(--color-text-rgb), 0.1);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clipboard-history-bulk-delete:hover:not(:disabled),
+.clipboard-history-range-clear:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.18);
+}
+
+.clipboard-history-bulk-delete:disabled,
+.clipboard-history-range-clear:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clipboard-history-range-select {
+  min-width: 96px;
+  height: 24px;
+  margin-left: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.78);
+  font-size: 11px;
+  outline: none;
+}
+
 .clipboard-history-feedback {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -449,11 +517,23 @@
   padding: 6px 8px;
 }
 
+.clipboard-history-item--selected {
+  border-color: rgba(105, 192, 255, 0.34);
+  background: rgba(105, 192, 255, 0.08);
+}
+
 .clipboard-history-summary-row {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-columns: 18px 24px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
+}
+
+.clipboard-history-item-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .clipboard-history-copy {
