@@ -430,6 +430,24 @@
   color: rgba(var(--color-text-rgb), 0.78);
   font-size: 11px;
   outline: none;
+  color-scheme: dark;
+}
+
+.clipboard-history-range-select option {
+  color: #f5f5f5;
+  background: #1f1f1f;
+}
+
+[data-theme='light'] .clipboard-history-range-select {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.78);
+  color-scheme: light;
+}
+
+[data-theme='light'] .clipboard-history-range-select option {
+  color: #1f1f1f;
+  background: #ffffff;
 }
 
 .clipboard-history-feedback {
