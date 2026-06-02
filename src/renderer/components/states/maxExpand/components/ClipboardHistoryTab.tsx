@@ -114,6 +114,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
   const [cleanupRange, setCleanupRange] = useState<ClipboardCleanupRange>('today');
   const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const copyFeedbackTimerRef = useRef<number | null>(null);
+  const rangeSelectionInitializedRef = useRef(false);
 
   const adjustTextareaHeight = useCallback((el: HTMLTextAreaElement | null): void => {
     if (!el) return;
@@ -236,10 +237,18 @@ export function ClipboardHistoryTab(): React.ReactElement {
   const selectedCount = selectedIds.length;
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const allSelected = totalCount > 0 && selectedCount === totalCount;
-  const cleanupMatchedCount = useMemo(() => {
+  const cleanupMatchedIdSet = useMemo(() => {
     const now = Date.now();
-    return items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).length;
+    return new Set(items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
   }, [items, cleanupRange]);
+  const cleanupMatchedCount = cleanupMatchedIdSet.size;
+
+  useEffect(() => {
+    if (!loaded || rangeSelectionInitializedRef.current) return;
+    rangeSelectionInitializedRef.current = true;
+    setSelectedIds(Array.from(cleanupMatchedIdSet));
+  }, [cleanupMatchedIdSet, loaded]);
+
   const countLabel = useMemo(
     () => t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount }),
     [t, totalCount],
@@ -271,6 +280,12 @@ export function ClipboardHistoryTab(): React.ReactElement {
 
   const handleToggleSelectAll = (): void => {
     setSelectedIds(allSelected ? [] : items.map((item) => item.id));
+  };
+
+  const handleCleanupRangeChange = (range: ClipboardCleanupRange): void => {
+    const now = Date.now();
+    setCleanupRange(range);
+    setSelectedIds(items.filter((item) => isItemInCleanupRange(item, range, now)).map((item) => item.id));
   };
 
   const handleRemoveSelected = (): void => {
@@ -396,7 +411,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
         <select
           className="clipboard-history-range-select"
           value={cleanupRange}
-          onChange={(e) => setCleanupRange(e.target.value as ClipboardCleanupRange)}
+          onChange={(e) => handleCleanupRangeChange(e.target.value as ClipboardCleanupRange)}
           aria-label={t('clipboardHistoryTab.actions.rangeAria', { defaultValue: '选择清理时间范围' })}
         >
           <option value="lastHour">{t('clipboardHistoryTab.ranges.lastHour', { defaultValue: '最近 1 小时' })}</option>
