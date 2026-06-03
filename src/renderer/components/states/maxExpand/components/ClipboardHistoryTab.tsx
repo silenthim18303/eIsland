@@ -42,6 +42,7 @@ const HISTORY_LIMIT_STORE_KEY = 'clipboard-history-limit';
 const EXIT_MAX_EXPAND_ON_COPY_STORE_KEY = 'clipboard-history-exit-max-expand-on-copy';
 const DEFAULT_HISTORY_LIMIT = 10;
 const POLL_INTERVAL_MS = 1000;
+const SELECTION_COLLAPSE_ANIMATION_MS = 180;
 const MS_PER_HOUR = 60 * 60 * 1000;
 const MS_PER_DAY = 24 * MS_PER_HOUR;
 
@@ -112,9 +113,11 @@ export function ClipboardHistoryTab(): React.ReactElement {
   const [editText, setEditText] = useState('');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [selectionCollapsing, setSelectionCollapsing] = useState(false);
   const [cleanupRange, setCleanupRange] = useState<ClipboardCleanupRange>('today');
   const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const copyFeedbackTimerRef = useRef<number | null>(null);
+  const selectionCollapseTimerRef = useRef<number | null>(null);
 
   const adjustTextareaHeight = useCallback((el: HTMLTextAreaElement | null): void => {
     if (!el) return;
@@ -248,12 +251,30 @@ export function ClipboardHistoryTab(): React.ReactElement {
     [t, totalCount],
   );
 
+  const collapseSelectionMode = (): void => {
+    if (!selectionMode || selectionCollapsing) return;
+    setSelectionCollapsing(true);
+    if (selectionCollapseTimerRef.current !== null) {
+      window.clearTimeout(selectionCollapseTimerRef.current);
+    }
+    selectionCollapseTimerRef.current = window.setTimeout(() => {
+      setSelectionMode(false);
+      setSelectionCollapsing(false);
+      setSelectedIds([]);
+      selectionCollapseTimerRef.current = null;
+    }, SELECTION_COLLAPSE_ANIMATION_MS);
+  };
+
   const handleToggleSelectionMode = (): void => {
     if (selectionMode) {
-      setSelectionMode(false);
-      setSelectedIds([]);
+      collapseSelectionMode();
       return;
     }
+    if (selectionCollapseTimerRef.current !== null) {
+      window.clearTimeout(selectionCollapseTimerRef.current);
+      selectionCollapseTimerRef.current = null;
+    }
+    setSelectionCollapsing(false);
     setSelectionMode(true);
     setSelectedIds(Array.from(cleanupMatchedIdSet));
   };
@@ -262,6 +283,11 @@ export function ClipboardHistoryTab(): React.ReactElement {
     setItems([]);
     setSelectedIds([]);
     setSelectionMode(false);
+    setSelectionCollapsing(false);
+    if (selectionCollapseTimerRef.current !== null) {
+      window.clearTimeout(selectionCollapseTimerRef.current);
+      selectionCollapseTimerRef.current = null;
+    }
     setExpandedId(null);
     setEditText('');
   };
@@ -299,6 +325,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
     setItems((prev) => prev.filter((item) => !nextSelectedIds.has(item.id)));
     setSelectedIds([]);
     setSelectionMode(false);
+    setSelectionCollapsing(false);
     if (expandedId !== null && nextSelectedIds.has(expandedId)) {
       setExpandedId(null);
       setEditText('');
@@ -312,6 +339,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
     setItems((prev) => prev.filter((item) => !removedIds.has(item.id)));
     setSelectedIds((prev) => prev.filter((id) => !removedIds.has(id)));
     setSelectionMode(false);
+    setSelectionCollapsing(false);
     if (expandedId !== null && removedIds.has(expandedId)) {
       setExpandedId(null);
       setEditText('');
@@ -366,6 +394,9 @@ export function ClipboardHistoryTab(): React.ReactElement {
     if (copyFeedbackTimerRef.current !== null) {
       window.clearTimeout(copyFeedbackTimerRef.current);
     }
+    if (selectionCollapseTimerRef.current !== null) {
+      window.clearTimeout(selectionCollapseTimerRef.current);
+    }
   }, []);
 
   const showCopyFeedback = (type: 'success' | 'error', text: string): void => {
@@ -407,7 +438,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
       </div>
 
       {selectionMode ? (
-        <div className="clipboard-history-bulk-bar">
+        <div className={`clipboard-history-bulk-bar${selectionCollapsing ? ' clipboard-history-bulk-bar--collapsing' : ''}`}>
           <label className="clipboard-history-select-all">
             <input
               type="checkbox"
@@ -470,8 +501,8 @@ export function ClipboardHistoryTab(): React.ReactElement {
           const expanded = expandedId === item.id;
           const selected = selectedIdSet.has(item.id);
           return (
-            <div key={item.id} className={`clipboard-history-item${selectionMode && selected ? ' clipboard-history-item--selected' : ''}`}>
-              <div className={`clipboard-history-summary-row${selectionMode ? ' clipboard-history-summary-row--selecting' : ''}`}>
+            <div key={item.id} className={`clipboard-history-item${selectionMode && !selectionCollapsing && selected ? ' clipboard-history-item--selected' : ''}`}>
+              <div className={`clipboard-history-summary-row${selectionMode ? ' clipboard-history-summary-row--selecting' : ''}${selectionCollapsing ? ' clipboard-history-summary-row--collapsing' : ''}`}>
                 {selectionMode ? (
                   <label className="clipboard-history-item-check">
                     <input
