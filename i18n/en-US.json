@@ -817,10 +817,15 @@
     "empty": "No records yet. Copy some text and it will appear here.",
     "messages": {
       "copySuccess": "Copied to clipboard",
-      "copyFailed": "Copy failed, please try again"
+      "copyFailed": "Copy failed, please try again",
+      "exportSuccess": "Exported {{count}} clipboard records",
+      "exportFailed": "Export failed, please try again"
     },
     "actions": {
       "clear": "Clear",
+      "export": "Export",
+      "exportAllTitle": "Export all records",
+      "exportSelectedTitle": "Export selected records",
       "select": "Select",
       "cancelSelect": "Cancel",
       "save": "Save",

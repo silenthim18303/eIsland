@@ -96,6 +96,41 @@ function isItemInCleanupRange(item: ClipboardHistoryItem, range: ClipboardCleanu
   return now - item.createdAt > 30 * MS_PER_DAY;
 }
 
+function getClipboardHistoryExportFileName(now: Date): string {
+  const pad = (value: number): string => String(value).padStart(2, '0');
+  const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
+  const time = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return `eIsland-clipboard-history-${date}-${time}.json`;
+}
+
+function buildClipboardHistoryExport(items: ClipboardHistoryItem[], exportedAt: Date): string {
+  return JSON.stringify({
+    app: 'eIsland',
+    type: 'clipboard-history',
+    exportedAt: exportedAt.toISOString(),
+    count: items.length,
+    items: items.map((item) => ({
+      id: item.id,
+      text: item.text,
+      createdAt: item.createdAt,
+      createdAtText: new Date(item.createdAt).toISOString(),
+    })),
+  }, null, 2);
+}
+
+function downloadTextFile(fileName: string, content: string): void {
+  const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
 /**
  * 渲染最大展开态的剪贴板历史标签页
  * @returns 剪贴板历史标签页
@@ -245,6 +280,11 @@ export function ClipboardHistoryTab(): React.ReactElement {
     return new Set(items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
   }, [items, cleanupRange]);
   const cleanupMatchedCount = cleanupMatchedIdSet.size;
+  const exportItems = useMemo(() => {
+    if (!selectionMode || selectedIds.length === 0) return items;
+    return items.filter((item) => selectedIdSet.has(item.id));
+  }, [items, selectedIdSet, selectedIds.length, selectionMode]);
+  const exportCount = exportItems.length;
 
   const countLabel = useMemo(
     () => t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount }),
@@ -346,6 +386,23 @@ export function ClipboardHistoryTab(): React.ReactElement {
     }
   };
 
+  const handleExport = (): void => {
+    if (exportItems.length === 0) return;
+    try {
+      const now = new Date();
+      downloadTextFile(
+        getClipboardHistoryExportFileName(now),
+        buildClipboardHistoryExport(exportItems, now),
+      );
+      showCopyFeedback('success', t('clipboardHistoryTab.messages.exportSuccess', {
+        defaultValue: '已导出 {{count}} 条剪贴板记录',
+        count: exportItems.length,
+      }));
+    } catch {
+      showCopyFeedback('error', t('clipboardHistoryTab.messages.exportFailed', { defaultValue: '导出失败，请稍后重试' }));
+    }
+  };
+
   const handleToggleExpand = (item: ClipboardHistoryItem): void => {
     if (expandedId === item.id) {
       setExpandedId(null);
@@ -423,6 +480,18 @@ export function ClipboardHistoryTab(): React.ReactElement {
             disabled={totalCount === 0}
           >
             {t('clipboardHistoryTab.actions.clear', { defaultValue: '清空' })}
+          </button>
+          <button
+            className="clipboard-history-export"
+            type="button"
+            onClick={handleExport}
+            disabled={exportCount === 0}
+            title={selectionMode && selectedCount > 0
+              ? t('clipboardHistoryTab.actions.exportSelectedTitle', { defaultValue: '导出已选记录' })
+              : t('clipboardHistoryTab.actions.exportAllTitle', { defaultValue: '导出全部记录' })}
+          >
+            {t('clipboardHistoryTab.actions.export', { defaultValue: '导出' })}
+            {selectionMode && selectedCount > 0 ? ` (${selectedCount})` : ''}
           </button>
           <button
             className={`clipboard-history-select-toggle${selectionMode ? ' clipboard-history-select-toggle--active' : ''}`}
