@@ -821,6 +821,8 @@
     },
     "actions": {
       "clear": "Clear",
+      "select": "Select",
+      "cancelSelect": "Cancel",
       "save": "Save",
       "selectAll": "Select all",
       "deleteSelected": "Delete selected",

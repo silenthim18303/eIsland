@@ -343,7 +343,8 @@
   color: rgba(var(--color-text-rgb), 0.4);
 }
 
-.clipboard-history-clear {
+.clipboard-history-clear,
+.clipboard-history-select-toggle {
   height: 24px;
   border: none;
   border-radius: 6px;
@@ -355,11 +356,14 @@
   transition: background 0.2s ease;
 }
 
-.clipboard-history-clear:hover:not(:disabled) {
+.clipboard-history-clear:hover:not(:disabled),
+.clipboard-history-select-toggle:hover:not(:disabled),
+.clipboard-history-select-toggle--active {
   background: rgba(var(--color-text-rgb), 0.18);
 }
 
-.clipboard-history-clear:disabled {
+.clipboard-history-clear:disabled,
+.clipboard-history-select-toggle:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
@@ -542,9 +546,13 @@
 
 .clipboard-history-summary-row {
   display: grid;
-  grid-template-columns: 18px 24px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
+}
+
+.clipboard-history-summary-row--selecting {
+  grid-template-columns: 18px 24px minmax(0, 1fr);
 }
 
 .clipboard-history-item-check {

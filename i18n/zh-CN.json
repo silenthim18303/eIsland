@@ -821,6 +821,8 @@
     },
     "actions": {
       "clear": "清空",
+      "select": "选择",
+      "cancelSelect": "取消",
       "save": "保存",
       "selectAll": "全选",
       "deleteSelected": "删除已选",

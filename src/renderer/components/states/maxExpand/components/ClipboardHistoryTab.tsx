@@ -111,10 +111,10 @@ export function ClipboardHistoryTab(): React.ReactElement {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [editText, setEditText] = useState('');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectionMode, setSelectionMode] = useState(false);
   const [cleanupRange, setCleanupRange] = useState<ClipboardCleanupRange>('today');
   const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const copyFeedbackTimerRef = useRef<number | null>(null);
-  const rangeSelectionInitializedRef = useRef(false);
 
   const adjustTextareaHeight = useCallback((el: HTMLTextAreaElement | null): void => {
     if (!el) return;
@@ -243,20 +243,25 @@ export function ClipboardHistoryTab(): React.ReactElement {
   }, [items, cleanupRange]);
   const cleanupMatchedCount = cleanupMatchedIdSet.size;
 
-  useEffect(() => {
-    if (!loaded || rangeSelectionInitializedRef.current) return;
-    rangeSelectionInitializedRef.current = true;
-    setSelectedIds(Array.from(cleanupMatchedIdSet));
-  }, [cleanupMatchedIdSet, loaded]);
-
   const countLabel = useMemo(
     () => t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount }),
     [t, totalCount],
   );
 
+  const handleToggleSelectionMode = (): void => {
+    if (selectionMode) {
+      setSelectionMode(false);
+      setSelectedIds([]);
+      return;
+    }
+    setSelectionMode(true);
+    setSelectedIds(Array.from(cleanupMatchedIdSet));
+  };
+
   const handleClear = (): void => {
     setItems([]);
     setSelectedIds([]);
+    setSelectionMode(false);
     setExpandedId(null);
     setEditText('');
   };
@@ -293,6 +298,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
     const nextSelectedIds = new Set(selectedIds);
     setItems((prev) => prev.filter((item) => !nextSelectedIds.has(item.id)));
     setSelectedIds([]);
+    setSelectionMode(false);
     if (expandedId !== null && nextSelectedIds.has(expandedId)) {
       setExpandedId(null);
       setEditText('');
@@ -305,6 +311,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
     if (removedIds.size === 0) return;
     setItems((prev) => prev.filter((item) => !removedIds.has(item.id)));
     setSelectedIds((prev) => prev.filter((id) => !removedIds.has(id)));
+    setSelectionMode(false);
     if (expandedId !== null && removedIds.has(expandedId)) {
       setExpandedId(null);
       setEditText('');
@@ -386,50 +393,62 @@ export function ClipboardHistoryTab(): React.ReactElement {
           >
             {t('clipboardHistoryTab.actions.clear', { defaultValue: '清空' })}
           </button>
+          <button
+            className={`clipboard-history-select-toggle${selectionMode ? ' clipboard-history-select-toggle--active' : ''}`}
+            type="button"
+            onClick={handleToggleSelectionMode}
+            disabled={totalCount === 0}
+          >
+            {selectionMode
+              ? t('clipboardHistoryTab.actions.cancelSelect', { defaultValue: '取消' })
+              : t('clipboardHistoryTab.actions.select', { defaultValue: '选择' })}
+          </button>
         </div>
       </div>
 
-      <div className="clipboard-history-bulk-bar">
-        <label className="clipboard-history-select-all">
-          <input
-            type="checkbox"
-            checked={allSelected}
-            disabled={totalCount === 0}
-            onChange={handleToggleSelectAll}
-          />
-          <span>{t('clipboardHistoryTab.actions.selectAll', { defaultValue: '全选' })}</span>
-        </label>
-        <button
-          className="clipboard-history-bulk-delete"
-          type="button"
-          onClick={handleRemoveSelected}
-          disabled={selectedCount === 0}
-        >
-          {t('clipboardHistoryTab.actions.deleteSelected', { defaultValue: '删除已选' })}
-          {selectedCount > 0 ? ` (${selectedCount})` : ''}
-        </button>
-        <select
-          className="clipboard-history-range-select"
-          value={cleanupRange}
-          onChange={(e) => handleCleanupRangeChange(e.target.value as ClipboardCleanupRange)}
-          aria-label={t('clipboardHistoryTab.actions.rangeAria', { defaultValue: '选择清理时间范围' })}
-        >
-          <option value="lastHour">{t('clipboardHistoryTab.ranges.lastHour', { defaultValue: '最近 1 小时' })}</option>
-          <option value="today">{t('clipboardHistoryTab.ranges.today', { defaultValue: '今天' })}</option>
-          <option value="last7Days">{t('clipboardHistoryTab.ranges.last7Days', { defaultValue: '最近 7 天' })}</option>
-          <option value="last30Days">{t('clipboardHistoryTab.ranges.last30Days', { defaultValue: '最近 30 天' })}</option>
-          <option value="olderThan30Days">{t('clipboardHistoryTab.ranges.olderThan30Days', { defaultValue: '30 天前' })}</option>
-        </select>
-        <button
-          className="clipboard-history-range-clear"
-          type="button"
-          onClick={handleClearByRange}
-          disabled={cleanupMatchedCount === 0}
-        >
-          {t('clipboardHistoryTab.actions.clearRange', { defaultValue: '清理范围' })}
-          {cleanupMatchedCount > 0 ? ` (${cleanupMatchedCount})` : ''}
-        </button>
-      </div>
+      {selectionMode ? (
+        <div className="clipboard-history-bulk-bar">
+          <label className="clipboard-history-select-all">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              disabled={totalCount === 0}
+              onChange={handleToggleSelectAll}
+            />
+            <span>{t('clipboardHistoryTab.actions.selectAll', { defaultValue: '全选' })}</span>
+          </label>
+          <button
+            className="clipboard-history-bulk-delete"
+            type="button"
+            onClick={handleRemoveSelected}
+            disabled={selectedCount === 0}
+          >
+            {t('clipboardHistoryTab.actions.deleteSelected', { defaultValue: '删除已选' })}
+            {selectedCount > 0 ? ` (${selectedCount})` : ''}
+          </button>
+          <select
+            className="clipboard-history-range-select"
+            value={cleanupRange}
+            onChange={(e) => handleCleanupRangeChange(e.target.value as ClipboardCleanupRange)}
+            aria-label={t('clipboardHistoryTab.actions.rangeAria', { defaultValue: '选择清理时间范围' })}
+          >
+            <option value="lastHour">{t('clipboardHistoryTab.ranges.lastHour', { defaultValue: '最近 1 小时' })}</option>
+            <option value="today">{t('clipboardHistoryTab.ranges.today', { defaultValue: '今天' })}</option>
+            <option value="last7Days">{t('clipboardHistoryTab.ranges.last7Days', { defaultValue: '最近 7 天' })}</option>
+            <option value="last30Days">{t('clipboardHistoryTab.ranges.last30Days', { defaultValue: '最近 30 天' })}</option>
+            <option value="olderThan30Days">{t('clipboardHistoryTab.ranges.olderThan30Days', { defaultValue: '30 天前' })}</option>
+          </select>
+          <button
+            className="clipboard-history-range-clear"
+            type="button"
+            onClick={handleClearByRange}
+            disabled={cleanupMatchedCount === 0}
+          >
+            {t('clipboardHistoryTab.actions.clearRange', { defaultValue: '清理范围' })}
+            {cleanupMatchedCount > 0 ? ` (${cleanupMatchedCount})` : ''}
+          </button>
+        </div>
+      ) : null}
 
       {copyFeedback ? (
         <div className={`clipboard-history-feedback clipboard-history-feedback--${copyFeedback.type}`} role="status" aria-live="polite">
@@ -451,16 +470,18 @@ export function ClipboardHistoryTab(): React.ReactElement {
           const expanded = expandedId === item.id;
           const selected = selectedIdSet.has(item.id);
           return (
-            <div key={item.id} className={`clipboard-history-item${selected ? ' clipboard-history-item--selected' : ''}`}>
-              <div className="clipboard-history-summary-row">
-                <label className="clipboard-history-item-check">
-                  <input
-                    type="checkbox"
-                    checked={selected}
-                    onChange={() => handleToggleSelect(item.id)}
-                    aria-label={t('clipboardHistoryTab.actions.selectItemAria', { defaultValue: '选择该剪贴板记录' })}
-                  />
-                </label>
+            <div key={item.id} className={`clipboard-history-item${selectionMode && selected ? ' clipboard-history-item--selected' : ''}`}>
+              <div className={`clipboard-history-summary-row${selectionMode ? ' clipboard-history-summary-row--selecting' : ''}`}>
+                {selectionMode ? (
+                  <label className="clipboard-history-item-check">
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={() => handleToggleSelect(item.id)}
+                      aria-label={t('clipboardHistoryTab.actions.selectItemAria', { defaultValue: '选择该剪贴板记录' })}
+                    />
+                  </label>
+                ) : null}
                 <button
                   className="clipboard-history-copy"
                   type="button"
