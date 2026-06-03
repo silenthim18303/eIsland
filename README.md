@@ -89,4 +89,10 @@ Under GPLv3 Section 7(b), limited additional terms apply: the following author a
 - Copyright (C) 2026-present JNTMTMTM (https://github.com/JNTMTMTM)
 - Copyright (C) 2026-present pyisland.com (https://pyisland.com)
 
+### Platform Restriction
+
+**This software is developed exclusively for Windows. Any porting, adaptation, or redistribution targeting Apple macOS or any Apple operating system is strictly prohibited by the original author.**
+
+This prohibition applies to all forks, derivative works, and redistributions. Any such work must retain this restriction notice in full. Violations will be subject to legal action.
+
 For full terms (including the standard GPLv3 text and additional clauses), see the `LICENSE` file in the repository root.
