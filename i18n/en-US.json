@@ -814,12 +814,20 @@
   "clipboardHistoryTab": {
     "title": "Clipboard History",
     "count": "{{count}} items",
+    "filteredCount": "{{count}} / {{total}} items",
     "empty": "No records yet. Copy some text and it will appear here.",
+    "emptyFiltered": "No records under the current type.",
     "messages": {
       "copySuccess": "Copied to clipboard",
       "copyFailed": "Copy failed, please try again",
       "exportSuccess": "Exported {{count}} clipboard records",
       "exportFailed": "Export failed, please try again"
+    },
+    "filters": {
+      "aria": "Clipboard type filter",
+      "all": "All",
+      "url": "URL",
+      "text": "Plain text"
     },
     "actions": {
       "clear": "Clear",

@@ -343,6 +343,34 @@
   color: rgba(var(--color-text-rgb), 0.4);
 }
 
+.clipboard-history-filter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 6px;
+  padding: 2px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.clipboard-history-filter {
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.58);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.clipboard-history-filter:hover,
+.clipboard-history-filter--active {
+  color: rgba(var(--color-text-rgb), 0.88);
+  background: rgba(var(--color-text-rgb), 0.1);
+}
+
 .clipboard-history-clear,
 .clipboard-history-export,
 .clipboard-history-select-toggle {

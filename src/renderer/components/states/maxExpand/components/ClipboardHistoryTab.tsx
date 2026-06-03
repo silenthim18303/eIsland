@@ -47,9 +47,48 @@ const MS_PER_HOUR = 60 * 60 * 1000;
 const MS_PER_DAY = 24 * MS_PER_HOUR;
 
 type ClipboardCleanupRange = 'lastHour' | 'today' | 'last7Days' | 'last30Days' | 'olderThan30Days';
+type ClipboardHistoryFilter = 'all' | 'url' | 'text';
+
+const CLIPBOARD_HISTORY_FILTERS: ClipboardHistoryFilter[] = ['all', 'url', 'text'];
+const CLIPBOARD_HISTORY_FILTER_LABEL_KEYS: Record<ClipboardHistoryFilter, string> = {
+  all: 'clipboardHistoryTab.filters.all',
+  url: 'clipboardHistoryTab.filters.url',
+  text: 'clipboardHistoryTab.filters.text',
+};
+const CLIPBOARD_HISTORY_FILTER_DEFAULT_LABELS: Record<ClipboardHistoryFilter, string> = {
+  all: '全部',
+  url: 'URL',
+  text: '纯文本',
+};
 
 function normalizeClipboardText(text: string): string {
   return text.replace(/\r\n/g, '\n').trim();
+}
+
+function isLikelyUrl(text: string): boolean {
+  const value = text.trim();
+  if (/^https?:\/\/\S+$/i.test(value)) return true;
+  if (/^www\.[^\s]+\.[^\s]+$/i.test(value)) return true;
+  return /^[a-z0-9.-]+\.[a-z]{2,}(?:[/?#:]\S*)?$/i.test(value);
+}
+
+function isLikelyPassword(text: string): boolean {
+  const value = text.trim();
+  if (value.length < 8 || value.length > 128) return false;
+  if (/\s/.test(value) || isLikelyUrl(value) || /^\S+@\S+\.\S+$/.test(value)) return false;
+  const groups = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z\d]/].filter((rule) => rule.test(value)).length;
+  return groups >= 3;
+}
+
+function isRecordableClipboardText(text: string): boolean {
+  return Boolean(text) && !isLikelyPassword(text);
+}
+
+function matchesClipboardFilter(item: ClipboardHistoryItem, filter: ClipboardHistoryFilter): boolean {
+  if (filter === 'all') return true;
+  const isUrl = isLikelyUrl(item.text);
+  if (filter === 'url') return isUrl;
+  return !isUrl && !isLikelyPassword(item.text);
 }
 
 function sanitizeHistory(data: unknown, historyLimit: number): ClipboardHistoryItem[] {
@@ -58,7 +97,7 @@ function sanitizeHistory(data: unknown, historyLimit: number): ClipboardHistoryI
     .map((item) => {
       const row = item as Partial<ClipboardHistoryItem>;
       const text = typeof row.text === 'string' ? normalizeClipboardText(row.text) : '';
-      if (!text) return null;
+      if (!isRecordableClipboardText(text)) return null;
       const createdAt = typeof row.createdAt === 'number' && Number.isFinite(row.createdAt) ? row.createdAt : Date.now();
       const id = typeof row.id === 'number' && Number.isFinite(row.id) ? row.id : createdAt;
       return { id, text, createdAt };
@@ -150,6 +189,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectionCollapsing, setSelectionCollapsing] = useState(false);
   const [cleanupRange, setCleanupRange] = useState<ClipboardCleanupRange>('today');
+  const [activeFilter, setActiveFilter] = useState<ClipboardHistoryFilter>('all');
   const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const copyFeedbackTimerRef = useRef<number | null>(null);
   const selectionCollapseTimerRef = useRef<number | null>(null);
@@ -241,7 +281,7 @@ export function ClipboardHistoryTab(): React.ReactElement {
         const rawText = await window.api.clipboardReadText();
         if (disposed) return;
         const normalized = normalizeClipboardText(rawText);
-        if (!normalized || normalized === lastText) return;
+        if (!isRecordableClipboardText(normalized) || normalized === lastText) return;
         lastText = normalized;
         setItems((prev) => {
           if (prev[0]?.text === normalized) return prev;
@@ -272,23 +312,35 @@ export function ClipboardHistoryTab(): React.ReactElement {
   }, [historyEnabled, historyLimit]);
 
   const totalCount = items.length;
+  const visibleItems = useMemo(
+    () => items.filter((item) => matchesClipboardFilter(item, activeFilter)),
+    [activeFilter, items],
+  );
+  const visibleCount = visibleItems.length;
   const selectedCount = selectedIds.length;
   const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
-  const allSelected = totalCount > 0 && selectedCount === totalCount;
+  const visibleIdSet = useMemo(() => new Set(visibleItems.map((item) => item.id)), [visibleItems]);
+  const allSelected = visibleCount > 0 && visibleItems.every((item) => selectedIdSet.has(item.id));
   const cleanupMatchedIdSet = useMemo(() => {
     const now = Date.now();
-    return new Set(items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
-  }, [items, cleanupRange]);
+    return new Set(visibleItems.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
+  }, [visibleItems, cleanupRange]);
   const cleanupMatchedCount = cleanupMatchedIdSet.size;
   const exportItems = useMemo(() => {
-    if (!selectionMode || selectedIds.length === 0) return items;
-    return items.filter((item) => selectedIdSet.has(item.id));
-  }, [items, selectedIdSet, selectedIds.length, selectionMode]);
+    if (!selectionMode || selectedIds.length === 0) return visibleItems;
+    return visibleItems.filter((item) => selectedIdSet.has(item.id));
+  }, [selectedIdSet, selectedIds.length, selectionMode, visibleItems]);
   const exportCount = exportItems.length;
 
   const countLabel = useMemo(
-    () => t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount }),
-    [t, totalCount],
+    () => activeFilter === 'all'
+      ? t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount })
+      : t('clipboardHistoryTab.filteredCount', {
+        defaultValue: '{{count}} / {{total}} 条',
+        count: visibleCount,
+        total: totalCount,
+      }),
+    [activeFilter, t, totalCount, visibleCount],
   );
 
   const collapseSelectionMode = (): void => {
@@ -350,13 +402,32 @@ export function ClipboardHistoryTab(): React.ReactElement {
   };
 
   const handleToggleSelectAll = (): void => {
-    setSelectedIds(allSelected ? [] : items.map((item) => item.id));
+    if (allSelected) {
+      setSelectedIds((prev) => prev.filter((id) => !visibleIdSet.has(id)));
+      return;
+    }
+    setSelectedIds((prev) => Array.from(new Set([
+      ...prev,
+      ...visibleItems.map((item) => item.id),
+    ])));
   };
 
   const handleCleanupRangeChange = (range: ClipboardCleanupRange): void => {
     const now = Date.now();
     setCleanupRange(range);
-    setSelectedIds(items.filter((item) => isItemInCleanupRange(item, range, now)).map((item) => item.id));
+    setSelectedIds(visibleItems.filter((item) => isItemInCleanupRange(item, range, now)).map((item) => item.id));
+  };
+
+  const handleFilterChange = (filter: ClipboardHistoryFilter): void => {
+    setActiveFilter(filter);
+    setSelectedIds([]);
+    if (expandedId !== null) {
+      const expandedItem = items.find((item) => item.id === expandedId);
+      if (expandedItem && !matchesClipboardFilter(expandedItem, filter)) {
+        setExpandedId(null);
+        setEditText('');
+      }
+    }
   };
 
   const handleRemoveSelected = (): void => {
@@ -473,6 +544,22 @@ export function ClipboardHistoryTab(): React.ReactElement {
         <span className="clipboard-history-title">{t('clipboardHistoryTab.title', { defaultValue: '剪贴板历史' })}</span>
         <div className="clipboard-history-header-right">
           <span className="clipboard-history-count">{countLabel}</span>
+          <div className="clipboard-history-filter-bar" role="tablist" aria-label={t('clipboardHistoryTab.filters.aria', { defaultValue: '剪贴板类型筛选' })}>
+            {CLIPBOARD_HISTORY_FILTERS.map((filter) => (
+              <button
+                key={filter}
+                className={`clipboard-history-filter${activeFilter === filter ? ' clipboard-history-filter--active' : ''}`}
+                type="button"
+                role="tab"
+                aria-selected={activeFilter === filter}
+                onClick={() => handleFilterChange(filter)}
+              >
+                {t(CLIPBOARD_HISTORY_FILTER_LABEL_KEYS[filter], {
+                  defaultValue: CLIPBOARD_HISTORY_FILTER_DEFAULT_LABELS[filter],
+                })}
+              </button>
+            ))}
+          </div>
           <button
             className="clipboard-history-clear"
             type="button"
@@ -566,7 +653,11 @@ export function ClipboardHistoryTab(): React.ReactElement {
           <div className="clipboard-history-empty">
             {t('clipboardHistoryTab.empty', { defaultValue: '暂时没有记录，复制一些文本后会显示在这里。' })}
           </div>
-        ) : items.map((item) => {
+        ) : visibleItems.length === 0 ? (
+          <div className="clipboard-history-empty">
+            {t('clipboardHistoryTab.emptyFiltered', { defaultValue: '当前类型下没有记录。' })}
+          </div>
+        ) : visibleItems.map((item) => {
           const expanded = expandedId === item.id;
           const selected = selectedIdSet.has(item.id);
           return (
