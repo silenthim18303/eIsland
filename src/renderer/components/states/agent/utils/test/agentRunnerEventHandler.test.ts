@@ -97,7 +97,7 @@ function makeEvent(type: string, payload?: unknown): StreamEvent {
 async function loadHandler(options?: Partial<CreateAgentStreamEventHandlerOptions>) {
   const mod = await import('../agentRunnerEventHandler');
   const opts = createOptions(options);
-  const handler = mod.createAgentStreamEventHandler(opts as any);
+  const handler = mod.createAgentStreamEventHandler(opts);
   return { handler, opts };
 }
 
@@ -108,8 +108,9 @@ async function loadHandler(options?: Partial<CreateAgentStreamEventHandlerOption
 describe('createAgentStreamEventHandler', () => {
   beforeEach(() => {
     // Reset window.api mock
-    (globalThis as any).window = (globalThis as any).window || {};
-    (globalThis as any).window.api = undefined;
+    const g = globalThis as Record<string, Record<string, unknown>>;
+    g.window = g.window ?? {};
+    g.window.api = undefined;
   });
 
   /* ========== isActive guard ========== */
@@ -415,7 +416,7 @@ describe('createAgentStreamEventHandler', () => {
 
         const execResult = { success: true, result: { data: 42 }, durationMs: 100 };
         const executeAgentLocalTool = vi.fn(async () => execResult);
-        (globalThis as any).window.api = { executeAgentLocalTool };
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = { executeAgentLocalTool };
 
         const { handler } = await loadHandler({ isOllama: false });
 
@@ -450,7 +451,7 @@ describe('createAgentStreamEventHandler', () => {
       it('sends error resolution when window.api.executeAgentLocalTool is unavailable', async () => {
         isClientLocalToolNameMock.mockReturnValue(true);
         isHighRiskLocalToolNameMock.mockReturnValue(false);
-        (globalThis as any).window.api = {};
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = {};
 
         const { handler } = await loadHandler();
 
@@ -477,7 +478,7 @@ describe('createAgentStreamEventHandler', () => {
       it('sends error resolution when window.api is undefined', async () => {
         isClientLocalToolNameMock.mockReturnValue(true);
         isHighRiskLocalToolNameMock.mockReturnValue(false);
-        (globalThis as any).window.api = undefined;
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = undefined;
 
         const { handler } = await loadHandler();
 
@@ -507,7 +508,7 @@ describe('createAgentStreamEventHandler', () => {
 
         const execResult = { success: false, result: {}, error: 'FILE_NOT_FOUND', durationMs: 50 };
         const executeAgentLocalTool = vi.fn(async () => execResult);
-        (globalThis as any).window.api = { executeAgentLocalTool };
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = { executeAgentLocalTool };
 
         const { handler } = await loadHandler();
 
@@ -536,7 +537,7 @@ describe('createAgentStreamEventHandler', () => {
         isHighRiskLocalToolNameMock.mockReturnValue(false);
 
         const executeAgentLocalTool = vi.fn(async () => null);
-        (globalThis as any).window.api = { executeAgentLocalTool };
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = { executeAgentLocalTool };
 
         const { handler } = await loadHandler();
 
@@ -565,7 +566,7 @@ describe('createAgentStreamEventHandler', () => {
         isHighRiskLocalToolNameMock.mockReturnValue(false);
 
         const executeAgentLocalTool = vi.fn(async () => { throw new Error('boom'); });
-        (globalThis as any).window.api = { executeAgentLocalTool };
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = { executeAgentLocalTool };
 
         const { handler } = await loadHandler();
 
@@ -588,7 +589,7 @@ describe('createAgentStreamEventHandler', () => {
         isHighRiskLocalToolNameMock.mockReturnValue(false);
 
         const executeAgentLocalTool = vi.fn(async () => ({ success: true, result: {}, durationMs: 0 }));
-        (globalThis as any).window.api = { executeAgentLocalTool };
+        ((globalThis as Record<string, Record<string, unknown>>).window).api = { executeAgentLocalTool };
         resolveMihtnelisLocalToolResultMock.mockRejectedValueOnce(new Error('network fail'));
 
         const { handler } = await loadHandler();
