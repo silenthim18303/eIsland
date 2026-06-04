@@ -56,23 +56,23 @@ export type OverviewWidgetType = 'shortcuts' | 'todo' | 'song' | 'countdown' | '
 export type OverviewClockStyle = 'classic' | 'gradient' | 'minimal';
 
 /** 控件选项列表 */
-export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType; label: string }[] = [
-  { value: 'shortcuts', label: '快捷启动' },
-  { value: 'todo', label: '待办事项' },
-  { value: 'song', label: '歌曲' },
-  { value: 'album', label: '相册轮播' },
-  { value: 'countdown', label: '倒数日' },
-  { value: 'pomodoro', label: '番茄钟' },
-  { value: 'mokugyo', label: '电子木鱼' },
-  { value: 'urlFavorites', label: 'URL 收藏' },
-  { value: 'breakReminder', label: '休息提醒' },
+export const OVERVIEW_WIDGET_OPTIONS: { value: OverviewWidgetType }[] = [
+  { value: 'shortcuts' },
+  { value: 'todo' },
+  { value: 'song' },
+  { value: 'album' },
+  { value: 'countdown' },
+  { value: 'pomodoro' },
+  { value: 'mokugyo' },
+  { value: 'urlFavorites' },
+  { value: 'breakReminder' },
 ];
 
 /** 时钟样式选项 */
-export const OVERVIEW_CLOCK_STYLE_OPTIONS: { value: OverviewClockStyle; label: string }[] = [
-  { value: 'classic', label: '经典样式' },
-  { value: 'gradient', label: '渐变样式' },
-  { value: 'minimal', label: '极简艺术' },
+export const OVERVIEW_CLOCK_STYLE_OPTIONS: { value: OverviewClockStyle }[] = [
+  { value: 'classic' },
+  { value: 'gradient' },
+  { value: 'minimal' },
 ];
 
 export interface OverviewGradientColors {

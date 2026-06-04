@@ -27,17 +27,12 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AnnouncementData } from '../../../../api/announcement/announcementApi';
+import { formatDatetime } from '../utils/formatDatetime';
+import { ANNOUNCEMENT_KEYS, ANNOUNCEMENT_DEFAULTS } from '../config/announcementDefaults';
 
 interface AnnouncementHeaderProps {
   announcement: AnnouncementData | null;
   onClose: () => void;
-}
-
-function formatDatetime(value?: string): string {
-  if (!value) return '';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 }
 
 /**
@@ -51,20 +46,20 @@ export function AnnouncementHeader({ announcement, onClose }: AnnouncementHeader
   return (
     <div className="announcement-panel-header">
       <div>
-        <div className="announcement-title">{t('announcement.title', { defaultValue: '公告' })}</div>
-        <div className="announcement-subtitle">{t('announcement.subtitle', { defaultValue: '当前已是最新版本，以下为最新公告内容。' })}</div>
+        <div className="announcement-title">{t(ANNOUNCEMENT_KEYS.TITLE, { defaultValue: ANNOUNCEMENT_DEFAULTS.TITLE })}</div>
+        <div className="announcement-subtitle">{t(ANNOUNCEMENT_KEYS.SUBTITLE, { defaultValue: ANNOUNCEMENT_DEFAULTS.SUBTITLE })}</div>
       </div>
       <div className="announcement-header-actions">
         {announcement && (
           <div className="announcement-meta-vertical">
-            <span className="announcement-meta-title">{announcement.title || t('announcement.defaultTitle', { defaultValue: '系统公告' })}</span>
+            <span className="announcement-meta-title">{announcement.title || t(ANNOUNCEMENT_KEYS.DEFAULT_TITLE, { defaultValue: ANNOUNCEMENT_DEFAULTS.DEFAULT_TITLE })}</span>
             {announcement.updatedAt && (
-              <span className="announcement-meta-time">{t('announcement.updatedAt', { defaultValue: '更新时间：{{time}}', time: formatDatetime(announcement.updatedAt) })}</span>
+              <span className="announcement-meta-time">{t(ANNOUNCEMENT_KEYS.UPDATED_AT, { defaultValue: ANNOUNCEMENT_DEFAULTS.UPDATED_AT, time: formatDatetime(announcement.updatedAt) })}</span>
             )}
           </div>
         )}
         <button type="button" className="announcement-close-btn" onClick={onClose}>
-          {t('announcement.close', { defaultValue: '关闭' })}
+          {t(ANNOUNCEMENT_KEYS.CLOSE, { defaultValue: ANNOUNCEMENT_DEFAULTS.CLOSE })}
         </button>
       </div>
     </div>

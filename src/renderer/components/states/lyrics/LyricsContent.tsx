@@ -24,72 +24,23 @@
  * @author 鸡哥
  */
 
-import { useEffect, useMemo, useState } from 'react';
 import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
-import type { SyncedLyricLine, SyncedLyricSyllable } from '../../../store/types';
 import { SvgIcon } from '../../../utils/SvgIcon';
+import { useLyricsSettings } from './hooks/useLyricsSettings';
+import { useBeijingClock } from './hooks/useBeijingClock';
+import { useAutoIdle } from './hooks/useAutoIdle';
+import { useCurrentLyric } from './hooks/useCurrentLyric';
+import { KaraokeSyllableLine } from './components/KaraokeSyllableLine';
 import '../../../styles/lyrics/lyrics.css';
-
-const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
-
-/** 二分查找当前歌词行索引 */
-function findCurrentIndex(lyrics: SyncedLyricLine[], posMs: number): number {
-  if (lyrics.length === 0 || posMs < lyrics[0].time_ms) return -1;
-  let lo = 0;
-  let hi = lyrics.length - 1;
-  while (lo < hi) {
-    const mid = (lo + hi + 1) >> 1;
-    if (lyrics[mid].time_ms <= posMs) lo = mid;
-    else hi = mid - 1;
-  }
-  return lo;
-}
-
-/**
- * 逐字扫光行渲染: 按音节真实 start/duration 计算每个音节的独立进度
- * @param syllables - 音节数组(相对偏移 + 持续时长)
- * @param lineStartMs - 行起始绝对毫秒
- * @param posMs - 当前播放位置(绝对毫秒)
- */
-function KaraokeSyllableLine({
-  syllables,
-  lineStartMs,
-  posMs,
-}: {
-  syllables: SyncedLyricSyllable[];
-  lineStartMs: number;
-  posMs: number;
-}): ReactElement {
-  return (
-    <>
-      {syllables.map((syl, i) => {
-        const sylStart = lineStartMs + syl.start_offset_ms;
-        const sylEnd = sylStart + syl.duration_ms;
-        let prog = 0;
-        if (posMs >= sylEnd) prog = 1;
-        else if (posMs > sylStart && syl.duration_ms > 0) {
-          prog = (posMs - sylStart) / syl.duration_ms;
-        }
-        return (
-          <span
-            key={i}
-            className="lyrics-syllable"
-            style={{ '--syl-prog': `${(prog * 100).toFixed(2)}%` } as React.CSSProperties}
-          >
-            {syl.text}
-          </span>
-        );
-      })}
-    </>
-  );
-}
 
 /**
  * 歌词状态内容组件
  * @description 鼠标离开 hover 且正在播放音乐时显示，左侧专辑封面+光晕，右侧歌词
  */
 export function LyricsContent(): ReactElement {
+  const { t } = useTranslation();
   const isMusicPlaying = useIslandStore((s) => s.isMusicPlaying);
   const isPlaying = useIslandStore((s) => s.isPlaying);
   const coverImage = useIslandStore((s) => s.coverImage);
@@ -100,101 +51,12 @@ export function LyricsContent(): ReactElement {
   const mediaInfo = useIslandStore((s) => s.mediaInfo);
   const setIdle = useIslandStore((s) => s.setIdle);
 
-  const [karaokeEnabled, setKaraokeEnabled] = useState(false);
-  const [clockEnabled, setClockEnabled] = useState(true);
-  const [clockText, setClockText] = useState('');
-  const [musicOuterGlowEffectEnabled, setMusicOuterGlowEffectEnabled] = useState<boolean>(true);
-
-  /** 加载逐字扫光配置 */
-  useEffect(() => {
-    window.api?.musicLyricsKaraokeGet().then(setKaraokeEnabled).catch(() => {});
-    window.api?.musicLyricsClockGet().then(setClockEnabled).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(MUSIC_OUTER_GLOW_EFFECT_STORE_KEY).then((value) => {
-      if (cancelled) return;
-      if (typeof value === 'boolean') {
-        setMusicOuterGlowEffectEnabled(value);
-      }
-    }).catch(() => {});
-
-    const handler = (e: Event): void => {
-      if (cancelled) return;
-      const val = (e as CustomEvent).detail;
-      if (typeof val === 'boolean') setMusicOuterGlowEffectEnabled(val);
-    };
-    window.addEventListener('music-outer-glow-effect-changed', handler);
-
-    return () => {
-      cancelled = true;
-      window.removeEventListener('music-outer-glow-effect-changed', handler);
-    };
-  }, []);
-
-  /** 按分钟边界更新北京时间，避免每秒重渲染 */
-  useEffect(() => {
-    if (!clockEnabled) return;
-
-    let timer: ReturnType<typeof setTimeout> | null = null;
-    const tick = (): void => {
-      const now = new Date();
-      const beijing = new Date(now.getTime() + (now.getTimezoneOffset() + 480) * 60000);
-      const hh = String(beijing.getHours()).padStart(2, '0');
-      const mm = String(beijing.getMinutes()).padStart(2, '0');
-      const nextText = `${hh}:${mm}`;
-      setClockText((prev) => (prev === nextText ? prev : nextText));
-
-      const delayToNextMinute = 60000 - (beijing.getSeconds() * 1000 + beijing.getMilliseconds());
-      timer = setTimeout(tick, Math.max(50, delayToNextMinute));
-    };
-
-    tick();
-
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [clockEnabled]);
+  const { karaokeEnabled, clockEnabled, musicOuterGlowEffectEnabled } = useLyricsSettings();
+  const clockText = useBeijingClock(clockEnabled);
+  useAutoIdle(isMusicPlaying, lyricsLoading, syncedLyrics, setIdle);
+  const { currentIdx, hasLyrics, isIntro, currentLine, currentText, hasSyllables } = useCurrentLyric(syncedLyrics, lyricsLoading, currentPositionMs);
 
   const [r, g, b] = dominantColor;
-
-  /** 音乐停止 或 无歌词时自动回到 idle */
-  useEffect(() => {
-    if (!isMusicPlaying) {
-      setIdle();
-      return;
-    }
-    if (!lyricsLoading && (!syncedLyrics || syncedLyrics.length === 0)) {
-      setIdle();
-    }
-  }, [isMusicPlaying, lyricsLoading, syncedLyrics, setIdle]);
-
-  /** 当前歌词行索引 */
-  const currentIdx = useMemo(() => {
-    if (!syncedLyrics || syncedLyrics.length === 0) return -1;
-    return findCurrentIndex(syncedLyrics, currentPositionMs);
-  }, [syncedLyrics, currentPositionMs]);
-
-  const hasLyrics = syncedLyrics && syncedLyrics.length > 0 && !lyricsLoading;
-  const isIntro = hasLyrics && currentIdx < 0;
-
-  /** 当前行对象, 便于读取 text 与 syllables */
-  const currentLine = useMemo(() => {
-    if (!hasLyrics || isIntro) return null;
-    if (currentIdx >= 0 && syncedLyrics && currentIdx < syncedLyrics.length) {
-      return syncedLyrics[currentIdx];
-    }
-    return null;
-  }, [hasLyrics, isIntro, currentIdx, syncedLyrics]);
-
-  /** 当前行文本(未启用逐字时直接渲染) */
-  const currentText = currentLine?.text ?? '';
-
-  /** 当前行是否具备真实逐字音节数据 */
-  const hasSyllables = Boolean(
-    currentLine && currentLine.syllables && currentLine.syllables.length > 0,
-  );
 
   return (
     <div className="lyrics-content">
@@ -229,7 +91,7 @@ export function LyricsContent(): ReactElement {
             <span className="lyrics-loading-dot" />
             <span className="lyrics-loading-dot" />
             <span className="lyrics-loading-dot" />
-            <span className="lyrics-loading-label">正在加载歌词</span>
+            <span className="lyrics-loading-label">{t('songTab.lyrics.loading')}</span>
           </div>
         ) : isIntro ? (
           <>
@@ -252,7 +114,7 @@ export function LyricsContent(): ReactElement {
             )}
           </span>
         ) : (
-          <span className="lyrics-empty">暂无歌词 享受音乐</span>
+          <span className="lyrics-empty">{t('songTab.lyrics.empty')} {t('songTab.lyrics.enjoyMusic', { defaultValue: '享受音乐' })}</span>
         )}
       </div>
     </div>

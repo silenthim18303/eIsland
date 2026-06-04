@@ -335,7 +335,7 @@ export function ThemeSettingsPage({
                   className={`settings-bg-gallery-item ${bgMediaType === 'image' && bgMediaPreviewUrl === wp.src ? 'active' : ''}`}
                   type="button"
                   onClick={() => handleSelectBuiltinBgImage(wp.src, wp.defaultOpacity)}
-                  title={`${wp.name}（默认透明度 ${wp.defaultOpacity}%）`}
+                  title={`${wp.name}${t('settings.app.theme.defaultOpacitySuffix', { defaultValue: '（默认透明度 {{opacity}}%）', opacity: wp.defaultOpacity })}`}
                 >
                   <img src={wp.src} alt={wp.name} className="settings-bg-gallery-img" />
                   <span className="settings-bg-gallery-name">{wp.name}</span>

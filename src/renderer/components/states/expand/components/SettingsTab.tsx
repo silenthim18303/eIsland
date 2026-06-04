@@ -25,15 +25,17 @@
  */
 
 import type React from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * 设置 Tab
  * @description 展开状态下的设置面板
  */
 export function SettingsTab(): React.ReactElement {
+  const { t } = useTranslation();
   return (
     <div className="expand-tab-panel">
-      <span className="text-sm text-[var(--color-island-text)] opacity-40">设置</span>
+      <span className="text-sm text-[var(--color-island-text)] opacity-40">{t('expanded.settingsTab.label')}</span>
     </div>
   );
 }

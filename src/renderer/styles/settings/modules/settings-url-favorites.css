@@ -343,7 +343,37 @@
   color: rgba(var(--color-text-rgb), 0.4);
 }
 
-.clipboard-history-clear {
+.clipboard-history-filter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 6px;
+  padding: 2px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.clipboard-history-filter {
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  padding: 0 10px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.58);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.clipboard-history-filter:hover,
+.clipboard-history-filter--active {
+  color: rgba(var(--color-text-rgb), 0.88);
+  background: rgba(var(--color-text-rgb), 0.1);
+}
+
+.clipboard-history-clear,
+.clipboard-history-export,
+.clipboard-history-select-toggle {
   height: 24px;
   border: none;
   border-radius: 6px;
@@ -352,16 +382,205 @@
   color: rgba(var(--color-text-rgb), 0.8);
   background: rgba(var(--color-text-rgb), 0.1);
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.clipboard-history-clear:hover:not(:disabled) {
+.clipboard-history-clear:hover:not(:disabled),
+.clipboard-history-export:hover:not(:disabled),
+.clipboard-history-select-toggle:hover:not(:disabled),
+.clipboard-history-select-toggle--active {
   background: rgba(var(--color-text-rgb), 0.18);
 }
 
-.clipboard-history-clear:disabled {
+.clipboard-history-clear:hover:not(:disabled),
+.clipboard-history-export:hover:not(:disabled),
+.clipboard-history-select-toggle:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.clipboard-history-select-toggle--active {
+  animation: clipboard-history-select-toggle-pop 0.22s ease-out both;
+}
+
+.clipboard-history-clear:disabled,
+.clipboard-history-export:disabled,
+.clipboard-history-select-toggle:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.clipboard-history-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+  transform-origin: top center;
+  animation: clipboard-history-bulk-bar-enter 0.24s ease-out both;
+}
+
+.clipboard-history-bulk-bar--collapsing {
+  pointer-events: none;
+  animation: clipboard-history-bulk-bar-exit 0.18s ease-in both;
+}
+
+.clipboard-history-select-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+  color: rgba(var(--color-text-rgb), 0.68);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.clipboard-history-select-all input,
+.clipboard-history-item-check input {
+  width: 13px;
+  height: 13px;
+  accent-color: rgba(105, 192, 255, 0.9);
+}
+
+.clipboard-history-select-all:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clipboard-history-bulk-delete,
+.clipboard-history-range-clear {
+  height: 24px;
+  border: none;
+  border-radius: 6px;
+  padding: 0 8px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.78);
+  background: rgba(var(--color-text-rgb), 0.1);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clipboard-history-bulk-delete:hover:not(:disabled),
+.clipboard-history-range-clear:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.18);
+}
+
+.clipboard-history-bulk-delete:disabled,
+.clipboard-history-range-clear:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clipboard-history-range-select {
+  min-width: 96px;
+  height: 24px;
+  margin-left: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.78);
+  font-size: 11px;
+  outline: none;
+  color-scheme: dark;
+}
+
+.clipboard-history-range-select option {
+  color: #f5f5f5;
+  background: #1f1f1f;
+}
+
+[data-theme='light'] .clipboard-history-range-select {
+  border-color: rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.78);
+  color-scheme: light;
+}
+
+[data-theme='light'] .clipboard-history-range-select option {
+  color: #1f1f1f;
+  background: #ffffff;
+}
+
+@keyframes clipboard-history-select-toggle-pop {
+  0% {
+    transform: scale(0.96);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes clipboard-history-bulk-bar-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.92);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes clipboard-history-bulk-bar-exit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.92);
+  }
+}
+
+@keyframes clipboard-history-checkbox-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes clipboard-history-checkbox-exit {
+  0% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clipboard-history-select-toggle--active,
+  .clipboard-history-bulk-bar,
+  .clipboard-history-bulk-bar--collapsing,
+  .clipboard-history-summary-row--selecting .clipboard-history-item-check,
+  .clipboard-history-summary-row--collapsing .clipboard-history-item-check {
+    animation: none;
+  }
+
+  .clipboard-history-clear,
+  .clipboard-history-export,
+  .clipboard-history-select-toggle,
+  .clipboard-history-summary-row {
+    transition: none;
+  }
+
+  .clipboard-history-clear:hover:not(:disabled),
+  .clipboard-history-export:hover:not(:disabled),
+  .clipboard-history-select-toggle:hover:not(:disabled) {
+    transform: none;
+  }
 }
 
 .clipboard-history-feedback {
@@ -449,11 +668,36 @@
   padding: 6px 8px;
 }
 
+.clipboard-history-item--selected {
+  border-color: rgba(105, 192, 255, 0.34);
+  background: rgba(105, 192, 255, 0.08);
+}
+
 .clipboard-history-summary-row {
   display: grid;
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
+  transition: grid-template-columns 0.2s ease;
+}
+
+.clipboard-history-summary-row--selecting {
+  grid-template-columns: 18px 24px minmax(0, 1fr);
+}
+
+.clipboard-history-summary-row--selecting .clipboard-history-item-check {
+  animation: clipboard-history-checkbox-enter 0.2s ease-out both;
+}
+
+.clipboard-history-summary-row--collapsing .clipboard-history-item-check {
+  animation: clipboard-history-checkbox-exit 0.18s ease-in both;
+}
+
+.clipboard-history-item-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .clipboard-history-copy {

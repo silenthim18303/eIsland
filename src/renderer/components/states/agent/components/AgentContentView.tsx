@@ -25,6 +25,7 @@
  */
 
 import type { ReactElement, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AgentPhase, AuthPending } from '../config/agentContentConfig';
 import { PHASE_IMAGE, PHASE_LABEL } from '../config/agentContentConfig';
 
@@ -47,6 +48,7 @@ interface AgentContentViewProps {
  * @returns Agent 内容视图节点。
  */
 export function AgentContentView(props: AgentContentViewProps): ReactElement {
+  const { t } = useTranslation();
   const {
     phase,
     overlayLabel,
@@ -82,11 +84,11 @@ export function AgentContentView(props: AgentContentViewProps): ReactElement {
       <div className="agent-actions">
         {authPending ? (
           <>
-            <button className="agent-action-btn agent-action-deny" onClick={onDeny}>不授权</button>
-            <button className="agent-action-btn agent-action-allow" onClick={onAllow}>授权</button>
+            <button className="agent-action-btn agent-action-deny" onClick={onDeny}>{t('agent.actions.denyAuth', { defaultValue: '不授权' })}</button>
+            <button className="agent-action-btn agent-action-allow" onClick={onAllow}>{t('agent.actions.allowAuth', { defaultValue: '授权' })}</button>
           </>
         ) : (
-          <button className="agent-action-btn" onClick={onClose}>关闭</button>
+          <button className="agent-action-btn" onClick={onClose}>{t('agent.actions.close', { defaultValue: '关闭' })}</button>
         )}
       </div>
     </div>

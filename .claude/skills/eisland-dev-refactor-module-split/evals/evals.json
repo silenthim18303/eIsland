@@ -1,0 +1,23 @@
+{
+  "skill_name": "eisland-dev-refactor-module-split",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "拆分 src/renderer/components/states/announcement/AnnouncementContent.tsx 进 components hooks utils config 文件夹",
+      "expected_output": "AnnouncementContent.tsx simplified to thin composition layer. Pure functions to utils/, hooks to hooks/, sub-components to components/, i18n keys/defaults to config/. License headers and JSDoc on all files. TypeScript compiles clean.",
+      "files": ["src/renderer/components/states/announcement/AnnouncementContent.tsx"]
+    },
+    {
+      "id": 2,
+      "prompt": "拆分 src/renderer/components/states/lyrics/LyricsContent.tsx 到 utils hooks config components",
+      "expected_output": "LyricsContent.tsx reduced from ~260 to ~130 lines. Binary search to utils/, multiple hooks to hooks/, KaraokeSyllableLine to components/, store key to config/. License headers and JSDoc on all files. TypeScript compiles clean.",
+      "files": ["src/renderer/components/states/lyrics/LyricsContent.tsx"]
+    },
+    {
+      "id": 3,
+      "prompt": "把 IdleContent.tsx 拆分到 components hooks utils config 子目录",
+      "expected_output": "IdleContent.tsx split into subdirectories. Only directories with extractable code are created. Each file has license header and JSDoc. Main file imports from new modules. TypeScript compiles clean.",
+      "files": ["src/renderer/components/states/idle/IdleContent.tsx"]
+    }
+  ]
+}

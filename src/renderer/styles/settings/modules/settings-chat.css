@@ -1993,6 +1993,25 @@
 }
 
 /** 模型选择卡片容器 */
+.max-expand-chat-model-card-wrap {
+  max-height: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateY(8px) scale(0.98);
+  transform-origin: bottom center;
+  transition: max-height 0.26s ease, margin-bottom 0.22s ease, opacity 0.18s ease, transform 0.26s ease;
+}
+
+.max-expand-chat-model-card-wrap--open {
+  max-height: 260px;
+  margin-bottom: 8px;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
 .max-expand-chat-model-card {
   width: 100%;
   border-radius: 10px;

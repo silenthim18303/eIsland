@@ -24,9 +24,11 @@
  * @author 鸡哥
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/isLandStore';
+import { useSttTextSync } from './hooks/useSttTextSync';
 import '../../../styles/stt/stt.css';
 
 /**
@@ -34,6 +36,7 @@ import '../../../styles/stt/stt.css';
  * @description 与 notification 尺寸一致
  */
 export function SttContent(): ReactElement {
+  const { t } = useTranslation();
   const sttText = useIslandStore((s) => s.sttText);
   const setIdle = useIslandStore((s) => s.setIdle);
   const setStt = useIslandStore((s) => s.setStt);
@@ -44,11 +47,7 @@ export function SttContent(): ReactElement {
   const [addedTodo, setAddedTodo] = useState(false);
   const [addedMemo, setAddedMemo] = useState(false);
 
-  useEffect(() => {
-    if (editRef.current && !editing) {
-      editRef.current.textContent = sttText || '...';
-    }
-  }, [sttText, editing]);
+  useSttTextSync(editRef, sttText, editing);
 
   const handleFocus = (): void => {
     setEditing(true);
@@ -87,7 +86,7 @@ export function SttContent(): ReactElement {
     const now = Date.now();
     const d = new Date(now);
     const ts = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-    const newMemo = { id: now, title: `${ts}-ASR快速添加`, content: text, createdAt: now, updatedAt: now, pinned: false, bookmarked: false };
+    const newMemo = { id: now, title: `${ts}-${t('stt.asrQuickAdd', { defaultValue: 'ASR快速添加' })}`, content: text, createdAt: now, updatedAt: now, pinned: false, bookmarked: false };
     window.api.storeRead('memos').then((data: unknown) => {
       const prev = Array.isArray(data) ? data : [];
       return window.api.storeWrite('memos', [newMemo, ...prev]);
@@ -110,7 +109,7 @@ export function SttContent(): ReactElement {
     <div className="stt-content">
       <img className="stt-icon" src="image/STT_LISTENING.png" alt="" draggable={false} />
       <div className="stt-text-area">
-        <span className="stt-text-label">识别结果</span>
+        <span className="stt-text-label">{t('stt.label', { defaultValue: '识别结果' })}</span>
         <div
           ref={editRef}
           className="stt-text-body"
@@ -122,11 +121,11 @@ export function SttContent(): ReactElement {
         />
       </div>
       <div className="stt-actions">
-        <button className="stt-action-btn" onClick={() => setAgent(editRef.current?.textContent?.trim() || sttText || '')}>发送给Agent</button>
-        <button className="stt-action-btn" onClick={handleAddMemo}>{addedMemo ? '已添加' : '添加到备忘录'}</button>
-        <button className="stt-action-btn" onClick={handleAddTodo}>{addedTodo ? '已添加' : '添加待办'}</button>
-        <button className="stt-action-btn" onClick={handleCopy}>{copied ? '已复制' : '复制'}</button>
-        <button className="stt-action-btn" onClick={() => setIdle(true)}>忽略</button>
+        <button className="stt-action-btn" onClick={() => setAgent(editRef.current?.textContent?.trim() || sttText || '')}>{t('stt.actions.sendToAgent', { defaultValue: '发送给Agent' })}</button>
+        <button className="stt-action-btn" onClick={handleAddMemo}>{addedMemo ? t('stt.actions.added', { defaultValue: '已添加' }) : t('stt.actions.addToMemo', { defaultValue: '添加到备忘录' })}</button>
+        <button className="stt-action-btn" onClick={handleAddTodo}>{addedTodo ? t('stt.actions.added', { defaultValue: '已添加' }) : t('stt.actions.addTodo', { defaultValue: '添加待办' })}</button>
+        <button className="stt-action-btn" onClick={handleCopy}>{copied ? t('stt.actions.copied', { defaultValue: '已复制' }) : t('stt.actions.copy', { defaultValue: '复制' })}</button>
+        <button className="stt-action-btn" onClick={() => setIdle(true)}>{t('stt.actions.ignore', { defaultValue: '忽略' })}</button>
       </div>
     </div>
   );

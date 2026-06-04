@@ -1609,7 +1609,7 @@ export function AiChatTab(): React.ReactElement {
     const safeTraceId = traceId.trim() || '-';
     const safeAnswer = finalAnswer.trim();
     const payload = {
-      title: `Agent输出不符合预期 - ${safeTraceId}`,
+      title: t('aiChat.feedback.issueTitle', { defaultValue: 'Agent输出不符合预期 - {{traceId}}', traceId: safeTraceId }),
       content: safeAnswer,
     };
     void window.api.storeWrite(SETTINGS_ABOUT_FEEDBACK_PREFILL_STORE_KEY, payload)
@@ -2518,9 +2518,8 @@ export function AiChatTab(): React.ReactElement {
       </div>
       {/* 输入栏 */}
       <div>
-        {showModelCard && (
-          <div style={{ marginBottom: 8 }}>
-            <div className="max-expand-chat-model-card">
+        <div className={`max-expand-chat-model-card-wrap ${showModelCard ? 'max-expand-chat-model-card-wrap--open' : ''}`} aria-hidden={!showModelCard}>
+          <div className="max-expand-chat-model-card">
               <div
                 className="max-expand-chat-model-card-scroll"
                 onWheelCapture={(e) => {
@@ -2814,7 +2813,7 @@ export function AiChatTab(): React.ReactElement {
               </div>
             </div>
           </div>
-        )}
+        </div>
         <input
           ref={fileInputRef}
           type="file"
@@ -2959,6 +2958,5 @@ export function AiChatTab(): React.ReactElement {
           )}
         </div>
       </div>
-    </div>
   );
 }

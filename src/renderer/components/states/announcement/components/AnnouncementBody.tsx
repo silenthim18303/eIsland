@@ -27,6 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AnnouncementData } from '../../../../api/announcement/announcementApi';
+import { ANNOUNCEMENT_KEYS, ANNOUNCEMENT_DEFAULTS } from '../config/announcementDefaults';
 
 interface AnnouncementBodyProps {
   loading: boolean;
@@ -42,11 +43,11 @@ export function AnnouncementBody({ loading, announcement }: AnnouncementBodyProp
   const { t } = useTranslation();
 
   if (loading) {
-    return <div className="announcement-empty">{t('announcement.loading', { defaultValue: '正在加载公告…' })}</div>;
+    return <div className="announcement-empty">{t(ANNOUNCEMENT_KEYS.LOADING, { defaultValue: ANNOUNCEMENT_DEFAULTS.LOADING })}</div>;
   }
 
   if (!announcement) {
-    return <div className="announcement-empty">{t('announcement.empty', { defaultValue: '暂无公告内容' })}</div>;
+    return <div className="announcement-empty">{t(ANNOUNCEMENT_KEYS.EMPTY, { defaultValue: ANNOUNCEMENT_DEFAULTS.EMPTY })}</div>;
   }
 
   if (announcement.contentHtml) {

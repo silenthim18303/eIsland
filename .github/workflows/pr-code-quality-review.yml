@@ -248,12 +248,12 @@ jobs:
 
           {
             echo "<!-- pr-auto-code-quality-review -->"
-            echo "## 🧪 PR 代码质量审查"
+            echo "## PR 代码质量审查"
             echo ""
             echo "- PR: #${{ github.event.pull_request.number }}"
             echo "- 分支: \`${{ github.event.pull_request.head.ref }}\` -> \`${{ github.event.pull_request.base.ref }}\`"
             echo "- 触发提交: \`${{ github.event.pull_request.head.sha }}\`"
-            echo "- 审查结果: ${{ steps.quality_check.outputs.passed == 'true' && '✅ 通过' || '❌ 未通过' }}"
+            echo "- 审查结果: ${{ steps.quality_check.outputs.passed == 'true' && 'PASS' || 'FAIL' }}"
             echo "- 违规数量: \`${{ steps.quality_check.outputs.violations }}\`"
             echo "- Checklist 未勾选项（仅自检提示，不影响结果）: \`${{ steps.quality_check.outputs.checklist_missing }}\`"
             echo ""

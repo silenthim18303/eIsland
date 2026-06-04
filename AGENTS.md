@@ -72,6 +72,26 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - At minimum, verify all affected prompt builders mention the new capability consistently.
 - If uncertain which prompts are affected, explicitly ask and confirm before finishing.
 
+## 6. i18n Completeness (UI Change Gate)
+
+**Every user-facing string must have translations. No exceptions.**
+
+After any UI change (new component, new text, modified labels, new feedback messages):
+1. Scan all `t('...')` calls in changed files for translation keys.
+2. Check both `i18n/zh-CN.json` and `i18n/en-US.json` — every key must exist in both.
+3. If a key is missing, add it to both files before marking the task done.
+4. Hard-coded Chinese/English strings in UI code are forbidden — wrap them in `t()`.
+
+Verification: `grep -rn "defaultValue" src/renderer/components/<changed-dir>/` should show `t()` wrappers, not raw strings.
+
+## 7. Comment Standards (Code Change Gate)
+
+**All code must comply with [`docs/COMMENT_STANDARDS.md`](docs/COMMENT_STANDARDS.md). No exceptions.**
+
+## 8. Frontend Standards (Code Change Gate)
+
+**All frontend code must comply with [`docs/FRONTEND_STANDARDS.md`](docs/FRONTEND_STANDARDS.md). No exceptions.**
+
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.

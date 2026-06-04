@@ -24,93 +24,27 @@
  * @author 鸡哥
  */
 
-import React, { useEffect, useState } from 'react';
-import {
-  MAXEXPAND_PERFORMANCE_MODE_STORE_KEY,
-  cacheMaxExpandPerformanceModeEnabled,
-  normalizeMaxExpandPerformanceModeEnabled,
-  readCachedMaxExpandPerformanceModeEnabled,
-} from './components/setting/utils/performanceSettings';
+import { lazy, Suspense, type ReactElement } from 'react';
+import { readCachedMaxExpandPerformanceModeEnabled } from './components/setting/utils/performanceSettings';
+import { usePerformanceMode } from './hooks/usePerformanceMode';
+import { useEagerContentLoader } from './hooks/useEagerContentLoader';
+import { renderEagerLoadingTab } from './utils/renderEagerLoadingTab';
 import { MaxExpandContentLazy } from './MaxExpandContentLazy';
 import { MaxExpandContentShell } from './MaxExpandContentShell';
-import {
-  getLoadedMaxExpandContentEager,
-  loadMaxExpandContentEager,
-  preloadMaxExpandContentEager,
-} from './maxExpandContentEagerLoader';
+import { loadMaxExpandContentEager, preloadMaxExpandContentEager } from './maxExpandContentEagerLoader';
 
-const MaxExpandContentEager = React.lazy(loadMaxExpandContentEager);
+const MaxExpandContentEager = lazy(loadMaxExpandContentEager);
 if (!readCachedMaxExpandPerformanceModeEnabled()) {
   preloadMaxExpandContentEager();
 }
-
-const renderEagerLoadingTab = (_activeTab: unknown, loadingFallback: React.ReactElement): React.ReactElement => loadingFallback;
 
 /**
  * 最大展开模式内容组件
  * @description 渲染最大展开态的 Tab 内容与底部导航点
  */
-export function MaxExpandContent(): React.ReactElement {
-  const [performanceModeEnabled, setPerformanceModeEnabled] = useState(readCachedMaxExpandPerformanceModeEnabled);
-  const [loadedEagerContent, setLoadedEagerContent] = useState(getLoadedMaxExpandContentEager);
-
-  useEffect(() => {
-    if (performanceModeEnabled || loadedEagerContent) return undefined;
-    let cancelled = false;
-    loadMaxExpandContentEager().then((module) => {
-      if (cancelled) return;
-      setLoadedEagerContent(() => module.default);
-    }).catch(() => {});
-    return () => { cancelled = true; };
-  }, [performanceModeEnabled, loadedEagerContent]);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(MAXEXPAND_PERFORMANCE_MODE_STORE_KEY).then((value) => {
-      if (cancelled) return;
-      const enabled = normalizeMaxExpandPerformanceModeEnabled(value);
-      cacheMaxExpandPerformanceModeEnabled(enabled);
-      setPerformanceModeEnabled(enabled);
-      if (!enabled) {
-        loadMaxExpandContentEager().then((module) => {
-          if (cancelled) return;
-          setLoadedEagerContent(() => module.default);
-        }).catch(() => {});
-      }
-    }).catch(() => {});
-    const unsubscribe = window.api.onSettingsChanged((channel: string, value: unknown) => {
-      if (cancelled) return;
-      if (channel === `store:${MAXEXPAND_PERFORMANCE_MODE_STORE_KEY}`) {
-        const enabled = normalizeMaxExpandPerformanceModeEnabled(value);
-        cacheMaxExpandPerformanceModeEnabled(enabled);
-        setPerformanceModeEnabled(enabled);
-        if (!enabled) {
-          loadMaxExpandContentEager().then((module) => {
-            if (cancelled) return;
-            setLoadedEagerContent(() => module.default);
-          }).catch(() => {});
-        }
-      }
-    });
-    const handleLocalChange = (event: Event): void => {
-      if (cancelled) return;
-      const enabled = normalizeMaxExpandPerformanceModeEnabled((event as CustomEvent).detail);
-      cacheMaxExpandPerformanceModeEnabled(enabled);
-      setPerformanceModeEnabled(enabled);
-      if (!enabled) {
-        loadMaxExpandContentEager().then((module) => {
-          if (cancelled) return;
-          setLoadedEagerContent(() => module.default);
-        }).catch(() => {});
-      }
-    };
-    window.addEventListener('maxexpand-performance-mode-changed', handleLocalChange);
-    return () => {
-      cancelled = true;
-      unsubscribe();
-      window.removeEventListener('maxexpand-performance-mode-changed', handleLocalChange);
-    };
-  }, []);
+export function MaxExpandContent(): ReactElement {
+  const performanceModeEnabled = usePerformanceMode();
+  const loadedEagerContent = useEagerContentLoader(performanceModeEnabled);
 
   if (performanceModeEnabled) return <MaxExpandContentLazy />;
   if (loadedEagerContent) {
@@ -118,8 +52,8 @@ export function MaxExpandContent(): React.ReactElement {
     return <LoadedEagerContent />;
   }
   return (
-    <React.Suspense fallback={<MaxExpandContentShell renderActiveTab={renderEagerLoadingTab} />}>
+    <Suspense fallback={<MaxExpandContentShell renderActiveTab={renderEagerLoadingTab} />}>
       <MaxExpandContentEager />
-    </React.Suspense>
+    </Suspense>
   );
 }

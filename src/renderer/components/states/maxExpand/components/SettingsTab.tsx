@@ -197,7 +197,7 @@ export function SettingsTab(): ReactElement {
     };
     return OVERVIEW_WIDGET_OPTIONS.map((option) => ({
       ...option,
-      label: t(labelKeyMap[option.value], { defaultValue: option.label }),
+      label: t(labelKeyMap[option.value]),
     }));
   }, [t]);
   const translatedOverviewClockStyleOptions = useMemo(() => {
@@ -208,7 +208,7 @@ export function SettingsTab(): ReactElement {
     };
     return OVERVIEW_CLOCK_STYLE_OPTIONS.map((option) => ({
       ...option,
-      label: t(labelKeyMap[option.value], { defaultValue: option.label }),
+      label: t(labelKeyMap[option.value]),
     }));
   }, [t]);
   const opacitySaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1827,7 +1827,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'hide')) {
-      setHotkeyError('重复快捷键');
+      setHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setHotkeyRecording(false);
       hotkeyInputRef.current?.blur();
       return;
@@ -1839,10 +1839,10 @@ export function SettingsTab(): ReactElement {
         setHotkeyRecording(false);
         hotkeyInputRef.current?.blur();
       } else {
-        setHotkeyError('快捷键注册失败，请尝试其他组合');
+        setHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setHotkeyError('快捷键注册失败');
+      setHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -1857,7 +1857,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'quit')) {
-      setQuitHotkeyError('重复快捷键');
+      setQuitHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setQuitHotkeyRecording(false);
       quitHotkeyInputRef.current?.blur();
       return;
@@ -1869,10 +1869,10 @@ export function SettingsTab(): ReactElement {
         setQuitHotkeyRecording(false);
         quitHotkeyInputRef.current?.blur();
       } else {
-        setQuitHotkeyError('快捷键注册失败，请尝试其他组合');
+        setQuitHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setQuitHotkeyError('快捷键注册失败');
+      setQuitHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -1887,7 +1887,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'screenshot')) {
-      setScreenshotHotkeyError('重复快捷键');
+      setScreenshotHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setScreenshotHotkeyRecording(false);
       screenshotHotkeyInputRef.current?.blur();
       return;
@@ -1899,10 +1899,10 @@ export function SettingsTab(): ReactElement {
         setScreenshotHotkeyRecording(false);
         screenshotHotkeyInputRef.current?.blur();
       } else {
-        setScreenshotHotkeyError('快捷键注册失败，请尝试其他组合');
+        setScreenshotHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setScreenshotHotkeyError('快捷键注册失败');
+      setScreenshotHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -1917,7 +1917,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'reset-position')) {
-      setResetPositionHotkeyError('重复快捷键');
+      setResetPositionHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setResetPositionHotkeyRecording(false);
       resetPositionHotkeyInputRef.current?.blur();
       return;
@@ -1929,10 +1929,10 @@ export function SettingsTab(): ReactElement {
         setResetPositionHotkeyRecording(false);
         resetPositionHotkeyInputRef.current?.blur();
       } else {
-        setResetPositionHotkeyError('快捷键注册失败，请尝试其他组合');
+        setResetPositionHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setResetPositionHotkeyError('快捷键注册失败');
+      setResetPositionHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -1947,7 +1947,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'toggle-tray')) {
-      setToggleTrayHotkeyError('重复快捷键');
+      setToggleTrayHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setToggleTrayHotkeyRecording(false);
       toggleTrayHotkeyInputRef.current?.blur();
       return;
@@ -1959,10 +1959,10 @@ export function SettingsTab(): ReactElement {
         setToggleTrayHotkeyRecording(false);
         toggleTrayHotkeyInputRef.current?.blur();
       } else {
-        setToggleTrayHotkeyError('快捷键注册失败，请尝试其他组合');
+        setToggleTrayHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setToggleTrayHotkeyError('快捷键注册失败');
+      setToggleTrayHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -1977,7 +1977,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'show-settings-window')) {
-      setShowSettingsWindowHotkeyError('重复快捷键');
+      setShowSettingsWindowHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setShowSettingsWindowHotkeyRecording(false);
       showSettingsWindowHotkeyInputRef.current?.blur();
       return;
@@ -1989,10 +1989,10 @@ export function SettingsTab(): ReactElement {
         setShowSettingsWindowHotkeyRecording(false);
         showSettingsWindowHotkeyInputRef.current?.blur();
       } else {
-        setShowSettingsWindowHotkeyError('快捷键注册失败，请尝试其他组合');
+        setShowSettingsWindowHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setShowSettingsWindowHotkeyError('快捷键注册失败');
+      setShowSettingsWindowHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2003,7 +2003,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'open-clipboard-history')) {
-      setOpenClipboardHistoryHotkeyError('重复快捷键');
+      setOpenClipboardHistoryHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setOpenClipboardHistoryHotkeyRecording(false);
       openClipboardHistoryHotkeyInputRef.current?.blur();
       return;
@@ -2015,10 +2015,10 @@ export function SettingsTab(): ReactElement {
         setOpenClipboardHistoryHotkeyRecording(false);
         openClipboardHistoryHotkeyInputRef.current?.blur();
       } else {
-        setOpenClipboardHistoryHotkeyError('快捷键注册失败，请尝试其他组合');
+        setOpenClipboardHistoryHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setOpenClipboardHistoryHotkeyError('快捷键注册失败');
+      setOpenClipboardHistoryHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2029,7 +2029,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'toggle-passthrough')) {
-      setTogglePassthroughHotkeyError('重复快捷键');
+      setTogglePassthroughHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setTogglePassthroughHotkeyRecording(false);
       togglePassthroughHotkeyInputRef.current?.blur();
       return;
@@ -2041,10 +2041,10 @@ export function SettingsTab(): ReactElement {
         setTogglePassthroughHotkeyRecording(false);
         togglePassthroughHotkeyInputRef.current?.blur();
       } else {
-        setTogglePassthroughHotkeyError('快捷键注册失败，请尝试其他组合');
+        setTogglePassthroughHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setTogglePassthroughHotkeyError('快捷键注册失败');
+      setTogglePassthroughHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2055,7 +2055,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'toggle-ui-lock')) {
-      setToggleUiLockHotkeyError('重复快捷键');
+      setToggleUiLockHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setToggleUiLockHotkeyRecording(false);
       toggleUiLockHotkeyInputRef.current?.blur();
       return;
@@ -2067,10 +2067,10 @@ export function SettingsTab(): ReactElement {
         setToggleUiLockHotkeyRecording(false);
         toggleUiLockHotkeyInputRef.current?.blur();
       } else {
-        setToggleUiLockHotkeyError('快捷键注册失败，请尝试其他组合');
+        setToggleUiLockHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setToggleUiLockHotkeyError('快捷键注册失败');
+      setToggleUiLockHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2081,7 +2081,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'agent-voice-input')) {
-      setAgentVoiceInputHotkeyError('重复快捷键');
+      setAgentVoiceInputHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setAgentVoiceInputHotkeyRecording(false);
       agentVoiceInputHotkeyInputRef.current?.blur();
       return;
@@ -2093,10 +2093,10 @@ export function SettingsTab(): ReactElement {
         setAgentVoiceInputHotkeyRecording(false);
         agentVoiceInputHotkeyInputRef.current?.blur();
       } else {
-        setAgentVoiceInputHotkeyError('快捷键注册失败，请尝试其他组合');
+        setAgentVoiceInputHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setAgentVoiceInputHotkeyError('快捷键注册失败');
+      setAgentVoiceInputHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2107,7 +2107,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'next-song')) {
-      setNextSongHotkeyError('重复快捷键');
+      setNextSongHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setNextSongHotkeyRecording(false);
       nextSongHotkeyInputRef.current?.blur();
       return;
@@ -2119,10 +2119,10 @@ export function SettingsTab(): ReactElement {
         setNextSongHotkeyRecording(false);
         nextSongHotkeyInputRef.current?.blur();
       } else {
-        setNextSongHotkeyError('快捷键注册失败，请尝试其他组合');
+        setNextSongHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setNextSongHotkeyError('快捷键注册失败');
+      setNextSongHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2133,7 +2133,7 @@ export function SettingsTab(): ReactElement {
     const acc = keyEventToAccelerator(e);
     if (!acc) return;
     if (isDuplicateHotkey(acc, 'play-pause-song')) {
-      setPlayPauseSongHotkeyError('重复快捷键');
+      setPlayPauseSongHotkeyError(t('settings.hotkey.duplicateHotkey', { defaultValue: '重复快捷键' }));
       setPlayPauseSongHotkeyRecording(false);
       playPauseSongHotkeyInputRef.current?.blur();
       return;
@@ -2145,10 +2145,10 @@ export function SettingsTab(): ReactElement {
         setPlayPauseSongHotkeyRecording(false);
         playPauseSongHotkeyInputRef.current?.blur();
       } else {
-        setPlayPauseSongHotkeyError('快捷键注册失败，请尝试其他组合');
+        setPlayPauseSongHotkeyError(t('settings.hotkey.registerFailedRetry', { defaultValue: '快捷键注册失败，请尝试其他组合' }));
       }
     }).catch(() => {
-      setPlayPauseSongHotkeyError('快捷键注册失败');
+      setPlayPauseSongHotkeyError(t('settings.hotkey.registerFailed', { defaultValue: '快捷键注册失败' }));
     });
   };
 
@@ -2172,7 +2172,7 @@ export function SettingsTab(): ReactElement {
     const exists = whitelist.some((item) => item.toLowerCase() === nextItem.toLowerCase());
     if (exists) {
       setWhitelistDraft('');
-      setWhitelistInputError('已在白名单中');
+      setWhitelistInputError(t('settings.music.whitelist.alreadyExists', { defaultValue: '已在白名单中' }));
       return;
     }
 
@@ -2188,23 +2188,23 @@ export function SettingsTab(): ReactElement {
 
     if (!musicSmtcNeverUnsubscribe) {
       if (!Number.isFinite(valueMs) || valueMs < 1000) {
-        setMusicSmtcConfigMessage({ type: 'error', text: '请输入有效毫秒值（>= 1000）或开启“永不取消订阅”' });
+        setMusicSmtcConfigMessage({ type: 'error', text: t('settings.music.smtc.invalidMsValue', { defaultValue: '请输入有效毫秒值（>= 1000）或开启「永不取消订阅」' }) });
         return;
       }
     }
 
     const ok = await window.api.musicSmtcUnsubscribeMsSet(valueMs);
     if (!ok) {
-      setMusicSmtcConfigMessage({ type: 'error', text: '保存失败，请稍后重试' });
+      setMusicSmtcConfigMessage({ type: 'error', text: t('settings.music.smtc.saveFailed', { defaultValue: '保存失败，请稍后重试' }) });
       return;
     }
 
     if (musicSmtcNeverUnsubscribe) {
-      setMusicSmtcConfigMessage({ type: 'success', text: '已保存：永不自动取消订阅' });
+      setMusicSmtcConfigMessage({ type: 'success', text: t('settings.music.smtc.savedNeverUnsubscribe', { defaultValue: '已保存：永不自动取消订阅' }) });
       return;
     }
 
-    setMusicSmtcConfigMessage({ type: 'success', text: `已保存：${Math.round(valueMs)} ms 自动取消订阅` });
+    setMusicSmtcConfigMessage({ type: 'success', text: t('settings.music.smtc.savedAutoUnsubscribe', { defaultValue: '已保存：{{ms}} ms 自动取消订阅', ms: Math.round(valueMs) }) });
   };
 
   return (

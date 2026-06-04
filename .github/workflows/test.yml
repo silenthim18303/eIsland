@@ -134,9 +134,9 @@ jobs:
             const fullCode = process.env.FULL_EXIT_CODE || '1';
             const preloadDuration = process.env.PRELOAD_DURATION_SECONDS || '-';
             const fullDuration = process.env.FULL_DURATION_SECONDS || '-';
-            const preloadStatus = preloadCode === '0' ? '✅ PASS' : '❌ FAIL';
-            const fullStatus = fullCode === '0' ? '✅ PASS' : '❌ FAIL';
-            const overallStatus = preloadCode === '0' && fullCode === '0' ? '✅ All tests passed' : '❌ Test failures detected';
+            const preloadStatus = preloadCode === '0' ? 'PASS' : 'FAIL';
+            const fullStatus = fullCode === '0' ? 'PASS' : 'FAIL';
+            const overallStatus = preloadCode === '0' && fullCode === '0' ? 'All tests passed' : 'Test failures detected';
             const shortSha = (context.sha || '').slice(0, 7) || 'unknown';
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
 
