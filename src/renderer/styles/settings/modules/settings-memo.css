@@ -108,13 +108,26 @@
   border-color: rgba(var(--color-text-rgb), 0.25);
 }
 
+.memo-tab-tag-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
 .memo-tab-tag-filter {
   display: flex;
+  flex: 1;
+  min-width: 0;
   gap: 6px;
-  padding: 0 10px 8px;
-  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
   overflow-x: auto;
   overflow-y: hidden;
+  overscroll-behavior-x: contain;
+}
+
+.memo-tab-tag-filter--scrollable {
+  padding-bottom: 5px;
 }
 
 .memo-tab-tag-filter::-webkit-scrollbar {

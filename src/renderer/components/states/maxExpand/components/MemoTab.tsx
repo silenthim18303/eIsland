@@ -181,11 +181,13 @@ export function MemoTab(): React.ReactElement {
   const [bookmarkOnly, setBookmarkOnly] = useState(false);
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [selectedMemoIds, setSelectedMemoIds] = useState<Set<number>>(() => new Set());
+  const [tagFilterScrollable, setTagFilterScrollable] = useState(false);
   const [viewMode, setViewMode] = useState<MemoViewMode>('edit');
   const [editorScroll, setEditorScroll] = useState({ left: 0, top: 0 });
   const skipPersistOnceRef = useRef(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  const tagFilterRef = useRef<HTMLDivElement>(null);
 
   /** 启动时从文件加载 */
   useEffect(() => {
@@ -356,6 +358,20 @@ export function MemoTab(): React.ReactElement {
     if (memos.length === 0) setBulkSelectMode(false);
   }, [memos]);
 
+  useEffect(() => {
+    const tagFilter = tagFilterRef.current;
+    if (!tagFilter) return;
+
+    const updateScrollable = (): void => {
+      setTagFilterScrollable(tagFilter.scrollWidth > tagFilter.clientWidth + 1);
+    };
+
+    updateScrollable();
+    const resizeObserver = new ResizeObserver(updateScrollable);
+    resizeObserver.observe(tagFilter);
+    return () => resizeObserver.disconnect();
+  }, [memoTags]);
+
   /** 过滤 & 排序：标签/书签/全文搜索后，置顶优先，然后按更新时间倒序 */
   const filteredMemos = memos
     .filter((m) => {
@@ -410,7 +426,7 @@ export function MemoTab(): React.ReactElement {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
           </button>
         </div>
-        <div className="memo-tab-tag-filter" aria-label={t('maxExpand.memo.tagFilter', { defaultValue: '标签筛选' })}>
+        <div className="memo-tab-tag-filter-row">
           <button
             className={`memo-tab-bookmark-filter memo-tab-bookmark-filter--tag-row ${bookmarkOnly ? 'memo-tab-bookmark-filter--active' : ''}`}
             type="button"
@@ -419,25 +435,35 @@ export function MemoTab(): React.ReactElement {
           >
             <img src={bookmarkOnly ? SvgIcon.BOOKMARK_ON : SvgIcon.BOOKMARK} alt="bookmark-filter" width="14" height="14" draggable={false} />
           </button>
-          <button
-            className={`memo-tab-tag-chip ${activeTag === null ? 'memo-tab-tag-chip--active' : ''}`}
-            type="button"
-            onClick={() => setActiveTag(null)}
+          <div
+            ref={tagFilterRef}
+            className={`memo-tab-tag-filter ${tagFilterScrollable ? 'memo-tab-tag-filter--scrollable' : ''}`}
+            aria-label={t('maxExpand.memo.tagFilter', { defaultValue: '标签筛选' })}
+            onWheel={(e) => {
+              if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+              e.currentTarget.scrollLeft += e.deltaY;
+            }}
           >
-            {t('maxExpand.memo.allTags', { defaultValue: '全部标签' })}
-          </button>
-          {memoTags.map(([tag, count]) => (
             <button
-              key={tag}
-              className={`memo-tab-tag-chip ${activeTag === tag ? 'memo-tab-tag-chip--active' : ''}`}
+              className={`memo-tab-tag-chip ${activeTag === null ? 'memo-tab-tag-chip--active' : ''}`}
               type="button"
-              onClick={() => setActiveTag((current) => (current === tag ? null : tag))}
-              title={t('maxExpand.memo.filterByTag', { defaultValue: '按标签筛选' })}
+              onClick={() => setActiveTag(null)}
             >
-              #{tag}
-              <span className="memo-tab-tag-count">{count}</span>
+              {t('maxExpand.memo.allTags', { defaultValue: '全部标签' })}
             </button>
-          ))}
+            {memoTags.map(([tag, count]) => (
+              <button
+                key={tag}
+                className={`memo-tab-tag-chip ${activeTag === tag ? 'memo-tab-tag-chip--active' : ''}`}
+                type="button"
+                onClick={() => setActiveTag((current) => (current === tag ? null : tag))}
+                title={t('maxExpand.memo.filterByTag', { defaultValue: '按标签筛选' })}
+              >
+                #{tag}
+                <span className="memo-tab-tag-count">{count}</span>
+              </button>
+            ))}
+          </div>
         </div>
         {bulkSelectMode && (
           <div className="memo-tab-bulk-actions">
