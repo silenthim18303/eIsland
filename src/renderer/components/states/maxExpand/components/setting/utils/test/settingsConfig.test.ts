@@ -196,9 +196,9 @@ describe('normalizeExpandNavLayoutConfig', () => {
     ];
     const result = mod.normalizeExpandNavLayoutConfig(input);
     const ids = result.map((i) => i.id);
-    for (const tab of mod.EXPAND_CONFIGURABLE_TABS) {
+    mod.EXPAND_CONFIGURABLE_TABS.forEach((tab) => {
       expect(ids).toContain(tab);
-    }
+    });
     expect(result.length).toBe(mod.EXPAND_CONFIGURABLE_TABS.length);
   });
 
@@ -347,9 +347,9 @@ describe('normalizeMaxExpandNavLayoutConfig', () => {
     const input = [{ id: 'todo', visible: false }];
     const result = mod.normalizeMaxExpandNavLayoutConfig(input);
     expect(result.length).toBe(mod.MAXEXPAND_CONFIGURABLE_TABS.length);
-    for (const tab of mod.MAXEXPAND_CONFIGURABLE_TABS) {
+    mod.MAXEXPAND_CONFIGURABLE_TABS.forEach((tab) => {
       expect(result.find((i) => i.id === tab)).toBeDefined();
-    }
+    });
   });
 
   it('returns deep copies: mutating result does not affect internal state', () => {
