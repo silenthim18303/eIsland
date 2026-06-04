@@ -451,9 +451,9 @@ describe('registerMusicIpcHandlers', () => {
         'music:detect-source-app-id',
       ];
       register();
-      for (const ch of expectedChannels) {
+      expectedChannels.forEach((ch) => {
         expect(handlers.has(ch)).toBe(true);
-      }
+      });
     });
   });
 
