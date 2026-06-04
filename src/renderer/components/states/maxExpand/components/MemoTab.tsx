@@ -348,6 +348,18 @@ export function MemoTab(): React.ReactElement {
                 onChange={(e) => handleTitleChange(selectedMemo.id, e.target.value)}
               />
               <div className="memo-tab-editor-actions">
+                <div className="memo-tab-markdown-toolbar" role="group" aria-label={t('maxExpand.memo.markdownModeGroup', { defaultValue: 'Markdown 视图模式' })}>
+                  {viewModes.map((mode) => (
+                    <button
+                      key={mode.id}
+                      className={`memo-tab-markdown-mode ${viewMode === mode.id ? 'memo-tab-markdown-mode--active' : ''}`}
+                      type="button"
+                      onClick={() => setViewMode(mode.id)}
+                    >
+                      {mode.label}
+                    </button>
+                  ))}
+                </div>
                 <button
                   className={`memo-tab-editor-bookmark ${selectedMemo.bookmarked ? 'memo-tab-editor-bookmark--active' : ''}`}
                   type="button"
@@ -373,18 +385,6 @@ export function MemoTab(): React.ReactElement {
                   <img src={SvgIcon.DELETE} alt="delete" width="14" height="14" draggable={false} />
                 </button>
               </div>
-            </div>
-            <div className="memo-tab-markdown-toolbar" role="group" aria-label={t('maxExpand.memo.markdownModeGroup', { defaultValue: 'Markdown 视图模式' })}>
-              {viewModes.map((mode) => (
-                <button
-                  key={mode.id}
-                  className={`memo-tab-markdown-mode ${viewMode === mode.id ? 'memo-tab-markdown-mode--active' : ''}`}
-                  type="button"
-                  onClick={() => setViewMode(mode.id)}
-                >
-                  {mode.label}
-                </button>
-              ))}
             </div>
             <div className={`memo-tab-markdown-workspace memo-tab-markdown-workspace--${viewMode}`}>
               {(viewMode === 'edit' || viewMode === 'split') && (

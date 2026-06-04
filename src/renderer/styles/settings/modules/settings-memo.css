@@ -286,8 +286,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 8px 14px;
-  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.05);
+  margin-right: 4px;
 }
 
 .memo-tab-markdown-mode {
@@ -297,7 +296,8 @@
   color: rgba(var(--color-text-rgb), 0.55);
   cursor: pointer;
   font-size: 11px;
-  padding: 4px 10px;
+  height: 26px;
+  padding: 0 9px;
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
