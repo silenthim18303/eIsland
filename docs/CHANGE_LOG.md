@@ -1,7 +1,42 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-05-30T16:49:18.853Z
+> 生成时间：2026-06-04T15:35:14.977Z
+
+## 26.5.13
+
+- 2026-05-31 | eb801188 | 鸡哥 | chore: 更新版本至 V26.5.13
+- 2026-05-31 | c0524fb7 | 鸡哥 | docs: 更新 V26.5.13 更新日志
+- 2026-05-30 | 39765074 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #72 by @JNTMTMTM [skip ci]
+- 2026-05-31 | ed574328 | 鸡哥 | Merge pull request #72 from JNTMTMTM/dev
+- 2026-05-31 | f83c7792 | 鸡哥 | i18n: 补齐重置密码界面翻译
+- 2026-05-31 | fe3611aa | 鸡哥 | fix: 修复所有不符合架构设计规范的地方
+- 2026-05-31 | 94efa210 | 鸡哥 | fix: 补齐所有 JSDoc 注释
+- 2026-05-30 | a3bbd20a | Claude | test: 补齐 main IPC handler、i18n、wallpaper 与下载引擎配置单元测试
+- 2026-05-30 | 42a7b175 | Claude | test: 补齐 main 进程工具函数与 renderer store 配置单元测试
+- 2026-05-30 | 275d4ee1 | Claude | test: 补齐 karaoke provider、app IPC handler 与 theme 工具单元测试
+- 2026-05-30 | 930fac04 | Claude | test: 补齐 AI Agent 与歌词 provider 逻辑层单元测试
+- 2026-05-30 | c499fc9b | Claude | test: 补齐 user/profile/payment/feedback、weather、miniGame、agent 与歌词解密单元测试
+- 2026-05-30 | 213706dc | Claude | test: 补齐 renderer/api 与 main/ipc/agent 逻辑层单元测试
+- 2026-05-30 | 3dec7886 | Claude | test: 补齐 renderer/utils 逻辑层单元测试
+- 2026-05-29 | ac08258e | 鸡哥 | refactor: 拆分expand界面到不同模块
+- 2026-05-28 | 2f09f9ed | 鸡哥 | i18n: 更新壁纸市场侧边栏文案
+- 2026-05-28 | c72ea386 | 鸡哥 | i18n: 优化工具界面侧边栏文案
+- 2026-05-28 | 021eb048 | 鸡哥 | feat: 调整插件市场重命名为壁纸市场去除插件分页
+- 2026-05-28 | d0237cb6 | 鸡哥 | feat: 补充完整的忘记密码重置密码链路
+- 2026-05-28 | aefa949f | 鸡哥 | style: 滑块验证码界面自适应颜色策略
+- 2026-05-28 | 24534fdd | 鸡哥 | style: 添加注册登录重置密码控件出现动画
+- 2026-05-28 | 0c462ec8 | 鸡哥 | fix: 修复弹性动画关闭后登录注册界面出现仍然存在的问题
+- 2026-05-28 | e4f84945 | 鸡哥 | i18n: 优化登录和注册界面退出文案
+- 2026-05-28 | 8946b634 | 鸡哥 | fix: 修复注册和登录界面流程死锁问题
+- 2026-05-28 | ac6baa99 | 鸡哥 | fix: 修复重置密码节点返回登录界面链路失效问题
+- 2026-05-28 | fb375b98 | 鸡哥 | feat: 添加登录界面跳转忘记密码界面功能
+- 2026-05-28 | 6374c5ca | 鸡哥 | refactor: 拆分hover状态组件到不同模块
+- 2026-05-28 | 6e96174a | 鸡哥 | refactor: 拆分空闲状态组件到不同模块
+- 2026-05-28 | f19c577e | 鸡哥 | refactor: 拆分登录界面组件到不同模块
+- 2026-05-27 | 858aac68 | 鸡哥 | refactor: 拆分重置密码界面到不同的模块
+- 2026-05-27 | 73a32a5f | 鸡哥 | feat: 添加重置密码界面布局
+- 2026-05-27 | 28f53cdd | 鸡哥 | feat(assets): 更新鸡哥的头像
 
 ## 26.5.12
 
@@ -1935,32 +1970,77 @@
 
 ## Unreleased
 
-- 2026-05-31 | ed574328 | 鸡哥 | Merge pull request #72 from JNTMTMTM/dev
-- 2026-05-31 | f83c7792 | 鸡哥 | i18n: 补齐重置密码界面翻译
-- 2026-05-31 | fe3611aa | 鸡哥 | fix: 修复所有不符合架构设计规范的地方
-- 2026-05-31 | 94efa210 | 鸡哥 | fix: 补齐所有 JSDoc 注释
-- 2026-05-30 | a3bbd20a | Claude | test: 补齐 main IPC handler、i18n、wallpaper 与下载引擎配置单元测试
-- 2026-05-30 | 42a7b175 | Claude | test: 补齐 main 进程工具函数与 renderer store 配置单元测试
-- 2026-05-30 | 275d4ee1 | Claude | test: 补齐 karaoke provider、app IPC handler 与 theme 工具单元测试
-- 2026-05-30 | 930fac04 | Claude | test: 补齐 AI Agent 与歌词 provider 逻辑层单元测试
-- 2026-05-30 | c499fc9b | Claude | test: 补齐 user/profile/payment/feedback、weather、miniGame、agent 与歌词解密单元测试
-- 2026-05-30 | 213706dc | Claude | test: 补齐 renderer/api 与 main/ipc/agent 逻辑层单元测试
-- 2026-05-30 | 3dec7886 | Claude | test: 补齐 renderer/utils 逻辑层单元测试
-- 2026-05-29 | ac08258e | 鸡哥 | refactor: 拆分expand界面到不同模块
-- 2026-05-28 | 2f09f9ed | 鸡哥 | i18n: 更新壁纸市场侧边栏文案
-- 2026-05-28 | c72ea386 | 鸡哥 | i18n: 优化工具界面侧边栏文案
-- 2026-05-28 | 021eb048 | 鸡哥 | feat: 调整插件市场重命名为壁纸市场去除插件分页
-- 2026-05-28 | d0237cb6 | 鸡哥 | feat: 补充完整的忘记密码重置密码链路
-- 2026-05-28 | aefa949f | 鸡哥 | style: 滑块验证码界面自适应颜色策略
-- 2026-05-28 | 24534fdd | 鸡哥 | style: 添加注册登录重置密码控件出现动画
-- 2026-05-28 | 0c462ec8 | 鸡哥 | fix: 修复弹性动画关闭后登录注册界面出现仍然存在的问题
-- 2026-05-28 | e4f84945 | 鸡哥 | i18n: 优化登录和注册界面退出文案
-- 2026-05-28 | 8946b634 | 鸡哥 | fix: 修复注册和登录界面流程死锁问题
-- 2026-05-28 | ac6baa99 | 鸡哥 | fix: 修复重置密码节点返回登录界面链路失效问题
-- 2026-05-28 | fb375b98 | 鸡哥 | feat: 添加登录界面跳转忘记密码界面功能
-- 2026-05-28 | 6374c5ca | 鸡哥 | refactor: 拆分hover状态组件到不同模块
-- 2026-05-28 | 6e96174a | 鸡哥 | refactor: 拆分空闲状态组件到不同模块
-- 2026-05-28 | f19c577e | 鸡哥 | refactor: 拆分登录界面组件到不同模块
-- 2026-05-27 | 858aac68 | 鸡哥 | refactor: 拆分重置密码界面到不同的模块
-- 2026-05-27 | 73a32a5f | 鸡哥 | feat: 添加重置密码界面布局
-- 2026-05-27 | 28f53cdd | 鸡哥 | feat(assets): 更新鸡哥的头像
+- 2026-06-04 | a0f663fe | 鸡哥 | Merge pull request #73 from JNTMTMTM/dev
+- 2026-06-04 | 0e26dc43 | 鸡哥 | fix(ci): upgrade Node.js 20 to 22 for --experimental-strip-types support
+- 2026-06-04 | 566db0fd | 鸡哥 | fix(lint): replace for...of with forEach in index.test.ts
+- 2026-06-04 | e647f6b6 | 鸡哥 | fix(lint): replace for...of with forEach in settingsConfig.test.ts
+- 2026-06-04 | 302c97b8 | 鸡哥 | fix(lint): replace for...of with forEach in board.test.ts
+- 2026-06-04 | 30abe20a | 鸡哥 | fix(lint): replace for...of with forEach in ai.test.ts
+- 2026-06-04 | 3c2ee1cc | 鸡哥 | fix(lint): replace React default import with named imports in MaxExpandContent.tsx
+- 2026-06-04 | 31c1f343 | 鸡哥 | fix(lint): replace any with Record types in guideContentUtils.test.ts
+- 2026-06-04 | 5702bbcd | 鸡哥 | fix(lint): replace for...of with forEach in getNavLabel.test.ts
+- 2026-06-04 | 4e62b193 | 鸡哥 | fix(lint): replace any with Record types in agentRunnerEventHandler.test.ts
+- 2026-06-04 | 2250d806 | 鸡哥 | fix(lint): use === in comment in dynamicIslandWindowUtils.test.ts
+- 2026-06-04 | 062cd061 | 鸡哥 | fix(lint): replace for...of with Object.keys().forEach in smtcService.test.ts
+- 2026-06-04 | 899a013b | 鸡哥 | fix(lint): replace for...of with forEach in music.test.ts
+- 2026-06-04 | 4b17577a | 鸡哥 | fix(lint): replace any with proper types in downloadEngine.test.ts
+- 2026-06-04 | 0875de3e | 鸡哥 | fix(test):补齐 SvgIcon CHECKED 测试例，修复 flaky Date.now 断言，修正版权头格式
+- 2026-06-04 | 02d15ee3 | 鸡哥 | test(settingsTabConfig): fix random ID generation in tests and update SvgIcon key count
+- 2026-06-04 | 5b4ad74a | 鸡哥 | fix(tests): update comment style in agentToolPolicy test file
+- 2026-06-04 | 979f9de3 | 鸡哥 | refactor(AiChatTab): enhance model card visibility and transitions
+- 2026-06-04 | 69c0727e | 鸡哥 | refactor(memo): improve bulk actions UI in MemoTab
+- 2026-06-04 | 384b223d | 鸡哥 | feat(memo): enhance tag filtering functionality in MemoTab
+- 2026-06-04 | aecb3863 | 鸡哥 | feat(memo): replace checkmarks with CHECKED icon in MemoTab
+- 2026-06-04 | d6dfe0d1 | 鸡哥 | feat(icon): add CHECKED icon to SvgIcon collection
+- 2026-06-04 | 1ce8b844 | 鸡哥 | feat(memo): implement bulk selection and deletion functionality in MemoTab
+- 2026-06-04 | c2926eac | 鸡哥 | feat(memo): add tagging functionality and enhance memo search capabilities
+- 2026-06-04 | 9ba5b81b | 鸡哥 | refactor(memo): enhance Markdown rendering and styling in MemoTab
+- 2026-06-04 | 5650298c | 鸡哥 | refactor(memo): streamline Markdown toolbar placement and update styles
+- 2026-06-04 | c6eadf8e | 鸡哥 | feat(memo): implement Markdown editing and preview modes in MemoTab
+- 2026-06-03 | 558fea94 | 鸡哥 | feat(clipboard): add type filter and inline filter bar in header
+- 2026-06-03 | 62ade7b4 | 鸡哥 | feat(clipboard): implement export functionality for clipboard history
+- 2026-06-03 | cd29d1d5 | 鸡哥 | style(clipboard): enhance hover effects and animations for clipboard history items
+- 2026-06-03 | 45b1095b | 鸡哥 | feat(clipboard): enhance selection functionality in ClipboardHistoryTab
+- 2026-06-03 | dab7b709 | 鸡哥 | docs(legal): add platform restriction prohibiting macOS porting
+- 2026-06-02 | 5e5bf81d | 鸡哥 | feat(clipboard): auto-select matched items on cleanup range change
+- 2026-06-02 | 06e525d0 | 鸡哥 | i18n(en-US): shorten notification settings description in quick nav card
+- 2026-06-02 | 4081f423 | 鸡哥 | chore(skills): add git status analysis and commit skill
+- 2026-06-02 | 175df63a | 鸡哥 | style(clipboard): add dark/light theme support for history range select
+- 2026-06-02 | e147da2d | 鸡哥 | feat(clipboard): add bulk history cleanup
+- 2026-06-02 | 4ed72813 | 鸡哥 | feat(maxExpand): add keyboard tab navigation
+- 2026-06-02 | eef82c1e | 鸡哥 | chore(cursor): update commit operation rule
+- 2026-06-02 | af65010b | 鸡哥 | chore(git): allow tracking cursor project files
+- 2026-06-02 | b922b892 | 鸡哥 | feat(island): add Escape navigation
+- 2026-06-01 | f07ab59c | 鸡哥 | refactor(stt): extract hooks from SttContent
+- 2026-06-01 | 47962f22 | 鸡哥 | refactor(sliderCaptcha): extract config and hooks from SliderCaptchaContent
+- 2026-06-01 | a169abf2 | 鸡哥 | refactor(register): extract utils, hooks, components, config from RegisterContent
+- 2026-06-01 | 3b10d894 | 鸡哥 | refactor(payment): extract utils, hooks, components, config from PaymentContent
+- 2026-06-01 | 2372808a | 鸡哥 | fix(tsconfig): add ignoreDeprecations for baseUrl deprecation warning
+- 2026-06-01 | f34cedc1 | 鸡哥 | fix(renderer): add CSS module type declaration to assets.d.ts
+- 2026-06-01 | 8c384c6f | 鸡哥 | fix(maxExpand): remove unused MaxExpandNavLayoutConfig import
+- 2026-06-01 | 2ad8dfde | 鸡哥 | refactor(maxExpand): extract utils, hooks, config from MaxExpandContent and MaxExpandContentShell
+- 2026-06-01 | 70945eab | 鸡哥 | feat(skill): add eisland-dev-generate-release-worklog skill
+- 2026-06-01 | dc099504 | 鸡哥 | chore: add .claude skills and workflows, unignore .claude directory
+- 2026-06-01 | 29779ca1 | 鸡哥 | refactor(notification): extract remaining hooks, add components directory
+- 2026-06-01 | 34e86e2a | 鸡哥 | refactor(notification): extract utils, hooks, config from NotificationContent
+- 2026-06-01 | 38b96834 | 鸡哥 | refactor(lyrics): extract utils, hooks, components, config from LyricsContent
+- 2026-06-01 | bb6850f6 | 鸡哥 | ci(workflows): remove all emoji from workflow output
+- 2026-06-01 | eb18eb7f | 鸡哥 | docs(announcement): restructure V26.5.13 to Chinese-first layout
+- 2026-06-01 | defd9139 | 鸡哥 | refactor(announcement): extract utils and config from announcement components
+- 2026-05-31 | 66e7d040 | 鸡哥 | docs(announcement): add English translation to V26.5.13 release notes
+- 2026-05-31 | 2b6976d1 | 鸡哥 | fix(i18n): resolve remaining translation issues
+- 2026-05-31 | a075cf22 | 鸡哥 | fix(i18n): wrap hardcoded strings in AgentContentView.tsx
+- 2026-05-31 | d2cd2e9a | 鸡哥 | fix(i18n): wrap hardcoded strings in SttContent.tsx
+- 2026-05-31 | e9883cb3 | 鸡哥 | fix(i18n): wrap hardcoded strings in maxExpand/components/SettingsTab.tsx
+- 2026-05-31 | 86faaac1 | 鸡哥 | fix(i18n): wrap hardcoded strings in standaloneMain.tsx
+- 2026-05-31 | 3995fd6f | 鸡哥 | fix(i18n): wrap hardcoded strings in main.tsx
+- 2026-05-31 | f360043f | 鸡哥 | fix(i18n): add missing translation keys
+- 2026-05-31 | 4a5a0099 | 鸡哥 | ci(i18n): add t() key validation and hardcoded Chinese detection
+- 2026-05-31 | f5b8be3d | 鸡哥 | ci: remove emojis, use professional report format
+- 2026-05-31 | c7c4f889 | 鸡哥 | ci: limit i18n check to pull_request trigger only
+- 2026-05-31 | 5f3ad075 | 鸡哥 | ci: add i18n completeness check workflow and script
+- 2026-05-31 | e557244a | 鸡哥 | fix(i18n): sync missing translations between zh-CN and en-US
+- 2026-05-31 | f8a38dd6 | 鸡哥 | docs: simplify standards references to direct links
+- 2026-05-31 | f28fe238 | 鸡哥 | docs: enforce COMMENT_STANDARDS and FRONTEND_STANDARDS in AGENTS.md
+- 2026-05-31 | b61230a7 | 鸡哥 | test: add unit tests for previously untested source files
+- 2026-05-31 | 0f7a454d | 鸡哥 | docs: 更新全局 AGENTS.md 规范文档添加翻译键相关约束
