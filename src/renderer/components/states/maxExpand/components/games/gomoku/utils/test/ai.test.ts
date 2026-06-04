@@ -83,14 +83,14 @@ describe('selectGomokuAIMove', () => {
     it('returns null for full board regardless of difficulty', () => {
       const fullBoard = Array.from({ length: 15 }, () => Array(15).fill(2));
       const difficulties = ['novice', 'easy', 'hard', 'expert', 'master'] as const;
-      for (const diff of difficulties) {
+      difficulties.forEach((diff) => {
         expect(selectGomokuAIMove(fullBoard, diff, 1)).toBeNull();
-      }
+      });
     });
 
     it('returns a valid unoccupied position for each difficulty on a mid-game board', () => {
       const difficulties = ['novice', 'easy', 'hard', 'expert', 'master'] as const;
-      for (const diff of difficulties) {
+      difficulties.forEach((diff) => {
         const board = createEmptyBoard();
         board[7][7] = 1;
         board[7][8] = 2;
@@ -104,7 +104,7 @@ describe('selectGomokuAIMove', () => {
         expect(c).toBeGreaterThanOrEqual(0);
         expect(c).toBeLessThan(15);
         expect(board[r][c]).toBe(0);
-      }
+      });
     });
   });
 
