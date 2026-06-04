@@ -56,9 +56,9 @@ const CLIPBOARD_HISTORY_FILTER_LABEL_KEYS: Record<ClipboardHistoryFilter, string
   text: 'clipboardHistoryTab.filters.text',
 };
 const CLIPBOARD_HISTORY_FILTER_DEFAULT_LABELS: Record<ClipboardHistoryFilter, string> = {
-  all: '全部',
+  all: 'All',
   url: 'URL',
-  text: '纯文本',
+  text: 'Text',
 };
 
 function normalizeClipboardText(text: string): string {

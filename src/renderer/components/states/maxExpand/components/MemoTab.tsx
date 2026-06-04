@@ -24,9 +24,13 @@
  * @author 鸡哥
  */
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useTranslation } from 'react-i18next';
+import remarkGfm from 'remark-gfm';
 import { SvgIcon } from '../../../../utils/SvgIcon';
+
+type MemoViewMode = 'edit' | 'preview' | 'split';
 
 /** 单条备忘录 */
 interface MemoItem {
@@ -73,8 +77,74 @@ function formatTime(ts: number): string {
 
 /** 从内容中提取摘要（首行非空文本，截断到 60 字符） */
 function extractSummary(content: string): string {
-  const line = content.split('\n').find((l) => l.trim().length > 0) ?? '';
+  const plainContent = content
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/[#>*_~\-[\]()]/g, ' ');
+  const line = plainContent.split('\n').find((l) => l.trim().length > 0)?.trim() ?? '';
   return line.length > 60 ? line.slice(0, 60) + '…' : line;
+}
+
+const MARKDOWN_TOKEN_PATTERNS = [
+  /(```[\s\S]*?```)/g,
+  /(`[^`\n]+`)/g,
+  /(^|\n)(#{1,6}\s[^\n]*)/g,
+  /(\*\*[^*\n]+\*\*|__[^_\n]+__)/g,
+  /(\*[^*\n]+\*|_[^_\n]+_)/g,
+  /(~~[^~\n]+~~)/g,
+  /(\[[^\]\n]+\]\([^\)\n]+\))/g,
+  /(^|\n)(>[^\n]*)/g,
+  /(^|\n)(\s*(?:[-*+]\s|\d+\.\s)[^\n]*)/g,
+];
+
+/** 生成编辑态 Markdown 语法高亮片段 */
+function renderMarkdownHighlight(content: string): React.ReactNode[] {
+  if (!content) return [];
+
+  const ranges = MARKDOWN_TOKEN_PATTERNS.flatMap((pattern) => {
+    const regex = new RegExp(pattern.source, pattern.flags);
+    const matches = Array.from(content.matchAll(regex));
+    return matches.map((match) => {
+      const value = match[2] ?? match[1] ?? match[0];
+      const index = match.index ?? 0;
+      const start = content.indexOf(value, index);
+      return { start, end: start + value.length };
+    });
+  })
+    .filter((range) => range.start >= 0 && range.end > range.start)
+    .sort((a, b) => a.start - b.start || b.end - a.end)
+    .reduce<Array<{ start: number; end: number }>>((acc, range) => {
+      const last = acc[acc.length - 1];
+      if (!last || range.start >= last.end) {
+        acc.push(range);
+      }
+      return acc;
+    }, []);
+
+  const nodes: React.ReactNode[] = [];
+  let cursor = 0;
+  ranges.forEach((range, index) => {
+    if (range.start > cursor) {
+      nodes.push(content.slice(cursor, range.start));
+    }
+    nodes.push(
+      <mark key={`${range.start}-${range.end}-${index}`} className="memo-tab-markdown-token">
+        {content.slice(range.start, range.end)}
+      </mark>,
+    );
+    cursor = range.end;
+  });
+
+  if (cursor < content.length) {
+    nodes.push(content.slice(cursor));
+  }
+
+  return nodes;
+}
+
+/** Markdown 预览空白补位 */
+function getMarkdownPreviewContent(content: string, placeholder: string): string {
+  return content.trim().length > 0 ? content : placeholder;
 }
 
 /**
@@ -88,6 +158,8 @@ export function MemoTab(): React.ReactElement {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
   const [bookmarkOnly, setBookmarkOnly] = useState(false);
+  const [viewMode, setViewMode] = useState<MemoViewMode>('edit');
+  const [editorScrollTop, setEditorScrollTop] = useState(0);
   const skipPersistOnceRef = useRef(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -199,6 +271,17 @@ export function MemoTab(): React.ReactElement {
     });
 
   const selectedMemo = memos.find((m) => m.id === selectedId) ?? null;
+  const contentPlaceholder = t('maxExpand.memo.contentPlaceholder', { defaultValue: '在这里写点什么…' });
+  const markdownPreviewContent = selectedMemo ? getMarkdownPreviewContent(selectedMemo.content, contentPlaceholder) : '';
+  const highlightedContent = useMemo(
+    () => renderMarkdownHighlight(selectedMemo?.content ?? ''),
+    [selectedMemo?.content],
+  );
+  const viewModes: Array<{ id: MemoViewMode; label: string }> = [
+    { id: 'edit', label: t('maxExpand.memo.editMode', { defaultValue: '编辑' }) },
+    { id: 'preview', label: t('maxExpand.memo.previewMode', { defaultValue: '预览' }) },
+    { id: 'split', label: t('maxExpand.memo.splitMode', { defaultValue: '分屏' }) },
+  ];
 
   return (
     <div className="memo-tab-container">
@@ -291,13 +374,47 @@ export function MemoTab(): React.ReactElement {
                 </button>
               </div>
             </div>
-            <textarea
-              ref={editorRef}
-              className="memo-tab-editor-content"
-              placeholder={t('maxExpand.memo.contentPlaceholder', { defaultValue: '在这里写点什么…' })}
-              value={selectedMemo.content}
-              onChange={(e) => handleContentChange(selectedMemo.id, e.target.value)}
-            />
+            <div className="memo-tab-markdown-toolbar" role="group" aria-label={t('maxExpand.memo.markdownModeGroup', { defaultValue: 'Markdown 视图模式' })}>
+              {viewModes.map((mode) => (
+                <button
+                  key={mode.id}
+                  className={`memo-tab-markdown-mode ${viewMode === mode.id ? 'memo-tab-markdown-mode--active' : ''}`}
+                  type="button"
+                  onClick={() => setViewMode(mode.id)}
+                >
+                  {mode.label}
+                </button>
+              ))}
+            </div>
+            <div className={`memo-tab-markdown-workspace memo-tab-markdown-workspace--${viewMode}`}>
+              {(viewMode === 'edit' || viewMode === 'split') && (
+                <div className="memo-tab-markdown-editor-pane">
+                  <pre
+                    className="memo-tab-markdown-highlight"
+                    aria-hidden="true"
+                    style={{ transform: `translateY(-${editorScrollTop}px)` }}
+                  >
+                    {highlightedContent.length > 0 ? highlightedContent : '\n'}
+                  </pre>
+                  <textarea
+                    ref={editorRef}
+                    className="memo-tab-editor-content"
+                    placeholder={contentPlaceholder}
+                    value={selectedMemo.content}
+                    spellCheck={false}
+                    onChange={(e) => handleContentChange(selectedMemo.id, e.target.value)}
+                    onScroll={(e) => setEditorScrollTop(e.currentTarget.scrollTop)}
+                  />
+                </div>
+              )}
+              {(viewMode === 'preview' || viewMode === 'split') && (
+                <div className="memo-tab-markdown-preview-pane">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {markdownPreviewContent}
+                  </ReactMarkdown>
+                </div>
+              )}
+            </div>
             <div className="memo-tab-editor-footer">
               <span>{t('maxExpand.memo.created', { defaultValue: '创建于' })} {formatTime(selectedMemo.createdAt)}</span>
               <span>{t('maxExpand.memo.updated', { defaultValue: '更新于' })} {formatTime(selectedMemo.updatedAt)}</span>
