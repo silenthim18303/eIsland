@@ -880,8 +880,8 @@ describe('MultiThreadDownloadEngine', () => {
       await flushN(5);
 
       // Find the GET call (non-HEAD call) and verify Range header was set
-      const getCalls = fetchMock.mock.calls.filter(
-        (c: any[]) => !(c[1]?.method === 'HEAD'),
+      const getCalls = (fetchMock.mock.calls as unknown[][]).filter(
+        (c) => (c[1] as Record<string, unknown>)?.method !== 'HEAD',
       );
       expect(getCalls.length).toBeGreaterThanOrEqual(1);
       expect(getCalls[0]![1].headers.Range).toBe('bytes=500-');
@@ -920,14 +920,15 @@ describe('MultiThreadDownloadEngine', () => {
       const engine = new MultiThreadDownloadEngine();
       const snap = await engine.startDownload({ url: FULL_URL, defaultDir: SAVE_DIR });
 
-      expect((snap as any).tempDir).toBeUndefined();
-      expect((snap as any).tempOutputPath).toBeUndefined();
-      expect((snap as any).partPaths).toBeUndefined();
-      expect((snap as any).supportsRange).toBeUndefined();
-      expect((snap as any).abortControllers).toBeUndefined();
-      expect((snap as any).lastSampleTime).toBeUndefined();
-      expect((snap as any).lastSampleBytes).toBeUndefined();
-      expect((snap as any).lastEmitTime).toBeUndefined();
+      const internal = snap as Record<string, unknown>;
+      expect(internal.tempDir).toBeUndefined();
+      expect(internal.tempOutputPath).toBeUndefined();
+      expect(internal.partPaths).toBeUndefined();
+      expect(internal.supportsRange).toBeUndefined();
+      expect(internal.abortControllers).toBeUndefined();
+      expect(internal.lastSampleTime).toBeUndefined();
+      expect(internal.lastSampleBytes).toBeUndefined();
+      expect(internal.lastEmitTime).toBeUndefined();
     });
 
     it('chunk download skips already-completed chunk files', async () => {
@@ -962,7 +963,9 @@ describe('MultiThreadDownloadEngine', () => {
 
       // Only chunk-1 should be fetched (chunk-0 was already complete)
       // fetch calls: 1 HEAD + 1 GET for chunk-1
-      const getCalls = fetchMock.mock.calls.filter((c: any[]) => c[0] === FULL_URL && c[1]?.headers?.Range);
+      const getCalls = (fetchMock.mock.calls as unknown[][]).filter(
+        (c) => c[0] === FULL_URL && (c[1] as Record<string, Record<string, unknown>>)?.headers?.Range,
+      );
       expect(getCalls.length).toBe(1);
     });
 
