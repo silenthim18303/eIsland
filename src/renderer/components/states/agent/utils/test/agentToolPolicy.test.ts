@@ -1,4 +1,4 @@
-/**
+/*
  * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
  * https://github.com/JNTMTMTM/eIsland
  *
