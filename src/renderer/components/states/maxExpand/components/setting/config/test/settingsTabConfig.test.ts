@@ -60,10 +60,12 @@ describe('generateMailAccountId', () => {
 
   it('uses 6 characters from Math.random result', () => {
     const fakeRandom = 0.123456789;
+    const fixed = 1700000000000;
     const expectedRandomPart = fakeRandom.toString(36).slice(2, 8);
+    vi.spyOn(Date, 'now').mockReturnValue(fixed);
     vi.spyOn(Math, 'random').mockReturnValue(fakeRandom);
     const id = generateMailAccountId();
-    expect(id).toBe(`${Date.now()}-${expectedRandomPart}`);
+    expect(id).toBe(`${fixed}-${expectedRandomPart}`);
   });
 });
 

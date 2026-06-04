@@ -123,7 +123,7 @@ describe('SvgIcon', () => {
     expect(SvgIcon.VIP).toBe('./svg/PRO.svg');
   });
 
-  it('should contain exactly 80 keys', () => {
-    expect(Object.keys(SvgIcon)).toHaveLength(80);
+  it('should contain exactly 81 keys', () => {
+    expect(Object.keys(SvgIcon)).toHaveLength(81);
   });
 });
