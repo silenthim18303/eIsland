@@ -140,8 +140,8 @@ function resolveRange(toRef: string, explicitFromTag?: string): { from: string |
   const exactTag = tryRunGit(`git describe --tags --exact-match ${toRef}`);
 
   if (exactTag) {
-    // toRef 恰好在 Tag 上 → 用 Tag 名替代 HEAD，回退到前一个 Tag
-    const from = explicitFromTag ?? tryRunGit(`git describe --tags --abbrev=0 ${toRef}^`);
+    // toRef 恰好在 Tag 上 → 用 Tag 名替代 HEAD，回退到前一个 Tag（使用 ~1 避免 Windows cmd.exe 转义 ^）
+    const from = explicitFromTag ?? tryRunGit(`git describe --tags --abbrev=0 ${toRef}~1`);
     return { from, to: exactTag };
   }
 
