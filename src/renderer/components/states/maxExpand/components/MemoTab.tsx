@@ -465,24 +465,23 @@ export function MemoTab(): React.ReactElement {
             ))}
           </div>
         </div>
-        {bulkSelectMode && (
-          <div className="memo-tab-bulk-actions">
-            <span className="memo-tab-bulk-selected-count">
-              {t('maxExpand.memo.selectedCount', { defaultValue: '已选 {{count}} 项', count: selectedMemoCount })}
-            </span>
-            <button
-              className="memo-tab-bulk-delete"
-              type="button"
-              onClick={handleDeleteSelected}
-              disabled={selectedMemoCount === 0}
-            >
-              {t('maxExpand.memo.deleteSelected', { defaultValue: '删除所选' })}
-            </button>
-            <button className="memo-tab-bulk-cancel" type="button" onClick={handleToggleBulkSelect}>
-              {t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' })}
-            </button>
-          </div>
-        )}
+        <div className={`memo-tab-bulk-actions ${bulkSelectMode ? 'memo-tab-bulk-actions--open' : ''}`} aria-hidden={!bulkSelectMode}>
+          <span className="memo-tab-bulk-selected-count">
+            {t('maxExpand.memo.selectedCount', { defaultValue: '已选 {{count}} 项', count: selectedMemoCount })}
+          </span>
+          <button
+            className="memo-tab-bulk-delete"
+            type="button"
+            onClick={handleDeleteSelected}
+            disabled={!bulkSelectMode || selectedMemoCount === 0}
+            tabIndex={bulkSelectMode ? 0 : -1}
+          >
+            {t('maxExpand.memo.deleteSelected', { defaultValue: '删除所选' })}
+          </button>
+          <button className="memo-tab-bulk-cancel" type="button" onClick={handleToggleBulkSelect} tabIndex={bulkSelectMode ? 0 : -1}>
+            {t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' })}
+          </button>
+        </div>
         <div className="memo-tab-list">
           {!loaded && <div className="memo-tab-loading">{t('maxExpand.memo.loading', { defaultValue: '加载中…' })}</div>}
           {loaded && filteredMemos.length === 0 && (
@@ -504,11 +503,9 @@ export function MemoTab(): React.ReactElement {
                   setTimeout(() => editorRef.current?.focus(), 50);
                 }}
               >
-                {bulkSelectMode && (
-                  <span className={`memo-tab-item-check ${memoSelected ? 'memo-tab-item-check--checked' : ''}`} aria-hidden="true">
-                    {memoSelected && <img className="memo-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="10" height="10" draggable={false} />}
-                  </span>
-                )}
+                <span className={`memo-tab-item-check ${memoSelected ? 'memo-tab-item-check--checked' : ''}`} aria-hidden="true">
+                  {memoSelected && <img className="memo-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="10" height="10" draggable={false} />}
+                </span>
                 <div className="memo-tab-item-title">
                   {memo.pinned && <img className="memo-tab-pin-icon" src={SvgIcon.PIN_ON_TOP} alt="pinned" width="12" height="12" draggable={false} title={t('maxExpand.memo.pinned', { defaultValue: '已置顶' })} />}
                   {memo.bookmarked && <img className="memo-tab-bookmark-icon" src={SvgIcon.BOOKMARK_ON} alt="bookmarked" width="12" height="12" draggable={false} title={t('maxExpand.memo.bookmarked', { defaultValue: '已标记' })} />}
