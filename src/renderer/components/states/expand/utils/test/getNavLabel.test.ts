@@ -104,12 +104,12 @@ describe('getNavLabel', () => {
     it('should always prefix the key with "expanded.nav."', () => {
       const t = createMockT()
       const tabs = ['hover', 'overview', 'song', 'tools', 'performanceMonitor', 'maxExpand'] as const
-      for (const tab of tabs) {
+      tabs.forEach((tab) => {
         t.mockClear()
         getNavLabel(tab, t)
         const calledKey = t.mock.calls[0][0] as string
         expect(calledKey.startsWith('expanded.nav.')).toBe(true)
-      }
+      })
     })
 
     it('should embed the tab ID directly after the prefix', () => {
