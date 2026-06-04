@@ -139,13 +139,13 @@ describe('useIslandStore (index.ts aggregator)', () => {
       mockCreatePomodoroSlice,
     ];
 
-    for (const sliceMock of allMocks) {
+    allMocks.forEach((sliceMock) => {
       const args = sliceMock.mock.calls[0];
       expect(args).toHaveLength(3);
       expect(args[0]).toBe(capturedArgs.set);
       expect(args[1]).toBe(capturedArgs.get);
       expect(args[2]).toBe(capturedArgs.store);
-    }
+    });
   });
 
   it('merges all slice properties into a single store object', async () => {
@@ -259,10 +259,10 @@ describe('useIslandStore (index.ts aggregator)', () => {
     ];
 
     // All slices should receive the same set/get/store from the factory
-    for (const [set, get, store] of allCalls) {
+    allCalls.forEach(([set, get, store]) => {
       expect(set).toBe(capturedArgs.set);
       expect(get).toBe(capturedArgs.get);
       expect(store).toBe(capturedArgs.store);
-    }
+    });
   });
 });
