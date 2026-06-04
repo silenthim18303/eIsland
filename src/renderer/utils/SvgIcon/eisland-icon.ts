@@ -105,6 +105,7 @@ export const SvgIcon = {
   SWITCHING: './svg/SWITCHING.svg',
   SOUND: './svg/SOUND.svg',
   NOTIFICATION: './svg/NOTIFICATION.svg',
+  CHECKED: './svg/CHECKED.svg'
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;
