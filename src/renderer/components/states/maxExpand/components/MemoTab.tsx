@@ -179,6 +179,8 @@ export function MemoTab(): React.ReactElement {
   const [tagInput, setTagInput] = useState('');
   const [tagEditorOpen, setTagEditorOpen] = useState(false);
   const [bookmarkOnly, setBookmarkOnly] = useState(false);
+  const [bulkSelectMode, setBulkSelectMode] = useState(false);
+  const [selectedMemoIds, setSelectedMemoIds] = useState<Set<number>>(() => new Set());
   const [viewMode, setViewMode] = useState<MemoViewMode>('edit');
   const [editorScroll, setEditorScroll] = useState({ left: 0, top: 0 });
   const skipPersistOnceRef = useRef(false);
@@ -248,8 +250,40 @@ export function MemoTab(): React.ReactElement {
   /** 删除备忘录 */
   const handleDelete = useCallback((id: number): void => {
     setMemos((prev) => prev.filter((m) => m.id !== id));
+    setSelectedMemoIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
     if (selectedId === id) setSelectedId(null);
   }, [selectedId]);
+
+  const handleToggleBulkSelect = useCallback((): void => {
+    setBulkSelectMode((enabled) => {
+      if (enabled) setSelectedMemoIds(new Set());
+      return !enabled;
+    });
+  }, []);
+
+  const handleToggleMemoSelection = useCallback((id: number): void => {
+    setSelectedMemoIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleDeleteSelected = useCallback((): void => {
+    if (selectedMemoIds.size === 0) return;
+    setMemos((prev) => prev.filter((m) => !selectedMemoIds.has(m.id)));
+    if (selectedId !== null && selectedMemoIds.has(selectedId)) setSelectedId(null);
+    setSelectedMemoIds(new Set());
+    setBulkSelectMode(false);
+  }, [selectedMemoIds, selectedId]);
 
   /** 标记/取消书签 */
   const handleToggleBookmark = useCallback((id: number): void => {
@@ -313,6 +347,15 @@ export function MemoTab(): React.ReactElement {
     }
   }, [activeTag, memoTags]);
 
+  useEffect(() => {
+    const memoIds = new Set(memos.map((memo) => memo.id));
+    setSelectedMemoIds((prev) => {
+      const next = new Set(Array.from(prev).filter((id) => memoIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+    if (memos.length === 0) setBulkSelectMode(false);
+  }, [memos]);
+
   /** 过滤 & 排序：标签/书签/全文搜索后，置顶优先，然后按更新时间倒序 */
   const filteredMemos = memos
     .filter((m) => {
@@ -340,6 +383,7 @@ export function MemoTab(): React.ReactElement {
     { id: 'preview', label: t('maxExpand.memo.previewMode', { defaultValue: '预览' }) },
     { id: 'split', label: t('maxExpand.memo.splitMode', { defaultValue: '分屏' }) },
   ];
+  const selectedMemoCount = selectedMemoIds.size;
 
   return (
     <div className="memo-tab-container">
@@ -347,12 +391,13 @@ export function MemoTab(): React.ReactElement {
       <div className="memo-tab-sidebar">
         <div className="memo-tab-sidebar-header">
           <button
-            className={`memo-tab-bookmark-filter ${bookmarkOnly ? 'memo-tab-bookmark-filter--active' : ''}`}
+            className={`memo-tab-bulk-select-toggle ${bulkSelectMode ? 'memo-tab-bulk-select-toggle--active' : ''}`}
             type="button"
-            onClick={() => setBookmarkOnly((v) => !v)}
-            title={bookmarkOnly ? t('maxExpand.memo.showAll', { defaultValue: '显示全部' }) : t('maxExpand.memo.showBookmarked', { defaultValue: '仅显示书签' })}
+            onClick={handleToggleBulkSelect}
+            title={bulkSelectMode ? t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.memo.bulkSelect', { defaultValue: '批量选择' })}
+            aria-label={bulkSelectMode ? t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.memo.bulkSelect', { defaultValue: '批量选择' })}
           >
-            <img src={bookmarkOnly ? SvgIcon.BOOKMARK_ON : SvgIcon.BOOKMARK} alt="bookmark-filter" width="14" height="14" draggable={false} />
+            ✓
           </button>
           <input
             className="memo-tab-search"
@@ -366,6 +411,14 @@ export function MemoTab(): React.ReactElement {
           </button>
         </div>
         <div className="memo-tab-tag-filter" aria-label={t('maxExpand.memo.tagFilter', { defaultValue: '标签筛选' })}>
+          <button
+            className={`memo-tab-bookmark-filter memo-tab-bookmark-filter--tag-row ${bookmarkOnly ? 'memo-tab-bookmark-filter--active' : ''}`}
+            type="button"
+            onClick={() => setBookmarkOnly((v) => !v)}
+            title={bookmarkOnly ? t('maxExpand.memo.showAll', { defaultValue: '显示全部' }) : t('maxExpand.memo.showBookmarked', { defaultValue: '仅显示书签' })}
+          >
+            <img src={bookmarkOnly ? SvgIcon.BOOKMARK_ON : SvgIcon.BOOKMARK} alt="bookmark-filter" width="14" height="14" draggable={false} />
+          </button>
           <button
             className={`memo-tab-tag-chip ${activeTag === null ? 'memo-tab-tag-chip--active' : ''}`}
             type="button"
@@ -386,37 +439,67 @@ export function MemoTab(): React.ReactElement {
             </button>
           ))}
         </div>
+        {bulkSelectMode && (
+          <div className="memo-tab-bulk-actions">
+            <span className="memo-tab-bulk-selected-count">
+              {t('maxExpand.memo.selectedCount', { defaultValue: '已选 {{count}} 项', count: selectedMemoCount })}
+            </span>
+            <button
+              className="memo-tab-bulk-delete"
+              type="button"
+              onClick={handleDeleteSelected}
+              disabled={selectedMemoCount === 0}
+            >
+              {t('maxExpand.memo.deleteSelected', { defaultValue: '删除所选' })}
+            </button>
+            <button className="memo-tab-bulk-cancel" type="button" onClick={handleToggleBulkSelect}>
+              {t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' })}
+            </button>
+          </div>
+        )}
         <div className="memo-tab-list">
           {!loaded && <div className="memo-tab-loading">{t('maxExpand.memo.loading', { defaultValue: '加载中…' })}</div>}
           {loaded && filteredMemos.length === 0 && (
             <div className="memo-tab-empty">{t('maxExpand.memo.empty', { defaultValue: '暂无备忘录' })}</div>
           )}
-          {filteredMemos.map((memo) => (
-            <button
-              key={memo.id}
-              className={`memo-tab-item ${selectedId === memo.id ? 'memo-tab-item--active' : ''} ${memo.pinned ? 'memo-tab-item--pinned' : ''}`}
-              type="button"
-              onClick={() => {
-                setSelectedId(memo.id);
-                setTimeout(() => editorRef.current?.focus(), 50);
-              }}
-            >
-              <div className="memo-tab-item-title">
-                {memo.pinned && <img className="memo-tab-pin-icon" src={SvgIcon.PIN_ON_TOP} alt="pinned" width="12" height="12" draggable={false} title={t('maxExpand.memo.pinned', { defaultValue: '已置顶' })} />}
-                {memo.bookmarked && <img className="memo-tab-bookmark-icon" src={SvgIcon.BOOKMARK_ON} alt="bookmarked" width="12" height="12" draggable={false} title={t('maxExpand.memo.bookmarked', { defaultValue: '已标记' })} />}
-                {memo.title || t('maxExpand.memo.untitled', { defaultValue: '无标题' })}
-              </div>
-              <div className="memo-tab-item-summary">{extractSummary(memo.content) || t('maxExpand.memo.noContent', { defaultValue: '无内容' })}</div>
-              {extractMemoTags(memo).length > 0 && (
-                <div className="memo-tab-item-tags">
-                  {extractMemoTags(memo).slice(0, 3).map((tag) => (
-                    <span key={tag} className="memo-tab-item-tag">#{tag}</span>
-                  ))}
+          {filteredMemos.map((memo) => {
+            const memoSelected = selectedMemoIds.has(memo.id);
+            return (
+              <button
+                key={memo.id}
+                className={`memo-tab-item ${selectedId === memo.id ? 'memo-tab-item--active' : ''} ${memo.pinned ? 'memo-tab-item--pinned' : ''} ${bulkSelectMode ? 'memo-tab-item--selectable' : ''} ${memoSelected ? 'memo-tab-item--selected' : ''}`}
+                type="button"
+                onClick={() => {
+                  if (bulkSelectMode) {
+                    handleToggleMemoSelection(memo.id);
+                    return;
+                  }
+                  setSelectedId(memo.id);
+                  setTimeout(() => editorRef.current?.focus(), 50);
+                }}
+              >
+                {bulkSelectMode && (
+                  <span className={`memo-tab-item-check ${memoSelected ? 'memo-tab-item-check--checked' : ''}`} aria-hidden="true">
+                    {memoSelected ? '✓' : ''}
+                  </span>
+                )}
+                <div className="memo-tab-item-title">
+                  {memo.pinned && <img className="memo-tab-pin-icon" src={SvgIcon.PIN_ON_TOP} alt="pinned" width="12" height="12" draggable={false} title={t('maxExpand.memo.pinned', { defaultValue: '已置顶' })} />}
+                  {memo.bookmarked && <img className="memo-tab-bookmark-icon" src={SvgIcon.BOOKMARK_ON} alt="bookmarked" width="12" height="12" draggable={false} title={t('maxExpand.memo.bookmarked', { defaultValue: '已标记' })} />}
+                  {memo.title || t('maxExpand.memo.untitled', { defaultValue: '无标题' })}
                 </div>
-              )}
-              <div className="memo-tab-item-time">{formatTime(memo.updatedAt)}</div>
-            </button>
-          ))}
+                <div className="memo-tab-item-summary">{extractSummary(memo.content) || t('maxExpand.memo.noContent', { defaultValue: '无内容' })}</div>
+                {extractMemoTags(memo).length > 0 && (
+                  <div className="memo-tab-item-tags">
+                    {extractMemoTags(memo).slice(0, 3).map((tag) => (
+                      <span key={tag} className="memo-tab-item-tag">#{tag}</span>
+                    ))}
+                  </div>
+                )}
+                <div className="memo-tab-item-time">{formatTime(memo.updatedAt)}</div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
