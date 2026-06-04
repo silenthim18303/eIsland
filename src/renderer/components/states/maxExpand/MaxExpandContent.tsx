@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import { lazy, Suspense, type ReactElement } from 'react';
 import { readCachedMaxExpandPerformanceModeEnabled } from './components/setting/utils/performanceSettings';
 import { usePerformanceMode } from './hooks/usePerformanceMode';
 import { useEagerContentLoader } from './hooks/useEagerContentLoader';
@@ -33,7 +33,7 @@ import { MaxExpandContentLazy } from './MaxExpandContentLazy';
 import { MaxExpandContentShell } from './MaxExpandContentShell';
 import { loadMaxExpandContentEager, preloadMaxExpandContentEager } from './maxExpandContentEagerLoader';
 
-const MaxExpandContentEager = React.lazy(loadMaxExpandContentEager);
+const MaxExpandContentEager = lazy(loadMaxExpandContentEager);
 if (!readCachedMaxExpandPerformanceModeEnabled()) {
   preloadMaxExpandContentEager();
 }
@@ -42,7 +42,7 @@ if (!readCachedMaxExpandPerformanceModeEnabled()) {
  * 最大展开模式内容组件
  * @description 渲染最大展开态的 Tab 内容与底部导航点
  */
-export function MaxExpandContent(): React.ReactElement {
+export function MaxExpandContent(): ReactElement {
   const performanceModeEnabled = usePerformanceMode();
   const loadedEagerContent = useEagerContentLoader(performanceModeEnabled);
 
@@ -52,8 +52,8 @@ export function MaxExpandContent(): React.ReactElement {
     return <LoadedEagerContent />;
   }
   return (
-    <React.Suspense fallback={<MaxExpandContentShell renderActiveTab={renderEagerLoadingTab} />}>
+    <Suspense fallback={<MaxExpandContentShell renderActiveTab={renderEagerLoadingTab} />}>
       <MaxExpandContentEager />
-    </React.Suspense>
+    </Suspense>
   );
 }
