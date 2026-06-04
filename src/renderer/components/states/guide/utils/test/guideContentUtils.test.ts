@@ -52,7 +52,7 @@ function mockBrowserGlobals(): void {
     set onerror(fn: (() => void) | null) { imageOnerror = fn; }
     set src(_v: string) { /* no-op */ }
   }
-  (globalThis as any).Image = MockImage;
+  (globalThis as Record<string, unknown>).Image = MockImage;
 
   // Mock document.createElement to return a canvas-like object
   const mockCanvas = {
@@ -61,7 +61,7 @@ function mockBrowserGlobals(): void {
     getContext: mockGetContext,
   };
   mockCreateElement.mockReturnValue(mockCanvas);
-  (globalThis as any).document = { createElement: mockCreateElement };
+  (globalThis as Record<string, unknown>).document = { createElement: mockCreateElement };
 
   // Define window on globalThis (node env has no window)
   Object.defineProperty(globalThis, 'window', {
