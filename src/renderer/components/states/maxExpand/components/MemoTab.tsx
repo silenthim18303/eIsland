@@ -397,7 +397,7 @@ export function MemoTab(): React.ReactElement {
             title={bulkSelectMode ? t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.memo.bulkSelect', { defaultValue: '批量选择' })}
             aria-label={bulkSelectMode ? t('maxExpand.memo.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.memo.bulkSelect', { defaultValue: '批量选择' })}
           >
-            ✓
+            <img className="memo-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="14" height="14" draggable={false} />
           </button>
           <input
             className="memo-tab-search"
@@ -480,7 +480,7 @@ export function MemoTab(): React.ReactElement {
               >
                 {bulkSelectMode && (
                   <span className={`memo-tab-item-check ${memoSelected ? 'memo-tab-item-check--checked' : ''}`} aria-hidden="true">
-                    {memoSelected ? '✓' : ''}
+                    {memoSelected && <img className="memo-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="10" height="10" draggable={false} />}
                   </span>
                 )}
                 <div className="memo-tab-item-title">

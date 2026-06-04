@@ -72,6 +72,16 @@
   font-weight: 700;
 }
 
+.memo-tab-checked-icon-img {
+  filter: brightness(0) invert(1);
+  opacity: 0.78;
+}
+
+.memo-tab-bulk-select-toggle:hover .memo-tab-checked-icon-img,
+.memo-tab-item-check--checked .memo-tab-checked-icon-img {
+  opacity: 1;
+}
+
 .memo-tab-bookmark-filter--tag-row {
   width: 24px;
   height: 24px;
@@ -963,6 +973,10 @@
 }
 
 [data-theme='light'] .memo-tab-pin-icon {
+  filter: brightness(0) invert(0);
+}
+
+[data-theme='light'] .memo-tab-checked-icon-img {
   filter: brightness(0) invert(0);
 }
 
