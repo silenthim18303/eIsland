@@ -204,7 +204,7 @@ describe('isMouseInWindow', () => {
 
   describe('edge cases', () => {
     it('should return true for a zero-width window where mouse x equals bounds x', async () => {
-      // width=0 means bounds.x + width = bounds.x, so x >= bounds.x && x <= bounds.x is true when x == bounds.x
+      // width=0 means bounds.x + width = bounds.x, so x >= bounds.x && x <= bounds.x is true when x === bounds.x
       getMousePositionMock.mockResolvedValue({ x: 100, y: 150 });
       getWindowBoundsMock.mockResolvedValue({ x: 100, y: 100, width: 0, height: 100 });
 
