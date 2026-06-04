@@ -31,12 +31,14 @@ import remarkGfm from 'remark-gfm';
 import { SvgIcon } from '../../../../utils/SvgIcon';
 
 type MemoViewMode = 'edit' | 'preview' | 'split';
+type MemoTagFilter = string | null;
 
 /** 单条备忘录 */
 interface MemoItem {
   id: number;
   title: string;
   content: string;
+  tags: string[];
   createdAt: number;
   updatedAt: number;
   pinned: boolean;
@@ -46,12 +48,27 @@ interface MemoItem {
 /** 存储键名（对应 userData/eIsland_store/memos.json） */
 const STORE_KEY = 'memos';
 
+function normalizeTag(value: string): string {
+  return value.trim().replace(/^#+/, '').slice(0, 24);
+}
+
+function normalizeTagList(tags: unknown): string[] {
+  if (!Array.isArray(tags)) return [];
+  return Array.from(new Set(
+    tags
+      .filter((tag): tag is string => typeof tag === 'string')
+      .map(normalizeTag)
+      .filter(Boolean),
+  ));
+}
+
 /** 规范化旧数据，补全缺失字段 */
 function normalizeMemos(items: MemoItem[]): MemoItem[] {
   return items.map((m) => ({
     ...m,
     title: m.title ?? '',
     content: m.content ?? '',
+    tags: normalizeTagList((m as Partial<MemoItem>).tags),
     createdAt: m.createdAt ?? Date.now(),
     updatedAt: m.updatedAt ?? m.createdAt ?? Date.now(),
     pinned: m.pinned ?? false,
@@ -83,6 +100,18 @@ function extractSummary(content: string): string {
     .replace(/[#>*_~\-[\]()]/g, ' ');
   const line = plainContent.split('\n').find((l) => l.trim().length > 0)?.trim() ?? '';
   return line.length > 60 ? line.slice(0, 60) + '…' : line;
+}
+
+function extractMemoTags(memo: Pick<MemoItem, 'title' | 'content' | 'tags'>): string[] {
+  const text = `${memo.title}\n${memo.content}`;
+  const inlineTags = Array.from(text.matchAll(/(^|\s)#([\p{L}\p{N}_-]{1,24})/gu))
+    .map((match) => match[2]?.trim())
+    .filter((tag): tag is string => Boolean(tag));
+  return Array.from(new Set([...normalizeTagList(memo.tags), ...inlineTags.map(normalizeTag)].filter(Boolean)));
+}
+
+function getMemoSearchText(memo: MemoItem): string {
+  return [memo.title, memo.content, ...extractMemoTags(memo)].join('\n').toLowerCase();
 }
 
 const MARKDOWN_HIGHLIGHT_PATTERNS = [
@@ -146,6 +175,9 @@ export function MemoTab(): React.ReactElement {
   const [loaded, setLoaded] = useState(false);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [search, setSearch] = useState('');
+  const [activeTag, setActiveTag] = useState<MemoTagFilter>(null);
+  const [tagInput, setTagInput] = useState('');
+  const [tagEditorOpen, setTagEditorOpen] = useState(false);
   const [bookmarkOnly, setBookmarkOnly] = useState(false);
   const [viewMode, setViewMode] = useState<MemoViewMode>('edit');
   const [editorScroll, setEditorScroll] = useState({ left: 0, top: 0 });
@@ -202,6 +234,7 @@ export function MemoTab(): React.ReactElement {
       id: now,
       title: '',
       content: '',
+      tags: [],
       createdAt: now,
       updatedAt: now,
       pinned: false,
@@ -246,13 +279,49 @@ export function MemoTab(): React.ReactElement {
     );
   }, []);
 
-  /** 过滤 & 排序：置顶优先，然后按更新时间倒序 */
+  const handleAddTag = useCallback((id: number): void => {
+    const tag = normalizeTag(tagInput);
+    if (!tag) return;
+    setMemos((prev) => prev.map((m) => {
+      if (m.id !== id) return m;
+      const tags = normalizeTagList([...m.tags, tag]);
+      return { ...m, tags, updatedAt: Date.now() };
+    }));
+    setActiveTag(tag);
+    setTagInput('');
+  }, [tagInput]);
+
+  const handleRemoveTag = useCallback((id: number, tag: string): void => {
+    setMemos((prev) => prev.map((m) => {
+      if (m.id !== id) return m;
+      return { ...m, tags: m.tags.filter((item) => item !== tag), updatedAt: Date.now() };
+    }));
+  }, []);
+
+  const memoTags = useMemo(() => {
+    const counts = new Map<string, number>();
+    memos.forEach((memo) => {
+      extractMemoTags(memo).forEach((tag) => counts.set(tag, (counts.get(tag) ?? 0) + 1));
+    });
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  }, [memos]);
+
+  useEffect(() => {
+    if (activeTag && !memoTags.some(([tag]) => tag === activeTag)) {
+      setActiveTag(null);
+    }
+  }, [activeTag, memoTags]);
+
+  /** 过滤 & 排序：标签/书签/全文搜索后，置顶优先，然后按更新时间倒序 */
   const filteredMemos = memos
     .filter((m) => {
       if (bookmarkOnly && !m.bookmarked) return false;
-      if (!search.trim()) return true;
-      const q = search.toLowerCase();
-      return m.title.toLowerCase().includes(q) || m.content.toLowerCase().includes(q);
+      const tags = extractMemoTags(m);
+      if (activeTag && !tags.includes(activeTag)) return false;
+      const q = search.trim().toLowerCase();
+      if (!q) return true;
+      return getMemoSearchText(m).includes(q);
     })
     .sort((a, b) => {
       if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
@@ -296,6 +365,27 @@ export function MemoTab(): React.ReactElement {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>
           </button>
         </div>
+        <div className="memo-tab-tag-filter" aria-label={t('maxExpand.memo.tagFilter', { defaultValue: '标签筛选' })}>
+          <button
+            className={`memo-tab-tag-chip ${activeTag === null ? 'memo-tab-tag-chip--active' : ''}`}
+            type="button"
+            onClick={() => setActiveTag(null)}
+          >
+            {t('maxExpand.memo.allTags', { defaultValue: '全部标签' })}
+          </button>
+          {memoTags.map(([tag, count]) => (
+            <button
+              key={tag}
+              className={`memo-tab-tag-chip ${activeTag === tag ? 'memo-tab-tag-chip--active' : ''}`}
+              type="button"
+              onClick={() => setActiveTag((current) => (current === tag ? null : tag))}
+              title={t('maxExpand.memo.filterByTag', { defaultValue: '按标签筛选' })}
+            >
+              #{tag}
+              <span className="memo-tab-tag-count">{count}</span>
+            </button>
+          ))}
+        </div>
         <div className="memo-tab-list">
           {!loaded && <div className="memo-tab-loading">{t('maxExpand.memo.loading', { defaultValue: '加载中…' })}</div>}
           {loaded && filteredMemos.length === 0 && (
@@ -317,6 +407,13 @@ export function MemoTab(): React.ReactElement {
                 {memo.title || t('maxExpand.memo.untitled', { defaultValue: '无标题' })}
               </div>
               <div className="memo-tab-item-summary">{extractSummary(memo.content) || t('maxExpand.memo.noContent', { defaultValue: '无内容' })}</div>
+              {extractMemoTags(memo).length > 0 && (
+                <div className="memo-tab-item-tags">
+                  {extractMemoTags(memo).slice(0, 3).map((tag) => (
+                    <span key={tag} className="memo-tab-item-tag">#{tag}</span>
+                  ))}
+                </div>
+              )}
               <div className="memo-tab-item-time">{formatTime(memo.updatedAt)}</div>
             </button>
           ))}
@@ -350,6 +447,16 @@ export function MemoTab(): React.ReactElement {
                   ))}
                 </div>
                 <button
+                  className={`memo-tab-editor-tag-toggle ${tagEditorOpen ? 'memo-tab-editor-tag-toggle--active' : ''}`}
+                  type="button"
+                  onClick={() => setTagEditorOpen((open) => !open)}
+                  title={t('maxExpand.memo.editTags', { defaultValue: '编辑标签' })}
+                  aria-label={t('maxExpand.memo.editTags', { defaultValue: '编辑标签' })}
+                  aria-expanded={tagEditorOpen}
+                >
+                  #
+                </button>
+                <button
                   className={`memo-tab-editor-bookmark ${selectedMemo.bookmarked ? 'memo-tab-editor-bookmark--active' : ''}`}
                   type="button"
                   onClick={() => handleToggleBookmark(selectedMemo.id)}
@@ -373,6 +480,51 @@ export function MemoTab(): React.ReactElement {
                 >
                   <img src={SvgIcon.DELETE} alt="delete" width="14" height="14" draggable={false} />
                 </button>
+              </div>
+            </div>
+            <div className={`memo-tab-editor-tag-panel ${tagEditorOpen ? 'memo-tab-editor-tag-panel--open' : ''}`}>
+              <div className="memo-tab-editor-tag-row">
+                <div className="memo-tab-editor-tags">
+                  {selectedMemo.tags.length === 0 ? (
+                    <span className="memo-tab-editor-tag-empty">
+                      {t('maxExpand.memo.noTags', { defaultValue: '暂无标签' })}
+                    </span>
+                  ) : selectedMemo.tags.map((tag) => (
+                    <button
+                      key={tag}
+                      className="memo-tab-editor-tag"
+                      type="button"
+                      onClick={() => handleRemoveTag(selectedMemo.id, tag)}
+                      title={t('maxExpand.memo.removeTag', { defaultValue: '移除标签' })}
+                    >
+                      #{tag}
+                      <span className="memo-tab-editor-tag-remove">×</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="memo-tab-tag-input-group">
+                  <input
+                    className="memo-tab-tag-input"
+                    type="text"
+                    placeholder={t('maxExpand.memo.tagPlaceholder', { defaultValue: '添加标签' })}
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddTag(selectedMemo.id);
+                      }
+                    }}
+                  />
+                  <button
+                    className="memo-tab-tag-add-btn"
+                    type="button"
+                    onClick={() => handleAddTag(selectedMemo.id)}
+                    title={t('maxExpand.memo.addTag', { defaultValue: '添加标签' })}
+                  >
+                    #+
+                  </button>
+                </div>
               </div>
             </div>
             <div className={`memo-tab-markdown-workspace memo-tab-markdown-workspace--${viewMode}`}>

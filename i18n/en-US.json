@@ -1466,7 +1466,14 @@
       "keywordPlaceholder": "Enter filename keyword, e.g. report, .pdf"
     },
     "memo": {
-      "search": "Search memos...",
+      "search": "Search title, content, or tags...",
+      "tagFilter": "Tag filter",
+      "allTags": "All tags",
+      "filterByTag": "Filter by tag",
+      "tagPlaceholder": "Add tag",
+      "addTag": "Add tag",
+      "removeTag": "Remove tag",
+      "noTags": "No tags",
       "add": "New",
       "loading": "Loading...",
       "empty": "No memos yet",
@@ -1478,6 +1485,7 @@
       "editMode": "Edit",
       "previewMode": "Preview",
       "splitMode": "Split",
+      "editTags": "Edit tags",
       "markdownModeGroup": "Markdown view mode",
       "bookmark": "Bookmark",
       "unbookmark": "Remove Bookmark",

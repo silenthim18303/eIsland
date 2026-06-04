@@ -1466,7 +1466,14 @@
       "keywordPlaceholder": "输入文件名关键词，例如 report、.pdf"
     },
     "memo": {
-      "search": "搜索备忘录…",
+      "search": "搜索标题、正文或标签…",
+      "tagFilter": "标签筛选",
+      "allTags": "全部标签",
+      "filterByTag": "按标签筛选",
+      "tagPlaceholder": "添加标签",
+      "addTag": "添加标签",
+      "removeTag": "移除标签",
+      "noTags": "暂无标签",
       "add": "新建",
       "loading": "加载中…",
       "empty": "暂无备忘录",
@@ -1478,6 +1485,7 @@
       "editMode": "编辑",
       "previewMode": "预览",
       "splitMode": "分屏",
+      "editTags": "编辑标签",
       "markdownModeGroup": "Markdown 视图模式",
       "bookmark": "标记书签",
       "unbookmark": "取消书签",
