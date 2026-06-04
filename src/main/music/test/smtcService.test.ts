@@ -135,7 +135,7 @@ function emitWorkerExit(code: number) {
 
 describe('createSmtcService', () => {
   beforeEach(() => {
-    for (const key of Object.keys(workerHandlers)) delete workerHandlers[key];
+    Object.keys(workerHandlers).forEach((key) => delete workerHandlers[key]);
     createdWorkers.length = 0;
     workerConstructLog.length = 0;
     mockGetAllWindows.mockReturnValue([mockWindow]);
