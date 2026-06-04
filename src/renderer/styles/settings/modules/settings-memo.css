@@ -339,11 +339,7 @@
   overflow: hidden;
 }
 
-.memo-tab-markdown-workspace--split .memo-tab-markdown-editor-pane {
-  border-right: 1px solid rgba(var(--color-text-rgb), 0.06);
-}
-
-.memo-tab-markdown-highlight,
+.memo-tab-markdown-editor-mirror,
 .memo-tab-editor-content {
   box-sizing: border-box;
   width: 100%;
@@ -353,24 +349,56 @@
   border: none;
   font-family: "Cascadia Code", "JetBrains Mono", Consolas, "Microsoft YaHei UI", monospace;
   font-size: 13px;
+  font-variant-ligatures: none;
   line-height: 1.7;
   tab-size: 2;
   white-space: pre-wrap;
   overflow-wrap: break-word;
 }
 
-.memo-tab-markdown-highlight {
+.memo-tab-markdown-editor-mirror {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  color: rgba(var(--color-text-rgb), 0.36);
+  color: rgba(var(--color-text-rgb), 0.78);
   overflow: hidden;
 }
 
-.memo-tab-markdown-token {
-  border-radius: 3px;
-  background: rgba(100, 181, 246, 0.14);
-  color: rgba(129, 212, 250, 0.95);
+.memo-tab-markdown-token--heading {
+  color: rgba(100, 181, 246, 0.98);
+}
+
+.memo-tab-markdown-token--strong {
+  color: rgba(255, 213, 79, 0.96);
+}
+
+.memo-tab-markdown-token--emphasis {
+  color: rgba(186, 104, 200, 0.96);
+}
+
+.memo-tab-markdown-token--inline-code,
+.memo-tab-markdown-token--code-block {
+  border-radius: 4px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(129, 212, 250, 0.96);
+}
+
+.memo-tab-markdown-token--link {
+  color: rgba(79, 195, 247, 0.98);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.memo-tab-markdown-token--quote {
+  color: rgba(129, 199, 132, 0.96);
+}
+
+.memo-tab-markdown-token--list {
+  color: rgba(255, 171, 64, 0.96);
+}
+
+.memo-tab-markdown-workspace--split .memo-tab-markdown-editor-pane {
+  border-right: 1px solid rgba(var(--color-text-rgb), 0.06);
 }
 
 /* ── 编辑器内容区 ── */
@@ -383,7 +411,12 @@
   outline: none;
   color: transparent;
   caret-color: rgba(var(--color-text-rgb), 0.9);
-  overflow-y: auto;
+  overflow: auto;
+}
+
+.memo-tab-editor-content::selection {
+  background: rgba(100, 181, 246, 0.32);
+  color: transparent;
 }
 
 .memo-tab-editor-content::placeholder {
@@ -557,6 +590,39 @@
 }
 
 /* ══════ 浅色主题覆盖 ══════ */
+[data-theme='light'] .memo-tab-markdown-editor-mirror {
+  color: rgba(var(--color-text-rgb), 0.76);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--heading {
+  color: rgba(21, 101, 192, 0.96);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--strong {
+  color: rgba(180, 140, 0, 0.96);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--emphasis {
+  color: rgba(123, 31, 162, 0.96);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--inline-code,
+[data-theme='light'] .memo-tab-markdown-token--code-block {
+  color: rgba(21, 101, 192, 0.96);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--link {
+  color: rgba(2, 119, 189, 0.98);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--quote {
+  color: rgba(46, 125, 50, 0.96);
+}
+
+[data-theme='light'] .memo-tab-markdown-token--list {
+  color: rgba(230, 126, 34, 0.96);
+}
+
 [data-theme='light'] .memo-tab-item--pinned .memo-tab-item-title {
   color: rgba(180, 140, 0, 0.95);
 }
@@ -576,15 +642,6 @@
 [data-theme='light'] .memo-tab-markdown-mode--active {
   border-color: rgba(30, 136, 229, 0.42);
   background: rgba(30, 136, 229, 0.1);
-}
-
-[data-theme='light'] .memo-tab-markdown-highlight {
-  color: rgba(var(--color-text-rgb), 0.5);
-}
-
-[data-theme='light'] .memo-tab-markdown-token {
-  background: rgba(30, 136, 229, 0.12);
-  color: rgba(21, 101, 192, 0.95);
 }
 
 [data-theme='light'] .memo-tab-markdown-preview-pane code {

@@ -85,64 +85,53 @@ function extractSummary(content: string): string {
   return line.length > 60 ? line.slice(0, 60) + '…' : line;
 }
 
-const MARKDOWN_TOKEN_PATTERNS = [
-  /(```[\s\S]*?```)/g,
-  /(`[^`\n]+`)/g,
-  /(^|\n)(#{1,6}\s[^\n]*)/g,
-  /(\*\*[^*\n]+\*\*|__[^_\n]+__)/g,
-  /(\*[^*\n]+\*|_[^_\n]+_)/g,
-  /(~~[^~\n]+~~)/g,
-  /(\[[^\]\n]+\]\([^\)\n]+\))/g,
-  /(^|\n)(>[^\n]*)/g,
-  /(^|\n)(\s*(?:[-*+]\s|\d+\.\s)[^\n]*)/g,
+const MARKDOWN_HIGHLIGHT_PATTERNS = [
+  { className: 'memo-tab-markdown-token--code-block', pattern: /(```[\s\S]*?```)/g },
+  { className: 'memo-tab-markdown-token--inline-code', pattern: /(`[^`\n]+`)/g },
+  { className: 'memo-tab-markdown-token--heading', pattern: /(^|\n)(#{1,6}\s[^\n]*)/g },
+  { className: 'memo-tab-markdown-token--strong', pattern: /(\*\*[^*\n]+\*\*|__[^_\n]+__)/g },
+  { className: 'memo-tab-markdown-token--emphasis', pattern: /(\*[^*\n]+\*|_[^_\n]+_)/g },
+  { className: 'memo-tab-markdown-token--link', pattern: /(\[[^\]\n]+\]\([^\)\n]+\))/g },
+  { className: 'memo-tab-markdown-token--quote', pattern: /(^|\n)(>[^\n]*)/g },
+  { className: 'memo-tab-markdown-token--list', pattern: /(^|\n)(\s*(?:[-*+]\s|\d+\.\s)[^\n]*)/g },
 ];
 
-/** 生成编辑态 Markdown 语法高亮片段 */
-function renderMarkdownHighlight(content: string): React.ReactNode[] {
-  if (!content) return [];
-
-  const ranges = MARKDOWN_TOKEN_PATTERNS.flatMap((pattern) => {
+/** 渲染与 textarea 同排版的 Markdown 高亮镜像 */
+function renderMarkdownEditorMirror(content: string): React.ReactNode[] {
+  const source = content.length > 0 ? content : ' ';
+  const ranges = MARKDOWN_HIGHLIGHT_PATTERNS.flatMap(({ className, pattern }) => {
     const regex = new RegExp(pattern.source, pattern.flags);
-    const matches = Array.from(content.matchAll(regex));
-    return matches.map((match) => {
+    return Array.from(source.matchAll(regex)).map((match) => {
       const value = match[2] ?? match[1] ?? match[0];
       const index = match.index ?? 0;
-      const start = content.indexOf(value, index);
-      return { start, end: start + value.length };
+      const start = source.indexOf(value, index);
+      return { className, start, end: start + value.length };
     });
   })
     .filter((range) => range.start >= 0 && range.end > range.start)
     .sort((a, b) => a.start - b.start || b.end - a.end)
-    .reduce<Array<{ start: number; end: number }>>((acc, range) => {
+    .reduce<Array<{ className: string; start: number; end: number }>>((acc, range) => {
       const last = acc[acc.length - 1];
-      if (!last || range.start >= last.end) {
-        acc.push(range);
-      }
+      if (!last || range.start >= last.end) acc.push(range);
       return acc;
     }, []);
 
   const nodes: React.ReactNode[] = [];
   let cursor = 0;
   ranges.forEach((range, index) => {
-    if (range.start > cursor) {
-      nodes.push(content.slice(cursor, range.start));
-    }
+    if (range.start > cursor) nodes.push(source.slice(cursor, range.start));
     nodes.push(
-      <mark key={`${range.start}-${range.end}-${index}`} className="memo-tab-markdown-token">
-        {content.slice(range.start, range.end)}
-      </mark>,
+      <span key={`${range.start}-${range.end}-${index}`} className={`memo-tab-markdown-token ${range.className}`}>
+        {source.slice(range.start, range.end)}
+      </span>,
     );
     cursor = range.end;
   });
-
-  if (cursor < content.length) {
-    nodes.push(content.slice(cursor));
-  }
-
+  if (cursor < source.length) nodes.push(source.slice(cursor));
+  if (source.endsWith('\n')) nodes.push(' ');
   return nodes;
 }
 
-/** Markdown 预览空白补位 */
 function getMarkdownPreviewContent(content: string, placeholder: string): string {
   return content.trim().length > 0 ? content : placeholder;
 }
@@ -159,7 +148,7 @@ export function MemoTab(): React.ReactElement {
   const [search, setSearch] = useState('');
   const [bookmarkOnly, setBookmarkOnly] = useState(false);
   const [viewMode, setViewMode] = useState<MemoViewMode>('edit');
-  const [editorScrollTop, setEditorScrollTop] = useState(0);
+  const [editorScroll, setEditorScroll] = useState({ left: 0, top: 0 });
   const skipPersistOnceRef = useRef(false);
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -273,8 +262,8 @@ export function MemoTab(): React.ReactElement {
   const selectedMemo = memos.find((m) => m.id === selectedId) ?? null;
   const contentPlaceholder = t('maxExpand.memo.contentPlaceholder', { defaultValue: '在这里写点什么…' });
   const markdownPreviewContent = selectedMemo ? getMarkdownPreviewContent(selectedMemo.content, contentPlaceholder) : '';
-  const highlightedContent = useMemo(
-    () => renderMarkdownHighlight(selectedMemo?.content ?? ''),
+  const markdownEditorMirror = useMemo(
+    () => renderMarkdownEditorMirror(selectedMemo?.content ?? ''),
     [selectedMemo?.content],
   );
   const viewModes: Array<{ id: MemoViewMode; label: string }> = [
@@ -389,13 +378,13 @@ export function MemoTab(): React.ReactElement {
             <div className={`memo-tab-markdown-workspace memo-tab-markdown-workspace--${viewMode}`}>
               {(viewMode === 'edit' || viewMode === 'split') && (
                 <div className="memo-tab-markdown-editor-pane">
-                  <pre
-                    className="memo-tab-markdown-highlight"
+                  <div
+                    className="memo-tab-markdown-editor-mirror"
                     aria-hidden="true"
-                    style={{ transform: `translateY(-${editorScrollTop}px)` }}
+                    style={{ transform: `translate(${-editorScroll.left}px, ${-editorScroll.top}px)` }}
                   >
-                    {highlightedContent.length > 0 ? highlightedContent : '\n'}
-                  </pre>
+                    {markdownEditorMirror}
+                  </div>
                   <textarea
                     ref={editorRef}
                     className="memo-tab-editor-content"
@@ -403,7 +392,7 @@ export function MemoTab(): React.ReactElement {
                     value={selectedMemo.content}
                     spellCheck={false}
                     onChange={(e) => handleContentChange(selectedMemo.id, e.target.value)}
-                    onScroll={(e) => setEditorScrollTop(e.currentTarget.scrollTop)}
+                    onScroll={(e) => setEditorScroll({ left: e.currentTarget.scrollLeft, top: e.currentTarget.scrollTop })}
                   />
                 </div>
               )}
