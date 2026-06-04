@@ -36,9 +36,9 @@ describe('createGomokuBoard', () => {
 
   it('should have GOMOKU_SIZE columns in each row', () => {
     const board = createGomokuBoard()
-    for (const row of board) {
+    board.forEach((row) => {
       expect(row).toHaveLength(GOMOKU_SIZE)
-    }
+    })
   })
 
   it('should initialize every cell to 0', () => {
