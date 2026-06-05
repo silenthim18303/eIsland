@@ -1539,8 +1539,79 @@ const api = {
     return () => {
       ipcRenderer.removeListener('external-agent:stopped', handler);
     };
+  },
+  claudeCodeStatusGet: (): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:status:get');
+  },
+  claudeCodeHookInstall: (): Promise<ClaudeCodeHookMutationResult> => {
+    return ipcRenderer.invoke('claude-code:hook:install');
+  },
+  claudeCodeHookUninstall: (): Promise<ClaudeCodeHookMutationResult> => {
+    return ipcRenderer.invoke('claude-code:hook:uninstall');
+  },
+  claudeCodeEventsClear: (): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:events:clear');
+  },
+  onClaudeCodeStatusUpdated: (callback: (snapshot: ClaudeCodeStatusSnapshot) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, snapshot: ClaudeCodeStatusSnapshot): void => {
+      callback(snapshot);
+    };
+    ipcRenderer.on('claude-code:status-updated', handler);
+    return () => {
+      ipcRenderer.removeListener('claude-code:status-updated', handler);
+    };
   }
 };
+
+interface ClaudeCodeHookEventDetailItem {
+  label: string;
+  value: string;
+}
+
+interface ClaudeCodeHookEvent {
+  id: string;
+  eventName: string;
+  kind: 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
+  sessionId: string;
+  cwd: string | null;
+  transcriptPath: string | null;
+  summary: string;
+  detail: string | null;
+  detailItems: ClaudeCodeHookEventDetailItem[];
+  toolName: string | null;
+  toolInputPreview: string | null;
+  createdAt: number;
+  raw: Record<string, unknown>;
+}
+
+interface ClaudeCodeSessionSnapshot {
+  id: string;
+  title: string;
+  phase: 'idle' | 'running' | 'waiting_permission' | 'completed';
+  cwd: string | null;
+  transcriptPath: string | null;
+  lastSummary: string;
+  lastEventAt: number;
+  pendingPermission: ClaudeCodeHookEvent | null;
+  events: ClaudeCodeHookEvent[];
+}
+
+interface ClaudeCodeStatusSnapshot {
+  enabled: boolean;
+  receiverRunning: boolean;
+  receiverUrl: string | null;
+  settingsPath: string;
+  hookScriptPath: string;
+  sessions: ClaudeCodeSessionSnapshot[];
+  events: ClaudeCodeHookEvent[];
+  updatedAt: number;
+}
+
+interface ClaudeCodeHookMutationResult {
+  ok: boolean;
+  message: string;
+  snapshot: ClaudeCodeStatusSnapshot;
+}
 
 /** 歌曲信息类型（与主进程发送的数据格式一致） */
 interface NowPlayingInfo {

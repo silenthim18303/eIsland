@@ -34,6 +34,7 @@ import { createTray, destroyTray, toggleTray } from './tray';
 import { createSessionMainLogger } from './log/mainLog';
 import { startClipboardUrlWatcher, stopClipboardUrlWatcher } from './clipboard/urlWatcher';
 import { createClipboardUrlState } from './clipboard/clipboardUrlState';
+import { registerClaudeCodeStatusIpcHandlers } from './ipc/agent/claudeCodeStatusIpc';
 import { registerClipboardIpcHandlers } from './ipc/settings/clipboard';
 import { registerCaptureIpcHandlers } from './ipc/window/capture';
 import { registerScreenshotHotkeyIpcHandlers } from './ipc/system/screenshotHotkey';
@@ -68,6 +69,7 @@ import { createSmtcService } from './music/smtcService';
 import { setSmtcAccessor } from './music/smtcAccessor';
 import { createAutoHideWatcher } from './system/autoHideWatcher';
 import { createExternalAgentWatcher } from './system/externalAgentWatcher';
+import { createClaudeCodeStatusService } from './system/claudeCodeStatusService';
 import { sendMediaVirtualKey } from './system/mediaKey';
 import {
   queryFocusedWindow,
@@ -261,6 +263,10 @@ const externalAgentWatcher = createExternalAgentWatcher({
   getMainWindow: () => mainWindow,
 });
 
+const claudeCodeStatusService = createClaudeCodeStatusService({
+  getMainWindow: () => mainWindow,
+});
+
 /** SMTC 自动取消订阅时间（毫秒），0 为永不取消 */
 let smtcUnsubscribeMs = DEFAULT_SMTC_UNSUBSCRIBE_MS;
 
@@ -442,6 +448,7 @@ function registerIpcHandlers(): void {
   });
 
   registerStoreIpcHandlers({ storeDir });
+  registerClaudeCodeStatusIpcHandlers({ service: claudeCodeStatusService });
   registerSettingsPreviewHandler();
 
   registerLogIpcHandlers({ writeMainLog });
@@ -635,6 +642,7 @@ registerAppLifecycleHandlers({
   onWillQuit: () => {
     autoHideWatcher.stop();
     externalAgentWatcher.stop();
+    claudeCodeStatusService.stop();
     stopClipboardUrlWatcher();
     globalShortcut.unregisterAll();
   },
@@ -719,6 +727,7 @@ app.whenReady().then(() => {
   });
 
   registerIpcHandlers();
+  void claudeCodeStatusService.start();
 
   // 读取持久化白名单
   nowPlayingWhitelist = readWhitelistConfig();

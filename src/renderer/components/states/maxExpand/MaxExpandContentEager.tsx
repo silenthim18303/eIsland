@@ -40,6 +40,7 @@ import { MemoTab } from './components/MemoTab';
 import { AlarmTab } from './components/AlarmTab';
 import { ToolboxTab } from './components/ToolboxTab';
 import { MiniGameTab } from './components/MiniGameTab';
+import { CliTab } from './components/cli';
 
 function renderEagerActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElement, contentReady: boolean): ReactElement | null {
   if (!contentReady) return loadingFallback;
@@ -55,6 +56,7 @@ function renderEagerActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactEle
   if (activeTab === 'alarm') return <AlarmTab />;
   if (activeTab === 'toolbox') return <ToolboxTab />;
   if (activeTab === 'miniGame') return <MiniGameTab />;
+  if (activeTab === 'cli') return <CliTab />;
   if (activeTab === 'settings') return <SettingsTab />;
   return null;
 }

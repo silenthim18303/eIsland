@@ -114,6 +114,56 @@ export interface PerformanceSnapshot {
   hardwareOptions: PerformanceHardwareOptions;
 }
 
+export interface ClaudeCodeHookEventDetailItem {
+  label: string;
+  value: string;
+}
+
+export interface ClaudeCodeHookEvent {
+  id: string;
+  eventName: string;
+  kind: 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
+  sessionId: string;
+  cwd: string | null;
+  transcriptPath: string | null;
+  summary: string;
+  detail: string | null;
+  detailItems: ClaudeCodeHookEventDetailItem[];
+  toolName: string | null;
+  toolInputPreview: string | null;
+  createdAt: number;
+  raw: Record<string, unknown>;
+}
+
+export interface ClaudeCodeSessionSnapshot {
+  id: string;
+  title: string;
+  phase: 'idle' | 'running' | 'waiting_permission' | 'completed';
+  cwd: string | null;
+  transcriptPath: string | null;
+  lastSummary: string;
+  lastEventAt: number;
+  pendingPermission: ClaudeCodeHookEvent | null;
+  events: ClaudeCodeHookEvent[];
+}
+
+export interface ClaudeCodeStatusSnapshot {
+  enabled: boolean;
+  receiverRunning: boolean;
+  receiverUrl: string | null;
+  settingsPath: string;
+  hookScriptPath: string;
+  sessions: ClaudeCodeSessionSnapshot[];
+  events: ClaudeCodeHookEvent[];
+  updatedAt: number;
+}
+
+export interface ClaudeCodeHookMutationResult {
+  ok: boolean;
+  message: string;
+  snapshot: ClaudeCodeStatusSnapshot;
+}
+
 declare global {
   interface Window {
     electron: ElectronAPI;
@@ -490,6 +540,11 @@ declare global {
       clipboardOpenUrl: (url: string) => Promise<boolean>;
       onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void) => () => void;
       onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void) => () => void;
+      claudeCodeStatusGet: () => Promise<ClaudeCodeStatusSnapshot>;
+      claudeCodeHookInstall: () => Promise<ClaudeCodeHookMutationResult>;
+      claudeCodeHookUninstall: () => Promise<ClaudeCodeHookMutationResult>;
+      claudeCodeEventsClear: () => Promise<ClaudeCodeStatusSnapshot>;
+      onClaudeCodeStatusUpdated: (callback: (snapshot: ClaudeCodeStatusSnapshot) => void) => () => void;
     };
   }
 }

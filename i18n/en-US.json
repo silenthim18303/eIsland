@@ -1139,8 +1139,41 @@
       "alarm": "Alarm",
       "toolbox": "Toolbox",
       "miniGame": "Mini Game",
+      "cli": "CLI Console",
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
+    },
+    "cli": {
+      "eyebrow": "Claude Code",
+      "title": "CLI Console",
+      "subtitle": "Monitor Claude Code CLI sessions, tool usage, notifications, and permission requests in real time. Enable the local hook first; new Claude Code sessions will start reporting status.",
+      "enableHook": "Enable Status Hook",
+      "disableHook": "Disable Status Hook",
+      "clear": "Clear Records",
+      "hookStatus": "Hook Status",
+      "receiverStatus": "Receiver",
+      "pendingAuth": "Pending Auth",
+      "activeSessions": "Active Sessions",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "running": "Running",
+      "stopped": "Stopped",
+      "receiverUrl": "Receiver URL",
+      "settingsPath": "Settings File",
+      "sessions": "Conversations",
+      "events": "Event Stream",
+      "loading": "Loading",
+      "updatedAt": "Updated at {{time}}",
+      "emptySessions": "No Claude Code sessions yet. Enable the hook and start a new Claude Code CLI session to see live status.",
+      "emptyEvents": "No events yet.",
+      "detail": {
+        "userInput": "User input",
+        "toolInput": "Tool input",
+        "toolResult": "Tool result",
+        "error": "Error",
+        "reason": "Reason",
+        "rawEvent": "Raw event"
+      }
     },
     "toolbox": {
       "sidebar": {
@@ -1879,7 +1912,8 @@
           "countdown": "Countdown",
           "alarm": "Alarm",
           "toolbox": "Toolbox",
-          "miniGame": "Mini Game"
+          "miniGame": "Mini Game",
+          "cli": "CLI Console"
         }
       },
       "hideProcess": {
