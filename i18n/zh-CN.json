@@ -766,6 +766,7 @@
     "actions": {
       "add": "添加",
       "save": "保存",
+      "manageImportExport": "导入导出",
       "import": "导入",
       "export": "导出",
       "expand": "展开",

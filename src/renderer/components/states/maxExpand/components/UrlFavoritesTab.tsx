@@ -167,6 +167,7 @@ export function UrlFavoritesTab(): React.ReactElement {
   const [focusedId, setFocusedId] = useState<number | null>(null);
   const [importFormat, setImportFormat] = useState<UrlFavoritesImportFormat>('json');
   const [exportFormat, setExportFormat] = useState<UrlFavoritesExportFormat>('json');
+  const [importExportOpen, setImportExportOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dragOverId, setDragOverId] = useState<number | null>(null);
@@ -508,9 +509,21 @@ export function UrlFavoritesTab(): React.ReactElement {
         <button className="url-favorites-add" type="button" onClick={handleAdd}>
           {t('urlFavoritesTab.actions.add', { defaultValue: '添加' })}
         </button>
+        <button
+          className={`url-favorites-manage${importExportOpen ? ' url-favorites-manage--active' : ''}`}
+          type="button"
+          onClick={() => setImportExportOpen((open) => !open)}
+          aria-expanded={importExportOpen}
+          aria-controls="url-favorites-import-export-panel"
+        >
+          {t('urlFavoritesTab.actions.manageImportExport', { defaultValue: '导入导出' })}
+        </button>
       </div>
 
-      <div className="url-favorites-import-export-panel">
+      <div
+        id="url-favorites-import-export-panel"
+        className={`url-favorites-import-export-panel${importExportOpen ? ' url-favorites-import-export-panel--open' : ''}`}
+      >
         <input
           ref={importInputRef}
           className="url-favorites-file-input"
@@ -558,6 +571,7 @@ export function UrlFavoritesTab(): React.ReactElement {
       {statusMessage ? <div className="url-favorites-status">{statusMessage}</div> : null}
 
       <div
+        className="url-favorites-list"
         onWheelCapture={(e) => {
           e.stopPropagation();
         }}

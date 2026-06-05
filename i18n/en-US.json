@@ -766,6 +766,7 @@
     "actions": {
       "add": "Add",
       "save": "Save",
+      "manageImportExport": "Import / Export",
       "import": "Import",
       "export": "Export",
       "expand": "Expand",
