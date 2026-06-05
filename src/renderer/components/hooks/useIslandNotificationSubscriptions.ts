@@ -121,6 +121,21 @@ export function useIslandNotificationSubscriptions(options: UseIslandNotificatio
   }, [language, t, setNotificationRef]);
 
   useEffect(() => {
+    const unsubAgentStopped = window.api?.onExternalAgentStopped?.((data) => {
+      setNotificationRef.current({
+        title: t('notification.externalAgent.stoppedTitle', { defaultValue: '桌面 Agent 已关闭', agentName: data.agentName }),
+        body: t('notification.externalAgent.stoppedBody', { defaultValue: '{{agentName}} 已停止工作', agentName: data.agentName }),
+        icon: SvgIcon.CODING,
+        type: 'external-agent-stopped',
+        agentName: data.agentName,
+      });
+    });
+    return () => {
+      unsubAgentStopped?.();
+    };
+  }, [language, t, setNotificationRef]);
+
+  useEffect(() => {
     const unsubClipboard = window.api?.onClipboardUrlsDetected?.(({ urls, title }) => {
       let suppressInFavorites = true;
       try {

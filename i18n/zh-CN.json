@@ -3203,7 +3203,9 @@
   "notification": {
     "externalAgent": {
       "title": "检测到桌面 Agent",
-      "body": "{{agentName}} 已开始工作"
+      "body": "{{agentName}} 已开始工作",
+      "stoppedTitle": "桌面 Agent 已关闭",
+      "stoppedBody": "{{agentName}} 已停止工作"
     },
     "actions": {
       "gotIt": "知道了"

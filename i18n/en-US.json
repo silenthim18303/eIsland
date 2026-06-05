@@ -3203,7 +3203,9 @@
   "notification": {
     "externalAgent": {
       "title": "Desktop Agent Detected",
-      "body": "{{agentName}} started working"
+      "body": "{{agentName}} started working",
+      "stoppedTitle": "Desktop Agent Closed",
+      "stoppedBody": "{{agentName}} stopped working"
     },
     "actions": {
       "gotIt": "Got it"

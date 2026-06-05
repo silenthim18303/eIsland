@@ -489,6 +489,7 @@ declare global {
       onClipboardUrlsDetected: (callback: (data: { urls: string[]; title: string }) => void) => () => void;
       clipboardOpenUrl: (url: string) => Promise<boolean>;
       onExternalAgentStarted: (callback: (data: { agentName: string }) => void) => () => void;
+      onExternalAgentStopped: (callback: (data: { agentName: string }) => void) => () => void;
     };
   }
 }

@@ -1525,6 +1525,20 @@ const api = {
     return () => {
       ipcRenderer.removeListener('external-agent:started', handler);
     };
+  },
+  /**
+   * 监听外部桌面 Agent 关闭事件
+   * @param callback - 收到事件时的回调，包含 agentName
+   * @returns 取消订阅函数
+   */
+  onExternalAgentStopped: (callback: (data: { agentName: string }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { agentName: string }): void => {
+      callback(data);
+    };
+    ipcRenderer.on('external-agent:stopped', handler);
+    return () => {
+      ipcRenderer.removeListener('external-agent:stopped', handler);
+    };
   }
 };
 

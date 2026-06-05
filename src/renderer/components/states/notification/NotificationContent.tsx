@@ -509,7 +509,7 @@ export function NotificationContent({
             <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleDismissUrl}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
           </div>
         </div>
-      ) : type === 'external-agent-active' ? (
+      ) : type === 'external-agent-active' || type === 'external-agent-stopped' ? (
         <div className="notification-actions notification-actions--right">
           <div className="notification-decision-actions">
             <button type="button" className="notification-action-btn notification-action-ignore" onClick={dismiss}>{t('notification.actions.gotIt', { defaultValue: '知道了' })}</button>
