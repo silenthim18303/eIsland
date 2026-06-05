@@ -37,6 +37,9 @@ interface UrlFavoriteItem {
   createdAt: number;
 }
 
+type UrlFavoritesImportFormat = 'json' | 'html';
+type UrlFavoritesExportFormat = 'json' | 'html';
+
 const STORE_KEY = 'url-favorites';
 const FOCUS_KEY = 'url-favorites-focus-url';
 
@@ -69,6 +72,83 @@ function sanitizeFavorites(data: unknown): UrlFavoriteItem[] {
     .filter((item): item is UrlFavoriteItem => Boolean(item));
 }
 
+function escapeHtmlText(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function parseJsonFavorites(content: string): UrlFavoriteItem[] {
+  const parsed = JSON.parse(content) as unknown;
+  if (Array.isArray(parsed)) return sanitizeFavorites(parsed);
+  if (parsed && typeof parsed === 'object' && Array.isArray((parsed as { items?: unknown }).items)) {
+    return sanitizeFavorites((parsed as { items: unknown[] }).items);
+  }
+  return [];
+}
+
+function parseHtmlBookmarks(content: string): UrlFavoriteItem[] {
+  const doc = new DOMParser().parseFromString(content, 'text/html');
+  const anchors = Array.from(doc.querySelectorAll('a[href]'));
+  return sanitizeFavorites(anchors.map((anchor, index) => {
+    const url = anchor.getAttribute('href') ?? '';
+    const title = anchor.textContent?.trim() ?? '';
+    const addDateRaw = anchor.getAttribute('add_date') ?? anchor.getAttribute('ADD_DATE') ?? '';
+    const createdAt = /^\d+$/.test(addDateRaw) ? Number(addDateRaw) * 1000 : Date.now() + index;
+    return { id: createdAt, url, title, note: '', createdAt };
+  }));
+}
+
+function parseImportedFavorites(content: string, format: UrlFavoritesImportFormat): UrlFavoriteItem[] {
+  return format === 'json' ? parseJsonFavorites(content) : parseHtmlBookmarks(content);
+}
+
+function mergeFavorites(current: UrlFavoriteItem[], incoming: UrlFavoriteItem[]): UrlFavoriteItem[] {
+  const existingUrls = new Set(current.map((item) => item.url.toLowerCase()));
+  const now = Date.now();
+  const accepted = incoming
+    .filter((item) => {
+      const key = item.url.toLowerCase();
+      if (existingUrls.has(key)) return false;
+      existingUrls.add(key);
+      return true;
+    })
+    .map((item, index) => ({ ...item, id: now + index, createdAt: item.createdAt || now + index }));
+  return [...accepted, ...current];
+}
+
+function serializeFavoritesToJson(items: UrlFavoriteItem[]): string {
+  return JSON.stringify({
+    source: 'eIsland',
+    exportedAt: new Date().toISOString(),
+    items,
+  }, null, 2);
+}
+
+function serializeFavoritesToHtml(items: UrlFavoriteItem[]): string {
+  const rows = items.map((item) => {
+    const addDate = Math.floor(item.createdAt / 1000);
+    const title = escapeHtmlText(item.title && item.title !== item.url ? item.title : item.url);
+    const note = item.note ? ` ${escapeHtmlText(item.note)}` : '';
+    return `        <DT><A HREF="${escapeHtmlText(item.url)}" ADD_DATE="${addDate}">${title}</A>${note}`;
+  }).join('\n');
+
+  return [
+    '<!DOCTYPE NETSCAPE-Bookmark-file-1>',
+    '<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">',
+    '<TITLE>Bookmarks</TITLE>',
+    '<H1>Bookmarks</H1>',
+    '<DL><p>',
+    '    <DT><H3 ADD_DATE="0">eIsland URL Favorites</H3>',
+    '    <DL><p>',
+    rows,
+    '    </DL><p>',
+    '</DL><p>',
+  ].filter(Boolean).join('\n');
+}
+
 function persistFavorites(items: UrlFavoriteItem[]): void {
   try { localStorage.setItem('eIsland_url_favorites', JSON.stringify(items)); } catch { /* noop */ }
   window.api.storeWrite(STORE_KEY, items).catch(() => {});
@@ -85,6 +165,9 @@ export function UrlFavoritesTab(): React.ReactElement {
   const [urlInput, setUrlInput] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [focusedId, setFocusedId] = useState<number | null>(null);
+  const [importFormat, setImportFormat] = useState<UrlFavoritesImportFormat>('json');
+  const [exportFormat, setExportFormat] = useState<UrlFavoritesExportFormat>('json');
+  const [statusMessage, setStatusMessage] = useState('');
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dragOverId, setDragOverId] = useState<number | null>(null);
   const [editUrlInput, setEditUrlInput] = useState('');
@@ -93,6 +176,14 @@ export function UrlFavoritesTab(): React.ReactElement {
   const dragFromIdRef = useRef<number | null>(null);
   const dragMovedRef = useRef(false);
   const skipPersistOnceRef = useRef(false);
+  const importInputRef = useRef<HTMLInputElement>(null);
+
+  const showStatusMessage = (message: string): void => {
+    setStatusMessage(message);
+    window.setTimeout(() => {
+      setStatusMessage((current) => (current === message ? '' : current));
+    }, 2400);
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -278,6 +369,65 @@ export function UrlFavoritesTab(): React.ReactElement {
     }
   };
 
+  const handleImportClick = (): void => {
+    importInputRef.current?.click();
+  };
+
+  const handleImportFile = (file: File | null): void => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const content = typeof reader.result === 'string' ? reader.result : '';
+        const imported = parseImportedFavorites(content, importFormat);
+        if (imported.length === 0) {
+          showStatusMessage(t('urlFavoritesTab.messages.importEmpty', { defaultValue: '未识别到可导入的收藏' }));
+          return;
+        }
+        const next = mergeFavorites(favorites, imported);
+        const addedCount = next.length - favorites.length;
+        if (addedCount === 0) {
+          showStatusMessage(t('urlFavoritesTab.messages.importEmpty', { defaultValue: '未识别到可导入的收藏' }));
+          return;
+        }
+        setFavorites(next);
+        showStatusMessage(t('urlFavoritesTab.messages.importSuccess', { defaultValue: '已导入 {{count}} 条收藏', count: addedCount }));
+      } catch {
+        showStatusMessage(t('urlFavoritesTab.messages.importFailed', { defaultValue: '导入失败，请检查文件格式' }));
+      } finally {
+        if (importInputRef.current) importInputRef.current.value = '';
+      }
+    };
+    reader.onerror = () => {
+      showStatusMessage(t('urlFavoritesTab.messages.importFailed', { defaultValue: '导入失败，请检查文件格式' }));
+      if (importInputRef.current) importInputRef.current.value = '';
+    };
+    reader.readAsText(file, 'utf-8');
+  };
+
+  const handleExport = (): void => {
+    const isJson = exportFormat === 'json';
+    const content = isJson ? serializeFavoritesToJson(favorites) : serializeFavoritesToHtml(favorites);
+    const date = new Date().toISOString().slice(0, 10);
+    window.api.saveTextFile({
+      defaultPath: `eIsland-url-favorites-${date}.${isJson ? 'json' : 'html'}`,
+      content,
+      filters: isJson
+        ? [{ name: 'JSON', extensions: ['json'] }]
+        : [{ name: 'HTML', extensions: ['html', 'htm'] }],
+    }).then((result) => {
+      if (result.ok) {
+        showStatusMessage(t('urlFavoritesTab.messages.exportSuccess', { defaultValue: '已导出 {{count}} 条收藏', count: favorites.length }));
+        return;
+      }
+      if (!result.canceled) {
+        showStatusMessage(t('urlFavoritesTab.messages.exportFailed', { defaultValue: '导出失败，请稍后重试' }));
+      }
+    }).catch(() => {
+      showStatusMessage(t('urlFavoritesTab.messages.exportFailed', { defaultValue: '导出失败，请稍后重试' }));
+    });
+  };
+
   const resetDragState = (): void => {
     dragFromIdRef.current = null;
     setDraggingId(null);
@@ -360,8 +510,54 @@ export function UrlFavoritesTab(): React.ReactElement {
         </button>
       </div>
 
+      <div className="url-favorites-import-export-panel">
+        <input
+          ref={importInputRef}
+          className="url-favorites-file-input"
+          type="file"
+          accept={importFormat === 'json' ? '.json,application/json' : '.html,.htm,text/html'}
+          onChange={(e) => handleImportFile(e.target.files?.[0] ?? null)}
+        />
+        <div className="url-favorites-format-group" aria-label={t('urlFavoritesTab.import.formatAria', { defaultValue: '导入格式' })}>
+          {(['json', 'html'] as const).map((format) => (
+            <button
+              key={`import-${format}`}
+              className={`url-favorites-format-btn${importFormat === format ? ' url-favorites-format-btn--active' : ''}`}
+              type="button"
+              onClick={() => setImportFormat(format)}
+            >
+              {format.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <button className="url-favorites-secondary-action" type="button" onClick={handleImportClick}>
+          {t('urlFavoritesTab.actions.import', { defaultValue: '导入' })}
+        </button>
+        <div className="url-favorites-format-group" aria-label={t('urlFavoritesTab.export.formatAria', { defaultValue: '导出格式' })}>
+          {(['json', 'html'] as const).map((format) => (
+            <button
+              key={`export-${format}`}
+              className={`url-favorites-format-btn${exportFormat === format ? ' url-favorites-format-btn--active' : ''}`}
+              type="button"
+              onClick={() => setExportFormat(format)}
+            >
+              {format.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <button
+          className="url-favorites-secondary-action"
+          type="button"
+          onClick={handleExport}
+          disabled={favorites.length === 0}
+        >
+          {t('urlFavoritesTab.actions.export', { defaultValue: '导出' })}
+        </button>
+      </div>
+
+      {statusMessage ? <div className="url-favorites-status">{statusMessage}</div> : null}
+
       <div
-        className="url-favorites-list"
         onWheelCapture={(e) => {
           e.stopPropagation();
         }}

@@ -143,6 +143,11 @@ declare global {
       pickLocalSearchDirectory: () => Promise<string | null>;
       pickSkillFile: () => Promise<string | null>;
       readTextFile: (filePath: string) => Promise<string | null>;
+      saveTextFile: (payload: {
+        defaultPath: string;
+        content: string;
+        filters?: Array<{ name: string; extensions: string[] }>;
+      }) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
       searchLocalFiles: (
         rootDir: string,
         keyword: string,

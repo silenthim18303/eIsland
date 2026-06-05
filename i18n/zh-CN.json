@@ -766,9 +766,24 @@
     "actions": {
       "add": "添加",
       "save": "保存",
+      "import": "导入",
+      "export": "导出",
       "expand": "展开",
       "collapse": "收起",
       "removeAria": "删除 URL 收藏"
+    },
+    "import": {
+      "formatAria": "导入格式"
+    },
+    "export": {
+      "formatAria": "导出格式"
+    },
+    "messages": {
+      "importSuccess": "已导入 {{count}} 条收藏",
+      "importEmpty": "未识别到可导入的收藏",
+      "importFailed": "导入失败，请检查文件格式",
+      "exportSuccess": "已导出 {{count}} 条收藏",
+      "exportFailed": "导出失败，请稍后重试"
     },
     "editor": {
       "urlLabel": "URL",

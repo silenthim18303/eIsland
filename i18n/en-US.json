@@ -766,9 +766,24 @@
     "actions": {
       "add": "Add",
       "save": "Save",
+      "import": "Import",
+      "export": "Export",
       "expand": "Expand",
       "collapse": "Collapse",
       "removeAria": "Remove URL favorite"
+    },
+    "import": {
+      "formatAria": "Import format"
+    },
+    "export": {
+      "formatAria": "Export format"
+    },
+    "messages": {
+      "importSuccess": "Imported {{count}} favorites",
+      "importEmpty": "No importable favorites found",
+      "importFailed": "Import failed, please check the file format",
+      "exportSuccess": "Exported {{count}} favorites",
+      "exportFailed": "Export failed, please try again"
     },
     "editor": {
       "urlLabel": "URL",

@@ -200,6 +200,16 @@ const api = {
     return ipcRenderer.invoke('app:read-text-file', filePath);
   },
   /**
+   * 保存文本文件内容
+   */
+  saveTextFile: (payload: {
+    defaultPath: string;
+    content: string;
+    filters?: Array<{ name: string; extensions: string[] }>;
+  }): Promise<{ ok: boolean; canceled: boolean; filePath: string | null }> => {
+    return ipcRenderer.invoke('app:save-text-file', payload);
+  },
+  /**
    * 搜索本地文件（名称匹配）
    */
   searchLocalFiles: (

@@ -94,6 +94,90 @@
   color: var(--color-island-text);
 }
 
+.url-favorites-import-export-panel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-height: 34px;
+  padding: 5px 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+  border-radius: 8px;
+  background: rgba(100, 181, 246, 0.06);
+  opacity: 1;
+  transform: translateY(0);
+  transition: max-height 0.24s ease, padding 0.24s ease, opacity 0.2s ease, transform 0.24s ease, border-color 0.2s ease;
+}
+
+.url-favorites-file-input {
+  display: none;
+}
+
+.url-favorites-format-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.url-favorites-format-btn,
+.url-favorites-secondary-action {
+  height: 24px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.58);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 9px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s, transform 0.2s;
+}
+
+.url-favorites-secondary-action {
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.72);
+}
+
+.url-favorites-format-btn:hover,
+.url-favorites-secondary-action:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.9);
+  transform: translateY(-1px);
+}
+
+.url-favorites-format-btn--active {
+  border-color: rgba(100, 181, 246, 0.55);
+  background: rgba(100, 181, 246, 0.15);
+  color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.url-favorites-secondary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.url-favorites-status {
+  min-height: 22px;
+  border: 1px solid rgba(100, 181, 246, 0.18);
+  border-radius: 8px;
+  background: rgba(100, 181, 246, 0.08);
+  color: rgba(var(--color-text-rgb), 0.72);
+  font-size: 11px;
+  line-height: 20px;
+  padding: 0 10px;
+  animation: url-favorites-status-enter 0.24s ease both;
+}
+
+@keyframes url-favorites-status-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .url-favorites-list {
   flex: 1;
   min-height: 0;
