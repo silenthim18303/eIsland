@@ -19,31 +19,14 @@
  */
 
 /**
- * @file getNavLabel.ts
- * @description 获取导航点的 i18n 标签工具函数
+ * @file TranslationTab.tsx
+ * @description Expanded 状态翻译页面占位组件。
  * @author 鸡哥
  */
 
-import type { NavDotId } from '../config/types';
+import type React from 'react';
 
-/** 获取导航点的 i18n 标签 */
-export const getNavLabel = (
-  tab: NavDotId,
-  t: (key: string, opts?: Record<string, unknown>) => string,
-): string =>
-  t(`expanded.nav.${tab}`, {
-    defaultValue:
-      tab === 'hover'
-        ? '返回'
-        : tab === 'overview'
-          ? '总览'
-          : tab === 'song'
-            ? '歌曲'
-            : tab === 'tools'
-              ? '工具'
-              : tab === 'translation'
-                ? '翻译'
-                : tab === 'performanceMonitor'
-                  ? '性能监控'
-                  : '最大展开',
-  });
+/** 翻译页面占位 */
+export function TranslationTab(): React.ReactElement {
+  return <div className="translation-tab" />;
+}

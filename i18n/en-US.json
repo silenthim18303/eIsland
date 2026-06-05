@@ -429,6 +429,7 @@
       "overview": "Overview",
       "song": "Music",
       "tools": "Tools",
+      "translation": "Translation",
       "performanceMonitor": "Performance Monitor",
       "maxExpand": "Max Expand",
       "switchToPage": "Switch to {{label}} page"
@@ -1812,6 +1813,7 @@
           "overview": "Overview",
           "song": "Music",
           "tools": "Tools",
+          "translation": "Translation",
           "performanceMonitor": "Performance Monitor"
         }
       },

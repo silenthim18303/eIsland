@@ -39,7 +39,7 @@ export type AnimationSpeed = 'slow' | 'medium' | 'fast';
 export type HoverTab = 'time' | 'o3ics' | 'weather' | 'expand';
 
 /** Expanded 状态下的子标签页类型 */
-export type ExpandTab = 'hover' | 'overview' | 'song' | 'tools' | 'performanceMonitor';
+export type ExpandTab = 'hover' | 'overview' | 'song' | 'tools' | 'translation' | 'performanceMonitor';
 
 /** MaxExpand 状态下的子标签页类型 */
 export type MaxExpandTab = 'aiChat' | 'todo' | 'urlFavorites' | 'localFileSearch' | 'clipboardHistory' | 'album' | 'mail' | 'memo' | 'countdown' | 'alarm' | 'toolbox' | 'miniGame' | 'settings';
