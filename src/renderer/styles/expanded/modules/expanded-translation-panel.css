@@ -108,15 +108,21 @@
   flex: 1;
   min-height: 0;
   width: 100%;
-  padding: 6px 0 10px;
-  border: none;
+  padding: 8px 10px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 10px;
   outline: none;
   resize: none;
-  background: transparent;
+  background: rgba(var(--color-text-rgb), 0.025);
   color: rgba(var(--color-text-rgb), 0.9);
   font-size: 12px;
   line-height: 1.58;
   font-family: inherit;
+}
+
+.translation-editor-textarea:focus {
+  border-color: rgba(120, 200, 255, 0.42);
+  background: rgba(var(--color-text-rgb), 0.035);
 }
 
 .translation-editor-textarea::placeholder {
