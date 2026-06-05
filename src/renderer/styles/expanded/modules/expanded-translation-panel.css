@@ -216,6 +216,26 @@
   font-size: 12px;
   line-height: 1.58;
   font-family: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.15) transparent;
+  overscroll-behavior: contain;
+}
+
+.translation-editor-textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.translation-editor-textarea::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.15);
+  border-radius: 2px;
+}
+
+.translation-editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.25);
+}
+
+.translation-editor-textarea::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .translation-editor-textarea:focus {

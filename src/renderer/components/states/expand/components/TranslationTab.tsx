@@ -161,6 +161,7 @@ export function TranslationTab(): ReactElement {
             className="translation-editor-textarea"
             placeholder={t('maxExpand.toolbox.translate.inputPlaceholder')}
             value={sourceText}
+            onWheel={(event) => event.stopPropagation()}
             onChange={(event) => setSourceText(event.target.value)}
           />
         </section>
@@ -222,6 +223,7 @@ export function TranslationTab(): ReactElement {
             className="translation-editor-textarea translation-editor-textarea-result"
             placeholder={t('maxExpand.toolbox.translate.outputPlaceholder')}
             value={resultText}
+            onWheel={(event) => event.stopPropagation()}
             readOnly
           />
         </section>
