@@ -755,6 +755,7 @@
   "urlFavoritesTab": {
     "title": "URL Favorites",
     "count": "{{count}} items",
+    "filteredCount": "{{count}} / {{total}} items",
     "empty": "No favorites yet, add a URL first.",
     "openWebsiteTitle": "Click to open website",
     "resolvingTitle": "Resolving website title…",
@@ -766,6 +767,7 @@
     "actions": {
       "add": "Add",
       "save": "Save",
+      "manageFolders": "Groups",
       "manageImportExport": "Import / Export",
       "import": "Import",
       "export": "Export",
@@ -779,6 +781,14 @@
     "export": {
       "formatAria": "Export format"
     },
+    "folders": {
+      "all": "All",
+      "uncategorized": "Uncategorized",
+      "newPlaceholder": "New folder",
+      "create": "Create",
+      "clearCurrent": "Clear current folder",
+      "emptyFiltered": "No favorites in the current folder."
+    },
     "messages": {
       "importSuccess": "Imported {{count}} favorites",
       "importEmpty": "No importable favorites found",
@@ -790,7 +800,9 @@
       "urlLabel": "URL",
       "urlPlaceholder": "Edit URL",
       "noteLabel": "Note",
-      "notePlaceholder": "Enter note"
+      "notePlaceholder": "Enter note",
+      "folderLabel": "Folder",
+      "folderPlaceholder": "Enter folder name, leave empty for uncategorized"
     }
   },
   "mailTab": {

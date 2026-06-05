@@ -34,6 +34,7 @@ interface UrlFavoriteItem {
   url: string;
   title: string;
   note: string;
+  folder: string;
   createdAt: number;
 }
 
@@ -42,6 +43,10 @@ type UrlFavoritesExportFormat = 'json' | 'html';
 
 const STORE_KEY = 'url-favorites';
 const FOCUS_KEY = 'url-favorites-focus-url';
+
+function normalizeFolder(raw: unknown): string {
+  return typeof raw === 'string' ? raw.trim() : '';
+}
 
 function normalizeUrl(raw: string): string {
   const text = raw.trim();
@@ -59,6 +64,7 @@ function sanitizeFavorites(data: unknown): UrlFavoriteItem[] {
       if (!url) return null;
       const title = typeof row.title === 'string' ? row.title.trim() : '';
       const noteValue = typeof row.note === 'string' ? row.note.trim() : '';
+      const folder = normalizeFolder(row.folder);
       const createdAt = typeof row.createdAt === 'number' && Number.isFinite(row.createdAt) ? row.createdAt : Date.now();
       const id = typeof row.id === 'number' && Number.isFinite(row.id) ? row.id : createdAt;
       return {
@@ -66,6 +72,7 @@ function sanitizeFavorites(data: unknown): UrlFavoriteItem[] {
         url,
         title: title || url,
         note: noteValue || (title && title !== url ? title : ''),
+        folder,
         createdAt,
       };
     })
@@ -97,7 +104,8 @@ function parseHtmlBookmarks(content: string): UrlFavoriteItem[] {
     const title = anchor.textContent?.trim() ?? '';
     const addDateRaw = anchor.getAttribute('add_date') ?? anchor.getAttribute('ADD_DATE') ?? '';
     const createdAt = /^\d+$/.test(addDateRaw) ? Number(addDateRaw) * 1000 : Date.now() + index;
-    return { id: createdAt, url, title, note: '', createdAt };
+    const folder = normalizeFolder(anchor.closest('dl')?.previousElementSibling?.textContent ?? '');
+    return { id: createdAt, url, title, note: '', folder, createdAt };
   }));
 }
 
@@ -115,7 +123,7 @@ function mergeFavorites(current: UrlFavoriteItem[], incoming: UrlFavoriteItem[])
       existingUrls.add(key);
       return true;
     })
-    .map((item, index) => ({ ...item, id: now + index, createdAt: item.createdAt || now + index }));
+    .map((item, index) => ({ ...item, folder: normalizeFolder(item.folder), id: now + index, createdAt: item.createdAt || now + index }));
   return [...accepted, ...current];
 }
 
@@ -127,12 +135,27 @@ function serializeFavoritesToJson(items: UrlFavoriteItem[]): string {
   }, null, 2);
 }
 
-function serializeFavoritesToHtml(items: UrlFavoriteItem[]): string {
-  const rows = items.map((item) => {
-    const addDate = Math.floor(item.createdAt / 1000);
-    const title = escapeHtmlText(item.title && item.title !== item.url ? item.title : item.url);
-    const note = item.note ? ` ${escapeHtmlText(item.note)}` : '';
-    return `        <DT><A HREF="${escapeHtmlText(item.url)}" ADD_DATE="${addDate}">${title}</A>${note}`;
+function serializeFavoritesToHtml(items: UrlFavoriteItem[], defaultFolderName: string): string {
+  const folders = new Map<string, UrlFavoriteItem[]>();
+  items.forEach((item) => {
+    const folderName = normalizeFolder(item.folder) || defaultFolderName;
+    folders.set(folderName, [...(folders.get(folderName) ?? []), item]);
+  });
+
+  const rows = Array.from(folders.entries()).map(([folderName, folderItems]) => {
+    const links = folderItems.map((item) => {
+      const addDate = Math.floor(item.createdAt / 1000);
+      const title = escapeHtmlText(item.title && item.title !== item.url ? item.title : item.url);
+      const note = item.note ? ` ${escapeHtmlText(item.note)}` : '';
+      return `        <DT><A HREF="${escapeHtmlText(item.url)}" ADD_DATE="${addDate}">${title}</A>${note}`;
+    }).join('\n');
+
+    return [
+      `    <DT><H3 ADD_DATE="0">${escapeHtmlText(folderName)}</H3>`,
+      '    <DL><p>',
+      links,
+      '    </DL><p>',
+    ].join('\n');
   }).join('\n');
 
   return [
@@ -141,10 +164,7 @@ function serializeFavoritesToHtml(items: UrlFavoriteItem[]): string {
     '<TITLE>Bookmarks</TITLE>',
     '<H1>Bookmarks</H1>',
     '<DL><p>',
-    '    <DT><H3 ADD_DATE="0">eIsland URL Favorites</H3>',
-    '    <DL><p>',
     rows,
-    '    </DL><p>',
     '</DL><p>',
   ].filter(Boolean).join('\n');
 }
@@ -167,12 +187,16 @@ export function UrlFavoritesTab(): React.ReactElement {
   const [focusedId, setFocusedId] = useState<number | null>(null);
   const [importFormat, setImportFormat] = useState<UrlFavoritesImportFormat>('json');
   const [exportFormat, setExportFormat] = useState<UrlFavoritesExportFormat>('json');
+  const [folderToolsOpen, setFolderToolsOpen] = useState(false);
   const [importExportOpen, setImportExportOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [dragOverId, setDragOverId] = useState<number | null>(null);
+  const [activeFolder, setActiveFolder] = useState('');
+  const [newFolderInput, setNewFolderInput] = useState('');
   const [editUrlInput, setEditUrlInput] = useState('');
   const [editNoteInput, setEditNoteInput] = useState('');
+  const [editFolderInput, setEditFolderInput] = useState('');
   const titleResolvingIdsRef = useRef<Set<number>>(new Set());
   const dragFromIdRef = useRef<number | null>(null);
   const dragMovedRef = useRef(false);
@@ -256,6 +280,7 @@ export function UrlFavoritesTab(): React.ReactElement {
     setExpandedId(matched.id);
     setEditUrlInput(matched.url);
     setEditNoteInput(matched.note);
+    setEditFolderInput(matched.folder);
     setFocusedId(matched.id);
     window.setTimeout(() => {
       setFocusedId((prev) => (prev === matched.id ? null : prev));
@@ -314,7 +339,7 @@ export function UrlFavoritesTab(): React.ReactElement {
       const exists = prev.some((item) => item.url.toLowerCase() === normalizedUrl.toLowerCase());
       if (exists) return prev;
       const now = Date.now();
-      return [{ id: now, url: normalizedUrl, title: normalizedUrl, note: '', createdAt: now }, ...prev];
+      return [{ id: now, url: normalizedUrl, title: normalizedUrl, note: '', folder: activeFolder, createdAt: now }, ...prev];
     });
     setUrlInput('');
   };
@@ -328,11 +353,13 @@ export function UrlFavoritesTab(): React.ReactElement {
       setExpandedId(null);
       setEditUrlInput('');
       setEditNoteInput('');
+      setEditFolderInput('');
       return;
     }
     setExpandedId(item.id);
     setEditUrlInput(item.url);
     setEditNoteInput(item.note);
+    setEditFolderInput(item.folder);
   };
 
   const handleSaveEdit = (id: number): void => {
@@ -350,15 +377,17 @@ export function UrlFavoritesTab(): React.ReactElement {
       const duplicated = prev.some((item) => item.id !== id && item.url.toLowerCase() === normalizedUrl.toLowerCase());
       if (duplicated) return prev;
       const nextNote = editNoteInput.trim();
+      const nextFolder = normalizeFolder(editFolderInput);
       return prev.map((item) => (
         item.id === id
-          ? { ...item, url: normalizedUrl, title: normalizedUrl, note: nextNote }
+          ? { ...item, url: normalizedUrl, title: normalizedUrl, note: nextNote, folder: nextFolder }
           : item
       ));
     });
     setExpandedId(null);
     setEditUrlInput('');
     setEditNoteInput('');
+    setEditFolderInput('');
   };
 
   const handleRemove = (id: number): void => {
@@ -367,11 +396,26 @@ export function UrlFavoritesTab(): React.ReactElement {
       setExpandedId(null);
       setEditUrlInput('');
       setEditNoteInput('');
+      setEditFolderInput('');
     }
   };
 
   const handleImportClick = (): void => {
     importInputRef.current?.click();
+  };
+
+  const handleCreateFolder = (): void => {
+    const folder = normalizeFolder(newFolderInput);
+    if (!folder) return;
+    setActiveFolder(folder);
+    setNewFolderInput('');
+  };
+
+  const handleClearFolder = (folder: string): void => {
+    setFavorites((prev) => prev.map((item) => (
+      item.folder === folder ? { ...item, folder: '' } : item
+    )));
+    if (activeFolder === folder) setActiveFolder('');
   };
 
   const handleImportFile = (file: File | null): void => {
@@ -408,7 +452,9 @@ export function UrlFavoritesTab(): React.ReactElement {
 
   const handleExport = (): void => {
     const isJson = exportFormat === 'json';
-    const content = isJson ? serializeFavoritesToJson(favorites) : serializeFavoritesToHtml(favorites);
+    const content = isJson
+      ? serializeFavoritesToJson(favorites)
+      : serializeFavoritesToHtml(favorites, t('urlFavoritesTab.folders.uncategorized', { defaultValue: '未分类' }));
     const date = new Date().toISOString().slice(0, 10);
     window.api.saveTextFile({
       defaultPath: `eIsland-url-favorites-${date}.${isJson ? 'json' : 'html'}`,
@@ -477,6 +523,15 @@ export function UrlFavoritesTab(): React.ReactElement {
   };
 
   const totalCount = favorites.length;
+  const folders = useMemo(
+    () => Array.from(new Set(favorites.map((item) => item.folder).filter(Boolean))).sort((a, b) => a.localeCompare(b)),
+    [favorites],
+  );
+  const visibleFavorites = useMemo(
+    () => (activeFolder ? favorites.filter((item) => item.folder === activeFolder) : favorites),
+    [activeFolder, favorites],
+  );
+  const visibleCount = visibleFavorites.length;
 
   const placeholder = useMemo(
     () => (totalCount > 0
@@ -489,7 +544,11 @@ export function UrlFavoritesTab(): React.ReactElement {
     <div className="url-favorites">
       <div className="url-favorites-header">
         <span className="url-favorites-title">{t('urlFavoritesTab.title', { defaultValue: 'URL 收藏' })}</span>
-        <span className="url-favorites-count">{t('urlFavoritesTab.count', { defaultValue: '{{count}} 条', count: totalCount })}</span>
+        <span className="url-favorites-count">
+          {activeFolder
+            ? t('urlFavoritesTab.filteredCount', { defaultValue: '{{count}} / {{total}} 条', count: visibleCount, total: totalCount })
+            : t('urlFavoritesTab.count', { defaultValue: '{{count}} 条', count: totalCount })}
+        </span>
       </div>
 
       <div className="url-favorites-input-bar">
@@ -510,6 +569,15 @@ export function UrlFavoritesTab(): React.ReactElement {
           {t('urlFavoritesTab.actions.add', { defaultValue: '添加' })}
         </button>
         <button
+          className={`url-favorites-tool-toggle${folderToolsOpen ? ' url-favorites-tool-toggle--active' : ''}`}
+          type="button"
+          onClick={() => setFolderToolsOpen((open) => !open)}
+          aria-expanded={folderToolsOpen}
+          aria-controls="url-favorites-folder-panel"
+        >
+          {t('urlFavoritesTab.actions.manageFolders', { defaultValue: '分组' })}
+        </button>
+        <button
           className={`url-favorites-manage${importExportOpen ? ' url-favorites-manage--active' : ''}`}
           type="button"
           onClick={() => setImportExportOpen((open) => !open)}
@@ -518,6 +586,54 @@ export function UrlFavoritesTab(): React.ReactElement {
         >
           {t('urlFavoritesTab.actions.manageImportExport', { defaultValue: '导入导出' })}
         </button>
+      </div>
+
+      <div
+        id="url-favorites-folder-panel"
+        className={`url-favorites-folder-bar${folderToolsOpen ? ' url-favorites-folder-bar--open' : ''}`}
+      >
+        <datalist id="url-favorites-folder-options">
+          {folders.map((folder) => <option key={folder} value={folder} />)}
+        </datalist>
+        <button
+          className={`url-favorites-folder-chip${activeFolder === '' ? ' url-favorites-folder-chip--active' : ''}`}
+          type="button"
+          onClick={() => setActiveFolder('')}
+        >
+          {t('urlFavoritesTab.folders.all', { defaultValue: '全部' })}
+        </button>
+        {folders.map((folder) => (
+          <button
+            key={folder}
+            className={`url-favorites-folder-chip${activeFolder === folder ? ' url-favorites-folder-chip--active' : ''}`}
+            type="button"
+            onClick={() => setActiveFolder(folder)}
+            title={folder}
+          >
+            {folder}
+          </button>
+        ))}
+        <input
+          className="url-favorites-folder-input"
+          type="text"
+          value={newFolderInput}
+          onChange={(e) => setNewFolderInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleCreateFolder();
+            }
+          }}
+          placeholder={t('urlFavoritesTab.folders.newPlaceholder', { defaultValue: '新建文件夹' })}
+        />
+        <button className="url-favorites-folder-add" type="button" onClick={handleCreateFolder}>
+          {t('urlFavoritesTab.folders.create', { defaultValue: '新建' })}
+        </button>
+        {activeFolder ? (
+          <button className="url-favorites-folder-clear" type="button" onClick={() => handleClearFolder(activeFolder)}>
+            {t('urlFavoritesTab.folders.clearCurrent', { defaultValue: '清空当前分类' })}
+          </button>
+        ) : null}
       </div>
 
       <div
@@ -576,9 +692,13 @@ export function UrlFavoritesTab(): React.ReactElement {
           e.stopPropagation();
         }}
       >
-        {favorites.length === 0 ? (
-          <div className="url-favorites-empty">{t('urlFavoritesTab.empty', { defaultValue: '还没有收藏，先添加一个 URL 吧。' })}</div>
-        ) : favorites.map((item) => (
+        {visibleFavorites.length === 0 ? (
+          <div className="url-favorites-empty">
+            {favorites.length === 0
+              ? t('urlFavoritesTab.empty', { defaultValue: '还没有收藏，先添加一个 URL 吧。' })
+              : t('urlFavoritesTab.folders.emptyFiltered', { defaultValue: '当前文件夹还没有收藏。' })}
+          </div>
+        ) : visibleFavorites.map((item) => (
           <div
             key={item.id}
             className={`url-favorites-item${focusedId === item.id ? ' url-favorites-item--focused' : ''}${dragOverId === item.id ? ' url-favorites-item--drag-over' : ''}${draggingId === item.id ? ' url-favorites-item--dragging' : ''}`}
@@ -611,6 +731,9 @@ export function UrlFavoritesTab(): React.ReactElement {
                 {item.title && item.title !== item.url ? item.title : t('urlFavoritesTab.resolvingTitle', { defaultValue: '读取网页名称中…' })}
               </span>
               <span className="url-favorites-note" title={item.note || t('urlFavoritesTab.noNote', { defaultValue: '未备注' })}>{item.note || t('urlFavoritesTab.noNote', { defaultValue: '未备注' })}</span>
+              <span className="url-favorites-folder-label" title={item.folder || t('urlFavoritesTab.folders.uncategorized', { defaultValue: '未分类' })}>
+                {item.folder || t('urlFavoritesTab.folders.uncategorized', { defaultValue: '未分类' })}
+              </span>
               <span className="url-favorites-expand-indicator">
                 {expandedId === item.id
                   ? t('urlFavoritesTab.actions.collapse', { defaultValue: '收起' })
@@ -644,6 +767,23 @@ export function UrlFavoritesTab(): React.ReactElement {
                       }
                     }}
                     placeholder={t('urlFavoritesTab.editor.notePlaceholder', { defaultValue: '输入备注' })}
+                  />
+                </div>
+                <div className="url-favorites-editor-row">
+                  <span className="url-favorites-editor-label">{t('urlFavoritesTab.editor.folderLabel', { defaultValue: '文件夹' })}</span>
+                  <input
+                    className="url-favorites-folder-edit-input"
+                    type="text"
+                    value={editFolderInput}
+                    onChange={(e) => setEditFolderInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSaveEdit(item.id);
+                      }
+                    }}
+                    placeholder={t('urlFavoritesTab.editor.folderPlaceholder', { defaultValue: '输入文件夹名称，留空为未分类' })}
+                    list="url-favorites-folder-options"
                   />
                 </div>
                 <div className="url-favorites-editor-actions">

@@ -755,6 +755,7 @@
   "urlFavoritesTab": {
     "title": "URL 收藏",
     "count": "{{count}} 条",
+    "filteredCount": "{{count}} / {{total}} 条",
     "empty": "还没有收藏，先添加一个 URL 吧。",
     "openWebsiteTitle": "点击打开网站",
     "resolvingTitle": "读取网页名称中…",
@@ -766,6 +767,7 @@
     "actions": {
       "add": "添加",
       "save": "保存",
+      "manageFolders": "分组",
       "manageImportExport": "导入导出",
       "import": "导入",
       "export": "导出",
@@ -779,6 +781,14 @@
     "export": {
       "formatAria": "导出格式"
     },
+    "folders": {
+      "all": "全部",
+      "uncategorized": "未分类",
+      "newPlaceholder": "新建文件夹",
+      "create": "新建",
+      "clearCurrent": "清空当前分类",
+      "emptyFiltered": "当前文件夹还没有收藏。"
+    },
     "messages": {
       "importSuccess": "已导入 {{count}} 条收藏",
       "importEmpty": "未识别到可导入的收藏",
@@ -790,7 +800,9 @@
       "urlLabel": "URL",
       "urlPlaceholder": "编辑 URL",
       "noteLabel": "备注",
-      "notePlaceholder": "输入备注"
+      "notePlaceholder": "输入备注",
+      "folderLabel": "文件夹",
+      "folderPlaceholder": "输入文件夹名称，留空为未分类"
     }
   },
   "mailTab": {
