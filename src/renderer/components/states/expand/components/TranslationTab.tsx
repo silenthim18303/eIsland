@@ -132,6 +132,16 @@ export function TranslationTab(): React.ReactElement {
           >
             <img className="translation-action-icon" src={SvgIcon.CANCEL} alt="" draggable={false} />
           </button>
+          <button
+            className="translation-copy-btn"
+            type="button"
+            disabled={!resultText}
+            onClick={handleCopyResult}
+            title={t('maxExpand.toolbox.translate.copy')}
+            aria-label={t('maxExpand.toolbox.translate.copy')}
+          >
+            <img className="translation-action-icon" src={SvgIcon.COPY} alt="" draggable={false} />
+          </button>
         </div>
 
         <section className="translation-pane translation-pane-result">
@@ -139,11 +149,6 @@ export function TranslationTab(): React.ReactElement {
             <div className="translation-language-block">
               <TranslationLangSelect options={TRANSLATE_TARGET_LANGUAGES} value={targetLang} onChange={setTargetLang} />
             </div>
-            {resultText && (
-              <button className="translation-copy-btn" type="button" onClick={handleCopyResult}>
-                {t('maxExpand.toolbox.translate.copy')}
-              </button>
-            )}
           </div>
           <textarea
             className="translation-editor-textarea translation-editor-textarea-result"
