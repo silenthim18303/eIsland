@@ -20,7 +20,7 @@
 
 /**
  * @file CliTab.tsx
- * @description Claude Code CLI 状态控制面板。
+ * @description Claude Code CLI 状态控制面板 — 简洁左右分栏布局
  * @author 鸡哥
  */
 
@@ -35,34 +35,33 @@ function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function phaseClass(phase: CliSessionSnapshot['phase']): string {
-  if (phase === 'waiting_permission') return 'waiting';
-  if (phase === 'running') return 'running';
-  if (phase === 'completed') return 'completed';
-  return 'idle';
+function phaseLabel(phase: CliSessionSnapshot['phase'], t: (key: string, opts?: Record<string, unknown>) => string): string {
+  if (phase === 'waiting_permission') return t('maxExpand.cli.phase.waiting', { defaultValue: '等待授权' });
+  if (phase === 'running') return t('maxExpand.cli.phase.running', { defaultValue: '运行中' });
+  if (phase === 'completed') return t('maxExpand.cli.phase.completed', { defaultValue: '已完成' });
+  return t('maxExpand.cli.phase.idle', { defaultValue: '空闲' });
 }
 
 function EventRow({ event }: { event: CliHookEvent }): ReactElement {
-  const { t } = useTranslation();
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
   return (
     <details className={`cli-event-row cli-event-${event.kind}`}>
-      <summary className="cli-event-summary-toggle">
+      <summary className="cli-event-toggle">
         <span className="cli-event-name">{event.eventName}</span>
         <span className="cli-event-time">{formatTime(event.createdAt)}</span>
       </summary>
       <div className="cli-event-summary">{event.summary}</div>
       {(event.toolName || event.toolInputPreview) && (
-        <div className="cli-event-detail">
+        <div className="cli-event-tool">
           {event.toolName && <span>{event.toolName}</span>}
           {event.toolInputPreview && <code>{event.toolInputPreview}</code>}
         </div>
       )}
       {visibleDetails.length > 0 && (
-        <div className="cli-event-detail-list">
+        <div className="cli-event-details">
           {visibleDetails.map((item) => (
-            <div className="cli-event-detail-block" key={item.label}>
-              <span>{t(`maxExpand.cli.detail.${item.label}`)}</span>
+            <div className="cli-event-detail-item" key={item.label}>
+              <span className="cli-event-detail-label">{item.label}</span>
               <pre>{item.value}</pre>
             </div>
           ))}
@@ -72,102 +71,71 @@ function EventRow({ event }: { event: CliHookEvent }): ReactElement {
   );
 }
 
-function SessionCard({ session }: { session: CliSessionSnapshot }): ReactElement {
-  const latestEvents = session.events.slice(0, 4);
-  return (
-    <section className="cli-session-card">
-      <div className="cli-session-header">
-        <div>
-          <div className="cli-session-title">{session.title}</div>
-          <div className="cli-session-path">{session.cwd ?? session.transcriptPath ?? session.id}</div>
-        </div>
-        <span className={`cli-phase-pill ${phaseClass(session.phase)}`}>{session.phase}</span>
-      </div>
-      {session.pendingPermission && (
-        <div className="cli-permission-card">
-          <div className="cli-permission-title">{session.pendingPermission.summary}</div>
-          {session.pendingPermission.toolInputPreview && <code>{session.pendingPermission.toolInputPreview}</code>}
-        </div>
-      )}
-      <div className="cli-session-events">
-        {latestEvents.map((event) => <EventRow key={event.id} event={event} />)}
-      </div>
-    </section>
-  );
-}
-
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
   const { snapshot, loading, actionMessage, enableHook, disableHook, clearEvents } = useClaudeCodeStatus();
-  const activeSessions = useMemo(() => snapshot.sessions.filter((session) => session.phase !== 'completed'), [snapshot.sessions]);
-  const pendingCount = snapshot.sessions.filter((session) => session.phase === 'waiting_permission').length;
+  const activeSessions = useMemo(() => snapshot.sessions.filter((s) => s.phase !== 'completed'), [snapshot.sessions]);
+  const pendingCount = snapshot.sessions.filter((s) => s.phase === 'waiting_permission').length;
 
   return (
-    <div className="cli-tab-container" onClick={(event) => event.stopPropagation()}>
-      <section className="cli-hero-card">
-        <div>
-          <div className="cli-eyebrow">{t('maxExpand.cli.eyebrow')}</div>
-          <h2>{t('maxExpand.cli.title')}</h2>
-          <p>{t('maxExpand.cli.subtitle')}</p>
+    <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
+      {/* 左侧：会话列表 */}
+      <div className="cli-tab-sidebar">
+        <div className="cli-tab-sidebar-header">
+          <span className="cli-tab-sidebar-title">{t('maxExpand.cli.sessions', { defaultValue: '会话' })}</span>
+          <span className="cli-tab-sidebar-count">{activeSessions.length}</span>
         </div>
-        <div className="cli-hero-actions">
-          <button className="cli-primary-button" type="button" onClick={snapshot.enabled ? disableHook : enableHook}>
-            {snapshot.enabled ? t('maxExpand.cli.disableHook') : t('maxExpand.cli.enableHook')}
-          </button>
-          <button className="cli-secondary-button" type="button" onClick={clearEvents} disabled={snapshot.events.length === 0}>
-            {t('maxExpand.cli.clear')}
-          </button>
-        </div>
-      </section>
-
-      <div className="cli-status-grid">
-        <div className="cli-status-card">
-          <span>{t('maxExpand.cli.hookStatus')}</span>
-          <strong>{snapshot.enabled ? t('maxExpand.cli.enabled') : t('maxExpand.cli.disabled')}</strong>
-        </div>
-        <div className="cli-status-card">
-          <span>{t('maxExpand.cli.receiverStatus')}</span>
-          <strong>{snapshot.receiverRunning ? t('maxExpand.cli.running') : t('maxExpand.cli.stopped')}</strong>
-        </div>
-        <div className="cli-status-card warning">
-          <span>{t('maxExpand.cli.pendingAuth')}</span>
-          <strong>{pendingCount}</strong>
-        </div>
-        <div className="cli-status-card">
-          <span>{t('maxExpand.cli.activeSessions')}</span>
-          <strong>{activeSessions.length}</strong>
+        <div className="cli-tab-session-list">
+          {snapshot.sessions.length === 0 && (
+            <div className="cli-tab-empty">{t('maxExpand.cli.emptySessions', { defaultValue: '暂无会话' })}</div>
+          )}
+          {snapshot.sessions.map((session) => (
+            <div key={session.id} className="cli-tab-session-item">
+              <div className="cli-tab-session-top">
+                <span className="cli-tab-session-title">{session.title}</span>
+                <span className={`cli-tab-phase ${session.phase}`}>{phaseLabel(session.phase, t)}</span>
+              </div>
+              <div className="cli-tab-session-path">{session.cwd ?? session.transcriptPath ?? session.id}</div>
+              {session.pendingPermission && (
+                <div className="cli-tab-permission">
+                  <span className="cli-tab-permission-text">{session.pendingPermission.summary}</span>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
 
-      {actionMessage && <div className="cli-action-message">{actionMessage}</div>}
+      {/* 右侧：事件流 + 控制 */}
+      <div className="cli-tab-main">
+        <div className="cli-tab-main-header">
+          <div className="cli-tab-status-row">
+            <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
+              {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
+            </span>
+            {pendingCount > 0 && (
+              <span className="cli-tab-pending-badge">{pendingCount} {t('maxExpand.cli.pendingAuth', { defaultValue: '待授权' })}</span>
+            )}
+            {loading && <span className="cli-tab-loading-hint">{t('maxExpand.cli.loading', { defaultValue: '刷新中…' })}</span>}
+          </div>
+          <div className="cli-tab-actions">
+            <button className="cli-tab-action-btn" type="button" onClick={snapshot.enabled ? disableHook : enableHook}>
+              {snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
+            </button>
+            <button className="cli-tab-action-btn cli-tab-action-btn--secondary" type="button" onClick={clearEvents} disabled={snapshot.events.length === 0}>
+              {t('maxExpand.cli.clear', { defaultValue: '清空' })}
+            </button>
+          </div>
+        </div>
 
-      <div className="cli-path-card">
-        <div><span>{t('maxExpand.cli.receiverUrl')}</span><code>{snapshot.receiverUrl ?? '--'}</code></div>
-        <div><span>{t('maxExpand.cli.settingsPath')}</span><code>{snapshot.settingsPath || '--'}</code></div>
-      </div>
+        {actionMessage && <div className="cli-tab-action-message">{actionMessage}</div>}
 
-      <div className="cli-main-grid">
-        <section className="cli-panel-card">
-          <div className="cli-section-heading">
-            <h3>{t('maxExpand.cli.sessions')}</h3>
-            <span>{loading ? t('maxExpand.cli.loading') : t('maxExpand.cli.updatedAt', { time: formatTime(snapshot.updatedAt) })}</span>
-          </div>
-          <div className="cli-session-list">
-            {snapshot.sessions.length === 0 && <div className="cli-empty-state">{t('maxExpand.cli.emptySessions')}</div>}
-            {snapshot.sessions.map((session) => <SessionCard key={session.id} session={session} />)}
-          </div>
-        </section>
-
-        <section className="cli-panel-card">
-          <div className="cli-section-heading">
-            <h3>{t('maxExpand.cli.events')}</h3>
-            <span>{snapshot.events.length}</span>
-          </div>
-          <div className="cli-event-list">
-            {snapshot.events.length === 0 && <div className="cli-empty-state">{t('maxExpand.cli.emptyEvents')}</div>}
-            {snapshot.events.map((event) => <EventRow key={event.id} event={event} />)}
-          </div>
-        </section>
+        <div className="cli-tab-event-list">
+          {snapshot.events.length === 0 && (
+            <div className="cli-tab-empty">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</div>
+          )}
+          {snapshot.events.map((event) => <EventRow key={event.id} event={event} />)}
+        </div>
       </div>
     </div>
   );

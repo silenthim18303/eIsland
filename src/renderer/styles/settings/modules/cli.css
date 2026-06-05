@@ -1,360 +1,396 @@
-.cli-tab-container {
+/*
+ * eIsland - CLI Tab Styles
+ * 简洁左右分栏，与备忘录 Tab 视觉一致
+ */
+
+/* ── 容器 ── */
+.cli-tab {
+  display: flex;
   width: 100%;
   height: 100%;
-  padding: 18px;
-  color: var(--settings-text-primary, #fff);
-  overflow: auto;
+  min-height: 0;
+  color: rgba(var(--color-text-rgb), 0.88);
 }
 
-.cli-hero-card,
-.cli-status-card,
-.cli-path-card,
-.cli-panel-card,
-.cli-session-card {
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(18px);
+/* ── 左侧列表 ── */
+.cli-tab-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  min-width: 200px;
+  border-right: 1px solid rgba(var(--color-text-rgb), 0.08);
+  overflow: hidden;
 }
 
-.cli-hero-card {
+.cli-tab-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px;
-  border-radius: 22px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
 }
 
-.cli-eyebrow {
-  margin-bottom: 6px;
-  color: rgba(125, 220, 255, 0.9);
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.cli-hero-card h2 {
-  margin: 0 0 6px;
-  font-size: 24px;
-  line-height: 1.2;
-}
-
-.cli-hero-card p {
-  max-width: 560px;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.68);
+.cli-tab-sidebar-title {
   font-size: 13px;
-  line-height: 1.6;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.85);
 }
 
-.cli-hero-actions {
+.cli-tab-sidebar-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.55);
+}
+
+.cli-tab-session-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.cli-tab-session-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cli-tab-session-list::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.12);
+  border-radius: 2px;
+}
+
+.cli-tab-session-item {
+  padding: 10px 12px;
+  border-left: 2px solid transparent;
+  transition: background 0.15s;
+  cursor: default;
+}
+
+.cli-tab-session-item:hover {
+  background: rgba(var(--color-text-rgb), 0.05);
+}
+
+.cli-tab-session-top {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.cli-tab-session-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cli-tab-phase {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 2px 7px;
+  font-size: 10px;
+  line-height: 1;
+  border: 1px solid rgba(var(--color-text-rgb), 0.08);
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.5);
+}
+
+.cli-tab-phase.running {
+  border-color: rgba(100, 200, 120, 0.25);
+  background: rgba(100, 200, 120, 0.1);
+  color: rgba(100, 200, 120, 0.85);
+}
+
+.cli-tab-phase.waiting_permission {
+  border-color: rgba(255, 213, 79, 0.25);
+  background: rgba(255, 213, 79, 0.1);
+  color: rgba(255, 213, 79, 0.85);
+}
+
+.cli-tab-phase.completed {
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
+.cli-tab-session-path {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.35);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cli-tab-permission {
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 213, 79, 0.2);
+  background: rgba(255, 213, 79, 0.06);
+}
+
+.cli-tab-permission-text {
+  font-size: 11px;
+  color: rgba(255, 213, 79, 0.85);
+}
+
+/* ── 右侧主区域 ── */
+.cli-tab-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cli-tab-main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
   flex-shrink: 0;
 }
 
-.cli-primary-button,
-.cli-secondary-button {
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 16px;
-  color: #fff;
-  cursor: pointer;
-}
-
-.cli-primary-button {
-  background: linear-gradient(135deg, #44b7ff, #8c6dff);
-}
-
-.cli-secondary-button {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.cli-secondary-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.cli-status-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin: 12px 0;
-}
-
-.cli-status-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 72px;
-  padding: 14px;
-  border-radius: 18px;
-}
-
-.cli-status-card span,
-.cli-path-card span,
-.cli-section-heading span,
-.cli-event-time,
-.cli-session-path {
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 12px;
-}
-
-.cli-status-card strong {
-  font-size: 22px;
-}
-
-.cli-status-card.warning strong {
-  color: #ffc36b;
-}
-
-.cli-action-message {
-  margin-bottom: 12px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: rgba(68, 183, 255, 0.12);
-  color: rgba(210, 241, 255, 0.95);
-  font-size: 13px;
-}
-
-.cli-path-card {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 12px 14px;
-  border-radius: 18px;
-}
-
-.cli-path-card div {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-}
-
-.cli-path-card code,
-.cli-event-detail code,
-.cli-permission-card code {
-  overflow: hidden;
-  color: rgba(255, 255, 255, 0.82);
-  font-family: Consolas, Monaco, monospace;
-  font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cli-main-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 12px;
-  min-height: 0;
-}
-
-.cli-panel-card {
-  min-height: 320px;
-  max-height: 430px;
-  padding: 14px;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.cli-section-heading {
+.cli-tab-status-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 8px;
 }
 
-.cli-section-heading h3 {
-  margin: 0;
-  font-size: 16px;
-}
-
-.cli-session-list,
-.cli-event-list {
-  display: grid;
-  gap: 10px;
-  max-height: 366px;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-.cli-session-card {
-  padding: 12px;
-  border-radius: 16px;
-}
-
-.cli-session-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.cli-session-title {
-  font-weight: 700;
-}
-
-.cli-phase-pill {
-  align-self: flex-start;
+.cli-tab-hook-badge {
   border-radius: 999px;
-  padding: 4px 9px;
-  background: rgba(255, 255, 255, 0.12);
+  padding: 3px 9px;
   font-size: 11px;
+  line-height: 1;
 }
 
-.cli-phase-pill.waiting {
-  background: rgba(255, 195, 107, 0.22);
-  color: #ffd38a;
+.cli-tab-hook-badge.enabled {
+  border: 1px solid rgba(100, 200, 120, 0.25);
+  background: rgba(100, 200, 120, 0.1);
+  color: rgba(100, 200, 120, 0.85);
 }
 
-.cli-phase-pill.running {
-  background: rgba(90, 220, 160, 0.18);
-  color: #8df0bd;
+.cli-tab-hook-badge.disabled {
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.45);
 }
 
-.cli-phase-pill.completed {
-  color: rgba(255, 255, 255, 0.48);
+.cli-tab-pending-badge {
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  line-height: 1;
+  border: 1px solid rgba(255, 213, 79, 0.25);
+  background: rgba(255, 213, 79, 0.1);
+  color: rgba(255, 213, 79, 0.85);
 }
 
-.cli-permission-card {
-  display: grid;
+.cli-tab-loading-hint {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.35);
+}
+
+.cli-tab-actions {
+  display: flex;
   gap: 6px;
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid rgba(255, 195, 107, 0.28);
-  border-radius: 14px;
-  background: rgba(255, 195, 107, 0.12);
+  flex-shrink: 0;
 }
 
-.cli-permission-title {
-  color: #ffd38a;
-  font-size: 13px;
-  font-weight: 700;
+.cli-tab-action-btn {
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.72);
+  font-size: 11px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
 }
 
-.cli-session-events,
-.cli-event-list {
-  display: grid;
-  gap: 8px;
+.cli-tab-action-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.12);
+  color: rgba(var(--color-text-rgb), 0.88);
 }
 
+.cli-tab-action-btn--secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.cli-tab-action-message {
+  margin: 8px 14px 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(100, 181, 246, 0.2);
+  background: rgba(100, 181, 246, 0.08);
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.78);
+}
+
+/* ── 事件列表 ── */
+.cli-tab-event-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 14px;
+}
+
+.cli-tab-event-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.cli-tab-event-list::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.12);
+  border-radius: 2px;
+}
+
+.cli-tab-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
+/* ── 事件行 ── */
 .cli-event-row {
-  display: grid;
-  gap: 5px;
-  padding: 9px 10px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
+  display: block;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  border: 1px solid rgba(var(--color-text-rgb), 0.04);
+  overflow: hidden;
 }
 
-.cli-event-meta,
-.cli-event-detail,
-.cli-event-summary-toggle {
+.cli-event-row:last-child {
+  margin-bottom: 0;
+}
+
+.cli-event-toggle {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-}
-
-.cli-event-summary-toggle {
+  padding: 7px 10px;
   cursor: pointer;
   list-style: none;
 }
 
-.cli-event-summary-toggle::-webkit-details-marker {
+.cli-event-toggle::-webkit-details-marker {
   display: none;
 }
 
 .cli-event-name {
-  color: rgba(180, 225, 255, 0.95);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(100, 181, 246, 0.88);
+}
+
+.cli-event-time {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.3);
+  flex-shrink: 0;
 }
 
 .cli-event-summary {
-  color: rgba(255, 255, 255, 0.86);
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-.cli-event-detail span,
-.cli-event-detail-block span {
-  color: rgba(255, 255, 255, 0.55);
+  padding: 0 10px 7px;
   font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.75);
+  line-height: 1.4;
 }
 
-.cli-event-detail-list {
-  display: grid;
-  gap: 8px;
-  margin-top: 4px;
+.cli-event-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px 7px;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.55);
 }
 
-.cli-event-detail-block {
-  display: grid;
+.cli-event-tool code {
+  border-radius: 4px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  padding: 1px 5px;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.7);
+}
+
+.cli-event-details {
+  padding: 0 10px 8px;
+  display: flex;
+  flex-direction: column;
   gap: 5px;
 }
 
-.cli-event-detail-block pre {
-  max-height: 160px;
+.cli-event-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cli-event-detail-label {
+  font-size: 10px;
+  color: rgba(var(--color-text-rgb), 0.35);
+}
+
+.cli-event-detail-item pre {
+  max-height: 120px;
   margin: 0;
   overflow: auto;
-  padding: 8px;
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.18);
-  color: rgba(255, 255, 255, 0.84);
-  font-family: Consolas, Monaco, monospace;
-  font-size: 11px;
-  line-height: 1.45;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  color: rgba(var(--color-text-rgb), 0.72);
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-.cli-empty-state {
-  display: grid;
-  min-height: 110px;
-  place-items: center;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.52);
-  font-size: 13px;
+.cli-event-detail-item pre::-webkit-scrollbar {
+  width: 3px;
 }
 
-[data-theme='light'] .cli-tab-container {
-  color: #151821;
+.cli-event-detail-item pre::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.1);
+  border-radius: 2px;
 }
 
-[data-theme='light'] .cli-hero-card,
-[data-theme='light'] .cli-status-card,
-[data-theme='light'] .cli-path-card,
-[data-theme='light'] .cli-panel-card,
-[data-theme='light'] .cli-session-card {
+/* ══════ 浅色主题 ══════ */
+[data-theme='light'] .cli-tab-action-btn {
   border-color: rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(0, 0, 0, 0.03);
 }
 
-[data-theme='light'] .cli-hero-card p,
-[data-theme='light'] .cli-status-card span,
-[data-theme='light'] .cli-path-card span,
-[data-theme='light'] .cli-section-heading span,
-[data-theme='light'] .cli-event-time,
-[data-theme='light'] .cli-session-path {
-  color: rgba(21, 24, 33, 0.55);
-}
-
-[data-theme='light'] .cli-path-card code,
-[data-theme='light'] .cli-event-detail code,
-[data-theme='light'] .cli-permission-card code,
-[data-theme='light'] .cli-event-summary,
-[data-theme='light'] .cli-event-detail-block pre {
-  color: rgba(21, 24, 33, 0.82);
-}
-
-[data-theme='light'] .cli-event-detail-block pre {
+[data-theme='light'] .cli-tab-action-btn:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
-[data-theme='light'] .cli-event-row,
-[data-theme='light'] .cli-empty-state {
-  background: rgba(0, 0, 0, 0.04);
+[data-theme='light'] .cli-event-row {
+  border-color: rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='light'] .cli-event-tool code {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .cli-event-detail-item pre {
+  background: rgba(0, 0, 0, 0.03);
 }
