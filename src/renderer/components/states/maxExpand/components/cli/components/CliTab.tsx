@@ -44,30 +44,31 @@ function phaseLabel(phase: CliSessionSnapshot['phase'], t: (key: string, opts?: 
 
 function EventRow({ event }: { event: CliHookEvent }): ReactElement {
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
+  const hasExtra = visibleDetails.length > 0 || event.toolName || event.toolInputPreview;
   return (
-    <details className={`cli-event-row cli-event-${event.kind}`}>
-      <summary className="cli-event-toggle">
-        <span className="cli-event-name">{event.eventName}</span>
-        <span className="cli-event-time">{formatTime(event.createdAt)}</span>
-      </summary>
-      <div className="cli-event-summary">{event.summary}</div>
-      {(event.toolName || event.toolInputPreview) && (
-        <div className="cli-event-tool">
-          {event.toolName && <span>{event.toolName}</span>}
-          {event.toolInputPreview && <code>{event.toolInputPreview}</code>}
-        </div>
+    <div className="cli-event-card">
+      <div className="cli-event-card-header">
+        <span className="cli-event-card-name">{event.eventName}</span>
+        <span className="cli-event-card-time">{formatTime(event.createdAt)}</span>
+      </div>
+      <div className="cli-event-card-body">{event.summary}</div>
+      {event.toolName && (
+        <div className="cli-event-card-tool">{event.toolName}</div>
       )}
-      {visibleDetails.length > 0 && (
-        <div className="cli-event-details">
+      {hasExtra && (
+        <details className="cli-event-card-details">
+          <summary className="cli-event-card-details-toggle">
+            {event.toolInputPreview && <code>{event.toolInputPreview}</code>}
+          </summary>
           {visibleDetails.map((item) => (
-            <div className="cli-event-detail-item" key={item.label}>
-              <span className="cli-event-detail-label">{item.label}</span>
+            <div className="cli-event-card-detail-item" key={item.label}>
+              <span>{item.label}</span>
               <pre>{item.value}</pre>
             </div>
           ))}
-        </div>
+        </details>
       )}
-    </details>
+    </div>
   );
 }
 
