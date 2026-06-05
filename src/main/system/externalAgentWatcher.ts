@@ -92,6 +92,7 @@ export function createExternalAgentWatcher(options: CreateExternalAgentWatcherOp
           }
         } else if (knownRunningProcesses.has(processName)) {
           knownRunningProcesses.delete(processName);
+          notifiedProcesses.delete(processName);
           stoppedNames.push(agentName);
         }
       }
