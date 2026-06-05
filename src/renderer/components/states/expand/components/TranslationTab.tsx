@@ -104,6 +104,7 @@ export function TranslationTab(): React.ReactElement {
             onClick={handleSwapLanguages}
             disabled={sourceLang === 'auto'}
             title={t('maxExpand.toolbox.translate.swap')}
+            aria-label={t('maxExpand.toolbox.translate.swap')}
           >
             <img className="translation-action-icon" src={SvgIcon.SWITCHING} alt="" draggable={false} />
           </button>
@@ -112,18 +113,24 @@ export function TranslationTab(): React.ReactElement {
             type="button"
             disabled={!sourceText.trim() || translating}
             onClick={handleTranslate}
-          >
-            {translating
+            title={translating
               ? t('maxExpand.toolbox.translate.translating')
               : t('maxExpand.toolbox.translate.translateBtn')}
+            aria-label={translating
+              ? t('maxExpand.toolbox.translate.translating')
+              : t('maxExpand.toolbox.translate.translateBtn')}
+          >
+            <img className="translation-action-icon" src={SvgIcon.LANGUAGE} alt="" draggable={false} />
           </button>
           <button
             className="translation-secondary-btn"
             type="button"
             disabled={!sourceText && !resultText}
             onClick={handleClearAll}
+            title={t('maxExpand.toolbox.translate.clear')}
+            aria-label={t('maxExpand.toolbox.translate.clear')}
           >
-            {t('maxExpand.toolbox.translate.clear')}
+            <img className="translation-action-icon" src={SvgIcon.CANCEL} alt="" draggable={false} />
           </button>
         </div>
 
