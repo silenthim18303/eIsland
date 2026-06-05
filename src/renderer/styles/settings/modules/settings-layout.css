@@ -3212,6 +3212,18 @@
   flex-shrink: 0;
 }
 
+.translate-lang-ai-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='light'] .translate-lang-ai-icon {
+  filter: brightness(0) invert(0);
+}
+
 .translate-lang-flag-placeholder {
   display: inline-block;
   width: 18px;

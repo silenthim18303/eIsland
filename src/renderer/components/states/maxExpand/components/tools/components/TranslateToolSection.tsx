@@ -61,6 +61,7 @@ function TranslateLangDropdown({
 
   const selected = options.find((o) => o.code === value);
   const selectedFlag = resolveCountryIcon(value);
+  const selectedIcon = selectedFlag ?? (value === 'auto' ? SvgIcon.AI : undefined);
 
   return (
     <div className="translate-lang-dropdown" ref={wrapperRef}>
@@ -69,8 +70,15 @@ function TranslateLangDropdown({
         className="translate-lang-dropdown-trigger"
         onClick={() => setOpen((prev) => !prev)}
       >
-        {selectedFlag && (
-          <img className="translate-lang-flag no-filter" src={selectedFlag} alt="" draggable={false} />
+        {selectedIcon ? (
+          <img
+            className={selectedFlag ? 'translate-lang-flag no-filter' : 'translate-lang-ai-icon'}
+            src={selectedIcon}
+            alt=""
+            draggable={false}
+          />
+        ) : (
+          <span className="translate-lang-flag-placeholder" />
         )}
         <span className="translate-lang-dropdown-label">
           {selected ? t(selected.labelKey) : value}
@@ -81,6 +89,7 @@ function TranslateLangDropdown({
         <div className="translate-lang-dropdown-menu">
           {options.map((lang) => {
             const flag = resolveCountryIcon(lang.code);
+            const icon = flag ?? (lang.code === 'auto' ? SvgIcon.AI : undefined);
             return (
               <button
                 key={lang.code}
@@ -91,8 +100,13 @@ function TranslateLangDropdown({
                   setOpen(false);
                 }}
               >
-                {flag ? (
-                  <img className="translate-lang-flag no-filter" src={flag} alt="" draggable={false} />
+                {icon ? (
+                  <img
+                    className={flag ? 'translate-lang-flag no-filter' : 'translate-lang-ai-icon'}
+                    src={icon}
+                    alt=""
+                    draggable={false}
+                  />
                 ) : (
                   <span className="translate-lang-flag-placeholder" />
                 )}

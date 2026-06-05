@@ -52,6 +52,7 @@ function TranslationLangSelect({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const selected = options.find((option) => option.code === value);
   const selectedFlag = resolveCountryIcon(value);
+  const selectedIcon = selectedFlag ?? (value === 'auto' ? SvgIcon.AI : undefined);
 
   useEffect(() => {
     if (!open || !wrapperRef.current) return;
@@ -90,8 +91,13 @@ function TranslationLangSelect({
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
       >
-        {selectedFlag ? (
-          <img className="translation-lang-flag no-filter" src={selectedFlag} alt="" draggable={false} />
+        {selectedIcon ? (
+          <img
+            className={selectedFlag ? 'translation-lang-flag no-filter' : 'translation-lang-ai-icon'}
+            src={selectedIcon}
+            alt=""
+            draggable={false}
+          />
         ) : (
           <span className="translation-lang-flag-placeholder" />
         )}
@@ -104,6 +110,7 @@ function TranslationLangSelect({
         <div className="translation-lang-dropdown-menu" style={menuStyle}>
           {options.map((lang) => {
             const flag = resolveCountryIcon(lang.code);
+            const icon = flag ?? (lang.code === 'auto' ? SvgIcon.AI : undefined);
             return (
               <button
                 key={lang.code}
@@ -114,8 +121,13 @@ function TranslationLangSelect({
                   setOpen(false);
                 }}
               >
-                {flag ? (
-                  <img className="translation-lang-flag no-filter" src={flag} alt="" draggable={false} />
+                {icon ? (
+                  <img
+                    className={flag ? 'translation-lang-flag no-filter' : 'translation-lang-ai-icon'}
+                    src={icon}
+                    alt=""
+                    draggable={false}
+                  />
                 ) : (
                   <span className="translation-lang-flag-placeholder" />
                 )}
