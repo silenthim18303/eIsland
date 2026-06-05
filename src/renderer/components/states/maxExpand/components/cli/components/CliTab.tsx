@@ -74,9 +74,8 @@ function EventRow({ event }: { event: CliHookEvent }): ReactElement {
 
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
-  const { snapshot, loading, actionMessage, enableHook, disableHook, clearEvents } = useClaudeCodeStatus();
+  const { snapshot, enableHook, disableHook, clearEvents } = useClaudeCodeStatus();
   const activeSessions = useMemo(() => snapshot.sessions.filter((s) => s.phase !== 'completed'), [snapshot.sessions]);
-  const pendingCount = snapshot.sessions.filter((s) => s.phase === 'waiting_permission').length;
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -110,15 +109,9 @@ export function CliTab(): ReactElement {
       {/* 右侧：事件流 + 控制 */}
       <div className="cli-tab-main">
         <div className="cli-tab-main-header">
-          <div className="cli-tab-status-row">
-            <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
-              {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
-            </span>
-            {pendingCount > 0 && (
-              <span className="cli-tab-pending-badge">{pendingCount} {t('maxExpand.cli.pendingAuth', { defaultValue: '待授权' })}</span>
-            )}
-            {loading && <span className="cli-tab-loading-hint">{t('maxExpand.cli.loading', { defaultValue: '刷新中…' })}</span>}
-          </div>
+          <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
+            {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
+          </span>
           <div className="cli-tab-actions">
             <button className="cli-tab-action-btn" type="button" onClick={snapshot.enabled ? disableHook : enableHook}>
               {snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
@@ -128,8 +121,6 @@ export function CliTab(): ReactElement {
             </button>
           </div>
         </div>
-
-        {actionMessage && <div className="cli-tab-action-message">{actionMessage}</div>}
 
         <div className="cli-tab-event-list">
           {snapshot.events.length === 0 && (
