@@ -107,12 +107,13 @@ export function useIslandNotificationSubscriptions(options: UseIslandNotificatio
 
   useEffect(() => {
     const unsubAgent = window.api?.onExternalAgentStarted?.((data) => {
+      const joined = data.agentNames.join('、');
       setNotificationRef.current({
-        title: t('notification.externalAgent.title', { defaultValue: '检测到桌面 Agent', agentName: data.agentName }),
-        body: t('notification.externalAgent.body', { defaultValue: '{{agentName}} 已开始工作', agentName: data.agentName }),
+        title: t('notification.externalAgent.title', { defaultValue: '检测到桌面 Agent', agentName: joined }),
+        body: t('notification.externalAgent.body', { defaultValue: '{{agentName}} 已开始工作', agentName: joined }),
         icon: SvgIcon.CODING,
         type: 'external-agent-active',
-        agentName: data.agentName,
+        agentName: joined,
       });
     });
     return () => {
@@ -122,12 +123,13 @@ export function useIslandNotificationSubscriptions(options: UseIslandNotificatio
 
   useEffect(() => {
     const unsubAgentStopped = window.api?.onExternalAgentStopped?.((data) => {
+      const joined = data.agentNames.join('、');
       setNotificationRef.current({
-        title: t('notification.externalAgent.stoppedTitle', { defaultValue: '桌面 Agent 已关闭', agentName: data.agentName }),
-        body: t('notification.externalAgent.stoppedBody', { defaultValue: '{{agentName}} 已停止工作', agentName: data.agentName }),
+        title: t('notification.externalAgent.stoppedTitle', { defaultValue: '桌面 Agent 已关闭', agentName: joined }),
+        body: t('notification.externalAgent.stoppedBody', { defaultValue: '{{agentName}} 已停止工作', agentName: joined }),
         icon: SvgIcon.CODING,
         type: 'external-agent-stopped',
-        agentName: data.agentName,
+        agentName: joined,
       });
     });
     return () => {

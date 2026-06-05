@@ -75,6 +75,9 @@ export function createExternalAgentWatcher(options: CreateExternalAgentWatcherOp
 
     checkInFlight = true;
     try {
+      const startedNames: string[] = [];
+      const stoppedNames: string[] = [];
+
       for (const processName of AGENT_PROCESS_NAMES) {
         const running = await hasAnyRunningProcess([processName]);
         const agentName = AGENT_PROCESS_MAP[processName] ?? processName;
@@ -84,13 +87,20 @@ export function createExternalAgentWatcher(options: CreateExternalAgentWatcherOp
             knownRunningProcesses.add(processName);
             if (!notifiedProcesses.has(processName)) {
               notifiedProcesses.add(processName);
-              mainWindow.webContents.send('external-agent:started', { agentName });
+              startedNames.push(agentName);
             }
           }
         } else if (knownRunningProcesses.has(processName)) {
           knownRunningProcesses.delete(processName);
-          mainWindow.webContents.send('external-agent:stopped', { agentName });
+          stoppedNames.push(agentName);
         }
+      }
+
+      if (startedNames.length > 0) {
+        mainWindow.webContents.send('external-agent:started', { agentNames: [...new Set(startedNames)] });
+      }
+      if (stoppedNames.length > 0) {
+        mainWindow.webContents.send('external-agent:stopped', { agentNames: [...new Set(stoppedNames)] });
       }
     } finally {
       checkInFlight = false;

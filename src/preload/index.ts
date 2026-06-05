@@ -1514,11 +1514,11 @@ const api = {
   },
   /**
    * 监听外部桌面 Agent 启动事件
-   * @param callback - 收到事件时的回调，包含 agentName
+   * @param callback - 收到事件时的回调，包含 agentNames 数组
    * @returns 取消订阅函数
    */
-  onExternalAgentStarted: (callback: (data: { agentName: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { agentName: string }): void => {
+  onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { agentNames: string[] }): void => {
       callback(data);
     };
     ipcRenderer.on('external-agent:started', handler);
@@ -1528,11 +1528,11 @@ const api = {
   },
   /**
    * 监听外部桌面 Agent 关闭事件
-   * @param callback - 收到事件时的回调，包含 agentName
+   * @param callback - 收到事件时的回调，包含 agentNames 数组
    * @returns 取消订阅函数
    */
-  onExternalAgentStopped: (callback: (data: { agentName: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { agentName: string }): void => {
+  onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { agentNames: string[] }): void => {
       callback(data);
     };
     ipcRenderer.on('external-agent:stopped', handler);

@@ -488,8 +488,8 @@ declare global {
       onUpdaterStartupAutoCheckRequest: (callback: (data: { requestedAt: number }) => void) => () => void;
       onClipboardUrlsDetected: (callback: (data: { urls: string[]; title: string }) => void) => () => void;
       clipboardOpenUrl: (url: string) => Promise<boolean>;
-      onExternalAgentStarted: (callback: (data: { agentName: string }) => void) => () => void;
-      onExternalAgentStopped: (callback: (data: { agentName: string }) => void) => () => void;
+      onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void) => () => void;
+      onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void) => () => void;
     };
   }
 }
