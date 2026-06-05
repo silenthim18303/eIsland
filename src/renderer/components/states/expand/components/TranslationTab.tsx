@@ -20,13 +20,132 @@
 
 /**
  * @file TranslationTab.tsx
- * @description Expanded 状态翻译页面占位组件。
+ * @description Expanded 状态翻译页面组件。
  * @author 鸡哥
  */
 
 import type React from 'react';
+import { useTranslation } from 'react-i18next';
+import { SvgIcon } from '../../../../utils/SvgIcon';
+import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../../maxExpand/components/tools/config/translateToolConfig';
+import { useTranslateTool } from '../../maxExpand/components/tools/hooks/useTranslateTool';
 
-/** 翻译页面占位 */
+interface TranslationLanguageOption {
+  code: string;
+  labelKey: string;
+}
+
+function TranslationLangSelect({
+  options,
+  value,
+  onChange,
+}: {
+  options: readonly TranslationLanguageOption[];
+  value: string;
+  onChange: (code: string) => void;
+}): React.ReactElement {
+  const { t } = useTranslation();
+
+  return (
+    <select
+      className="translation-lang-select"
+      value={value}
+      aria-label={t('expanded.translation.languageAria')}
+      onChange={(event) => onChange(event.target.value)}
+    >
+      {options.map((lang) => (
+        <option key={lang.code} value={lang.code}>
+          {t(lang.labelKey)}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/** Expanded 翻译页面 */
 export function TranslationTab(): React.ReactElement {
-  return <div className="translation-tab" />;
+  const { t } = useTranslation();
+  const {
+    sourceLang,
+    targetLang,
+    sourceText,
+    resultText,
+    translating,
+    setSourceLang,
+    setTargetLang,
+    setSourceText,
+    handleSwapLanguages,
+    handleTranslate,
+    handleCopyResult,
+    handleClearAll,
+  } = useTranslateTool();
+
+  return (
+    <div className="translation-tab expand-tab-panel">
+      <div className="translation-workspace">
+        <section className="translation-pane translation-pane-source">
+          <div className="translation-pane-toolbar">
+            <div className="translation-language-block">
+              <TranslationLangSelect options={TRANSLATE_LANGUAGES} value={sourceLang} onChange={setSourceLang} />
+            </div>
+          </div>
+          <textarea
+            className="translation-editor-textarea"
+            placeholder={t('maxExpand.toolbox.translate.inputPlaceholder')}
+            value={sourceText}
+            onChange={(event) => setSourceText(event.target.value)}
+          />
+        </section>
+
+        <div className="translation-center-actions">
+          <button
+            className="translation-swap-btn"
+            type="button"
+            onClick={handleSwapLanguages}
+            disabled={sourceLang === 'auto'}
+            title={t('maxExpand.toolbox.translate.swap')}
+          >
+            <img className="translation-action-icon" src={SvgIcon.SWITCHING} alt="" draggable={false} />
+          </button>
+          <button
+            className="translation-primary-btn"
+            type="button"
+            disabled={!sourceText.trim() || translating}
+            onClick={handleTranslate}
+          >
+            {translating
+              ? t('maxExpand.toolbox.translate.translating')
+              : t('maxExpand.toolbox.translate.translateBtn')}
+          </button>
+          <button
+            className="translation-secondary-btn"
+            type="button"
+            disabled={!sourceText && !resultText}
+            onClick={handleClearAll}
+          >
+            {t('maxExpand.toolbox.translate.clear')}
+          </button>
+        </div>
+
+        <section className="translation-pane translation-pane-result">
+          <div className="translation-pane-toolbar">
+            <div className="translation-language-block">
+              <TranslationLangSelect options={TRANSLATE_TARGET_LANGUAGES} value={targetLang} onChange={setTargetLang} />
+            </div>
+            {resultText && (
+              <button className="translation-copy-btn" type="button" onClick={handleCopyResult}>
+                {t('maxExpand.toolbox.translate.copy')}
+              </button>
+            )}
+          </div>
+          <textarea
+            className="translation-editor-textarea translation-editor-textarea-result"
+            placeholder={t('maxExpand.toolbox.translate.outputPlaceholder')}
+            value={resultText}
+            readOnly
+          />
+        </section>
+      </div>
+    </div>
+  );
 }

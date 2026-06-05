@@ -24,13 +24,12 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { fetchTranslate } from '../../../../../../api/tools/toolboxTranslateApi';
-import { readLocalToken } from '../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { resolveCountryIcon } from '../../../../../../utils/SvgIcon/country-icon';
 import { TRANSLATE_LANGUAGES, TRANSLATE_TARGET_LANGUAGES } from '../config/translateToolConfig';
+import { useTranslateTool } from '../hooks/useTranslateTool';
 
 interface LangOption {
   code: string;
@@ -112,50 +111,20 @@ function TranslateLangDropdown({
  */
 export function TranslateToolSection(): ReactElement {
   const { t } = useTranslation();
-  const [sourceLang, setSourceLang] = useState('auto');
-  const [targetLang, setTargetLang] = useState('en');
-  const [sourceText, setSourceText] = useState('');
-  const [resultText, setResultText] = useState('');
-  const [translating, setTranslating] = useState(false);
-
-  const handleSwapLanguages = useCallback((): void => {
-    if (sourceLang === 'auto') return;
-    const prevSource = sourceLang;
-    const prevTarget = targetLang;
-    setSourceLang(prevTarget);
-    setTargetLang(prevSource);
-    setSourceText(resultText);
-    setResultText(sourceText);
-  }, [sourceLang, targetLang, sourceText, resultText]);
-
-  const handleTranslate = useCallback((): void => {
-    if (!sourceText.trim() || translating) return;
-    const token = readLocalToken();
-    if (!token) {
-      setResultText(t('maxExpand.toolbox.translate.loginRequired', { defaultValue: '请先登录后再使用翻译服务' }));
-      return;
-    }
-    setTranslating(true);
-    fetchTranslate(token, sourceText, sourceLang, targetLang)
-      .then((result) => {
-        if (result.success && result.data) {
-          setResultText(result.data.targetText);
-        } else {
-          setResultText(result.message ?? t('maxExpand.toolbox.translate.error'));
-        }
-      })
-      .finally(() => setTranslating(false));
-  }, [sourceText, sourceLang, targetLang, translating, t]);
-
-  const handleCopyResult = useCallback((): void => {
-    if (!resultText) return;
-    navigator.clipboard.writeText(resultText).catch(() => {});
-  }, [resultText]);
-
-  const handleClearAll = useCallback((): void => {
-    setSourceText('');
-    setResultText('');
-  }, []);
+  const {
+    sourceLang,
+    targetLang,
+    sourceText,
+    resultText,
+    translating,
+    setSourceLang,
+    setTargetLang,
+    setSourceText,
+    handleSwapLanguages,
+    handleTranslate,
+    handleCopyResult,
+    handleClearAll,
+  } = useTranslateTool();
 
   return (
     <div className="settings-cards translate-panel">

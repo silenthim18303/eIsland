@@ -1,0 +1,237 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file expanded-translation-panel.css
+ * @description Expanded 翻译面板样式
+ */
+
+.translation-tab {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0 14px 8px;
+}
+
+.translation-workspace {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.translation-pane {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.translation-pane-toolbar {
+  height: 31px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.translation-pane-result .translation-pane-toolbar {
+  justify-content: flex-end;
+}
+
+.translation-pane-result .translation-language-block {
+  order: 1;
+  align-items: flex-end;
+}
+
+.translation-pane-result .translation-copy-btn {
+  order: 2;
+}
+
+.translation-language-block {
+  min-width: 0;
+  width: min(160px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 3px;
+}
+
+.translation-lang-select {
+  width: 100%;
+  height: 26px;
+  padding: 0 24px 0 8px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 8px;
+  outline: none;
+  background: rgba(var(--color-text-rgb), 0.035);
+  color: rgba(var(--color-text-rgb), 0.74);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: auto;
+}
+
+.translation-lang-select:focus {
+  border-color: rgba(120, 200, 255, 0.42);
+  background: rgba(var(--color-text-rgb), 0.055);
+}
+
+.translation-lang-select option {
+  color: #111;
+}
+
+.translation-editor-textarea {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 6px 0 10px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.9);
+  font-size: 12px;
+  line-height: 1.58;
+  font-family: inherit;
+}
+
+.translation-editor-textarea::placeholder {
+  color: rgba(var(--color-text-rgb), 0.28);
+}
+
+.translation-editor-textarea-result {
+  cursor: default;
+  text-align: right;
+}
+
+.translation-center-actions {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 0;
+  transform: translateY(4px);
+}
+
+.translation-swap-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.65);
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.translation-swap-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.translation-swap-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.translation-action-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(var(--icon-invert));
+}
+
+.translation-primary-btn,
+.translation-secondary-btn,
+.translation-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.55);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.translation-primary-btn,
+.translation-secondary-btn {
+  width: 100%;
+  min-width: 72px;
+  height: 28px;
+  padding: 5px 10px;
+}
+
+.translation-primary-btn:hover:not(:disabled),
+.translation-secondary-btn:hover:not(:disabled),
+.translation-copy-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.8);
+}
+
+.translation-primary-btn:disabled,
+.translation-secondary-btn:disabled,
+.translation-copy-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  color: rgba(var(--color-text-rgb), 0.35);
+  border-color: rgba(var(--color-text-rgb), 0.08);
+  background: rgba(var(--color-text-rgb), 0.03);
+  pointer-events: none;
+}
+
+.translation-copy-btn {
+  height: 26px;
+  margin-top: 3px;
+  padding: 0 8px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .translation-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .translation-center-actions {
+    flex-direction: row;
+    padding-top: 0;
+  }
+}

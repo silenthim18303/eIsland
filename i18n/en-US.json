@@ -463,6 +463,14 @@
     },
     "settingsTab": {
       "label": "Settings"
+    },
+    "translation": {
+      "title": "Quick Translate",
+      "sourceLabel": "Source",
+      "targetLabel": "Target",
+      "inputTitle": "Original",
+      "outputTitle": "Translation",
+      "languageAria": "Translation language selector"
     }
   },
   "toolsTab": {

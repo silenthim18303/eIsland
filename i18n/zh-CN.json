@@ -463,6 +463,14 @@
     },
     "settingsTab": {
       "label": "设置"
+    },
+    "translation": {
+      "title": "快速翻译",
+      "sourceLabel": "源语言",
+      "targetLabel": "目标语言",
+      "inputTitle": "原文",
+      "outputTitle": "译文",
+      "languageAria": "翻译语言选择"
     }
   },
   "toolsTab": {
