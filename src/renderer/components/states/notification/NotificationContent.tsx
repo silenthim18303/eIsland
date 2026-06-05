@@ -57,6 +57,7 @@ export function NotificationContent({
   startupUpdateResolvedUrl,
   urls,
   breakReminderItemId,
+  agentName: _agentName,
 }: NotificationContentProps): ReactElement {
   const { t } = useTranslation();
   const { setIdle, setLyrics, setNotification, setMaxExpand, setMaxExpandTab } = useIslandStore();
@@ -506,6 +507,12 @@ export function NotificationContent({
               </button>
             )}
             <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleDismissUrl}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
+          </div>
+        </div>
+      ) : type === 'external-agent-active' ? (
+        <div className="notification-actions notification-actions--right">
+          <div className="notification-decision-actions">
+            <button type="button" className="notification-action-btn notification-action-ignore" onClick={dismiss}>{t('notification.actions.gotIt', { defaultValue: '知道了' })}</button>
           </div>
         </div>
       ) : type === 'source-switch' ? (

@@ -3199,5 +3199,14 @@
     "pomodoro": {
       "label": "番茄钟"
     }
+  },
+  "notification": {
+    "externalAgent": {
+      "title": "检测到桌面 Agent",
+      "body": "{{agentName}} 已开始工作"
+    },
+    "actions": {
+      "gotIt": "知道了"
+    }
   }
 }

@@ -3199,5 +3199,14 @@
     "pomodoro": {
       "label": "Pomodoro"
     }
+  },
+  "notification": {
+    "externalAgent": {
+      "title": "Desktop Agent Detected",
+      "body": "{{agentName}} started working"
+    },
+    "actions": {
+      "gotIt": "Got it"
+    }
   }
 }

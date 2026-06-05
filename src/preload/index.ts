@@ -1511,6 +1511,20 @@ const api = {
    */
   clipboardOpenUrl: (url: string): Promise<boolean> => {
     return ipcRenderer.invoke('clipboard:open-url', url);
+  },
+  /**
+   * 监听外部桌面 Agent 启动事件
+   * @param callback - 收到事件时的回调，包含 agentName
+   * @returns 取消订阅函数
+   */
+  onExternalAgentStarted: (callback: (data: { agentName: string }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { agentName: string }): void => {
+      callback(data);
+    };
+    ipcRenderer.on('external-agent:started', handler);
+    return () => {
+      ipcRenderer.removeListener('external-agent:started', handler);
+    };
   }
 };
 

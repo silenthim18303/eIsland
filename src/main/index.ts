@@ -67,6 +67,7 @@ import { openStandaloneWindow } from './window/standaloneWindow';
 import { createSmtcService } from './music/smtcService';
 import { setSmtcAccessor } from './music/smtcAccessor';
 import { createAutoHideWatcher } from './system/autoHideWatcher';
+import { createExternalAgentWatcher } from './system/externalAgentWatcher';
 import { sendMediaVirtualKey } from './system/mediaKey';
 import {
   queryFocusedWindow,
@@ -254,6 +255,10 @@ const mainWindowService = createMainWindowService({
 const autoHideWatcher = createAutoHideWatcher({
   getMainWindow: () => mainWindow,
   defaultWindowTitleList: DEFAULT_HIDE_PROCESS_LIST,
+});
+
+const externalAgentWatcher = createExternalAgentWatcher({
+  getMainWindow: () => mainWindow,
 });
 
 /** SMTC 自动取消订阅时间（毫秒），0 为永不取消 */
@@ -629,11 +634,13 @@ registerAppLifecycleHandlers({
   getMainWindow: () => mainWindow,
   onWillQuit: () => {
     autoHideWatcher.stop();
+    externalAgentWatcher.stop();
     stopClipboardUrlWatcher();
     globalShortcut.unregisterAll();
   },
   onWindowAllClosed: () => {
     autoHideWatcher.stop();
+    externalAgentWatcher.stop();
     smtcService.cleanupWorker();
     destroyTray();
     if (process.platform !== 'darwin') {
@@ -725,6 +732,7 @@ app.whenReady().then(() => {
   autoHideWatcher.setConfiguredHideWindowTitleList([...savedHideProcessList]);
   if (process.platform === 'win32') {
     autoHideWatcher.start();
+    externalAgentWatcher.start();
   }
 
   // 读取持久化快捷键并注册

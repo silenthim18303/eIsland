@@ -115,6 +115,7 @@ export function DynamicIslandStateContent({
         startupUpdateResolvedUrl={notification.startupUpdateResolvedUrl}
         urls={notification.urls}
         breakReminderItemId={notification.breakReminderItemId}
+        agentName={notification.agentName}
       />
     );
   }
