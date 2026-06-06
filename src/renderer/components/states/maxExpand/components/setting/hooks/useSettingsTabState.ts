@@ -29,18 +29,12 @@ import { readLocalToken, subscribeUserAccountSessionChanged } from '../../../../
 import { SETTINGS_SIDEBAR_DEFAULT_TAB } from '../config/settingsTabConfig';
 import type { SettingsSidebarTabKey } from '../utils/settingsConfig';
 
-let lastSettingsSidebarTab: SettingsSidebarTabKey = SETTINGS_SIDEBAR_DEFAULT_TAB;
-
 /**
- * 管理设置侧栏当前页签并在模块作用域内保留上次选择。
+ * 管理设置侧栏当前页签；每次进入设置默认停留在「快速导航」页。
  * @returns 当前页签与页签更新函数
  */
 export function useSettingsSidebarTabState() {
-  const [activeTab, setActiveTab] = useState<SettingsSidebarTabKey>(() => lastSettingsSidebarTab);
-
-  useEffect(() => {
-    lastSettingsSidebarTab = activeTab;
-  }, [activeTab]);
+  const [activeTab, setActiveTab] = useState<SettingsSidebarTabKey>(SETTINGS_SIDEBAR_DEFAULT_TAB);
 
   return [activeTab, setActiveTab] as const;
 }
