@@ -447,6 +447,7 @@ function sessionTitleFrom(cwd: string | null, sessionId: string): string {
 function phaseAfterEvent(current: ClaudeCodeSessionPhase, event: ClaudeCodeHookEvent): ClaudeCodeSessionPhase {
   if (event.eventName === 'PermissionRequest') return 'waiting_permission';
   if (event.eventName === 'SessionEnd') return 'completed';
+  if (event.eventName === 'SessionStart' || event.eventName === 'SubagentStart') return 'running';
   if (event.eventName === 'Stop' || event.eventName === 'StopFailure') return 'idle';
   if (event.eventName === 'PostToolUse' && current === 'waiting_permission') return 'running';
   if (event.kind === 'tool' || event.kind === 'message' || event.kind === 'session') return 'running';
