@@ -576,6 +576,7 @@
   background: rgba(var(--color-text-rgb), 0.03);
 }
 
+/* 与按钮主题色一致：数量越多，蓝色越深 */
 .cli-tab-heatmap-cell.level-1 { background: rgba(100, 180, 255, 0.3); }
 .cli-tab-heatmap-cell.level-2 { background: rgba(100, 180, 255, 0.5); }
 .cli-tab-heatmap-cell.level-3 { background: rgba(100, 180, 255, 0.72); }
