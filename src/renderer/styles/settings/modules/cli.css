@@ -206,6 +206,33 @@
   opacity: 0.35;
 }
 
+.cli-tab-event-filters {
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px 0;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.cli-tab-filter-btn {
+  border: 1px solid rgba(var(--color-text-rgb), 0.08);
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.48);
+  font-size: 11px;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.cli-tab-filter-btn:hover,
+.cli-tab-filter-btn.active {
+  border-color: rgba(100, 200, 120, 0.24);
+  background: rgba(100, 200, 120, 0.1);
+  color: rgba(100, 200, 120, 0.86);
+}
+
 /* ── 事件列表 ── */
 .cli-tab-event-list {
   flex: 1;

@@ -1154,6 +1154,12 @@
       "receiverStatus": "Receiver",
       "pendingAuth": "Pending Auth",
       "activeSessions": "Active Sessions",
+      "phase": {
+        "waiting": "Waiting for Permission",
+        "running": "Running",
+        "completed": "Completed",
+        "idle": "Idle"
+      },
       "enabled": "Enabled",
       "disabled": "Disabled",
       "running": "Running",
@@ -1166,8 +1172,17 @@
       "updatedAt": "Updated at {{time}}",
       "emptySessions": "No Claude Code sessions yet. Enable the hook and start a new Claude Code CLI session to see live status.",
       "emptyEvents": "No events yet.",
+      "filterAria": "Event filters",
+      "filters": {
+        "all": "All",
+        "message": "Conversation",
+        "tool": "Tool calls",
+        "output": "Output",
+        "permission": "Permission"
+      },
       "detail": {
         "userInput": "User input",
+        "assistantOutput": "Claude output",
         "toolInput": "Tool input",
         "toolResult": "Tool result",
         "error": "Error",

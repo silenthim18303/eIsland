@@ -24,25 +24,16 @@
  * @author 鸡哥
  */
 
-import { useMemo, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
-import type { CliHookEvent, CliSessionSnapshot } from '../config/types';
+import { useCliEvents } from '../hooks/useCliEvents';
+import { EVENT_FILTERS } from '../config/cliFilters';
+import type { CliHookEvent } from '../config/types';
+import { formatTime, phaseLabel, detailLabel, filterLabel } from '../utils/cliFormatters';
 import '../../../../../../styles/settings/modules/cli.css';
 
-function formatTime(timestamp: number): string {
-  if (!timestamp) return '--';
-  return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
-
-function phaseLabel(phase: CliSessionSnapshot['phase'], t: (key: string, opts?: Record<string, unknown>) => string): string {
-  if (phase === 'waiting_permission') return t('maxExpand.cli.phase.waiting', { defaultValue: '等待授权' });
-  if (phase === 'running') return t('maxExpand.cli.phase.running', { defaultValue: '运行中' });
-  if (phase === 'completed') return t('maxExpand.cli.phase.completed', { defaultValue: '已完成' });
-  return t('maxExpand.cli.phase.idle', { defaultValue: '空闲' });
-}
-
-function EventRow({ event }: { event: CliHookEvent }): ReactElement {
+function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
   const hasExtra = visibleDetails.length > 0 || event.toolName || event.toolInputPreview;
   return (
@@ -62,7 +53,7 @@ function EventRow({ event }: { event: CliHookEvent }): ReactElement {
           </summary>
           {visibleDetails.map((item) => (
             <div className="cli-event-card-detail-item" key={item.label}>
-              <span>{item.label}</span>
+              <span>{detailLabel(item.label, t)}</span>
               <pre>{item.value}</pre>
             </div>
           ))}
@@ -75,7 +66,7 @@ function EventRow({ event }: { event: CliHookEvent }): ReactElement {
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
   const { snapshot, enableHook, disableHook, clearEvents } = useClaudeCodeStatus();
-  const activeSessions = useMemo(() => snapshot.sessions.filter((s) => s.phase !== 'completed'), [snapshot.sessions]);
+  const { eventFilter, setEventFilter, activeSessions, filteredEvents } = useCliEvents(snapshot);
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -122,11 +113,26 @@ export function CliTab(): ReactElement {
           </div>
         </div>
 
+        <div className="cli-tab-event-filters" role="tablist" aria-label={t('maxExpand.cli.filterAria', { defaultValue: '事件筛选' })}>
+          {EVENT_FILTERS.map((filter) => (
+            <button
+              className={`cli-tab-filter-btn ${eventFilter === filter ? 'active' : ''}`}
+              type="button"
+              role="tab"
+              aria-selected={eventFilter === filter}
+              key={filter}
+              onClick={() => setEventFilter(filter)}
+            >
+              {filterLabel(filter, t)}
+            </button>
+          ))}
+        </div>
+
         <div className="cli-tab-event-list">
-          {snapshot.events.length === 0 && (
+          {filteredEvents.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</div>
           )}
-          {snapshot.events.map((event) => <EventRow key={event.id} event={event} />)}
+          {filteredEvents.map((event) => <EventRow key={event.id} event={event} t={t} />)}
         </div>
       </div>
     </div>

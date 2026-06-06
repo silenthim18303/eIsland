@@ -1154,6 +1154,12 @@
       "receiverStatus": "接收器",
       "pendingAuth": "待授权",
       "activeSessions": "活跃会话",
+      "phase": {
+        "waiting": "等待授权",
+        "running": "运行中",
+        "completed": "已完成",
+        "idle": "空闲"
+      },
       "enabled": "已启用",
       "disabled": "未启用",
       "running": "运行中",
@@ -1166,8 +1172,17 @@
       "updatedAt": "更新于 {{time}}",
       "emptySessions": "暂无 Claude Code 会话。启用 Hook 后启动新的 Claude Code CLI 会话即可看到状态。",
       "emptyEvents": "暂无事件。",
+      "filterAria": "事件筛选",
+      "filters": {
+        "all": "全部",
+        "message": "对话",
+        "tool": "工具调用",
+        "output": "输出",
+        "permission": "授权"
+      },
       "detail": {
         "userInput": "用户输入",
+        "assistantOutput": "Claude 输出",
         "toolInput": "工具入参",
         "toolResult": "工具结果",
         "error": "错误信息",

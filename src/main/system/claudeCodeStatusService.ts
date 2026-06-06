@@ -160,15 +160,15 @@ function textFromContent(value: unknown): string | null {
   return text || null;
 }
 
-function userInputFromTranscript(transcriptPath: string | null): string | null {
+function transcriptTextFromRole(transcriptPath: string | null, roleName: 'user' | 'assistant'): string | null {
   if (!transcriptPath || !existsSync(transcriptPath)) return null;
   try {
-    const lines = readFileSync(transcriptPath, 'utf-8').trim().split(/\r?\n/).slice(-80).reverse();
+    const lines = readFileSync(transcriptPath, 'utf-8').trim().split(/\r?\n/).slice(-120).reverse();
     for (const line of lines) {
       const entry = asRecord(JSON.parse(line));
       const message = asRecord(entry.message);
       const role = asString(message.role) ?? asString(entry.role);
-      if (role !== 'user') continue;
+      if (role !== roleName) continue;
       const content = textFromContent(message.content) ?? textFromContent(entry.content);
       if (content) return content;
     }
@@ -178,14 +178,28 @@ function userInputFromTranscript(transcriptPath: string | null): string | null {
   return null;
 }
 
+function userInputFromTranscript(transcriptPath: string | null): string | null {
+  return transcriptTextFromRole(transcriptPath, 'user');
+}
+
+function assistantOutputFromTranscript(transcriptPath: string | null): string | null {
+  return transcriptTextFromRole(transcriptPath, 'assistant');
+}
+
 function inferUserInput(payload: Record<string, unknown>, transcriptPath: string | null): string | null {
   return firstDetailValue(payload, ['prompt', 'user_prompt', 'userPrompt', 'user_input', 'userInput'])
     ?? userInputFromTranscript(transcriptPath);
 }
 
-function inferDetailItems(payload: Record<string, unknown>, toolInput: unknown, userInput: string | null): ClaudeCodeHookEventDetailItem[] {
+function inferDetailItems(
+  payload: Record<string, unknown>,
+  toolInput: unknown,
+  userInput: string | null,
+  assistantOutput: string | null,
+): ClaudeCodeHookEventDetailItem[] {
   const detailSpecs: Array<[string, string | null]> = [
     ['userInput', userInput],
+    ['assistantOutput', assistantOutput],
     ['toolInput', detailValue(toolInput)],
     ['toolResult', firstDetailValue(payload, ['tool_response', 'toolResponse', 'response', 'result', 'output'])],
     ['error', firstDetailValue(payload, ['error', 'error_details', 'errorDetails'])],
@@ -353,33 +367,50 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     updatedAt,
   });
 
-  const withUserInputDetail = (event: ClaudeCodeHookEvent, userInput: string): ClaudeCodeHookEvent => ({
+  const withDetailItem = (event: ClaudeCodeHookEvent, label: string, value: string): ClaudeCodeHookEvent => ({
     ...event,
     detailItems: [
-      { label: 'userInput', value: userInput },
-      ...event.detailItems.filter((item) => item.label !== 'userInput'),
+      { label, value },
+      ...event.detailItems.filter((item) => item.label !== label),
     ],
   });
 
-  const backfillUserInput = (eventId: string, sessionId: string, transcriptPath: string | null): void => {
-    const userInput = userInputFromTranscript(transcriptPath);
-    if (!userInput) return;
-    events = events.map((event) => (event.id === eventId ? withUserInputDetail(event, userInput) : event));
+  const backfillDetailItem = (
+    eventId: string,
+    sessionId: string,
+    label: string,
+    valueFromTranscript: () => string | null,
+  ): void => {
+    const value = valueFromTranscript();
+    if (!value) return;
+    events = events.map((event) => (event.id === eventId ? withDetailItem(event, label, value) : event));
     const session = sessions.get(sessionId);
     if (session) {
       sessions.set(sessionId, {
         ...session,
-        events: session.events.map((event) => (event.id === eventId ? withUserInputDetail(event, userInput) : event)),
+        events: session.events.map((event) => (event.id === eventId ? withDetailItem(event, label, value) : event)),
       });
     }
     emitSnapshot();
   };
 
-  const scheduleUserInputBackfill = (event: ClaudeCodeHookEvent): void => {
-    if (event.eventName !== 'UserPromptSubmit') return;
-    if (event.detailItems.some((item) => item.label === 'userInput')) return;
-    setTimeout(() => backfillUserInput(event.id, event.sessionId, event.transcriptPath), 350);
-    setTimeout(() => backfillUserInput(event.id, event.sessionId, event.transcriptPath), 1200);
+  const scheduleDetailBackfill = (
+    event: ClaudeCodeHookEvent,
+    label: string,
+    valueFromTranscript: () => string | null,
+  ): void => {
+    if (event.detailItems.some((item) => item.label === label)) return;
+    setTimeout(() => backfillDetailItem(event.id, event.sessionId, label, valueFromTranscript), 350);
+    setTimeout(() => backfillDetailItem(event.id, event.sessionId, label, valueFromTranscript), 1200);
+  };
+
+  const scheduleEventBackfill = (event: ClaudeCodeHookEvent): void => {
+    if (event.eventName === 'UserPromptSubmit') {
+      scheduleDetailBackfill(event, 'userInput', () => userInputFromTranscript(event.transcriptPath));
+    }
+    if (event.eventName === 'Stop' || event.eventName === 'SessionEnd') {
+      scheduleDetailBackfill(event, 'assistantOutput', () => assistantOutputFromTranscript(event.transcriptPath));
+    }
   };
 
   const addEvent = (payload: Record<string, unknown>): void => {
@@ -390,7 +421,10 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     const toolName = asString(payload.tool_name) ?? asString(payload.toolName) ?? asString(payload.name);
     const toolInput = payload.tool_input ?? payload.toolInput ?? payload.input;
     const userInput = inferUserInput(payload, transcriptPath);
-    const detailItems = inferDetailItems(payload, toolInput, userInput);
+    const assistantOutput = eventName === 'Stop' || eventName === 'SessionEnd'
+      ? assistantOutputFromTranscript(transcriptPath)
+      : null;
+    const detailItems = inferDetailItems(payload, toolInput, userInput, assistantOutput);
     const event: ClaudeCodeHookEvent = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       eventName,
@@ -428,7 +462,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       pendingPermission: nextPhase === 'waiting_permission' ? event : null,
       events: nextEvents,
     });
-    scheduleUserInputBackfill(event);
+    scheduleEventBackfill(event);
     emitSnapshot();
   };
 
