@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useState, useEffect, useRef, useCallback, type ReactElement } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactElement, type SyntheticEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
@@ -40,8 +40,12 @@ const INITIAL_EVENT_COUNT = 10;
 const LOAD_MORE_COUNT = 10;
 
 function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
+  const [expanded, setExpanded] = useState(false);
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
   const hasExtra = visibleDetails.length > 0 || event.toolName || event.toolInputPreview;
+  const handleToggle = useCallback((e: SyntheticEvent<HTMLDetailsElement>) => {
+    setExpanded((e.target as HTMLDetailsElement).open);
+  }, []);
   return (
     <div className="cli-event-card">
       <div className="cli-event-card-header">
@@ -53,9 +57,10 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
         <div className="cli-event-card-tool">{event.toolName}</div>
       )}
       {hasExtra && (
-        <details className="cli-event-card-details">
+        <details className="cli-event-card-details" onToggle={handleToggle}>
           <summary className="cli-event-card-details-toggle">
-            {event.toolInputPreview && <code>{event.toolInputPreview}</code>}
+            <span className="cli-event-card-details-label">{expanded ? t('maxExpand.cli.collapse', { defaultValue: '收起' }) : t('maxExpand.cli.expand', { defaultValue: '展开' })}</span>
+            {event.toolInputPreview && <code onClick={(e) => e.preventDefault()}>{event.toolInputPreview}</code>}
           </summary>
           {visibleDetails.map((item) => (
             <div className="cli-event-card-detail-item" key={item.label}>
