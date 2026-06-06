@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { type ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
@@ -76,6 +76,7 @@ export function CliTab(): ReactElement {
     activeSessions,
     filteredEvents,
   } = useCliEvents(snapshot);
+  const [filtersVisible, setFiltersVisible] = useState(false);
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -147,10 +148,20 @@ export function CliTab(): ReactElement {
             >
               <img src={SvgIcon.DELETE} alt="" width="14" height="14" draggable={false} />
             </button>
+            <button
+              className={`cli-tab-action-btn ${filtersVisible ? 'cli-tab-action-btn--active' : ''}`}
+              type="button"
+              title={t('maxExpand.cli.filterAria', { defaultValue: '事件筛选' })}
+              onClick={() => setFiltersVisible((v) => !v)}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+              </svg>
+            </button>
           </div>
         </div>
 
-        <div className="cli-tab-event-filters" role="tablist" aria-label={t('maxExpand.cli.filterAria', { defaultValue: '事件筛选' })}>
+        <div className={`cli-tab-event-filters ${filtersVisible ? 'open' : ''}`} role="tablist" aria-label={t('maxExpand.cli.filterAria', { defaultValue: '事件筛选' })}>
           {EVENT_FILTERS.map((filter) => (
             <button
               className={`cli-tab-filter-btn ${eventFilter === filter ? 'active' : ''}`}
