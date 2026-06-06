@@ -605,11 +605,34 @@
   margin-top: 6px;
 }
 
+/* 外层容器展开/收起动画：grid-template-rows 0fr↔1fr 过渡，自适应高度，双向都有动画 */
+.cli-event-card-details-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.26s ease, opacity 0.26s ease;
+}
+
+.cli-event-card-details-content.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.cli-event-card-details-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .cli-event-card-details-toggle {
   display: flex;
   align-items: center;
   gap: 6px;
+  width: 100%;
   padding: 0;
+  border: none;
+  background: none;
+  appearance: none;
+  text-align: left;
   cursor: pointer;
   list-style: none;
   font-size: 11px;

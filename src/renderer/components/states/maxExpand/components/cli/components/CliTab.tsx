@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useState, useEffect, useRef, useCallback, type ReactElement, type SyntheticEvent } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactElement } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -54,8 +54,8 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
   const cardRef = useRef<HTMLDivElement>(null);
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
   const hasExtra = visibleDetails.length > 0 || event.toolName || event.toolInputPreview;
-  const handleToggle = useCallback((e: SyntheticEvent<HTMLDetailsElement>) => {
-    setExpanded((e.target as HTMLDetailsElement).open);
+  const handleToggle = useCallback(() => {
+    setExpanded((v) => !v);
   }, []);
 
   useGSAP(() => {
@@ -79,18 +79,22 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
       </div>
       <div className="cli-event-card-body"><ReactMarkdown>{event.summary}</ReactMarkdown></div>
       {hasExtra && (
-        <details className="cli-event-card-details" onToggle={handleToggle}>
-          <summary className="cli-event-card-details-toggle">
+        <div className="cli-event-card-details">
+          <button type="button" className="cli-event-card-details-toggle" onClick={handleToggle}>
             <span className="cli-event-card-details-label">{expanded ? t('maxExpand.cli.collapse', { defaultValue: '收起' }) : t('maxExpand.cli.expand', { defaultValue: '展开' })}</span>
-            {event.toolInputPreview && <code onClick={(e) => e.preventDefault()}>{event.toolInputPreview}</code>}
-          </summary>
-          {visibleDetails.map((item) => (
-            <div className="cli-event-card-detail-item" key={item.label}>
-              <span>{detailLabel(item.label, t)}</span>
-              <pre>{item.value}</pre>
+            {event.toolInputPreview && <code onClick={(e) => e.stopPropagation()}>{event.toolInputPreview}</code>}
+          </button>
+          <div className={`cli-event-card-details-content${expanded ? ' is-open' : ''}`}>
+            <div className="cli-event-card-details-inner">
+              {visibleDetails.map((item) => (
+                <div className="cli-event-card-detail-item" key={item.label}>
+                  <span>{detailLabel(item.label, t)}</span>
+                  <pre>{item.value}</pre>
+                </div>
+              ))}
             </div>
-          ))}
-        </details>
+          </div>
+        </div>
       )}
     </div>
   );
