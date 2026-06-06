@@ -26,6 +26,7 @@
 
 import { useEffect, useRef } from 'react';
 import { playNotificationSoundOnce } from '../../utils/audio/notificationSound';
+import useIslandStore from '../../store/isLandStore';
 
 /**
  * @description 以 ref 形式追踪是否存在活跃 Claude 会话（phase 非 completed），不触发组件重渲染。
@@ -58,6 +59,10 @@ export function useClaudeCliSessionStatus(): {
         for (const id of pendingIds) {
           if (!seenPermissionIdsRef.current.has(id)) {
             playNotificationSoundOnce();
+            // 若当前不在 CLI 视图（cli 态 / maxExpand 的 CLI 标签），切换到 cli 态展示授权
+            const store = useIslandStore.getState();
+            const inCliView = store.state === 'cli' || (store.state === 'maxExpand' && store.maxExpandTab === 'cli');
+            if (!inCliView) store.setCli();
             break;
           }
         }
