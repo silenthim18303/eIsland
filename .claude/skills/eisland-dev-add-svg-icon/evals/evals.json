@@ -1,0 +1,23 @@
+{
+  "skill_name": "eisland-dev-add-svg-icon",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "添加 src/renderer/public/svg/NA.svg 枚举和测试例",
+      "expected_output": "eisland-icon.ts 新增 NA 条目，测试新增 NA 断言，key 数量 +1，测试通过",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "帮我把 NA 这个图标注册到 SvgIcon 枚举里，SVG 在 public/svg/NA.svg，记得补测试",
+      "expected_output": "eisland-icon.ts 新增 NA 条目，测试新增 NA 断言，key 数量 +1，测试通过",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "svg/agent/ 目录下有个 CLAUDE.svg，帮我加到 AgentIcon 枚举和对应测试文件里",
+      "expected_output": "agent-icon.ts 已有 CLAUDE 则跳过或确认存在，测试通过",
+      "files": []
+    }
+  ]
+}
