@@ -123,7 +123,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
-  width: 100%;
+  max-width: calc(100% - 230px);
   min-width: 0;
 }
 
@@ -193,7 +193,7 @@
 .cli-state-permission {
   position: absolute;
   right: 16px;
-  bottom: 8px;
+  bottom: 6px;
   display: flex;
   gap: 6px;
 }
