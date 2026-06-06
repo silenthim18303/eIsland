@@ -423,6 +423,7 @@
       "hide": "Hide",
       "ignore": "Ignore",
       "switch": "Switch",
+      "switchCliState": "Switch to Island",
       "snooze5m": "Later 5m",
       "snooze15m": "Later 15m",
       "snooze1h": "Later 1h",

@@ -27,6 +27,7 @@
 import { useEffect, useRef } from 'react';
 import { playNotificationSoundOnce } from '../../utils/audio/notificationSound';
 import useIslandStore from '../../store/isLandStore';
+import { AgentIcon } from '../../utils/SvgIcon';
 
 /**
  * @description 以 ref 形式追踪是否存在活跃 Claude 会话（phase 非 completed），不触发组件重渲染。
@@ -82,6 +83,7 @@ export function useClaudeCliSessionStatus(): {
             store.setNotification({
               title: 'Claude Code',
               body: '检测到新的 Claude Code 活动，是否切换到 CLI 面板查看？',
+              icon: AgentIcon.CLAUDE_KB,
               type: 'cli-session-detected',
             });
           }
