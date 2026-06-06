@@ -492,14 +492,59 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
   const port = options.port ?? DEFAULT_PORT;
   const settingsPath = join(app.getPath('home'), '.claude', 'settings.json');
   const hookScriptPath = join(app.getPath('userData'), 'claude-code-hook.cjs');
+  const persistPath = join(app.getPath('userData'), 'eIsland_store', 'claude-code-status.json');
   const sessions = new Map<string, ClaudeCodeSessionSnapshot>();
   let events: ClaudeCodeHookEvent[] = [];
   let server: http.Server | null = null;
   let receiverUrl: string | null = null;
   let updatedAt = Date.now();
 
+  // ── 持久化：事件流与会话写入磁盘，重启后恢复 maxExpand CLI 面板内容 ──
+  let persistTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const persistNow = (): void => {
+    try {
+      mkdirSync(dirname(persistPath), { recursive: true });
+      const payload = JSON.stringify({
+        version: 1,
+        events,
+        sessions: Array.from(sessions.values()),
+        updatedAt,
+      });
+      writeFileSync(persistPath, payload, 'utf-8');
+    } catch {
+      // 持久化失败不影响运行
+    }
+  };
+
+  const schedulePersist = (): void => {
+    if (persistTimer) clearTimeout(persistTimer);
+    persistTimer = setTimeout(() => { persistTimer = null; persistNow(); }, 400);
+  };
+
+  const loadPersisted = (): void => {
+    try {
+      if (!existsSync(persistPath)) return;
+      const root = asRecord(JSON.parse(readFileSync(persistPath, 'utf-8')));
+      const loadedEvents = Array.isArray(root.events) ? (root.events as ClaudeCodeHookEvent[]) : [];
+      const loadedSessions = Array.isArray(root.sessions) ? (root.sessions as ClaudeCodeSessionSnapshot[]) : [];
+      events = loadedEvents.slice(0, MAX_EVENTS);
+      sessions.clear();
+      for (const session of loadedSessions) {
+        if (session && typeof session.id === 'string') {
+          // 重启后无法再响应历史待授权请求，挂起态归并为已结束/空闲展示
+          const phase = session.phase === 'waiting_permission' ? 'idle' : session.phase;
+          sessions.set(session.id, { ...session, phase, pendingPermission: null });
+        }
+      }
+    } catch {
+      // 读取失败时忽略，使用空状态
+    }
+  };
+
   const emitSnapshot = (): void => {
     updatedAt = Date.now();
+    schedulePersist();
     const win = options.getMainWindow();
     if (!win || win.isDestroyed()) return;
     win.webContents.send('claude-code:status-updated', getSnapshot());
@@ -728,6 +773,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
 
   async function start(): Promise<void> {
     if (server) return;
+    loadPersisted();
     mkdirSync(dirname(hookScriptPath), { recursive: true });
     writeFileSync(hookScriptPath, createHookScript(port), 'utf-8');
     syncInstalledHookCommands();
