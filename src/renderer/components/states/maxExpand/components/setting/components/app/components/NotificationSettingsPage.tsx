@@ -38,7 +38,7 @@ const AGENT_NOTIFICATION_ENABLED_STORE_KEY = 'agent-notification-enabled';
 export function NotificationSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [notificationSoundEnabled, setNotificationSoundEnabled] = useState<boolean>(true);
-  const [agentNotificationEnabled, setAgentNotificationEnabled] = useState<boolean>(true);
+  const [agentNotificationEnabled, setAgentNotificationEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     let cancelled = false;

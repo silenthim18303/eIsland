@@ -48,7 +48,7 @@ interface UseIslandNotificationSubscriptionsOptions {
 export function useIslandNotificationSubscriptions(options: UseIslandNotificationSubscriptionsOptions): void {
   const { language, t, setNotificationRef } = options;
   const updateNotifiedRef = useRef(false);
-  const [agentNotificationEnabled, setAgentNotificationEnabled] = useState<boolean>(true);
+  const [agentNotificationEnabled, setAgentNotificationEnabled] = useState<boolean>(false);
 
   useEffect(() => {
     let cancelled = false;
