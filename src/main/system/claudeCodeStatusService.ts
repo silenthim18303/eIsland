@@ -65,6 +65,16 @@ export interface ClaudeCodeSessionSnapshot {
   events: ClaudeCodeHookEvent[];
 }
 
+/** 单日热力图计数：按指标分别统计 */
+export interface ClaudeCodeHeatmapDailyCount {
+  session: number;
+  tool: number;
+  prompt: number;
+}
+
+/** 热力图按天累计计数，键为 `年-月-日`（月、日均不补零，与渲染层一致） */
+export type ClaudeCodeHeatmapDaily = Record<string, ClaudeCodeHeatmapDailyCount>;
+
 export interface ClaudeCodeStatusSnapshot {
   enabled: boolean;
   receiverRunning: boolean;
@@ -73,6 +83,7 @@ export interface ClaudeCodeStatusSnapshot {
   hookScriptPath: string;
   sessions: ClaudeCodeSessionSnapshot[];
   events: ClaudeCodeHookEvent[];
+  heatmap: ClaudeCodeHeatmapDaily;
   updatedAt: number;
 }
 
@@ -484,8 +495,11 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
   const settingsPath = join(app.getPath('home'), '.claude', 'settings.json');
   const hookScriptPath = join(app.getPath('userData'), 'claude-code-hook.cjs');
   const persistPath = join(app.getPath('userData'), 'eIsland_store', 'claude-code-status.json');
+  // 热力图独立持久化：与事件/会话存储互不影响，清空会话或事件不波及热力图
+  const persistHeatmapPath = join(app.getPath('userData'), 'eIsland_store', 'claude-code-heatmap.json');
   const sessions = new Map<string, ClaudeCodeSessionSnapshot>();
   let events: ClaudeCodeHookEvent[] = [];
+  let heatmapDaily: ClaudeCodeHeatmapDaily = {};
   let server: http.Server | null = null;
   let receiverUrl: string | null = null;
   let updatedAt = Date.now();
@@ -513,6 +527,43 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     persistTimer = setTimeout(() => { persistTimer = null; persistNow(); }, 400);
   };
 
+  // ── 热力图独立持久化：单独文件、单独防抖，不与事件/会话存储耦合 ──
+  let heatmapPersistTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const persistHeatmapNow = (): void => {
+    try {
+      mkdirSync(dirname(persistHeatmapPath), { recursive: true });
+      writeFileSync(persistHeatmapPath, JSON.stringify({ version: 1, daily: heatmapDaily }), 'utf-8');
+    } catch {
+      // 持久化失败不影响运行
+    }
+  };
+
+  const scheduleHeatmapPersist = (): void => {
+    if (heatmapPersistTimer) clearTimeout(heatmapPersistTimer);
+    heatmapPersistTimer = setTimeout(() => { heatmapPersistTimer = null; persistHeatmapNow(); }, 400);
+  };
+
+  /** 事件名到热力图指标的映射，仅这三类计入热力图 */
+  const heatmapMetricOf = (eventName: string): keyof ClaudeCodeHeatmapDailyCount | null => {
+    if (eventName === 'SessionStart') return 'session';
+    if (eventName === 'PreToolUse') return 'tool';
+    if (eventName === 'UserPromptSubmit') return 'prompt';
+    return null;
+  };
+
+  /** 把一个事件累计进热力图当日计数；累计后独立落盘 */
+  const recordHeatmap = (eventName: string, createdAt: number): void => {
+    const metric = heatmapMetricOf(eventName);
+    if (!metric) return;
+    const d = new Date(createdAt);
+    const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    const bucket = heatmapDaily[key] ?? { session: 0, tool: 0, prompt: 0 };
+    bucket[metric] += 1;
+    heatmapDaily[key] = bucket;
+    scheduleHeatmapPersist();
+  };
+
   const loadPersisted = (): void => {
     try {
       if (!existsSync(persistPath)) return;
@@ -531,6 +582,26 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
           if (session.transcriptPath) transcriptToSession.set(session.transcriptPath, session.id);
         }
       }
+    } catch {
+      // 读取失败时忽略，使用空状态
+    }
+  };
+
+  const loadHeatmap = (): void => {
+    try {
+      if (!existsSync(persistHeatmapPath)) return;
+      const root = asRecord(JSON.parse(readFileSync(persistHeatmapPath, 'utf-8')));
+      const daily = asRecord(root.daily);
+      const next: ClaudeCodeHeatmapDaily = {};
+      for (const [key, value] of Object.entries(daily)) {
+        const rec = asRecord(value);
+        next[key] = {
+          session: typeof rec.session === 'number' ? rec.session : 0,
+          tool: typeof rec.tool === 'number' ? rec.tool : 0,
+          prompt: typeof rec.prompt === 'number' ? rec.prompt : 0,
+        };
+      }
+      heatmapDaily = next;
     } catch {
       // 读取失败时忽略，使用空状态
     }
@@ -583,6 +654,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     hookScriptPath,
     sessions: Array.from(sessions.values()).sort((a, b) => b.lastEventAt - a.lastEventAt),
     events,
+    heatmap: heatmapDaily,
     updatedAt,
   });
 
@@ -754,6 +826,8 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     };
 
     events = [event, ...events].slice(0, MAX_EVENTS);
+    // 热力图累计：独立于事件/会话存储，清空时不会被清除
+    recordHeatmap(eventName, event.createdAt);
     const current = sessions.get(sessionId);
     const nextEvents = [event, ...(current?.events ?? [])].slice(0, MAX_SESSION_EVENTS);
     const nextPhase = phaseAfterEvent(current?.phase ?? 'idle', event);
@@ -830,6 +904,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
   async function start(): Promise<void> {
     if (server) return;
     loadPersisted();
+    loadHeatmap();
     mkdirSync(dirname(hookScriptPath), { recursive: true });
     writeFileSync(hookScriptPath, createHookScript(port), 'utf-8');
     syncInstalledHookCommands();

@@ -1618,6 +1618,7 @@ interface ClaudeCodeStatusSnapshot {
   hookScriptPath: string;
   sessions: ClaudeCodeSessionSnapshot[];
   events: ClaudeCodeHookEvent[];
+  heatmap: Record<string, { session: number; tool: number; prompt: number }>;
   updatedAt: number;
 }
 

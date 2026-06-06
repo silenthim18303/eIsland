@@ -36,5 +36,6 @@ export const EMPTY_CLI_STATUS: CliStatusSnapshot = {
   hookScriptPath: '',
   sessions: [],
   events: [],
+  heatmap: {},
   updatedAt: 0,
 };

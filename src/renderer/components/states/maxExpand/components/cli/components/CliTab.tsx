@@ -208,27 +208,20 @@ export function CliTab(): ReactElement {
     return ids;
   }, [snapshot.sessions]);
 
-  // 热力图：按天统计（完整一年，以今日为中心：今日所在月份前后各约半年），按月分块并对齐星期
+  // 热力图：按天统计（完整一年，以今日为中心：今日所在月份前后各约半年），按月分块并对齐星期。
+  // 数据来自独立持久化的 snapshot.heatmap，清空会话/事件不影响此处展示
   const heatmap = useMemo(() => {
     const MONTHS_BEFORE = 6;
     const MONTHS_AFTER = 5;
     const totals = { session: 0, tool: 0, prompt: 0 };
-    const matchMetric = (eventName: string): 'session' | 'tool' | 'prompt' | null => {
-      if (eventName === 'SessionStart') return 'session';
-      if (eventName === 'PreToolUse') return 'tool';
-      if (eventName === 'UserPromptSubmit') return 'prompt';
-      return null;
-    };
     const dayCounts = new Map<string, number>();
     const dayKey = (y: number, mo: number, da: number): string => `${y}-${mo}-${da}`;
-    for (const event of snapshot.events) {
-      const metric = matchMetric(event.eventName);
-      if (!metric) continue;
-      totals[metric] += 1;
-      if (metric !== heatmapMetric) continue;
-      const d = new Date(event.createdAt);
-      const key = dayKey(d.getFullYear(), d.getMonth() + 1, d.getDate());
-      dayCounts.set(key, (dayCounts.get(key) ?? 0) + 1);
+    for (const [key, counts] of Object.entries(snapshot.heatmap)) {
+      totals.session += counts.session;
+      totals.tool += counts.tool;
+      totals.prompt += counts.prompt;
+      const value = counts[heatmapMetric];
+      if (value > 0) dayCounts.set(key, value);
     }
     const now = new Date();
     now.setHours(0, 0, 0, 0);
@@ -255,7 +248,7 @@ export function CliTab(): ReactElement {
       months.push({ key: `${year}-${month}`, month, offset: firstDow, cells });
     }
     return { months, max, totals };
-  }, [snapshot.events, heatmapMetric]);
+  }, [snapshot.heatmap, heatmapMetric]);
 
   /** 一月到十二月的国际化短标签 key */
   const heatmapMonthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
