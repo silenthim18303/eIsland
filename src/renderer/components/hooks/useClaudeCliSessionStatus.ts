@@ -41,8 +41,7 @@ export function useClaudeCliSessionStatus(): {
   // 已提示过的待授权事件 id，避免重复播放音效
   const seenPermissionIdsRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
-  // 本次启动是否已弹出过「切换到 CLI 面板」询问；基线顶部事件 id
-  const promptedNewEventRef = useRef(false);
+  // 基线顶部事件 id，用于判断是否出现新的事件
   const baselineTopEventIdRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ export function useClaudeCliSessionStatus(): {
       const topEvent = snapshot.events?.[0];
       const topEventId = topEvent?.id ?? null;
       const topEventName = topEvent?.eventName ?? '';
-      const isSessionEndEvent = /^session(end|close)$/i.test(topEventName);
+      const isSessionStartEvent = /^session(start)$/i.test(topEventName) || /^sessionstart$/i.test(topEventName);
 
       // 首次快照只记录基线，不触发音效；之后出现新的待授权请求才播放
       if (initializedRef.current) {
@@ -78,10 +77,8 @@ export function useClaudeCliSessionStatus(): {
           }
         }
 
-        // 本次启动首次出现新的流式事件：弹通知询问是否切换到 maxExpand CLI 面板
-        // 但若新事件是 SessionEnd/SessionClose（会话已结束），不触发该通知
-        if (!promptedNewEventRef.current && topEventId && topEventId !== baselineTopEventIdRef.current && !isSessionEndEvent) {
-          promptedNewEventRef.current = true;
+        // 只要检测到新的 SessionStart 事件，就弹通知 + 音效 + 光效（不再限制每次启动仅一次）
+        if (topEventId && topEventId !== baselineTopEventIdRef.current && isSessionStartEvent) {
           const store = useIslandStore.getState();
           const inCliView = store.state === 'cli' || (store.state === 'maxExpand' && store.maxExpandTab === 'cli');
           if (!inCliView) {
