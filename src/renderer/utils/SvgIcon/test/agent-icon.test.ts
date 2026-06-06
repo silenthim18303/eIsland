@@ -19,22 +19,27 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file agent-icon.test.ts
+ * @description unit test
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+import { describe, expect, it } from 'vitest';
+import { AgentIcon } from '../agent-icon';
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+describe('AgentIcon', () => {
+  it('should contain expected keys', () => {
+    expect(AgentIcon).toHaveProperty('CLAUDE');
+  });
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
+  it('all values should be strings starting with ./svg/agent/ and ending with .svg', () => {
+    Object.entries(AgentIcon).forEach(([, value]) => {
+      expect(typeof value).toBe('string');
+      expect(value).toMatch(/^\.\/svg\/agent\/.+\.svg$/);
+    });
+  });
+
+  it('should contain exactly 1 key', () => {
+    expect(Object.keys(AgentIcon)).toHaveLength(1);
+  });
+});

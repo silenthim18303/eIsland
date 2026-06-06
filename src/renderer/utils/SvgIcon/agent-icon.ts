@@ -19,22 +19,13 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file agent-icon.ts
+ * @description AI Agent 图标路径枚举
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+export const AgentIcon = {
+  CLAUDE: './svg/agent/CLAUDE.svg',
+} as const;
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
+export type AgentIconKey = keyof typeof AgentIcon;
