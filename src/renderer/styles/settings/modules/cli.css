@@ -45,10 +45,20 @@
   min-width: 18px;
   height: 18px;
   padding: 0 5px;
+  border: 1px solid transparent;
   border-radius: 999px;
   background: rgba(var(--color-text-rgb), 0.08);
-  font-size: 10px;
   color: rgba(var(--color-text-rgb), 0.55);
+  font-size: 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cli-tab-sidebar-count:hover,
+.cli-tab-sidebar-count.active {
+  border-color: rgba(100, 200, 120, 0.24);
+  background: rgba(100, 200, 120, 0.1);
+  color: rgba(100, 200, 120, 0.86);
 }
 
 .cli-tab-session-list {
@@ -83,10 +93,6 @@
 .cli-tab-session-item.active {
   border-left-color: rgba(100, 200, 120, 0.65);
   background: rgba(100, 200, 120, 0.08);
-}
-
-.cli-tab-session-item--all {
-  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
 }
 
 .cli-tab-session-top {

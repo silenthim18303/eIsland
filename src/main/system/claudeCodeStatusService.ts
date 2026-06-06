@@ -230,6 +230,7 @@ function assistantOutputFromTranscript(transcriptPath: string | null): string | 
 }
 
 interface ClaudeTranscriptDetails {
+  sessionId: string | null;
   userInput: string | null;
   assistantOutput: string | null;
   model: string | null;
@@ -242,6 +243,7 @@ interface ClaudeTranscriptDetails {
 
 function emptyTranscriptDetails(): ClaudeTranscriptDetails {
   return {
+    sessionId: null,
     userInput: null,
     assistantOutput: null,
     model: null,
@@ -307,6 +309,7 @@ function readClaudeTranscriptDetails(transcriptPath: string | null, payload: Rec
     const lines = readFileSync(transcriptPath, 'utf-8').trim().split(/\r?\n/).slice(-260).reverse();
     for (const line of lines) {
       const entry = asRecord(JSON.parse(line));
+      details.sessionId = details.sessionId ?? asString(entry.sessionId) ?? asString(entry.session_id);
       const message = asRecord(entry.message);
       const role = asString(message.role) ?? asString(entry.role);
       const content = message.content ?? entry.content;

@@ -83,24 +83,18 @@ export function CliTab(): ReactElement {
       <div className="cli-tab-sidebar">
         <div className="cli-tab-sidebar-header">
           <span className="cli-tab-sidebar-title">{t('maxExpand.cli.sessions', { defaultValue: '会话' })}</span>
-          <span className="cli-tab-sidebar-count">{activeSessions.length}</span>
+          <button
+            className={`cli-tab-sidebar-count ${selectedSessionId === null ? 'active' : ''}`}
+            type="button"
+            title={t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}
+            onClick={() => setSelectedSessionId(null)}
+          >
+            {activeSessions.length}
+          </button>
         </div>
         <div className="cli-tab-session-list">
           {snapshot.sessions.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptySessions', { defaultValue: '暂无会话' })}</div>
-          )}
-          {snapshot.sessions.length > 0 && (
-            <button
-              className={`cli-tab-session-item cli-tab-session-item--all ${selectedSessionId === null ? 'active' : ''}`}
-              type="button"
-              onClick={() => setSelectedSessionId(null)}
-            >
-              <div className="cli-tab-session-top">
-                <span className="cli-tab-session-title">{t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}</span>
-                <span className="cli-tab-phase">{snapshot.sessions.length}</span>
-              </div>
-              <div className="cli-tab-session-path">{t('maxExpand.cli.allSessionsHint', { defaultValue: '显示所有 Claude Code 事件流' })}</div>
-            </button>
           )}
           {snapshot.sessions.map((session) => (
             <button
