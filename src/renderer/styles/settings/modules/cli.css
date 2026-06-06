@@ -157,8 +157,11 @@
 }
 
 .cli-tab-permission {
-  margin-top: 6px;
-  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 4px;
+  padding: 3px 8px;
   border-radius: 6px;
   border: 1px solid rgba(255, 213, 79, 0.2);
   background: rgba(255, 213, 79, 0.06);
@@ -167,6 +170,7 @@
 
 .cli-tab-permission-text {
   font-size: 11px;
+  line-height: 1.2;
   color: rgba(255, 213, 79, 0.85);
 }
 
