@@ -42,6 +42,7 @@ import { useIslandEscapeNavigation } from './useIslandEscapeNavigation';
 import { useIslandShellPresentation } from './useIslandShellPresentation';
 import { useIslandRuntimeRefs } from './useIslandRuntimeRefs';
 import { useIslandAutoDim } from './useIslandAutoDim';
+import { useClaudeCliSessionStatus } from './useClaudeCliSessionStatus';
 
 interface UseDynamicIslandCoordinatorOptions {
   store: IIslandStore;
@@ -79,6 +80,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setHover,
     setIdle,
     setExpanded,
+    setCli,
     setLyrics,
     setGuide,
     setAnnouncement,
@@ -119,6 +121,8 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setNotification,
   });
 
+  const { hasActiveSessionRef: hasActiveCliSessionRef } = useClaudeCliSessionStatus();
+
   const {
     bgOpacityRef,
     bgBlurRef,
@@ -154,6 +158,8 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     isPlaying,
     setHover,
     setExpanded,
+    setCli,
+    hasActiveCliSessionRef,
     idleClickExpandRef,
     isHoveringRef,
   });

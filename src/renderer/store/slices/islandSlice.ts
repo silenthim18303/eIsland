@@ -203,6 +203,13 @@ export const createIslandSlice: StateCreator<
     return { state: 'agent' as const, agentPrompt: prompt ?? prev.sttText ?? '', authReturnState: null };
   }),
 
+  setCli: () => set((prev) => {
+    if (prev.uiStateLocked && prev.state !== 'cli') return prev;
+    window.api?.expandWindowNotification();
+    window.api?.disableMousePassthrough();
+    return { state: 'cli' as const, authReturnState: null };
+  }),
+
   toggleUiStateLock: () => {
     const next = !get().uiStateLocked;
     set({ uiStateLocked: next });

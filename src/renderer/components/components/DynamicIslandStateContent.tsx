@@ -41,6 +41,7 @@ import { AnnouncementContent } from '../states/announcement/AnnouncementContent'
 import { AgentVoiceInputContent } from '../states/agentVoiceInput/AgentVoiceInputContent';
 import { AgentContent } from '../states/agent/AgentContent';
 import { SttContent } from '../states/stt/SttContent';
+import { CliContent } from '../states/cli/CliContent';
 import type { IslandState } from '../hooks/useDynamicIslandShell';
 
 interface DynamicIslandStateContentProps {
@@ -131,6 +132,7 @@ export function DynamicIslandStateContent({
   if (state === 'agentVoiceInput') return <AgentVoiceInputContent />;
   if (state === 'agent') return <AgentContent />;
   if (state === 'stt') return <SttContent />;
+  if (state === 'cli') return <CliContent />;
 
   return null;
 }

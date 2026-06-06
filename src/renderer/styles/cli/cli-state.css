@@ -1,0 +1,146 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file cli-state.css
+ * @description CLI 灵动岛状态样式（500×88，参考 agent 态布局）
+ */
+
+.cli-state-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 8px 16px;
+  animation: cliStateEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cli-state-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.cli-state-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cli-state-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.cli-state-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-phase {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.5);
+}
+
+.cli-state-phase.running {
+  background: rgba(100, 180, 255, 0.16);
+  color: rgba(100, 180, 255, 0.9);
+}
+
+.cli-state-phase.waiting_permission {
+  background: rgba(255, 196, 0, 0.16);
+  color: rgba(255, 196, 0, 0.95);
+}
+
+.cli-state-event {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.cli-state-event-name {
+  flex-shrink: 0;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.7);
+}
+
+.cli-state-event-summary {
+  min-width: 0;
+  color: rgba(var(--color-text-rgb), 0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-actions {
+  position: absolute;
+  right: 16px;
+  top: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.cli-state-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.35);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.cli-state-action-btn:hover {
+  color: rgba(var(--color-text-rgb), 0.7);
+  background: rgba(var(--color-text-rgb), 0.08);
+}
+
+@keyframes cliStateEnter {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

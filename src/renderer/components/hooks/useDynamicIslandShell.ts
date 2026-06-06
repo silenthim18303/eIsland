@@ -28,7 +28,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
 
-export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'minimal' | 'lyrics' | 'guide' | 'login' | 'register' | 'resetPassword' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt';
+export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'minimal' | 'lyrics' | 'guide' | 'login' | 'register' | 'resetPassword' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
 
 const MORPH_DURATION_BY_SPEED: Record<string, number> = { slow: 1100, medium: 550, fast: 280 };
 
@@ -40,6 +40,8 @@ interface UseDynamicIslandShellOptions {
   isPlaying: boolean;
   setHover: () => void;
   setExpanded: () => void;
+  setCli: () => void;
+  hasActiveCliSessionRef: React.MutableRefObject<boolean>;
   idleClickExpandRef: React.MutableRefObject<boolean>;
   isHoveringRef: React.MutableRefObject<boolean>;
 }
@@ -65,6 +67,8 @@ export function useDynamicIslandShell(options: UseDynamicIslandShellOptions): Dy
     isPlaying,
     setHover,
     setExpanded,
+    setCli,
+    hasActiveCliSessionRef,
     idleClickExpandRef,
     isHoveringRef,
   } = options;
@@ -119,9 +123,14 @@ export function useDynamicIslandShell(options: UseDynamicIslandShellOptions): Dy
     }
 
     if (state === 'expanded' || state === 'maxExpand' || state === 'announcement') {
+      // 退出 maxExpand 时，如存在活跃的 Claude 会话则进入 cli 态展示实时流事件
+      if (state === 'maxExpand' && hasActiveCliSessionRef.current) {
+        setCli();
+        return;
+      }
       setHover();
     }
-  }, [state, setExpanded, setHover, idleClickExpandRef, isHoveringRef]);
+  }, [state, setExpanded, setHover, setCli, hasActiveCliSessionRef, idleClickExpandRef, isHoveringRef]);
 
   return {
     morphing,
