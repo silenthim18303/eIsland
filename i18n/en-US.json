@@ -1182,6 +1182,7 @@
       "allSessions": "All Sessions",
       "allSessionsHint": "Show all Claude Code event streams",
       "filterAria": "Event filters",
+      "permissionProject": "Permission: {{project}}",
       "filters": {
         "all": "All",
         "message": "Conversation",

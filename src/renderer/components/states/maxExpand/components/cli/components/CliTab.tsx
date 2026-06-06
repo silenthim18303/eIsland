@@ -30,7 +30,7 @@ import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
 import { EVENT_FILTERS } from '../config/cliFilters';
 import type { CliHookEvent } from '../config/types';
-import { formatTime, phaseLabel, detailLabel, filterLabel } from '../utils/cliFormatters';
+import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import '../../../../../../styles/settings/modules/cli.css';
 
@@ -110,8 +110,8 @@ export function CliTab(): ReactElement {
               </div>
               <div className="cli-tab-session-path">{session.cwd ?? session.transcriptPath ?? session.id}</div>
               {session.pendingPermission && (
-                <div className="cli-tab-permission">
-                  <span className="cli-tab-permission-text">{session.pendingPermission.summary}</span>
+                <div className="cli-tab-permission" title={session.pendingPermission.summary}>
+                  <span className="cli-tab-permission-text">{permissionProjectLabel(session.pendingPermission, t)}</span>
                 </div>
               )}
             </button>

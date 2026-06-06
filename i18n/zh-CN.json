@@ -1182,6 +1182,7 @@
       "allSessions": "全部会话",
       "allSessionsHint": "显示所有 Claude Code 事件流",
       "filterAria": "事件筛选",
+      "permissionProject": "授权项目：{{project}}",
       "filters": {
         "all": "全部",
         "message": "对话",

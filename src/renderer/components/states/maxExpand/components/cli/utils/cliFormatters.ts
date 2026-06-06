@@ -51,6 +51,11 @@ export function filterLabel(filter: CliEventFilter, t: (key: string, opts?: Reco
   return t(`maxExpand.cli.filters.${filter}`, { defaultValue: filter });
 }
 
+export function permissionProjectLabel(event: CliHookEvent, t: (key: string, opts?: Record<string, unknown>) => string): string {
+  const project = event.toolName ?? event.toolInputPreview ?? event.summary;
+  return t('maxExpand.cli.permissionProject', { defaultValue: '授权项目：{{project}}', project });
+}
+
 /** 判断事件是否匹配当前筛选条件 */
 export function matchesFilter(event: CliHookEvent, filter: CliEventFilter): boolean {
   if (filter === 'all') return true;
