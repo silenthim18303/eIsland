@@ -336,6 +336,11 @@
   color: rgba(var(--color-text-rgb), 0.3);
 }
 
+.cli-tab-event-sentinel {
+  height: 1px;
+  color: rgba(var(--color-text-rgb), 0.3);
+}
+
 /* ── 事件卡片（统一样式） ── */
 .cli-event-card {
   padding: 10px 12px;

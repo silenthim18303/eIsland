@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useState, type ReactElement } from 'react';
+import { useState, useEffect, useRef, useCallback, type ReactElement } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
@@ -34,6 +34,10 @@ import type { CliHookEvent } from '../config/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
 import '../../../../../../styles/settings/modules/cli.css';
+
+/** 初始渲染数量 & 每次追加数量 */
+const INITIAL_EVENT_COUNT = 10;
+const LOAD_MORE_COUNT = 10;
 
 function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
@@ -78,6 +82,38 @@ export function CliTab(): ReactElement {
     filteredEvents,
   } = useCliEvents(snapshot);
   const [filtersVisible, setFiltersVisible] = useState(false);
+
+  /* ── 渐进加载 ── */
+  const [visibleCount, setVisibleCount] = useState(INITIAL_EVENT_COUNT);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const prevFilterRef = useRef(eventFilter);
+  const prevSessionRef = useRef(selectedSessionId);
+
+  // 筛选条件变化时重置计数
+  useEffect(() => {
+    if (prevFilterRef.current !== eventFilter || prevSessionRef.current !== selectedSessionId) {
+      prevFilterRef.current = eventFilter;
+      prevSessionRef.current = selectedSessionId;
+      setVisibleCount(INITIAL_EVENT_COUNT);
+    }
+  }, [eventFilter, selectedSessionId]);
+
+  // IntersectionObserver：触底追加
+  const loadMore = useCallback(() => setVisibleCount((c) => c + LOAD_MORE_COUNT), []);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) loadMore(); },
+      { root: el.parentElement, threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  const visibleEvents = filteredEvents.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredEvents.length;
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -180,7 +216,8 @@ export function CliTab(): ReactElement {
           {filteredEvents.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</div>
           )}
-          {filteredEvents.map((event) => <EventRow key={event.id} event={event} t={t} />)}
+          {visibleEvents.map((event) => <EventRow key={event.id} event={event} t={t} />)}
+          {hasMore && <div ref={sentinelRef} className="cli-tab-event-sentinel" />}
         </div>
       </div>
     </div>
