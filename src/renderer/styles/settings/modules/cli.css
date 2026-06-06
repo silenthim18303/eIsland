@@ -670,6 +670,56 @@
   margin-top: 6px;
 }
 
+/* 事件卡片内的授权按钮组（PermissionRequest） */
+.cli-event-card-permission {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cli-event-card-permission-btn {
+  appearance: none;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.65);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cli-event-card-permission-deny {
+  border-color: rgba(239, 83, 80, 0.4);
+  color: rgba(239, 83, 80, 0.9);
+}
+
+.cli-event-card-permission-deny:hover {
+  background: rgba(239, 83, 80, 0.16);
+  color: rgba(239, 83, 80, 1);
+}
+
+.cli-event-card-permission-allow {
+  border-color: rgba(76, 175, 80, 0.45);
+  color: rgba(76, 175, 80, 0.95);
+}
+
+.cli-event-card-permission-allow:hover {
+  background: rgba(76, 175, 80, 0.16);
+  color: rgba(76, 175, 80, 1);
+}
+
+.cli-event-card-permission-always {
+  border-color: rgba(100, 180, 255, 0.45);
+  color: rgba(100, 180, 255, 0.95);
+}
+
+.cli-event-card-permission-always:hover {
+  background: rgba(100, 180, 255, 0.16);
+  color: rgba(100, 180, 255, 1);
+}
+
 /* 外层容器展开/收起动画：grid-template-rows 0fr↔1fr 过渡，自适应高度，双向都有动画 */
 .cli-event-card-details-content {
   display: grid;

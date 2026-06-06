@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useState, useEffect, useRef, useCallback, type ReactElement } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo, type ReactElement } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { gsap } from 'gsap';
 import { useGSAP } from '@gsap/react';
@@ -49,7 +49,7 @@ const STOP_EVENTS = new Set(['Stop', 'StopFailure', 'SubagentStop', 'SessionEnd'
 /** 等待授权事件名 */
 const PERMISSION_EVENTS = new Set(['PermissionRequest', 'PermissionDenied']);
 
-function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
+function EventRow({ event, t, showPermission }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string; showPermission: boolean }): ReactElement {
   const [expanded, setExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
@@ -78,6 +78,31 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
         </div>
       </div>
       <div className="cli-event-card-body"><ReactMarkdown>{event.summary}</ReactMarkdown></div>
+      {showPermission && (
+        <div className="cli-event-card-permission">
+          <button
+            type="button"
+            className="cli-event-card-permission-btn cli-event-card-permission-deny"
+            onClick={() => { void window.api.claudeCodePermissionResolve(event.sessionId, 'deny'); }}
+          >
+            {t('cli.permission.deny', { defaultValue: '拒绝' })}
+          </button>
+          <button
+            type="button"
+            className="cli-event-card-permission-btn cli-event-card-permission-allow"
+            onClick={() => { void window.api.claudeCodePermissionResolve(event.sessionId, 'allow'); }}
+          >
+            {t('cli.permission.allow', { defaultValue: '批准' })}
+          </button>
+          <button
+            type="button"
+            className="cli-event-card-permission-btn cli-event-card-permission-always"
+            onClick={() => { void window.api.claudeCodePermissionResolve(event.sessionId, 'always'); }}
+          >
+            {t('cli.permission.always', { defaultValue: '永久批准' })}
+          </button>
+        </div>
+      )}
       {hasExtra && (
         <div className="cli-event-card-details">
           <button type="button" className="cli-event-card-details-toggle" onClick={handleToggle}>
@@ -172,6 +197,14 @@ export function CliTab(): ReactElement {
   const currentPage = Math.min(page, totalPages - 1);
   const pagedEvents = filteredEvents.slice(currentPage * EVENTS_PER_PAGE, currentPage * EVENTS_PER_PAGE + EVENTS_PER_PAGE);
   const selectedSessionCount = selectedSessionIds.size;
+  // 仍在等待授权的会话，其待授权事件 id —— 仅这些事件卡片显示授权按钮
+  const pendingPermissionEventIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const session of snapshot.sessions) {
+      if (session.phase === 'waiting_permission' && session.pendingPermission) ids.add(session.pendingPermission.id);
+    }
+    return ids;
+  }, [snapshot.sessions]);
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -346,7 +379,7 @@ export function CliTab(): ReactElement {
           {filteredEvents.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</div>
           )}
-          {pagedEvents.map((event) => <EventRow key={event.id} event={event} t={t} />)}
+          {pagedEvents.map((event) => <EventRow key={event.id} event={event} t={t} showPermission={pendingPermissionEventIds.has(event.id)} />)}
         </div>
       </div>
     </div>
