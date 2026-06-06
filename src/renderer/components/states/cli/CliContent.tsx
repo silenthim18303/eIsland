@@ -32,6 +32,8 @@ import { AgentIcon } from '../../../utils/SvgIcon';
 import { useClaudeCodeStatus } from '../maxExpand/components/cli/hooks/useClaudeCodeStatus';
 import { phaseLabel } from '../maxExpand/components/cli/utils/cliFormatters';
 import { useCurrentLyric } from '../lyrics/hooks/useCurrentLyric';
+import { useLyricsSettings } from '../lyrics/hooks/useLyricsSettings';
+import { KaraokeSyllableLine } from '../lyrics/components/KaraokeSyllableLine';
 import '../../../styles/cli/cli-state.css';
 
 /**
@@ -50,7 +52,8 @@ export function CliContent(): ReactElement {
   const syncedLyrics = useIslandStore((s) => s.syncedLyrics);
   const lyricsLoading = useIslandStore((s) => s.lyricsLoading);
   const currentPositionMs = useIslandStore((s) => s.currentPositionMs);
-  const { currentIdx, currentText } = useCurrentLyric(syncedLyrics, lyricsLoading, currentPositionMs);
+  const { currentIdx, currentLine, currentText, hasSyllables } = useCurrentLyric(syncedLyrics, lyricsLoading, currentPositionMs);
+  const { karaokeEnabled } = useLyricsSettings();
 
   // 选取最近活跃的会话及其最新流事件
   const { activeSession, latestEvent } = useMemo(() => {
@@ -115,7 +118,17 @@ export function CliContent(): ReactElement {
         </button>
       </div>
       {isMusicPlaying && currentText && (
-        <span key={currentIdx} className="cli-state-lyric">{currentText}</span>
+        <span key={currentIdx} className={`cli-state-lyric${karaokeEnabled && hasSyllables ? ' cli-state-lyric-karaoke' : ''}`}>
+          {karaokeEnabled && hasSyllables && currentLine ? (
+            <KaraokeSyllableLine
+              syllables={currentLine.syllables!}
+              lineStartMs={currentLine.time_ms}
+              posMs={currentPositionMs}
+            />
+          ) : (
+            currentText
+          )}
+        </span>
       )}
     </div>
   );
