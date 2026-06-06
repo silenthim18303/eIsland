@@ -391,15 +391,6 @@ function inferEventName(payload: Record<string, unknown>): string {
     ?? 'Unknown';
 }
 
-function inferSessionId(payload: Record<string, unknown>, transcriptPath: string | null, cwd: string | null): string {
-  return asString(payload.session_id)
-    ?? asString(payload.sessionID)
-    ?? asString(payload.sessionId)
-    ?? transcriptPath
-    ?? cwd
-    ?? 'claude-code';
-}
-
 function inferKind(eventName: string): ClaudeCodeHookEventKind {
   if (eventName === 'PermissionRequest' || eventName === 'PermissionDenied') return 'permission';
   if (eventName === 'PreToolUse' || eventName === 'PostToolUse' || eventName === 'PostToolUseFailure') return 'tool';
@@ -535,6 +526,9 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
           // 重启后无法再响应历史待授权请求，挂起态归并为已结束/空闲展示
           const phase = session.phase === 'waiting_permission' ? 'idle' : session.phase;
           sessions.set(session.id, { ...session, phase, pendingPermission: null });
+          // 重建合并锚点，避免重启后同一 cwd / transcript 再次分裂
+          if (session.cwd) cwdToSession.set(session.cwd, session.id);
+          if (session.transcriptPath) transcriptToSession.set(session.transcriptPath, session.id);
         }
       }
     } catch {
@@ -642,6 +636,68 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     }
   };
 
+  // transcriptPath / cwd → 规范 sessionId 映射，用于把同一会话的事件并入，避免会话分裂
+  const transcriptToSession = new Map<string, string>();
+  const cwdToSession = new Map<string, string>();
+
+  /** 将 fromId 会话的事件并入 toId 会话，并清理来源会话 */
+  const mergeSession = (fromId: string, toId: string): void => {
+    if (fromId === toId) return;
+    const from = sessions.get(fromId);
+    events = events.map((e) => (e.sessionId === fromId ? { ...e, sessionId: toId } : e));
+    if (from) {
+      const to = sessions.get(toId);
+      if (to) {
+        const mergedEvents = [...to.events, ...from.events]
+          .map((e) => (e.sessionId === fromId ? { ...e, sessionId: toId } : e))
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .slice(0, MAX_SESSION_EVENTS);
+        sessions.set(toId, { ...to, events: mergedEvents, lastEventAt: Math.max(to.lastEventAt, from.lastEventAt) });
+      } else {
+        sessions.set(toId, { ...from, id: toId });
+      }
+      sessions.delete(fromId);
+    }
+    for (const [key, value] of transcriptToSession) {
+      if (value === fromId) transcriptToSession.set(key, toId);
+    }
+    for (const [key, value] of cwdToSession) {
+      if (value === fromId) cwdToSession.set(key, toId);
+    }
+  };
+
+  /**
+   * 解析事件所属会话：优先 session_id，并以 transcriptPath 与 cwd 作为合并锚点防止分裂。
+   * Claude Code 在新会话启动早期常把 transcript 富化为上一轮文件、且 session_id 可能与
+   * 结束事件不一致，导致同一终端被拆成两个会话；以 cwd 归并保证一个工作目录只对应一个会话卡片。
+   */
+  const resolveSessionId = (payload: Record<string, unknown>, transcriptPath: string | null, cwd: string | null): string => {
+    const explicit = asString(payload.session_id) ?? asString(payload.sessionID) ?? asString(payload.sessionId);
+    let canonical: string;
+    if (explicit) {
+      canonical = explicit;
+    } else if (transcriptPath && transcriptToSession.has(transcriptPath)) {
+      canonical = transcriptToSession.get(transcriptPath)!;
+    } else if (cwd && cwdToSession.has(cwd)) {
+      canonical = cwdToSession.get(cwd)!;
+    } else {
+      canonical = transcriptPath ?? cwd ?? 'claude-code';
+    }
+
+    // 以 cwd 归并：同一工作目录已有其它会话则合并为同一个
+    if (cwd) {
+      const prev = cwdToSession.get(cwd);
+      if (prev && prev !== canonical) mergeSession(prev, canonical);
+      cwdToSession.set(cwd, canonical);
+    }
+    if (transcriptPath) {
+      const prev = transcriptToSession.get(transcriptPath);
+      if (prev && prev !== canonical) mergeSession(prev, canonical);
+      transcriptToSession.set(transcriptPath, canonical);
+    }
+    return canonical;
+  };
+
   const addEvent = (payload: Record<string, unknown>): ClaudeCodeHookEvent => {
     const eventName = inferEventName(payload);
     // 不在 CLI / maxExpand 面板展示 Notification 事件：直接忽略，不存储也不广播
@@ -666,7 +722,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     };
     const cwd = asString(enrichedPayload.cwd) ?? asString(enrichedPayload.workspace) ?? asString(enrichedPayload.project_dir) ?? asString(enrichedPayload.projectDir);
     const transcriptPath = asString(enrichedPayload.transcript_path) ?? asString(enrichedPayload.transcriptPath);
-    const sessionId = inferSessionId(enrichedPayload, transcriptPath, cwd);
+    const sessionId = resolveSessionId(enrichedPayload, transcriptPath, cwd);
     const toolName = asString(enrichedPayload.tool_name) ?? asString(enrichedPayload.toolName) ?? asString(enrichedPayload.name);
     const toolInput = enrichedPayload.tool_input ?? enrichedPayload.toolInput ?? enrichedPayload.input;
     const toolResponse = payloadToolResponse(enrichedPayload);
