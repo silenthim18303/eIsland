@@ -217,12 +217,15 @@
 }
 
 .cli-tab-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border: 1px solid rgba(var(--color-text-rgb), 0.1);
   border-radius: 6px;
   background: rgba(var(--color-text-rgb), 0.06);
   color: rgba(var(--color-text-rgb), 0.72);
-  font-size: 11px;
-  padding: 4px 10px;
   cursor: pointer;
   transition: background 0.2s, color 0.2s;
 }

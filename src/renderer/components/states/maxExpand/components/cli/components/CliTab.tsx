@@ -31,6 +31,7 @@ import { useCliEvents } from '../hooks/useCliEvents';
 import { EVENT_FILTERS } from '../config/cliFilters';
 import type { CliHookEvent } from '../config/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel } from '../utils/cliFormatters';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import '../../../../../../styles/settings/modules/cli.css';
 
 function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
@@ -135,11 +136,22 @@ export function CliTab(): ReactElement {
             </span>
           </div>
           <div className="cli-tab-actions">
-            <button className="cli-tab-action-btn" type="button" onClick={snapshot.enabled ? disableHook : enableHook}>
-              {snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
+            <button
+              className="cli-tab-action-btn"
+              type="button"
+              title={snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
+              onClick={snapshot.enabled ? disableHook : enableHook}
+            >
+              <img src={SvgIcon.PLUGIN} alt="" width="14" height="14" draggable={false} />
             </button>
-            <button className="cli-tab-action-btn cli-tab-action-btn--secondary" type="button" onClick={clearEvents} disabled={snapshot.events.length === 0}>
-              {t('maxExpand.cli.clear', { defaultValue: '清空' })}
+            <button
+              className="cli-tab-action-btn cli-tab-action-btn--secondary"
+              type="button"
+              title={t('maxExpand.cli.clear', { defaultValue: '清空' })}
+              onClick={clearEvents}
+              disabled={snapshot.events.length === 0}
+            >
+              <img src={SvgIcon.DELETE} alt="" width="14" height="14" draggable={false} />
             </button>
           </div>
         </div>
