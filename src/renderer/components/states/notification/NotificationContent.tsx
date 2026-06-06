@@ -311,8 +311,8 @@ export function NotificationContent({
     dismiss();
   };
 
-  const handleRestartNow = (): void => { void window.api?.restartApp?.().catch(() => {}); dismiss(); };
-  const handleRestartLater = (): void => { dismiss(); };
+  const handleRestartNow = (): void => { void window.api?.restartApp?.().catch(() => {}); dismiss(); };  const handleRestartLater = (): void => { dismiss(); };
+  const handleSwitchToCli = (): void => { setMaxExpandTab('cli'); setMaxExpand(); };
   const handleOpenUrl = (url: string): void => { window.api?.clipboardOpenUrl(url); dismiss(); };
 
   const handleOpenAllUrls = (): void => {
@@ -509,10 +509,16 @@ export function NotificationContent({
             <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleDismissUrl}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
           </div>
         </div>
-      ) : type === 'external-agent-active' || type === 'external-agent-stopped' ? (
-        <div className="notification-actions notification-actions--right">
+      ) : type === 'external-agent-active' || type === 'external-agent-stopped' ? (        <div className="notification-actions notification-actions--right">
           <div className="notification-decision-actions">
             <button type="button" className="notification-action-btn notification-action-ignore" onClick={dismiss}>{t('notification.actions.gotIt', { defaultValue: '知道了' })}</button>
+          </div>
+        </div>
+      ) : type === 'cli-session-detected' ? (
+        <div className="notification-actions">
+          <div className="notification-decision-actions">
+            <button type="button" className="notification-action-btn notification-action-complete" onClick={handleSwitchToCli}>{t('notification.actions.switch', { defaultValue: '切换' })}</button>
+            <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleIgnore}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
           </div>
         </div>
       ) : type === 'source-switch' ? (

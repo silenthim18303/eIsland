@@ -53,7 +53,7 @@ export interface NotificationContentProps {
   /** 通知图标（可选） */
   icon?: string;
   /** 通知类型 */
-  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required' | 'external-agent-active' | 'external-agent-stopped';
+  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required' | 'external-agent-active' | 'external-agent-stopped' | 'cli-session-detected';
   /** 外部 Agent 名称（仅 external-agent-active / external-agent-stopped 类型） */
   agentName?: string;
   /** 请求切换到的播放源 ID（仅 source-switch） */

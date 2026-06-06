@@ -166,8 +166,8 @@ export interface NotificationData {
   title: string;
   body: string;
   icon?: string;
-  /** 通知类型：默认通知 / 播放源切换请求 / 有新版本 / 更新下载中 / 更新就绪 / 启动天气预警 / 剪贴板URL / 重启确认 / 外部Agent启动 / 外部Agent关闭 */
-  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required' | 'external-agent-active' | 'external-agent-stopped';
+  /** 通知类型：默认通知 / 播放源切换请求 / 有新版本 / 更新下载中 / 更新就绪 / 启动天气预警 / 剪贴板URL / 重启确认 / 外部Agent启动 / 外部Agent关闭 / 检测到 Claude Code 流事件 */
+  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required' | 'external-agent-active' | 'external-agent-stopped' | 'cli-session-detected';
   /** 外部 Agent 名称（仅 external-agent-active / external-agent-stopped 类型） */
   agentName?: string;
   /** 请求切换到的播放源 ID（仅 source-switch 类型） */

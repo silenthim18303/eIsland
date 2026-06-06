@@ -39,11 +39,14 @@ export function useClaudeCliSessionStatus(): {
   // 已提示过的待授权事件 id，避免重复播放音效
   const seenPermissionIdsRef = useRef<Set<string>>(new Set());
   const initializedRef = useRef(false);
+  // 本次启动是否已弹出过「切换到 CLI 面板」询问；基线顶部事件 id
+  const promptedNewEventRef = useRef(false);
+  const baselineTopEventIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    const applySnapshot = (snapshot: { sessions: Array<{ phase: string; pendingPermission?: { id: string } | null }> } | null | undefined): void => {
+    const applySnapshot = (snapshot: { sessions: Array<{ phase: string; pendingPermission?: { id: string } | null }>; events?: Array<{ id: string }> } | null | undefined): void => {
       if (cancelled || !snapshot) return;
       hasActiveSessionRef.current = snapshot.sessions.some((session) => session.phase !== 'completed');
 
@@ -54,6 +57,9 @@ export function useClaudeCliSessionStatus(): {
           pendingIds.add(session.pendingPermission.id);
         }
       }
+
+      const topEventId = snapshot.events?.[0]?.id ?? null;
+
       // 首次快照只记录基线，不触发音效；之后出现新的待授权请求才播放
       if (initializedRef.current) {
         for (const id of pendingIds) {
@@ -66,9 +72,24 @@ export function useClaudeCliSessionStatus(): {
             break;
           }
         }
+
+        // 本次启动首次出现新的流式事件：弹通知询问是否切换到 maxExpand CLI 面板
+        if (!promptedNewEventRef.current && topEventId && topEventId !== baselineTopEventIdRef.current) {
+          promptedNewEventRef.current = true;
+          const store = useIslandStore.getState();
+          const inCliView = store.state === 'cli' || (store.state === 'maxExpand' && store.maxExpandTab === 'cli');
+          if (!inCliView) {
+            store.setNotification({
+              title: 'Claude Code',
+              body: '检测到新的 Claude Code 活动，是否切换到 CLI 面板查看？',
+              type: 'cli-session-detected',
+            });
+          }
+        }
       }
       initializedRef.current = true;
       seenPermissionIdsRef.current = pendingIds;
+      baselineTopEventIdRef.current = topEventId;
     };
 
     window.api?.claudeCodeStatusGet?.().then(applySnapshot).catch(() => {});
