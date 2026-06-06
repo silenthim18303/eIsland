@@ -50,12 +50,12 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
     <div className="cli-event-card">
       <div className="cli-event-card-header">
         <span className="cli-event-card-name">{event.eventName}</span>
-        <span className="cli-event-card-time">{formatTime(event.createdAt)}</span>
+        <div className="cli-event-card-header-right">
+          {event.toolName && <span className="cli-event-card-tool-tag">{event.toolName}</span>}
+          <span className="cli-event-card-time">{formatTime(event.createdAt)}</span>
+        </div>
       </div>
       <div className="cli-event-card-body"><ReactMarkdown>{event.summary}</ReactMarkdown></div>
-      {event.toolName && (
-        <div className="cli-event-card-tool">{event.toolName}</div>
-      )}
       {hasExtra && (
         <details className="cli-event-card-details" onToggle={handleToggle}>
           <summary className="cli-event-card-details-toggle">
