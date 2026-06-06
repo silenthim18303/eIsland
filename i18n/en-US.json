@@ -1183,6 +1183,7 @@
       "allSessionsHint": "Show all Claude Code event streams",
       "allLabel": "all",
       "filterAria": "Event filters",
+      "enterCliState": "Live event stream",
       "bulkSelect": "Bulk Select",
       "cancelSelection": "Cancel Selection",
       "selectedCount": "{{count}} selected",

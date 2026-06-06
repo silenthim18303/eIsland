@@ -387,6 +387,16 @@
   color: rgba(var(--color-text-rgb), 0.88);
 }
 
+.cli-tab-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.cli-tab-action-btn:disabled:hover {
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: inherit;
+}
+
 .cli-tab-action-btn--secondary:disabled {
   cursor: not-allowed;
   opacity: 0.35;

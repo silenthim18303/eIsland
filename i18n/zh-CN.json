@@ -1183,6 +1183,7 @@
       "allSessionsHint": "显示所有 Claude Code 事件流",
       "allLabel": "all",
       "filterAria": "事件筛选",
+      "enterCliState": "进入实时流",
       "bulkSelect": "批量选择",
       "cancelSelection": "取消选择",
       "selectedCount": "已选 {{count}} 项",

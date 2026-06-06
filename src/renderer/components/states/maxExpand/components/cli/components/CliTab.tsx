@@ -35,6 +35,7 @@ import { EVENT_FILTERS } from '../config/cliFilters';
 import type { CliHookEvent } from '../config/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
+import useIslandStore from '../../../../../../store/isLandStore';
 import '../../../../../../styles/settings/modules/cli.css';
 
 gsap.registerPlugin(useGSAP);
@@ -102,6 +103,7 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
 
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
+  const setCli = useIslandStore((s) => s.setCli);
   const { snapshot, enableHook, disableHook, clearEvents, deleteSessions } = useClaudeCodeStatus();
   const {
     eventFilter,
@@ -109,6 +111,7 @@ export function CliTab(): ReactElement {
     selectedSession,
     selectedSessionId,
     setSelectedSessionId,
+    activeSessions,
     filteredEvents,
   } = useCliEvents(snapshot);
   const [filtersVisible, setFiltersVisible] = useState(false);
@@ -301,6 +304,15 @@ export function CliTab(): ReactElement {
               onClick={() => setFiltersVisible((v) => !v)}
             >
               <img src={SvgIcon.FILTER} alt="" width="14" height="14" draggable={false} />
+            </button>
+            <button
+              className="cli-tab-action-btn"
+              type="button"
+              title={t('maxExpand.cli.enterCliState', { defaultValue: '进入实时流' })}
+              onClick={() => setCli()}
+              disabled={activeSessions.length === 0}
+            >
+              <img src={SvgIcon.AI} alt="" width="14" height="14" draggable={false} />
             </button>
           </div>
         </div>
