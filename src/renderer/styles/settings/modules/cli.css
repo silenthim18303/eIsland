@@ -372,6 +372,73 @@
   font-size: 13px;
   color: rgba(var(--color-text-rgb), 0.85);
   line-height: 1.5;
+  overflow: hidden;
+}
+
+/* markdown 子元素重置 */
+.cli-event-card-body > *:first-child {
+  margin-top: 0;
+}
+
+.cli-event-card-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.cli-event-card-body p {
+  margin: 4px 0;
+}
+
+.cli-event-card-body code {
+  border-radius: 3px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  padding: 1px 4px;
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+}
+
+.cli-event-card-body pre {
+  margin: 4px 0;
+  padding: 6px 8px;
+  border-radius: 5px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  overflow-x: auto;
+}
+
+.cli-event-card-body pre code {
+  padding: 0;
+  background: none;
+  font-size: 11px;
+}
+
+.cli-event-card-body a {
+  color: rgba(100, 180, 255, 0.85);
+  text-decoration: none;
+}
+
+.cli-event-card-body a:hover {
+  text-decoration: underline;
+}
+
+.cli-event-card-body ul,
+.cli-event-card-body ol {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.cli-event-card-body li {
+  margin: 2px 0;
+}
+
+.cli-event-card-body blockquote {
+  margin: 4px 0;
+  padding: 2px 10px;
+  border-left: 2px solid rgba(var(--color-text-rgb), 0.15);
+  color: rgba(var(--color-text-rgb), 0.6);
+}
+
+.cli-event-card-body strong {
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.92);
 }
 
 .cli-event-card-tool {

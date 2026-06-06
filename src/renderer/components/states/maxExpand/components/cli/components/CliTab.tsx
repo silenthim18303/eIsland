@@ -25,6 +25,7 @@
  */
 
 import { useState, type ReactElement } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
@@ -43,7 +44,7 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
         <span className="cli-event-card-name">{event.eventName}</span>
         <span className="cli-event-card-time">{formatTime(event.createdAt)}</span>
       </div>
-      <div className="cli-event-card-body">{event.summary}</div>
+      <div className="cli-event-card-body"><ReactMarkdown>{event.summary}</ReactMarkdown></div>
       {event.toolName && (
         <div className="cli-event-card-tool">{event.toolName}</div>
       )}
