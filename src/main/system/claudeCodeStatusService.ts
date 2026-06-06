@@ -125,7 +125,7 @@ function asString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-function clipped(value: string | null, limit = 110): string | null {
+function clipped(value: string | null, limit = 1000): string | null {
   if (!value) return null;
   const collapsed = value.replace(/[\n\t]+/g, ' ').split(' ').filter(Boolean).join(' ').trim();
   if (!collapsed) return null;

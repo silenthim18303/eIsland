@@ -348,7 +348,6 @@
   border-radius: 8px;
   border: 1px solid rgba(var(--color-text-rgb), 0.06);
   background: rgba(var(--color-text-rgb), 0.03);
-  overflow: hidden;
 }
 
 .cli-event-card:last-child {
@@ -387,7 +386,6 @@
   font-size: 13px;
   color: rgba(var(--color-text-rgb), 0.85);
   line-height: 1.5;
-  overflow: hidden;
 }
 
 /* markdown 子元素重置 */
