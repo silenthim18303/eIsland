@@ -107,7 +107,6 @@ const HOOK_EVENTS: Array<{ name: string; matcher?: string; timeout?: number }> =
   { name: 'SessionEnd' },
   { name: 'Stop' },
   { name: 'StopFailure' },
-  { name: 'Notification', matcher: '*' },
   { name: 'PreToolUse', matcher: '*' },
   { name: 'PermissionRequest', matcher: '*', timeout: 86400 },
   { name: 'PostToolUse', matcher: '*' },
