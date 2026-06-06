@@ -56,9 +56,9 @@
 
 .cli-tab-sidebar-count:hover,
 .cli-tab-sidebar-count.active {
-  border-color: rgba(100, 200, 120, 0.24);
-  background: rgba(100, 200, 120, 0.1);
-  color: rgba(100, 200, 120, 0.86);
+  border-color: rgba(100, 180, 255, 0.24);
+  background: rgba(100, 180, 255, 0.1);
+  color: rgba(100, 180, 255, 0.86);
 }
 
 .cli-tab-session-list {
@@ -91,8 +91,8 @@
 
 .cli-tab-session-item:hover,
 .cli-tab-session-item.active {
-  border-left-color: rgba(100, 200, 120, 0.65);
-  background: rgba(100, 200, 120, 0.08);
+  border-left-color: rgba(100, 180, 255, 0.65);
+  background: rgba(100, 180, 255, 0.08);
 }
 
 .cli-tab-session-top {
@@ -124,9 +124,9 @@
 }
 
 .cli-tab-phase.running {
-  border-color: rgba(100, 200, 120, 0.25);
-  background: rgba(100, 200, 120, 0.1);
-  color: rgba(100, 200, 120, 0.85);
+  border-color: rgba(100, 180, 255, 0.25);
+  background: rgba(100, 180, 255, 0.1);
+  color: rgba(100, 180, 255, 0.85);
 }
 
 .cli-tab-phase.waiting_permission {
@@ -205,9 +205,9 @@
 }
 
 .cli-tab-hook-badge.enabled {
-  border: 1px solid rgba(100, 200, 120, 0.25);
-  background: rgba(100, 200, 120, 0.1);
-  color: rgba(100, 200, 120, 0.85);
+  border: 1px solid rgba(100, 180, 255, 0.25);
+  background: rgba(100, 180, 255, 0.1);
+  color: rgba(100, 180, 255, 0.85);
 }
 
 .cli-tab-hook-badge.disabled {
@@ -268,9 +268,9 @@
 
 .cli-tab-filter-btn:hover,
 .cli-tab-filter-btn.active {
-  border-color: rgba(100, 200, 120, 0.24);
-  background: rgba(100, 200, 120, 0.1);
-  color: rgba(100, 200, 120, 0.86);
+  border-color: rgba(100, 180, 255, 0.24);
+  background: rgba(100, 180, 255, 0.1);
+  color: rgba(100, 180, 255, 0.86);
 }
 
 /* ── 事件列表 ── */
