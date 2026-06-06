@@ -26,6 +26,8 @@
 
 import { useState, useEffect, useRef, useCallback, type ReactElement, type SyntheticEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
@@ -34,6 +36,8 @@ import type { CliHookEvent } from '../config/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
 import '../../../../../../styles/settings/modules/cli.css';
+
+gsap.registerPlugin(useGSAP);
 
 /** 初始渲染数量 & 每次追加数量 */
 const INITIAL_EVENT_COUNT = 10;
@@ -47,13 +51,25 @@ const PERMISSION_EVENTS = new Set(['PermissionRequest', 'PermissionDenied']);
 
 function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
   const [expanded, setExpanded] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
   const hasExtra = visibleDetails.length > 0 || event.toolName || event.toolInputPreview;
   const handleToggle = useCallback((e: SyntheticEvent<HTMLDetailsElement>) => {
     setExpanded((e.target as HTMLDetailsElement).open);
   }, []);
+
+  useGSAP(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    gsap.fromTo(
+      card,
+      { autoAlpha: 0, y: 10, scale: 0.985 },
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.28, ease: 'power2.out' },
+    );
+  }, { scope: cardRef });
+
   return (
-    <div className={`cli-event-card${STOP_EVENTS.has(event.eventName) ? ' cli-event-card--stop' : ''}${PERMISSION_EVENTS.has(event.eventName) ? ' cli-event-card--permission' : ''}`}>
+    <div ref={cardRef} className={`cli-event-card${STOP_EVENTS.has(event.eventName) ? ' cli-event-card--stop' : ''}${PERMISSION_EVENTS.has(event.eventName) ? ' cli-event-card--permission' : ''}`}>
       <div className="cli-event-card-header">
         <span className="cli-event-card-name">{event.eventName}</span>
         <div className="cli-event-card-header-right">

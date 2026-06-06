@@ -342,24 +342,12 @@
 }
 
 /* ── 事件卡片（统一样式） ── */
-@keyframes cli-card-enter {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .cli-event-card {
   padding: 10px 12px;
   margin-bottom: 6px;
   border-radius: 8px;
   border: 1px solid rgba(var(--color-text-rgb), 0.06);
   background: rgba(var(--color-text-rgb), 0.03);
-  animation: cli-card-enter 0.2s ease-out both;
 }
 
 .cli-event-card:last-child {
