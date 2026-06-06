@@ -67,6 +67,8 @@
   font-size: 12px;
   font-weight: 600;
   color: rgba(var(--color-text-rgb), 0.85);
+  min-width: 0;
+  flex: 0 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -101,10 +103,11 @@
   line-height: 1.3;
 }
 
-.cli-state-event-name {
-  flex-shrink: 0;
-  font-weight: 500;
-  color: rgba(var(--color-text-rgb), 0.7);
+.cli-state-event-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cli-state-event-summary {

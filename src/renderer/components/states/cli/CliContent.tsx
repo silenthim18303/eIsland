@@ -71,10 +71,11 @@ export function CliContent(): ReactElement {
         <span className="cli-state-title-row">
           <span className="cli-state-title">{title}</span>
           {phaseText && <span className={`cli-state-phase ${activeSession?.phase ?? ''}`}>{phaseText}</span>}
+          {latestEvent && <span className="cli-state-phase cli-state-event-tag">{latestEvent.eventName}</span>}
         </span>
         <span className="cli-state-event">
           {latestEvent
-            ? <><span className="cli-state-event-name">{latestEvent.eventName}</span>{latestEvent.summary && <span className="cli-state-event-summary">{latestEvent.summary}</span>}</>
+            ? (latestEvent.summary && <span className="cli-state-event-summary">{latestEvent.summary}</span>)
             : <span className="cli-state-event-summary">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</span>}
         </span>
       </button>
