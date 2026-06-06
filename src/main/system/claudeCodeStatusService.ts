@@ -112,6 +112,9 @@ const HOOK_EVENTS: Array<{ name: string; matcher?: string; timeout?: number }> =
   { name: 'PostToolUse', matcher: '*' },
   { name: 'PostToolUseFailure', matcher: '*' },
   { name: 'PermissionDenied', matcher: '*' },
+  { name: 'SubagentStart' },
+  { name: 'SubagentStop' },
+  { name: 'PreCompact' },
 ];
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -122,11 +125,51 @@ function asString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
-function stringifyPreview(value: unknown, maxLength = 220): string | null {
-  if (value === null || value === undefined) return null;
-  const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
-  if (!text) return null;
-  return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+function clipped(value: string | null, limit = 110): string | null {
+  if (!value) return null;
+  const collapsed = value.replace(/[\n\t]+/g, ' ').split(' ').filter(Boolean).join(' ').trim();
+  if (!collapsed) return null;
+  return collapsed.length > limit ? `${collapsed.slice(0, limit - 1)}…` : collapsed;
+}
+
+function jsonValueString(value: unknown): string | null {
+  if (value === null) return 'null';
+  if (value === undefined) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) return `[${value.map((item) => jsonValueString(item) ?? 'null').join(', ')}]`;
+  const record = asRecord(value);
+  const rendered = Object.keys(record)
+    .sort()
+    .map((key) => `${key}: ${jsonValueString(record[key]) ?? 'null'}`)
+    .join(', ');
+  return `{${rendered}}`;
+}
+
+function toolInputPreviewFrom(toolInput: unknown): string | null {
+  const record = asRecord(toolInput);
+  const priorityKeys = ['command', 'file_path', 'pattern', 'query', 'prompt', 'description', 'skill', 'url'];
+  for (const key of priorityKeys) {
+    const value = asString(record[key]);
+    if (value) return clipped(value);
+  }
+  return clipped(jsonValueString(toolInput));
+}
+
+function notificationPreview(payload: Record<string, unknown>): string | null {
+  const preview = [asString(payload.title), asString(payload.message)]
+    .filter((item): item is string => Boolean(item))
+    .join(' · ');
+  return clipped(preview);
+}
+
+function payloadAssistantOutput(payload: Record<string, unknown>, transcriptPath: string | null): string | null {
+  return firstDetailValue(payload, ['last_assistant_message', 'lastAssistantMessage'])
+    ?? assistantOutputFromTranscript(transcriptPath);
+}
+
+function payloadToolResponse(payload: Record<string, unknown>): unknown {
+  return payload.tool_response ?? payload.toolResponse ?? payload.response ?? payload.result ?? payload.output;
 }
 
 function detailValue(value: unknown): string | null {
@@ -186,6 +229,119 @@ function assistantOutputFromTranscript(transcriptPath: string | null): string | 
   return transcriptTextFromRole(transcriptPath, 'assistant');
 }
 
+interface ClaudeTranscriptDetails {
+  userInput: string | null;
+  assistantOutput: string | null;
+  model: string | null;
+  toolUseId: string | null;
+  toolName: string | null;
+  toolInput: unknown;
+  toolInputPreview: string | null;
+  toolResult: string | null;
+}
+
+function emptyTranscriptDetails(): ClaudeTranscriptDetails {
+  return {
+    userInput: null,
+    assistantOutput: null,
+    model: null,
+    toolUseId: null,
+    toolName: null,
+    toolInput: undefined,
+    toolInputPreview: null,
+    toolResult: null,
+  };
+}
+
+function contentBlocks(value: unknown): Record<string, unknown>[] {
+  return Array.isArray(value)
+    ? value.map((item) => asRecord(item)).filter((item) => Object.keys(item).length > 0)
+    : [];
+}
+
+function textBlockValue(value: unknown): string | null {
+  if (typeof value === 'string') return clipped(value, 140);
+  for (const block of contentBlocks(value)) {
+    if (asString(block.type) !== 'text') continue;
+    const text = asString(block.text);
+    if (text) return clipped(text, 140);
+  }
+  return null;
+}
+
+function toolResultFromContent(value: unknown, expectedToolUseId: string | null): { id: string | null; value: string | null } | null {
+  for (const block of contentBlocks(value)) {
+    if (asString(block.type) !== 'tool_result') continue;
+    const id = asString(block.tool_use_id) ?? asString(block.toolUseId);
+    if (expectedToolUseId && id !== expectedToolUseId) continue;
+    return { id, value: detailValue(block.content) ?? textBlockValue(block.content) ?? detailValue(block) };
+  }
+  return null;
+}
+
+function toolUseFromContent(
+  value: unknown,
+  expectedToolUseId: string | null,
+  expectedToolName: string | null,
+): { id: string; name: string; input: unknown; preview: string | null } | null {
+  const blocks = contentBlocks(value).reverse();
+  for (const block of blocks) {
+    if (asString(block.type) !== 'tool_use') continue;
+    const id = asString(block.id);
+    const name = asString(block.name);
+    if (!id || !name) continue;
+    if (expectedToolUseId && id !== expectedToolUseId) continue;
+    if (!expectedToolUseId && expectedToolName && name !== expectedToolName) continue;
+    const input = block.input;
+    return { id, name, input, preview: toolInputPreviewFrom(input) };
+  }
+  return null;
+}
+
+function readClaudeTranscriptDetails(transcriptPath: string | null, payload: Record<string, unknown>): ClaudeTranscriptDetails {
+  if (!transcriptPath || !existsSync(transcriptPath)) return emptyTranscriptDetails();
+  const expectedToolUseId = firstDetailValue(payload, ['tool_use_id', 'toolUseID', 'toolUseId']);
+  const expectedToolName = asString(payload.tool_name) ?? asString(payload.toolName) ?? asString(payload.name);
+  const details = emptyTranscriptDetails();
+  try {
+    const lines = readFileSync(transcriptPath, 'utf-8').trim().split(/\r?\n/).slice(-260).reverse();
+    for (const line of lines) {
+      const entry = asRecord(JSON.parse(line));
+      const message = asRecord(entry.message);
+      const role = asString(message.role) ?? asString(entry.role);
+      const content = message.content ?? entry.content;
+      if (role === 'user') {
+        if (!details.userInput) details.userInput = textBlockValue(content);
+        if (!details.toolResult) {
+          const result = toolResultFromContent(content, expectedToolUseId ?? details.toolUseId);
+          if (result?.value) {
+            details.toolResult = result.value;
+            details.toolUseId = details.toolUseId ?? result.id;
+          }
+        }
+      } else if (role === 'assistant') {
+        if (!details.assistantOutput) details.assistantOutput = textBlockValue(content);
+        details.model = details.model ?? asString(message.model) ?? asString(entry.model);
+        if (!details.toolName || !details.toolInputPreview) {
+          const toolUse = toolUseFromContent(content, expectedToolUseId ?? details.toolUseId, expectedToolName);
+          if (toolUse) {
+            details.toolUseId = details.toolUseId ?? toolUse.id;
+            details.toolName = details.toolName ?? toolUse.name;
+            details.toolInput = details.toolInput ?? toolUse.input;
+            details.toolInputPreview = details.toolInputPreview ?? toolUse.preview;
+          }
+        }
+      } else if (asString(entry.type) === 'summary' && !details.assistantOutput) {
+        details.assistantOutput = asString(entry.summary);
+      }
+      if (details.userInput && details.assistantOutput && details.toolName && details.toolInputPreview && details.toolResult) break;
+    }
+  } catch {
+    return emptyTranscriptDetails();
+  }
+  return details;
+}
+
 function inferUserInput(payload: Record<string, unknown>, transcriptPath: string | null): string | null {
   return firstDetailValue(payload, ['prompt', 'user_prompt', 'userPrompt', 'user_input', 'userInput'])
     ?? userInputFromTranscript(transcriptPath);
@@ -197,11 +353,16 @@ function inferDetailItems(
   userInput: string | null,
   assistantOutput: string | null,
 ): ClaudeCodeHookEventDetailItem[] {
+  const toolResponse = payloadToolResponse(payload);
   const detailSpecs: Array<[string, string | null]> = [
     ['userInput', userInput],
     ['assistantOutput', assistantOutput],
+    ['toolUseId', firstDetailValue(payload, ['tool_use_id', 'toolUseID', 'toolUseId'])],
     ['toolInput', detailValue(toolInput)],
-    ['toolResult', firstDetailValue(payload, ['tool_response', 'toolResponse', 'response', 'result', 'output'])],
+    ['toolResult', detailValue(toolResponse)],
+    ['model', firstDetailValue(payload, ['model'])],
+    ['notification', notificationPreview(payload)],
+    ['eventSubtype', firstDetailValue(payload, ['notification_type', 'notificationType', 'subtype'])],
     ['error', firstDetailValue(payload, ['error', 'error_details', 'errorDetails'])],
     ['reason', firstDetailValue(payload, ['reason', 'permission_decision', 'permissionDecision'])],
     ['rawEvent', detailValue(payload)],
@@ -235,20 +396,26 @@ function inferKind(eventName: string): ClaudeCodeHookEventKind {
   if (eventName === 'PreToolUse' || eventName === 'PostToolUse' || eventName === 'PostToolUseFailure') return 'tool';
   if (eventName === 'UserPromptSubmit') return 'message';
   if (eventName === 'Notification') return 'notification';
-  if (eventName === 'Stop' || eventName === 'StopFailure' || eventName === 'SessionEnd') return 'completed';
-  if (eventName === 'SessionStart') return 'session';
+  if (eventName === 'Stop' || eventName === 'StopFailure' || eventName === 'SessionEnd' || eventName === 'SubagentStop') return 'completed';
+  if (eventName === 'SessionStart' || eventName === 'SubagentStart' || eventName === 'PreCompact') return 'session';
   return 'unknown';
 }
 
 function inferSummary(eventName: string, payload: Record<string, unknown>, toolName: string | null): string {
+  const toolResponsePreview = clipped(jsonValueString(payloadToolResponse(payload)));
+  const assistantPreview = clipped(firstDetailValue(payload, ['last_assistant_message', 'lastAssistantMessage']));
   const direct = asString(payload.message)
     ?? asString(payload.prompt)
     ?? asString(payload.reason)
     ?? asString(payload.summary)
     ?? asString(payload.notification);
+  if (eventName === 'PostToolUse' && toolName && toolResponsePreview) return `${toolName} 已完成：${toolResponsePreview}`;
+  if ((eventName === 'Stop' || eventName === 'StopFailure' || eventName === 'SubagentStop') && assistantPreview) return assistantPreview;
+  if (eventName === 'Notification') return notificationPreview(payload) ?? direct ?? '收到通知';
   if (direct) return direct;
   if (eventName === 'PreToolUse' && toolName) return `正在使用 ${toolName}`;
   if (eventName === 'PostToolUse' && toolName) return `${toolName} 已完成`;
+  if (eventName === 'PostToolUseFailure' && toolName) return `${toolName} 执行失败`;
   if (eventName === 'PermissionRequest') return toolName ? `${toolName} 请求授权` : '请求授权';
   if (eventName === 'PermissionDenied') return toolName ? `${toolName} 授权被拒绝` : '授权被拒绝';
   if (eventName === 'UserPromptSubmit') return '收到用户输入';
@@ -256,6 +423,9 @@ function inferSummary(eventName: string, payload: Record<string, unknown>, toolN
   if (eventName === 'SessionEnd') return '会话结束';
   if (eventName === 'Stop') return '本轮完成';
   if (eventName === 'StopFailure') return '本轮异常结束';
+  if (eventName === 'SubagentStart') return '子代理开始';
+  if (eventName === 'SubagentStop') return '子代理完成';
+  if (eventName === 'PreCompact') return '正在压缩上下文';
   return eventName;
 }
 
@@ -275,7 +445,7 @@ function phaseAfterEvent(current: ClaudeCodeSessionPhase, event: ClaudeCodeHookE
 }
 
 function createHookScript(port: number): string {
-  return `const http = require('http');\nconst hookEventName = process.argv[2] || null;\nlet input = '';\nprocess.stdin.setEncoding('utf8');\nprocess.stdin.on('data', chunk => { input += chunk; });\nprocess.stdin.on('end', () => {\n  let payload = {};\n  try { payload = input.trim() ? JSON.parse(input) : {}; } catch (error) { payload = { parseError: String(error), raw: input }; }\n  if (hookEventName && !payload.hook_event_name) payload.hook_event_name = hookEventName;\n  const body = JSON.stringify(payload);\n  const req = http.request({ hostname: '127.0.0.1', port: ${port}, path: '/claude-code/hook', method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) }, timeout: 1500 }, res => { res.resume(); res.on('end', () => process.exit(0)); });\n  req.on('timeout', () => { req.destroy(); process.exit(0); });\n  req.on('error', () => process.exit(0));\n  req.write(body);\n  req.end();\n});\nsetTimeout(() => process.exit(0), 2000);\n`;
+  return `const http = require('http');\nconst fs = require('fs');\nconst os = require('os');\nconst path = require('path');\nconst hookEventName = process.argv[2] || null;\nlet input = '';\nfunction normalize(value) { return String(value || '').replace(/\\\\/g, '/').toLowerCase(); }\nfunction readJsonLine(filePath, fromEnd) {\n  try {\n    const text = fs.readFileSync(filePath, 'utf8').trim();\n    const lines = text.split(/\\r?\\n/);\n    const selected = fromEnd ? lines.slice(-80).reverse() : lines.slice(0, 80);\n    for (const line of selected) {\n      try { return JSON.parse(line); } catch (_) {}\n    }\n  } catch (_) {}\n  return null;\n}\nfunction entryCwd(filePath) {\n  const first = readJsonLine(filePath, false);\n  if (first && typeof first.cwd === 'string' && first.cwd) return first.cwd;\n  const recent = readJsonLine(filePath, true);\n  if (recent && typeof recent.cwd === 'string' && recent.cwd) return recent.cwd;\n  return null;\n}\nfunction collectJsonlFiles(dir, output, deadline) {\n  if (Date.now() > deadline || output.length > 240) return;\n  let entries = [];\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { return; }\n  for (const entry of entries) {\n    if (Date.now() > deadline || output.length > 240) return;\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name !== 'subagents') collectJsonlFiles(fullPath, output, deadline);\n      continue;\n    }\n    if (entry.isFile() && entry.name.endsWith('.jsonl')) {\n      try { output.push({ path: fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs }); } catch (_) {}\n    }\n  }\n}\nfunction latestTranscriptForCwd(cwd) {\n  const root = path.join(os.homedir(), '.claude', 'projects');\n  const files = [];\n  collectJsonlFiles(root, files, Date.now() + 650);\n  const normalizedCwd = normalize(cwd);\n  const recentFiles = files.sort((a, b) => b.mtimeMs - a.mtimeMs).slice(0, 80);\n  for (const file of recentFiles) {\n    const fileCwd = entryCwd(file.path);\n    if (fileCwd && normalize(fileCwd) === normalizedCwd) return file.path;\n  }\n  return recentFiles[0] ? recentFiles[0].path : null;\n}\nfunction enrichPayload(payload) {\n  const cwd = payload.cwd || payload.project_dir || payload.projectDir || process.cwd();\n  if (!payload.cwd) payload.cwd = cwd;\n  if (!payload.transcript_path && !payload.transcriptPath) {\n    const transcriptPath = latestTranscriptForCwd(cwd);\n    if (transcriptPath) payload.transcript_path = transcriptPath;\n  }\n  return payload;\n}\nprocess.stdin.setEncoding('utf8');\nprocess.stdin.on('data', chunk => { input += chunk; });\nprocess.stdin.on('end', () => {\n  let payload = {};\n  try { payload = input.trim() ? JSON.parse(input) : {}; } catch (error) { payload = { parseError: String(error), raw: input }; }\n  if (hookEventName && !payload.hook_event_name) payload.hook_event_name = hookEventName;\n  payload = enrichPayload(payload);\n  const body = JSON.stringify(payload);\n  const req = http.request({ hostname: '127.0.0.1', port: ${port}, path: '/claude-code/hook', method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) }, timeout: 1500 }, res => { res.resume(); res.on('end', () => process.exit(0)); });\n  req.on('timeout', () => { req.destroy(); process.exit(0); });\n  req.on('error', () => process.exit(0));\n  req.write(body);\n  req.end();\n});\nsetTimeout(() => process.exit(0), 2500);\n`;
 }
 
 function shellQuote(value: string): string {
@@ -406,25 +576,42 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
 
   const scheduleEventBackfill = (event: ClaudeCodeHookEvent): void => {
     if (event.eventName === 'UserPromptSubmit') {
-      scheduleDetailBackfill(event, 'userInput', () => userInputFromTranscript(event.transcriptPath));
+      scheduleDetailBackfill(event, 'userInput', () => readClaudeTranscriptDetails(event.transcriptPath, event.raw).userInput);
     }
-    if (event.eventName === 'Stop' || event.eventName === 'SessionEnd') {
-      scheduleDetailBackfill(event, 'assistantOutput', () => assistantOutputFromTranscript(event.transcriptPath));
+    if (event.kind === 'tool') {
+      scheduleDetailBackfill(event, 'toolUseId', () => readClaudeTranscriptDetails(event.transcriptPath, event.raw).toolUseId);
+      scheduleDetailBackfill(event, 'toolResult', () => readClaudeTranscriptDetails(event.transcriptPath, event.raw).toolResult);
+    }
+    if (event.eventName === 'Stop' || event.eventName === 'StopFailure' || event.eventName === 'SessionEnd' || event.eventName === 'SubagentStop') {
+      scheduleDetailBackfill(event, 'assistantOutput', () => readClaudeTranscriptDetails(event.transcriptPath, event.raw).assistantOutput);
     }
   };
 
   const addEvent = (payload: Record<string, unknown>): void => {
     const eventName = inferEventName(payload);
-    const cwd = asString(payload.cwd) ?? asString(payload.workspace) ?? asString(payload.project_dir) ?? asString(payload.projectDir);
-    const transcriptPath = asString(payload.transcript_path) ?? asString(payload.transcriptPath);
-    const sessionId = inferSessionId(payload, transcriptPath, cwd);
-    const toolName = asString(payload.tool_name) ?? asString(payload.toolName) ?? asString(payload.name);
-    const toolInput = payload.tool_input ?? payload.toolInput ?? payload.input;
-    const userInput = inferUserInput(payload, transcriptPath);
-    const assistantOutput = eventName === 'Stop' || eventName === 'SessionEnd'
-      ? assistantOutputFromTranscript(transcriptPath)
-      : null;
-    const detailItems = inferDetailItems(payload, toolInput, userInput, assistantOutput);
+    const rawTranscriptPath = asString(payload.transcript_path) ?? asString(payload.transcriptPath);
+    const transcriptDetails = readClaudeTranscriptDetails(rawTranscriptPath, payload);
+    const enrichedPayload: Record<string, unknown> = {
+      ...payload,
+      tool_use_id: firstDetailValue(payload, ['tool_use_id', 'toolUseID', 'toolUseId']) ?? transcriptDetails.toolUseId ?? undefined,
+      tool_name: asString(payload.tool_name) ?? asString(payload.toolName) ?? asString(payload.name) ?? transcriptDetails.toolName ?? undefined,
+      tool_input: payload.tool_input ?? payload.toolInput ?? payload.input ?? transcriptDetails.toolInput,
+      tool_response: payloadToolResponse(payload) ?? transcriptDetails.toolResult ?? undefined,
+      model: asString(payload.model) ?? transcriptDetails.model ?? undefined,
+      last_assistant_message: firstDetailValue(payload, ['last_assistant_message', 'lastAssistantMessage']) ?? transcriptDetails.assistantOutput ?? undefined,
+      prompt: asString(payload.prompt) ?? asString(payload.user_prompt) ?? asString(payload.userPrompt) ?? transcriptDetails.userInput ?? undefined,
+    };
+    const cwd = asString(enrichedPayload.cwd) ?? asString(enrichedPayload.workspace) ?? asString(enrichedPayload.project_dir) ?? asString(enrichedPayload.projectDir);
+    const transcriptPath = asString(enrichedPayload.transcript_path) ?? asString(enrichedPayload.transcriptPath);
+    const sessionId = inferSessionId(enrichedPayload, transcriptPath, cwd);
+    const toolName = asString(enrichedPayload.tool_name) ?? asString(enrichedPayload.toolName) ?? asString(enrichedPayload.name);
+    const toolInput = enrichedPayload.tool_input ?? enrichedPayload.toolInput ?? enrichedPayload.input;
+    const toolResponse = payloadToolResponse(enrichedPayload);
+    const userInput = inferUserInput(enrichedPayload, transcriptPath);
+    const assistantOutput = eventName === 'Stop' || eventName === 'StopFailure' || eventName === 'SessionEnd' || eventName === 'SubagentStop'
+      ? payloadAssistantOutput(enrichedPayload, transcriptPath)
+      : firstDetailValue(enrichedPayload, ['last_assistant_message', 'lastAssistantMessage']);
+    const detailItems = inferDetailItems(enrichedPayload, toolInput, userInput, assistantOutput);
     const event: ClaudeCodeHookEvent = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       eventName,
@@ -432,19 +619,19 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       sessionId,
       cwd,
       transcriptPath,
-      summary: inferSummary(eventName, payload, toolName),
-      detail: asString(payload.reason)
-        ?? asString(payload.error)
-        ?? asString(payload.error_details)
-        ?? asString(payload.errorDetails)
-        ?? stringifyPreview(payload.message)
-        ?? stringifyPreview(payload.tool_response)
-        ?? stringifyPreview(payload.toolResponse),
+      summary: inferSummary(eventName, enrichedPayload, toolName),
+      detail: asString(enrichedPayload.reason)
+        ?? asString(enrichedPayload.error)
+        ?? asString(enrichedPayload.error_details)
+        ?? asString(enrichedPayload.errorDetails)
+        ?? clipped(asString(enrichedPayload.message))
+        ?? clipped(jsonValueString(toolResponse))
+        ?? assistantOutput,
       detailItems,
       toolName,
-      toolInputPreview: stringifyPreview(toolInput),
+      toolInputPreview: transcriptDetails.toolInputPreview ?? toolInputPreviewFrom(toolInput),
       createdAt: Date.now(),
-      raw: payload,
+      raw: enrichedPayload,
     };
 
     events = [event, ...events].slice(0, MAX_EVENTS);

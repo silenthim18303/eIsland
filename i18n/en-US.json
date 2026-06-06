@@ -1183,8 +1183,12 @@
       "detail": {
         "userInput": "User input",
         "assistantOutput": "Claude output",
+        "toolUseId": "Tool call ID",
         "toolInput": "Tool input",
         "toolResult": "Tool result",
+        "model": "Model",
+        "notification": "Notification",
+        "eventSubtype": "Event subtype",
         "error": "Error",
         "reason": "Reason",
         "rawEvent": "Raw event"

@@ -1183,8 +1183,12 @@
       "detail": {
         "userInput": "用户输入",
         "assistantOutput": "Claude 输出",
+        "toolUseId": "工具调用 ID",
         "toolInput": "工具入参",
         "toolResult": "工具结果",
+        "model": "模型",
+        "notification": "通知",
+        "eventSubtype": "事件子类型",
         "error": "错误信息",
         "reason": "原因",
         "rawEvent": "原始事件"
