@@ -30,6 +30,7 @@ import { AgentIcon } from '../agent-icon';
 describe('AgentIcon', () => {
   it('should contain expected keys', () => {
     expect(AgentIcon).toHaveProperty('CLAUDE');
+    expect(AgentIcon).toHaveProperty('CLAUDE_KB');
   });
 
   it('all values should be strings starting with ./svg/agent/ and ending with .svg', () => {
@@ -40,6 +41,6 @@ describe('AgentIcon', () => {
   });
 
   it('should contain exactly 1 key', () => {
-    expect(Object.keys(AgentIcon)).toHaveLength(1);
+    expect(Object.keys(AgentIcon)).toHaveLength(2);
   });
 });
