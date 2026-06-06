@@ -119,10 +119,14 @@
 }
 
 .cli-tab-phase {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  min-height: 20px;
   margin-left: auto;
   border-radius: 999px;
-  padding: 2px 7px;
+  padding: 3px 7px;
   font-size: 10px;
   line-height: 1;
   border: 1px solid rgba(var(--color-text-rgb), 0.08);
