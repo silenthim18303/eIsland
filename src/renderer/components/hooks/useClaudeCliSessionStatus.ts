@@ -25,6 +25,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { playNotificationSoundOnce } from '../../utils/audio/notificationSound';
 
 /**
  * @description 以 ref 形式追踪是否存在活跃 Claude 会话（phase 非 completed），不触发组件重渲染。
@@ -34,13 +35,35 @@ export function useClaudeCliSessionStatus(): {
   hasActiveSessionRef: React.MutableRefObject<boolean>;
 } {
   const hasActiveSessionRef = useRef(false);
+  // 已提示过的待授权事件 id，避免重复播放音效
+  const seenPermissionIdsRef = useRef<Set<string>>(new Set());
+  const initializedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
 
-    const applySnapshot = (snapshot: { sessions: Array<{ phase: string }> } | null | undefined): void => {
+    const applySnapshot = (snapshot: { sessions: Array<{ phase: string; pendingPermission?: { id: string } | null }> } | null | undefined): void => {
       if (cancelled || !snapshot) return;
       hasActiveSessionRef.current = snapshot.sessions.some((session) => session.phase !== 'completed');
+
+      // 收集当前所有待授权事件 id
+      const pendingIds = new Set<string>();
+      for (const session of snapshot.sessions) {
+        if (session.phase === 'waiting_permission' && session.pendingPermission?.id) {
+          pendingIds.add(session.pendingPermission.id);
+        }
+      }
+      // 首次快照只记录基线，不触发音效；之后出现新的待授权请求才播放
+      if (initializedRef.current) {
+        for (const id of pendingIds) {
+          if (!seenPermissionIdsRef.current.has(id)) {
+            playNotificationSoundOnce();
+            break;
+          }
+        }
+      }
+      initializedRef.current = true;
+      seenPermissionIdsRef.current = pendingIds;
     };
 
     window.api?.claudeCodeStatusGet?.().then(applySnapshot).catch(() => {});
