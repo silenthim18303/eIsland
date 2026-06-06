@@ -1130,6 +1130,13 @@
       "close": "关闭"
     }
   },
+  "cli": {
+    "permission": {
+      "allow": "批准",
+      "always": "永久批准",
+      "deny": "拒绝"
+    }
+  },
   "maxExpand": {
     "loading": "正在加载最大展开界面...",
     "nav": {

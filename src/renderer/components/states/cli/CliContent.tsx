@@ -117,18 +117,44 @@ export function CliContent(): ReactElement {
           {t('agent.actions.close', { defaultValue: '关闭' })}
         </button>
       </div>
-      {isMusicPlaying && currentText && (
-        <span key={currentIdx} className={`cli-state-lyric${karaokeEnabled && hasSyllables ? ' cli-state-lyric-karaoke' : ''}`}>
-          {karaokeEnabled && hasSyllables && currentLine ? (
-            <KaraokeSyllableLine
-              syllables={currentLine.syllables!}
-              lineStartMs={currentLine.time_ms}
-              posMs={currentPositionMs}
-            />
-          ) : (
-            currentText
-          )}
-        </span>
+      {activeSession?.phase === 'waiting_permission' ? (
+        <div className="cli-state-permission">
+          <button
+            type="button"
+            className="cli-state-permission-btn cli-state-permission-deny"
+            onClick={() => { void window.api.claudeCodePermissionResolve(activeSession.id, 'deny'); }}
+          >
+            {t('cli.permission.deny', { defaultValue: '拒绝' })}
+          </button>
+          <button
+            type="button"
+            className="cli-state-permission-btn cli-state-permission-allow"
+            onClick={() => { void window.api.claudeCodePermissionResolve(activeSession.id, 'allow'); }}
+          >
+            {t('cli.permission.allow', { defaultValue: '批准' })}
+          </button>
+          <button
+            type="button"
+            className="cli-state-permission-btn cli-state-permission-always"
+            onClick={() => { void window.api.claudeCodePermissionResolve(activeSession.id, 'always'); }}
+          >
+            {t('cli.permission.always', { defaultValue: '永久批准' })}
+          </button>
+        </div>
+      ) : (
+        isMusicPlaying && currentText && (
+          <span key={currentIdx} className={`cli-state-lyric${karaokeEnabled && hasSyllables ? ' cli-state-lyric-karaoke' : ''}`}>
+            {karaokeEnabled && hasSyllables && currentLine ? (
+              <KaraokeSyllableLine
+                syllables={currentLine.syllables!}
+                lineStartMs={currentLine.time_ms}
+                posMs={currentPositionMs}
+              />
+            ) : (
+              currentText
+            )}
+          </span>
+        )
       )}
     </div>
   );

@@ -95,11 +95,17 @@ export interface ClaudeCodeStatusService {
   uninstallHook: () => Promise<ClaudeSettingsMutationResult>;
   clearEvents: () => ClaudeCodeStatusSnapshot;
   deleteSessions: (sessionIds: string[]) => ClaudeCodeStatusSnapshot;
+  resolvePermission: (sessionId: string, decision: PermissionDecision) => ClaudeCodeStatusSnapshot;
 }
+
+/** 授权决策：批准 / 永久批准 / 拒绝 */
+export type PermissionDecision = 'allow' | 'always' | 'deny';
 
 const MAX_EVENTS = 120;
 const MAX_SESSION_EVENTS = 40;
 const DEFAULT_PORT = 17861;
+/** 授权等待的安全超时（无操作则放行 hook，回退到 Claude Code 自身的交互流程） */
+const PERMISSION_WAIT_TIMEOUT_MS = 10 * 60 * 1000;
 const MANAGED_MARKER = 'eisland-claude-code-status';
 const HOOK_EVENTS: Array<{ name: string; matcher?: string; timeout?: number }> = [
   { name: 'UserPromptSubmit' },
@@ -448,7 +454,7 @@ function phaseAfterEvent(current: ClaudeCodeSessionPhase, event: ClaudeCodeHookE
 }
 
 function createHookScript(port: number): string {
-  return `const http = require('http');\nconst fs = require('fs');\nconst os = require('os');\nconst path = require('path');\nconst hookEventName = process.argv[2] || null;\nlet input = '';\nfunction normalize(value) { return String(value || '').replace(/\\\\/g, '/').toLowerCase(); }\nfunction readJsonLine(filePath, fromEnd) {\n  try {\n    const text = fs.readFileSync(filePath, 'utf8').trim();\n    const lines = text.split(/\\r?\\n/);\n    const selected = fromEnd ? lines.slice(-80).reverse() : lines.slice(0, 80);\n    for (const line of selected) {\n      try { return JSON.parse(line); } catch (_) {}\n    }\n  } catch (_) {}\n  return null;\n}\nfunction entryCwd(filePath) {\n  const first = readJsonLine(filePath, false);\n  if (first && typeof first.cwd === 'string' && first.cwd) return first.cwd;\n  const recent = readJsonLine(filePath, true);\n  if (recent && typeof recent.cwd === 'string' && recent.cwd) return recent.cwd;\n  return null;\n}\nfunction collectJsonlFiles(dir, output, deadline) {\n  if (Date.now() > deadline || output.length > 240) return;\n  let entries = [];\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { return; }\n  for (const entry of entries) {\n    if (Date.now() > deadline || output.length > 240) return;\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name !== 'subagents') collectJsonlFiles(fullPath, output, deadline);\n      continue;\n    }\n    if (entry.isFile() && entry.name.endsWith('.jsonl')) {\n      try { output.push({ path: fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs }); } catch (_) {}\n    }\n  }\n}\nfunction latestTranscriptForCwd(cwd) {\n  const root = path.join(os.homedir(), '.claude', 'projects');\n  const files = [];\n  collectJsonlFiles(root, files, Date.now() + 650);\n  const normalizedCwd = normalize(cwd);\n  const recentFiles = files.sort((a, b) => b.mtimeMs - a.mtimeMs).slice(0, 80);\n  for (const file of recentFiles) {\n    const fileCwd = entryCwd(file.path);\n    if (fileCwd && normalize(fileCwd) === normalizedCwd) return file.path;\n  }\n  return recentFiles[0] ? recentFiles[0].path : null;\n}\nfunction enrichPayload(payload) {\n  const cwd = payload.cwd || payload.project_dir || payload.projectDir || process.cwd();\n  if (!payload.cwd) payload.cwd = cwd;\n  if (!payload.transcript_path && !payload.transcriptPath) {\n    const transcriptPath = latestTranscriptForCwd(cwd);\n    if (transcriptPath) payload.transcript_path = transcriptPath;\n  }\n  return payload;\n}\nprocess.stdin.setEncoding('utf8');\nprocess.stdin.on('data', chunk => { input += chunk; });\nprocess.stdin.on('end', () => {\n  let payload = {};\n  try { payload = input.trim() ? JSON.parse(input) : {}; } catch (error) { payload = { parseError: String(error), raw: input }; }\n  if (hookEventName && !payload.hook_event_name) payload.hook_event_name = hookEventName;\n  payload = enrichPayload(payload);\n  const body = JSON.stringify(payload);\n  const req = http.request({ hostname: '127.0.0.1', port: ${port}, path: '/claude-code/hook', method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) }, timeout: 1500 }, res => { res.resume(); res.on('end', () => process.exit(0)); });\n  req.on('timeout', () => { req.destroy(); process.exit(0); });\n  req.on('error', () => process.exit(0));\n  req.write(body);\n  req.end();\n});\nsetTimeout(() => process.exit(0), 2500);\n`;
+  return `const http = require('http');\nconst fs = require('fs');\nconst os = require('os');\nconst path = require('path');\nconst hookEventName = process.argv[2] || null;\nlet input = '';\nfunction normalize(value) { return String(value || '').replace(/\\\\/g, '/').toLowerCase(); }\nfunction readJsonLine(filePath, fromEnd) {\n  try {\n    const text = fs.readFileSync(filePath, 'utf8').trim();\n    const lines = text.split(/\\r?\\n/);\n    const selected = fromEnd ? lines.slice(-80).reverse() : lines.slice(0, 80);\n    for (const line of selected) {\n      try { return JSON.parse(line); } catch (_) {}\n    }\n  } catch (_) {}\n  return null;\n}\nfunction entryCwd(filePath) {\n  const first = readJsonLine(filePath, false);\n  if (first && typeof first.cwd === 'string' && first.cwd) return first.cwd;\n  const recent = readJsonLine(filePath, true);\n  if (recent && typeof recent.cwd === 'string' && recent.cwd) return recent.cwd;\n  return null;\n}\nfunction collectJsonlFiles(dir, output, deadline) {\n  if (Date.now() > deadline || output.length > 240) return;\n  let entries = [];\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { return; }\n  for (const entry of entries) {\n    if (Date.now() > deadline || output.length > 240) return;\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name !== 'subagents') collectJsonlFiles(fullPath, output, deadline);\n      continue;\n    }\n    if (entry.isFile() && entry.name.endsWith('.jsonl')) {\n      try { output.push({ path: fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs }); } catch (_) {}\n    }\n  }\n}\nfunction latestTranscriptForCwd(cwd) {\n  const root = path.join(os.homedir(), '.claude', 'projects');\n  const files = [];\n  collectJsonlFiles(root, files, Date.now() + 650);\n  const normalizedCwd = normalize(cwd);\n  const recentFiles = files.sort((a, b) => b.mtimeMs - a.mtimeMs).slice(0, 80);\n  for (const file of recentFiles) {\n    const fileCwd = entryCwd(file.path);\n    if (fileCwd && normalize(fileCwd) === normalizedCwd) return file.path;\n  }\n  return recentFiles[0] ? recentFiles[0].path : null;\n}\nfunction enrichPayload(payload) {\n  const cwd = payload.cwd || payload.project_dir || payload.projectDir || process.cwd();\n  if (!payload.cwd) payload.cwd = cwd;\n  if (!payload.transcript_path && !payload.transcriptPath) {\n    const transcriptPath = latestTranscriptForCwd(cwd);\n    if (transcriptPath) payload.transcript_path = transcriptPath;\n  }\n  return payload;\n}\nprocess.stdin.setEncoding('utf8');\nprocess.stdin.on('data', chunk => { input += chunk; });\nprocess.stdin.on('end', () => {\n  let payload = {};\n  try { payload = input.trim() ? JSON.parse(input) : {}; } catch (error) { payload = { parseError: String(error), raw: input }; }\n  if (hookEventName && !payload.hook_event_name) payload.hook_event_name = hookEventName;\n  payload = enrichPayload(payload);\n  const body = JSON.stringify(payload);\n  const isPermission = hookEventName === 'PermissionRequest';\n  const req = http.request({ hostname: '127.0.0.1', port: ${port}, path: '/claude-code/hook', method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) }, timeout: isPermission ? ${PERMISSION_WAIT_TIMEOUT_MS + 5000} : 1500 }, res => { let resBody = ''; res.setEncoding('utf8'); res.on('data', c => { resBody += c; }); res.on('end', () => { if (isPermission) { try { const parsed = JSON.parse(resBody || '{}'); const decision = parsed && parsed.decision; if (decision === 'deny') { process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true, hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: { behavior: 'deny', message: 'User denied the permission request', interrupt: false } } })); } else if (decision === 'allow' || decision === 'always') { const out = { behavior: 'allow' }; if (decision === 'always' && payload && payload.permission_suggestions) out.updatedPermissions = payload.permission_suggestions; process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true, hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: out } })); } } catch (_) {} } process.exit(0); }); });\n  req.on('timeout', () => { req.destroy(); process.exit(0); });\n  req.on('error', () => process.exit(0));\n  req.write(body);\n  req.end();\n});\n  if (hookEventName !== 'PermissionRequest') setTimeout(() => process.exit(0), 2500);\n`;
 }
 
 function shellQuote(value: string): string {
@@ -590,7 +596,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     }
   };
 
-  const addEvent = (payload: Record<string, unknown>): void => {
+  const addEvent = (payload: Record<string, unknown>): ClaudeCodeHookEvent => {
     const eventName = inferEventName(payload);
     const rawTranscriptPath = asString(payload.transcript_path) ?? asString(payload.transcriptPath);
     const transcriptDetails = readClaudeTranscriptDetails(rawTranscriptPath, payload);
@@ -654,6 +660,33 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     });
     scheduleEventBackfill(event);
     emitSnapshot();
+    return event;
+  };
+
+  /** 等待用户授权决策的 hook 请求（按 sessionId 暂存其 HTTP 响应） */
+  const permissionWaiters = new Map<string, { response: http.ServerResponse; timer: ReturnType<typeof setTimeout> }>();
+
+  /** 向暂存的 hook 请求写回授权决策并结束响应 */
+  const respondPermission = (sessionId: string, decision: PermissionDecision | null): boolean => {
+    const waiter = permissionWaiters.get(sessionId);
+    if (!waiter) return false;
+    clearTimeout(waiter.timer);
+    permissionWaiters.delete(sessionId);
+    try {
+      waiter.response.writeHead(200, { 'content-type': 'application/json' });
+      waiter.response.end(JSON.stringify({ ok: true, decision }));
+    } catch { /* 响应已结束，忽略 */ }
+    return true;
+  };
+
+  const resolvePermission = (sessionId: string, decision: PermissionDecision): ClaudeCodeStatusSnapshot => {
+    respondPermission(sessionId, decision);
+    const current = sessions.get(sessionId);
+    if (current && current.phase === 'waiting_permission') {
+      sessions.set(sessionId, { ...current, phase: 'running', pendingPermission: null });
+      emitSnapshot();
+    }
+    return getSnapshot();
   };
 
   const handleRequest = (request: http.IncomingMessage, response: http.ServerResponse): void => {
@@ -667,7 +700,14 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     request.on('data', (chunk) => { body += chunk; });
     request.on('end', () => {
       try {
-        addEvent(asRecord(JSON.parse(body || '{}')));
+        const event = addEvent(asRecord(JSON.parse(body || '{}')));
+        // 授权请求：暂存响应，等待用户在 UI 上做出决策（批准/永久批准/拒绝）
+        if (event.eventName === 'PermissionRequest') {
+          respondPermission(event.sessionId, null); // 清理同会话的旧等待
+          const timer = setTimeout(() => { respondPermission(event.sessionId, null); }, PERMISSION_WAIT_TIMEOUT_MS);
+          permissionWaiters.set(event.sessionId, { response, timer });
+          return;
+        }
         response.writeHead(200, { 'content-type': 'application/json' });
         response.end(JSON.stringify({ ok: true }));
       } catch (error) {
@@ -699,6 +739,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
 
   function stop(): void {
     if (!server) return;
+    for (const sessionId of Array.from(permissionWaiters.keys())) respondPermission(sessionId, null);
     server.close();
     server = null;
     receiverUrl = null;
@@ -728,10 +769,11 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       if (!existsSync(settingsPath)) return { ok: true, message: 'Claude Code 配置不存在。', snapshot: getSnapshot() };
       const root = asRecord(JSON.parse(readFileSync(settingsPath, 'utf-8')));
       const hooks = asRecord(root.hooks);
-      for (const spec of HOOK_EVENTS) {
-        const currentGroups = removeManagedGroups(hooks[spec.name]);
-        if (currentGroups.length > 0) hooks[spec.name] = currentGroups;
-        else delete hooks[spec.name];
+      // 遍历所有已存在的 hook 键，清除托管分组（含历史遗留/已移除的事件，如 Notification）
+      for (const name of Object.keys(hooks)) {
+        const currentGroups = removeManagedGroups(hooks[name]);
+        if (currentGroups.length > 0) hooks[name] = currentGroups;
+        else delete hooks[name];
       }
       const nextRoot = Object.keys(hooks).length > 0 ? { ...root, hooks } : { ...root };
       if (Object.keys(hooks).length === 0) delete nextRoot.hooks;
@@ -759,5 +801,5 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     return getSnapshot();
   }
 
-  return { start, stop, getSnapshot, installHook, uninstallHook, clearEvents, deleteSessions };
+  return { start, stop, getSnapshot, installHook, uninstallHook, clearEvents, deleteSessions, resolvePermission };
 }

@@ -545,6 +545,7 @@ declare global {
       claudeCodeHookUninstall: () => Promise<ClaudeCodeHookMutationResult>;
       claudeCodeEventsClear: () => Promise<ClaudeCodeStatusSnapshot>;
       claudeCodeSessionsDelete: (sessionIds: string[]) => Promise<ClaudeCodeStatusSnapshot>;
+      claudeCodePermissionResolve: (sessionId: string, decision: 'allow' | 'always' | 'deny') => Promise<ClaudeCodeStatusSnapshot>;
       onClaudeCodeStatusUpdated: (callback: (snapshot: ClaudeCodeStatusSnapshot) => void) => () => void;
     };
   }

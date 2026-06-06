@@ -1130,6 +1130,13 @@
       "close": "Close"
     }
   },
+  "cli": {
+    "permission": {
+      "allow": "Allow",
+      "always": "Allow always",
+      "deny": "Deny"
+    }
+  },
   "maxExpand": {
     "loading": "Loading max expand view...",
     "nav": {

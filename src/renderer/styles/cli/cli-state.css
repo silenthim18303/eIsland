@@ -190,6 +190,62 @@
   background: rgba(var(--color-text-rgb), 0.08);
 }
 
+.cli-state-permission {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  display: flex;
+  gap: 6px;
+}
+
+.cli-state-permission-btn {
+  appearance: none;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.65);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cli-state-permission-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.cli-state-permission-deny {
+  border-color: rgba(239, 83, 80, 0.4);
+  color: rgba(239, 83, 80, 0.9);
+}
+
+.cli-state-permission-deny:hover {
+  background: rgba(239, 83, 80, 0.16);
+  color: rgba(239, 83, 80, 1);
+}
+
+.cli-state-permission-allow {
+  border-color: rgba(76, 175, 80, 0.45);
+  color: rgba(76, 175, 80, 0.95);
+}
+
+.cli-state-permission-allow:hover {
+  background: rgba(76, 175, 80, 0.16);
+  color: rgba(76, 175, 80, 1);
+}
+
+.cli-state-permission-always {
+  border-color: rgba(100, 180, 255, 0.45);
+  color: rgba(100, 180, 255, 0.95);
+}
+
+.cli-state-permission-always:hover {
+  background: rgba(100, 180, 255, 0.16);
+  color: rgba(100, 180, 255, 1);
+}
+
 .cli-state-lyric {
   position: absolute;
   right: 16px;

@@ -25,7 +25,7 @@
  */
 
 import { ipcMain } from 'electron';
-import type { ClaudeCodeStatusService } from '../../system/claudeCodeStatusService';
+import type { ClaudeCodeStatusService, PermissionDecision } from '../../system/claudeCodeStatusService';
 
 interface RegisterClaudeCodeStatusIpcHandlersOptions {
   service: ClaudeCodeStatusService;
@@ -37,4 +37,5 @@ export function registerClaudeCodeStatusIpcHandlers(options: RegisterClaudeCodeS
   ipcMain.handle('claude-code:hook:uninstall', () => options.service.uninstallHook());
   ipcMain.handle('claude-code:events:clear', () => options.service.clearEvents());
   ipcMain.handle('claude-code:sessions:delete', (_event, sessionIds: string[]) => options.service.deleteSessions(sessionIds));
+  ipcMain.handle('claude-code:permission:resolve', (_event, sessionId: string, decision: PermissionDecision) => options.service.resolvePermission(sessionId, decision));
 }
