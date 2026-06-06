@@ -28,7 +28,7 @@ import { useMemo } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/isLandStore';
-import { AgentIcon } from '../../../utils/SvgIcon';
+import { GifIcon } from '../../../utils/GifIcon/gif-icon';
 import { useClaudeCodeStatus } from '../maxExpand/components/cli/hooks/useClaudeCodeStatus';
 import { phaseLabel } from '../maxExpand/components/cli/utils/cliFormatters';
 import { useCurrentLyric } from '../lyrics/hooks/useCurrentLyric';
@@ -75,6 +75,13 @@ export function CliContent(): ReactElement {
   const title = activeSession?.title || t('maxExpand.cli.sessions', { defaultValue: '会话' });
   const phaseText = activeSession ? phaseLabel(activeSession.phase, t) : '';
 
+  // 根据会话状态选择左侧 GIF：idle → 空闲；等待授权/调用工具 → 挥手；运行 → 等待
+  const gifSrc = (() => {
+    if (!activeSession || activeSession.phase === 'idle') return GifIcon.CLAWD_IDLE;
+    if (activeSession.phase === 'waiting_permission' || latestEvent?.kind === 'tool') return GifIcon.CLAWD_WAVING;
+    return GifIcon.CLAWD_WAITING;
+  })();
+
   // 等待授权时，从待授权事件的 tool_input 中取出 command + description
   const permissionCommand = useMemo(() => {
     if (!activeSession || activeSession.phase !== 'waiting_permission') return null;
@@ -89,7 +96,7 @@ export function CliContent(): ReactElement {
 
   return (
     <div className="cli-state-content">
-      <img className="cli-state-icon" src={AgentIcon.CLAUDE} alt="" draggable={false} />
+      <img className="cli-state-icon" src={gifSrc} alt="" draggable={false} />
       <button type="button" className="cli-state-body" onClick={openPanel}>
         <span className="cli-state-title-row">
           <span className="cli-state-title">{title}</span>
