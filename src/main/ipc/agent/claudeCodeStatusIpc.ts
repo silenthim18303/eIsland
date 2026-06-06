@@ -36,4 +36,5 @@ export function registerClaudeCodeStatusIpcHandlers(options: RegisterClaudeCodeS
   ipcMain.handle('claude-code:hook:install', () => options.service.installHook());
   ipcMain.handle('claude-code:hook:uninstall', () => options.service.uninstallHook());
   ipcMain.handle('claude-code:events:clear', () => options.service.clearEvents());
+  ipcMain.handle('claude-code:sessions:delete', (_event, sessionIds: string[]) => options.service.deleteSessions(sessionIds));
 }

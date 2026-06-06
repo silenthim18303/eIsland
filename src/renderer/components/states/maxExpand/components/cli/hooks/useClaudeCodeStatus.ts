@@ -34,6 +34,7 @@ export function useClaudeCodeStatus(): {
   enableHook: () => Promise<void>;
   disableHook: () => Promise<void>;
   clearEvents: () => Promise<void>;
+  deleteSessions: (sessionIds: string[]) => Promise<void>;
 } {
   const [snapshot, setSnapshot] = useState<CliStatusSnapshot>(EMPTY_CLI_STATUS);
   const [loading, setLoading] = useState(true);
@@ -78,5 +79,10 @@ export function useClaudeCodeStatus(): {
     setSnapshot(next);
   }, []);
 
-  return { snapshot, loading, actionMessage, enableHook, disableHook, clearEvents };
+  const deleteSessions = useCallback(async (sessionIds: string[]): Promise<void> => {
+    const next = await window.api.claudeCodeSessionsDelete(sessionIds);
+    setSnapshot(next);
+  }, []);
+
+  return { snapshot, loading, actionMessage, enableHook, disableHook, clearEvents, deleteSessions };
 }

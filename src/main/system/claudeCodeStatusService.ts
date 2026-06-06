@@ -94,6 +94,7 @@ export interface ClaudeCodeStatusService {
   installHook: () => Promise<ClaudeSettingsMutationResult>;
   uninstallHook: () => Promise<ClaudeSettingsMutationResult>;
   clearEvents: () => ClaudeCodeStatusSnapshot;
+  deleteSessions: (sessionIds: string[]) => ClaudeCodeStatusSnapshot;
 }
 
 const MAX_EVENTS = 120;
@@ -750,5 +751,14 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
     return getSnapshot();
   }
 
-  return { start, stop, getSnapshot, installHook, uninstallHook, clearEvents };
+  function deleteSessions(sessionIds: string[]): ClaudeCodeStatusSnapshot {
+    const sessionIdSet = new Set(sessionIds.filter(Boolean));
+    if (sessionIdSet.size === 0) return getSnapshot();
+    events = events.filter((event) => !sessionIdSet.has(event.sessionId));
+    sessionIdSet.forEach((sessionId) => sessions.delete(sessionId));
+    emitSnapshot();
+    return getSnapshot();
+  }
+
+  return { start, stop, getSnapshot, installHook, uninstallHook, clearEvents, deleteSessions };
 }

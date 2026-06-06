@@ -98,17 +98,18 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
 
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
-  const { snapshot, enableHook, disableHook, clearEvents } = useClaudeCodeStatus();
+  const { snapshot, enableHook, disableHook, clearEvents, deleteSessions } = useClaudeCodeStatus();
   const {
     eventFilter,
     setEventFilter,
     selectedSession,
     selectedSessionId,
     setSelectedSessionId,
-    activeSessions,
     filteredEvents,
   } = useCliEvents(snapshot);
   const [filtersVisible, setFiltersVisible] = useState(false);
+  const [bulkSelectMode, setBulkSelectMode] = useState(false);
+  const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(() => new Set());
 
   /* ── 渐进加载 ── */
   const [visibleCount, setVisibleCount] = useState(INITIAL_EVENT_COUNT);
@@ -128,6 +129,43 @@ export function CliTab(): ReactElement {
   // IntersectionObserver：触底追加
   const loadMore = useCallback(() => setVisibleCount((c) => c + LOAD_MORE_COUNT), []);
 
+  const handleToggleBulkSelect = useCallback((): void => {
+    setBulkSelectMode((enabled) => {
+      if (enabled) setSelectedSessionIds(new Set());
+      return !enabled;
+    });
+  }, []);
+
+  const handleToggleSessionSelection = useCallback((id: string): void => {
+    setSelectedSessionIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleDeleteSelectedSessions = useCallback((): void => {
+    if (selectedSessionIds.size === 0) return;
+    const deletedIds = Array.from(selectedSessionIds);
+    deleteSessions(deletedIds).catch(() => {});
+    if (selectedSessionId && selectedSessionIds.has(selectedSessionId)) setSelectedSessionId(null);
+    setSelectedSessionIds(new Set());
+    setBulkSelectMode(false);
+  }, [deleteSessions, selectedSessionId, selectedSessionIds, setSelectedSessionId]);
+
+  useEffect(() => {
+    const sessionIds = new Set(snapshot.sessions.map((session) => session.id));
+    setSelectedSessionIds((prev) => {
+      const next = new Set(Array.from(prev).filter((id) => sessionIds.has(id)));
+      return next.size === prev.size ? prev : next;
+    });
+    if (snapshot.sessions.length === 0) setBulkSelectMode(false);
+  }, [snapshot.sessions]);
+
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
@@ -141,12 +179,22 @@ export function CliTab(): ReactElement {
 
   const visibleEvents = filteredEvents.slice(0, visibleCount);
   const hasMore = visibleCount < filteredEvents.length;
+  const selectedSessionCount = selectedSessionIds.size;
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
       {/* 左侧：会话列表 */}
       <div className="cli-tab-sidebar">
         <div className="cli-tab-sidebar-header">
+          <button
+            className={`cli-tab-bulk-select-toggle ${bulkSelectMode ? 'cli-tab-bulk-select-toggle--active' : ''}`}
+            type="button"
+            onClick={handleToggleBulkSelect}
+            title={bulkSelectMode ? t('maxExpand.cli.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.cli.bulkSelect', { defaultValue: '批量选择' })}
+            aria-label={bulkSelectMode ? t('maxExpand.cli.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.cli.bulkSelect', { defaultValue: '批量选择' })}
+          >
+            <img className="cli-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="14" height="14" draggable={false} />
+          </button>
           <span className="cli-tab-sidebar-title">{t('maxExpand.cli.sessions', { defaultValue: '会话' })}</span>
           <button
             className={`cli-tab-sidebar-count ${selectedSessionId === null ? 'active' : ''}`}
@@ -154,33 +202,62 @@ export function CliTab(): ReactElement {
             title={t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}
             onClick={() => setSelectedSessionId(null)}
           >
-            {activeSessions.length}
+            {t('maxExpand.cli.allLabel', { defaultValue: 'all' })}
+          </button>
+        </div>
+        <div className={`cli-tab-bulk-actions ${bulkSelectMode ? 'cli-tab-bulk-actions--open' : ''}`} aria-hidden={!bulkSelectMode}>
+          <span className="cli-tab-bulk-selected-count">
+            {t('maxExpand.cli.selectedCount', { defaultValue: '已选 {{count}} 项', count: selectedSessionCount })}
+          </span>
+          <button
+            className="cli-tab-bulk-delete"
+            type="button"
+            onClick={handleDeleteSelectedSessions}
+            disabled={!bulkSelectMode || selectedSessionCount === 0}
+            tabIndex={bulkSelectMode ? 0 : -1}
+          >
+            {t('maxExpand.cli.deleteSelected', { defaultValue: '删除所选' })}
+          </button>
+          <button className="cli-tab-bulk-cancel" type="button" onClick={handleToggleBulkSelect} tabIndex={bulkSelectMode ? 0 : -1}>
+            {t('maxExpand.cli.cancelSelection', { defaultValue: '取消选择' })}
           </button>
         </div>
         <div className="cli-tab-session-list">
           {snapshot.sessions.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptySessions', { defaultValue: '暂无会话' })}</div>
           )}
-          {snapshot.sessions.map((session) => (
-            <button
-              key={session.id}
-              className={`cli-tab-session-item ${selectedSessionId === session.id ? 'active' : ''}`}
-              type="button"
-              onClick={() => setSelectedSessionId(session.id)}
-            >
-              <div className="cli-tab-session-top">
-                <img className="cli-tab-session-icon" src={AgentIcon.CLAUDE} alt="" width="18" height="18" draggable={false} />
-                <span className="cli-tab-session-title">{session.title}</span>
-                <span className={`cli-tab-phase ${session.phase}`}>{phaseLabel(session.phase, t)}</span>
-              </div>
-              <div className="cli-tab-session-path">{session.cwd ?? session.transcriptPath ?? session.id}</div>
-              {session.pendingPermission && (
-                <div className="cli-tab-permission" title={session.pendingPermission.summary}>
-                  <span className="cli-tab-permission-text">{permissionProjectLabel(session.pendingPermission, t)}</span>
+          {snapshot.sessions.map((session) => {
+            const sessionSelected = selectedSessionIds.has(session.id);
+            return (
+              <button
+                key={session.id}
+                className={`cli-tab-session-item ${selectedSessionId === session.id ? 'active' : ''} ${bulkSelectMode ? 'cli-tab-session-item--selectable' : ''} ${sessionSelected ? 'cli-tab-session-item--selected' : ''}`}
+                type="button"
+                onClick={() => {
+                  if (bulkSelectMode) {
+                    handleToggleSessionSelection(session.id);
+                    return;
+                  }
+                  setSelectedSessionId(session.id);
+                }}
+              >
+                <span className={`cli-tab-session-item-check ${sessionSelected ? 'cli-tab-session-item-check--checked' : ''}`} aria-hidden="true">
+                  {sessionSelected && <img className="cli-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="10" height="10" draggable={false} />}
+                </span>
+                <div className="cli-tab-session-top">
+                  <img className="cli-tab-session-icon" src={AgentIcon.CLAUDE} alt="" width="18" height="18" draggable={false} />
+                  <span className="cli-tab-session-title">{session.title}</span>
+                  <span className={`cli-tab-phase ${session.phase}`}>{phaseLabel(session.phase, t)}</span>
                 </div>
-              )}
-            </button>
-          ))}
+                <div className="cli-tab-session-path">{session.cwd ?? session.transcriptPath ?? session.id}</div>
+                {session.pendingPermission && (
+                  <div className="cli-tab-permission" title={session.pendingPermission.summary}>
+                    <span className="cli-tab-permission-text">{permissionProjectLabel(session.pendingPermission, t)}</span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 

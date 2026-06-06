@@ -1552,6 +1552,9 @@ const api = {
   claudeCodeEventsClear: (): Promise<ClaudeCodeStatusSnapshot> => {
     return ipcRenderer.invoke('claude-code:events:clear');
   },
+  claudeCodeSessionsDelete: (sessionIds: string[]): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:sessions:delete', sessionIds);
+  },
   onClaudeCodeStatusUpdated: (callback: (snapshot: ClaudeCodeStatusSnapshot) => void): (() => void) => {
     const handler = (_event: Electron.IpcRendererEvent, snapshot: ClaudeCodeStatusSnapshot): void => {
       callback(snapshot);
