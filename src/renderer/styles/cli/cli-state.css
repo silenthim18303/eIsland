@@ -190,6 +190,26 @@
   background: rgba(var(--color-text-rgb), 0.08);
 }
 
+.cli-state-lyric {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  max-width: 60%;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.5);
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: cliStateLyricFade 0.3s ease both;
+  pointer-events: none;
+}
+
+@keyframes cliStateLyricFade {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes cliStateEnter {
   0%   { opacity: 0; transform: translateY(4px); }
   100% { opacity: 1; transform: translateY(0); }
