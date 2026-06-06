@@ -360,6 +360,11 @@
   background: rgba(255, 82, 82, 0.04);
 }
 
+.cli-event-card--permission {
+  border-color: rgba(255, 213, 79, 0.35);
+  background: rgba(255, 213, 79, 0.04);
+}
+
 .cli-event-card-header {
   display: flex;
   align-items: center;

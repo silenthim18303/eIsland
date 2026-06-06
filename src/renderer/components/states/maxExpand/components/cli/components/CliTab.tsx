@@ -42,6 +42,9 @@ const LOAD_MORE_COUNT = 10;
 /** 流结束事件名 */
 const STOP_EVENTS = new Set(['Stop', 'StopFailure', 'SubagentStop', 'SessionEnd']);
 
+/** 等待授权事件名 */
+const PERMISSION_EVENTS = new Set(['PermissionRequest', 'PermissionDenied']);
+
 function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
   const [expanded, setExpanded] = useState(false);
   const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
@@ -50,7 +53,7 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
     setExpanded((e.target as HTMLDetailsElement).open);
   }, []);
   return (
-    <div className={`cli-event-card${STOP_EVENTS.has(event.eventName) ? ' cli-event-card--stop' : ''}`}>
+    <div className={`cli-event-card${STOP_EVENTS.has(event.eventName) ? ' cli-event-card--stop' : ''}${PERMISSION_EVENTS.has(event.eventName) ? ' cli-event-card--permission' : ''}`}>
       <div className="cli-event-card-header">
         <span className="cli-event-card-name">{event.eventName}</span>
         <div className="cli-event-card-header-right">
