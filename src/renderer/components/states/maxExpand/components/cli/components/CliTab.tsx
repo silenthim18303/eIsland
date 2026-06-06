@@ -277,7 +277,7 @@ export function CliTab(): ReactElement {
                   onClick={() => setPage(currentPage - 1)}
                   title={t('maxExpand.cli.prevPage', { defaultValue: '上一页' })}
                 >
-                  ‹
+                  <img src={SvgIcon.PREVIOUS} alt="" width="12" height="12" draggable={false} />
                 </button>
                 <button
                   className="cli-tab-page-btn"
@@ -286,7 +286,7 @@ export function CliTab(): ReactElement {
                   onClick={() => setPage(currentPage + 1)}
                   title={t('maxExpand.cli.nextPage', { defaultValue: '下一页' })}
                 >
-                  ›
+                  <img src={SvgIcon.NEXT} alt="" width="12" height="12" draggable={false} />
                 </button>
               </div>
             )}
