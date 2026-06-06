@@ -40,9 +40,8 @@ import '../../../../../../styles/settings/modules/cli.css';
 
 gsap.registerPlugin(useGSAP);
 
-/** 初始渲染数量 & 每次追加数量 */
-const INITIAL_EVENT_COUNT = 10;
-const LOAD_MORE_COUNT = 10;
+/** 每页显示的流事件数量 */
+const EVENTS_PER_PAGE = 3;
 
 /** 流结束事件名 */
 const STOP_EVENTS = new Set(['Stop', 'StopFailure', 'SubagentStop', 'SessionEnd']);
@@ -118,23 +117,19 @@ export function CliTab(): ReactElement {
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(() => new Set());
 
-  /* ── 渐进加载 ── */
-  const [visibleCount, setVisibleCount] = useState(INITIAL_EVENT_COUNT);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  /* ── 分页 ── */
+  const [page, setPage] = useState(0);
   const prevFilterRef = useRef(eventFilter);
   const prevSessionRef = useRef(selectedSessionId);
 
-  // 筛选条件变化时重置计数
+  // 筛选条件变化时重置页码
   useEffect(() => {
     if (prevFilterRef.current !== eventFilter || prevSessionRef.current !== selectedSessionId) {
       prevFilterRef.current = eventFilter;
       prevSessionRef.current = selectedSessionId;
-      setVisibleCount(INITIAL_EVENT_COUNT);
+      setPage(0);
     }
   }, [eventFilter, selectedSessionId]);
-
-  // IntersectionObserver：触底追加
-  const loadMore = useCallback(() => setVisibleCount((c) => c + LOAD_MORE_COUNT), []);
 
   const handleToggleBulkSelect = useCallback((): void => {
     setBulkSelectMode((enabled) => {
@@ -173,19 +168,9 @@ export function CliTab(): ReactElement {
     if (snapshot.sessions.length === 0) setBulkSelectMode(false);
   }, [snapshot.sessions]);
 
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) loadMore(); },
-      { root: el.parentElement, threshold: 0.1 },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [loadMore]);
-
-  const visibleEvents = filteredEvents.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredEvents.length;
+  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / EVENTS_PER_PAGE));
+  const currentPage = Math.min(page, totalPages - 1);
+  const pagedEvents = filteredEvents.slice(currentPage * EVENTS_PER_PAGE, currentPage * EVENTS_PER_PAGE + EVENTS_PER_PAGE);
   const selectedSessionCount = selectedSessionIds.size;
 
   return (
@@ -275,11 +260,36 @@ export function CliTab(): ReactElement {
             <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
               {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
             </span>
+            {totalPages > 1 && (
+              <span className="cli-tab-phase cli-tab-page-indicator">{currentPage + 1}/{totalPages}</span>
+            )}
             <span className="cli-tab-stream-session">
               {selectedSession?.title ?? t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}
             </span>
           </div>
           <div className="cli-tab-actions">
+            {totalPages > 1 && (
+              <div className="cli-tab-page-switch">
+                <button
+                  className="cli-tab-page-btn"
+                  type="button"
+                  disabled={currentPage === 0}
+                  onClick={() => setPage(currentPage - 1)}
+                  title={t('maxExpand.cli.prevPage', { defaultValue: '上一页' })}
+                >
+                  ‹
+                </button>
+                <button
+                  className="cli-tab-page-btn"
+                  type="button"
+                  disabled={currentPage >= totalPages - 1}
+                  onClick={() => setPage(currentPage + 1)}
+                  title={t('maxExpand.cli.nextPage', { defaultValue: '下一页' })}
+                >
+                  ›
+                </button>
+              </div>
+            )}
             <button
               className="cli-tab-action-btn"
               type="button"
@@ -336,8 +346,7 @@ export function CliTab(): ReactElement {
           {filteredEvents.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</div>
           )}
-          {visibleEvents.map((event) => <EventRow key={event.id} event={event} t={t} />)}
-          {hasMore && <div ref={sentinelRef} className="cli-tab-event-sentinel" />}
+          {pagedEvents.map((event) => <EventRow key={event.id} event={event} t={t} />)}
         </div>
       </div>
     </div>

@@ -479,6 +479,47 @@
   color: rgba(var(--color-text-rgb), 0.3);
 }
 
+/* ── 分页 ── */
+.cli-tab-page-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: 2px;
+}
+
+.cli-tab-page-indicator {
+  flex-shrink: 0;
+  margin-left: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.cli-tab-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.6);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.cli-tab-page-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.85);
+}
+
+.cli-tab-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* ── 事件卡片（统一样式） ── */
 .cli-event-card {
   padding: 10px 12px;

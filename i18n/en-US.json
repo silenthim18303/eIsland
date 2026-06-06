@@ -1184,6 +1184,8 @@
       "allLabel": "all",
       "filterAria": "Event filters",
       "enterCliState": "Live event stream",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
       "bulkSelect": "Bulk Select",
       "cancelSelection": "Cancel Selection",
       "selectedCount": "{{count}} selected",
