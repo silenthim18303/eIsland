@@ -25,6 +25,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import useIslandStore from '../../store/isLandStore';
 
 const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
 
@@ -123,8 +124,8 @@ export function useDynamicIslandShell(options: UseDynamicIslandShellOptions): Dy
     }
 
     if (state === 'expanded' || state === 'maxExpand' || state === 'announcement') {
-      // 退出 maxExpand 时，如存在活跃的 Claude 会话则进入 cli 态展示实时流事件
-      if (state === 'maxExpand' && hasActiveCliSessionRef.current) {
+      // 退出 maxExpand 时，仅当当前在 CLI 子标签且存在活跃的 Claude 会话才进入 cli 态
+      if (state === 'maxExpand' && hasActiveCliSessionRef.current && useIslandStore.getState().maxExpandTab === 'cli') {
         setCli();
         return;
       }
