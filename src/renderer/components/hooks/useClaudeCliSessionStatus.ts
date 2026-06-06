@@ -26,6 +26,7 @@
 
 import { useEffect, useRef } from 'react';
 import { playNotificationSoundOnce } from '../../utils/audio/notificationSound';
+import { readEffectiveAudioVolume } from '../../utils/audio/volume';
 import useIslandStore from '../../store/isLandStore';
 import { AgentIcon } from '../../utils/SvgIcon';
 
@@ -84,6 +85,17 @@ export function useClaudeCliSessionStatus(): {
           const store = useIslandStore.getState();
           const inCliView = store.state === 'cli' || (store.state === 'maxExpand' && store.maxExpandTab === 'cli');
           if (!inCliView) {
+            // 与 STT 触发同款音效
+            void (async () => {
+              const targetVolume = await readEffectiveAudioVolume('effect').catch(() => 1);
+              const triggerSound = new Audio('./audio/AGENT.wav');
+              triggerSound.volume = targetVolume;
+              void triggerSound.play().catch(() => {
+                triggerSound.src = './public/audio/AGENT.wav';
+                triggerSound.volume = targetVolume;
+                void triggerSound.play().catch(() => {});
+              });
+            })();
             store.setNotification({
               title: 'Claude Code',
               body: '检测到新的 Claude Code 活动，是否切换到 CLI 面板查看？',

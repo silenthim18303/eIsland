@@ -164,7 +164,7 @@ export const createIslandSlice: StateCreator<
   setNotification: (data) => set((prev) => {
     if (prev.uiStateLocked && prev.state !== 'notification') return prev;
     window.api?.expandWindowNotification();
-    playNotificationSoundOnce();
+    if (data.type !== 'cli-session-detected') playNotificationSoundOnce();
     return { state: 'notification', notification: data, authReturnState: null };
   }),
 
