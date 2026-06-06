@@ -31,7 +31,7 @@ import { useCliEvents } from '../hooks/useCliEvents';
 import { EVENT_FILTERS } from '../config/cliFilters';
 import type { CliHookEvent } from '../config/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
-import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
 import '../../../../../../styles/settings/modules/cli.css';
 
 function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string }): ReactElement {
@@ -105,6 +105,7 @@ export function CliTab(): ReactElement {
               onClick={() => setSelectedSessionId(session.id)}
             >
               <div className="cli-tab-session-top">
+                <img className="cli-tab-session-icon" src={AgentIcon.CLAUDE} alt="" width="18" height="18" draggable={false} />
                 <span className="cli-tab-session-title">{session.title}</span>
                 <span className={`cli-tab-phase ${session.phase}`}>{phaseLabel(session.phase, t)}</span>
               </div>

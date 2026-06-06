@@ -98,12 +98,18 @@
 .cli-tab-session-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 0;
   margin-bottom: 3px;
 }
 
+.cli-tab-session-icon {
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+
 .cli-tab-session-title {
+  flex: 1;
+  min-width: 0;
   font-size: 13px;
   font-weight: 500;
   color: rgba(var(--color-text-rgb), 0.85);
@@ -114,6 +120,7 @@
 
 .cli-tab-phase {
   flex-shrink: 0;
+  margin-left: auto;
   border-radius: 999px;
   padding: 2px 7px;
   font-size: 10px;
@@ -155,6 +162,7 @@
   border-radius: 6px;
   border: 1px solid rgba(255, 213, 79, 0.2);
   background: rgba(255, 213, 79, 0.06);
+  text-align: center;
 }
 
 .cli-tab-permission-text {
