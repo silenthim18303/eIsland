@@ -598,6 +598,14 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
 
   const addEvent = (payload: Record<string, unknown>): ClaudeCodeHookEvent => {
     const eventName = inferEventName(payload);
+    // 不在 CLI / maxExpand 面板展示 Notification 事件：直接忽略，不存储也不广播
+    if (eventName === 'Notification') {
+      return {
+        id: '', eventName, kind: 'notification', sessionId: '', cwd: null, transcriptPath: null,
+        summary: '', detail: null, detailItems: [], toolName: null, toolInputPreview: null,
+        createdAt: Date.now(), raw: payload,
+      };
+    }
     const rawTranscriptPath = asString(payload.transcript_path) ?? asString(payload.transcriptPath);
     const transcriptDetails = readClaudeTranscriptDetails(rawTranscriptPath, payload);
     const enrichedPayload: Record<string, unknown> = {
