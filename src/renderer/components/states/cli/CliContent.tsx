@@ -64,6 +64,18 @@ export function CliContent(): ReactElement {
   const title = activeSession?.title || t('maxExpand.cli.sessions', { defaultValue: '会话' });
   const phaseText = activeSession ? phaseLabel(activeSession.phase, t) : '';
 
+  // 等待授权时，从待授权事件的 tool_input 中取出 command + description
+  const permissionCommand = useMemo(() => {
+    if (!activeSession || activeSession.phase !== 'waiting_permission') return null;
+    const raw = activeSession.pendingPermission?.raw as Record<string, unknown> | undefined;
+    const toolInput = (raw?.tool_input ?? raw?.toolInput ?? raw?.input) as Record<string, unknown> | undefined;
+    if (!toolInput) return null;
+    const command = typeof toolInput.command === 'string' ? toolInput.command : '';
+    const description = typeof toolInput.description === 'string' ? toolInput.description : '';
+    if (!command && !description) return null;
+    return { command, description, toolName: activeSession.pendingPermission?.toolName ?? '' };
+  }, [activeSession]);
+
   return (
     <div className="cli-state-content">
       <img className="cli-state-icon" src={AgentIcon.CLAUDE} alt="" draggable={false} />
@@ -73,11 +85,21 @@ export function CliContent(): ReactElement {
           {phaseText && <span className={`cli-state-phase ${activeSession?.phase ?? ''}`}>{phaseText}</span>}
           {latestEvent && <span className="cli-state-phase cli-state-event-tag">{latestEvent.eventName}</span>}
         </span>
-        <span className="cli-state-event">
-          {latestEvent
-            ? (latestEvent.summary && <span className="cli-state-event-summary">{latestEvent.summary}</span>)
-            : <span className="cli-state-event-summary">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</span>}
-        </span>
+        {permissionCommand ? (
+          <span className="cli-state-command">
+            <span className="cli-state-command-line">
+              {permissionCommand.toolName && <span className="cli-state-command-tool">{permissionCommand.toolName}</span>}
+              {permissionCommand.command && <code className="cli-state-command-text">{permissionCommand.command}</code>}
+            </span>
+            {permissionCommand.description && <span className="cli-state-command-desc">{permissionCommand.description}</span>}
+          </span>
+        ) : (
+          <span className="cli-state-event">
+            {latestEvent
+              ? (latestEvent.summary && <span className="cli-state-event-summary">{latestEvent.summary}</span>)
+              : <span className="cli-state-event-summary">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</span>}
+          </span>
+        )}
       </button>
       <div className="cli-state-actions">
         <button type="button" className="cli-state-action-btn" onClick={() => setIdle(true)}>
