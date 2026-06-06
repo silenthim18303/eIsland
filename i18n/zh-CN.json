@@ -2222,6 +2222,11 @@
         "title": "通知音效",
         "hint": "通知触发时播放一次提示音。",
         "toggle": "启用通知音效"
+      },
+      "agentNotification": {
+        "title": "Agent 启动通知",
+        "hint": "检测到桌面 Agent 启动或关闭时弹出灵动岛通知。",
+        "toggle": "启用 Agent 启动通知"
       }
     },
     "breakReminder": {

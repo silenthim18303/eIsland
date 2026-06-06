@@ -24,13 +24,16 @@
  * @author 鸡哥
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useIslandStore from '../../store/isLandStore';
 import type { NotificationData } from '../../store/types';
 import { SvgIcon } from '../../utils/SvgIcon';
 import { fetchVersion, reportUpdateDownloadCount } from '../../api/update/versionApi';
 import { getWebsiteFaviconUrl, getWebsiteHostname } from '../../api/site/siteMetaApi';
 import { CLIPBOARD_URL_SUPPRESS_IN_FAVORITES_KEY, UPDATE_SOURCE_STORE_KEY, getUpdateSourceLabel } from '../config/dynamicIslandConfig';
+
+/** Agent 启动通知开关存储键名 */
+const AGENT_NOTIFICATION_ENABLED_STORE_KEY = 'agent-notification-enabled';
 
 interface UseIslandNotificationSubscriptionsOptions {
   language: string | undefined;
@@ -45,6 +48,16 @@ interface UseIslandNotificationSubscriptionsOptions {
 export function useIslandNotificationSubscriptions(options: UseIslandNotificationSubscriptionsOptions): void {
   const { language, t, setNotificationRef } = options;
   const updateNotifiedRef = useRef(false);
+  const [agentNotificationEnabled, setAgentNotificationEnabled] = useState<boolean>(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(AGENT_NOTIFICATION_ENABLED_STORE_KEY).then((value) => {
+      if (cancelled) return;
+      if (typeof value === 'boolean') setAgentNotificationEnabled(value);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const unsubSwitch = window.api?.onSourceSwitchRequest((data) => {
@@ -106,6 +119,7 @@ export function useIslandNotificationSubscriptions(options: UseIslandNotificatio
   }, [language, t, setNotificationRef]);
 
   useEffect(() => {
+    if (!agentNotificationEnabled) return;
     const unsubAgent = window.api?.onExternalAgentStarted?.((data) => {
       const joined = data.agentNames.join('、');
       setNotificationRef.current({
@@ -119,9 +133,10 @@ export function useIslandNotificationSubscriptions(options: UseIslandNotificatio
     return () => {
       unsubAgent?.();
     };
-  }, [language, t, setNotificationRef]);
+  }, [agentNotificationEnabled, language, t, setNotificationRef]);
 
   useEffect(() => {
+    if (!agentNotificationEnabled) return;
     const unsubAgentStopped = window.api?.onExternalAgentStopped?.((data) => {
       const joined = data.agentNames.join('、');
       setNotificationRef.current({
@@ -135,7 +150,7 @@ export function useIslandNotificationSubscriptions(options: UseIslandNotificatio
     return () => {
       unsubAgentStopped?.();
     };
-  }, [language, t, setNotificationRef]);
+  }, [agentNotificationEnabled, language, t, setNotificationRef]);
 
   useEffect(() => {
     const unsubClipboard = window.api?.onClipboardUrlsDetected?.(({ urls, title }) => {
