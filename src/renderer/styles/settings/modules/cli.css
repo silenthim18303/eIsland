@@ -151,8 +151,14 @@
 .cli-tab-session-list {
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   padding: 4px 0;
+}
+
+.cli-tab-session-list .cli-tab-empty {
+  flex: 1;
 }
 
 .cli-tab-session-list::-webkit-scrollbar {
@@ -451,9 +457,15 @@
 .cli-tab-event-list {
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px 14px;
+}
+
+.cli-tab-event-list .cli-tab-empty {
+  flex: 1;
 }
 
 .cli-tab-event-list::-webkit-scrollbar {
