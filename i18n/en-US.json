@@ -1191,6 +1191,26 @@
       "allSessionsHint": "Show all Claude Code event streams",
       "allLabel": "all",
       "filterAria": "Event filters",
+      "heatmapAria": "Activity heatmap",
+      "heatmap": {
+        "session": "Sessions",
+        "tool": "Tool calls",
+        "prompt": "Prompts",
+        "month": {
+          "jan": "Jan",
+          "feb": "Feb",
+          "mar": "Mar",
+          "apr": "Apr",
+          "may": "May",
+          "jun": "Jun",
+          "jul": "Jul",
+          "aug": "Aug",
+          "sep": "Sep",
+          "oct": "Oct",
+          "nov": "Nov",
+          "dec": "Dec"
+        }
+      },
       "enterCliState": "Live event stream",
       "prevPage": "Previous page",
       "nextPage": "Next page",

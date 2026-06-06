@@ -1191,6 +1191,26 @@
       "allSessionsHint": "显示所有 Claude Code 事件流",
       "allLabel": "all",
       "filterAria": "事件筛选",
+      "heatmapAria": "活动热力图",
+      "heatmap": {
+        "session": "会话开始",
+        "tool": "工具调用",
+        "prompt": "提示词输入",
+        "month": {
+          "jan": "1月",
+          "feb": "2月",
+          "mar": "3月",
+          "apr": "4月",
+          "may": "5月",
+          "jun": "6月",
+          "jul": "7月",
+          "aug": "8月",
+          "sep": "9月",
+          "oct": "10月",
+          "nov": "11月",
+          "dec": "12月"
+        }
+      },
       "enterCliState": "进入实时流",
       "prevPage": "上一页",
       "nextPage": "下一页",
