@@ -524,6 +524,8 @@
   font-size: 13px;
   color: rgba(var(--color-text-rgb), 0.85);
   line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* markdown 子元素重置 */
