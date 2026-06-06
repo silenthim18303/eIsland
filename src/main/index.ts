@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { app, BrowserWindow, globalShortcut, protocol, net } from 'electron';
+import { app, BrowserWindow, globalShortcut, protocol, net, ipcMain } from 'electron';
 import { join, resolve as resolvePath } from 'path';
 import { pathToFileURL } from 'url';
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
@@ -128,6 +128,7 @@ if (!gotTheLock) {
 
 let mainWindow: BrowserWindow | null = null;
 let agentVoiceInputWindow: BrowserWindow | null = null;
+let cliGlowWindow: BrowserWindow | null = null;
 
 function isIslandInExpandedOrMaxExpandState(): boolean {
   if (!mainWindow || mainWindow.isDestroyed()) return false;
@@ -224,10 +225,90 @@ function hideAgentVoiceInputWindow(): void {
     mainWindow.webContents.send('agent-voice-input:state', false);
   }
 }
+
+/**
+ * 显示 CLI 检测全屏边缘光效窗口
+ * @description 独立于 Agent 语音输入窗口，加载 AIbackground.html，常驻直到用户响应弹窗后关闭
+ */
+function showCliGlowWindow(): void {
+  if (cliGlowWindow && !cliGlowWindow.isDestroyed()) {
+    cliGlowWindow.show();
+    return;
+  }
+
+  const { screen } = require('electron');
+  const targetDisplay = mainWindow && !mainWindow.isDestroyed()
+    ? screen.getDisplayMatching(mainWindow.getBounds())
+    : screen.getPrimaryDisplay();
+  const { width, height } = targetDisplay.bounds;
+
+  cliGlowWindow = new BrowserWindow({
+    x: targetDisplay.bounds.x,
+    y: targetDisplay.bounds.y,
+    width,
+    height,
+    fullscreen: true,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: false,
+    focusable: false,
+    hasShadow: false,
+    show: false,
+    title: '',
+    type: 'toolbar',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  cliGlowWindow.setIgnoreMouseEvents(true);
+  cliGlowWindow.setAlwaysOnTop(true, 'screen-saver');
+  cliGlowWindow.removeMenu();
+
+  if (app.isPackaged) {
+    cliGlowWindow.loadFile(join(__dirname, '../renderer/AIbackground.html'));
+  } else {
+    cliGlowWindow.loadFile(join(__dirname, '../../src/renderer/AIbackground.html'));
+  }
+
+  cliGlowWindow.once('ready-to-show', () => {
+    if (cliGlowWindow && !cliGlowWindow.isDestroyed()) {
+      cliGlowWindow.show();
+    }
+  });
+
+  cliGlowWindow.on('closed', () => {
+    cliGlowWindow = null;
+  });
+
+  // 保证灵动岛始终位于光效窗口之上
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.setAlwaysOnTop(true, 'screen-saver');
+  }
+}
+
+/**
+ * 关闭 CLI 检测光效窗口（先播放淡出动画再关闭）
+ */
+function hideCliGlowWindow(): void {
+  if (cliGlowWindow && !cliGlowWindow.isDestroyed()) {
+    const win = cliGlowWindow;
+    win.webContents.executeJavaScript('startFadeOut()').catch(() => {});
+    setTimeout(() => {
+      if (win && !win.isDestroyed()) {
+        win.close();
+      }
+    }, 450);
+    cliGlowWindow = null;
+  }
+}
+
 const captureWindowService = createCaptureWindowService({
   getMainWindow: () => mainWindow,
 });
-
 /** 运行时白名单（可被用户修改） */
 let nowPlayingWhitelist: string[] = [...DEFAULT_WHITELIST];
 
@@ -364,6 +445,10 @@ const hotkeyService = createHotkeyService({
 
 /** 注册 IPC 处理器 */
 function registerIpcHandlers(): void {
+  // CLI 检测：显示/关闭全屏边缘光效（独立窗口，由用户响应弹窗后关闭）
+  ipcMain.handle('cli-glow:show', () => { showCliGlowWindow(); return true; });
+  ipcMain.handle('cli-glow:hide', () => { hideCliGlowWindow(); return true; });
+
   registerWindowIpcHandlers({
     getMainWindow: () => mainWindow,
     getInitialCenterX: mainWindowService.getInitialCenterX,

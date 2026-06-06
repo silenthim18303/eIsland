@@ -950,6 +950,14 @@ const api = {
       ipcRenderer.removeListener('agent-voice-input:state', handler);
     };
   },
+  /** 显示 CLI 检测全屏边缘光效（常驻直到调用 cliGlowHide） */
+  cliGlowShow: (): Promise<boolean> => {
+    return ipcRenderer.invoke('cli-glow:show');
+  },
+  /** 关闭 CLI 检测全屏边缘光效 */
+  cliGlowHide: (): Promise<boolean> => {
+    return ipcRenderer.invoke('cli-glow:hide');
+  },
   /**
    * 监听鼠标穿透锁定状态变化
    * @param callback - 回调函数，参数为是否锁定

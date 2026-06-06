@@ -312,8 +312,9 @@ export function NotificationContent({
   };
 
   const handleRestartNow = (): void => { void window.api?.restartApp?.().catch(() => {}); dismiss(); };  const handleRestartLater = (): void => { dismiss(); };
-  const handleSwitchToCli = (): void => { setMaxExpandTab('cli'); setMaxExpand(); };
-  const handleSwitchToCliState = (): void => { setCli(); };
+  const handleSwitchToCli = (): void => { void window.api?.cliGlowHide?.(); setMaxExpandTab('cli'); setMaxExpand(); };
+  const handleSwitchToCliState = (): void => { void window.api?.cliGlowHide?.(); setCli(); };
+  const handleCliIgnore = (): void => { void window.api?.cliGlowHide?.(); dismiss(); };
   const handleOpenUrl = (url: string): void => { window.api?.clipboardOpenUrl(url); dismiss(); };
 
   const handleOpenAllUrls = (): void => {
@@ -520,7 +521,7 @@ export function NotificationContent({
           <div className="notification-decision-actions">
             <button type="button" className="notification-action-btn notification-action-complete" onClick={handleSwitchToCli}>{t('notification.actions.switch', { defaultValue: '切换' })}</button>
             <button type="button" className="notification-action-btn notification-action-complete" onClick={handleSwitchToCliState}>{t('notification.actions.switchCliState', { defaultValue: '切换到灵动岛' })}</button>
-            <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleIgnore}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
+            <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleCliIgnore}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
           </div>
         </div>
       ) : type === 'source-switch' ? (

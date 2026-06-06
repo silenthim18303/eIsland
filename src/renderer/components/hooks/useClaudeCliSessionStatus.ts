@@ -96,6 +96,7 @@ export function useClaudeCliSessionStatus(): {
                 void triggerSound.play().catch(() => {});
               });
             })();
+            void window.api?.cliGlowShow?.();
             store.setNotification({
               title: 'Claude Code',
               body: '检测到新的 Claude Code 活动，是否切换到 CLI 面板查看？',
