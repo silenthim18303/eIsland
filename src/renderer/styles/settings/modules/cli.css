@@ -68,14 +68,25 @@
 }
 
 .cli-tab-session-item {
+  display: block;
+  width: 100%;
   padding: 10px 12px;
+  border: 0;
   border-left: 2px solid transparent;
-  transition: background 0.15s;
-  cursor: default;
+  background: transparent;
+  text-align: left;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
 }
 
-.cli-tab-session-item:hover {
-  background: rgba(var(--color-text-rgb), 0.05);
+.cli-tab-session-item:hover,
+.cli-tab-session-item.active {
+  border-left-color: rgba(100, 200, 120, 0.65);
+  background: rgba(100, 200, 120, 0.08);
+}
+
+.cli-tab-session-item--all {
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
 }
 
 .cli-tab-session-top {
@@ -161,6 +172,23 @@
   padding: 0 14px;
   border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
   flex-shrink: 0;
+}
+
+.cli-tab-stream-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cli-tab-stream-session {
+  min-width: 0;
+  max-width: 240px;
+  overflow: hidden;
+  color: rgba(var(--color-text-rgb), 0.68);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cli-tab-hook-badge {

@@ -66,7 +66,15 @@ function EventRow({ event, t }: { event: CliHookEvent; t: (key: string, opts?: R
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
   const { snapshot, enableHook, disableHook, clearEvents } = useClaudeCodeStatus();
-  const { eventFilter, setEventFilter, activeSessions, filteredEvents } = useCliEvents(snapshot);
+  const {
+    eventFilter,
+    setEventFilter,
+    selectedSession,
+    selectedSessionId,
+    setSelectedSessionId,
+    activeSessions,
+    filteredEvents,
+  } = useCliEvents(snapshot);
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -80,8 +88,26 @@ export function CliTab(): ReactElement {
           {snapshot.sessions.length === 0 && (
             <div className="cli-tab-empty">{t('maxExpand.cli.emptySessions', { defaultValue: '暂无会话' })}</div>
           )}
+          {snapshot.sessions.length > 0 && (
+            <button
+              className={`cli-tab-session-item cli-tab-session-item--all ${selectedSessionId === null ? 'active' : ''}`}
+              type="button"
+              onClick={() => setSelectedSessionId(null)}
+            >
+              <div className="cli-tab-session-top">
+                <span className="cli-tab-session-title">{t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}</span>
+                <span className="cli-tab-phase">{snapshot.sessions.length}</span>
+              </div>
+              <div className="cli-tab-session-path">{t('maxExpand.cli.allSessionsHint', { defaultValue: '显示所有 Claude Code 事件流' })}</div>
+            </button>
+          )}
           {snapshot.sessions.map((session) => (
-            <div key={session.id} className="cli-tab-session-item">
+            <button
+              key={session.id}
+              className={`cli-tab-session-item ${selectedSessionId === session.id ? 'active' : ''}`}
+              type="button"
+              onClick={() => setSelectedSessionId(session.id)}
+            >
               <div className="cli-tab-session-top">
                 <span className="cli-tab-session-title">{session.title}</span>
                 <span className={`cli-tab-phase ${session.phase}`}>{phaseLabel(session.phase, t)}</span>
@@ -92,7 +118,7 @@ export function CliTab(): ReactElement {
                   <span className="cli-tab-permission-text">{session.pendingPermission.summary}</span>
                 </div>
               )}
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -100,9 +126,14 @@ export function CliTab(): ReactElement {
       {/* 右侧：事件流 + 控制 */}
       <div className="cli-tab-main">
         <div className="cli-tab-main-header">
-          <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
-            {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
-          </span>
+          <div className="cli-tab-stream-title">
+            <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
+              {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
+            </span>
+            <span className="cli-tab-stream-session">
+              {selectedSession?.title ?? t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}
+            </span>
+          </div>
           <div className="cli-tab-actions">
             <button className="cli-tab-action-btn" type="button" onClick={snapshot.enabled ? disableHook : enableHook}>
               {snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
