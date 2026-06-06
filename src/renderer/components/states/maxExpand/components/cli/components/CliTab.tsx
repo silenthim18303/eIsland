@@ -420,7 +420,7 @@ export function CliTab(): ReactElement {
               title={t('maxExpand.cli.heatmapAria', { defaultValue: '活动热力图' })}
               onClick={() => { setHeatmapVisible((v) => !v); setFiltersVisible(false); }}
             >
-              <img src={SvgIcon.NETWORK} alt="" width="14" height="14" draggable={false} />
+              <img src={SvgIcon.FIRE} alt="" width="14" height="14" draggable={false} />
             </button>
             <button
               className="cli-tab-action-btn"
