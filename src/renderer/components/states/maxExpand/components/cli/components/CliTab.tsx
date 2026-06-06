@@ -142,7 +142,7 @@ export function CliTab(): ReactElement {
               title={snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
               onClick={snapshot.enabled ? disableHook : enableHook}
             >
-              <img src={SvgIcon.PLUGIN} alt="" width="14" height="14" draggable={false} />
+              <img src={snapshot.enabled ? SvgIcon.PAUSE : SvgIcon.CONTINUE} alt="" width="14" height="14" draggable={false} />
             </button>
             <button
               className="cli-tab-action-btn cli-tab-action-btn--secondary"
