@@ -418,6 +418,9 @@ function inferSummary(eventName: string, payload: Record<string, unknown>, toolN
     ?? asString(payload.reason)
     ?? asString(payload.summary)
     ?? asString(payload.notification);
+  if (eventName === 'SessionStart') return '发现新的 Claude Code 终端';
+  if (eventName === 'SessionEnd') return '用户关闭了 Claude Code 终端';
+  if (eventName === 'UserPromptSubmit') return '获取到用户提示词';
   if (eventName === 'PostToolUse' && toolName && toolResponsePreview) return `${toolName} 已完成：${toolResponsePreview}`;
   if ((eventName === 'Stop' || eventName === 'StopFailure' || eventName === 'SubagentStop') && assistantPreview) return assistantPreview;
   if (eventName === 'Notification') return notificationPreview(payload) ?? direct ?? '收到通知';
@@ -427,9 +430,6 @@ function inferSummary(eventName: string, payload: Record<string, unknown>, toolN
   if (eventName === 'PostToolUseFailure' && toolName) return `${toolName} 执行失败`;
   if (eventName === 'PermissionRequest') return toolName ? `${toolName} 请求授权` : '请求授权';
   if (eventName === 'PermissionDenied') return toolName ? `${toolName} 授权被拒绝` : '授权被拒绝';
-  if (eventName === 'UserPromptSubmit') return '收到用户输入';
-  if (eventName === 'SessionStart') return '会话开始';
-  if (eventName === 'SessionEnd') return '会话结束';
   if (eventName === 'Stop') return '本轮完成';
   if (eventName === 'StopFailure') return '本轮异常结束';
   if (eventName === 'SubagentStart') return '子代理开始';
