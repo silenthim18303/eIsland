@@ -75,10 +75,11 @@ export function CliContent(): ReactElement {
   const title = activeSession?.title || t('maxExpand.cli.sessions', { defaultValue: '会话' });
   const phaseText = activeSession ? phaseLabel(activeSession.phase, t) : '';
 
-  // 根据会话状态选择左侧 GIF：idle → 空闲；等待授权/调用工具 → 挥手；运行 → 等待
+  // 根据会话状态选择左侧 GIF：idle → 空闲；等待授权 → review；调用工具 → 挥手；运行 → 等待
   const gifSrc = (() => {
     if (!activeSession || activeSession.phase === 'idle') return GifIcon.CLAWD_IDLE;
-    if (activeSession.phase === 'waiting_permission' || latestEvent?.kind === 'tool') return GifIcon.CLAWD_WAVING;
+    if (activeSession.phase === 'waiting_permission') return GifIcon.CLAWD_REVIEW;
+    if (latestEvent?.kind === 'tool') return GifIcon.CLAWD_WAVING;
     return GifIcon.CLAWD_WAITING;
   })();
 
