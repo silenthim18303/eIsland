@@ -27,6 +27,7 @@
 export type CliStatusSnapshot = Awaited<ReturnType<typeof window.api.claudeCodeStatusGet>>;
 export type CliSessionSnapshot = CliStatusSnapshot['sessions'][number];
 export type CliHookEvent = CliStatusSnapshot['events'][number];
+export type CliHeatmapDaily = CliStatusSnapshot['heatmap'];
 
 export const EMPTY_CLI_STATUS: CliStatusSnapshot = {
   enabled: false,

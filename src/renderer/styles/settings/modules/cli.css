@@ -582,6 +582,41 @@
 .cli-tab-heatmap-cell.level-3 { background: rgba(100, 180, 255, 0.72); }
 .cli-tab-heatmap-cell.level-4 { background: rgba(100, 180, 255, 0.95); }
 
+/* ── 紧凑模式：用于用户中心等空间受限处，整体高度较 CLI 面板更小 ── */
+.cli-tab-heatmap-metrics--compact {
+  gap: 4px;
+}
+
+.cli-tab-heatmap-metrics--compact .cli-tab-heatmap-metric {
+  font-size: 10px;
+  padding: 3px 8px;
+}
+
+.cli-tab-heatmap-grid--compact .cli-tab-heatmap-month-block {
+  gap: 3px;
+}
+
+.cli-tab-heatmap-grid--compact .cli-tab-heatmap-month-label {
+  font-size: 10px;
+  line-height: 11px;
+}
+
+.cli-tab-heatmap-grid--compact .cli-tab-heatmap-month {
+  grid-template-rows: repeat(7, 10px);
+  grid-auto-columns: 10px;
+  gap: 2px;
+}
+
+.cli-tab-heatmap-grid--compact .cli-tab-heatmap-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.cli-tab-heatmap-grid--compact .cli-tab-heatmap-cells {
+  gap: 9px;
+}
+
 /* ── 事件列表 ── */
 .cli-tab-event-list {
   flex: 1;

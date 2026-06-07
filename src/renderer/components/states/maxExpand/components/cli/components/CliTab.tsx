@@ -36,6 +36,7 @@ import type { CliHookEvent } from '../config/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
 import useIslandStore from '../../../../../../store/isLandStore';
+import { ActivityHeatmap } from './ActivityHeatmap';
 import '../../../../../../styles/settings/modules/cli.css';
 
 gsap.registerPlugin(useGSAP);
@@ -140,7 +141,6 @@ export function CliTab(): ReactElement {
   } = useCliEvents(snapshot);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [heatmapVisible, setHeatmapVisible] = useState(false);
-  const [heatmapMetric, setHeatmapMetric] = useState<'session' | 'tool' | 'prompt'>('session');
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
   const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(() => new Set());
 
@@ -207,70 +207,6 @@ export function CliTab(): ReactElement {
     }
     return ids;
   }, [snapshot.sessions]);
-
-  // 热力图：按天统计（完整一年，以今日为中心：今日所在月份前后各约半年），按月分块并对齐星期。
-  // 数据来自独立持久化的 snapshot.heatmap，清空会话/事件不影响此处展示
-  const heatmap = useMemo(() => {
-    const MONTHS_BEFORE = 6;
-    const MONTHS_AFTER = 5;
-    const totals = { session: 0, tool: 0, prompt: 0 };
-    const dayCounts = new Map<string, number>();
-    const dayKey = (y: number, mo: number, da: number): string => `${y}-${mo}-${da}`;
-    for (const [key, counts] of Object.entries(snapshot.heatmap)) {
-      totals.session += counts.session;
-      totals.tool += counts.tool;
-      totals.prompt += counts.prompt;
-      const value = counts[heatmapMetric];
-      if (value > 0) dayCounts.set(key, value);
-    }
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const todayKey = dayKey(now.getFullYear(), now.getMonth() + 1, now.getDate());
-
-    type Cell = { key: string; label: string; count: number; future: boolean; isToday: boolean };
-    const months: Array<{ key: string; month: number; offset: number; cells: Cell[] }> = [];
-    let max = 1;
-    for (let m = MONTHS_BEFORE; m >= -MONTHS_AFTER; m -= 1) {
-      const ref = new Date(now.getFullYear(), now.getMonth() - m, 1);
-      const year = ref.getFullYear();
-      const month = ref.getMonth();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // 周一为 0
-      const cells: Cell[] = [];
-      for (let day = 1; day <= daysInMonth; day += 1) {
-        const d = new Date(year, month, day);
-        const future = d.getTime() > now.getTime();
-        const key = dayKey(year, month + 1, day);
-        const count = future ? 0 : (dayCounts.get(key) ?? 0);
-        if (!future && count > max) max = count;
-        cells.push({ key, label: `${month + 1}/${day}`, count, future, isToday: key === todayKey });
-      }
-      months.push({ key: `${year}-${month}`, month, offset: firstDow, cells });
-    }
-    return { months, max, totals };
-  }, [snapshot.heatmap, heatmapMetric]);
-
-  /** 一月到十二月的国际化短标签 key */
-  const heatmapMonthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-
-  const heatmapLevel = (count: number): number => {
-    if (count <= 0) return 0;
-    return Math.min(4, Math.ceil((count / heatmap.max) * 4));
-  };
-
-  // 热力图打开或切换指标时，把今日滚动到水平居中
-  const heatmapScrollRef = useRef<HTMLDivElement>(null);
-  const heatmapTodayRef = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    if (!heatmapVisible) return;
-    const id = requestAnimationFrame(() => {
-      const scroller = heatmapScrollRef.current;
-      const today = heatmapTodayRef.current;
-      if (!scroller || !today) return;
-      scroller.scrollLeft = today.offsetLeft - scroller.clientWidth / 2 + today.offsetWidth / 2;
-    });
-    return () => cancelAnimationFrame(id);
-  }, [heatmapVisible, heatmapMetric]);
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
@@ -450,56 +386,7 @@ export function CliTab(): ReactElement {
         </div>
 
         <div className={`cli-tab-heatmap ${heatmapVisible ? 'open' : ''}`}>
-          <div className="cli-tab-heatmap-metrics">
-            <button
-              type="button"
-              className={`cli-tab-heatmap-metric ${heatmapMetric === 'session' ? 'active' : ''}`}
-              onClick={() => setHeatmapMetric('session')}
-            >
-              {t('maxExpand.cli.heatmap.session', { defaultValue: '会话开始' })} {heatmap.totals.session}
-            </button>
-            <button
-              type="button"
-              className={`cli-tab-heatmap-metric ${heatmapMetric === 'tool' ? 'active' : ''}`}
-              onClick={() => setHeatmapMetric('tool')}
-            >
-              {t('maxExpand.cli.heatmap.tool', { defaultValue: '工具调用' })} {heatmap.totals.tool}
-            </button>
-            <button
-              type="button"
-              className={`cli-tab-heatmap-metric ${heatmapMetric === 'prompt' ? 'active' : ''}`}
-              onClick={() => setHeatmapMetric('prompt')}
-            >
-              {t('maxExpand.cli.heatmap.prompt', { defaultValue: '提示词输入' })} {heatmap.totals.prompt}
-            </button>
-          </div>
-          <div className="cli-tab-heatmap-grid">
-            <div className="cli-tab-heatmap-scroll" ref={heatmapScrollRef}>
-              <div className="cli-tab-heatmap-cells">
-                {heatmap.months.map((month) => (
-                  <div key={month.key} className="cli-tab-heatmap-month-block">
-                    <span className="cli-tab-heatmap-month-label">
-                      {t(`maxExpand.cli.heatmap.month.${heatmapMonthKeys[month.month]}`, { defaultValue: heatmapMonthKeys[month.month] })}
-                    </span>
-                    <div className="cli-tab-heatmap-month">
-                      {month.cells.map((cell, idx) => {
-                        const pos = month.offset + idx;
-                        return (
-                          <span
-                            key={cell.key}
-                            ref={cell.isToday ? heatmapTodayRef : undefined}
-                            className={`cli-tab-heatmap-cell${cell.future ? ' cli-tab-heatmap-cell--future' : ` level-${heatmapLevel(cell.count)}`}${cell.isToday ? ' cli-tab-heatmap-cell--today' : ''}`}
-                            style={{ gridColumnStart: Math.floor(pos / 7) + 1, gridRowStart: (pos % 7) + 1 }}
-                            title={cell.future ? '' : `${cell.label}: ${cell.count}`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ActivityHeatmap heatmap={snapshot.heatmap} visible={heatmapVisible} />
         </div>
 
         <div className="cli-tab-event-list">

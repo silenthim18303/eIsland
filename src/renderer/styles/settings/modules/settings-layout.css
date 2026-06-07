@@ -4342,6 +4342,18 @@
   filter: none;
 }
 
+/* 用户中心活动热力图容器：紧贴用户信息卡片下方，紧凑高度，作为导航卡片组的视觉分隔 */
+.settings-user-info-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.08);
+  border-radius: 12px;
+  background: rgba(var(--color-text-rgb), 0.03);
+  flex-shrink: 0;
+}
+
 .settings-user-info-nav-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

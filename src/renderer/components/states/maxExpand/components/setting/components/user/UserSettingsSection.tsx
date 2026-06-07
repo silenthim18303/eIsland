@@ -55,6 +55,9 @@ import {
   type UserAccountProfile,
 } from '../../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../../utils/SvgIcon';
+import { ActivityHeatmap } from '../../../cli/components/ActivityHeatmap';
+import { useClaudeCodeHeatmap } from '../../../cli/hooks/useClaudeCodeHeatmap';
+import '../../../../../../../styles/settings/modules/cli.css';
 
 type FeedbackType = 'success' | 'error' | 'info';
 type UserProfilePage = 'info' | 'edit' | 'password' | 'pro' | 'recharge' | 'orders' | 'account';
@@ -179,6 +182,9 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
   const [rechargeCustomValue, setRechargeCustomValue] = useState('');
   const [rechargeFeedback, setRechargeFeedback] = useState<Feedback | null>(null);
   const [userBalance, setUserBalance] = useState<string | null>(null);
+
+  /** 用户中心活动热力图数据：与 CLI 面板共享同一持久化源 */
+  const activityHeatmap = useClaudeCodeHeatmap();
 
   const currentUserProfilePageLabel = t(`settings.user.pages.${userProfilePage}`, {
     defaultValue: userProfilePage === 'info'
@@ -1096,6 +1102,10 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="settings-user-info-heatmap">
+            <ActivityHeatmap heatmap={activityHeatmap} compact />
           </div>
 
           <div className="settings-user-info-nav-cards">
