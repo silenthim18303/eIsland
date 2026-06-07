@@ -1196,7 +1196,6 @@
         "session": "会话开始",
         "tool": "工具调用",
         "prompt": "提示词输入",
-        "loginDays": "登录天数",
         "loggedIn": "已登录",
         "month": {
           "jan": "1月",

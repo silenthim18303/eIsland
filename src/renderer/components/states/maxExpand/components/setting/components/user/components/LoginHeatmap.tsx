@@ -62,40 +62,33 @@ export function LoginHeatmap({ loginDays, compact = false, visible = true }: Log
   const variantClass = compact ? ' cli-tab-heatmap--compact' : '';
 
   return (
-    <>
-      <div className={`cli-tab-heatmap-metrics${variantClass}`}>
-        <span className="cli-tab-heatmap-metric active">
-          {t('maxExpand.cli.heatmap.loginDays', { defaultValue: '登录天数' })} {loginDays.size}
-        </span>
-      </div>
-      <div className={`cli-tab-heatmap-grid${variantClass}`}>
-        <div className="cli-tab-heatmap-scroll" ref={scrollRef}>
-          <div className="cli-tab-heatmap-cells">
-            {months.map((month) => (
-              <div key={month.key} className="cli-tab-heatmap-month-block">
-                <span className="cli-tab-heatmap-month-label">
-                  {t(`maxExpand.cli.heatmap.month.${HEATMAP_MONTH_KEYS[month.month]}`, { defaultValue: HEATMAP_MONTH_KEYS[month.month] })}
-                </span>
-                <div className="cli-tab-heatmap-month">
-                  {month.cells.map((cell, idx) => {
-                    const pos = month.offset + idx;
-                    const loggedIn = !cell.future && cell.count > 0;
-                    return (
-                      <span
-                        key={cell.key}
-                        ref={cell.isToday ? todayRef : undefined}
-                        className={`cli-tab-heatmap-cell${cell.future ? ' cli-tab-heatmap-cell--future' : (loggedIn ? ' cli-tab-heatmap-cell--login' : '')}${cell.isToday ? ' cli-tab-heatmap-cell--today' : ''}`}
-                        style={{ gridColumnStart: Math.floor(pos / 7) + 1, gridRowStart: (pos % 7) + 1 }}
-                        title={loggedIn ? `${cell.label}: ${t('maxExpand.cli.heatmap.loggedIn', { defaultValue: '已登录' })}` : ''}
-                      />
-                    );
-                  })}
-                </div>
+    <div className={`cli-tab-heatmap-grid${variantClass}`}>
+      <div className="cli-tab-heatmap-scroll" ref={scrollRef}>
+        <div className="cli-tab-heatmap-cells">
+          {months.map((month) => (
+            <div key={month.key} className="cli-tab-heatmap-month-block">
+              <span className="cli-tab-heatmap-month-label">
+                {t(`maxExpand.cli.heatmap.month.${HEATMAP_MONTH_KEYS[month.month]}`, { defaultValue: HEATMAP_MONTH_KEYS[month.month] })}
+              </span>
+              <div className="cli-tab-heatmap-month">
+                {month.cells.map((cell, idx) => {
+                  const pos = month.offset + idx;
+                  const loggedIn = !cell.future && cell.count > 0;
+                  return (
+                    <span
+                      key={cell.key}
+                      ref={cell.isToday ? todayRef : undefined}
+                      className={`cli-tab-heatmap-cell${cell.future ? ' cli-tab-heatmap-cell--future' : (loggedIn ? ' cli-tab-heatmap-cell--login' : '')}${cell.isToday ? ' cli-tab-heatmap-cell--today' : ''}`}
+                      style={{ gridColumnStart: Math.floor(pos / 7) + 1, gridRowStart: (pos % 7) + 1 }}
+                      title={loggedIn ? `${cell.label}: ${t('maxExpand.cli.heatmap.loggedIn', { defaultValue: '已登录' })}` : ''}
+                    />
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }
