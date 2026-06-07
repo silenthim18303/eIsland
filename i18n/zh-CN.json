@@ -2942,7 +2942,10 @@
       "card": {
         "memberSince": "加入时间",
         "proExpireAt": "Pro到期时间",
-        "balance": "余额"
+        "balance": "余额",
+        "loginDays": "登录天数",
+        "expandHeatmap": "展开热力图",
+        "collapseHeatmap": "收起热力图"
       },
       "infoNav": {
         "editDesc": "修改性别、生日等基本资料",

@@ -2942,7 +2942,10 @@
       "card": {
         "memberSince": "Member since",
         "proExpireAt": "Pro Expiration",
-        "balance": "Balance"
+        "balance": "Balance",
+        "loginDays": "Login days",
+        "expandHeatmap": "Expand heatmap",
+        "collapseHeatmap": "Collapse heatmap"
       },
       "infoNav": {
         "editDesc": "Edit gender, birthday, and other profile details",
