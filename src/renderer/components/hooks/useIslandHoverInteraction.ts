@@ -118,7 +118,7 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
         return;
       }
 
-      if (state === 'notification' || state === 'agent' || state === 'stt' || state === 'agentVoiceInput' || state === 'guide' || state === 'login' || state === 'register' || state === 'resetPassword' || state === 'payment' || state === 'announcement') {
+      if (state === 'notification' || state === 'agent' || state === 'stt' || state === 'cli' || state === 'agentVoiceInput' || state === 'guide' || state === 'login' || state === 'register' || state === 'resetPassword' || state === 'payment' || state === 'announcement') {
         if (inWindow) {
           window.api?.disableMousePassthrough();
         }

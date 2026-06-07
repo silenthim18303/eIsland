@@ -55,6 +55,9 @@ import {
   type UserAccountProfile,
 } from '../../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../../utils/SvgIcon';
+import { LoginHeatmap } from './components/LoginHeatmap';
+import { readLoginDays, recordLoginDay } from './utils/loginHeatmapStorage';
+import '../../../../../../../styles/settings/modules/cli.css';
 
 type FeedbackType = 'success' | 'error' | 'info';
 type UserProfilePage = 'info' | 'edit' | 'password' | 'pro' | 'recharge' | 'orders' | 'account';
@@ -179,6 +182,11 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
   const [rechargeCustomValue, setRechargeCustomValue] = useState('');
   const [rechargeFeedback, setRechargeFeedback] = useState<Feedback | null>(null);
   const [userBalance, setUserBalance] = useState<string | null>(null);
+
+  /** 用户中心登录天数热力图：记录并展示当前用户每个自然日是否登录 */
+  const [loginDays, setLoginDays] = useState<Set<string>>(() => readLoginDays(profile?.username));
+  /** 登录热力图是否展开（默认收起，点击右侧统计卡内的图标按钮切换） */
+  const [loginHeatmapVisible, setLoginHeatmapVisible] = useState(false);
 
   const currentUserProfilePageLabel = t(`settings.user.pages.${userProfilePage}`, {
     defaultValue: userProfilePage === 'info'
@@ -315,6 +323,14 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
     syncSession();
     return subscribeUserAccountSessionChanged(syncSession);
   }, []);
+
+  // 登录态有效时记录今日登录，并刷新热力图数据
+  useEffect(() => {
+    const username = profile?.username;
+    if (!token || !username) return;
+    recordLoginDay(username);
+    setLoginDays(readLoginDays(username));
+  }, [token, profile?.username]);
 
   useEffect(() => {
     if (!token) return;
@@ -1095,7 +1111,26 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
                   <span className="settings-user-info-summary-value">{profile?.birthday ?? '—'}</span>
                 </div>
               </div>
+              <div className="settings-user-info-summary-login-card">
+                <div className="settings-user-info-summary-login-stat">
+                  <span className="settings-user-info-summary-label">{t('settings.user.card.loginDays', { defaultValue: '登录天数' })}</span>
+                  <span className="settings-user-info-summary-login-value">{loginDays.size}</span>
+                </div>
+                <button
+                  type="button"
+                  className={`settings-user-info-summary-login-toggle${loginHeatmapVisible ? ' settings-user-info-summary-login-toggle--active' : ''}`}
+                  title={loginHeatmapVisible ? t('settings.user.card.collapseHeatmap', { defaultValue: '收起热力图' }) : t('settings.user.card.expandHeatmap', { defaultValue: '展开热力图' })}
+                  aria-label={loginHeatmapVisible ? t('settings.user.card.collapseHeatmap', { defaultValue: '收起热力图' }) : t('settings.user.card.expandHeatmap', { defaultValue: '展开热力图' })}
+                  onClick={() => setLoginHeatmapVisible((v) => !v)}
+                >
+                  <img src={SvgIcon.FIRE} alt="" width="14" height="14" draggable={false} />
+                </button>
+              </div>
             </div>
+          </div>
+
+          <div className={`settings-user-info-heatmap${loginHeatmapVisible ? ' settings-user-info-heatmap--open' : ''}`}>
+            <LoginHeatmap loginDays={loginDays} compact visible={loginHeatmapVisible} />
           </div>
 
           <div className="settings-user-info-nav-cards">

@@ -57,9 +57,10 @@ export function NotificationContent({
   startupUpdateResolvedUrl,
   urls,
   breakReminderItemId,
+  agentName: _agentName,
 }: NotificationContentProps): ReactElement {
   const { t } = useTranslation();
-  const { setIdle, setLyrics, setNotification, setMaxExpand, setMaxExpandTab } = useIslandStore();
+  const { setIdle, setLyrics, setNotification, setMaxExpand, setMaxExpandTab, setCli } = useIslandStore();
   const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
   const [useClipboardVectorFallbackIcon, setUseClipboardVectorFallbackIcon] = useState(false);
   const [clipboardFaviconIndex, setClipboardFaviconIndex] = useState(0);
@@ -100,7 +101,7 @@ export function NotificationContent({
   })();
   const effectiveDisplayIcon = useClipboardVectorFallbackIcon && type === 'clipboard-url' ? SvgIcon.LINK : displayIcon;
   const resolvedDisplayIcon = resolveNotificationIconUrl(effectiveDisplayIcon);
-  const isVectorIcon = typeof effectiveDisplayIcon === 'string' && /^\.?\/svg\//i.test(effectiveDisplayIcon);
+  const isVectorIcon = typeof effectiveDisplayIcon === 'string' && /^\.?\/svg\//i.test(effectiveDisplayIcon) && !/^\.?\/svg\/agent\//i.test(effectiveDisplayIcon);
 
   const { favoriteUrlSet, setFavoriteUrlSet } = useNotificationFavorites(type, urls);
   const updateDownloadProgress = useUpdateDownloadProgress(type);
@@ -310,8 +311,10 @@ export function NotificationContent({
     dismiss();
   };
 
-  const handleRestartNow = (): void => { void window.api?.restartApp?.().catch(() => {}); dismiss(); };
-  const handleRestartLater = (): void => { dismiss(); };
+  const handleRestartNow = (): void => { void window.api?.restartApp?.().catch(() => {}); dismiss(); };  const handleRestartLater = (): void => { dismiss(); };
+  const handleSwitchToCli = (): void => { void window.api?.cliGlowHide?.(); setMaxExpandTab('cli'); setMaxExpand(); };
+  const handleSwitchToCliState = (): void => { void window.api?.cliGlowHide?.(); setCli(); };
+  const handleCliIgnore = (): void => { void window.api?.cliGlowHide?.(); dismiss(); };
   const handleOpenUrl = (url: string): void => { window.api?.clipboardOpenUrl(url); dismiss(); };
 
   const handleOpenAllUrls = (): void => {
@@ -346,7 +349,7 @@ export function NotificationContent({
   return (
     <div className="notification-content">
       <div className={showWeatherAlertMeta ? 'notification-main-row notification-main-row--with-meta' : 'notification-main-row'}>
-        <div className="notification-icon">
+        <div className={`notification-icon${type === 'cli-session-detected' ? ' notification-icon--lg' : ''}`}>
           {resolvedDisplayIcon ? (
             <img
               src={resolvedDisplayIcon}
@@ -506,6 +509,19 @@ export function NotificationContent({
               </button>
             )}
             <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleDismissUrl}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
+          </div>
+        </div>
+      ) : type === 'external-agent-active' || type === 'external-agent-stopped' ? (        <div className="notification-actions notification-actions--right">
+          <div className="notification-decision-actions">
+            <button type="button" className="notification-action-btn notification-action-ignore" onClick={dismiss}>{t('notification.actions.gotIt', { defaultValue: '知道了' })}</button>
+          </div>
+        </div>
+      ) : type === 'cli-session-detected' ? (
+        <div className="notification-actions notification-actions--right notification-actions--cli-detected">
+          <div className="notification-decision-actions">
+            <button type="button" className="notification-action-btn notification-action-complete" onClick={handleSwitchToCli}>{t('notification.actions.switch', { defaultValue: '切换' })}</button>
+            <button type="button" className="notification-action-btn notification-action-complete" onClick={handleSwitchToCliState}>{t('notification.actions.switchCliState', { defaultValue: '切换到灵动岛' })}</button>
+            <button type="button" className="notification-action-btn notification-action-ignore" onClick={handleCliIgnore}>{t('notification.actions.ignore', { defaultValue: '忽略' })}</button>
           </div>
         </div>
       ) : type === 'source-switch' ? (

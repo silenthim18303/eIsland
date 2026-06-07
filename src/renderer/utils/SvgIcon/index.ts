@@ -35,3 +35,6 @@ export {
   resolveDevIconByFileName,
 } from './dev-icon';
 export type { DevIconKey } from './dev-icon';
+
+export { AgentIcon } from './agent-icon';
+export type { AgentIconKey } from './agent-icon';

@@ -249,6 +249,9 @@ export const TOGGLE_UI_LOCK_HOTKEY_STORE_KEY = 'toggle-ui-lock-hotkey';
 /** Agent 语音输入快捷键存储键名 */
 export const AGENT_VOICE_INPUT_HOTKEY_STORE_KEY = 'agent-voice-input-hotkey';
 
+/** Agent 启动通知开关存储键名 */
+export const AGENT_NOTIFICATION_ENABLED_STORE_KEY = 'agent-notification-enabled';
+
 // ===== Helper =====
 
 function getStoreDir(): string {

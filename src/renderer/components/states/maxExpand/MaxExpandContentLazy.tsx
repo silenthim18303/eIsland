@@ -42,6 +42,7 @@ const MemoTab = lazy(() => import('./components/MemoTab').then((module) => ({ de
 const AlarmTab = lazy(() => import('./components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
 const ToolboxTab = lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));
 const MiniGameTab = lazy(() => import('./components/MiniGameTab').then((module) => ({ default: module.MiniGameTab })));
+const CliTab = lazy(() => import('./components/cli').then((module) => ({ default: module.CliTab })));
 
 function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElement, contentReady: boolean): ReactElement | null {
   if (!contentReady) return loadingFallback;
@@ -58,6 +59,7 @@ function renderLazyActiveTab(activeTab: MaxExpandTab, loadingFallback: ReactElem
   if (activeTab === 'alarm') content = <AlarmTab />;
   if (activeTab === 'toolbox') content = <ToolboxTab />;
   if (activeTab === 'miniGame') content = <MiniGameTab />;
+  if (activeTab === 'cli') content = <CliTab />;
   if (activeTab === 'settings') content = <SettingsTab />;
   return <Suspense fallback={loadingFallback}>{content}</Suspense>;
 }

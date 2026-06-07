@@ -41,7 +41,9 @@ export const getNavLabel = (
             ? '歌曲'
             : tab === 'tools'
               ? '工具'
-              : tab === 'performanceMonitor'
-                ? '性能监控'
-                : '最大展开',
+              : tab === 'translation'
+                ? '翻译'
+                : tab === 'performanceMonitor'
+                  ? '性能监控'
+                  : '最大展开',
   });

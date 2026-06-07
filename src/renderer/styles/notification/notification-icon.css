@@ -48,6 +48,18 @@
   filter: brightness(0) invert(var(--icon-invert));
 }
 
+/* CLI 检测通知：图标更大且垂直居中 */
+.notification-icon--lg {
+  width: 52px;
+  height: 52px;
+  align-self: center;
+}
+
+.notification-icon--lg .notification-icon-img {
+  width: 44px;
+  height: 44px;
+}
+
 .notification-icon-vector {
   width: 24px;
   height: 24px;

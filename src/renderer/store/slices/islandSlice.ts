@@ -164,7 +164,7 @@ export const createIslandSlice: StateCreator<
   setNotification: (data) => set((prev) => {
     if (prev.uiStateLocked && prev.state !== 'notification') return prev;
     window.api?.expandWindowNotification();
-    playNotificationSoundOnce();
+    if (data.type !== 'cli-session-detected') playNotificationSoundOnce();
     return { state: 'notification', notification: data, authReturnState: null };
   }),
 
@@ -201,6 +201,13 @@ export const createIslandSlice: StateCreator<
     window.api?.expandWindowNotification();
     window.api?.disableMousePassthrough();
     return { state: 'agent' as const, agentPrompt: prompt ?? prev.sttText ?? '', authReturnState: null };
+  }),
+
+  setCli: () => set((prev) => {
+    if (prev.uiStateLocked && prev.state !== 'cli') return prev;
+    window.api?.expandWindowNotification();
+    window.api?.disableMousePassthrough();
+    return { state: 'cli' as const, authReturnState: null };
   }),
 
   toggleUiStateLock: () => {

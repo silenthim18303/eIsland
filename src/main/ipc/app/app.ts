@@ -2255,6 +2255,58 @@ export function registerAppIpcHandlers(): void {
     }
   });
 
+  ipcMain.handle('app:save-text-file', async (event, payload: unknown) => {
+    try {
+      if (!payload || typeof payload !== 'object') {
+        return { ok: false, canceled: false, filePath: null as string | null };
+      }
+      const data = payload as {
+        defaultPath?: unknown;
+        content?: unknown;
+        filters?: unknown;
+      };
+      const content = typeof data.content === 'string' ? data.content : '';
+      const defaultPath = typeof data.defaultPath === 'string' && data.defaultPath.trim()
+        ? data.defaultPath.trim()
+        : 'eIsland-export.txt';
+      const filters = Array.isArray(data.filters)
+        ? data.filters
+          .map((filter) => {
+            if (!filter || typeof filter !== 'object') return null;
+            const row = filter as { name?: unknown; extensions?: unknown };
+            const name = typeof row.name === 'string' && row.name.trim() ? row.name.trim() : '';
+            const extensions = Array.isArray(row.extensions)
+              ? row.extensions.filter((ext): ext is string => typeof ext === 'string' && ext.trim().length > 0)
+              : [];
+            return name && extensions.length > 0 ? { name, extensions } : null;
+          })
+          .filter((filter): filter is { name: string; extensions: string[] } => filter !== null)
+        : undefined;
+
+      const win = BrowserWindow.fromWebContents(event.sender) ?? BrowserWindow.getFocusedWindow();
+      if (!win) {
+        return { ok: false, canceled: false, filePath: null as string | null };
+      }
+
+      const result = await dialog.showSaveDialog(win, {
+        title: '保存文件',
+        defaultPath,
+        filters: filters && filters.length > 0 ? filters : undefined,
+      });
+
+      if (result.canceled || !result.filePath) {
+        return { ok: false, canceled: true, filePath: null as string | null };
+      }
+
+      await writeFile(result.filePath, content, 'utf8');
+      shell.showItemInFolder(result.filePath);
+      return { ok: true, canceled: false, filePath: result.filePath };
+    } catch (err) {
+      console.error('[App] save text file error:', err);
+      return { ok: false, canceled: false, filePath: null as string | null };
+    }
+  });
+
   ipcMain.handle('app:search-local-files', async (
     _event,
     rootDir: string,

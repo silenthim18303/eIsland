@@ -30,7 +30,7 @@ import type { WeatherApiConfig } from '../../api/weather/weatherApi';
 export type { WeatherApiConfig };
 
 /** 灵动岛 UI 状态枚举 */
-export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'lyrics' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt';
+export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'lyrics' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
 
 /** 灵动岛动画速度档位 */
 export type AnimationSpeed = 'slow' | 'medium' | 'fast';
@@ -39,10 +39,10 @@ export type AnimationSpeed = 'slow' | 'medium' | 'fast';
 export type HoverTab = 'time' | 'o3ics' | 'weather' | 'expand';
 
 /** Expanded 状态下的子标签页类型 */
-export type ExpandTab = 'hover' | 'overview' | 'song' | 'tools' | 'performanceMonitor';
+export type ExpandTab = 'hover' | 'overview' | 'song' | 'tools' | 'translation' | 'performanceMonitor';
 
 /** MaxExpand 状态下的子标签页类型 */
-export type MaxExpandTab = 'aiChat' | 'todo' | 'urlFavorites' | 'localFileSearch' | 'clipboardHistory' | 'album' | 'mail' | 'memo' | 'countdown' | 'alarm' | 'toolbox' | 'miniGame' | 'settings';
+export type MaxExpandTab = 'aiChat' | 'todo' | 'urlFavorites' | 'localFileSearch' | 'clipboardHistory' | 'album' | 'mail' | 'memo' | 'countdown' | 'alarm' | 'toolbox' | 'miniGame' | 'cli' | 'settings';
 
 /** 歌词显示模式 */
 export type LrcMode = 'off' | 'info' | 'lrc';
@@ -166,8 +166,10 @@ export interface NotificationData {
   title: string;
   body: string;
   icon?: string;
-  /** 通知类型：默认通知 / 播放源切换请求 / 有新版本 / 更新下载中 / 更新就绪 / 启动天气预警 / 剪贴板URL / 重启确认 */
-  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required';
+  /** 通知类型：默认通知 / 播放源切换请求 / 有新版本 / 更新下载中 / 更新就绪 / 启动天气预警 / 剪贴板URL / 重启确认 / 外部Agent启动 / 外部Agent关闭 / 检测到 Claude Code 流事件 */
+  type?: 'default' | 'source-switch' | 'update-available' | 'update-downloading' | 'update-ready' | 'weather-alert-startup' | 'clipboard-url' | 'restart-required' | 'external-agent-active' | 'external-agent-stopped' | 'cli-session-detected';
+  /** 外部 Agent 名称（仅 external-agent-active / external-agent-stopped 类型） */
+  agentName?: string;
   /** 请求切换到的播放源 ID（仅 source-switch 类型） */
   sourceAppId?: string;
   /** 更新版本号（用于 update-available 与 update-ready 类型） */
@@ -331,6 +333,7 @@ export interface IslandSlice {
   setAgentVoiceInput: () => void;
   setStt: (text?: string) => void;
   setAgent: (prompt?: string) => void;
+  setCli: () => void;
   toggleUiStateLock: () => boolean;
   setHoverTab: (tab: HoverTab) => void;
   setExpandTab: (tab: ExpandTab) => void;

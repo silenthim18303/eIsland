@@ -1,0 +1,274 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file cli-state.css
+ * @description CLI 灵动岛状态样式（500×88，参考 agent 态布局）
+ */
+
+.cli-state-content {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  padding: 11px 16px;
+  animation: cliStateEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.cli-state-icon {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  flex-shrink: 0;
+  align-self: center;
+  transform: translateY(-10px);
+}
+
+.cli-state-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cli-state-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.cli-state-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.85);
+  min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-phase {
+  flex-shrink: 0;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.5);
+}
+
+.cli-state-phase.running {
+  background: rgba(100, 180, 255, 0.16);
+  color: rgba(100, 180, 255, 0.9);
+}
+
+.cli-state-phase.waiting_permission {
+  background: rgba(255, 196, 0, 0.16);
+  color: rgba(255, 196, 0, 0.95);
+}
+
+.cli-state-event {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.cli-state-event-tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-event-summary {
+  min-width: 0;
+  color: rgba(var(--color-text-rgb), 0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-command {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: calc(100% - 230px);
+  min-width: 0;
+}
+
+.cli-state-command-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.cli-state-command-tool {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.7);
+}
+
+.cli-state-command-text {
+  max-width: 100%;
+  min-width: 0;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(var(--color-text-rgb), 0.08);
+  font-family: "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.78);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-command-desc {
+  max-width: 100%;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cli-state-actions {
+  position: absolute;
+  right: 16px;
+  top: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.cli-state-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(var(--color-text-rgb), 0.35);
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.cli-state-action-btn:hover {
+  color: rgba(var(--color-text-rgb), 0.7);
+  background: rgba(var(--color-text-rgb), 0.08);
+}
+
+.cli-state-permission {
+  position: absolute;
+  right: 16px;
+  bottom: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.cli-state-permission-btn {
+  appearance: none;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  background: rgba(var(--color-text-rgb), 0.04);
+  color: rgba(var(--color-text-rgb), 0.65);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cli-state-permission-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.cli-state-permission-deny {
+  border-color: rgba(239, 83, 80, 0.4);
+  color: rgba(239, 83, 80, 0.9);
+}
+
+.cli-state-permission-deny:hover {
+  background: rgba(239, 83, 80, 0.16);
+  color: rgba(239, 83, 80, 1);
+}
+
+.cli-state-permission-allow {
+  border-color: rgba(76, 175, 80, 0.45);
+  color: rgba(76, 175, 80, 0.95);
+}
+
+.cli-state-permission-allow:hover {
+  background: rgba(76, 175, 80, 0.16);
+  color: rgba(76, 175, 80, 1);
+}
+
+.cli-state-permission-always {
+  border-color: rgba(100, 180, 255, 0.45);
+  color: rgba(100, 180, 255, 0.95);
+}
+
+.cli-state-permission-always:hover {
+  background: rgba(100, 180, 255, 0.16);
+  color: rgba(100, 180, 255, 1);
+}
+
+.cli-state-lyric {
+  position: absolute;
+  right: 16px;
+  bottom: 8px;
+  max-width: 60%;
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.5);
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: cliStateLyricFade 0.3s ease both;
+  pointer-events: none;
+}
+
+@keyframes cliStateLyricFade {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cliStateEnter {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}

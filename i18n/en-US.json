@@ -401,7 +401,14 @@
       "workFinished": "Focus session finished, take a break",
       "breakFinished": "Break finished, back to focus"
     },
+    "externalAgent": {
+      "title": "Desktop Agent Detected",
+      "body": "{{agentName}} started working",
+      "stoppedTitle": "Desktop Agent Closed",
+      "stoppedBody": "{{agentName}} stopped working"
+    },
     "actions": {
+      "gotIt": "Got it",
       "installRestart": "Install & Restart",
       "later": "Later",
       "downloadUpdate": "Download Update",
@@ -416,6 +423,7 @@
       "hide": "Hide",
       "ignore": "Ignore",
       "switch": "Switch",
+      "switchCliState": "Switch to Island",
       "snooze5m": "Later 5m",
       "snooze15m": "Later 15m",
       "snooze1h": "Later 1h",
@@ -429,6 +437,7 @@
       "overview": "Overview",
       "song": "Music",
       "tools": "Tools",
+      "translation": "Translation",
       "performanceMonitor": "Performance Monitor",
       "maxExpand": "Max Expand",
       "switchToPage": "Switch to {{label}} page"
@@ -462,6 +471,14 @@
     },
     "settingsTab": {
       "label": "Settings"
+    },
+    "translation": {
+      "title": "Quick Translate",
+      "sourceLabel": "Source",
+      "targetLabel": "Target",
+      "inputTitle": "Original",
+      "outputTitle": "Translation",
+      "languageAria": "Translation language selector"
     }
   },
   "toolsTab": {
@@ -746,6 +763,7 @@
   "urlFavoritesTab": {
     "title": "URL Favorites",
     "count": "{{count}} items",
+    "filteredCount": "{{count}} / {{total}} items",
     "empty": "No favorites yet, add a URL first.",
     "openWebsiteTitle": "Click to open website",
     "resolvingTitle": "Resolving website title…",
@@ -757,15 +775,42 @@
     "actions": {
       "add": "Add",
       "save": "Save",
+      "manageFolders": "Groups",
+      "manageImportExport": "Import / Export",
+      "import": "Import",
+      "export": "Export",
       "expand": "Expand",
       "collapse": "Collapse",
       "removeAria": "Remove URL favorite"
+    },
+    "import": {
+      "formatAria": "Import format"
+    },
+    "export": {
+      "formatAria": "Export format"
+    },
+    "folders": {
+      "all": "All",
+      "uncategorized": "Uncategorized",
+      "newPlaceholder": "New folder",
+      "create": "Create",
+      "clearCurrent": "Clear current folder",
+      "emptyFiltered": "No favorites in the current folder."
+    },
+    "messages": {
+      "importSuccess": "Imported {{count}} favorites",
+      "importEmpty": "No importable favorites found",
+      "importFailed": "Import failed, please check the file format",
+      "exportSuccess": "Exported {{count}} favorites",
+      "exportFailed": "Export failed, please try again"
     },
     "editor": {
       "urlLabel": "URL",
       "urlPlaceholder": "Edit URL",
       "noteLabel": "Note",
-      "notePlaceholder": "Enter note"
+      "notePlaceholder": "Enter note",
+      "folderLabel": "Folder",
+      "folderPlaceholder": "Enter folder name, leave empty for uncategorized"
     }
   },
   "mailTab": {
@@ -1086,6 +1131,13 @@
       "close": "Close"
     }
   },
+  "cli": {
+    "permission": {
+      "allow": "Allow",
+      "always": "Allow always",
+      "deny": "Deny"
+    }
+  },
   "maxExpand": {
     "loading": "Loading max expand view...",
     "nav": {
@@ -1102,8 +1154,94 @@
       "alarm": "Alarm",
       "toolbox": "Toolbox",
       "miniGame": "Mini Game",
+      "cli": "CLI Console",
       "settings": "Settings",
       "switchTo": "Switch to {{label}}"
+    },
+    "cli": {
+      "eyebrow": "Claude Code",
+      "title": "CLI Console",
+      "subtitle": "Monitor Claude Code CLI sessions, tool usage, notifications, and permission requests in real time. Enable the local hook first; new Claude Code sessions will start reporting status.",
+      "enableHook": "Enable Status Hook",
+      "disableHook": "Disable Status Hook",
+      "clear": "Clear Records",
+      "hookStatus": "Hook Status",
+      "receiverStatus": "Receiver",
+      "pendingAuth": "Pending Auth",
+      "activeSessions": "Active Sessions",
+      "phase": {
+        "waiting": "Waiting for Permission",
+        "running": "Running",
+        "completed": "Completed",
+        "idle": "Idle"
+      },
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "running": "Running",
+      "stopped": "Stopped",
+      "receiverUrl": "Receiver URL",
+      "settingsPath": "Settings File",
+      "sessions": "Conversations",
+      "events": "Event Stream",
+      "loading": "Loading",
+      "updatedAt": "Updated at {{time}}",
+      "emptySessions": "No Claude Code sessions yet.",
+      "emptyEvents": "Enable the hook and start a new Claude Code CLI session to see live status.",
+      "allSessions": "All Sessions",
+      "allSessionsHint": "Show all Claude Code event streams",
+      "allLabel": "all",
+      "filterAria": "Event filters",
+      "heatmapAria": "Activity heatmap",
+      "heatmap": {
+        "session": "Sessions",
+        "tool": "Tool calls",
+        "prompt": "Prompts",
+        "loggedIn": "Logged in",
+        "month": {
+          "jan": "Jan",
+          "feb": "Feb",
+          "mar": "Mar",
+          "apr": "Apr",
+          "may": "May",
+          "jun": "Jun",
+          "jul": "Jul",
+          "aug": "Aug",
+          "sep": "Sep",
+          "oct": "Oct",
+          "nov": "Nov",
+          "dec": "Dec"
+        }
+      },
+      "enterCliState": "Live event stream",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "bulkSelect": "Bulk Select",
+      "cancelSelection": "Cancel Selection",
+      "selectedCount": "{{count}} selected",
+      "deleteSelected": "Delete Selected",
+      "expand": "Expand",
+      "collapse": "Collapse",
+      "permissionProject": "Permission: {{project}}",
+      "filters": {
+        "all": "All",
+        "message": "Conversation",
+        "tool": "Tool calls",
+        "output": "Output",
+        "permission": "Permission"
+      },
+      "detail": {
+        "userInput": "User input",
+        "assistantOutput": "Claude output",
+        "toolUseId": "Tool call ID",
+        "toolInput": "Tool input",
+        "toolResult": "Tool result",
+        "model": "Model",
+        "notification": "Notification",
+        "eventSubtype": "Event subtype",
+        "error": "Error",
+        "reason": "Reason",
+        "rawEvent": "Raw event"
+      }
     },
     "toolbox": {
       "sidebar": {
@@ -1812,6 +1950,7 @@
           "overview": "Overview",
           "song": "Music",
           "tools": "Tools",
+          "translation": "Translation",
           "performanceMonitor": "Performance Monitor"
         }
       },
@@ -1841,7 +1980,8 @@
           "countdown": "Countdown",
           "alarm": "Alarm",
           "toolbox": "Toolbox",
-          "miniGame": "Mini Game"
+          "miniGame": "Mini Game",
+          "cli": "CLI Console"
         }
       },
       "hideProcess": {
@@ -2131,6 +2271,11 @@
         "title": "Notification Sound",
         "hint": "Play a one-shot sound when a notification is triggered.",
         "toggle": "Enable Notification Sound"
+      },
+      "agentNotification": {
+        "title": "Agent Launch Notification",
+        "hint": "Show a Dynamic Island notification when a desktop agent starts or stops.",
+        "toggle": "Enable Agent Launch Notification"
       }
     },
     "breakReminder": {
@@ -2797,7 +2942,10 @@
       "card": {
         "memberSince": "Member since",
         "proExpireAt": "Pro Expiration",
-        "balance": "Balance"
+        "balance": "Balance",
+        "loginDays": "Login days",
+        "expandHeatmap": "Expand heatmap",
+        "collapseHeatmap": "Collapse heatmap"
       },
       "infoNav": {
         "editDesc": "Edit gender, birthday, and other profile details",

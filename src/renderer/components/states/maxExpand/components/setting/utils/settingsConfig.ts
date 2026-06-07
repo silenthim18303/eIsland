@@ -203,7 +203,7 @@ export interface ExpandNavItem {
 
 export type ExpandNavLayoutConfig = ExpandNavItem[];
 
-export const EXPAND_CONFIGURABLE_TABS: string[] = ['overview', 'song', 'tools', 'performanceMonitor'];
+export const EXPAND_CONFIGURABLE_TABS: string[] = ['overview', 'song', 'tools', 'translation', 'performanceMonitor'];
 
 export const EXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['overview']);
 
@@ -211,6 +211,7 @@ export const EXPAND_TAB_LABELS: Record<string, string> = {
   overview: '总览',
   song: '歌曲',
   tools: '工具',
+  translation: '翻译',
   performanceMonitor: '性能监控',
 };
 
@@ -263,7 +264,7 @@ export interface MaxExpandNavItem {
 
 export type MaxExpandNavLayoutConfig = MaxExpandNavItem[];
 
-export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox', 'miniGame'];
+export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox', 'miniGame', 'cli'];
 
 export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat', 'miniGame']);
 
@@ -280,6 +281,7 @@ export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
   alarm: '闹钟',
   toolbox: '工具箱',
   miniGame: '小游戏',
+  cli: 'CLI 控制台',
 };
 
 export const DEFAULT_MAXEXPAND_NAV_LAYOUT: MaxExpandNavLayoutConfig = MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: true }));

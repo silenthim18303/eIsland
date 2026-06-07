@@ -114,6 +114,57 @@ export interface PerformanceSnapshot {
   hardwareOptions: PerformanceHardwareOptions;
 }
 
+export interface ClaudeCodeHookEventDetailItem {
+  label: string;
+  value: string;
+}
+
+export interface ClaudeCodeHookEvent {
+  id: string;
+  eventName: string;
+  kind: 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
+  sessionId: string;
+  cwd: string | null;
+  transcriptPath: string | null;
+  summary: string;
+  detail: string | null;
+  detailItems: ClaudeCodeHookEventDetailItem[];
+  toolName: string | null;
+  toolInputPreview: string | null;
+  createdAt: number;
+  raw: Record<string, unknown>;
+}
+
+export interface ClaudeCodeSessionSnapshot {
+  id: string;
+  title: string;
+  phase: 'idle' | 'running' | 'waiting_permission' | 'completed';
+  cwd: string | null;
+  transcriptPath: string | null;
+  lastSummary: string;
+  lastEventAt: number;
+  pendingPermission: ClaudeCodeHookEvent | null;
+  events: ClaudeCodeHookEvent[];
+}
+
+export interface ClaudeCodeStatusSnapshot {
+  enabled: boolean;
+  receiverRunning: boolean;
+  receiverUrl: string | null;
+  settingsPath: string;
+  hookScriptPath: string;
+  sessions: ClaudeCodeSessionSnapshot[];
+  events: ClaudeCodeHookEvent[];
+  heatmap: Record<string, { session: number; tool: number; prompt: number }>;
+  updatedAt: number;
+}
+
+export interface ClaudeCodeHookMutationResult {
+  ok: boolean;
+  message: string;
+  snapshot: ClaudeCodeStatusSnapshot;
+}
+
 declare global {
   interface Window {
     electron: ElectronAPI;
@@ -143,6 +194,11 @@ declare global {
       pickLocalSearchDirectory: () => Promise<string | null>;
       pickSkillFile: () => Promise<string | null>;
       readTextFile: (filePath: string) => Promise<string | null>;
+      saveTextFile: (payload: {
+        defaultPath: string;
+        content: string;
+        filters?: Array<{ name: string; extensions: string[] }>;
+      }) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
       searchLocalFiles: (
         rootDir: string,
         keyword: string,
@@ -344,6 +400,8 @@ declare global {
       agentVoiceInputHotkeyGet: () => Promise<string>;
       agentVoiceInputHotkeySet: (accelerator: string) => Promise<boolean>;
       onAgentVoiceInputState: (callback: (active: boolean) => void) => () => void;
+      cliGlowShow: () => Promise<boolean>;
+      cliGlowHide: () => Promise<boolean>;
       onPassthroughLockChanged: (callback: (locked: boolean) => void) => () => void;
       logWrite: (level: string, message: string) => void;
       musicWhitelistGet: () => Promise<string[]>;
@@ -483,6 +541,15 @@ declare global {
       onUpdaterStartupAutoCheckRequest: (callback: (data: { requestedAt: number }) => void) => () => void;
       onClipboardUrlsDetected: (callback: (data: { urls: string[]; title: string }) => void) => () => void;
       clipboardOpenUrl: (url: string) => Promise<boolean>;
+      onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void) => () => void;
+      onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void) => () => void;
+      claudeCodeStatusGet: () => Promise<ClaudeCodeStatusSnapshot>;
+      claudeCodeHookInstall: () => Promise<ClaudeCodeHookMutationResult>;
+      claudeCodeHookUninstall: () => Promise<ClaudeCodeHookMutationResult>;
+      claudeCodeEventsClear: () => Promise<ClaudeCodeStatusSnapshot>;
+      claudeCodeSessionsDelete: (sessionIds: string[]) => Promise<ClaudeCodeStatusSnapshot>;
+      claudeCodePermissionResolve: (sessionId: string, decision: 'allow' | 'always' | 'deny') => Promise<ClaudeCodeStatusSnapshot>;
+      onClaudeCodeStatusUpdated: (callback: (snapshot: ClaudeCodeStatusSnapshot) => void) => () => void;
     };
   }
 }

@@ -375,7 +375,8 @@
 
 .island-shell.notification,
 .island-shell.agent,
-.island-shell.stt {
+.island-shell.stt,
+.island-shell.cli {
   width: 500px;
   height: 88px;
 }

@@ -200,6 +200,16 @@ const api = {
     return ipcRenderer.invoke('app:read-text-file', filePath);
   },
   /**
+   * 保存文本文件内容
+   */
+  saveTextFile: (payload: {
+    defaultPath: string;
+    content: string;
+    filters?: Array<{ name: string; extensions: string[] }>;
+  }): Promise<{ ok: boolean; canceled: boolean; filePath: string | null }> => {
+    return ipcRenderer.invoke('app:save-text-file', payload);
+  },
+  /**
    * 搜索本地文件（名称匹配）
    */
   searchLocalFiles: (
@@ -940,6 +950,14 @@ const api = {
       ipcRenderer.removeListener('agent-voice-input:state', handler);
     };
   },
+  /** 显示 CLI 检测全屏边缘光效（常驻直到调用 cliGlowHide） */
+  cliGlowShow: (): Promise<boolean> => {
+    return ipcRenderer.invoke('cli-glow:show');
+  },
+  /** 关闭 CLI 检测全屏边缘光效 */
+  cliGlowHide: (): Promise<boolean> => {
+    return ipcRenderer.invoke('cli-glow:hide');
+  },
   /**
    * 监听鼠标穿透锁定状态变化
    * @param callback - 回调函数，参数为是否锁定
@@ -1501,8 +1519,114 @@ const api = {
    */
   clipboardOpenUrl: (url: string): Promise<boolean> => {
     return ipcRenderer.invoke('clipboard:open-url', url);
+  },
+  /**
+   * 监听外部桌面 Agent 启动事件
+   * @param callback - 收到事件时的回调，包含 agentNames 数组
+   * @returns 取消订阅函数
+   */
+  onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { agentNames: string[] }): void => {
+      callback(data);
+    };
+    ipcRenderer.on('external-agent:started', handler);
+    return () => {
+      ipcRenderer.removeListener('external-agent:started', handler);
+    };
+  },
+  /**
+   * 监听外部桌面 Agent 关闭事件
+   * @param callback - 收到事件时的回调，包含 agentNames 数组
+   * @returns 取消订阅函数
+   */
+  onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: { agentNames: string[] }): void => {
+      callback(data);
+    };
+    ipcRenderer.on('external-agent:stopped', handler);
+    return () => {
+      ipcRenderer.removeListener('external-agent:stopped', handler);
+    };
+  },
+  claudeCodeStatusGet: (): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:status:get');
+  },
+  claudeCodeHookInstall: (): Promise<ClaudeCodeHookMutationResult> => {
+    return ipcRenderer.invoke('claude-code:hook:install');
+  },
+  claudeCodeHookUninstall: (): Promise<ClaudeCodeHookMutationResult> => {
+    return ipcRenderer.invoke('claude-code:hook:uninstall');
+  },
+  claudeCodeEventsClear: (): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:events:clear');
+  },
+  claudeCodeSessionsDelete: (sessionIds: string[]): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:sessions:delete', sessionIds);
+  },
+  claudeCodePermissionResolve: (sessionId: string, decision: 'allow' | 'always' | 'deny'): Promise<ClaudeCodeStatusSnapshot> => {
+    return ipcRenderer.invoke('claude-code:permission:resolve', sessionId, decision);
+  },
+  onClaudeCodeStatusUpdated: (callback: (snapshot: ClaudeCodeStatusSnapshot) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, snapshot: ClaudeCodeStatusSnapshot): void => {
+      callback(snapshot);
+    };
+    ipcRenderer.on('claude-code:status-updated', handler);
+    return () => {
+      ipcRenderer.removeListener('claude-code:status-updated', handler);
+    };
   }
 };
+
+interface ClaudeCodeHookEventDetailItem {
+  label: string;
+  value: string;
+}
+
+interface ClaudeCodeHookEvent {
+  id: string;
+  eventName: string;
+  kind: 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
+  sessionId: string;
+  cwd: string | null;
+  transcriptPath: string | null;
+  summary: string;
+  detail: string | null;
+  detailItems: ClaudeCodeHookEventDetailItem[];
+  toolName: string | null;
+  toolInputPreview: string | null;
+  createdAt: number;
+  raw: Record<string, unknown>;
+}
+
+interface ClaudeCodeSessionSnapshot {
+  id: string;
+  title: string;
+  phase: 'idle' | 'running' | 'waiting_permission' | 'completed';
+  cwd: string | null;
+  transcriptPath: string | null;
+  lastSummary: string;
+  lastEventAt: number;
+  pendingPermission: ClaudeCodeHookEvent | null;
+  events: ClaudeCodeHookEvent[];
+}
+
+interface ClaudeCodeStatusSnapshot {
+  enabled: boolean;
+  receiverRunning: boolean;
+  receiverUrl: string | null;
+  settingsPath: string;
+  hookScriptPath: string;
+  sessions: ClaudeCodeSessionSnapshot[];
+  events: ClaudeCodeHookEvent[];
+  heatmap: Record<string, { session: number; tool: number; prompt: number }>;
+  updatedAt: number;
+}
+
+interface ClaudeCodeHookMutationResult {
+  ok: boolean;
+  message: string;
+  snapshot: ClaudeCodeStatusSnapshot;
+}
 
 /** 歌曲信息类型（与主进程发送的数据格式一致） */
 interface NowPlayingInfo {

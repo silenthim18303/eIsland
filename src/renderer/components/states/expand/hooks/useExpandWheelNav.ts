@@ -64,6 +64,7 @@ export function useExpandWheelNav({
       if (target.closest('.ov-dash-url-favorites-list')) return;
       if (target.closest('.ov-dash-break-reminder-list')) return;
       if (target.closest('.tools-app-list-body')) return;
+      if (target.closest('.translation-editor-textarea')) return;
       e.preventDefault();
       const cur = expandTabRef.current;
       const dots = navDotsRef.current;

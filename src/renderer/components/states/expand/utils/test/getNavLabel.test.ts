@@ -56,6 +56,12 @@ describe('getNavLabel', () => {
       expect(t).toHaveBeenCalledWith('expanded.nav.tools', { defaultValue: '工具' })
     })
 
+    it('should call t with key "expanded.nav.translation" and defaultValue "翻译"', () => {
+      const t = createMockT()
+      getNavLabel('translation', t)
+      expect(t).toHaveBeenCalledWith('expanded.nav.translation', { defaultValue: '翻译' })
+    })
+
     it('should call t with key "expanded.nav.performanceMonitor" and defaultValue "性能监控"', () => {
       const t = createMockT()
       getNavLabel('performanceMonitor', t)
@@ -103,7 +109,7 @@ describe('getNavLabel', () => {
   describe('i18n key format', () => {
     it('should always prefix the key with "expanded.nav."', () => {
       const t = createMockT()
-      const tabs = ['hover', 'overview', 'song', 'tools', 'performanceMonitor', 'maxExpand'] as const
+      const tabs = ['hover', 'overview', 'song', 'tools', 'translation', 'performanceMonitor', 'maxExpand'] as const
       tabs.forEach((tab) => {
         t.mockClear()
         getNavLabel(tab, t)

@@ -42,6 +42,7 @@ export const STATE_AREA: Record<string, number> = {
   agentVoiceInput: 500 * 42,
   agent: 500 * 88,
   stt: 500 * 88,
+  cli: 500 * 88,
 };
 
 interface StateConfig {
@@ -153,6 +154,13 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   },
   stt: {
     name: 'stt',
+    mousePassthrough: false,
+    expanded: true,
+    enterDelay: 0,
+    leaveDelay: 0,
+  },
+  cli: {
+    name: 'cli',
     mousePassthrough: false,
     expanded: true,
     enterDelay: 0,

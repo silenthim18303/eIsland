@@ -55,6 +55,11 @@
   justify-content: flex-end;
 }
 
+/* CLI 检测通知：按钮组上移一些 */
+.notification-actions--cli-detected {
+  margin-top: -5px;
+}
+
 .notification-actions--weather-alert-startup {
   width: 100%;
   margin-top: -8px;

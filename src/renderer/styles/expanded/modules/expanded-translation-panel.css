@@ -1,0 +1,377 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file expanded-translation-panel.css
+ * @description Expanded 翻译面板样式
+ */
+
+.translation-tab {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 0 14px 8px;
+}
+
+.translation-workspace {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
+  overflow: visible;
+}
+
+.translation-pane {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.translation-pane-toolbar {
+  position: relative;
+  z-index: 20;
+  height: 35px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.translation-pane-result .translation-pane-toolbar {
+  justify-content: flex-end;
+}
+
+.translation-pane-result .translation-language-block {
+  order: 1;
+  align-items: flex-end;
+}
+
+.translation-language-block {
+  min-width: 0;
+  width: min(160px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 3px;
+}
+
+.translation-lang-dropdown {
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  z-index: 30;
+}
+
+.translation-lang-dropdown-trigger {
+  width: 100%;
+  height: 26px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  outline: none;
+  background: rgba(var(--color-text-rgb), 0.05);
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.translation-lang-dropdown-trigger:hover,
+.translation-lang-dropdown-trigger:focus-visible {
+  border-color: rgba(var(--color-text-rgb), 0.22);
+  background: rgba(var(--color-text-rgb), 0.065);
+}
+
+.translation-lang-flag {
+  width: 18px;
+  height: 13px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+  filter: none;
+  opacity: 1;
+}
+
+.translation-lang-ai-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='light'] .translation-lang-ai-icon {
+  filter: brightness(0) invert(0);
+}
+
+.translation-lang-flag-placeholder {
+  display: inline-block;
+  width: 18px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.translation-lang-dropdown-label {
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.translation-pane-result .translation-lang-dropdown-label {
+  text-align: right;
+}
+
+.translation-lang-dropdown-arrow {
+  flex-shrink: 0;
+  font-size: 10px;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+.translation-lang-dropdown-menu {
+  z-index: 10000;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 8px;
+  background: #2a2a2d;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.15) transparent;
+}
+
+.translation-lang-dropdown-menu::-webkit-scrollbar {
+  width: 4px;
+}
+
+.translation-lang-dropdown-menu::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.15);
+  border-radius: 2px;
+}
+
+.translation-lang-dropdown-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.25);
+}
+
+[data-theme='light'] .translation-lang-dropdown-menu {
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.translation-lang-dropdown-item {
+  width: 100%;
+  padding: 5px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.translation-lang-dropdown-item:hover {
+  background: rgba(var(--color-text-rgb), 0.08);
+}
+
+.translation-lang-dropdown-item.active {
+  background: rgba(var(--color-text-rgb), 0.12);
+  font-weight: 600;
+}
+
+.translation-editor-textarea {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  padding: 8px 10px 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 10px;
+  outline: none;
+  resize: none;
+  background: rgba(var(--color-text-rgb), 0.025);
+  color: rgba(var(--color-text-rgb), 0.9);
+  font-size: 12px;
+  line-height: 1.58;
+  font-family: inherit;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.15) transparent;
+  overscroll-behavior: contain;
+}
+
+.translation-editor-textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+.translation-editor-textarea::-webkit-scrollbar-thumb {
+  background: rgba(var(--color-text-rgb), 0.15);
+  border-radius: 2px;
+}
+
+.translation-editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--color-text-rgb), 0.25);
+}
+
+.translation-editor-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.translation-editor-textarea:focus {
+  border-color: rgba(120, 200, 255, 0.42);
+  background: rgba(var(--color-text-rgb), 0.035);
+}
+
+.translation-editor-textarea::placeholder {
+  color: rgba(var(--color-text-rgb), 0.28);
+}
+
+.translation-editor-textarea-result {
+  cursor: default;
+  text-align: right;
+}
+
+.translation-center-actions {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 28px);
+  grid-auto-rows: 28px;
+  align-content: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 0;
+  transform: translateY(16px);
+}
+
+.translation-swap-btn {
+  flex-shrink: 0;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  gap: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.55);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.translation-swap-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.translation-swap-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.translation-action-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: brightness(0) invert(var(--icon-invert));
+}
+
+.translation-swap-btn .translation-action-icon,
+.translation-primary-btn .translation-action-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.translation-primary-btn,
+.translation-secondary-btn,
+.translation-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.55);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.translation-primary-btn,
+.translation-secondary-btn,
+.translation-copy-btn {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  padding: 0;
+  align-self: center;
+}
+
+.translation-primary-btn:hover:not(:disabled),
+.translation-secondary-btn:hover:not(:disabled),
+.translation-copy-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.8);
+}
+
+.translation-primary-btn:disabled,
+.translation-secondary-btn:disabled,
+.translation-copy-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  color: rgba(var(--color-text-rgb), 0.35);
+  border-color: rgba(var(--color-text-rgb), 0.08);
+  background: rgba(var(--color-text-rgb), 0.03);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .translation-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .translation-center-actions {
+    padding-top: 0;
+  }
+}

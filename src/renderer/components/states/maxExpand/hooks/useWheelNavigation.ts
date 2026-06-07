@@ -59,6 +59,9 @@ const WHEEL_EXCLUDED_SELECTORS = [
   '.settings-field-textarea',
   '.memo-tab-container',
   '.alarm-tab-container',
+  '.cli-tab',
+  '.cli-tab-event-list',
+  '.cli-tab-session-list',
 ];
 
 interface FilteredNavDot {

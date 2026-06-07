@@ -3212,6 +3212,18 @@
   flex-shrink: 0;
 }
 
+.translate-lang-ai-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='light'] .translate-lang-ai-icon {
+  filter: brightness(0) invert(0);
+}
+
 .translate-lang-flag-placeholder {
   display: inline-block;
   width: 18px;
@@ -4317,6 +4329,60 @@
   border: 1px solid rgba(var(--color-text-rgb), 0.06);
 }
 
+/* 登录信息统计卡：与余额/性别卡同级，右侧带热力图展开按钮 */
+.settings-user-info-summary-login-card {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.settings-user-info-summary-login-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.settings-user-info-summary-login-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.92);
+  white-space: nowrap;
+}
+
+.settings-user-info-summary-login-toggle {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  background: rgba(var(--color-text-rgb), 0.04);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.settings-user-info-summary-login-toggle:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+}
+
+.settings-user-info-summary-login-toggle--active {
+  border-color: rgba(100, 180, 255, 0.35);
+  background: rgba(100, 180, 255, 0.12);
+}
+
+.settings-user-info-summary-login-toggle img {
+  filter: invert(calc(1 - var(--icon-invert)));
+  opacity: 0.85;
+}
+
 .settings-user-info-gender-icon {
   width: 14px;
   height: 14px;
@@ -4328,6 +4394,31 @@
 
 .settings-user-info-gender-icon--original {
   filter: none;
+}
+
+/* 用户中心登录热力图容器：默认收起，点击右上角图标按钮展开 */
+.settings-user-info-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 0;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(var(--color-text-rgb), 0.03);
+  flex-shrink: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: max-height 0.24s ease, padding 0.24s ease, opacity 0.2s ease, transform 0.24s ease, border-color 0.24s ease;
+}
+
+.settings-user-info-heatmap--open {
+  max-height: 180px;
+  padding: 8px 12px 6px;
+  border-color: rgba(var(--color-text-rgb), 0.08);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .settings-user-info-nav-cards {

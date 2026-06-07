@@ -32,6 +32,7 @@ export type NavDotId = MaxExpandTab | 'expanded';
 export const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set([
   'todo', 'countdown', 'urlFavorites', 'album', 'mail',
   'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'settings',
+  'cli',
 ]);
 
 /** 当前启动模式（集成 / 独立） */

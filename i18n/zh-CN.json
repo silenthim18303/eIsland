@@ -401,7 +401,14 @@
       "workFinished": "专注时间结束，开始休息吧",
       "breakFinished": "休息时间结束，开始专注吧"
     },
+    "externalAgent": {
+      "title": "检测到桌面 Agent",
+      "body": "{{agentName}} 已开始工作",
+      "stoppedTitle": "桌面 Agent 已关闭",
+      "stoppedBody": "{{agentName}} 已停止工作"
+    },
     "actions": {
+      "gotIt": "知道了",
       "installRestart": "安装并重启",
       "later": "稍后",
       "downloadUpdate": "下载更新",
@@ -416,6 +423,7 @@
       "hide": "隐藏",
       "ignore": "忽略",
       "switch": "切换",
+      "switchCliState": "切换到灵动岛",
       "snooze5m": "稍后 5m",
       "snooze15m": "稍后 15m",
       "snooze1h": "稍后 1h",
@@ -429,6 +437,7 @@
       "overview": "总览",
       "song": "歌曲",
       "tools": "工具",
+      "translation": "翻译",
       "performanceMonitor": "性能监控",
       "maxExpand": "最大展开",
       "switchToPage": "切换到{{label}}页面"
@@ -462,6 +471,14 @@
     },
     "settingsTab": {
       "label": "设置"
+    },
+    "translation": {
+      "title": "快速翻译",
+      "sourceLabel": "源语言",
+      "targetLabel": "目标语言",
+      "inputTitle": "原文",
+      "outputTitle": "译文",
+      "languageAria": "翻译语言选择"
     }
   },
   "toolsTab": {
@@ -746,6 +763,7 @@
   "urlFavoritesTab": {
     "title": "URL 收藏",
     "count": "{{count}} 条",
+    "filteredCount": "{{count}} / {{total}} 条",
     "empty": "还没有收藏，先添加一个 URL 吧。",
     "openWebsiteTitle": "点击打开网站",
     "resolvingTitle": "读取网页名称中…",
@@ -757,15 +775,42 @@
     "actions": {
       "add": "添加",
       "save": "保存",
+      "manageFolders": "分组",
+      "manageImportExport": "导入导出",
+      "import": "导入",
+      "export": "导出",
       "expand": "展开",
       "collapse": "收起",
       "removeAria": "删除 URL 收藏"
+    },
+    "import": {
+      "formatAria": "导入格式"
+    },
+    "export": {
+      "formatAria": "导出格式"
+    },
+    "folders": {
+      "all": "全部",
+      "uncategorized": "未分类",
+      "newPlaceholder": "新建文件夹",
+      "create": "新建",
+      "clearCurrent": "清空当前分类",
+      "emptyFiltered": "当前文件夹还没有收藏。"
+    },
+    "messages": {
+      "importSuccess": "已导入 {{count}} 条收藏",
+      "importEmpty": "未识别到可导入的收藏",
+      "importFailed": "导入失败，请检查文件格式",
+      "exportSuccess": "已导出 {{count}} 条收藏",
+      "exportFailed": "导出失败，请稍后重试"
     },
     "editor": {
       "urlLabel": "URL",
       "urlPlaceholder": "编辑 URL",
       "noteLabel": "备注",
-      "notePlaceholder": "输入备注"
+      "notePlaceholder": "输入备注",
+      "folderLabel": "文件夹",
+      "folderPlaceholder": "输入文件夹名称，留空为未分类"
     }
   },
   "mailTab": {
@@ -1086,6 +1131,13 @@
       "close": "关闭"
     }
   },
+  "cli": {
+    "permission": {
+      "allow": "批准",
+      "always": "永久批准",
+      "deny": "拒绝"
+    }
+  },
   "maxExpand": {
     "loading": "正在加载最大展开界面...",
     "nav": {
@@ -1102,8 +1154,94 @@
       "alarm": "闹钟",
       "toolbox": "工具箱",
       "miniGame": "小游戏",
+      "cli": "CLI 控制台",
       "settings": "设置",
       "switchTo": "切换到{{label}}"
+    },
+    "cli": {
+      "eyebrow": "Claude Code",
+      "title": "CLI 控制台",
+      "subtitle": "实时汇总 Claude Code CLI 的会话、工具调用、通知和授权请求。首次使用需要启用本地 hook，新的 Claude Code 会话会开始上报状态。",
+      "enableHook": "启用状态 Hook",
+      "disableHook": "关闭状态 Hook",
+      "clear": "清空记录",
+      "hookStatus": "Hook 状态",
+      "receiverStatus": "接收器",
+      "pendingAuth": "待授权",
+      "activeSessions": "活跃会话",
+      "phase": {
+        "waiting": "等待授权",
+        "running": "运行中",
+        "completed": "已完成",
+        "idle": "空闲"
+      },
+      "enabled": "已启用",
+      "disabled": "未启用",
+      "running": "运行中",
+      "stopped": "未运行",
+      "receiverUrl": "接收地址",
+      "settingsPath": "配置文件",
+      "sessions": "对话链路",
+      "events": "事件流",
+      "loading": "加载中",
+      "updatedAt": "更新于 {{time}}",
+      "emptySessions": "暂无 Claude Code 会话。",
+      "emptyEvents": "启用 Hook 后启动新的 Claude Code CLI 会话即可看到状态。",
+      "allSessions": "全部会话",
+      "allSessionsHint": "显示所有 Claude Code 事件流",
+      "allLabel": "all",
+      "filterAria": "事件筛选",
+      "heatmapAria": "活动热力图",
+      "heatmap": {
+        "session": "会话开始",
+        "tool": "工具调用",
+        "prompt": "提示词输入",
+        "loggedIn": "已登录",
+        "month": {
+          "jan": "1月",
+          "feb": "2月",
+          "mar": "3月",
+          "apr": "4月",
+          "may": "5月",
+          "jun": "6月",
+          "jul": "7月",
+          "aug": "8月",
+          "sep": "9月",
+          "oct": "10月",
+          "nov": "11月",
+          "dec": "12月"
+        }
+      },
+      "enterCliState": "进入实时流",
+      "prevPage": "上一页",
+      "nextPage": "下一页",
+      "bulkSelect": "批量选择",
+      "cancelSelection": "取消选择",
+      "selectedCount": "已选 {{count}} 项",
+      "deleteSelected": "删除所选",
+      "expand": "展开",
+      "collapse": "收起",
+      "permissionProject": "授权项目：{{project}}",
+      "filters": {
+        "all": "全部",
+        "message": "对话",
+        "tool": "工具调用",
+        "output": "输出",
+        "permission": "授权"
+      },
+      "detail": {
+        "userInput": "用户输入",
+        "assistantOutput": "Claude 输出",
+        "toolUseId": "工具调用 ID",
+        "toolInput": "工具入参",
+        "toolResult": "工具结果",
+        "model": "模型",
+        "notification": "通知",
+        "eventSubtype": "事件子类型",
+        "error": "错误信息",
+        "reason": "原因",
+        "rawEvent": "原始事件"
+      }
     },
     "toolbox": {
       "sidebar": {
@@ -1812,6 +1950,7 @@
           "overview": "总览",
           "song": "歌曲",
           "tools": "工具",
+          "translation": "翻译",
           "performanceMonitor": "性能监控"
         }
       },
@@ -1841,7 +1980,8 @@
           "countdown": "倒数日",
           "alarm": "闹钟",
           "toolbox": "工具箱",
-          "miniGame": "小游戏"
+          "miniGame": "小游戏",
+          "cli": "CLI 控制台"
         }
       },
       "hideProcess": {
@@ -2131,6 +2271,11 @@
         "title": "通知音效",
         "hint": "通知触发时播放一次提示音。",
         "toggle": "启用通知音效"
+      },
+      "agentNotification": {
+        "title": "Agent 启动通知",
+        "hint": "检测到桌面 Agent 启动或关闭时弹出灵动岛通知。",
+        "toggle": "启用 Agent 启动通知"
       }
     },
     "breakReminder": {
@@ -2797,7 +2942,10 @@
       "card": {
         "memberSince": "加入时间",
         "proExpireAt": "Pro到期时间",
-        "balance": "余额"
+        "balance": "余额",
+        "loginDays": "登录天数",
+        "expandHeatmap": "展开热力图",
+        "collapseHeatmap": "收起热力图"
       },
       "infoNav": {
         "editDesc": "修改性别、生日等基本资料",

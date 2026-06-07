@@ -33,6 +33,7 @@ import { OverviewTab } from './components/OverviewTab';
 import { PerformanceMonitorTab } from './components/PerformanceMonitorTab';
 import { SongTab } from './components/SongTab';
 import { ToolsTab } from './components/ToolsTab';
+import { TranslationTab } from './components/TranslationTab';
 import type { NavDotId } from './config/types';
 import { useExpandNavLayout } from './hooks/useExpandNavLayout';
 import { useExpandTabAnimation } from './hooks/useExpandTabAnimation';
@@ -95,6 +96,7 @@ export function ExpandedContent(): React.ReactElement {
           {expandTab === 'overview' && <OverviewTab />}
           {expandTab === 'song' && <SongTab />}
           {expandTab === 'tools' && <ToolsTab />}
+          {expandTab === 'translation' && <TranslationTab />}
           {expandTab === 'performanceMonitor' && <PerformanceMonitorTab />}
         </div>
       </div>
