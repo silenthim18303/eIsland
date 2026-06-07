@@ -1,7 +1,87 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-04T15:35:14.977Z
+> 生成时间：2026-06-07T12:25:22.765Z
+
+## 26.5.14
+
+- 2026-06-04 | c179c636 | 鸡哥 | docs(announcement): add V26.5.14 release notes
+- 2026-06-04 | 9d3260bf | 鸡哥 | chore: update version to 26.5.14 in package.json and package-lock.json
+- 2026-06-04 | f6cf3df1 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #73 by @JNTMTMTM [skip ci]
+- 2026-06-04 | a0f663fe | 鸡哥 | Merge pull request #73 from JNTMTMTM/dev
+- 2026-06-04 | 0e26dc43 | 鸡哥 | fix(ci): upgrade Node.js 20 to 22 for --experimental-strip-types support
+- 2026-06-04 | 566db0fd | 鸡哥 | fix(lint): replace for...of with forEach in index.test.ts
+- 2026-06-04 | e647f6b6 | 鸡哥 | fix(lint): replace for...of with forEach in settingsConfig.test.ts
+- 2026-06-04 | 302c97b8 | 鸡哥 | fix(lint): replace for...of with forEach in board.test.ts
+- 2026-06-04 | 30abe20a | 鸡哥 | fix(lint): replace for...of with forEach in ai.test.ts
+- 2026-06-04 | 3c2ee1cc | 鸡哥 | fix(lint): replace React default import with named imports in MaxExpandContent.tsx
+- 2026-06-04 | 31c1f343 | 鸡哥 | fix(lint): replace any with Record types in guideContentUtils.test.ts
+- 2026-06-04 | 5702bbcd | 鸡哥 | fix(lint): replace for...of with forEach in getNavLabel.test.ts
+- 2026-06-04 | 4e62b193 | 鸡哥 | fix(lint): replace any with Record types in agentRunnerEventHandler.test.ts
+- 2026-06-04 | 2250d806 | 鸡哥 | fix(lint): use === in comment in dynamicIslandWindowUtils.test.ts
+- 2026-06-04 | 062cd061 | 鸡哥 | fix(lint): replace for...of with Object.keys().forEach in smtcService.test.ts
+- 2026-06-04 | 899a013b | 鸡哥 | fix(lint): replace for...of with forEach in music.test.ts
+- 2026-06-04 | 4b17577a | 鸡哥 | fix(lint): replace any with proper types in downloadEngine.test.ts
+- 2026-06-04 | 0875de3e | 鸡哥 | fix(test):补齐 SvgIcon CHECKED 测试例，修复 flaky Date.now 断言，修正版权头格式
+- 2026-06-04 | 02d15ee3 | 鸡哥 | test(settingsTabConfig): fix random ID generation in tests and update SvgIcon key count
+- 2026-06-04 | 5b4ad74a | 鸡哥 | fix(tests): update comment style in agentToolPolicy test file
+- 2026-06-04 | 979f9de3 | 鸡哥 | refactor(AiChatTab): enhance model card visibility and transitions
+- 2026-06-04 | 69c0727e | 鸡哥 | refactor(memo): improve bulk actions UI in MemoTab
+- 2026-06-04 | 384b223d | 鸡哥 | feat(memo): enhance tag filtering functionality in MemoTab
+- 2026-06-04 | aecb3863 | 鸡哥 | feat(memo): replace checkmarks with CHECKED icon in MemoTab
+- 2026-06-04 | d6dfe0d1 | 鸡哥 | feat(icon): add CHECKED icon to SvgIcon collection
+- 2026-06-04 | 1ce8b844 | 鸡哥 | feat(memo): implement bulk selection and deletion functionality in MemoTab
+- 2026-06-04 | c2926eac | 鸡哥 | feat(memo): add tagging functionality and enhance memo search capabilities
+- 2026-06-04 | 9ba5b81b | 鸡哥 | refactor(memo): enhance Markdown rendering and styling in MemoTab
+- 2026-06-04 | 5650298c | 鸡哥 | refactor(memo): streamline Markdown toolbar placement and update styles
+- 2026-06-04 | c6eadf8e | 鸡哥 | feat(memo): implement Markdown editing and preview modes in MemoTab
+- 2026-06-03 | 558fea94 | 鸡哥 | feat(clipboard): add type filter and inline filter bar in header
+- 2026-06-03 | 62ade7b4 | 鸡哥 | feat(clipboard): implement export functionality for clipboard history
+- 2026-06-03 | cd29d1d5 | 鸡哥 | style(clipboard): enhance hover effects and animations for clipboard history items
+- 2026-06-03 | 45b1095b | 鸡哥 | feat(clipboard): enhance selection functionality in ClipboardHistoryTab
+- 2026-06-03 | dab7b709 | 鸡哥 | docs(legal): add platform restriction prohibiting macOS porting
+- 2026-06-02 | 5e5bf81d | 鸡哥 | feat(clipboard): auto-select matched items on cleanup range change
+- 2026-06-02 | 06e525d0 | 鸡哥 | i18n(en-US): shorten notification settings description in quick nav card
+- 2026-06-02 | 4081f423 | 鸡哥 | chore(skills): add git status analysis and commit skill
+- 2026-06-02 | 175df63a | 鸡哥 | style(clipboard): add dark/light theme support for history range select
+- 2026-06-02 | e147da2d | 鸡哥 | feat(clipboard): add bulk history cleanup
+- 2026-06-02 | 4ed72813 | 鸡哥 | feat(maxExpand): add keyboard tab navigation
+- 2026-06-02 | eef82c1e | 鸡哥 | chore(cursor): update commit operation rule
+- 2026-06-02 | af65010b | 鸡哥 | chore(git): allow tracking cursor project files
+- 2026-06-02 | b922b892 | 鸡哥 | feat(island): add Escape navigation
+- 2026-06-01 | f07ab59c | 鸡哥 | refactor(stt): extract hooks from SttContent
+- 2026-06-01 | 47962f22 | 鸡哥 | refactor(sliderCaptcha): extract config and hooks from SliderCaptchaContent
+- 2026-06-01 | a169abf2 | 鸡哥 | refactor(register): extract utils, hooks, components, config from RegisterContent
+- 2026-06-01 | 3b10d894 | 鸡哥 | refactor(payment): extract utils, hooks, components, config from PaymentContent
+- 2026-06-01 | 2372808a | 鸡哥 | fix(tsconfig): add ignoreDeprecations for baseUrl deprecation warning
+- 2026-06-01 | f34cedc1 | 鸡哥 | fix(renderer): add CSS module type declaration to assets.d.ts
+- 2026-06-01 | 8c384c6f | 鸡哥 | fix(maxExpand): remove unused MaxExpandNavLayoutConfig import
+- 2026-06-01 | 2ad8dfde | 鸡哥 | refactor(maxExpand): extract utils, hooks, config from MaxExpandContent and MaxExpandContentShell
+- 2026-06-01 | 70945eab | 鸡哥 | feat(skill): add eisland-dev-generate-release-worklog skill
+- 2026-06-01 | dc099504 | 鸡哥 | chore: add .claude skills and workflows, unignore .claude directory
+- 2026-06-01 | 29779ca1 | 鸡哥 | refactor(notification): extract remaining hooks, add components directory
+- 2026-06-01 | 34e86e2a | 鸡哥 | refactor(notification): extract utils, hooks, config from NotificationContent
+- 2026-06-01 | 38b96834 | 鸡哥 | refactor(lyrics): extract utils, hooks, components, config from LyricsContent
+- 2026-06-01 | bb6850f6 | 鸡哥 | ci(workflows): remove all emoji from workflow output
+- 2026-06-01 | eb18eb7f | 鸡哥 | docs(announcement): restructure V26.5.13 to Chinese-first layout
+- 2026-06-01 | defd9139 | 鸡哥 | refactor(announcement): extract utils and config from announcement components
+- 2026-05-31 | 66e7d040 | 鸡哥 | docs(announcement): add English translation to V26.5.13 release notes
+- 2026-05-31 | 2b6976d1 | 鸡哥 | fix(i18n): resolve remaining translation issues
+- 2026-05-31 | a075cf22 | 鸡哥 | fix(i18n): wrap hardcoded strings in AgentContentView.tsx
+- 2026-05-31 | d2cd2e9a | 鸡哥 | fix(i18n): wrap hardcoded strings in SttContent.tsx
+- 2026-05-31 | e9883cb3 | 鸡哥 | fix(i18n): wrap hardcoded strings in maxExpand/components/SettingsTab.tsx
+- 2026-05-31 | 86faaac1 | 鸡哥 | fix(i18n): wrap hardcoded strings in standaloneMain.tsx
+- 2026-05-31 | 3995fd6f | 鸡哥 | fix(i18n): wrap hardcoded strings in main.tsx
+- 2026-05-31 | f360043f | 鸡哥 | fix(i18n): add missing translation keys
+- 2026-05-31 | 4a5a0099 | 鸡哥 | ci(i18n): add t() key validation and hardcoded Chinese detection
+- 2026-05-31 | f5b8be3d | 鸡哥 | ci: remove emojis, use professional report format
+- 2026-05-31 | c7c4f889 | 鸡哥 | ci: limit i18n check to pull_request trigger only
+- 2026-05-31 | 5f3ad075 | 鸡哥 | ci: add i18n completeness check workflow and script
+- 2026-05-31 | e557244a | 鸡哥 | fix(i18n): sync missing translations between zh-CN and en-US
+- 2026-05-31 | f8a38dd6 | 鸡哥 | docs: simplify standards references to direct links
+- 2026-05-31 | f28fe238 | 鸡哥 | docs: enforce COMMENT_STANDARDS and FRONTEND_STANDARDS in AGENTS.md
+- 2026-05-31 | b61230a7 | 鸡哥 | test: add unit tests for previously untested source files
+- 2026-05-31 | 0f7a454d | 鸡哥 | docs: 更新全局 AGENTS.md 规范文档添加翻译键相关约束
 
 ## 26.5.13
 
@@ -1970,77 +2050,109 @@
 
 ## Unreleased
 
-- 2026-06-04 | a0f663fe | 鸡哥 | Merge pull request #73 from JNTMTMTM/dev
-- 2026-06-04 | 0e26dc43 | 鸡哥 | fix(ci): upgrade Node.js 20 to 22 for --experimental-strip-types support
-- 2026-06-04 | 566db0fd | 鸡哥 | fix(lint): replace for...of with forEach in index.test.ts
-- 2026-06-04 | e647f6b6 | 鸡哥 | fix(lint): replace for...of with forEach in settingsConfig.test.ts
-- 2026-06-04 | 302c97b8 | 鸡哥 | fix(lint): replace for...of with forEach in board.test.ts
-- 2026-06-04 | 30abe20a | 鸡哥 | fix(lint): replace for...of with forEach in ai.test.ts
-- 2026-06-04 | 3c2ee1cc | 鸡哥 | fix(lint): replace React default import with named imports in MaxExpandContent.tsx
-- 2026-06-04 | 31c1f343 | 鸡哥 | fix(lint): replace any with Record types in guideContentUtils.test.ts
-- 2026-06-04 | 5702bbcd | 鸡哥 | fix(lint): replace for...of with forEach in getNavLabel.test.ts
-- 2026-06-04 | 4e62b193 | 鸡哥 | fix(lint): replace any with Record types in agentRunnerEventHandler.test.ts
-- 2026-06-04 | 2250d806 | 鸡哥 | fix(lint): use === in comment in dynamicIslandWindowUtils.test.ts
-- 2026-06-04 | 062cd061 | 鸡哥 | fix(lint): replace for...of with Object.keys().forEach in smtcService.test.ts
-- 2026-06-04 | 899a013b | 鸡哥 | fix(lint): replace for...of with forEach in music.test.ts
-- 2026-06-04 | 4b17577a | 鸡哥 | fix(lint): replace any with proper types in downloadEngine.test.ts
-- 2026-06-04 | 0875de3e | 鸡哥 | fix(test):补齐 SvgIcon CHECKED 测试例，修复 flaky Date.now 断言，修正版权头格式
-- 2026-06-04 | 02d15ee3 | 鸡哥 | test(settingsTabConfig): fix random ID generation in tests and update SvgIcon key count
-- 2026-06-04 | 5b4ad74a | 鸡哥 | fix(tests): update comment style in agentToolPolicy test file
-- 2026-06-04 | 979f9de3 | 鸡哥 | refactor(AiChatTab): enhance model card visibility and transitions
-- 2026-06-04 | 69c0727e | 鸡哥 | refactor(memo): improve bulk actions UI in MemoTab
-- 2026-06-04 | 384b223d | 鸡哥 | feat(memo): enhance tag filtering functionality in MemoTab
-- 2026-06-04 | aecb3863 | 鸡哥 | feat(memo): replace checkmarks with CHECKED icon in MemoTab
-- 2026-06-04 | d6dfe0d1 | 鸡哥 | feat(icon): add CHECKED icon to SvgIcon collection
-- 2026-06-04 | 1ce8b844 | 鸡哥 | feat(memo): implement bulk selection and deletion functionality in MemoTab
-- 2026-06-04 | c2926eac | 鸡哥 | feat(memo): add tagging functionality and enhance memo search capabilities
-- 2026-06-04 | 9ba5b81b | 鸡哥 | refactor(memo): enhance Markdown rendering and styling in MemoTab
-- 2026-06-04 | 5650298c | 鸡哥 | refactor(memo): streamline Markdown toolbar placement and update styles
-- 2026-06-04 | c6eadf8e | 鸡哥 | feat(memo): implement Markdown editing and preview modes in MemoTab
-- 2026-06-03 | 558fea94 | 鸡哥 | feat(clipboard): add type filter and inline filter bar in header
-- 2026-06-03 | 62ade7b4 | 鸡哥 | feat(clipboard): implement export functionality for clipboard history
-- 2026-06-03 | cd29d1d5 | 鸡哥 | style(clipboard): enhance hover effects and animations for clipboard history items
-- 2026-06-03 | 45b1095b | 鸡哥 | feat(clipboard): enhance selection functionality in ClipboardHistoryTab
-- 2026-06-03 | dab7b709 | 鸡哥 | docs(legal): add platform restriction prohibiting macOS porting
-- 2026-06-02 | 5e5bf81d | 鸡哥 | feat(clipboard): auto-select matched items on cleanup range change
-- 2026-06-02 | 06e525d0 | 鸡哥 | i18n(en-US): shorten notification settings description in quick nav card
-- 2026-06-02 | 4081f423 | 鸡哥 | chore(skills): add git status analysis and commit skill
-- 2026-06-02 | 175df63a | 鸡哥 | style(clipboard): add dark/light theme support for history range select
-- 2026-06-02 | e147da2d | 鸡哥 | feat(clipboard): add bulk history cleanup
-- 2026-06-02 | 4ed72813 | 鸡哥 | feat(maxExpand): add keyboard tab navigation
-- 2026-06-02 | eef82c1e | 鸡哥 | chore(cursor): update commit operation rule
-- 2026-06-02 | af65010b | 鸡哥 | chore(git): allow tracking cursor project files
-- 2026-06-02 | b922b892 | 鸡哥 | feat(island): add Escape navigation
-- 2026-06-01 | f07ab59c | 鸡哥 | refactor(stt): extract hooks from SttContent
-- 2026-06-01 | 47962f22 | 鸡哥 | refactor(sliderCaptcha): extract config and hooks from SliderCaptchaContent
-- 2026-06-01 | a169abf2 | 鸡哥 | refactor(register): extract utils, hooks, components, config from RegisterContent
-- 2026-06-01 | 3b10d894 | 鸡哥 | refactor(payment): extract utils, hooks, components, config from PaymentContent
-- 2026-06-01 | 2372808a | 鸡哥 | fix(tsconfig): add ignoreDeprecations for baseUrl deprecation warning
-- 2026-06-01 | f34cedc1 | 鸡哥 | fix(renderer): add CSS module type declaration to assets.d.ts
-- 2026-06-01 | 8c384c6f | 鸡哥 | fix(maxExpand): remove unused MaxExpandNavLayoutConfig import
-- 2026-06-01 | 2ad8dfde | 鸡哥 | refactor(maxExpand): extract utils, hooks, config from MaxExpandContent and MaxExpandContentShell
-- 2026-06-01 | 70945eab | 鸡哥 | feat(skill): add eisland-dev-generate-release-worklog skill
-- 2026-06-01 | dc099504 | 鸡哥 | chore: add .claude skills and workflows, unignore .claude directory
-- 2026-06-01 | 29779ca1 | 鸡哥 | refactor(notification): extract remaining hooks, add components directory
-- 2026-06-01 | 34e86e2a | 鸡哥 | refactor(notification): extract utils, hooks, config from NotificationContent
-- 2026-06-01 | 38b96834 | 鸡哥 | refactor(lyrics): extract utils, hooks, components, config from LyricsContent
-- 2026-06-01 | bb6850f6 | 鸡哥 | ci(workflows): remove all emoji from workflow output
-- 2026-06-01 | eb18eb7f | 鸡哥 | docs(announcement): restructure V26.5.13 to Chinese-first layout
-- 2026-06-01 | defd9139 | 鸡哥 | refactor(announcement): extract utils and config from announcement components
-- 2026-05-31 | 66e7d040 | 鸡哥 | docs(announcement): add English translation to V26.5.13 release notes
-- 2026-05-31 | 2b6976d1 | 鸡哥 | fix(i18n): resolve remaining translation issues
-- 2026-05-31 | a075cf22 | 鸡哥 | fix(i18n): wrap hardcoded strings in AgentContentView.tsx
-- 2026-05-31 | d2cd2e9a | 鸡哥 | fix(i18n): wrap hardcoded strings in SttContent.tsx
-- 2026-05-31 | e9883cb3 | 鸡哥 | fix(i18n): wrap hardcoded strings in maxExpand/components/SettingsTab.tsx
-- 2026-05-31 | 86faaac1 | 鸡哥 | fix(i18n): wrap hardcoded strings in standaloneMain.tsx
-- 2026-05-31 | 3995fd6f | 鸡哥 | fix(i18n): wrap hardcoded strings in main.tsx
-- 2026-05-31 | f360043f | 鸡哥 | fix(i18n): add missing translation keys
-- 2026-05-31 | 4a5a0099 | 鸡哥 | ci(i18n): add t() key validation and hardcoded Chinese detection
-- 2026-05-31 | f5b8be3d | 鸡哥 | ci: remove emojis, use professional report format
-- 2026-05-31 | c7c4f889 | 鸡哥 | ci: limit i18n check to pull_request trigger only
-- 2026-05-31 | 5f3ad075 | 鸡哥 | ci: add i18n completeness check workflow and script
-- 2026-05-31 | e557244a | 鸡哥 | fix(i18n): sync missing translations between zh-CN and en-US
-- 2026-05-31 | f8a38dd6 | 鸡哥 | docs: simplify standards references to direct links
-- 2026-05-31 | f28fe238 | 鸡哥 | docs: enforce COMMENT_STANDARDS and FRONTEND_STANDARDS in AGENTS.md
-- 2026-05-31 | b61230a7 | 鸡哥 | test: add unit tests for previously untested source files
-- 2026-05-31 | 0f7a454d | 鸡哥 | docs: 更新全局 AGENTS.md 规范文档添加翻译键相关约束
+- 2026-06-07 | 3a407fe9 | 鸡哥 | Merge pull request #74 from JNTMTMTM/dev
+- 2026-06-07 | 709fe3ef | 鸡哥 | refactor(cli): optimize session permission handling and improve heatmap data processing
+- 2026-06-07 | ccfecb92 | 鸡哥 | feat(cli): add documentation comments for Claude Code components
+- 2026-06-07 | 27ce9a85 | 鸡哥 | feat(user-settings): add login days and heatmap toggle functionality
+- 2026-06-07 | 0ab671c5 | 鸡哥 | Remove 'loginDays' key from internationalization files and refactor LoginHeatmap component for improved structure and readability. This change enhances the clarity of the heatmap display while maintaining functionality.
+- 2026-06-07 | 7b807a3b | 鸡哥 | feat(cli): enhance user login tracking with new heatmap feature
+- 2026-06-07 | 854cb381 | 鸡哥 | feat(cli): introduce ActivityHeatmap component and integrate into CLI and User Settings
+- 2026-06-07 | 315e0633 | 鸡哥 | feat(gsapskills): add official GSAP skills for core, frameworks, performance, plugins, and utilities
+- 2026-06-07 | 82aa64e7 | 鸡哥 | style(cli): update heatmap cell background colors for consistency
+- 2026-06-07 | ee1f8019 | 鸡哥 | fix(cli): update icon in CLI tab for heatmap toggle button
+- 2026-06-07 | 672deb34 | 鸡哥 | feat(claudeCodeStatusService): implement heatmap persistence and tracking
+- 2026-06-07 | ee616d2a | 鸡哥 | feat(cli): add activity heatmap feature to CLI tab
+- 2026-06-06 | 46b74b85 | 鸡哥 | feat(svgIcon): add FIRE icon to SvgIcon and update tests
+- 2026-06-06 | e8eb325a | 鸡哥 | fix(claudeCodeStatusService): update phase handling for session events
+- 2026-06-06 | 030be35d | 鸡哥 | refactor(claudeCodeStatusService): improve session ID resolution and merging logic
+- 2026-06-06 | bbf94104 | 鸡哥 | feat(cli): implement persistence for event streams and session data
+- 2026-06-06 | 69f6c181 | 鸡哥 | refactor(cli): improve session start event detection and notification logic
+- 2026-06-06 | 388d6995 | 鸡哥 | feat(cli): implement CLI glow window for enhanced user interaction
+- 2026-06-06 | 7aefd7ff | 鸡哥 | feat(cli): add audio feedback for CLI session notifications
+- 2026-06-06 | c81f7021 | 鸡哥 | fix(cli): refine event handling in CLI session status to include event names and improve session end detection
+- 2026-06-06 | d7176376 | 鸡哥 | feat(cli): enhance notification actions and styles for CLI session detection
+- 2026-06-06 | 37b9ea29 | 鸡哥 | feat(cli): implement notification actions for CLI session detection and enhance session status tracking
+- 2026-06-06 | 86c53a4e | 鸡哥 | feat(cli): add automatic switch to CLI view for new permission notifications when not in CLI context
+- 2026-06-06 | d085bad0 | 鸡哥 | fix(claudeCodeStatusService): update event summaries for session start, end, and user prompt submission to improve clarity and user feedback
+- 2026-06-06 | 70ea619d | 鸡哥 | feat(cli): enhance session status handling by adding notification sound for new permission requests and tracking seen permission IDs
+- 2026-06-06 | 1b3fed25 | 鸡哥 | fix(cli): update GIF selection logic in CLI state to reflect accurate session phases for improved visual feedback
+- 2026-06-06 | b8fca8c2 | 鸡哥 | feat(cli): integrate GIF icons in CLI state to enhance visual feedback based on session status and update styles for improved layout
+- 2026-06-06 | 10283aab | 鸡哥 | fix(claudeCodeStatusService): refine error handling and payload processing in createHookScript function for better hook event management
+- 2026-06-06 | ba2634e8 | 鸡哥 | fix(claudeCodeStatusService): update createHookScript function to improve payload enrichment and error handling for hook events
+- 2026-06-06 | e90a1ff9 | 鸡哥 | feat(SvgIcon): add CLAUDE_KB icon and update tests to reflect new key
+- 2026-06-06 | 585ca52f | 鸡哥 | feat(cli): add permission handling buttons in CLI event rows for user authorization decisions
+- 2026-06-06 | 75903696 | 鸡哥 | fix(cli): adjust layout and positioning in CLI state styles for improved UI consistency
+- 2026-06-06 | 856c5e12 | 鸡哥 | feat(settings): update settings sidebar tab state to default to '快速导航' page on entry, removing last tab persistence
+- 2026-06-06 | 190536ea | 鸡哥 | feat(claudeCodeStatusService): update phase handling to include 'SessionStart' and 'SubagentStart' events for improved session state management
+- 2026-06-06 | 82fb6616 | 鸡哥 | feat(claudeCodeStatusService): ignore 'Notification' events in addEvent function to prevent storage and broadcasting
+- 2026-06-06 | 85618bbb | 鸡哥 | feat(cli): implement permission handling in CLI state, adding buttons for user decisions and enhancing UI for authorization requests
+- 2026-06-06 | eceaea43 | 鸡哥 | feat(cli): enhance lyric display in CLI state with karaoke support, integrating syllable handling for improved user experience
+- 2026-06-06 | 50d2f33c | 鸡哥 | feat(cli): sync current playing song lyrics in CLI state, adding dynamic display and styling for improved user experience
+- 2026-06-06 | e31c54a1 | 鸡哥 | fix(i18n): update empty session and event messages for clarity in English and Chinese translations
+- 2026-06-06 | 60aad7a6 | 鸡哥 | chore(claudeCodeStatusService): remove 'Notification' event from HOOK_EVENTS for code cleanup
+- 2026-06-06 | 95bf349a | 鸡哥 | fix(cli): replace pagination arrows with SVG icons for improved visual consistency in CLI tab Co-Authored-By: Claude <noreply@anthropic.com>
+- 2026-06-06 | 1ea46c9e | 鸡哥 | feat(cli): implement pagination in CLI tab for event display, adding navigation buttons and updating styles
+- 2026-06-06 | c8f6458d | 鸡哥 | style(cli): enhance text handling in CLI styles by adding overflow-wrap and word-break properties for better readability
+- 2026-06-06 | b3ef22e6 | 鸡哥 | feat(cli): implement permission command display in CLI state, enhancing user feedback during authorization
+- 2026-06-06 | cffce6ad | 鸡哥 | style(cli): update CLI event display to include event tags and improve text handling in styles
+- 2026-06-06 | 26b44e17 | 鸡哥 | feat(cli): add 'enterCliState' functionality and button in CLI tab for live event stream access
+- 2026-06-06 | 83122644 | 鸡哥 | feat(cli): enhance CLI state handling by integrating island store for maxExpand tab checks
+- 2026-06-06 | 9a69fd51 | 鸡哥 | style(cli): adjust alignment and padding in CLI state content for improved layout
+- 2026-06-06 | 74de5331 | 鸡哥 | feat(cli): add CLI state handling and integration into dynamic island components
+- 2026-06-06 | 62b11b65 | 鸡哥 | refactor(cli): enhance toggle functionality and animations for CLI event card details
+- 2026-06-06 | 694ad5ba | 鸡哥 | feat(cli): implement bulk session selection and deletion in CLI tab with updated UI elements
+- 2026-06-06 | 78ad2722 | 鸡哥 | feat(cli): integrate GSAP for animation effects on CLI event cards and update dependencies
+- 2026-06-06 | c85ea059 | 鸡哥 | feat(cli): add animation to CLI event cards for smoother entry transition
+- 2026-06-06 | af4971d4 | 鸡哥 | fix(cli): update clipped function limit to 1000 and remove overflow hidden from CLI styles for better text handling
+- 2026-06-06 | add27cd8 | 鸡哥 | feat(cli): add permission event styling to CLI event cards for enhanced visual distinction
+- 2026-06-06 | 4c3e60c0 | 鸡哥 | feat(cli): add stop event styling to CLI event cards for better visual distinction
+- 2026-06-06 | e13ba567 | 鸡哥 | style(cli): reorganize CLI event card header layout and add tool tag for improved visual clarity
+- 2026-06-06 | 99e55748 | 鸡哥 | feat(cli): add expandable details to CLI event cards with improved toggle functionality and styles
+- 2026-06-06 | 193fbe71 | 鸡哥 | feat(cli): implement progressive loading for CLI events with IntersectionObserver and update styles for event sentinel
+- 2026-06-06 | aa29d9a8 | 鸡哥 | feat(cli): integrate ReactMarkdown for event summaries in CliTab and enhance styles for markdown elements
+- 2026-06-06 | fcfb7875 | 鸡哥 | style(cli): enhance cli-event-card styles with overflow handling and improved text display
+- 2026-06-06 | b18f6cdf | 鸡哥 | style(cli): enhance cli-tab-phase styles for better layout and alignment
+- 2026-06-06 | ecbe2697 | 鸡哥 | style(cli): update cli-tab-permission styles for improved layout and alignment
+- 2026-06-06 | b63e6ff0 | 鸡哥 | feat(cli): add AgentIcon to CLI tab for enhanced session representation and update styles for improved layout
+- 2026-06-06 | c4abeb0a | 鸡哥 | feat(cli): add permission project label to CLI tab for enhanced user clarity in permission status
+- 2026-06-06 | 0e25cde1 | 鸡哥 | fix(cli): correct SVG icon rendering issue in CLI tab for better visual consistency
+- 2026-06-06 | 7faedc86 | 鸡哥 | refactor(cli): replace SVG filter icon with image component for improved performance and maintainability
+- 2026-06-06 | 73d30d9c | 鸡哥 | feat(svg): add FILTER icon to SvgIcon and update tests to reflect the change
+- 2026-06-06 | f675ec5d | 鸡哥 | feat(cli): implement filter visibility toggle in CLI tab with corresponding styles for enhanced user interaction
+- 2026-06-06 | 965a2169 | 鸡哥 | style(cli): add RTL support and left text alignment for improved readability in CLI tab
+- 2026-06-06 | 30c3814d | 鸡哥 | style(cli): update color scheme for CLI tab elements to improve visual consistency and user experience
+- 2026-06-06 | 1b1f3d6e | 鸡哥 | feat(transcript): add sessionId field to ClaudeTranscriptDetails and update related functions for improved session tracking
+- 2026-06-06 | 5d3bc262 | 鸡哥 | feat(i18n): add external agent notifications in English and Chinese translations
+- 2026-06-06 | 6e4454df | 鸡哥 | style(cli): update icon in CLI tab button to reflect hook state for improved user feedback
+- 2026-06-06 | 791c97b5 | 鸡哥 | style(cli): update button layout and add icons for CLI tab actions to enhance user experience
+- 2026-06-06 | 03146c3f | 鸡哥 | feat(cli): add session selection feature to CLI tab with improved layout and event filtering
+- 2026-06-06 | c43411cb | 鸡哥 | style(cli): update padding and height for CLI tab elements to enhance layout consistency
+- 2026-06-06 | 96594cbb | 鸡哥 | fix(notification): set default state for agent notification to disabled in hooks and settings page
+- 2026-06-06 | c7bafd11 | 鸡哥 | feat(notification): add agent launch notification settings and functionality for enabling/disabling notifications
+- 2026-06-06 | a49de8a7 | 鸡哥 | feat(svg): add CLAUDE SVG icon and corresponding TypeScript module with unit tests
+- 2026-06-06 | 60e9feeb | 鸡哥 | feat(transcript): enhance transcript details with additional fields for tool usage and notifications
+- 2026-06-06 | 69764949 | 鸡哥 | feat(cli): enhance CLI tab with event filtering options and improved layout for better user interaction
+- 2026-06-06 | a7ad0f37 | 鸡哥 | refactor(cli): simplify CliTab component by removing unused state and styling for improved clarity
+- 2026-06-06 | 2d17c0a9 | 鸡哥 | style(cli): refactor event row to card layout with updated styles for improved readability and consistency
+- 2026-06-06 | f67d7c4c | 鸡哥 | feat(cli): add CLI tab selectors to wheel navigation exclusions for improved user experience
+- 2026-06-06 | ec6229f4 | 鸡哥 | refactor(cli): update CliTab layout and styles for improved usability and visual consistency
+- 2026-06-05 | 18ce4998 | 鸡哥 | feat(cli): add CLI Console support with real-time session monitoring and event handling
+- 2026-06-05 | 2d669409 | 鸡哥 | fix(notification): ensure notified processes are removed when external agents stop
+- 2026-06-05 | 6b520404 | 鸡哥 | feat(notification): update external agent notifications to handle multiple agent names for start/stop events
+- 2026-06-05 | bdb1cfd8 | 鸡哥 | feat(notification): enhance external agent notifications with start/stop events and UI updates
+- 2026-06-05 | a93d9ba4 | 鸡哥 | feat(notification): add external agent detection notifications and related UI updates
+- 2026-06-05 | 016acb64 | 鸡哥 | style(url-favorites): tighten gap between URL list and input bar when panels collapsed
+- 2026-06-05 | 276dcfe1 | 鸡哥 | feat(url-favorites): add folder management features and enhance UI for URL favorites
+- 2026-06-05 | bdb87e37 | 鸡哥 | feat(url-favorites): add manage import/export button and enhance UI for URL favorites
+- 2026-06-05 | 0e4bb3d9 | 鸡哥 | feat(url-favorites): implement import and export functionality for URL favorites with corresponding UI updates and messages
+- 2026-06-05 | 1c893a9e | 鸡哥 | feat(translation): enhance language selection icons in TranslationTab and TranslateToolSection with AI icon support
+- 2026-06-05 | 9034df48 | 鸡哥 | fix(translation): stop scroll event propagation in TranslationTab textareas for better user experience
+- 2026-06-05 | e2e1e6a3 | 鸡哥 | fix(translation): prevent scroll event propagation in TranslationTab textareas and enhance scrollbar styles
+- 2026-06-05 | 500352a3 | 鸡哥 | feat(translation): implement dropdown language selection in TranslationTab with improved styling and accessibility
+- 2026-06-05 | 5bdb26a2 | 鸡哥 | feat(translation): add copy button to TranslationTab and adjust layout styles
+- 2026-06-05 | a6109e53 | 鸡哥 | style(translation): update textarea styles for improved appearance and focus state
+- 2026-06-05 | 1f3e9ae8 | 鸡哥 | feat(translation): enhance TranslationTab accessibility and improve button styles
+- 2026-06-05 | 320e8813 | 鸡哥 | feat(translation): implement translation tab with language selection and functionality in English and Chinese
+- 2026-06-05 | 2b9c4910 | 鸡哥 | feat(i18n): add translation tab and corresponding labels in English and Chinese
+- 2026-06-04 | 782cc36e | 鸡哥 | fix(tsconfig): update ignoreDeprecations option from 6.0 to 5.0
+- 2026-06-04 | 333aa5be | 鸡哥 | fix(ci): use HEAD~1 instead of HEAD^ to avoid Windows cmd.exe escaping
