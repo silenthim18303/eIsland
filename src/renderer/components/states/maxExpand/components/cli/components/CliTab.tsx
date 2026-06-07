@@ -126,6 +126,10 @@ function EventRow({ event, t, showPermission }: { event: CliHookEvent; t: (key: 
   );
 }
 
+/**
+ * Claude Code CLI 状态控制面板主组件
+ * @returns CLI 面板 React 元素
+ */
 export function CliTab(): ReactElement {
   const { t } = useTranslation();
   const setCli = useIslandStore((s) => s.setCli);

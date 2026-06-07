@@ -51,6 +51,12 @@ export function filterLabel(filter: CliEventFilter, t: (key: string, opts?: Reco
   return t(`maxExpand.cli.filters.${filter}`, { defaultValue: filter });
 }
 
+/**
+ * 将授权事件转为可读的授权项目标签
+ * @param event - CLI hook 事件
+ * @param t - i18n 翻译函数
+ * @returns 授权项目标签文本
+ */
 export function permissionProjectLabel(event: CliHookEvent, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const project = event.toolName ?? event.toolInputPreview ?? event.summary;
   return t('maxExpand.cli.permissionProject', { defaultValue: '授权项目：{{project}}', project });

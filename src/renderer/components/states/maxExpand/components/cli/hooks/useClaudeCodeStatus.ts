@@ -27,6 +27,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { EMPTY_CLI_STATUS, type CliStatusSnapshot } from '../config/types';
 
+/**
+ * Claude Code CLI 面板状态订阅 hook
+ * @returns 包含快照、加载状态、操作方法的对象
+ */
 export function useClaudeCodeStatus(): {
   snapshot: CliStatusSnapshot;
   loading: boolean;

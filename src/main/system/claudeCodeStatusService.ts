@@ -490,6 +490,11 @@ function removeManagedGroups(groups: unknown): Record<string, unknown>[] {
     .filter((group) => Array.isArray(group.hooks) && group.hooks.length > 0);
 }
 
+/**
+ * 创建 Claude Code 状态服务实例
+ * @param options - 创建参数，包含主窗口获取函数和可选端口号
+ * @returns 状态服务实例
+ */
 export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusServiceOptions): ClaudeCodeStatusService {
   const port = options.port ?? DEFAULT_PORT;
   const settingsPath = join(app.getPath('home'), '.claude', 'settings.json');

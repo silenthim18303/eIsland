@@ -31,6 +31,11 @@ interface RegisterClaudeCodeStatusIpcHandlersOptions {
   service: ClaudeCodeStatusService;
 }
 
+/**
+ * 注册 Claude Code 状态相关的 IPC 处理器
+ * @param options - 注册参数，包含状态服务实例
+ * @returns void
+ */
 export function registerClaudeCodeStatusIpcHandlers(options: RegisterClaudeCodeStatusIpcHandlersOptions): void {
   ipcMain.handle('claude-code:status:get', () => options.service.getSnapshot());
   ipcMain.handle('claude-code:hook:install', () => options.service.installHook());

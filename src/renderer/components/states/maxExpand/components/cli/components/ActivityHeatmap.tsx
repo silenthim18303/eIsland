@@ -40,6 +40,11 @@ interface ActivityHeatmapProps {
   visible?: boolean;
 }
 
+/**
+ * Claude Code 活动热力图组件
+ * @param props - 组件属性
+ * @returns 热力图 React 元素
+ */
 export function ActivityHeatmap({ heatmap, compact = false, visible = true }: ActivityHeatmapProps): ReactElement {
   const { t } = useTranslation();
   const [metric, setMetric] = useState<HeatmapMetric>('session');

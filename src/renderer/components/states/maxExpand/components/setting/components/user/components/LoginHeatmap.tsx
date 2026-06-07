@@ -37,6 +37,11 @@ interface LoginHeatmapProps {
   visible?: boolean;
 }
 
+/**
+ * 登录天数热力图组件
+ * @param props - 组件属性
+ * @returns 热力图 React 元素
+ */
 export function LoginHeatmap({ loginDays, compact = false, visible = true }: LoginHeatmapProps): ReactElement {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
