@@ -54,13 +54,13 @@ export function ActivityHeatmap({ heatmap, compact = false, visible = true }: Ac
   const grid = useMemo(() => {
     const totals = { session: 0, tool: 0, prompt: 0 };
     const dayCounts = new Map<string, number>();
-    for (const [key, counts] of Object.entries(heatmap)) {
+    Object.entries(heatmap).forEach(([key, counts]) => {
       totals.session += counts.session;
       totals.tool += counts.tool;
       totals.prompt += counts.prompt;
       const value = counts[metric];
       if (value > 0) dayCounts.set(key, value);
-    }
+    });
     const { months, max } = buildHeatmapMonths((key) => dayCounts.get(key) ?? 0);
     return { months, max, totals };
   }, [heatmap, metric]);

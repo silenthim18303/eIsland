@@ -166,11 +166,8 @@ function jsonValueString(value: unknown): string | null {
 function toolInputPreviewFrom(toolInput: unknown): string | null {
   const record = asRecord(toolInput);
   const priorityKeys = ['command', 'file_path', 'pattern', 'query', 'prompt', 'description', 'skill', 'url'];
-  for (const key of priorityKeys) {
-    const value = asString(record[key]);
-    if (value) return clipped(value);
-  }
-  return clipped(jsonValueString(toolInput));
+  const match = priorityKeys.map((key) => asString(record[key])).find(Boolean);
+  return clipped(match ?? jsonValueString(toolInput));
 }
 
 function notificationPreview(payload: Record<string, unknown>): string | null {
@@ -196,11 +193,7 @@ function detailValue(value: unknown): string | null {
 }
 
 function firstDetailValue(payload: Record<string, unknown>, keys: string[]): string | null {
-  for (const key of keys) {
-    const value = detailValue(payload[key]);
-    if (value) return value;
-  }
-  return null;
+  return keys.reduce<string | null>((found, key) => found ?? detailValue(payload[key]), null);
 }
 
 function textFromContent(value: unknown): string | null {
@@ -224,14 +217,14 @@ function transcriptTextFromRole(transcriptPath: string | null, roleName: 'user' 
   if (!transcriptPath || !existsSync(transcriptPath)) return null;
   try {
     const lines = readFileSync(transcriptPath, 'utf-8').trim().split(/\r?\n/).slice(-120).reverse();
-    for (const line of lines) {
+    return lines.reduce<string | null>((found, line) => {
+      if (found) return found;
       const entry = asRecord(JSON.parse(line));
       const message = asRecord(entry.message);
       const role = asString(message.role) ?? asString(entry.role);
-      if (role !== roleName) continue;
-      const content = textFromContent(message.content) ?? textFromContent(entry.content);
-      if (content) return content;
-    }
+      if (role !== roleName) return null;
+      return textFromContent(message.content) ?? textFromContent(entry.content);
+    }, null);
   } catch {
     return null;
   }
@@ -280,22 +273,22 @@ function contentBlocks(value: unknown): Record<string, unknown>[] {
 
 function textBlockValue(value: unknown): string | null {
   if (typeof value === 'string') return clipped(value, 140);
-  for (const block of contentBlocks(value)) {
-    if (asString(block.type) !== 'text') continue;
-    const text = asString(block.text);
-    if (text) return clipped(text, 140);
-  }
-  return null;
+  const text = contentBlocks(value)
+    .filter((block) => asString(block.type) === 'text')
+    .map((block) => asString(block.text))
+    .find(Boolean);
+  return text ? clipped(text, 140) : null;
 }
 
 function toolResultFromContent(value: unknown, expectedToolUseId: string | null): { id: string | null; value: string | null } | null {
-  for (const block of contentBlocks(value)) {
-    if (asString(block.type) !== 'tool_result') continue;
+  const match = contentBlocks(value).find((block) => {
+    if (asString(block.type) !== 'tool_result') return false;
     const id = asString(block.tool_use_id) ?? asString(block.toolUseId);
-    if (expectedToolUseId && id !== expectedToolUseId) continue;
-    return { id, value: detailValue(block.content) ?? textBlockValue(block.content) ?? detailValue(block) };
-  }
-  return null;
+    return !expectedToolUseId || id === expectedToolUseId;
+  });
+  if (!match) return null;
+  const id = asString(match.tool_use_id) ?? asString(match.toolUseId);
+  return { id, value: detailValue(match.content) ?? textBlockValue(match.content) ?? detailValue(match) };
 }
 
 function toolUseFromContent(
@@ -303,18 +296,20 @@ function toolUseFromContent(
   expectedToolUseId: string | null,
   expectedToolName: string | null,
 ): { id: string; name: string; input: unknown; preview: string | null } | null {
-  const blocks = contentBlocks(value).reverse();
-  for (const block of blocks) {
-    if (asString(block.type) !== 'tool_use') continue;
+  const match = contentBlocks(value).reverse().find((block) => {
+    if (asString(block.type) !== 'tool_use') return false;
     const id = asString(block.id);
     const name = asString(block.name);
-    if (!id || !name) continue;
-    if (expectedToolUseId && id !== expectedToolUseId) continue;
-    if (!expectedToolUseId && expectedToolName && name !== expectedToolName) continue;
-    const input = block.input;
-    return { id, name, input, preview: toolInputPreviewFrom(input) };
-  }
-  return null;
+    if (!id || !name) return false;
+    if (expectedToolUseId && id !== expectedToolUseId) return false;
+    if (!expectedToolUseId && expectedToolName && name !== expectedToolName) return false;
+    return true;
+  });
+  if (!match) return null;
+  const id = asString(match.id)!;
+  const name = asString(match.name)!;
+  const input = match.input;
+  return { id, name, input, preview: toolInputPreviewFrom(input) };
 }
 
 function readClaudeTranscriptDetails(transcriptPath: string | null, payload: Record<string, unknown>): ClaudeTranscriptDetails {
@@ -324,7 +319,7 @@ function readClaudeTranscriptDetails(transcriptPath: string | null, payload: Rec
   const details = emptyTranscriptDetails();
   try {
     const lines = readFileSync(transcriptPath, 'utf-8').trim().split(/\r?\n/).slice(-260).reverse();
-    for (const line of lines) {
+    lines.some((line) => {
       const entry = asRecord(JSON.parse(line));
       details.sessionId = details.sessionId ?? asString(entry.sessionId) ?? asString(entry.session_id);
       const message = asRecord(entry.message);
@@ -354,8 +349,8 @@ function readClaudeTranscriptDetails(transcriptPath: string | null, payload: Rec
       } else if (asString(entry.type) === 'summary' && !details.assistantOutput) {
         details.assistantOutput = asString(entry.summary);
       }
-      if (details.userInput && details.assistantOutput && details.toolName && details.toolInputPreview && details.toolResult) break;
-    }
+      return Boolean(details.userInput && details.assistantOutput && details.toolName && details.toolInputPreview && details.toolResult);
+    });
   } catch {
     return emptyTranscriptDetails();
   }
@@ -457,7 +452,7 @@ function phaseAfterEvent(current: ClaudeCodeSessionPhase, event: ClaudeCodeHookE
 }
 
 function createHookScript(port: number): string {
-  return `const http = require('http');\nconst fs = require('fs');\nconst os = require('os');\nconst path = require('path');\nconst hookEventName = process.argv[2] || null;\nlet input = '';\nfunction normalize(value) { return String(value || '').replace(/\\\\/g, '/').toLowerCase(); }\nfunction readJsonLine(filePath, fromEnd) {\n  try {\n    const text = fs.readFileSync(filePath, 'utf8').trim();\n    const lines = text.split(/\\r?\\n/);\n    const selected = fromEnd ? lines.slice(-80).reverse() : lines.slice(0, 80);\n    for (const line of selected) {\n      try { return JSON.parse(line); } catch (_) {}\n    }\n  } catch (_) {}\n  return null;\n}\nfunction entryCwd(filePath) {\n  const first = readJsonLine(filePath, false);\n  if (first && typeof first.cwd === 'string' && first.cwd) return first.cwd;\n  const recent = readJsonLine(filePath, true);\n  if (recent && typeof recent.cwd === 'string' && recent.cwd) return recent.cwd;\n  return null;\n}\nfunction collectJsonlFiles(dir, output, deadline) {\n  if (Date.now() > deadline || output.length > 240) return;\n  let entries = [];\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { return; }\n  for (const entry of entries) {\n    if (Date.now() > deadline || output.length > 240) return;\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name !== 'subagents') collectJsonlFiles(fullPath, output, deadline);\n      continue;\n    }\n    if (entry.isFile() && entry.name.endsWith('.jsonl')) {\n      try { output.push({ path: fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs }); } catch (_) {}\n    }\n  }\n}\nfunction latestTranscriptForCwd(cwd) {\n  const root = path.join(os.homedir(), '.claude', 'projects');\n  const files = [];\n  collectJsonlFiles(root, files, Date.now() + 650);\n  const normalizedCwd = normalize(cwd);\n  const recentFiles = files.sort((a, b) => b.mtimeMs - a.mtimeMs).slice(0, 80);\n  for (const file of recentFiles) {\n    const fileCwd = entryCwd(file.path);\n    if (fileCwd && normalize(fileCwd) === normalizedCwd) return file.path;\n  }\n  return recentFiles[0] ? recentFiles[0].path : null;\n}\nfunction enrichPayload(payload) {\n  const cwd = payload.cwd || payload.project_dir || payload.projectDir || process.cwd();\n  if (!payload.cwd) payload.cwd = cwd;\n  if (!payload.transcript_path && !payload.transcriptPath) {\n    const transcriptPath = latestTranscriptForCwd(cwd);\n    if (transcriptPath) payload.transcript_path = transcriptPath;\n  }\n  return payload;\n}\nprocess.stdin.setEncoding('utf8');\nprocess.stdin.on('data', chunk => { input += chunk; });\nprocess.stdin.on('end', () => {\n  let payload = {};\n  try { payload = input.trim() ? JSON.parse(input) : {}; } catch (error) { payload = { parseError: String(error), raw: input }; }\n  if (hookEventName && !payload.hook_event_name) payload.hook_event_name = hookEventName;\n  payload = enrichPayload(payload);\n  const body = JSON.stringify(payload);\n  const isPermission = hookEventName === 'PermissionRequest';\n  const req = http.request({ hostname: '127.0.0.1', port: ${port}, path: '/claude-code/hook', method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) }, timeout: isPermission ? ${PERMISSION_WAIT_TIMEOUT_MS + 5000} : 1500 }, res => { let resBody = ''; res.setEncoding('utf8'); res.on('data', c => { resBody += c; }); res.on('end', () => { if (isPermission) { try { const parsed = JSON.parse(resBody || '{}'); const decision = parsed && parsed.decision; if (decision === 'deny') { process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true, hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: { behavior: 'deny', message: 'User denied the permission request', interrupt: false } } })); } else if (decision === 'allow' || decision === 'always') { process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true, hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: { behavior: 'allow' } } })); } } catch (_) {} } process.exit(0); }); });\n  req.on('timeout', () => { req.destroy(); process.exit(0); });\n  req.on('error', () => process.exit(0));\n  req.write(body);\n  req.end();\n});\n  if (hookEventName !== 'PermissionRequest') setTimeout(() => process.exit(0), 2500);\n`;
+  return `const http = require('http');\nconst fs = require('fs');\nconst os = require('os');\nconst path = require('path');\nconst hookEventName = process.argv[2] || null;\nlet input = '';\nfunction normalize(value) { return String(value || '').replace(/\\\\/g, '/').toLowerCase(); }\nfunction readJsonLine(filePath, fromEnd) {\n  try {\n    const text = fs.readFileSync(filePath, 'utf8').trim();\n    const lines = text.split(/\\r?\\n/);\n    const selected = fromEnd ? lines.slice(-80).reverse() : lines.slice(0, 80);\n    let _parsed = null;\n    selected.some((line) => { try { _parsed = JSON.parse(line); return true; } catch (_) { return false; } });\n    return _parsed;\n  } catch (_) {}\n  return null;\n}\nfunction entryCwd(filePath) {\n  const first = readJsonLine(filePath, false);\n  if (first && typeof first.cwd === 'string' && first.cwd) return first.cwd;\n  const recent = readJsonLine(filePath, true);\n  if (recent && typeof recent.cwd === 'string' && recent.cwd) return recent.cwd;\n  return null;\n}\nfunction collectJsonlFiles(dir, output, deadline) {\n  if (Date.now() > deadline || output.length > 240) return;\n  let entries = [];\n  try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch (_) { return; }\n  let _done = false;\n  entries.forEach((entry) => {\n    if (_done) return;\n    if (Date.now() > deadline || output.length > 240) { _done = true; return; }\n    const fullPath = path.join(dir, entry.name);\n    if (entry.isDirectory()) {\n      if (entry.name !== 'subagents') collectJsonlFiles(fullPath, output, deadline);\n      return;\n    }\n    if (entry.isFile() && entry.name.endsWith('.jsonl')) {\n      try { output.push({ path: fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs }); } catch (_) {}\n    }\n  });\n}\nfunction latestTranscriptForCwd(cwd) {\n  const root = path.join(os.homedir(), '.claude', 'projects');\n  const files = [];\n  collectJsonlFiles(root, files, Date.now() + 650);\n  const normalizedCwd = normalize(cwd);\n  const recentFiles = files.sort((a, b) => b.mtimeMs - a.mtimeMs).slice(0, 80);\n  const _matched = recentFiles.find((file) => { const fileCwd = entryCwd(file.path); return fileCwd && normalize(fileCwd) === normalizedCwd; });\n  if (_matched) return _matched.path;\n  return recentFiles[0] ? recentFiles[0].path : null;\n}\nfunction enrichPayload(payload) {\n  const cwd = payload.cwd || payload.project_dir || payload.projectDir || process.cwd();\n  if (!payload.cwd) payload.cwd = cwd;\n  if (!payload.transcript_path && !payload.transcriptPath) {\n    const transcriptPath = latestTranscriptForCwd(cwd);\n    if (transcriptPath) payload.transcript_path = transcriptPath;\n  }\n  return payload;\n}\nprocess.stdin.setEncoding('utf8');\nprocess.stdin.on('data', chunk => { input += chunk; });\nprocess.stdin.on('end', () => {\n  let payload = {};\n  try { payload = input.trim() ? JSON.parse(input) : {}; } catch (error) { payload = { parseError: String(error), raw: input }; }\n  if (hookEventName && !payload.hook_event_name) payload.hook_event_name = hookEventName;\n  payload = enrichPayload(payload);\n  const body = JSON.stringify(payload);\n  const isPermission = hookEventName === 'PermissionRequest';\n  const req = http.request({ hostname: '127.0.0.1', port: ${port}, path: '/claude-code/hook', method: 'POST', headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(body) }, timeout: isPermission ? ${PERMISSION_WAIT_TIMEOUT_MS + 5000} : 1500 }, res => { let resBody = ''; res.setEncoding('utf8'); res.on('data', c => { resBody += c; }); res.on('end', () => { if (isPermission) { try { const parsed = JSON.parse(resBody || '{}'); const decision = parsed && parsed.decision; if (decision === 'deny') { process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true, hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: { behavior: 'deny', message: 'User denied the permission request', interrupt: false } } })); } else if (decision === 'allow' || decision === 'always') { process.stdout.write(JSON.stringify({ continue: true, suppressOutput: true, hookSpecificOutput: { hookEventName: 'PermissionRequest', decision: { behavior: 'allow' } } })); } } catch (_) {} } process.exit(0); }); });\n  req.on('timeout', () => { req.destroy(); process.exit(0); });\n  req.on('error', () => process.exit(0));\n  req.write(body);\n  req.end();\n});\n  if (hookEventName !== 'PermissionRequest') setTimeout(() => process.exit(0), 2500);\n`;
 }
 
 function shellQuote(value: string): string {
@@ -577,7 +572,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       const loadedSessions = Array.isArray(root.sessions) ? (root.sessions as ClaudeCodeSessionSnapshot[]) : [];
       events = loadedEvents.slice(0, MAX_EVENTS);
       sessions.clear();
-      for (const session of loadedSessions) {
+      loadedSessions.forEach((session) => {
         if (session && typeof session.id === 'string') {
           // 重启后无法再响应历史待授权请求，挂起态归并为已结束/空闲展示
           const phase = session.phase === 'waiting_permission' ? 'idle' : session.phase;
@@ -586,7 +581,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
           if (session.cwd) cwdToSession.set(session.cwd, session.id);
           if (session.transcriptPath) transcriptToSession.set(session.transcriptPath, session.id);
         }
-      }
+      });
     } catch {
       // 读取失败时忽略，使用空状态
     }
@@ -598,14 +593,14 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       const root = asRecord(JSON.parse(readFileSync(persistHeatmapPath, 'utf-8')));
       const daily = asRecord(root.daily);
       const next: ClaudeCodeHeatmapDaily = {};
-      for (const [key, value] of Object.entries(daily)) {
+      Object.entries(daily).forEach(([key, value]) => {
         const rec = asRecord(value);
         next[key] = {
           session: typeof rec.session === 'number' ? rec.session : 0,
           tool: typeof rec.tool === 'number' ? rec.tool : 0,
           prompt: typeof rec.prompt === 'number' ? rec.prompt : 0,
         };
-      }
+      });
       heatmapDaily = next;
     } catch {
       // 读取失败时忽略，使用空状态
@@ -637,14 +632,14 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       const root = asRecord(JSON.parse(raw));
       const hooks = asRecord(root.hooks);
       let changed = false;
-      for (const spec of HOOK_EVENTS) {
+      HOOK_EVENTS.forEach((spec) => {
         const currentGroups = removeManagedGroups(hooks[spec.name]);
         const nextGroups = [...currentGroups, managedHook(buildManagedCommand(hookScriptPath, spec.name), spec.matcher, spec.timeout)];
         if (JSON.stringify(hooks[spec.name]) !== JSON.stringify(nextGroups)) {
           hooks[spec.name] = nextGroups;
           changed = true;
         }
-      }
+      });
       if (changed) writeFileSync(settingsPath, JSON.stringify({ ...root, hooks }, null, 2), 'utf-8');
     } catch {
       // Keep status receiver available even if Claude settings cannot be migrated.
@@ -735,12 +730,12 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       }
       sessions.delete(fromId);
     }
-    for (const [key, value] of transcriptToSession) {
+    transcriptToSession.forEach((value, key) => {
       if (value === fromId) transcriptToSession.set(key, toId);
-    }
-    for (const [key, value] of cwdToSession) {
+    });
+    cwdToSession.forEach((value, key) => {
       if (value === fromId) cwdToSession.set(key, toId);
-    }
+    });
   };
 
   /**
@@ -930,7 +925,7 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
 
   function stop(): void {
     if (!server) return;
-    for (const sessionId of Array.from(permissionWaiters.keys())) respondPermission(sessionId, null);
+    Array.from(permissionWaiters.keys()).forEach((sessionId) => respondPermission(sessionId, null));
     server.close();
     server = null;
     receiverUrl = null;
@@ -943,10 +938,10 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       mkdirSync(dirname(settingsPath), { recursive: true });
       const root = existsSync(settingsPath) ? asRecord(JSON.parse(readFileSync(settingsPath, 'utf-8'))) : {};
       const hooks = asRecord(root.hooks);
-      for (const spec of HOOK_EVENTS) {
+      HOOK_EVENTS.forEach((spec) => {
         const currentGroups = removeManagedGroups(hooks[spec.name]);
         hooks[spec.name] = [...currentGroups, managedHook(buildManagedCommand(hookScriptPath, spec.name), spec.matcher, spec.timeout)];
-      }
+      });
       writeFileSync(settingsPath, JSON.stringify({ ...root, hooks }, null, 2), 'utf-8');
       emitSnapshot();
       return { ok: true, message: 'Claude Code 状态 hook 已启用。', snapshot: getSnapshot() };
@@ -961,11 +956,11 @@ export function createClaudeCodeStatusService(options: CreateClaudeCodeStatusSer
       const root = asRecord(JSON.parse(readFileSync(settingsPath, 'utf-8')));
       const hooks = asRecord(root.hooks);
       // 遍历所有已存在的 hook 键，清除托管分组（含历史遗留/已移除的事件，如 Notification）
-      for (const name of Object.keys(hooks)) {
+      Object.keys(hooks).forEach((name) => {
         const currentGroups = removeManagedGroups(hooks[name]);
         if (currentGroups.length > 0) hooks[name] = currentGroups;
         else delete hooks[name];
-      }
+      });
       const nextRoot = Object.keys(hooks).length > 0 ? { ...root, hooks } : { ...root };
       if (Object.keys(hooks).length === 0) delete nextRoot.hooks;
       writeFileSync(settingsPath, JSON.stringify(nextRoot, null, 2), 'utf-8');

@@ -78,7 +78,8 @@ export function createExternalAgentWatcher(options: CreateExternalAgentWatcherOp
       const startedNames: string[] = [];
       const stoppedNames: string[] = [];
 
-      for (const processName of AGENT_PROCESS_NAMES) {
+      await AGENT_PROCESS_NAMES.reduce(async (prev, processName) => {
+        await prev;
         const running = await hasAnyRunningProcess([processName]);
         const agentName = AGENT_PROCESS_MAP[processName] ?? processName;
 
@@ -95,7 +96,7 @@ export function createExternalAgentWatcher(options: CreateExternalAgentWatcherOp
           notifiedProcesses.delete(processName);
           stoppedNames.push(agentName);
         }
-      }
+      }, Promise.resolve());
 
       if (startedNames.length > 0) {
         mainWindow.webContents.send('external-agent:started', { agentNames: [...new Set(startedNames)] });

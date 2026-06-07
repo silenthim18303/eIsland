@@ -52,12 +52,11 @@ export function useClaudeCliSessionStatus(): {
       hasActiveSessionRef.current = snapshot.sessions.some((session) => session.phase !== 'completed');
 
       // 收集当前所有待授权事件 id
-      const pendingIds = new Set<string>();
-      for (const session of snapshot.sessions) {
-        if (session.phase === 'waiting_permission' && session.pendingPermission?.id) {
-          pendingIds.add(session.pendingPermission.id);
-        }
-      }
+      const pendingIds = new Set<string>(
+        snapshot.sessions
+          .filter((session) => session.phase === 'waiting_permission' && session.pendingPermission?.id)
+          .map((session) => session.pendingPermission!.id),
+      );
 
       const topEvent = snapshot.events?.[0];
       const topEventId = topEvent?.id ?? null;
@@ -66,16 +65,15 @@ export function useClaudeCliSessionStatus(): {
 
       // 首次快照只记录基线，不触发音效；之后出现新的待授权请求才播放
       if (initializedRef.current) {
-        for (const id of pendingIds) {
-          if (!seenPermissionIdsRef.current.has(id)) {
-            playNotificationSoundOnce();
-            // 若当前不在 CLI 视图（cli 态 / maxExpand 的 CLI 标签），切换到 cli 态展示授权
-            const store = useIslandStore.getState();
-            const inCliView = store.state === 'cli' || (store.state === 'maxExpand' && store.maxExpandTab === 'cli');
-            if (!inCliView) store.setCli();
-            break;
-          }
-        }
+        [...pendingIds].some((id) => {
+          if (seenPermissionIdsRef.current.has(id)) return false;
+          playNotificationSoundOnce();
+          // 若当前不在 CLI 视图（cli 态 / maxExpand 的 CLI 标签），切换到 cli 态展示授权
+          const store = useIslandStore.getState();
+          const inCliView = store.state === 'cli' || (store.state === 'maxExpand' && store.maxExpandTab === 'cli');
+          if (!inCliView) store.setCli();
+          return true;
+        });
 
         // 只要检测到新的 SessionStart 事件，就弹通知 + 音效 + 光效（不再限制每次启动仅一次）
         if (topEventId && topEventId !== baselineTopEventIdRef.current && isSessionStartEvent) {

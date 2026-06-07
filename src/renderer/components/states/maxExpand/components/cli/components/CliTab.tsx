@@ -205,11 +205,11 @@ export function CliTab(): ReactElement {
   const selectedSessionCount = selectedSessionIds.size;
   // 仍在等待授权的会话，其待授权事件 id —— 仅这些事件卡片显示授权按钮
   const pendingPermissionEventIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const session of snapshot.sessions) {
-      if (session.phase === 'waiting_permission' && session.pendingPermission) ids.add(session.pendingPermission.id);
-    }
-    return ids;
+    return new Set<string>(
+      snapshot.sessions
+        .filter((session) => session.phase === 'waiting_permission' && session.pendingPermission)
+        .map((session) => session.pendingPermission!.id),
+    );
   }, [snapshot.sessions]);
 
   return (
