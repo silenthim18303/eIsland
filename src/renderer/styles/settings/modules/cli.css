@@ -582,6 +582,9 @@
 .cli-tab-heatmap-cell.level-3 { background: rgba(100, 180, 255, 0.72); }
 .cli-tab-heatmap-cell.level-4 { background: rgba(100, 180, 255, 0.95); }
 
+/* 登录热力图：所有登录日使用同一颜色，不分强度 */
+.cli-tab-heatmap-cell--login { background: rgba(100, 180, 255, 0.85); }
+
 /* ── 紧凑模式：用于用户中心等空间受限处，整体高度较 CLI 面板更小 ── */
 .cli-tab-heatmap-metrics--compact {
   gap: 4px;

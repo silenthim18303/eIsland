@@ -55,8 +55,8 @@ import {
   type UserAccountProfile,
 } from '../../../../../../../utils/userAccount';
 import { SvgIcon } from '../../../../../../../utils/SvgIcon';
-import { ActivityHeatmap } from '../../../cli/components/ActivityHeatmap';
-import { useClaudeCodeHeatmap } from '../../../cli/hooks/useClaudeCodeHeatmap';
+import { LoginHeatmap } from './components/LoginHeatmap';
+import { readLoginDays, recordLoginDay } from './utils/loginHeatmapStorage';
 import '../../../../../../../styles/settings/modules/cli.css';
 
 type FeedbackType = 'success' | 'error' | 'info';
@@ -183,8 +183,8 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
   const [rechargeFeedback, setRechargeFeedback] = useState<Feedback | null>(null);
   const [userBalance, setUserBalance] = useState<string | null>(null);
 
-  /** 用户中心活动热力图数据：与 CLI 面板共享同一持久化源 */
-  const activityHeatmap = useClaudeCodeHeatmap();
+  /** 用户中心登录天数热力图：记录并展示当前用户每个自然日是否登录 */
+  const [loginDays, setLoginDays] = useState<Set<string>>(() => readLoginDays(profile?.username));
 
   const currentUserProfilePageLabel = t(`settings.user.pages.${userProfilePage}`, {
     defaultValue: userProfilePage === 'info'
@@ -321,6 +321,14 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
     syncSession();
     return subscribeUserAccountSessionChanged(syncSession);
   }, []);
+
+  // 登录态有效时记录今日登录，并刷新热力图数据
+  useEffect(() => {
+    const username = profile?.username;
+    if (!token || !username) return;
+    recordLoginDay(username);
+    setLoginDays(readLoginDays(username));
+  }, [token, profile?.username]);
 
   useEffect(() => {
     if (!token) return;
@@ -1105,7 +1113,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
           </div>
 
           <div className="settings-user-info-heatmap">
-            <ActivityHeatmap heatmap={activityHeatmap} compact />
+            <LoginHeatmap loginDays={loginDays} compact />
           </div>
 
           <div className="settings-user-info-nav-cards">

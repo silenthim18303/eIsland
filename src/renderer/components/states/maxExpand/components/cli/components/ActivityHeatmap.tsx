@@ -27,6 +27,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CliHeatmapDaily } from '../config/types';
+import { buildHeatmapMonths, HEATMAP_MONTH_KEYS } from '../utils/heatmapGrid';
 
 type HeatmapMetric = 'session' | 'tool' | 'prompt';
 
@@ -39,13 +40,6 @@ interface ActivityHeatmapProps {
   visible?: boolean;
 }
 
-/** 一月到十二月的国际化短标签 key */
-const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
-
-/** 默认显示窗口：今日所在月份前 6 个月 + 后 5 个月 */
-const MONTHS_BEFORE = 6;
-const MONTHS_AFTER = 5;
-
 export function ActivityHeatmap({ heatmap, compact = false, visible = true }: ActivityHeatmapProps): ReactElement {
   const { t } = useTranslation();
   const [metric, setMetric] = useState<HeatmapMetric>('session');
@@ -55,7 +49,6 @@ export function ActivityHeatmap({ heatmap, compact = false, visible = true }: Ac
   const grid = useMemo(() => {
     const totals = { session: 0, tool: 0, prompt: 0 };
     const dayCounts = new Map<string, number>();
-    const dayKey = (y: number, mo: number, da: number): string => `${y}-${mo}-${da}`;
     for (const [key, counts] of Object.entries(heatmap)) {
       totals.session += counts.session;
       totals.tool += counts.tool;
@@ -63,30 +56,7 @@ export function ActivityHeatmap({ heatmap, compact = false, visible = true }: Ac
       const value = counts[metric];
       if (value > 0) dayCounts.set(key, value);
     }
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-    const todayKey = dayKey(now.getFullYear(), now.getMonth() + 1, now.getDate());
-
-    type Cell = { key: string; label: string; count: number; future: boolean; isToday: boolean };
-    const months: Array<{ key: string; month: number; offset: number; cells: Cell[] }> = [];
-    let max = 1;
-    for (let m = MONTHS_BEFORE; m >= -MONTHS_AFTER; m -= 1) {
-      const ref = new Date(now.getFullYear(), now.getMonth() - m, 1);
-      const year = ref.getFullYear();
-      const month = ref.getMonth();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const firstDow = (new Date(year, month, 1).getDay() + 6) % 7; // 周一为 0
-      const cells: Cell[] = [];
-      for (let day = 1; day <= daysInMonth; day += 1) {
-        const d = new Date(year, month, day);
-        const future = d.getTime() > now.getTime();
-        const key = dayKey(year, month + 1, day);
-        const count = future ? 0 : (dayCounts.get(key) ?? 0);
-        if (!future && count > max) max = count;
-        cells.push({ key, label: `${month + 1}/${day}`, count, future, isToday: key === todayKey });
-      }
-      months.push({ key: `${year}-${month}`, month, offset: firstDow, cells });
-    }
+    const { months, max } = buildHeatmapMonths((key) => dayCounts.get(key) ?? 0);
     return { months, max, totals };
   }, [heatmap, metric]);
 
@@ -141,7 +111,7 @@ export function ActivityHeatmap({ heatmap, compact = false, visible = true }: Ac
             {grid.months.map((month) => (
               <div key={month.key} className="cli-tab-heatmap-month-block">
                 <span className="cli-tab-heatmap-month-label">
-                  {t(`maxExpand.cli.heatmap.month.${MONTH_KEYS[month.month]}`, { defaultValue: MONTH_KEYS[month.month] })}
+                  {t(`maxExpand.cli.heatmap.month.${HEATMAP_MONTH_KEYS[month.month]}`, { defaultValue: HEATMAP_MONTH_KEYS[month.month] })}
                 </span>
                 <div className="cli-tab-heatmap-month">
                   {month.cells.map((cell, idx) => {

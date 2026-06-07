@@ -1196,6 +1196,8 @@
         "session": "Sessions",
         "tool": "Tool calls",
         "prompt": "Prompts",
+        "loginDays": "Login days",
+        "loggedIn": "Logged in",
         "month": {
           "jan": "Jan",
           "feb": "Feb",
