@@ -28,7 +28,7 @@
 import { ipcMain } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 
-type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
+type UpdateSourceKey = 'cloudflare-r2' | 'esa-cdn' | 'tencent-cos' | 'aliyun-oss' | 'github';
 
 interface RegisterUpdaterIpcHandlersOptions {
   updater: AppUpdater;
@@ -38,6 +38,7 @@ interface RegisterUpdaterIpcHandlersOptions {
 
 const DEFAULT_UPDATE_SOURCE: UpdateSourceKey = 'cloudflare-r2';
 const R2_UPDATE_URL = 'https://pub-4c1e73c3c2004901aecd6ca014cb16bd.r2.dev';
+const ESA_CDN_URL = 'https://eisland-server-download-cdn.pyisland.com';
 const GITHUB_OWNER = 'JNTMTMTM';
 const GITHUB_REPO = 'eIsland';
 
@@ -45,6 +46,7 @@ function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   if (value === 'github') return 'github';
   if (value === 'tencent-cos') return 'tencent-cos';
   if (value === 'aliyun-oss') return 'aliyun-oss';
+  if (value === 'esa-cdn') return 'esa-cdn';
   return DEFAULT_UPDATE_SOURCE;
 }
 
@@ -65,6 +67,13 @@ function applyUpdateSource(updater: AppUpdater, source: UpdateSourceKey, resolve
     updater.setFeedURL({
       provider: 'generic',
       url: resolvedUrl,
+    });
+    return;
+  }
+  if (source === 'esa-cdn') {
+    updater.setFeedURL({
+      provider: 'generic',
+      url: ESA_CDN_URL,
     });
     return;
   }

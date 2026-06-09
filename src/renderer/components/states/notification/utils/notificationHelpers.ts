@@ -110,6 +110,7 @@ export function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   if (value === 'github') return 'github';
   if (value === 'tencent-cos') return 'tencent-cos';
   if (value === 'aliyun-oss') return 'aliyun-oss';
+  if (value === 'esa-cdn') return 'esa-cdn';
   return 'cloudflare-r2';
 }
 

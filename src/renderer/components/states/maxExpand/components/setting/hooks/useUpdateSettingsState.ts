@@ -74,7 +74,9 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
         ? 'tencent-cos'
         : value === 'aliyun-oss'
           ? 'aliyun-oss'
-          : 'cloudflare-r2';
+          : value === 'esa-cdn'
+            ? 'esa-cdn'
+            : 'cloudflare-r2';
 
     if (isProOnlyUpdateSource(nextSource) && !isProUser) {
       setUpdateStatus('error');
@@ -126,7 +128,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     let cancelled = false;
     window.api.storeRead(UPDATE_SOURCE_STORE_KEY).then((value) => {
       if (cancelled) return;
-      setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : 'cloudflare-r2');
+      setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : value === 'esa-cdn' ? 'esa-cdn' : 'cloudflare-r2');
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);

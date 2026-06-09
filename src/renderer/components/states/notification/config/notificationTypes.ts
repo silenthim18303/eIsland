@@ -34,7 +34,7 @@ export interface UrlFavoriteItem {
 }
 
 /** 更新源键 */
-export type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
+export type UpdateSourceKey = 'cloudflare-r2' | 'esa-cdn' | 'tencent-cos' | 'aliyun-oss' | 'github';
 
 /** 更新下载进度数据 */
 export interface DownloadProgressData {

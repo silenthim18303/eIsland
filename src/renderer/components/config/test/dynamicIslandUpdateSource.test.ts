@@ -63,6 +63,10 @@ describe('normalizeUpdateSource', () => {
     expect(normalizeUpdateSource('cloudflare-r2')).toBe('cloudflare-r2');
   });
 
+  it('returns "esa-cdn" for "esa-cdn"', () => {
+    expect(normalizeUpdateSource('esa-cdn')).toBe('esa-cdn');
+  });
+
   it('returns "cloudflare-r2" as default for unknown string', () => {
     expect(normalizeUpdateSource('unknown-source')).toBe('cloudflare-r2');
   });
@@ -112,6 +116,10 @@ describe('isProOnlyUpdateSource', () => {
 
   it('returns false for "cloudflare-r2"', () => {
     expect(isProOnlyUpdateSource('cloudflare-r2')).toBe(false);
+  });
+
+  it('returns false for "esa-cdn"', () => {
+    expect(isProOnlyUpdateSource('esa-cdn')).toBe(false);
   });
 });
 
@@ -248,6 +256,10 @@ describe('getUpdateSourceLabel', () => {
 
   it('returns "Cloudflare R2" for "cloudflare-r2"', () => {
     expect(getUpdateSourceLabel('cloudflare-r2')).toBe('Cloudflare R2');
+  });
+
+  it('returns "ESA CDN" for "esa-cdn"', () => {
+    expect(getUpdateSourceLabel('esa-cdn')).toBe('ESA CDN');
   });
 
   it('returns "Cloudflare R2" as default for unknown string', () => {

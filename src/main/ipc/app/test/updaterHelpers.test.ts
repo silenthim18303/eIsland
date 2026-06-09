@@ -54,6 +54,7 @@ import { registerUpdaterIpcHandlers } from '../updater';
 // ── test helpers ──
 
 const R2_UPDATE_URL = 'https://pub-4c1e73c3c2004901aecd6ca014cb16bd.r2.dev';
+const ESA_CDN_URL = 'https://eisland-server-download-cdn.pyisland.com';
 const GITHUB_OWNER = 'JNTMTMTM';
 const GITHUB_REPO = 'eIsland';
 
@@ -132,6 +133,16 @@ describe('updater.ts helpers (via registerUpdaterIpcHandlers)', () => {
       expect(setFeedURLMock).toHaveBeenCalledWith({
         provider: 'generic',
         url: R2_UPDATE_URL,
+      });
+    });
+
+    it("'esa-cdn' configures correct ESA CDN feed URL", async () => {
+      checkForUpdatesMock.mockResolvedValue(null);
+      const handler = handleHandlers.get('updater:check')!;
+      await handler({}, 'esa-cdn');
+      expect(setFeedURLMock).toHaveBeenCalledWith({
+        provider: 'generic',
+        url: ESA_CDN_URL,
       });
     });
 
@@ -270,6 +281,16 @@ describe('updater.ts helpers (via registerUpdaterIpcHandlers)', () => {
       expect(setFeedURLMock).toHaveBeenCalledWith({
         provider: 'generic',
         url: R2_UPDATE_URL,
+      });
+    });
+
+    it('esa-cdn source uses ESA CDN URL regardless of resolvedUrl', async () => {
+      checkForUpdatesMock.mockResolvedValue(null);
+      const handler = handleHandlers.get('updater:check')!;
+      await handler({}, 'esa-cdn', 'https://ignored.example.com');
+      expect(setFeedURLMock).toHaveBeenCalledWith({
+        provider: 'generic',
+        url: ESA_CDN_URL,
       });
     });
   });

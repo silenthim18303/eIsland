@@ -2512,7 +2512,7 @@
       "actionCardHint": "手动触发检查，有新版本时可下载安装；下载完成后点击“安装并重启”应用更新",
       "currentVersion": "当前版本",
       "source": "更新源",
-      "sourceHint": "Cloudflare R2：全球访问稳定，综合速度均衡\nTencent COS：国内网络通常更快\nAliyun OSS：国内节点覆盖广，峰值速度高\nGitHub Releases：海外链路较稳，国内可能偏慢",
+      "sourceHint": "Cloudflare R2：全球访问稳定，综合速度均衡\nESA CDN：ESA全球CDN，所有用户可用\nTencent COS：国内网络通常更快\nAliyun OSS：国内节点覆盖广，峰值速度高\nGitHub Releases：海外链路较稳，国内可能偏慢",
       "proOnlyTag": "",
       "proOnlyError": "当前账户不可用该更新源",
       "proOnlyNeedLogin": "请先登录账号后再使用该更新源",

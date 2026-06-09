@@ -355,6 +355,10 @@ describe('isProOnlyUpdateSource', () => {
     expect(isProOnlyUpdateSource('cloudflare-r2')).toBe(false);
   });
 
+  it('returns false for "esa-cdn"', () => {
+    expect(isProOnlyUpdateSource('esa-cdn')).toBe(false);
+  });
+
   it('returns false for "github"', () => {
     expect(isProOnlyUpdateSource('github')).toBe(false);
   });
@@ -373,8 +377,8 @@ describe('exported constants', () => {
     expect(PLUGIN_MARKET_PAGES).toEqual(['wallpaper', 'contribution', 'edit']);
   });
 
-  it('exports UPDATE_SOURCES with four entries', () => {
-    expect(UPDATE_SOURCES).toHaveLength(4);
+  it('exports UPDATE_SOURCES with five entries', () => {
+    expect(UPDATE_SOURCES).toHaveLength(5);
   });
 
   it('marks exactly tencent-cos and aliyun-oss as proOnly in UPDATE_SOURCES', () => {

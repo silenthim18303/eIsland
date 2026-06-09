@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-export type UpdateSourceKey = 'cloudflare-r2' | 'tencent-cos' | 'aliyun-oss' | 'github';
+export type UpdateSourceKey = 'cloudflare-r2' | 'esa-cdn' | 'tencent-cos' | 'aliyun-oss' | 'github';
 
 const PRO_UPDATE_SOURCE_SET: ReadonlySet<UpdateSourceKey> = new Set<UpdateSourceKey>(['tencent-cos', 'aliyun-oss']);
 
@@ -37,6 +37,7 @@ export function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   if (value === 'github') return 'github';
   if (value === 'tencent-cos') return 'tencent-cos';
   if (value === 'aliyun-oss') return 'aliyun-oss';
+  if (value === 'esa-cdn') return 'esa-cdn';
   return 'cloudflare-r2';
 }
 
@@ -77,5 +78,6 @@ export function getUpdateSourceLabel(value: unknown): string {
   if (value === 'github') return 'GitHub Releases';
   if (value === 'tencent-cos') return 'Tencent COS';
   if (value === 'aliyun-oss') return 'Aliyun OSS';
+  if (value === 'esa-cdn') return 'ESA CDN';
   return 'Cloudflare R2';
 }
