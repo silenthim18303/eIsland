@@ -409,8 +409,8 @@
 
 .album-selection-check {
   position: absolute;
-  top: 7px;
-  left: 7px;
+  top: 4px;
+  left: 9px;
   z-index: 2;
   width: 18px;
   opacity: 0;
@@ -426,7 +426,6 @@
 }
 
 .album-grid-item--selectable {
-  padding-left: 2px;
   cursor: pointer;
 }
 
