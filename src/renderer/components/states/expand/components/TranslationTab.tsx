@@ -50,6 +50,7 @@ function TranslationLangSelect({
   const [open, setOpen] = useState(false);
   const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const selected = options.find((option) => option.code === value);
   const selectedFlag = resolveCountryIcon(value);
   const selectedIcon = selectedFlag ?? (value === 'auto' ? SvgIcon.AI : undefined);
@@ -73,9 +74,10 @@ function TranslationLangSelect({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent): void => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
+      const target = event.target as Node;
+      if (wrapperRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      setOpen(false);
     };
 
     if (open) document.addEventListener('mousedown', handleClickOutside);
@@ -107,7 +109,7 @@ function TranslationLangSelect({
         <span className="translation-lang-dropdown-arrow">▾</span>
       </button>
       {open && createPortal(
-        <div className="translation-lang-dropdown-menu" style={menuStyle}>
+        <div className="translation-lang-dropdown-menu" ref={menuRef} style={menuStyle}>
           {options.map((lang) => {
             const flag = resolveCountryIcon(lang.code);
             const icon = flag ?? (lang.code === 'auto' ? SvgIcon.AI : undefined);
