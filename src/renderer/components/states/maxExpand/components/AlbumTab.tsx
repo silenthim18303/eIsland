@@ -431,6 +431,8 @@ export function AlbumTab(): ReactElement {
   const [columns, setColumns] = useState<number>(DEFAULT_COLUMNS);
   const [sortMode, setSortMode] = useState<AlbumSortMode>('addedDesc');
   const [filterMode, setFilterMode] = useState<AlbumFilterMode>('all');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
+  const [selectMode, setSelectMode] = useState(false);
   const [activeId, setActiveId] = useState<number | null>(null);
   const [zoom, setZoom] = useState<number>(1);
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -512,6 +514,18 @@ export function AlbumTab(): ReactElement {
     if (!loaded) return;
     window.api.storeWrite(SORT_STORE_KEY, sortMode).catch(() => { });
   }, [sortMode, loaded]);
+
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      if (prev.size === 0) return prev;
+      const existing = new Set(items.map((item) => item.id));
+      const next = new Set<number>();
+      prev.forEach((id) => {
+        if (existing.has(id)) next.add(id);
+      });
+      return next.size === prev.size ? prev : next;
+    });
+  }, [items]);
 
   /** 状态信息自动消失 */
   useEffect(() => {
@@ -826,6 +840,62 @@ export function AlbumTab(): ReactElement {
     setFilterMode(mode);
   };
 
+  const selectedCount = selectedIds.size;
+  const visibleSelectedCount = filteredItems.filter((item) => selectedIds.has(item.id)).length;
+  const allVisibleSelected = filteredItems.length > 0 && visibleSelectedCount === filteredItems.length;
+
+  const handleToggleItemSelection = (id: number): void => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAllVisible = (): void => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allVisibleSelected) {
+        filteredItems.forEach((item) => next.delete(item.id));
+      } else {
+        filteredItems.forEach((item) => next.add(item.id));
+      }
+      return next;
+    });
+  };
+
+  const handleClearSelection = (): void => {
+    setSelectedIds(new Set());
+  };
+
+  const handleToggleSelectMode = (): void => {
+    setSelectMode((prev) => {
+      if (prev) setSelectedIds(new Set());
+      return !prev;
+    });
+  };
+
+  const handleRemoveSelected = (): void => {
+    if (selectedIds.size === 0) return;
+    const idsToRemove = new Set(selectedIds);
+    setItems((prev) => prev.filter((item) => !idsToRemove.has(item.id)));
+    setMetaCache((prev) => {
+      const next = { ...prev };
+      idsToRemove.forEach((id) => {
+        revokeBlobUrl(next[id]?.videoUrl);
+        delete next[id];
+      });
+      return next;
+    });
+    if (activeId !== null && idsToRemove.has(activeId)) setActiveId(null);
+    setSelectedIds(new Set());
+    setStatusMessage(t('albumTab.status.removedSelected', { count: idsToRemove.size }));
+  };
+
   /** 二次确认清空 */
   const handleClear = (): void => {
     if (!confirmingClear) {
@@ -836,6 +906,7 @@ export function AlbumTab(): ReactElement {
     Object.values(metaCacheRef.current).forEach((meta) => revokeBlobUrl(meta.videoUrl));
     setItems([]);
     setMetaCache({});
+    setSelectedIds(new Set());
     setActiveId(null);
     setConfirmingClear(false);
     setStatusMessage(t('albumTab.status.cleared'));
@@ -848,6 +919,12 @@ export function AlbumTab(): ReactElement {
       const next = { ...prev };
       revokeBlobUrl(next[id]?.videoUrl);
       delete next[id];
+      return next;
+    });
+    setSelectedIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
       return next;
     });
     if (activeId === id) setActiveId(null);
@@ -1163,6 +1240,15 @@ export function AlbumTab(): ReactElement {
             {t('albumTab.actions.add')}
           </button>
           <button
+            className={`album-text-btn${selectMode ? ' album-text-btn--active' : ''}`}
+            type="button"
+            onClick={handleToggleSelectMode}
+            disabled={filteredItems.length === 0}
+            title={t('albumTab.actions.select')}
+          >
+            {t('albumTab.actions.select')}
+          </button>
+          <button
             className={`album-danger-btn${confirmingClear ? ' album-danger-btn--confirm' : ''}`}
             type="button"
             onClick={handleClear}
@@ -1210,8 +1296,18 @@ export function AlbumTab(): ReactElement {
             <div className="album-grid" onWheelCapture={(event) => event.stopPropagation()}>
               {filteredItems.map((item) => {
                 const meta = metaCache[item.id];
+                const selected = selectedIds.has(item.id);
                 return (
-                  <div key={item.id} className="album-grid-item">
+                  <div key={item.id} className={`album-grid-item${selected ? ' album-grid-item--selected' : ''}${selectMode ? ' album-grid-item--selectable' : ''}`}>
+                    <label className="album-selection-check" title={t('albumTab.selection.toggle', { name: item.name })}>
+                      <input
+                        className="album-selection-input"
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => handleToggleItemSelection(item.id)}
+                        aria-label={t('albumTab.selection.toggle', { name: item.name })}
+                      />
+                    </label>
                     <button
                       className="album-thumb"
                       type="button"
@@ -1576,6 +1672,50 @@ export function AlbumTab(): ReactElement {
           </div>
         ) : null
       )}
+
+      {/* 底部选择工具条 */}
+      <div className={`album-selection-bar${selectMode ? ' album-selection-bar--open' : ''}`} aria-hidden={!selectMode}>
+        <span className="album-selection-bar-count">
+          {selectedCount > 0
+            ? t('albumTab.selection.selectedCount', { count: selectedCount })
+            : t('albumTab.selection.hint')}
+        </span>
+        <button
+          className="album-selection-bar-btn"
+          type="button"
+          onClick={handleSelectAllVisible}
+          disabled={filteredItems.length === 0}
+          tabIndex={selectMode ? 0 : -1}
+        >
+          {allVisibleSelected ? t('albumTab.actions.unselectAllVisible') : t('albumTab.actions.selectAllVisible')}
+        </button>
+        <button
+          className="album-selection-bar-btn"
+          type="button"
+          onClick={handleClearSelection}
+          disabled={selectedCount === 0}
+          tabIndex={selectMode ? 0 : -1}
+        >
+          {t('albumTab.actions.clearSelection')}
+        </button>
+        <button
+          className="album-selection-bar-btn album-selection-bar-btn--danger"
+          type="button"
+          onClick={handleRemoveSelected}
+          disabled={selectedCount === 0}
+          tabIndex={selectMode ? 0 : -1}
+        >
+          {t('albumTab.actions.removeSelected')}
+        </button>
+        <button
+          className="album-selection-bar-btn"
+          type="button"
+          onClick={handleToggleSelectMode}
+          tabIndex={selectMode ? 0 : -1}
+        >
+          {t('albumTab.actions.cancelSelect')}
+        </button>
+      </div>
 
       {/* 拖拽蒙层提示 */}
       {dragOverPage ? (

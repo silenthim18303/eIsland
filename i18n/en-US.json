@@ -916,7 +916,18 @@
       "clear": "Clear",
       "clearConfirm": "Click again to confirm",
       "remove": "Remove",
-      "removeAria": "Remove media {{name}}"
+      "removeAria": "Remove media {{name}}",
+      "selectAllVisible": "Select All",
+      "unselectAllVisible": "Unselect All",
+      "clearSelection": "Clear Selection",
+      "removeSelected": "Delete Selected",
+      "select": "Select",
+      "cancelSelect": "Cancel"
+    },
+    "selection": {
+      "selectedCount": "{{count}} selected",
+      "toggle": "Select media {{name}}",
+      "hint": "Click items to select"
     },
     "sort": {
       "label": "Sort",
@@ -999,6 +1010,7 @@
       "saveAsSuccess": "Saved {{name}}",
       "saveAsCanceled": "Save canceled",
       "saveAsFailed": "Failed to save {{name}}. Please try again.",
+      "removedSelected": "Deleted {{count}} media file(s)",
       "setIslandBackgroundSuccess": "Set {{name}} as island background",
       "setIslandBackgroundFailed": "Failed to set island background. Please try again."
     }

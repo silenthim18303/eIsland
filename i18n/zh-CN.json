@@ -916,7 +916,18 @@
       "clear": "清空",
       "clearConfirm": "再次点击确认清空",
       "remove": "移除",
-      "removeAria": "移除媒体 {{name}}"
+      "removeAria": "移除媒体 {{name}}",
+      "selectAllVisible": "全选当前",
+      "unselectAllVisible": "取消全选",
+      "clearSelection": "取消选择",
+      "removeSelected": "删除已选",
+      "select": "选择",
+      "cancelSelect": "取消选择"
+    },
+    "selection": {
+      "selectedCount": "已选 {{count}} 项",
+      "toggle": "选择媒体 {{name}}",
+      "hint": "点击图片进行选择"
     },
     "sort": {
       "label": "排序",
@@ -999,6 +1010,7 @@
       "saveAsSuccess": "已保存 {{name}}",
       "saveAsCanceled": "已取消保存",
       "saveAsFailed": "保存 {{name}} 失败，请稍后重试",
+      "removedSelected": "已删除 {{count}} 个媒体文件",
       "setIslandBackgroundSuccess": "已将 {{name}} 设为灵动岛背景",
       "setIslandBackgroundFailed": "设置灵动岛背景失败，请稍后重试"
     }
