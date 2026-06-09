@@ -1311,7 +1311,7 @@ export function AlbumTab(): ReactElement {
                     <button
                       className="album-thumb"
                       type="button"
-                      onClick={() => handleOpenItem(item)}
+                      onClick={() => (selectMode ? handleToggleItemSelection(item.id) : handleOpenItem(item))}
                       onMouseEnter={() => handleThumbMouseEnter(item)}
                       onMouseLeave={() => handleThumbMouseLeave(item)}
                       title={item.name}

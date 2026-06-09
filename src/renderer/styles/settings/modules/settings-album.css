@@ -427,6 +427,15 @@
 
 .album-grid-item--selectable {
   padding-left: 2px;
+  cursor: pointer;
+}
+
+.album-grid-item--selectable .album-thumb {
+  cursor: pointer;
+}
+
+.album-grid-item--selectable:hover {
+  border-color: rgba(82, 168, 255, 0.35);
 }
 
 .album-grid-remove {
