@@ -18,7 +18,7 @@
     "release:notes": "node --experimental-strip-types scripts/generate-incremental-release-notes.ts -o RELEASE_NOTES_SINCE_LAST_TAG.md",
     "release:upload": "npm run package && node --experimental-strip-types scripts/upload-release-to-cos-oss.ts",
     "release:upload-only": "node --experimental-strip-types scripts/upload-release-to-cos-oss.ts",
-    "release:upload-baota": "node --experimental-strip-types scripts/upload-release-to-cos-oss.ts --baota-only",
+    "release:upload-minio": "node --experimental-strip-types scripts/upload-release-to-cos-oss.ts --minio-only",
     "comment:check": "node --experimental-strip-types scripts/check-comment-standards.ts",
     "i18n:check": "node --experimental-strip-types scripts/check-i18n-completeness.ts"
   },
