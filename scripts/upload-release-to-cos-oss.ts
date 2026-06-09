@@ -24,9 +24,11 @@
  * @author 鸡哥
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, createReadStream } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { request as httpRequest } from 'node:http';
 
 type Provider = 'cos' | 'oss';
 
@@ -112,18 +114,20 @@ function loadEnvFile(envFilePath = '.env'): void {
   }
 }
 
-function parseDistDir(argv: string[]): string {
-  const defaultDist = 'dist';
+function parseArgv(argv: string[]): { distDir: string; baotaOnly: boolean } {
+  let distDir = 'dist';
+  let baotaOnly = false;
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
     if ((arg === '--dist' || arg === '-d') && argv[i + 1]) {
-      return argv[i + 1];
-    }
-    if (arg === '--help' || arg === '-h') {
+      distDir = argv[++i];
+    } else if (arg === '--baota-only') {
+      baotaOnly = true;
+    } else if (arg === '--help' || arg === '-h') {
       printHelpAndExit(0);
     }
   }
-  return defaultDist;
+  return { distDir, baotaOnly };
 }
 
 function printHelpAndExit(code: number): never {
@@ -132,6 +136,7 @@ function printHelpAndExit(code: number): never {
     '',
     'Options:',
     '  -d, --dist <dir>      Dist directory path (default: dist)',
+    '  --baota-only           Only upload to BaoTa panel, skip COS/OSS',
     '  -h, --help            Show this help',
     '',
     'Required env (COS):',
@@ -140,8 +145,13 @@ function printHelpAndExit(code: number): never {
     'Required env (OSS):',
     '  OSS_ACCESS_KEY_ID, OSS_ACCESS_KEY_SECRET, OSS_REGION, OSS_BUCKET_NAME',
     '',
-    'Requirement:',
-    '  AWS CLI must be installed and available in PATH.'
+    'Optional env (BaoTa Panel):',
+    '  BT_PANEL_URL          BaoTa panel URL (e.g. https://panel.example.com:8888)',
+    '  BT_API_KEY            BaoTa API key',
+    '  BT_REMOTE_PATH        Remote directory (default: /www/wwwroot/eisland-server-download-cdn.pyisland.com)',
+    '',
+    'Requirements:',
+    '  - AWS CLI must be installed and available in PATH (for COS/OSS).'
   ].join('\n'));
   process.exit(code);
 }
@@ -284,11 +294,109 @@ function uploadToTarget(awsExecutable: string, target: UploadTarget, files: stri
   }
 }
 
-function main(): void {
-  loadEnvFile('.env');
-  const awsExecutable = resolveAwsExecutable();
+function computeBtToken(apiKey: string): { requestTime: string; requestToken: string } {
+  const requestTime = String(Math.floor(Date.now() / 1000));
+  const skHash = createHash('md5').update(apiKey).digest('hex');
+  const requestToken = createHash('md5').update(requestTime + skHash).digest('hex');
+  return { requestTime, requestToken };
+}
 
-  const distDir = parseDistDir(process.argv.slice(2));
+function uploadSingleToBaoTa(panelUrl: string, apiKey: string, remotePath: string, file: string): Promise<void> {
+  return new Promise((resolvePromise, rejectPromise) => {
+    const fileName = file.split(/[\\/]/).pop() ?? file;
+    const fileSize = statSync(file).size;
+    console.log(`[BAOTA] Uploading ${fileName} (${(fileSize / 1024 / 1024).toFixed(1)} MB)`);
+
+    const boundary = '----BaotaUploadBoundary' + Date.now().toString(36);
+    const mimeType = fileName.endsWith('.yml') || fileName.endsWith('.yaml')
+      ? 'text/yaml'
+      : 'application/octet-stream';
+
+    const header = Buffer.from(
+      `--${boundary}\r\n` +
+      `Content-Disposition: form-data; name="path"\r\n\r\n` +
+      `${remotePath}\r\n` +
+      `--${boundary}\r\n` +
+      `Content-Disposition: form-data; name="file"; filename="${fileName}"\r\n` +
+      `Content-Type: ${mimeType}\r\n\r\n`,
+      'utf-8',
+    );
+    const footer = Buffer.from(`\r\n--${boundary}--\r\n`, 'utf-8');
+    const contentLength = header.length + fileSize + footer.length;
+
+    const { requestTime, requestToken } = computeBtToken(apiKey);
+    const baseUrl = panelUrl.replace(/\/+$/, '');
+    const reqUrl = new URL(`${baseUrl}/files?action=upload_file&request_time=${requestTime}&request_token=${requestToken}`);
+
+    console.log(`[BAOTA] POST ${baseUrl}/files?action=upload_file (${(contentLength / 1024 / 1024).toFixed(1)} MB body)`);
+
+    const req = httpRequest({
+      hostname: reqUrl.hostname,
+      port: reqUrl.port || 80,
+      path: reqUrl.pathname + reqUrl.search,
+      method: 'POST',
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${boundary}`,
+        'Content-Length': contentLength,
+      },
+      timeout: 10 * 60 * 1000,
+    }, (res) => {
+      const chunks: Buffer[] = [];
+      res.on('data', (chunk: Buffer) => chunks.push(chunk));
+      res.on('end', () => {
+        const raw = Buffer.concat(chunks).toString('utf-8').trim();
+        console.log(`[BAOTA] HTTP ${res.statusCode} — ${raw.slice(0, 200)}`);
+
+        let status = raw;
+        try {
+          const parsed = JSON.parse(raw) as { status?: boolean; msg?: string };
+          status = parsed.status === true ? 'ok' : parsed.msg || raw;
+        } catch { /* not JSON */ }
+
+        if ((res.statusCode ?? 0) >= 400) {
+          rejectPromise(new Error(`[BAOTA] HTTP ${res.statusCode} for ${fileName}: ${status}`));
+          return;
+        }
+        if (raw.toLowerCase().includes('error') || raw.toLowerCase().includes('fail')) {
+          rejectPromise(new Error(`[BAOTA] Upload failed for ${fileName}: ${status}`));
+          return;
+        }
+
+        console.log(green(`[BAOTA] Upload completed: ${fileName}`));
+        resolvePromise();
+      });
+    });
+
+    req.on('error', (err) => rejectPromise(new Error(`[BAOTA] Network error for ${fileName}: ${err.message}`)));
+    req.on('timeout', () => { req.destroy(); rejectPromise(new Error(`[BAOTA] Timeout for ${fileName}`)); });
+
+    req.write(header);
+    const stream = createReadStream(file);
+    stream.on('data', (chunk) => {
+      if (!req.write(chunk)) {
+        stream.pause();
+        req.once('drain', () => stream.resume());
+      }
+    });
+    stream.on('end', () => {
+      req.end(footer);
+    });
+    stream.on('error', (err) => rejectPromise(new Error(`[BAOTA] Read error for ${fileName}: ${err.message}`)));
+  });
+}
+
+async function uploadToBaoTa(panelUrl: string, apiKey: string, remotePath: string, localFiles: string[]): Promise<void> {
+  console.log(`\n[BAOTA] panel=${panelUrl} path=${remotePath}`);
+
+  for (const file of localFiles) {
+    await uploadSingleToBaoTa(panelUrl, apiKey, remotePath, file);
+  }
+}
+
+async function main(): Promise<void> {
+  loadEnvFile('.env');
+
+  const { distDir, baotaOnly } = parseArgv(process.argv.slice(2));
   const version = readPackageVersion();
   const installerFile = resolveInstallerForVersion(distDir, version);
   const blockmapFile = resolveInstallerBlockmap(installerFile);
@@ -300,19 +408,34 @@ function main(): void {
   console.log(`Blockmap: ${blockmapFile}`);
   console.log(`Metadata: ${latestYmlFile}`);
 
-  const targets = getUploadTargets();
-
-  for (const target of targets) {
-    uploadToTarget(awsExecutable, target, uploadFiles);
+  if (!baotaOnly) {
+    const awsExecutable = resolveAwsExecutable();
+    const targets = getUploadTargets();
+    for (const target of targets) {
+      uploadToTarget(awsExecutable, target, uploadFiles);
+    }
   }
 
-  console.log(`\n${green('Upload completed: COS + OSS (installer + blockmap + latest.yml)')}`);
+  const btPanelUrl = process.env.BT_PANEL_URL?.trim();
+  const btApiKey = process.env.BT_API_KEY?.trim();
+  const btRemotePath = process.env.BT_REMOTE_PATH?.trim() || '/www/wwwroot/eisland-server-download-cdn.pyisland.com';
+
+  if (btPanelUrl && btApiKey) {
+    await uploadToBaoTa(btPanelUrl, btApiKey, btRemotePath, uploadFiles);
+  } else if (baotaOnly) {
+    throw new Error('[BAOTA] BT_PANEL_URL or BT_API_KEY not set');
+  }
+
+  const parts = baotaOnly ? ['BaoTa'] : ['COS', 'OSS'];
+  if (btPanelUrl && btApiKey) parts.push('BaoTa');
+  console.log(`\n${green(`Upload completed: ${parts.join(' + ')} (installer + blockmap + latest.yml)`)}`);
+  if (!baotaOnly && (!btPanelUrl || !btApiKey)) {
+    console.log('[BAOTA] Skipped — BT_PANEL_URL or BT_API_KEY not set');
+  }
 }
 
-try {
-  main();
-} catch (error) {
+main().catch((error) => {
   const message = error instanceof Error ? error.message : String(error);
   console.error(red(`Upload failed: ${message}`));
   process.exit(1);
-}
+});
