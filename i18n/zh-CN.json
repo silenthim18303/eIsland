@@ -944,6 +944,16 @@
       "image": "仅图片",
       "video": "仅视频"
     },
+    "group": {
+      "label": "浏览方式",
+      "none": "全部",
+      "folder": "按文件夹",
+      "date": "按日期",
+      "all": "全部媒体",
+      "count": "{{count}} 项",
+      "unknownFolder": "未知文件夹",
+      "unknownDate": "未知日期"
+    },
     "columns": {
       "aria": "调整每行列数",
       "smaller": "减少列数",

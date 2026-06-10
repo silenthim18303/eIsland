@@ -944,6 +944,16 @@
       "image": "Images",
       "video": "Videos"
     },
+    "group": {
+      "label": "View Mode",
+      "none": "All",
+      "folder": "By Folder",
+      "date": "By Date",
+      "all": "All Media",
+      "count": "{{count}} items",
+      "unknownFolder": "Unknown Folder",
+      "unknownDate": "Unknown Date"
+    },
     "columns": {
       "aria": "Adjust columns per row",
       "smaller": "Decrease columns",

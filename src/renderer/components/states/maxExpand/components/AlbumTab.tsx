@@ -40,6 +40,8 @@ const LOCAL_STORAGE_KEY = 'eIsland_photo_album_items';
 const COLUMNS_STORE_KEY = 'photo-album-columns';
 /** 总览排序模式持久化键 */
 const SORT_STORE_KEY = 'photo-album-sort';
+/** 总览浏览模式持久化键 */
+const GROUP_MODE_STORE_KEY = 'photo-album-group-mode';
 /** 灵动岛背景本地同步事件名（与设置页保持一致） */
 const LOCAL_ISLAND_BG_SYNC_EVENT = 'island-bg-local-sync';
 /** 灵动岛背景媒体持久化键 */
@@ -69,6 +71,7 @@ const MEDIA_LOAD_DELAY_MS = 320;
 /** 相册条目排序模式 */
 export type AlbumSortMode = 'addedDesc' | 'addedAsc' | 'nameAsc' | 'nameDesc' | 'durationDesc' | 'durationAsc';
 export type AlbumFilterMode = 'all' | 'image' | 'video';
+type AlbumGroupMode = 'none' | 'folder' | 'date';
 type AlbumMediaType = 'image' | 'video';
 
 /** 相册条目（持久化结构） */
@@ -225,6 +228,32 @@ function formatTimestamp(ts: number | undefined): string {
   } catch {
     return '-';
   }
+}
+
+function formatDateGroup(ts: number, locale: string): string {
+  if (!Number.isFinite(ts) || ts <= 0) return '-';
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(new Date(ts));
+  } catch {
+    return '-';
+  }
+}
+
+function getParentFolder(path: string): string {
+  const normalized = path.trim();
+  const sepIdx = Math.max(normalized.lastIndexOf('\\'), normalized.lastIndexOf('/'));
+  if (sepIdx <= 0) return '-';
+  return normalized.slice(0, sepIdx);
+}
+
+function getFolderName(folderPath: string): string {
+  if (!folderPath || folderPath === '-') return '-';
+  const sepIdx = Math.max(folderPath.lastIndexOf('\\'), folderPath.lastIndexOf('/'));
+  return sepIdx >= 0 ? folderPath.slice(sepIdx + 1) || folderPath : folderPath;
 }
 
 /** 估算 data URL 中 base64 部分对应的字节数 */
@@ -424,13 +453,14 @@ function AlbumControlIcon({ src }: { src: string }): ReactElement {
  * @description 提供总览、单图放大、元数据侧栏与基础 EXIF 解析等能力。
  */
 export function AlbumTab(): ReactElement {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState<AlbumItem[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [mediaLoadReady, setMediaLoadReady] = useState(false);
   const [columns, setColumns] = useState<number>(DEFAULT_COLUMNS);
   const [sortMode, setSortMode] = useState<AlbumSortMode>('addedDesc');
   const [filterMode, setFilterMode] = useState<AlbumFilterMode>('all');
+  const [groupMode, setGroupMode] = useState<AlbumGroupMode>('none');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
   const [selectMode, setSelectMode] = useState(false);
   const [activeId, setActiveId] = useState<number | null>(null);
@@ -463,7 +493,8 @@ export function AlbumTab(): ReactElement {
       window.api.storeRead(STORE_KEY).catch(() => null),
       window.api.storeRead(COLUMNS_STORE_KEY).catch(() => null),
       window.api.storeRead(SORT_STORE_KEY).catch(() => null),
-    ]).then(([rawItems, rawColumns, rawSort]) => {
+      window.api.storeRead(GROUP_MODE_STORE_KEY).catch(() => null),
+    ]).then(([rawItems, rawColumns, rawSort, rawGroupMode]) => {
       if (cancelled) return;
       let parsed: AlbumItem[] = [];
       if (Array.isArray(rawItems) && rawItems.length > 0) {
@@ -478,6 +509,9 @@ export function AlbumTab(): ReactElement {
       setColumns(clampColumns(rawColumns));
       if (rawSort === 'addedDesc' || rawSort === 'addedAsc' || rawSort === 'nameAsc' || rawSort === 'nameDesc' || rawSort === 'durationDesc' || rawSort === 'durationAsc') {
         setSortMode(rawSort);
+      }
+      if (rawGroupMode === 'none' || rawGroupMode === 'folder' || rawGroupMode === 'date') {
+        setGroupMode(rawGroupMode);
       }
       setLoaded(true);
     }).catch(() => {
@@ -514,6 +548,12 @@ export function AlbumTab(): ReactElement {
     if (!loaded) return;
     window.api.storeWrite(SORT_STORE_KEY, sortMode).catch(() => { });
   }, [sortMode, loaded]);
+
+  /** 持久化浏览模式 */
+  useEffect(() => {
+    if (!loaded) return;
+    window.api.storeWrite(GROUP_MODE_STORE_KEY, groupMode).catch(() => { });
+  }, [groupMode, loaded]);
 
   useEffect(() => {
     setSelectedIds((prev) => {
@@ -701,6 +741,27 @@ export function AlbumTab(): ReactElement {
     if (filterMode === 'video') return sortedItems.filter((item) => item.mediaType === 'video');
     return sortedItems;
   }, [sortedItems, filterMode]);
+  const groupedItems = useMemo(() => {
+    if (groupMode === 'none') {
+      return [{ key: 'all', title: t('albumTab.group.all'), subtitle: '', items: filteredItems }];
+    }
+    const groups = new Map<string, { key: string; title: string; subtitle: string; items: AlbumItem[] }>();
+    filteredItems.forEach((item) => {
+      const key = groupMode === 'folder'
+        ? getParentFolder(item.path)
+        : formatDateGroup(item.addedAt, i18n.language || navigator.language || 'zh-CN');
+      const fallbackTitle = groupMode === 'folder' ? t('albumTab.group.unknownFolder') : t('albumTab.group.unknownDate');
+      const title = key === '-' ? fallbackTitle : (groupMode === 'folder' ? getFolderName(key) : key);
+      const subtitle = groupMode === 'folder' && key !== '-' ? key : '';
+      const existing = groups.get(key);
+      if (existing) {
+        existing.items.push(item);
+      } else {
+        groups.set(key, { key, title, subtitle, items: [item] });
+      }
+    });
+    return Array.from(groups.values());
+  }, [filteredItems, groupMode, i18n.language, t]);
 
   /** 缩略图为可见时按需加载 dataUrl */
   useEffect(() => {
@@ -838,6 +899,10 @@ export function AlbumTab(): ReactElement {
 
   const handleFilterModeChange = (mode: AlbumFilterMode): void => {
     setFilterMode(mode);
+  };
+
+  const handleGroupModeChange = (mode: AlbumGroupMode): void => {
+    setGroupMode(mode);
   };
 
   const selectedCount = selectedIds.size;
@@ -1156,6 +1221,71 @@ export function AlbumTab(): ReactElement {
     { value: 'durationAsc', label: t('albumTab.sort.durationAsc') },
   ]), [t]);
 
+  const renderAlbumGridItem = (item: AlbumItem): ReactElement => {
+    const meta = metaCache[item.id];
+    const selected = selectedIds.has(item.id);
+    return (
+      <div key={item.id} className={`album-grid-item${selected ? ' album-grid-item--selected' : ''}${selectMode ? ' album-grid-item--selectable' : ''}`}>
+        <label className="album-selection-check" title={t('albumTab.selection.toggle', { name: item.name })}>
+          <input
+            className="album-selection-input"
+            type="checkbox"
+            checked={selected}
+            onChange={() => handleToggleItemSelection(item.id)}
+            aria-label={t('albumTab.selection.toggle', { name: item.name })}
+          />
+        </label>
+        <button
+          className="album-thumb"
+          type="button"
+          onClick={() => (selectMode ? handleToggleItemSelection(item.id) : handleOpenItem(item))}
+          onMouseEnter={() => handleThumbMouseEnter(item)}
+          onMouseLeave={() => handleThumbMouseLeave(item)}
+          title={item.name}
+        >
+          {item.mediaType === 'video' ? (
+            meta?.videoUrl ? (
+            <>
+              <video
+                className="album-thumb-video"
+                src={meta.videoUrl}
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                ref={(el) => { gridVideoRefs.current[item.id] = el; }}
+              />
+              <span className="album-thumb-badge">{formatDuration(meta?.durationSec)}</span>
+            </>
+            ) : meta?.loadFailed ? (
+              <span className="album-thumb-fallback">{t('albumTab.thumb.failed')}</span>
+            ) : (
+              <span className="album-thumb-fallback">{t('albumTab.thumb.loading')}</span>
+            )
+          ) : meta?.dataUrl ? (
+            <img className="album-thumb-img" src={meta.dataUrl} alt={item.name} loading="lazy" />
+          ) : meta?.loadFailed ? (
+            <span className="album-thumb-fallback">{t('albumTab.thumb.failed')}</span>
+          ) : (
+            <span className="album-thumb-fallback">{t('albumTab.thumb.loading')}</span>
+          )}
+        </button>
+        <div className="album-grid-meta">
+          <span className="album-grid-name" title={item.name}>{item.name}</span>
+          <button
+            className="album-grid-remove"
+            type="button"
+            onClick={() => handleRemove(item.id)}
+            title={t('albumTab.actions.remove')}
+            aria-label={t('albumTab.actions.removeAria', { name: item.name })}
+          >
+            <AlbumControlIcon src={SvgIcon.DELETE} />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
       className={`album-tab${dragOverPage ? ' album-tab--drag-over' : ''}`}
@@ -1206,6 +1336,29 @@ export function AlbumTab(): ReactElement {
               onClick={() => handleFilterModeChange('video')}
             >
               {t('albumTab.filter.video')}
+            </button>
+          </div>
+          <div className="album-filter-group" role="group" aria-label={t('albumTab.group.label')}>
+            <button
+              className={`album-filter-btn${groupMode === 'none' ? ' album-filter-btn--active' : ''}`}
+              type="button"
+              onClick={() => handleGroupModeChange('none')}
+            >
+              {t('albumTab.group.none')}
+            </button>
+            <button
+              className={`album-filter-btn${groupMode === 'folder' ? ' album-filter-btn--active' : ''}`}
+              type="button"
+              onClick={() => handleGroupModeChange('folder')}
+            >
+              {t('albumTab.group.folder')}
+            </button>
+            <button
+              className={`album-filter-btn${groupMode === 'date' ? ' album-filter-btn--active' : ''}`}
+              type="button"
+              onClick={() => handleGroupModeChange('date')}
+            >
+              {t('albumTab.group.date')}
             </button>
           </div>
           <div className="album-columns" aria-label={t('albumTab.columns.aria')}>
@@ -1293,71 +1446,25 @@ export function AlbumTab(): ReactElement {
               <div className="album-empty-desc">{t('albumTab.empty.filteredDesc')}</div>
             </div>
           ) : (
-            <div className="album-grid" onWheelCapture={(event) => event.stopPropagation()}>
-              {filteredItems.map((item) => {
-                const meta = metaCache[item.id];
-                const selected = selectedIds.has(item.id);
-                return (
-                  <div key={item.id} className={`album-grid-item${selected ? ' album-grid-item--selected' : ''}${selectMode ? ' album-grid-item--selectable' : ''}`}>
-                    <label className="album-selection-check" title={t('albumTab.selection.toggle', { name: item.name })}>
-                      <input
-                        className="album-selection-input"
-                        type="checkbox"
-                        checked={selected}
-                        onChange={() => handleToggleItemSelection(item.id)}
-                        aria-label={t('albumTab.selection.toggle', { name: item.name })}
-                      />
-                    </label>
-                    <button
-                      className="album-thumb"
-                      type="button"
-                      onClick={() => (selectMode ? handleToggleItemSelection(item.id) : handleOpenItem(item))}
-                      onMouseEnter={() => handleThumbMouseEnter(item)}
-                      onMouseLeave={() => handleThumbMouseLeave(item)}
-                      title={item.name}
-                    >
-                      {item.mediaType === 'video' ? (
-                        meta?.videoUrl ? (
-                        <>
-                          <video
-                            className="album-thumb-video"
-                            src={meta.videoUrl}
-                            muted
-                            loop
-                            playsInline
-                            preload="metadata"
-                            ref={(el) => { gridVideoRefs.current[item.id] = el; }}
-                          />
-                          <span className="album-thumb-badge">{formatDuration(meta?.durationSec)}</span>
-                        </>
-                        ) : meta?.loadFailed ? (
-                          <span className="album-thumb-fallback">{t('albumTab.thumb.failed')}</span>
-                        ) : (
-                          <span className="album-thumb-fallback">{t('albumTab.thumb.loading')}</span>
-                        )
-                      ) : meta?.dataUrl ? (
-                        <img className="album-thumb-img" src={meta.dataUrl} alt={item.name} loading="lazy" />
-                      ) : meta?.loadFailed ? (
-                        <span className="album-thumb-fallback">{t('albumTab.thumb.failed')}</span>
-                      ) : (
-                        <span className="album-thumb-fallback">{t('albumTab.thumb.loading')}</span>
-                      )}
-                    </button>
-                    <div className="album-grid-meta">
-                      <span className="album-grid-name" title={item.name}>{item.name}</span>
-                      <button
-                        className="album-grid-remove"
-                        type="button"
-                        onClick={() => handleRemove(item.id)}
-                        title={t('albumTab.actions.remove')}
-                        aria-label={t('albumTab.actions.removeAria', { name: item.name })}
-                      >
-                        <AlbumControlIcon src={SvgIcon.DELETE} />
-                      </button>
+            <div className="album-group-list" onWheelCapture={(event) => event.stopPropagation()}>
+              {groupedItems.map((group) => (
+                <section key={group.key} className="album-group-section">
+                  {groupMode !== 'none' ? (
+                    <div className="album-group-header">
+                      <div className="album-group-title-wrap">
+                        <span className="album-group-title" title={group.subtitle || group.title}>{group.title}</span>
+                        {group.subtitle ? <span className="album-group-subtitle" title={group.subtitle}>{group.subtitle}</span> : null}
+                      </div>
+                      <span className="album-group-count">
+                        {t('albumTab.group.count', { count: group.items.length })}
+                      </span>
                     </div>
+                  ) : null}
+                  <div className="album-grid">
+                    {group.items.map((item) => renderAlbumGridItem(item))}
                   </div>
-                );
-              })}
+                </section>
+              ))}
             </div>
           )}
         </div>
