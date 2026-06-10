@@ -237,12 +237,26 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
         const hasTitle = Boolean(media?.title);
         const isPlaying = (playback?.playbackStatus ?? 0) === 4;
 
+        const prevEntry = sessionRuntime.get(sourceAppId);
+        const prevPayload = prevEntry?.payload;
+        const sameTrack = Boolean(
+          prevPayload
+          && prevPayload.title === (media?.title ?? '')
+          && prevPayload.artist === (media?.artist ?? ''),
+        );
+        const durationMs = timeline
+          ? Math.round((timeline.duration ?? 0) * 1000)
+          : sameTrack ? prevPayload!.duration_ms : 0;
+        const positionMs = timeline
+          ? Math.round((timeline.position ?? 0) * 1000)
+          : sameTrack ? prevPayload!.position_ms : 0;
+
         const payload = {
           title: media?.title ?? '',
           artist: media?.artist ?? '',
           album: media?.albumTitle ?? '',
-          duration_ms: Math.round((timeline?.duration ?? 0) * 1000),
-          position_ms: Math.round((timeline?.position ?? 0) * 1000),
+          duration_ms: durationMs,
+          position_ms: positionMs,
           isPlaying,
           thumbnail: media?.thumbnail ?? null,
           canFastForward: false,
@@ -253,7 +267,6 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
           deviceId: sourceAppId,
         };
 
-        const prevEntry = sessionRuntime.get(sourceAppId);
         let playStartedAt = prevEntry?.playStartedAt ?? 0;
         if (isPlaying) {
           if (!prevEntry?.isPlaying || playStartedAt <= 0) {

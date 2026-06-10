@@ -397,6 +397,37 @@ describe('createSmtcService', () => {
       expect(mockWindow.webContents.send).toHaveBeenCalledWith('nowplaying:info', entry.payload);
     });
 
+    it('keeps previous timeline when playback-only update has no timeline for same track', async () => {
+      const { createSmtcService } = await import('../smtcService');
+      const svc = createSmtcService(defaultOptions({ getWhitelist: () => ['spotify'] }));
+      svc.initWorker();
+
+      emitWorkerMessage({
+        type: 'session-update',
+        sourceAppId: 'Spotify.exe',
+        session: {
+          media: { title: 'Test Song', artist: 'Test Artist', albumTitle: 'Test Album', thumbnail: 'data:image/png;base64,abc' },
+          playback: { playbackStatus: 2, playbackType: 1 },
+          timeline: { position: 42, duration: 180 },
+        },
+      });
+
+      emitWorkerMessage({
+        type: 'session-update',
+        sourceAppId: 'Spotify.exe',
+        session: {
+          media: { title: 'Test Song', artist: 'Test Artist', albumTitle: 'Test Album', thumbnail: 'data:image/png;base64,abc' },
+          playback: { playbackStatus: 4, playbackType: 1 },
+          timeline: null,
+        },
+      });
+
+      const entry = svc.getSmtcSessionRuntime()!.get('Spotify.exe')!;
+      expect(entry.payload.duration_ms).toBe(180000);
+      expect(entry.payload.position_ms).toBe(42000);
+      expect(entry.payload.isPlaying).toBe(true);
+    });
+
     it('ignores sessions from non-whitelisted apps', async () => {
       const { createSmtcService } = await import('../smtcService');
       const svc = createSmtcService(defaultOptions({ getWhitelist: () => ['spotify'] }));
