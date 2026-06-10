@@ -913,8 +913,6 @@
     },
     "actions": {
       "add": "添加媒体",
-      "clear": "清空",
-      "clearConfirm": "再次点击确认清空",
       "remove": "移除",
       "removeAria": "移除媒体 {{name}}",
       "selectAllVisible": "全选当前",
@@ -1012,7 +1010,6 @@
     },
     "status": {
       "added": "已添加 {{count}} 个媒体文件",
-      "cleared": "相册已清空",
       "allDuplicated": "媒体文件已存在，未重复添加",
       "unsupportedOnly": "未识别到受支持的图片/视频格式",
       "zoomReset": "已恢复到实际大小",

@@ -913,8 +913,6 @@
     },
     "actions": {
       "add": "Add Media",
-      "clear": "Clear",
-      "clearConfirm": "Click again to confirm",
       "remove": "Remove",
       "removeAria": "Remove media {{name}}",
       "selectAllVisible": "Select All",
@@ -1012,7 +1010,6 @@
     },
     "status": {
       "added": "Imported {{count}} media file(s)",
-      "cleared": "Album cleared",
       "allDuplicated": "Media file already exists, skipped duplicates",
       "unsupportedOnly": "No supported image/video format detected",
       "zoomReset": "Reset to actual size",

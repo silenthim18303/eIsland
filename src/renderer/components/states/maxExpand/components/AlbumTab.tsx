@@ -468,7 +468,6 @@ export function AlbumTab(): ReactElement {
   const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [dragOverPage, setDragOverPage] = useState(false);
-  const [confirmingClear, setConfirmingClear] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [videoPlaying, setVideoPlaying] = useState<boolean>(true);
   const [videoMuted, setVideoMuted] = useState<boolean>(true);
@@ -961,22 +960,6 @@ export function AlbumTab(): ReactElement {
     setStatusMessage(t('albumTab.status.removedSelected', { count: idsToRemove.size }));
   };
 
-  /** 二次确认清空 */
-  const handleClear = (): void => {
-    if (!confirmingClear) {
-      setConfirmingClear(true);
-      window.setTimeout(() => setConfirmingClear(false), 2600);
-      return;
-    }
-    Object.values(metaCacheRef.current).forEach((meta) => revokeBlobUrl(meta.videoUrl));
-    setItems([]);
-    setMetaCache({});
-    setSelectedIds(new Set());
-    setActiveId(null);
-    setConfirmingClear(false);
-    setStatusMessage(t('albumTab.status.cleared'));
-  };
-
   /** 删除单个条目 */
   const handleRemove = (id: number): void => {
     setItems((prev) => prev.filter((it) => it.id !== id));
@@ -1400,15 +1383,6 @@ export function AlbumTab(): ReactElement {
             title={t('albumTab.actions.select')}
           >
             {t('albumTab.actions.select')}
-          </button>
-          <button
-            className={`album-danger-btn${confirmingClear ? ' album-danger-btn--confirm' : ''}`}
-            type="button"
-            onClick={handleClear}
-            disabled={totalCount === 0}
-            title={t('albumTab.actions.clear')}
-          >
-            {confirmingClear ? t('albumTab.actions.clearConfirm') : t('albumTab.actions.clear')}
           </button>
         </div>
       </div>
