@@ -24,6 +24,15 @@ jobs:
           node-version: 25
           cache: npm
 
+      - name: Install Visual Studio Build Tools
+        shell: pwsh
+        run: |
+          # Install VS Build Tools with C++ Desktop workload (required by node-gyp for native modules)
+          $installerPath = "${{ runner.temp }}\vs_buildtools.exe"
+          Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile $installerPath
+          Start-Process -FilePath $installerPath -ArgumentList '--quiet', '--norestart', '--nocache', '--add', 'Microsoft.VisualStudio.Workload.VCTools', '--includeRecommended' -Wait
+          Remove-Item $installerPath
+
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
