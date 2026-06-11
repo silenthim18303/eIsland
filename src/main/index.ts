@@ -25,7 +25,7 @@
  */
 
 import { app, BrowserWindow, globalShortcut, protocol, net, ipcMain } from 'electron';
-import { join, resolve as resolvePath } from 'path';
+import { join, resolve as resolvePath, sep } from 'path';
 import { pathToFileURL } from 'url';
 import { mkdirSync, existsSync, readFileSync, writeFileSync } from 'fs';
 import { electronApp, optimizer } from '@electron-toolkit/utils';
@@ -716,8 +716,6 @@ protocol.registerSchemesAsPrivileged([
       secure: true,
       supportFetchAPI: true,
       stream: true,
-      corsEnabled: true,
-      bypassCSP: true,
     },
   },
 ]);
@@ -755,7 +753,7 @@ app.whenReady().then(() => {
   /**
    * eisland-media:// 协议处理器
    * @description 将形如 eisland-media://local/<encoded-abs-path> 的请求代理到本地文件，
-   *   允许读取任意本地绝对路径（渲染进程已通过 readLocalFileAsBuffer 拥有同等权限）。
+   *   仅允许读取 userData/wallpapers 下的文件，超出范围返回 403。
    *   使用纯字符串切片解析以避免 Node URL 解析对非内置 scheme 的差异。
    */
   protocol.handle('eisland-media', (request) => {
@@ -782,6 +780,11 @@ app.whenReady().then(() => {
       if (qIdx >= 0) rest = rest.slice(0, qIdx);
       const rawPath = decodeURIComponent(rest);
       const absPath = resolvePath(rawPath);
+      const allowedDir = join(app.getPath('userData'), 'wallpapers') + sep;
+      if (!absPath.startsWith(allowedDir)) {
+        console.warn('[eisland-media] path outside allowed directory:', absPath);
+        return new Response('Forbidden', { status: 403 });
+      }
       if (!existsSync(absPath)) {
         console.warn('[eisland-media] not found:', absPath);
         return new Response('Not Found', { status: 404 });
