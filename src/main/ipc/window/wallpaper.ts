@@ -28,7 +28,7 @@
 import { app, BrowserWindow, dialog, ipcMain, net } from 'electron';
 import { execFile } from 'child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync, writeFileSync } from 'fs';
-import { extname, join } from 'path';
+import { extname, join, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
 
 const DESKTOP_SYNC_FILE_BASENAME = 'desktop-sync-wallpaper';
@@ -271,8 +271,10 @@ export function registerWallpaperIpcHandlers(): void {
   ipcMain.handle('wallpaper:read-file-buffer', async (_event, filePath: string): Promise<Uint8Array | null> => {
     try {
       if (!filePath || typeof filePath !== 'string') return null;
-      if (!existsSync(filePath)) return null;
-      const buf = readFileSync(filePath);
+      const normalized = resolve(filePath);
+      if (!normalized.startsWith(wallpaperCacheDir + sep)) return null;
+      if (!existsSync(normalized)) return null;
+      const buf = readFileSync(normalized);
       return new Uint8Array(buf);
     } catch {
       return null;
