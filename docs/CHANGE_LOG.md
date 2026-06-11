@@ -1,7 +1,119 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-07T12:25:22.765Z
+> 生成时间：2026-06-11T16:27:38.132Z
+
+## 26.6.0
+
+- 2026-06-09 | b477122d | 鸡哥 | chore: update version to 26.6.0 in package.json and package-lock.json
+- 2026-06-09 | 1259752b | 鸡哥 | docs(announcement): add V26.6.0 release notes
+- 2026-06-07 | 3408051d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #74 by @JNTMTMTM [skip ci]
+- 2026-06-07 | 3a407fe9 | 鸡哥 | Merge pull request #74 from JNTMTMTM/dev
+- 2026-06-07 | 709fe3ef | 鸡哥 | refactor(cli): optimize session permission handling and improve heatmap data processing
+- 2026-06-07 | ccfecb92 | 鸡哥 | feat(cli): add documentation comments for Claude Code components
+- 2026-06-07 | 27ce9a85 | 鸡哥 | feat(user-settings): add login days and heatmap toggle functionality
+- 2026-06-07 | 0ab671c5 | 鸡哥 | Remove 'loginDays' key from internationalization files and refactor LoginHeatmap component for improved structure and readability. This change enhances the clarity of the heatmap display while maintaining functionality.
+- 2026-06-07 | 7b807a3b | 鸡哥 | feat(cli): enhance user login tracking with new heatmap feature
+- 2026-06-07 | 854cb381 | 鸡哥 | feat(cli): introduce ActivityHeatmap component and integrate into CLI and User Settings
+- 2026-06-07 | 315e0633 | 鸡哥 | feat(gsapskills): add official GSAP skills for core, frameworks, performance, plugins, and utilities
+- 2026-06-07 | 82aa64e7 | 鸡哥 | style(cli): update heatmap cell background colors for consistency
+- 2026-06-07 | ee1f8019 | 鸡哥 | fix(cli): update icon in CLI tab for heatmap toggle button
+- 2026-06-07 | 672deb34 | 鸡哥 | feat(claudeCodeStatusService): implement heatmap persistence and tracking
+- 2026-06-07 | ee616d2a | 鸡哥 | feat(cli): add activity heatmap feature to CLI tab
+- 2026-06-06 | 46b74b85 | 鸡哥 | feat(svgIcon): add FIRE icon to SvgIcon and update tests
+- 2026-06-06 | e8eb325a | 鸡哥 | fix(claudeCodeStatusService): update phase handling for session events
+- 2026-06-06 | 030be35d | 鸡哥 | refactor(claudeCodeStatusService): improve session ID resolution and merging logic
+- 2026-06-06 | bbf94104 | 鸡哥 | feat(cli): implement persistence for event streams and session data
+- 2026-06-06 | 69f6c181 | 鸡哥 | refactor(cli): improve session start event detection and notification logic
+- 2026-06-06 | 388d6995 | 鸡哥 | feat(cli): implement CLI glow window for enhanced user interaction
+- 2026-06-06 | 7aefd7ff | 鸡哥 | feat(cli): add audio feedback for CLI session notifications
+- 2026-06-06 | c81f7021 | 鸡哥 | fix(cli): refine event handling in CLI session status to include event names and improve session end detection
+- 2026-06-06 | d7176376 | 鸡哥 | feat(cli): enhance notification actions and styles for CLI session detection
+- 2026-06-06 | 37b9ea29 | 鸡哥 | feat(cli): implement notification actions for CLI session detection and enhance session status tracking
+- 2026-06-06 | 86c53a4e | 鸡哥 | feat(cli): add automatic switch to CLI view for new permission notifications when not in CLI context
+- 2026-06-06 | d085bad0 | 鸡哥 | fix(claudeCodeStatusService): update event summaries for session start, end, and user prompt submission to improve clarity and user feedback
+- 2026-06-06 | 70ea619d | 鸡哥 | feat(cli): enhance session status handling by adding notification sound for new permission requests and tracking seen permission IDs
+- 2026-06-06 | 1b3fed25 | 鸡哥 | fix(cli): update GIF selection logic in CLI state to reflect accurate session phases for improved visual feedback
+- 2026-06-06 | b8fca8c2 | 鸡哥 | feat(cli): integrate GIF icons in CLI state to enhance visual feedback based on session status and update styles for improved layout
+- 2026-06-06 | 10283aab | 鸡哥 | fix(claudeCodeStatusService): refine error handling and payload processing in createHookScript function for better hook event management
+- 2026-06-06 | ba2634e8 | 鸡哥 | fix(claudeCodeStatusService): update createHookScript function to improve payload enrichment and error handling for hook events
+- 2026-06-06 | e90a1ff9 | 鸡哥 | feat(SvgIcon): add CLAUDE_KB icon and update tests to reflect new key
+- 2026-06-06 | 585ca52f | 鸡哥 | feat(cli): add permission handling buttons in CLI event rows for user authorization decisions
+- 2026-06-06 | 75903696 | 鸡哥 | fix(cli): adjust layout and positioning in CLI state styles for improved UI consistency
+- 2026-06-06 | 856c5e12 | 鸡哥 | feat(settings): update settings sidebar tab state to default to '快速导航' page on entry, removing last tab persistence
+- 2026-06-06 | 190536ea | 鸡哥 | feat(claudeCodeStatusService): update phase handling to include 'SessionStart' and 'SubagentStart' events for improved session state management
+- 2026-06-06 | 82fb6616 | 鸡哥 | feat(claudeCodeStatusService): ignore 'Notification' events in addEvent function to prevent storage and broadcasting
+- 2026-06-06 | 85618bbb | 鸡哥 | feat(cli): implement permission handling in CLI state, adding buttons for user decisions and enhancing UI for authorization requests
+- 2026-06-06 | eceaea43 | 鸡哥 | feat(cli): enhance lyric display in CLI state with karaoke support, integrating syllable handling for improved user experience
+- 2026-06-06 | 50d2f33c | 鸡哥 | feat(cli): sync current playing song lyrics in CLI state, adding dynamic display and styling for improved user experience
+- 2026-06-06 | e31c54a1 | 鸡哥 | fix(i18n): update empty session and event messages for clarity in English and Chinese translations
+- 2026-06-06 | 60aad7a6 | 鸡哥 | chore(claudeCodeStatusService): remove 'Notification' event from HOOK_EVENTS for code cleanup
+- 2026-06-06 | 95bf349a | 鸡哥 | fix(cli): replace pagination arrows with SVG icons for improved visual consistency in CLI tab Co-Authored-By: Claude <noreply@anthropic.com>
+- 2026-06-06 | 1ea46c9e | 鸡哥 | feat(cli): implement pagination in CLI tab for event display, adding navigation buttons and updating styles
+- 2026-06-06 | c8f6458d | 鸡哥 | style(cli): enhance text handling in CLI styles by adding overflow-wrap and word-break properties for better readability
+- 2026-06-06 | b3ef22e6 | 鸡哥 | feat(cli): implement permission command display in CLI state, enhancing user feedback during authorization
+- 2026-06-06 | cffce6ad | 鸡哥 | style(cli): update CLI event display to include event tags and improve text handling in styles
+- 2026-06-06 | 26b44e17 | 鸡哥 | feat(cli): add 'enterCliState' functionality and button in CLI tab for live event stream access
+- 2026-06-06 | 83122644 | 鸡哥 | feat(cli): enhance CLI state handling by integrating island store for maxExpand tab checks
+- 2026-06-06 | 9a69fd51 | 鸡哥 | style(cli): adjust alignment and padding in CLI state content for improved layout
+- 2026-06-06 | 74de5331 | 鸡哥 | feat(cli): add CLI state handling and integration into dynamic island components
+- 2026-06-06 | 62b11b65 | 鸡哥 | refactor(cli): enhance toggle functionality and animations for CLI event card details
+- 2026-06-06 | 694ad5ba | 鸡哥 | feat(cli): implement bulk session selection and deletion in CLI tab with updated UI elements
+- 2026-06-06 | 78ad2722 | 鸡哥 | feat(cli): integrate GSAP for animation effects on CLI event cards and update dependencies
+- 2026-06-06 | c85ea059 | 鸡哥 | feat(cli): add animation to CLI event cards for smoother entry transition
+- 2026-06-06 | af4971d4 | 鸡哥 | fix(cli): update clipped function limit to 1000 and remove overflow hidden from CLI styles for better text handling
+- 2026-06-06 | add27cd8 | 鸡哥 | feat(cli): add permission event styling to CLI event cards for enhanced visual distinction
+- 2026-06-06 | 4c3e60c0 | 鸡哥 | feat(cli): add stop event styling to CLI event cards for better visual distinction
+- 2026-06-06 | e13ba567 | 鸡哥 | style(cli): reorganize CLI event card header layout and add tool tag for improved visual clarity
+- 2026-06-06 | 99e55748 | 鸡哥 | feat(cli): add expandable details to CLI event cards with improved toggle functionality and styles
+- 2026-06-06 | 193fbe71 | 鸡哥 | feat(cli): implement progressive loading for CLI events with IntersectionObserver and update styles for event sentinel
+- 2026-06-06 | aa29d9a8 | 鸡哥 | feat(cli): integrate ReactMarkdown for event summaries in CliTab and enhance styles for markdown elements
+- 2026-06-06 | fcfb7875 | 鸡哥 | style(cli): enhance cli-event-card styles with overflow handling and improved text display
+- 2026-06-06 | b18f6cdf | 鸡哥 | style(cli): enhance cli-tab-phase styles for better layout and alignment
+- 2026-06-06 | ecbe2697 | 鸡哥 | style(cli): update cli-tab-permission styles for improved layout and alignment
+- 2026-06-06 | b63e6ff0 | 鸡哥 | feat(cli): add AgentIcon to CLI tab for enhanced session representation and update styles for improved layout
+- 2026-06-06 | c4abeb0a | 鸡哥 | feat(cli): add permission project label to CLI tab for enhanced user clarity in permission status
+- 2026-06-06 | 0e25cde1 | 鸡哥 | fix(cli): correct SVG icon rendering issue in CLI tab for better visual consistency
+- 2026-06-06 | 7faedc86 | 鸡哥 | refactor(cli): replace SVG filter icon with image component for improved performance and maintainability
+- 2026-06-06 | 73d30d9c | 鸡哥 | feat(svg): add FILTER icon to SvgIcon and update tests to reflect the change
+- 2026-06-06 | f675ec5d | 鸡哥 | feat(cli): implement filter visibility toggle in CLI tab with corresponding styles for enhanced user interaction
+- 2026-06-06 | 965a2169 | 鸡哥 | style(cli): add RTL support and left text alignment for improved readability in CLI tab
+- 2026-06-06 | 30c3814d | 鸡哥 | style(cli): update color scheme for CLI tab elements to improve visual consistency and user experience
+- 2026-06-06 | 1b1f3d6e | 鸡哥 | feat(transcript): add sessionId field to ClaudeTranscriptDetails and update related functions for improved session tracking
+- 2026-06-06 | 5d3bc262 | 鸡哥 | feat(i18n): add external agent notifications in English and Chinese translations
+- 2026-06-06 | 6e4454df | 鸡哥 | style(cli): update icon in CLI tab button to reflect hook state for improved user feedback
+- 2026-06-06 | 791c97b5 | 鸡哥 | style(cli): update button layout and add icons for CLI tab actions to enhance user experience
+- 2026-06-06 | 03146c3f | 鸡哥 | feat(cli): add session selection feature to CLI tab with improved layout and event filtering
+- 2026-06-06 | c43411cb | 鸡哥 | style(cli): update padding and height for CLI tab elements to enhance layout consistency
+- 2026-06-06 | 96594cbb | 鸡哥 | fix(notification): set default state for agent notification to disabled in hooks and settings page
+- 2026-06-06 | c7bafd11 | 鸡哥 | feat(notification): add agent launch notification settings and functionality for enabling/disabling notifications
+- 2026-06-06 | a49de8a7 | 鸡哥 | feat(svg): add CLAUDE SVG icon and corresponding TypeScript module with unit tests
+- 2026-06-06 | 60e9feeb | 鸡哥 | feat(transcript): enhance transcript details with additional fields for tool usage and notifications
+- 2026-06-06 | 69764949 | 鸡哥 | feat(cli): enhance CLI tab with event filtering options and improved layout for better user interaction
+- 2026-06-06 | a7ad0f37 | 鸡哥 | refactor(cli): simplify CliTab component by removing unused state and styling for improved clarity
+- 2026-06-06 | 2d17c0a9 | 鸡哥 | style(cli): refactor event row to card layout with updated styles for improved readability and consistency
+- 2026-06-06 | f67d7c4c | 鸡哥 | feat(cli): add CLI tab selectors to wheel navigation exclusions for improved user experience
+- 2026-06-06 | ec6229f4 | 鸡哥 | refactor(cli): update CliTab layout and styles for improved usability and visual consistency
+- 2026-06-05 | 18ce4998 | 鸡哥 | feat(cli): add CLI Console support with real-time session monitoring and event handling
+- 2026-06-05 | 2d669409 | 鸡哥 | fix(notification): ensure notified processes are removed when external agents stop
+- 2026-06-05 | 6b520404 | 鸡哥 | feat(notification): update external agent notifications to handle multiple agent names for start/stop events
+- 2026-06-05 | bdb1cfd8 | 鸡哥 | feat(notification): enhance external agent notifications with start/stop events and UI updates
+- 2026-06-05 | a93d9ba4 | 鸡哥 | feat(notification): add external agent detection notifications and related UI updates
+- 2026-06-05 | 016acb64 | 鸡哥 | style(url-favorites): tighten gap between URL list and input bar when panels collapsed
+- 2026-06-05 | 276dcfe1 | 鸡哥 | feat(url-favorites): add folder management features and enhance UI for URL favorites
+- 2026-06-05 | bdb87e37 | 鸡哥 | feat(url-favorites): add manage import/export button and enhance UI for URL favorites
+- 2026-06-05 | 0e4bb3d9 | 鸡哥 | feat(url-favorites): implement import and export functionality for URL favorites with corresponding UI updates and messages
+- 2026-06-05 | 1c893a9e | 鸡哥 | feat(translation): enhance language selection icons in TranslationTab and TranslateToolSection with AI icon support
+- 2026-06-05 | 9034df48 | 鸡哥 | fix(translation): stop scroll event propagation in TranslationTab textareas for better user experience
+- 2026-06-05 | e2e1e6a3 | 鸡哥 | fix(translation): prevent scroll event propagation in TranslationTab textareas and enhance scrollbar styles
+- 2026-06-05 | 500352a3 | 鸡哥 | feat(translation): implement dropdown language selection in TranslationTab with improved styling and accessibility
+- 2026-06-05 | 5bdb26a2 | 鸡哥 | feat(translation): add copy button to TranslationTab and adjust layout styles
+- 2026-06-05 | a6109e53 | 鸡哥 | style(translation): update textarea styles for improved appearance and focus state
+- 2026-06-05 | 1f3e9ae8 | 鸡哥 | feat(translation): enhance TranslationTab accessibility and improve button styles
+- 2026-06-05 | 320e8813 | 鸡哥 | feat(translation): implement translation tab with language selection and functionality in English and Chinese
+- 2026-06-05 | 2b9c4910 | 鸡哥 | feat(i18n): add translation tab and corresponding labels in English and Chinese
+- 2026-06-04 | 782cc36e | 鸡哥 | fix(tsconfig): update ignoreDeprecations option from 6.0 to 5.0
+- 2026-06-04 | 333aa5be | 鸡哥 | fix(ci): use HEAD~1 instead of HEAD^ to avoid Windows cmd.exe escaping
 
 ## 26.5.14
 
@@ -2050,109 +2162,28 @@
 
 ## Unreleased
 
-- 2026-06-07 | 3a407fe9 | 鸡哥 | Merge pull request #74 from JNTMTMTM/dev
-- 2026-06-07 | 709fe3ef | 鸡哥 | refactor(cli): optimize session permission handling and improve heatmap data processing
-- 2026-06-07 | ccfecb92 | 鸡哥 | feat(cli): add documentation comments for Claude Code components
-- 2026-06-07 | 27ce9a85 | 鸡哥 | feat(user-settings): add login days and heatmap toggle functionality
-- 2026-06-07 | 0ab671c5 | 鸡哥 | Remove 'loginDays' key from internationalization files and refactor LoginHeatmap component for improved structure and readability. This change enhances the clarity of the heatmap display while maintaining functionality.
-- 2026-06-07 | 7b807a3b | 鸡哥 | feat(cli): enhance user login tracking with new heatmap feature
-- 2026-06-07 | 854cb381 | 鸡哥 | feat(cli): introduce ActivityHeatmap component and integrate into CLI and User Settings
-- 2026-06-07 | 315e0633 | 鸡哥 | feat(gsapskills): add official GSAP skills for core, frameworks, performance, plugins, and utilities
-- 2026-06-07 | 82aa64e7 | 鸡哥 | style(cli): update heatmap cell background colors for consistency
-- 2026-06-07 | ee1f8019 | 鸡哥 | fix(cli): update icon in CLI tab for heatmap toggle button
-- 2026-06-07 | 672deb34 | 鸡哥 | feat(claudeCodeStatusService): implement heatmap persistence and tracking
-- 2026-06-07 | ee616d2a | 鸡哥 | feat(cli): add activity heatmap feature to CLI tab
-- 2026-06-06 | 46b74b85 | 鸡哥 | feat(svgIcon): add FIRE icon to SvgIcon and update tests
-- 2026-06-06 | e8eb325a | 鸡哥 | fix(claudeCodeStatusService): update phase handling for session events
-- 2026-06-06 | 030be35d | 鸡哥 | refactor(claudeCodeStatusService): improve session ID resolution and merging logic
-- 2026-06-06 | bbf94104 | 鸡哥 | feat(cli): implement persistence for event streams and session data
-- 2026-06-06 | 69f6c181 | 鸡哥 | refactor(cli): improve session start event detection and notification logic
-- 2026-06-06 | 388d6995 | 鸡哥 | feat(cli): implement CLI glow window for enhanced user interaction
-- 2026-06-06 | 7aefd7ff | 鸡哥 | feat(cli): add audio feedback for CLI session notifications
-- 2026-06-06 | c81f7021 | 鸡哥 | fix(cli): refine event handling in CLI session status to include event names and improve session end detection
-- 2026-06-06 | d7176376 | 鸡哥 | feat(cli): enhance notification actions and styles for CLI session detection
-- 2026-06-06 | 37b9ea29 | 鸡哥 | feat(cli): implement notification actions for CLI session detection and enhance session status tracking
-- 2026-06-06 | 86c53a4e | 鸡哥 | feat(cli): add automatic switch to CLI view for new permission notifications when not in CLI context
-- 2026-06-06 | d085bad0 | 鸡哥 | fix(claudeCodeStatusService): update event summaries for session start, end, and user prompt submission to improve clarity and user feedback
-- 2026-06-06 | 70ea619d | 鸡哥 | feat(cli): enhance session status handling by adding notification sound for new permission requests and tracking seen permission IDs
-- 2026-06-06 | 1b3fed25 | 鸡哥 | fix(cli): update GIF selection logic in CLI state to reflect accurate session phases for improved visual feedback
-- 2026-06-06 | b8fca8c2 | 鸡哥 | feat(cli): integrate GIF icons in CLI state to enhance visual feedback based on session status and update styles for improved layout
-- 2026-06-06 | 10283aab | 鸡哥 | fix(claudeCodeStatusService): refine error handling and payload processing in createHookScript function for better hook event management
-- 2026-06-06 | ba2634e8 | 鸡哥 | fix(claudeCodeStatusService): update createHookScript function to improve payload enrichment and error handling for hook events
-- 2026-06-06 | e90a1ff9 | 鸡哥 | feat(SvgIcon): add CLAUDE_KB icon and update tests to reflect new key
-- 2026-06-06 | 585ca52f | 鸡哥 | feat(cli): add permission handling buttons in CLI event rows for user authorization decisions
-- 2026-06-06 | 75903696 | 鸡哥 | fix(cli): adjust layout and positioning in CLI state styles for improved UI consistency
-- 2026-06-06 | 856c5e12 | 鸡哥 | feat(settings): update settings sidebar tab state to default to '快速导航' page on entry, removing last tab persistence
-- 2026-06-06 | 190536ea | 鸡哥 | feat(claudeCodeStatusService): update phase handling to include 'SessionStart' and 'SubagentStart' events for improved session state management
-- 2026-06-06 | 82fb6616 | 鸡哥 | feat(claudeCodeStatusService): ignore 'Notification' events in addEvent function to prevent storage and broadcasting
-- 2026-06-06 | 85618bbb | 鸡哥 | feat(cli): implement permission handling in CLI state, adding buttons for user decisions and enhancing UI for authorization requests
-- 2026-06-06 | eceaea43 | 鸡哥 | feat(cli): enhance lyric display in CLI state with karaoke support, integrating syllable handling for improved user experience
-- 2026-06-06 | 50d2f33c | 鸡哥 | feat(cli): sync current playing song lyrics in CLI state, adding dynamic display and styling for improved user experience
-- 2026-06-06 | e31c54a1 | 鸡哥 | fix(i18n): update empty session and event messages for clarity in English and Chinese translations
-- 2026-06-06 | 60aad7a6 | 鸡哥 | chore(claudeCodeStatusService): remove 'Notification' event from HOOK_EVENTS for code cleanup
-- 2026-06-06 | 95bf349a | 鸡哥 | fix(cli): replace pagination arrows with SVG icons for improved visual consistency in CLI tab Co-Authored-By: Claude <noreply@anthropic.com>
-- 2026-06-06 | 1ea46c9e | 鸡哥 | feat(cli): implement pagination in CLI tab for event display, adding navigation buttons and updating styles
-- 2026-06-06 | c8f6458d | 鸡哥 | style(cli): enhance text handling in CLI styles by adding overflow-wrap and word-break properties for better readability
-- 2026-06-06 | b3ef22e6 | 鸡哥 | feat(cli): implement permission command display in CLI state, enhancing user feedback during authorization
-- 2026-06-06 | cffce6ad | 鸡哥 | style(cli): update CLI event display to include event tags and improve text handling in styles
-- 2026-06-06 | 26b44e17 | 鸡哥 | feat(cli): add 'enterCliState' functionality and button in CLI tab for live event stream access
-- 2026-06-06 | 83122644 | 鸡哥 | feat(cli): enhance CLI state handling by integrating island store for maxExpand tab checks
-- 2026-06-06 | 9a69fd51 | 鸡哥 | style(cli): adjust alignment and padding in CLI state content for improved layout
-- 2026-06-06 | 74de5331 | 鸡哥 | feat(cli): add CLI state handling and integration into dynamic island components
-- 2026-06-06 | 62b11b65 | 鸡哥 | refactor(cli): enhance toggle functionality and animations for CLI event card details
-- 2026-06-06 | 694ad5ba | 鸡哥 | feat(cli): implement bulk session selection and deletion in CLI tab with updated UI elements
-- 2026-06-06 | 78ad2722 | 鸡哥 | feat(cli): integrate GSAP for animation effects on CLI event cards and update dependencies
-- 2026-06-06 | c85ea059 | 鸡哥 | feat(cli): add animation to CLI event cards for smoother entry transition
-- 2026-06-06 | af4971d4 | 鸡哥 | fix(cli): update clipped function limit to 1000 and remove overflow hidden from CLI styles for better text handling
-- 2026-06-06 | add27cd8 | 鸡哥 | feat(cli): add permission event styling to CLI event cards for enhanced visual distinction
-- 2026-06-06 | 4c3e60c0 | 鸡哥 | feat(cli): add stop event styling to CLI event cards for better visual distinction
-- 2026-06-06 | e13ba567 | 鸡哥 | style(cli): reorganize CLI event card header layout and add tool tag for improved visual clarity
-- 2026-06-06 | 99e55748 | 鸡哥 | feat(cli): add expandable details to CLI event cards with improved toggle functionality and styles
-- 2026-06-06 | 193fbe71 | 鸡哥 | feat(cli): implement progressive loading for CLI events with IntersectionObserver and update styles for event sentinel
-- 2026-06-06 | aa29d9a8 | 鸡哥 | feat(cli): integrate ReactMarkdown for event summaries in CliTab and enhance styles for markdown elements
-- 2026-06-06 | fcfb7875 | 鸡哥 | style(cli): enhance cli-event-card styles with overflow handling and improved text display
-- 2026-06-06 | b18f6cdf | 鸡哥 | style(cli): enhance cli-tab-phase styles for better layout and alignment
-- 2026-06-06 | ecbe2697 | 鸡哥 | style(cli): update cli-tab-permission styles for improved layout and alignment
-- 2026-06-06 | b63e6ff0 | 鸡哥 | feat(cli): add AgentIcon to CLI tab for enhanced session representation and update styles for improved layout
-- 2026-06-06 | c4abeb0a | 鸡哥 | feat(cli): add permission project label to CLI tab for enhanced user clarity in permission status
-- 2026-06-06 | 0e25cde1 | 鸡哥 | fix(cli): correct SVG icon rendering issue in CLI tab for better visual consistency
-- 2026-06-06 | 7faedc86 | 鸡哥 | refactor(cli): replace SVG filter icon with image component for improved performance and maintainability
-- 2026-06-06 | 73d30d9c | 鸡哥 | feat(svg): add FILTER icon to SvgIcon and update tests to reflect the change
-- 2026-06-06 | f675ec5d | 鸡哥 | feat(cli): implement filter visibility toggle in CLI tab with corresponding styles for enhanced user interaction
-- 2026-06-06 | 965a2169 | 鸡哥 | style(cli): add RTL support and left text alignment for improved readability in CLI tab
-- 2026-06-06 | 30c3814d | 鸡哥 | style(cli): update color scheme for CLI tab elements to improve visual consistency and user experience
-- 2026-06-06 | 1b1f3d6e | 鸡哥 | feat(transcript): add sessionId field to ClaudeTranscriptDetails and update related functions for improved session tracking
-- 2026-06-06 | 5d3bc262 | 鸡哥 | feat(i18n): add external agent notifications in English and Chinese translations
-- 2026-06-06 | 6e4454df | 鸡哥 | style(cli): update icon in CLI tab button to reflect hook state for improved user feedback
-- 2026-06-06 | 791c97b5 | 鸡哥 | style(cli): update button layout and add icons for CLI tab actions to enhance user experience
-- 2026-06-06 | 03146c3f | 鸡哥 | feat(cli): add session selection feature to CLI tab with improved layout and event filtering
-- 2026-06-06 | c43411cb | 鸡哥 | style(cli): update padding and height for CLI tab elements to enhance layout consistency
-- 2026-06-06 | 96594cbb | 鸡哥 | fix(notification): set default state for agent notification to disabled in hooks and settings page
-- 2026-06-06 | c7bafd11 | 鸡哥 | feat(notification): add agent launch notification settings and functionality for enabling/disabling notifications
-- 2026-06-06 | a49de8a7 | 鸡哥 | feat(svg): add CLAUDE SVG icon and corresponding TypeScript module with unit tests
-- 2026-06-06 | 60e9feeb | 鸡哥 | feat(transcript): enhance transcript details with additional fields for tool usage and notifications
-- 2026-06-06 | 69764949 | 鸡哥 | feat(cli): enhance CLI tab with event filtering options and improved layout for better user interaction
-- 2026-06-06 | a7ad0f37 | 鸡哥 | refactor(cli): simplify CliTab component by removing unused state and styling for improved clarity
-- 2026-06-06 | 2d17c0a9 | 鸡哥 | style(cli): refactor event row to card layout with updated styles for improved readability and consistency
-- 2026-06-06 | f67d7c4c | 鸡哥 | feat(cli): add CLI tab selectors to wheel navigation exclusions for improved user experience
-- 2026-06-06 | ec6229f4 | 鸡哥 | refactor(cli): update CliTab layout and styles for improved usability and visual consistency
-- 2026-06-05 | 18ce4998 | 鸡哥 | feat(cli): add CLI Console support with real-time session monitoring and event handling
-- 2026-06-05 | 2d669409 | 鸡哥 | fix(notification): ensure notified processes are removed when external agents stop
-- 2026-06-05 | 6b520404 | 鸡哥 | feat(notification): update external agent notifications to handle multiple agent names for start/stop events
-- 2026-06-05 | bdb1cfd8 | 鸡哥 | feat(notification): enhance external agent notifications with start/stop events and UI updates
-- 2026-06-05 | a93d9ba4 | 鸡哥 | feat(notification): add external agent detection notifications and related UI updates
-- 2026-06-05 | 016acb64 | 鸡哥 | style(url-favorites): tighten gap between URL list and input bar when panels collapsed
-- 2026-06-05 | 276dcfe1 | 鸡哥 | feat(url-favorites): add folder management features and enhance UI for URL favorites
-- 2026-06-05 | bdb87e37 | 鸡哥 | feat(url-favorites): add manage import/export button and enhance UI for URL favorites
-- 2026-06-05 | 0e4bb3d9 | 鸡哥 | feat(url-favorites): implement import and export functionality for URL favorites with corresponding UI updates and messages
-- 2026-06-05 | 1c893a9e | 鸡哥 | feat(translation): enhance language selection icons in TranslationTab and TranslateToolSection with AI icon support
-- 2026-06-05 | 9034df48 | 鸡哥 | fix(translation): stop scroll event propagation in TranslationTab textareas for better user experience
-- 2026-06-05 | e2e1e6a3 | 鸡哥 | fix(translation): prevent scroll event propagation in TranslationTab textareas and enhance scrollbar styles
-- 2026-06-05 | 500352a3 | 鸡哥 | feat(translation): implement dropdown language selection in TranslationTab with improved styling and accessibility
-- 2026-06-05 | 5bdb26a2 | 鸡哥 | feat(translation): add copy button to TranslationTab and adjust layout styles
-- 2026-06-05 | a6109e53 | 鸡哥 | style(translation): update textarea styles for improved appearance and focus state
-- 2026-06-05 | 1f3e9ae8 | 鸡哥 | feat(translation): enhance TranslationTab accessibility and improve button styles
-- 2026-06-05 | 320e8813 | 鸡哥 | feat(translation): implement translation tab with language selection and functionality in English and Chinese
-- 2026-06-05 | 2b9c4910 | 鸡哥 | feat(i18n): add translation tab and corresponding labels in English and Chinese
-- 2026-06-04 | 782cc36e | 鸡哥 | fix(tsconfig): update ignoreDeprecations option from 6.0 to 5.0
-- 2026-06-04 | 333aa5be | 鸡哥 | fix(ci): use HEAD~1 instead of HEAD^ to avoid Windows cmd.exe escaping
+- 2026-06-12 | 8112deaa | 鸡哥 | Merge pull request #91 from JNTMTMTM/dev
+- 2026-06-12 | e7c055e1 | 鸡哥 | fix(workflow): add step to install Electron binary before running tests
+- 2026-06-12 | 5848385a | 鸡哥 | fix(tests): add log output for preload and full test failures
+- 2026-06-11 | 3724c369 | 鸡哥 | fix(workflow): add --ignore-scripts flag to npm ci and enable continue-on-error for downloading test logs
+- 2026-06-11 | 329c32df | 鸡哥 | fix(test): update preload and full test steps to handle exit codes correctly
+- 2026-06-11 | a83c2ca9 | 鸡哥 | fix(test): update file path in wallpaper capture tests to reflect new directory structure
+- 2026-06-11 | 4e5286c3 | 鸡哥 | fix(store): ensure store key validation is consistently applied across all operations
+- 2026-06-11 | 6937cd1a | 鸡哥 | fix(store): validate store key before reading and writing operations #89
+- 2026-06-11 | f8ba86b0 | 鸡哥 | feat(announcement): integrate DOMPurify for sanitizing HTML content in announcements #89
+- 2026-06-11 | 99df20f2 | 鸡哥 | feat(protocol): restrict eisland-media protocol to userData/wallpapers directory #89
+- 2026-06-11 | f7336cfa | 鸡哥 | fix(wallpaper): normalize file path before reading to ensure valid access #89
+- 2026-06-11 | 9fabb444 | 鸡哥 | feat(smtcService): retain previous timeline data for playback-only updates of the same track #88
+- 2026-06-10 | f3f268cf | 鸡哥 | refactor(AlbumTab): remove clear confirmation functionality and related translations
+- 2026-06-10 | b5063022 | 鸡哥 | feat(AlbumTab): add media grouping feature with folder and date options
+- 2026-06-10 | dd0d0d8b | 鸡哥 | feat(album-grid): enhance hover effect with scale transformation
+- 2026-06-10 | e09ba5c6 | 鸡哥 | fix(album-selection): adjust position of selection check and remove unnecessary padding
+- 2026-06-10 | d8849d59 | 鸡哥 | feat(AlbumTab): enhance item selection with toggle functionality and improve hover styles
+- 2026-06-10 | c254c44e | 鸡哥 | feat(AlbumTab): implement media selection features and update styles
+- 2026-06-09 | b300e3d8 | 鸡哥 | feat(tests): redirect test output to log files and display logs after execution
+- 2026-06-09 | 28a81a96 | 鸡哥 | feat(TranslationTab): add menuRef to handle clicks outside the dropdown
+- 2026-06-09 | 3a9b2e96 | 鸡哥 | feat(updater): update ESA CDN URL to include /eisland-update path
+- 2026-06-09 | 8862bd16 | 鸡哥 | feat(upload): replace BaoTa upload support with MinIO integration
+- 2026-06-09 | 5f920bf5 | 鸡哥 | feat(upload): add support for BaoTa panel uploads
+- 2026-06-09 | 3fd93388 | 鸡哥 | chore: update @types/node version and adjust tsconfig includes
+- 2026-06-09 | 1f13b909 | 鸡哥 | feat(updater): add ESA CDN as a new update source
