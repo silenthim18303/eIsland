@@ -260,7 +260,7 @@ describe('capture and wallpaper ipc handlers', () => {
     expect(unlinkSyncMock).toHaveBeenCalledWith(expect.stringContaining('custom-bg-abc.png'));
 
     await expect(loadFile?.({}, 'D:/wall/in.png')).resolves.toBe(`data:image/png;base64,${Buffer.from('img').toString('base64')}`);
-    await expect(readBuffer?.({}, 'D:/wall/in.png')).resolves.toEqual(new Uint8Array(Buffer.from('img')));
+    await expect(readBuffer?.({}, 'C:/AppData/eIsland/wallpapers/test.png')).resolves.toEqual(new Uint8Array(Buffer.from('img')));
 
     await clearCache?.({});
     expect(unlinkSyncMock).toHaveBeenCalled();

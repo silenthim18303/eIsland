@@ -26,6 +26,7 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import DOMPurify from 'dompurify';
 import type { AnnouncementData } from '../../../../api/announcement/announcementApi';
 import { ANNOUNCEMENT_KEYS, ANNOUNCEMENT_DEFAULTS } from '../config/announcementDefaults';
 
@@ -51,7 +52,7 @@ export function AnnouncementBody({ loading, announcement }: AnnouncementBodyProp
   }
 
   if (announcement.contentHtml) {
-    return <div className="announcement-body" dangerouslySetInnerHTML={{ __html: announcement.contentHtml }} />;
+    return <div className="announcement-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(announcement.contentHtml) }} />;
   }
 
   return (

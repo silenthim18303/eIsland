@@ -34,6 +34,11 @@ interface RegisterStoreIpcHandlersOptions {
   storeDir: string;
 }
 
+/** 合法的 store key：不含路径分隔符和 traversal 片段 */
+function isValidStoreKey(key: unknown): key is string {
+  return typeof key === 'string' && key.length > 0 && !/[\\/]/.test(key) && !key.includes('..');
+}
+
 /**
  * 注册通用存储 IPC 处理器
  * @description 注册通用键值存储读写 IPC 事件处理器
@@ -42,6 +47,7 @@ interface RegisterStoreIpcHandlersOptions {
 export function registerStoreIpcHandlers(options: RegisterStoreIpcHandlersOptions): void {
   ipcMain.handle('store:read', (_event, key: string) => {
     try {
+      if (!isValidStoreKey(key)) return null;
       const filePath = join(options.storeDir, `${key}.json`);
       if (!existsSync(filePath)) return null;
       const raw = readFileSync(filePath, 'utf-8');
@@ -54,6 +60,7 @@ export function registerStoreIpcHandlers(options: RegisterStoreIpcHandlersOption
 
   ipcMain.handle('store:write', (event, key: string, data: unknown) => {
     try {
+      if (!isValidStoreKey(key)) return false;
       const filePath = join(options.storeDir, `${key}.json`);
       writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
       broadcastSettingChange(event.sender.id, `store:${key}`, data);

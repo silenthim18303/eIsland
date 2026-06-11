@@ -913,10 +913,19 @@
     },
     "actions": {
       "add": "Add Media",
-      "clear": "Clear",
-      "clearConfirm": "Click again to confirm",
       "remove": "Remove",
-      "removeAria": "Remove media {{name}}"
+      "removeAria": "Remove media {{name}}",
+      "selectAllVisible": "Select All",
+      "unselectAllVisible": "Unselect All",
+      "clearSelection": "Clear Selection",
+      "removeSelected": "Delete Selected",
+      "select": "Select",
+      "cancelSelect": "Cancel"
+    },
+    "selection": {
+      "selectedCount": "{{count}} selected",
+      "toggle": "Select media {{name}}",
+      "hint": "Click items to select"
     },
     "sort": {
       "label": "Sort",
@@ -932,6 +941,16 @@
       "all": "All",
       "image": "Images",
       "video": "Videos"
+    },
+    "group": {
+      "label": "View Mode",
+      "none": "All",
+      "folder": "By Folder",
+      "date": "By Date",
+      "all": "All Media",
+      "count": "{{count}} items",
+      "unknownFolder": "Unknown Folder",
+      "unknownDate": "Unknown Date"
     },
     "columns": {
       "aria": "Adjust columns per row",
@@ -991,7 +1010,6 @@
     },
     "status": {
       "added": "Imported {{count}} media file(s)",
-      "cleared": "Album cleared",
       "allDuplicated": "Media file already exists, skipped duplicates",
       "unsupportedOnly": "No supported image/video format detected",
       "zoomReset": "Reset to actual size",
@@ -999,6 +1017,7 @@
       "saveAsSuccess": "Saved {{name}}",
       "saveAsCanceled": "Save canceled",
       "saveAsFailed": "Failed to save {{name}}. Please try again.",
+      "removedSelected": "Deleted {{count}} media file(s)",
       "setIslandBackgroundSuccess": "Set {{name}} as island background",
       "setIslandBackgroundFailed": "Failed to set island background. Please try again."
     }

@@ -913,10 +913,19 @@
     },
     "actions": {
       "add": "添加媒体",
-      "clear": "清空",
-      "clearConfirm": "再次点击确认清空",
       "remove": "移除",
-      "removeAria": "移除媒体 {{name}}"
+      "removeAria": "移除媒体 {{name}}",
+      "selectAllVisible": "全选当前",
+      "unselectAllVisible": "取消全选",
+      "clearSelection": "取消选择",
+      "removeSelected": "删除已选",
+      "select": "选择",
+      "cancelSelect": "取消选择"
+    },
+    "selection": {
+      "selectedCount": "已选 {{count}} 项",
+      "toggle": "选择媒体 {{name}}",
+      "hint": "点击图片进行选择"
     },
     "sort": {
       "label": "排序",
@@ -932,6 +941,16 @@
       "all": "全部",
       "image": "仅图片",
       "video": "仅视频"
+    },
+    "group": {
+      "label": "浏览方式",
+      "none": "全部",
+      "folder": "按文件夹",
+      "date": "按日期",
+      "all": "全部媒体",
+      "count": "{{count}} 项",
+      "unknownFolder": "未知文件夹",
+      "unknownDate": "未知日期"
     },
     "columns": {
       "aria": "调整每行列数",
@@ -991,7 +1010,6 @@
     },
     "status": {
       "added": "已添加 {{count}} 个媒体文件",
-      "cleared": "相册已清空",
       "allDuplicated": "媒体文件已存在，未重复添加",
       "unsupportedOnly": "未识别到受支持的图片/视频格式",
       "zoomReset": "已恢复到实际大小",
@@ -999,6 +1017,7 @@
       "saveAsSuccess": "已保存 {{name}}",
       "saveAsCanceled": "已取消保存",
       "saveAsFailed": "保存 {{name}} 失败，请稍后重试",
+      "removedSelected": "已删除 {{count}} 个媒体文件",
       "setIslandBackgroundSuccess": "已将 {{name}} 设为灵动岛背景",
       "setIslandBackgroundFailed": "设置灵动岛背景失败，请稍后重试"
     }

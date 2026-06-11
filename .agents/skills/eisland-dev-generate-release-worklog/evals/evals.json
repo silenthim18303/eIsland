@@ -1,0 +1,23 @@
+{
+  "skill_name": "eisland-dev-generate-release-worklog",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "生成 V26.5.14 的更新日志，日期是今天",
+      "expected_output": "A markdown file at docs/announcement/V26.5.14.md following the exact format: English metadata blockquote, Chinese bold summary, English italic summary, Chinese sections (新功能/体验优化/问题修复/文档更新), Chinese closing, English sections (New Features/Improvements/Bug Fixes/Documentation), English closing. No emoji, no title, no dividers.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Draft release notes for version V26.6.0, release date 2026-06-15, since 2026-06-01",
+      "expected_output": "A markdown file at docs/announcement/V26.6.0.md with commits from 2026-06-01 grouped into user-facing sections. Chinese content first, English content second. Format matches the project convention.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "帮我写一下新版本的发布公告，版本号 V26.5.15",
+      "expected_output": "A markdown file following the exact template structure with proper i18n layout. Commits are rewritten as user-facing bullet points without internal implementation details.",
+      "files": []
+    }
+  ]
+}
