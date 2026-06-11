@@ -92,6 +92,12 @@ jobs:
         run: |
           if [ "${{ steps.preload_test.outputs.exit_code }}" != "0" ] || [ "${{ steps.full_test.outputs.exit_code }}" != "0" ]; then
             echo "Tests failed. preload=${{ steps.preload_test.outputs.exit_code }}, full=${{ steps.full_test.outputs.exit_code }}"
+            echo ""
+            echo "--- preload-test.log tail ---"
+            if [ -f preload-test.log ]; then tail -n 120 preload-test.log; else echo "preload-test.log not found"; fi
+            echo ""
+            echo "--- full-test.log tail ---"
+            if [ -f full-test.log ]; then tail -n 160 full-test.log; else echo "full-test.log not found"; fi
             exit 1
           fi
 
