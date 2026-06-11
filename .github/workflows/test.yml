@@ -55,10 +55,9 @@ jobs:
         id: preload_test
         continue-on-error: true
         run: |
-          set +e
           START=$(date +%s)
-          FORCE_COLOR=0 NO_COLOR=1 npm run test:preload > preload-test.log 2>&1
-          EXIT_CODE=$?
+          EXIT_CODE=0
+          FORCE_COLOR=0 NO_COLOR=1 npm run test:preload > preload-test.log 2>&1 || EXIT_CODE=$?
           END=$(date +%s)
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
           echo "duration_seconds=$((END - START))" >> "$GITHUB_OUTPUT"
@@ -69,10 +68,9 @@ jobs:
         id: full_test
         continue-on-error: true
         run: |
-          set +e
           START=$(date +%s)
-          FORCE_COLOR=0 NO_COLOR=1 npm run test > full-test.log 2>&1
-          EXIT_CODE=$?
+          EXIT_CODE=0
+          FORCE_COLOR=0 NO_COLOR=1 npm run test > full-test.log 2>&1 || EXIT_CODE=$?
           END=$(date +%s)
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
           echo "duration_seconds=$((END - START))" >> "$GITHUB_OUTPUT"
