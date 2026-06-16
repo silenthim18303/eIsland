@@ -11,7 +11,8 @@
     "build": "node-gyp rebuild",
     "clean": "node-gyp clean",
     "rebuild": "node-gyp clean && node-gyp rebuild",
-    "test": "node --experimental-strip-types test/fullscreen-detector.test.ts"
+    "test": "node --experimental-strip-types test/fullscreen-detector.test.ts",
+    "smoke": "node --experimental-strip-types test/fullscreen-detector.smoke.ts"
   },
   "devDependencies": {
     "node-gyp": "^11.2.0"
