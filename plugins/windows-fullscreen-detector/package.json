@@ -10,7 +10,8 @@
   "scripts": {
     "build": "node-gyp rebuild",
     "clean": "node-gyp clean",
-    "rebuild": "node-gyp clean && node-gyp rebuild"
+    "rebuild": "node-gyp clean && node-gyp rebuild",
+    "test": "node --experimental-strip-types test/fullscreen-detector.test.ts"
   },
   "devDependencies": {
     "node-gyp": "^11.2.0"
