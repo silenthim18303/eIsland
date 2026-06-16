@@ -5,8 +5,14 @@
   "license": "GPL-3.0",
   "main": "index.js",
   "types": "index.d.ts",
-  "os": ["win32"],
-  "cpu": ["x64", "arm64", "ia32"],
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64",
+    "ia32"
+  ],
   "scripts": {
     "build": "node-gyp rebuild",
     "clean": "node-gyp clean",
@@ -15,6 +21,7 @@
     "smoke": "node --experimental-strip-types test/fullscreen-detector.smoke.ts"
   },
   "devDependencies": {
+    "@types/node": "^25.9.3",
     "node-gyp": "^11.2.0"
   },
   "gypfile": true,
