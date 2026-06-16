@@ -1,7 +1,8 @@
 {
   "name": "@eisland/windows-fullscreen-detector",
-  "version": "0.1.0",
+  "version": "26.0.0",
   "description": "Windows N-API addon for detecting foreground fullscreen windows across multiple monitors.",
+  "author": "JNTMTMTM",
   "license": "GPL-3.0",
   "main": "index.js",
   "types": "index.d.ts",
