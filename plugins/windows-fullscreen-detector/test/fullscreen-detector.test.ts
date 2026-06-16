@@ -1,29 +1,79 @@
-const assert = require('node:assert/strict');
-const detector = require('../');
+import { describe, expect, it } from 'vitest';
 
-assert.equal(typeof detector.getForegroundFullscreenWindow, 'function');
-assert.equal(typeof detector.getFullscreenWindows, 'function');
-assert.equal(typeof detector.isAnyFullscreenWindow, 'function');
+const detector = require('../') as {
+  getForegroundFullscreenWindow: () => {
+    title: string;
+    processId: number;
+    isForeground: boolean;
+    bounds: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+      width: number;
+      height: number;
+    };
+    monitor: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+      width: number;
+      height: number;
+      isPrimary: boolean;
+    };
+  } | null;
+  getFullscreenWindows: () => Array<{
+    hwnd: string;
+    title: string;
+    processId: number;
+    isForeground: boolean;
+    bounds: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+      width: number;
+      height: number;
+    };
+    monitor: {
+      left: number;
+      top: number;
+      right: number;
+      bottom: number;
+      width: number;
+      height: number;
+      isPrimary: boolean;
+    };
+  }>;
+  isAnyFullscreenWindow: () => boolean;
+};
 
-const foreground = detector.getForegroundFullscreenWindow();
-assert.ok(foreground === null || typeof foreground === 'object');
+describe('windows-fullscreen-detector', () => {
+  it('exports detector methods and result shape', () => {
+    expect(typeof detector.getForegroundFullscreenWindow).toBe('function');
+    expect(typeof detector.getFullscreenWindows).toBe('function');
+    expect(typeof detector.isAnyFullscreenWindow).toBe('function');
 
-const list = detector.getFullscreenWindows();
-assert.ok(Array.isArray(list));
-assert.equal(typeof detector.isAnyFullscreenWindow(), 'boolean');
+    const foreground = detector.getForegroundFullscreenWindow();
+    const list = detector.getFullscreenWindows();
 
-for (const item of list) {
-  assert.equal(typeof item.hwnd, 'string');
-  assert.equal(typeof item.title, 'string');
-  assert.equal(typeof item.processId, 'number');
-  assert.equal(typeof item.isForeground, 'boolean');
-  assert.equal(typeof item.bounds.left, 'number');
-  assert.equal(typeof item.bounds.top, 'number');
-  assert.equal(typeof item.bounds.right, 'number');
-  assert.equal(typeof item.bounds.bottom, 'number');
-  assert.equal(typeof item.bounds.width, 'number');
-  assert.equal(typeof item.bounds.height, 'number');
-  assert.equal(typeof item.monitor.isPrimary, 'boolean');
-}
+    expect(foreground === null || typeof foreground === 'object').toBe(true);
+    expect(Array.isArray(list)).toBe(true);
+    expect(detector.isAnyFullscreenWindow()).toBeTypeOf('boolean');
 
-console.log('windows-fullscreen-detector test passed');
+    for (const item of list) {
+      expect(item.hwnd).toBeTypeOf('string');
+      expect(item.title).toBeTypeOf('string');
+      expect(item.processId).toBeTypeOf('number');
+      expect(item.isForeground).toBeTypeOf('boolean');
+      expect(item.bounds.left).toBeTypeOf('number');
+      expect(item.bounds.top).toBeTypeOf('number');
+      expect(item.bounds.right).toBeTypeOf('number');
+      expect(item.bounds.bottom).toBeTypeOf('number');
+      expect(item.bounds.width).toBeTypeOf('number');
+      expect(item.bounds.height).toBeTypeOf('number');
+      expect(item.monitor.isPrimary).toBeTypeOf('boolean');
+    }
+  });
+});

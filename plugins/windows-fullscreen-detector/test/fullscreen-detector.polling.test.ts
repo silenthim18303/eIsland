@@ -1,4 +1,4 @@
-const assert = require('node:assert/strict');
+import { describe, expect, it } from 'vitest';
 
 const POLL_TIMES = 5;
 const POLL_INTERVAL_MS = 200;
@@ -17,12 +17,11 @@ type FullscreenWindowMonitor = FullscreenWindowRect & {
 };
 
 type FullscreenWindowInfo = {
-  hwnd: string;
   title: string;
   processId: number;
+  isForeground: boolean;
   bounds: FullscreenWindowRect;
   monitor: FullscreenWindowMonitor;
-  isForeground: boolean;
 };
 
 type PollFrame = {
@@ -58,12 +57,11 @@ type PollOptions = {
 };
 
 const fullscreenWindow: FullscreenWindowInfo = {
-  hwnd: '0x1',
   title: 'Mock Fullscreen App',
   processId: 1001,
+  isForeground: true,
   bounds: { left: 0, top: 0, right: 1920, bottom: 1080, width: 1920, height: 1080 },
   monitor: { left: 0, top: 0, right: 1920, bottom: 1080, width: 1920, height: 1080, isPrimary: true },
-  isForeground: true,
 };
 
 const mockFrames: PollFrame[] = [
@@ -105,9 +103,9 @@ function takeSnapshot(detector: MockDetector, index: number): DetectorSnapshot {
   const foreground = detector.getForegroundFullscreenWindow();
   const fullscreenWindows = detector.getFullscreenWindows();
 
-  assert.equal(typeof any, 'boolean');
-  assert.ok(foreground === null || typeof foreground === 'object');
-  assert.ok(Array.isArray(fullscreenWindows));
+  expect(typeof any).toBe('boolean');
+  expect(foreground === null || typeof foreground === 'object').toBe(true);
+  expect(Array.isArray(fullscreenWindows)).toBe(true);
 
   return {
     index,
@@ -131,27 +129,22 @@ async function pollDetector(detector: MockDetector, options: PollOptions): Promi
   return snapshots;
 }
 
-async function main() {
-  const detector = createMockDetector(mockFrames);
-  const waiter = createMockWaiter();
+describe('windows-fullscreen-detector polling', () => {
+  it('polls detector snapshots with mocked state sequence', async () => {
+    const detector = createMockDetector(mockFrames);
+    const waiter = createMockWaiter();
 
-  const snapshots = await pollDetector(detector, {
-    times: POLL_TIMES,
-    intervalMs: POLL_INTERVAL_MS,
-    wait: waiter.wait,
+    const snapshots = await pollDetector(detector, {
+      times: POLL_TIMES,
+      intervalMs: POLL_INTERVAL_MS,
+      wait: waiter.wait,
+    });
+
+    expect(detector.getReadCount()).toBe(POLL_TIMES);
+    expect(snapshots).toHaveLength(POLL_TIMES);
+    expect(waiter.calls).toEqual([POLL_INTERVAL_MS, POLL_INTERVAL_MS, POLL_INTERVAL_MS, POLL_INTERVAL_MS]);
+    expect(snapshots.map((snapshot) => snapshot.any)).toEqual([false, false, true, true, false]);
+    expect(snapshots.map((snapshot) => snapshot.fullscreenWindowCount)).toEqual([0, 0, 1, 1, 0]);
+    expect(snapshots.map((snapshot) => snapshot.foregroundWindowCount)).toEqual([0, 0, 1, 1, 0]);
   });
-
-  assert.equal(detector.getReadCount(), POLL_TIMES);
-  assert.equal(snapshots.length, POLL_TIMES);
-  assert.deepEqual(waiter.calls, [POLL_INTERVAL_MS, POLL_INTERVAL_MS, POLL_INTERVAL_MS, POLL_INTERVAL_MS]);
-  assert.deepEqual(snapshots.map((snapshot) => snapshot.any), [false, false, true, true, false]);
-  assert.deepEqual(snapshots.map((snapshot) => snapshot.fullscreenWindowCount), [0, 0, 1, 1, 0]);
-  assert.deepEqual(snapshots.map((snapshot) => snapshot.foregroundWindowCount), [0, 0, 1, 1, 0]);
-
-  console.log('windows-fullscreen-detector polling test passed');
-}
-
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
 });
