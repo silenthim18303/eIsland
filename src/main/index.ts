@@ -94,6 +94,7 @@ import {
   WHITELIST_STORE_KEY, LYRICS_SOURCE_STORE_KEY,
   LYRICS_KARAOKE_STORE_KEY, LYRICS_CLOCK_STORE_KEY,
   SMTC_UNSUBSCRIBE_MS_STORE_KEY, HIDE_PROCESS_LIST_STORE_KEY,
+  AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY,
   THEME_MODE_STORE_KEY, ISLAND_OPACITY_STORE_KEY,
   EXPAND_MOUSELEAVE_IDLE_STORE_KEY, MAXEXPAND_MOUSELEAVE_IDLE_STORE_KEY, IDLE_CLICK_EXPAND_STORE_KEY,
   CLIPBOARD_URL_MONITOR_ENABLED_STORE_KEY,
@@ -113,7 +114,7 @@ import {
   readToggleTrayHotkeyConfig, readShowSettingsWindowHotkeyConfig, readOpenClipboardHistoryHotkeyConfig, readTogglePassthroughHotkeyConfig, readToggleUiLockHotkeyConfig,
   readAgentVoiceInputHotkeyConfig,
   readWhitelistConfig, readLyricsSourceConfig, readSmtcUnsubscribeMsConfig,
-  readHideProcessListConfig, readIslandPositionOffsetConfig, readIslandDisplaySelectionConfig,
+  readHideProcessListConfig, readAutoHideFullscreenWindowsConfig, readIslandPositionOffsetConfig, readIslandDisplaySelectionConfig,
   writeIslandPositionOffsetConfig, writeIslandDisplaySelectionConfig,
   readClipboardUrlMonitorEnabledConfig, readClipboardUrlDetectModeConfig, readClipboardUrlBlacklistConfig,
   readUpdateAutoPromptConfig,
@@ -129,6 +130,20 @@ if (!gotTheLock) {
 let mainWindow: BrowserWindow | null = null;
 let agentVoiceInputWindow: BrowserWindow | null = null;
 let cliGlowWindow: BrowserWindow | null = null;
+let cachedFullscreenDetector: { isAnyFullscreenWindow: () => boolean } | null | undefined;
+
+function detectAnyFullscreenWindow(): boolean {
+  if (process.platform !== 'win32') return false;
+  if (cachedFullscreenDetector === undefined) {
+    try {
+      cachedFullscreenDetector = require('@eisland/windows-fullscreen-detector') as { isAnyFullscreenWindow: () => boolean };
+    } catch (err) {
+      cachedFullscreenDetector = null;
+      console.warn('[FullscreenDetector] unavailable:', err);
+    }
+  }
+  return cachedFullscreenDetector?.isAnyFullscreenWindow() === true;
+}
 
 function isIslandInExpandedOrMaxExpandState(): boolean {
   if (!mainWindow || mainWindow.isDestroyed()) return false;
@@ -338,6 +353,8 @@ const mainWindowService = createMainWindowService({
 const autoHideWatcher = createAutoHideWatcher({
   getMainWindow: () => mainWindow,
   defaultWindowTitleList: DEFAULT_HIDE_PROCESS_LIST,
+  defaultAutoHideFullscreenWindows: false,
+  isAnyFullscreenWindow: detectAnyFullscreenWindow,
 });
 
 const externalAgentWatcher = createExternalAgentWatcher({
@@ -580,9 +597,12 @@ function registerIpcHandlers(): void {
   registerHideProcessIpcHandlers({
     storeDir,
     hideProcessListStoreKey: HIDE_PROCESS_LIST_STORE_KEY,
+    autoHideFullscreenWindowsStoreKey: AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY,
     getConfiguredHideProcessList: autoHideWatcher.getConfiguredHideWindowTitleList,
     setConfiguredHideProcessList: autoHideWatcher.setConfiguredHideWindowTitleList,
     setAutoHideProcessList: autoHideWatcher.setAutoHideWindowTitleList,
+    getAutoHideFullscreenWindows: autoHideWatcher.getAutoHideFullscreenWindows,
+    setAutoHideFullscreenWindows: autoHideWatcher.setAutoHideFullscreenWindows,
     sanitizeProcessNameList,
     checkAutoHideProcessList: autoHideWatcher.checkNow,
   });
@@ -827,6 +847,7 @@ app.whenReady().then(() => {
   const savedHideProcessList = readHideProcessListConfig();
   autoHideWatcher.setAutoHideWindowTitleList(savedHideProcessList);
   autoHideWatcher.setConfiguredHideWindowTitleList([...savedHideProcessList]);
+  autoHideWatcher.setAutoHideFullscreenWindows(readAutoHideFullscreenWindowsConfig());
   if (process.platform === 'win32') {
     autoHideWatcher.start();
     externalAgentWatcher.start();

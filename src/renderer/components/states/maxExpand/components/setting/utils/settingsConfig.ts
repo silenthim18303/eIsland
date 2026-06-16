@@ -420,6 +420,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '点击卡片行为', desc: '配置点击总览相册卡片后的行为', labelKey: 'settings.app.album.clickBehaviorLabel', descKey: 'settings.app.album.clickBehaviorHint', tab: 'app', appPage: 'album' },
   { label: '自动播放与视频行为', desc: '仅影响总览相册轮播卡片，不影响相册主页面。', labelKey: 'settings.app.album.playbackTitle', descKey: 'settings.app.album.playbackHint', tab: 'app', appPage: 'album' },
   // ── 软件设置 > 隐藏窗口管理 ──
+  { label: '全屏时自动隐藏', desc: '检测到任意窗口进入全屏后自动隐藏灵动岛，退出全屏后自动显示。', labelKey: 'settings.app.hideProcess.fullscreenTitle', descKey: 'settings.app.hideProcess.fullscreenHint', tab: 'app', appPage: 'hide-process-list' },
   { label: '隐藏窗口管理', desc: '当黑名单进程对应窗口处于焦点状态时，将立即隐藏灵动岛；失去焦点后自动显示。', labelKey: 'settings.app.hideProcess.title', descKey: 'settings.app.hideProcess.hint', tab: 'app', appPage: 'hide-process-list' },
   { label: '当前运行的窗口', desc: '在列表中点击可将窗口加入 / 移出黑名单，支持按进程名搜索。', labelKey: 'settings.app.hideProcess.runningTitle', descKey: 'settings.app.hideProcess.runningHint', tab: 'app', appPage: 'hide-process-list' },
   // ── 软件设置 > 位置校准 ──

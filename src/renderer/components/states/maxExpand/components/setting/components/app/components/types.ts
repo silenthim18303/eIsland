@@ -94,6 +94,8 @@ export interface AppSettingsSectionProps {
   toggleHideProcess: (name: string) => void;
   runningProcesses: AppRunningWindow[];
   hideProcessKeyword: string;
+  autoHideFullscreenWindows: boolean;
+  setAutoHideFullscreenWindows: (enabled: boolean) => void;
   islandPositionOffset: AppPositionOffset;
   applyIslandPositionOffset: (x: number, y: number) => void;
   islandPositionInput: AppPositionInput;

@@ -2006,6 +2006,9 @@
       "hideProcess": {
         "title": "Hidden Window Management",
         "hint": "When blacklisted process windows are focused, Dynamic Island hides automatically.",
+        "fullscreenTitle": "Auto Hide in Fullscreen",
+        "fullscreenHint": "Automatically hide Dynamic Island when any window enters fullscreen, then show it again after fullscreen exits.",
+        "fullscreenToggle": "Enable fullscreen window auto hide",
         "runningTitle": "Currently Running Windows",
         "runningHint": "Click a row to add/remove from the blacklist. Search by process name is supported.",
         "searchPlaceholder": "Search process name",
