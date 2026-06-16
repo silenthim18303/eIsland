@@ -2006,6 +2006,9 @@
       "hideProcess": {
         "title": "隐藏窗口管理",
         "hint": "当下方黑名单进程对应窗口处于焦点状态时，将立即隐藏灵动岛；失去焦点后自动显示。",
+        "fullscreenTitle": "全屏时自动隐藏",
+        "fullscreenHint": "检测到任意窗口进入全屏后自动隐藏灵动岛，退出全屏后自动显示。",
+        "fullscreenToggle": "启用全屏窗口自动隐藏",
         "runningTitle": "当前运行的窗口",
         "runningHint": "在列表中点击可将窗口加入 / 移出黑名单，支持按进程名搜索。",
         "searchPlaceholder": "搜索进程名",

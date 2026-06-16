@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@coooookies/windows-smtc-monitor": "^1.0.12",
+    "@eisland/windows-fullscreen-detector": "file:plugins/windows-fullscreen-detector",
     "@gsap/react": "^2.1.2",
     "@tailwindcss/vite": "^4.2.2",
     "colorthief": "^3.3.1",

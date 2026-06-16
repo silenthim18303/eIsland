@@ -31,6 +31,8 @@ import { hasAnyFocusedWindowTitle } from './runningProcesses';
 interface CreateAutoHideWatcherOptions {
   getMainWindow: () => BrowserWindow | null;
   defaultWindowTitleList: string[];
+  defaultAutoHideFullscreenWindows?: boolean;
+  isAnyFullscreenWindow?: () => boolean | Promise<boolean>;
   pollIntervalMs?: number;
 }
 
@@ -42,6 +44,8 @@ interface AutoHideWatcherService {
   setAutoHideWindowTitleList: (list: string[]) => void;
   getConfiguredHideWindowTitleList: () => string[];
   setConfiguredHideWindowTitleList: (list: string[]) => void;
+  getAutoHideFullscreenWindows: () => boolean;
+  setAutoHideFullscreenWindows: (enabled: boolean) => void;
   getHiddenByAutoHideProcess: () => boolean;
   setHiddenByAutoHideProcess: (hidden: boolean) => void;
 }
@@ -57,6 +61,7 @@ export function createAutoHideWatcher(options: CreateAutoHideWatcherOptions): Au
 
   let autoHideWindowTitleList: string[] = [...options.defaultWindowTitleList];
   let configuredHideWindowTitleList: string[] = [...options.defaultWindowTitleList];
+  let autoHideFullscreenWindows = options.defaultAutoHideFullscreenWindows ?? false;
   let watcherTimer: NodeJS.Timeout | null = null;
   let checkInFlight = false;
   let hiddenByAutoHideProcess = false;
@@ -68,16 +73,14 @@ export function createAutoHideWatcher(options: CreateAutoHideWatcherOptions): Au
 
     checkInFlight = true;
     try {
-      if (!autoHideWindowTitleList.length) {
-        if (hiddenByAutoHideProcess && !mainWindow.isVisible()) {
-          mainWindow.show();
-          mainWindow.setAlwaysOnTop(true, 'screen-saver');
-        }
-        hiddenByAutoHideProcess = false;
-        return;
-      }
-
-      const shouldHide = await hasAnyFocusedWindowTitle(autoHideWindowTitleList);
+      const hasWindowTitleRules = autoHideWindowTitleList.length > 0;
+      const shouldHideByFocusedTitle = hasWindowTitleRules
+        ? await hasAnyFocusedWindowTitle(autoHideWindowTitleList)
+        : false;
+      const shouldHideByFullscreen = autoHideFullscreenWindows && options.isAnyFullscreenWindow
+        ? await options.isAnyFullscreenWindow()
+        : false;
+      const shouldHide = shouldHideByFocusedTitle || shouldHideByFullscreen;
 
       if (shouldHide) {
         if (mainWindow.isVisible()) {
@@ -129,6 +132,10 @@ export function createAutoHideWatcher(options: CreateAutoHideWatcherOptions): Au
     getConfiguredHideWindowTitleList: () => configuredHideWindowTitleList,
     setConfiguredHideWindowTitleList: (list) => {
       configuredHideWindowTitleList = list;
+    },
+    getAutoHideFullscreenWindows: () => autoHideFullscreenWindows,
+    setAutoHideFullscreenWindows: (enabled) => {
+      autoHideFullscreenWindows = enabled;
     },
     getHiddenByAutoHideProcess: () => hiddenByAutoHideProcess,
     setHiddenByAutoHideProcess: (hidden) => {

@@ -514,6 +514,8 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   clip-path: inset(1px 0 0 0);
+  opacity: 1;
+  transition: opacity 180ms ease;
   animation: music-glow-rotate 2.5s linear infinite;
   pointer-events: none;
   z-index: 2;
@@ -526,7 +528,8 @@
   }
 }
 
-/** 音乐播放暂停时停止旋转 */
+/** 音乐暂停时隐藏光带并保留恢复位置 */
 .island-shell.music-glow.music-paused::after {
+  opacity: 0;
   animation-play-state: paused;
 }

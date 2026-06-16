@@ -104,6 +104,7 @@ import {
   ISLAND_AUTO_DIM_ENABLED_STORE_KEY,
   ISLAND_AUTO_DIM_DELAY_STORE_KEY,
   DEFAULT_AUTO_DIM_DELAY_SEC,
+  AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY,
   UPDATE_SOURCES,
   PLUGIN_MARKET_PAGES,
   generateMailAccountId,
@@ -369,6 +370,7 @@ export function SettingsTab(): ReactElement {
   const [hideProcessList, setHideProcessList] = useState<string[]>([]);
   const [hideProcessFilter, setHideProcessFilter] = useState<string>('');
   const [hideProcessLoading, setHideProcessLoading] = useState(false);
+  const [autoHideFullscreenWindows, setAutoHideFullscreenWindowsState] = useState<boolean>(false);
   const [themeMode, setThemeModeState] = useState<ThemeMode>(getThemeMode);
   const [standaloneMacControls, setStandaloneMacControls] = useState<boolean>(false);
   const [appLanguage, setAppLanguage] = useState<AppLanguage>(getLanguage);
@@ -982,6 +984,9 @@ export function SettingsTab(): ReactElement {
       }
       if (channel === `store:${ISLAND_AUTO_DIM_DELAY_STORE_KEY}`) {
         if (typeof value === 'number' && Number.isFinite(value)) setAutoDimDelaySec(Math.max(1, Math.min(120, Math.round(value))));
+      }
+      if (channel === `store:${AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY}`) {
+        setAutoHideFullscreenWindowsState(value === true);
       }
     });
     return () => {
@@ -1623,6 +1628,11 @@ export function SettingsTab(): ReactElement {
     });
   };
 
+  const setAutoHideFullscreenWindows = (enabled: boolean): void => {
+    setAutoHideFullscreenWindowsState(enabled);
+    window.api.autoHideFullscreenWindowsSet(enabled).catch(() => {});
+  };
+
   const refreshRunningProcesses = async (): Promise<void> => {
     setHideProcessLoading(true);
     try {
@@ -1644,6 +1654,10 @@ export function SettingsTab(): ReactElement {
     window.api.hideProcessListGet().then((list) => {
       if (cancelled) return;
       if (Array.isArray(list)) setHideProcessList(list);
+    }).catch(() => {});
+    window.api.autoHideFullscreenWindowsGet().then((enabled) => {
+      if (cancelled) return;
+      setAutoHideFullscreenWindowsState(enabled === true);
     }).catch(() => {});
     window.api.getOpenWindowsWithIcons().then((list) => {
       if (cancelled) return;
@@ -2371,6 +2385,8 @@ export function SettingsTab(): ReactElement {
               toggleHideProcess={toggleHideProcess}
               runningProcesses={runningProcesses}
               hideProcessKeyword={hideProcessKeyword}
+              autoHideFullscreenWindows={autoHideFullscreenWindows}
+              setAutoHideFullscreenWindows={setAutoHideFullscreenWindows}
               islandPositionOffset={islandPositionOffset}
               applyIslandPositionOffset={applyIslandPositionOffset}
               islandPositionInput={islandPositionInput}

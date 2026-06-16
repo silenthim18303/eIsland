@@ -38,6 +38,8 @@ type HideProcessSettingsPageProps = Pick<
   | 'toggleHideProcess'
   | 'runningProcesses'
   | 'hideProcessKeyword'
+  | 'autoHideFullscreenWindows'
+  | 'setAutoHideFullscreenWindows'
 >;
 
 /**
@@ -61,12 +63,31 @@ export function HideProcessSettingsPage({
   toggleHideProcess,
   runningProcesses,
   hideProcessKeyword,
+  autoHideFullscreenWindows,
+  setAutoHideFullscreenWindows,
 }: HideProcessSettingsPageProps): ReactElement {
   const { t } = useTranslation();
 
   return (
     <div className="max-expand-settings-section">
       <div className="settings-cards">
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-card-title">{t('settings.app.hideProcess.fullscreenTitle', { defaultValue: '全屏时自动隐藏' })}</div>
+            <div className="settings-card-subtitle">{t('settings.app.hideProcess.fullscreenHint', { defaultValue: '检测到任意窗口进入全屏后自动隐藏灵动岛，退出全屏后自动显示。' })}</div>
+          </div>
+          <div className="settings-card-inline-row">
+            <label className="settings-card-check">
+              <input
+                type="checkbox"
+                checked={autoHideFullscreenWindows}
+                onChange={(event) => setAutoHideFullscreenWindows(event.target.checked)}
+              />
+              <span>{t('settings.app.hideProcess.fullscreenToggle', { defaultValue: '启用全屏窗口自动隐藏' })}</span>
+            </label>
+          </div>
+        </div>
+
         <div className="settings-card">
           <div className="settings-card-header">
             <div className="settings-card-title">{t('settings.app.hideProcess.title', { defaultValue: '隐藏窗口管理' })}</div>

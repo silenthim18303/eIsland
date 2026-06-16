@@ -48,6 +48,7 @@ export const MAIL_FETCH_LIMIT_STORE_KEY = 'mail-fetch-limit';
 export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 export const ISLAND_AUTO_DIM_ENABLED_STORE_KEY = 'island-auto-dim-enabled';
 export const ISLAND_AUTO_DIM_DELAY_STORE_KEY = 'island-auto-dim-delay';
+export const AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY = 'auto-hide-fullscreen-windows';
 export const DEFAULT_AUTO_DIM_DELAY_SEC = 10;
 
 export type SettingsOpenTabIntent = 'update' | 'about-feedback' | 'user-orders' | 'user-info' | 'ai' | 'mail' | 'performance-monitor' | 'expand-layout';

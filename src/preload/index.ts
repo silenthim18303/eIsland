@@ -1085,6 +1085,14 @@ const api = {
   hideProcessListSet: (list: string[]): Promise<boolean> => {
     return ipcRenderer.invoke('hide-process-list:set', list);
   },
+  /** 获取全屏窗口自动隐藏开关 */
+  autoHideFullscreenWindowsGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('hide-process-list:auto-hide-fullscreen:get');
+  },
+  /** 设置全屏窗口自动隐藏开关 */
+  autoHideFullscreenWindowsSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('hide-process-list:auto-hide-fullscreen:set', enabled);
+  },
   /** 订阅播放源切换请求（主进程推送） */
   onSourceSwitchRequest: (callback: (data: { sourceAppId: string; title: string; artist: string }) => void): (() => void) => {
     const handler = (_event: Electron.IpcRendererEvent, data: { sourceAppId: string; title: string; artist: string }) => {

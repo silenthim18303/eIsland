@@ -28,13 +28,17 @@
 import { ipcMain } from 'electron';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
+import { broadcastSettingChange } from '../../utils/broadcast';
 
 interface RegisterHideProcessIpcHandlersOptions {
   storeDir: string;
   hideProcessListStoreKey: string;
+  autoHideFullscreenWindowsStoreKey: string;
   getConfiguredHideProcessList: () => string[];
   setConfiguredHideProcessList: (list: string[]) => void;
   setAutoHideProcessList: (list: string[]) => void;
+  getAutoHideFullscreenWindows: () => boolean;
+  setAutoHideFullscreenWindows: (enabled: boolean) => void;
   sanitizeProcessNameList: (list: string[]) => string[];
   checkAutoHideProcessList: () => Promise<void>;
 }
@@ -65,6 +69,29 @@ export function registerHideProcessIpcHandlers(options: RegisterHideProcessIpcHa
       return true;
     } catch (err) {
       console.error('[HideProcessList] persist error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('hide-process-list:auto-hide-fullscreen:get', () => {
+    return options.getAutoHideFullscreenWindows();
+  });
+
+  ipcMain.handle('hide-process-list:auto-hide-fullscreen:set', async (event, enabled: boolean) => {
+    try {
+      const next = enabled === true;
+      options.setAutoHideFullscreenWindows(next);
+      const filePath = join(options.storeDir, `${options.autoHideFullscreenWindowsStoreKey}.json`);
+      writeFileSync(filePath, JSON.stringify(next, null, 2), 'utf-8');
+      broadcastSettingChange(event.sender.id, `store:${options.autoHideFullscreenWindowsStoreKey}`, next);
+
+      if (process.platform === 'win32') {
+        await options.checkAutoHideProcessList().catch(() => {});
+      }
+
+      return true;
+    } catch (err) {
+      console.error('[HideProcessList] auto hide fullscreen persist error:', err);
       return false;
     }
   });

@@ -1,0 +1,37 @@
+{
+  "name": "@eisland/windows-fullscreen-detector",
+  "version": "26.0.1",
+  "description": "Windows N-API addon for detecting foreground fullscreen windows across multiple monitors.",
+  "author": "JNTMTMTM",
+  "license": "GPL-3.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64",
+    "ia32"
+  ],
+  "scripts": {
+    "build": "node-gyp rebuild",
+    "clean": "node-gyp clean",
+    "rebuild": "node-gyp clean && node-gyp rebuild",
+    "test": "vitest run --config vitest.config.ts",
+    "test:polling": "vitest run --config vitest.config.ts test/fullscreen-detector.polling.test.ts",
+    "smoke": "node --experimental-strip-types test/fullscreen-detector.smoke.ts",
+    "smoke:polling": "node --experimental-strip-types test/fullscreen-detector.polling.smoke.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "node-gyp": "^11.2.0"
+  },
+  "gypfile": true,
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "binding.gyp",
+    "src"
+  ]
+}

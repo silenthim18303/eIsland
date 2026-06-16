@@ -76,6 +76,8 @@ export function AppSettingsSection({
   toggleHideProcess,
   runningProcesses,
   hideProcessKeyword,
+  autoHideFullscreenWindows,
+  setAutoHideFullscreenWindows,
 
   islandPositionOffset,
   applyIslandPositionOffset,
@@ -210,6 +212,8 @@ export function AppSettingsSection({
             toggleHideProcess={toggleHideProcess}
             runningProcesses={runningProcesses}
             hideProcessKeyword={hideProcessKeyword}
+            autoHideFullscreenWindows={autoHideFullscreenWindows}
+            setAutoHideFullscreenWindows={setAutoHideFullscreenWindows}
           />
         );
       case 'position':

@@ -421,6 +421,8 @@ declare global {
       getFocusedWindow: () => Promise<RunningWindowInfo | null>;
       hideProcessListGet: () => Promise<string[]>;
       hideProcessListSet: (list: string[]) => Promise<boolean>;
+      autoHideFullscreenWindowsGet: () => Promise<boolean>;
+      autoHideFullscreenWindowsSet: (enabled: boolean) => Promise<boolean>;
       onSourceSwitchRequest: (callback: (data: { sourceAppId: string; title: string; artist: string }) => void) => () => void;
       mediaAcceptSourceSwitch: () => Promise<void>;
       mediaRejectSourceSwitch: () => Promise<void>;

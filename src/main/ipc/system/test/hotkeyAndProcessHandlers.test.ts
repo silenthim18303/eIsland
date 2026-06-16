@@ -38,6 +38,9 @@ vi.mock('electron', () => ({
   ipcMain: {
     handle: handleMock,
   },
+  BrowserWindow: {
+    getAllWindows: () => [],
+  },
 }));
 
 vi.mock('fs', () => ({
@@ -243,15 +246,19 @@ describe('system hotkey and hide-process ipc handlers', () => {
   it('handles hide-process list read/set success and error branches', async () => {
     const setConfiguredHideProcessList = vi.fn();
     const setAutoHideProcessList = vi.fn();
+    const setAutoHideFullscreenWindows = vi.fn();
     const sanitizeProcessNameList = vi.fn((list: string[]) => list.filter(Boolean).map((x) => x.toLowerCase()));
     const checkAutoHideProcessList = vi.fn(async () => {});
 
     registerHideProcessIpcHandlers({
       storeDir: 'C:/store',
       hideProcessListStoreKey: 'hideList',
+      autoHideFullscreenWindowsStoreKey: 'autoHideFullscreen',
       getConfiguredHideProcessList: () => ['wechat.exe'],
       setConfiguredHideProcessList,
       setAutoHideProcessList,
+      getAutoHideFullscreenWindows: () => false,
+      setAutoHideFullscreenWindows,
       sanitizeProcessNameList,
       checkAutoHideProcessList,
     });
@@ -272,6 +279,11 @@ describe('system hotkey and hide-process ipc handlers', () => {
       throw new Error('persist failed');
     });
     await expect(setList?.({}, ['X.EXE'])).resolves.toBe(false);
+
+    expect(handlers.get('hide-process-list:auto-hide-fullscreen:get')?.({})).toBe(false);
+    const setFullscreen = handlers.get('hide-process-list:auto-hide-fullscreen:set');
+    await expect(setFullscreen?.({ sender: { id: 1 } }, true)).resolves.toBe(true);
+    expect(setAutoHideFullscreenWindows).toHaveBeenCalledWith(true);
   });
 
   it('normalizes invalid hide-process payload to empty list', async () => {
@@ -280,9 +292,12 @@ describe('system hotkey and hide-process ipc handlers', () => {
     registerHideProcessIpcHandlers({
       storeDir: 'C:/store',
       hideProcessListStoreKey: 'hideList',
+      autoHideFullscreenWindowsStoreKey: 'autoHideFullscreen',
       getConfiguredHideProcessList: () => [],
       setConfiguredHideProcessList: vi.fn(),
       setAutoHideProcessList: vi.fn(),
+      getAutoHideFullscreenWindows: () => false,
+      setAutoHideFullscreenWindows: vi.fn(),
       sanitizeProcessNameList,
       checkAutoHideProcessList: vi.fn(async () => {}),
     });

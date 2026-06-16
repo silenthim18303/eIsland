@@ -168,6 +168,9 @@ export const SMTC_UNSUBSCRIBE_MS_STORE_KEY = 'music-smtc-unsubscribe-ms';
 /** 隐藏进程名单存储键名 */
 export const HIDE_PROCESS_LIST_STORE_KEY = 'hide-process-list';
 
+/** 全屏窗口自动隐藏灵动岛开关存储键名 */
+export const AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY = 'auto-hide-fullscreen-windows';
+
 /** 主题模式存储键名 */
 export const THEME_MODE_STORE_KEY = 'theme-mode';
 
@@ -501,6 +504,15 @@ export function writeIslandDisplaySelectionConfig(selection: string): boolean {
     console.error('[IslandDisplay] persist error:', err);
     return false;
   }
+}
+
+/**
+ * 读取全屏窗口自动隐藏开关配置
+ * @returns 是否启用全屏窗口自动隐藏
+ */
+export function readAutoHideFullscreenWindowsConfig(): boolean {
+  const data = readJsonFile(AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY);
+  return typeof data === 'boolean' ? data : false;
 }
 
 /**

@@ -211,6 +211,38 @@ describe('createAutoHideWatcher', () => {
       expect(hasAnyFocusedWindowTitleMock).not.toHaveBeenCalled();
     });
 
+    it('hides window when fullscreen auto hide is enabled and fullscreen exists', async () => {
+      const isAnyFullscreenWindow = vi.fn(() => true);
+      const watcher = createAutoHideWatcher({
+        getMainWindow,
+        defaultWindowTitleList: [],
+        defaultAutoHideFullscreenWindows: true,
+        isAnyFullscreenWindow,
+      });
+
+      await watcher.checkNow();
+
+      expect(isAnyFullscreenWindow).toHaveBeenCalledTimes(1);
+      expect(hasAnyFocusedWindowTitleMock).not.toHaveBeenCalled();
+      expect(mockWindow.hide).toHaveBeenCalledTimes(1);
+      expect(watcher.getHiddenByAutoHideProcess()).toBe(true);
+    });
+
+    it('skips fullscreen detector when fullscreen auto hide is disabled', async () => {
+      const isAnyFullscreenWindow = vi.fn(() => true);
+      const watcher = createAutoHideWatcher({
+        getMainWindow,
+        defaultWindowTitleList: [],
+        defaultAutoHideFullscreenWindows: false,
+        isAnyFullscreenWindow,
+      });
+
+      await watcher.checkNow();
+
+      expect(isAnyFullscreenWindow).not.toHaveBeenCalled();
+      expect(mockWindow.hide).not.toHaveBeenCalled();
+    });
+
     it('prevents concurrent checkNow calls', async () => {
       let resolveCheck!: (value: boolean) => void;
       hasAnyFocusedWindowTitleMock.mockImplementation(
@@ -380,6 +412,18 @@ describe('createAutoHideWatcher', () => {
 
       watcher.setConfiguredHideWindowTitleList(['configured.exe']);
       expect(watcher.getConfiguredHideWindowTitleList()).toEqual(['configured.exe']);
+    });
+
+    it('setAutoHideFullscreenWindows updates the fullscreen auto hide flag', () => {
+      const watcher = createAutoHideWatcher({
+        getMainWindow,
+        defaultWindowTitleList: [],
+        defaultAutoHideFullscreenWindows: false,
+      });
+
+      expect(watcher.getAutoHideFullscreenWindows()).toBe(false);
+      watcher.setAutoHideFullscreenWindows(true);
+      expect(watcher.getAutoHideFullscreenWindows()).toBe(true);
     });
 
     it('getHiddenByAutoHideProcess defaults to false', () => {
