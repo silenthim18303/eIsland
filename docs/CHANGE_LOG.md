@@ -1,7 +1,40 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-11T16:27:38.132Z
+> 生成时间：2026-06-16T18:13:30.347Z
+
+## 26.6.1
+
+- 2026-06-12 | cf1ffd1d | 鸡哥 | fix(workflow): install VS Build Tools for native module compilation in release build
+- 2026-06-12 | 6101dc44 | 鸡哥 | fix(workflow): skip postinstall in release build to avoid node-gyp failure
+- 2026-06-12 | 009b0efa | 鸡哥 | chore: update version to 26.6.1 in package.json and package-lock.json
+- 2026-06-12 | 2082577f | 鸡哥 | docs(announcement): add V26.6.1 release notes
+- 2026-06-11 | 6980692d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #91 by @JNTMTMTM [skip ci]
+- 2026-06-12 | 8112deaa | 鸡哥 | Merge pull request #91 from JNTMTMTM/dev
+- 2026-06-12 | e7c055e1 | 鸡哥 | fix(workflow): add step to install Electron binary before running tests
+- 2026-06-12 | 5848385a | 鸡哥 | fix(tests): add log output for preload and full test failures
+- 2026-06-11 | 3724c369 | 鸡哥 | fix(workflow): add --ignore-scripts flag to npm ci and enable continue-on-error for downloading test logs
+- 2026-06-11 | 329c32df | 鸡哥 | fix(test): update preload and full test steps to handle exit codes correctly
+- 2026-06-11 | a83c2ca9 | 鸡哥 | fix(test): update file path in wallpaper capture tests to reflect new directory structure
+- 2026-06-11 | 4e5286c3 | 鸡哥 | fix(store): ensure store key validation is consistently applied across all operations
+- 2026-06-11 | 6937cd1a | 鸡哥 | fix(store): validate store key before reading and writing operations #89
+- 2026-06-11 | f8ba86b0 | 鸡哥 | feat(announcement): integrate DOMPurify for sanitizing HTML content in announcements #89
+- 2026-06-11 | 99df20f2 | 鸡哥 | feat(protocol): restrict eisland-media protocol to userData/wallpapers directory #89
+- 2026-06-11 | f7336cfa | 鸡哥 | fix(wallpaper): normalize file path before reading to ensure valid access #89
+- 2026-06-11 | 9fabb444 | 鸡哥 | feat(smtcService): retain previous timeline data for playback-only updates of the same track #88
+- 2026-06-10 | f3f268cf | 鸡哥 | refactor(AlbumTab): remove clear confirmation functionality and related translations
+- 2026-06-10 | b5063022 | 鸡哥 | feat(AlbumTab): add media grouping feature with folder and date options
+- 2026-06-10 | dd0d0d8b | 鸡哥 | feat(album-grid): enhance hover effect with scale transformation
+- 2026-06-10 | e09ba5c6 | 鸡哥 | fix(album-selection): adjust position of selection check and remove unnecessary padding
+- 2026-06-10 | d8849d59 | 鸡哥 | feat(AlbumTab): enhance item selection with toggle functionality and improve hover styles
+- 2026-06-10 | c254c44e | 鸡哥 | feat(AlbumTab): implement media selection features and update styles
+- 2026-06-09 | b300e3d8 | 鸡哥 | feat(tests): redirect test output to log files and display logs after execution
+- 2026-06-09 | 28a81a96 | 鸡哥 | feat(TranslationTab): add menuRef to handle clicks outside the dropdown
+- 2026-06-09 | 3a9b2e96 | 鸡哥 | feat(updater): update ESA CDN URL to include /eisland-update path
+- 2026-06-09 | 8862bd16 | 鸡哥 | feat(upload): replace BaoTa upload support with MinIO integration
+- 2026-06-09 | 5f920bf5 | 鸡哥 | feat(upload): add support for BaoTa panel uploads
+- 2026-06-09 | 3fd93388 | 鸡哥 | chore: update @types/node version and adjust tsconfig includes
+- 2026-06-09 | 1f13b909 | 鸡哥 | feat(updater): add ESA CDN as a new update source
 
 ## 26.6.0
 
@@ -2162,28 +2195,15 @@
 
 ## Unreleased
 
-- 2026-06-12 | 8112deaa | 鸡哥 | Merge pull request #91 from JNTMTMTM/dev
-- 2026-06-12 | e7c055e1 | 鸡哥 | fix(workflow): add step to install Electron binary before running tests
-- 2026-06-12 | 5848385a | 鸡哥 | fix(tests): add log output for preload and full test failures
-- 2026-06-11 | 3724c369 | 鸡哥 | fix(workflow): add --ignore-scripts flag to npm ci and enable continue-on-error for downloading test logs
-- 2026-06-11 | 329c32df | 鸡哥 | fix(test): update preload and full test steps to handle exit codes correctly
-- 2026-06-11 | a83c2ca9 | 鸡哥 | fix(test): update file path in wallpaper capture tests to reflect new directory structure
-- 2026-06-11 | 4e5286c3 | 鸡哥 | fix(store): ensure store key validation is consistently applied across all operations
-- 2026-06-11 | 6937cd1a | 鸡哥 | fix(store): validate store key before reading and writing operations #89
-- 2026-06-11 | f8ba86b0 | 鸡哥 | feat(announcement): integrate DOMPurify for sanitizing HTML content in announcements #89
-- 2026-06-11 | 99df20f2 | 鸡哥 | feat(protocol): restrict eisland-media protocol to userData/wallpapers directory #89
-- 2026-06-11 | f7336cfa | 鸡哥 | fix(wallpaper): normalize file path before reading to ensure valid access #89
-- 2026-06-11 | 9fabb444 | 鸡哥 | feat(smtcService): retain previous timeline data for playback-only updates of the same track #88
-- 2026-06-10 | f3f268cf | 鸡哥 | refactor(AlbumTab): remove clear confirmation functionality and related translations
-- 2026-06-10 | b5063022 | 鸡哥 | feat(AlbumTab): add media grouping feature with folder and date options
-- 2026-06-10 | dd0d0d8b | 鸡哥 | feat(album-grid): enhance hover effect with scale transformation
-- 2026-06-10 | e09ba5c6 | 鸡哥 | fix(album-selection): adjust position of selection check and remove unnecessary padding
-- 2026-06-10 | d8849d59 | 鸡哥 | feat(AlbumTab): enhance item selection with toggle functionality and improve hover styles
-- 2026-06-10 | c254c44e | 鸡哥 | feat(AlbumTab): implement media selection features and update styles
-- 2026-06-09 | b300e3d8 | 鸡哥 | feat(tests): redirect test output to log files and display logs after execution
-- 2026-06-09 | 28a81a96 | 鸡哥 | feat(TranslationTab): add menuRef to handle clicks outside the dropdown
-- 2026-06-09 | 3a9b2e96 | 鸡哥 | feat(updater): update ESA CDN URL to include /eisland-update path
-- 2026-06-09 | 8862bd16 | 鸡哥 | feat(upload): replace BaoTa upload support with MinIO integration
-- 2026-06-09 | 5f920bf5 | 鸡哥 | feat(upload): add support for BaoTa panel uploads
-- 2026-06-09 | 3fd93388 | 鸡哥 | chore: update @types/node version and adjust tsconfig includes
-- 2026-06-09 | 1f13b909 | 鸡哥 | feat(updater): add ESA CDN as a new update source
+- 2026-06-17 | 48aa1593 | 鸡哥 | Merge pull request #100 from JNTMTMTM/dev
+- 2026-06-17 | 24f46125 | 鸡哥 | feat(windows-fullscreen-detector): add comprehensive documentation and type definitions
+- 2026-06-17 | 4b13a468 | 鸡哥 | feat(hide-process): implement fullscreen auto-hide feature
+- 2026-06-17 | d846df00 | 鸡哥 | feat(windows-fullscreen-detector): update to version 26.0.1 and add fullscreen_core.c
+- 2026-06-17 | 5de5b7a4 | 鸡哥 | feat(windows-fullscreen-detector): migrate tests to Vitest and update test scripts
+- 2026-06-17 | 6d2c2aaf | 鸡哥 | feat(windows-fullscreen-detector): add polling test and smoke scripts to package.json
+- 2026-06-17 | 3ff5a927 | 鸡哥 | feat(windows-fullscreen-detector): upgrade to version 26.0.0 and add plugin dependency
+- 2026-06-17 | 6a90a49e | 鸡哥 | feat(windows-fullscreen-detector): update devDependencies and package-lock.json
+- 2026-06-17 | b6aed852 | 鸡哥 | feat(windows-fullscreen-detector): add smoke test script to package.json
+- 2026-06-17 | f1726f49 | 鸡哥 | feat(windows-fullscreen-detector): add test script for fullscreen detector module
+- 2026-06-17 | ab0e7a80 | 鸡哥 | feat(windows-fullscreen-detector): add initial implementation for detecting fullscreen windows on Windows platform
+- 2026-06-13 | 27603588 | 鸡哥 | style(shell): enhance music glow effect with opacity transition on pause #93 @ThinkofRain1213
