@@ -1,0 +1,14 @@
+node_modules/
+build/
+*.log
+*.pdb
+*.ipdb
+*.iobj
+*.exp
+*.lib
+*.node
+*.recipe
+*.lastbuildstate
+*.tlog
+.DS_Store
+Thumbs.db
