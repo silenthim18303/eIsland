@@ -38,12 +38,24 @@ const monitor = require('../') as {
     availableBytes: number;
     usagePercent: number;
   };
+  getTemperature: () => {
+    isAvailable: boolean;
+    readings: Array<{
+      id: string;
+      label: string;
+      category: string;
+      temperatureCelsius: number;
+      source: string;
+    }>;
+    maxTemperatureCelsius: number | null;
+  };
 };
 
 describe('windows-performance-monitor', () => {
-  it('exports CPU and memory snapshot methods', () => {
+  it('exports CPU, memory, and temperature snapshot methods', () => {
     expect(typeof monitor.getCpu).toBe('function');
     expect(typeof monitor.getMemory).toBe('function');
+    expect(typeof monitor.getTemperature).toBe('function');
   });
 
   it('returns CPU snapshot shape after baseline warmup', () => {
@@ -68,5 +80,23 @@ describe('windows-performance-monitor', () => {
     expect(memory.availableBytes).toBeGreaterThanOrEqual(0);
     expect(memory.usagePercent).toBeGreaterThanOrEqual(0);
     expect(memory.usagePercent).toBeLessThanOrEqual(100);
+  });
+
+  it('returns temperature snapshot shape', () => {
+    const temperature = monitor.getTemperature();
+
+    expect(temperature.isAvailable).toBeTypeOf('boolean');
+    expect(Array.isArray(temperature.readings)).toBe(true);
+    expect(
+      typeof temperature.maxTemperatureCelsius === 'number' || temperature.maxTemperatureCelsius === null,
+    ).toBe(true);
+
+    for (const reading of temperature.readings) {
+      expect(reading.id).toBeTypeOf('string');
+      expect(reading.label).toBeTypeOf('string');
+      expect(reading.category).toBeTypeOf('string');
+      expect(reading.temperatureCelsius).toBeTypeOf('number');
+      expect(reading.source).toBeTypeOf('string');
+    }
   });
 });

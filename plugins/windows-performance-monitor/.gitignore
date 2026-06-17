@@ -1,5 +1,8 @@
 node_modules/
 build/
+temperature-helper/bin/
+temperature-helper/obj/
+temperature-helper/.vs/
 *.log
 *.pdb
 *.ipdb

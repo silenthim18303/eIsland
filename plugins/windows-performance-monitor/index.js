@@ -21,10 +21,12 @@
 /**
  * @file index.js
  * @description Windows 性能采集插件入口
- * @description 加载原生绑定模块并导出 CPU 与内存采集 API
+ * @description 加载原生绑定模块并导出 CPU、内存与温度采集 API
  * @author 鸡哥
  */
 
+const { spawnSync } = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 
 if (process.platform !== 'win32') {
@@ -35,6 +37,17 @@ const candidates = [
   path.join(__dirname, 'build', 'Release', 'windows_performance_monitor.node'),
   path.join(__dirname, 'build', 'Debug', 'windows_performance_monitor.node'),
 ];
+
+const temperatureReaderCandidates = [
+  path.join(__dirname, 'temperature-helper', 'bin', 'Release', 'net10.0', 'eIslandTemperatureReader.exe'),
+  path.join(__dirname, 'temperature-helper', 'bin', 'Debug', 'net10.0', 'eIslandTemperatureReader.exe'),
+];
+
+const emptyTemperatureSnapshot = Object.freeze({
+  isAvailable: false,
+  readings: [],
+  maxTemperatureCelsius: null,
+});
 
 let nativeBinding;
 let lastError;
@@ -51,5 +64,42 @@ for (const candidate of candidates) {
 if (!nativeBinding) {
   throw lastError ?? new Error('Unable to load windows_performance_monitor native binding.');
 }
+
+function findTemperatureReader() {
+  return temperatureReaderCandidates.find((candidate) => fs.existsSync(candidate)) ?? null;
+}
+
+function getTemperature() {
+  const readerPath = findTemperatureReader();
+
+  if (!readerPath) {
+    return emptyTemperatureSnapshot;
+  }
+
+  const result = spawnSync(readerPath, [], {
+    encoding: 'utf8',
+    windowsHide: true,
+    timeout: 5000,
+  });
+
+  if (result.status !== 0 || result.error || !result.stdout) {
+    return emptyTemperatureSnapshot;
+  }
+
+  try {
+    const snapshot = JSON.parse(result.stdout);
+    const readings = Array.isArray(snapshot.readings) ? snapshot.readings : [];
+
+    return {
+      isAvailable: snapshot.isAvailable === true && readings.length > 0,
+      readings,
+      maxTemperatureCelsius: typeof snapshot.maxTemperatureCelsius === 'number' ? snapshot.maxTemperatureCelsius : null,
+    };
+  } catch {
+    return emptyTemperatureSnapshot;
+  }
+}
+
+nativeBinding.getTemperature = getTemperature;
 
 module.exports = nativeBinding;

@@ -21,7 +21,7 @@
 /**
  * @file index.d.ts
  * @description Windows 性能采集插件类型声明
- * @description 为 CPU 与内存原生采集模块提供 TypeScript 类型定义
+ * @description 为 CPU、内存与温度采集模块提供 TypeScript 类型定义
  * @author 鸡哥
  */
 
@@ -37,5 +37,22 @@ export interface MemorySnapshot {
   usagePercent: number;
 }
 
+export type TemperatureCategory = 'cpu' | 'gpu' | 'motherboard' | 'storage' | 'unknown';
+
+export interface TemperatureReading {
+  id: string;
+  label: string;
+  category: TemperatureCategory;
+  temperatureCelsius: number;
+  source: 'libre-hardware-monitor';
+}
+
+export interface TemperatureSnapshot {
+  isAvailable: boolean;
+  readings: TemperatureReading[];
+  maxTemperatureCelsius: number | null;
+}
+
 export function getCpu(): CpuSnapshot;
 export function getMemory(): MemorySnapshot;
+export function getTemperature(): TemperatureSnapshot;

@@ -1,7 +1,7 @@
 {
   "name": "@eisland/windows-performance-monitor",
   "version": "26.0.1",
-  "description": "Windows N-API addon for low-overhead CPU and memory performance snapshots.",
+  "description": "Windows N-API addon for low-overhead CPU, memory, and temperature performance snapshots.",
   "author": "JNTMTMTM",
   "license": "GPL-3.0",
   "main": "index.js",
@@ -15,9 +15,9 @@
     "ia32"
   ],
   "scripts": {
-    "build": "node-gyp rebuild",
-    "clean": "node-gyp clean",
-    "rebuild": "node-gyp clean && node-gyp rebuild",
+    "build": "node-gyp rebuild && dotnet build temperature-helper/eIslandTemperatureReader.csproj -c Release",
+    "clean": "node-gyp clean && dotnet clean temperature-helper/eIslandTemperatureReader.csproj",
+    "rebuild": "node-gyp clean && node-gyp rebuild && dotnet build temperature-helper/eIslandTemperatureReader.csproj -c Release",
     "test": "vitest run --config vitest.config.ts",
     "smoke": "node --experimental-strip-types test/performance-monitor.smoke.ts",
     "smoke:polling": "node --experimental-strip-types test/performance-monitor.polling.smoke.ts"
@@ -31,6 +31,7 @@
     "index.js",
     "index.d.ts",
     "binding.gyp",
-    "src"
+    "src",
+    "temperature-helper"
   ]
 }
