@@ -34,12 +34,14 @@ const main = async () => {
   for (let index = 0; index < 5; index += 1) {
     await wait(100);
 
-    console.log({
+    const snapshot = {
       index,
       cpu: monitor.getCpu(),
       memory: monitor.getMemory(),
       temperature: monitor.getTemperature(),
-    });
+    };
+
+    console.log(JSON.stringify(snapshot, null, 2));
   }
 };
 

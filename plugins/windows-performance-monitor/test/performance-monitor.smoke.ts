@@ -27,8 +27,10 @@
 
 const monitor = require('../');
 
-console.log({
+const snapshot = {
   cpu: monitor.getCpu(),
   memory: monitor.getMemory(),
   temperature: monitor.getTemperature(),
-});
+};
+
+console.log(JSON.stringify(snapshot, null, 2));
