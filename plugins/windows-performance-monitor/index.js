@@ -49,6 +49,12 @@ const emptyTemperatureSnapshot = Object.freeze({
   maxTemperatureCelsius: null,
 });
 
+const emptyHardwareListSnapshot = Object.freeze({
+  isAvailable: false,
+  cpus: [],
+  gpus: [],
+});
+
 let nativeBinding;
 let lastError;
 
@@ -69,37 +75,54 @@ function findTemperatureReader() {
   return temperatureReaderCandidates.find((candidate) => fs.existsSync(candidate)) ?? null;
 }
 
-function getTemperature() {
+function readHelperSnapshot(args, fallback) {
   const readerPath = findTemperatureReader();
 
   if (!readerPath) {
-    return emptyTemperatureSnapshot;
+    return fallback;
   }
 
-  const result = spawnSync(readerPath, [], {
+  const result = spawnSync(readerPath, args, {
     encoding: 'utf8',
     windowsHide: true,
     timeout: 5000,
   });
 
   if (result.status !== 0 || result.error || !result.stdout) {
-    return emptyTemperatureSnapshot;
+    return fallback;
   }
 
   try {
-    const snapshot = JSON.parse(result.stdout);
-    const readings = Array.isArray(snapshot.readings) ? snapshot.readings : [];
-
-    return {
-      isAvailable: snapshot.isAvailable === true && readings.length > 0,
-      readings,
-      maxTemperatureCelsius: typeof snapshot.maxTemperatureCelsius === 'number' ? snapshot.maxTemperatureCelsius : null,
-    };
+    return JSON.parse(result.stdout);
   } catch {
-    return emptyTemperatureSnapshot;
+    return fallback;
   }
 }
 
+function getTemperature() {
+  const snapshot = readHelperSnapshot([], emptyTemperatureSnapshot);
+  const readings = Array.isArray(snapshot.readings) ? snapshot.readings : [];
+
+  return {
+    isAvailable: snapshot.isAvailable === true && readings.length > 0,
+    readings,
+    maxTemperatureCelsius: typeof snapshot.maxTemperatureCelsius === 'number' ? snapshot.maxTemperatureCelsius : null,
+  };
+}
+
+function getHardwareList() {
+  const snapshot = readHelperSnapshot(['hardware-list'], emptyHardwareListSnapshot);
+  const cpus = Array.isArray(snapshot.cpus) ? snapshot.cpus : [];
+  const gpus = Array.isArray(snapshot.gpus) ? snapshot.gpus : [];
+
+  return {
+    isAvailable: snapshot.isAvailable === true && (cpus.length > 0 || gpus.length > 0),
+    cpus,
+    gpus,
+  };
+}
+
 nativeBinding.getTemperature = getTemperature;
+nativeBinding.getHardwareList = getHardwareList;
 
 module.exports = nativeBinding;

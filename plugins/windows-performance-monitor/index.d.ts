@@ -53,6 +53,21 @@ export interface TemperatureSnapshot {
   maxTemperatureCelsius: number | null;
 }
 
+export interface HardwareDevice {
+  id: string;
+  name: string;
+  category: 'cpu' | 'gpu';
+  hardwareType: string;
+  source: 'libre-hardware-monitor';
+}
+
+export interface HardwareListSnapshot {
+  isAvailable: boolean;
+  cpus: HardwareDevice[];
+  gpus: HardwareDevice[];
+}
+
 export function getCpu(): CpuSnapshot;
 export function getMemory(): MemorySnapshot;
 export function getTemperature(): TemperatureSnapshot;
+export function getHardwareList(): HardwareListSnapshot;

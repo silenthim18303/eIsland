@@ -49,13 +49,31 @@ const monitor = require('../') as {
     }>;
     maxTemperatureCelsius: number | null;
   };
+  getHardwareList: () => {
+    isAvailable: boolean;
+    cpus: Array<{
+      id: string;
+      name: string;
+      category: string;
+      hardwareType: string;
+      source: string;
+    }>;
+    gpus: Array<{
+      id: string;
+      name: string;
+      category: string;
+      hardwareType: string;
+      source: string;
+    }>;
+  };
 };
 
 describe('windows-performance-monitor', () => {
-  it('exports CPU, memory, and temperature snapshot methods', () => {
+  it('exports CPU, memory, temperature, and hardware list snapshot methods', () => {
     expect(typeof monitor.getCpu).toBe('function');
     expect(typeof monitor.getMemory).toBe('function');
     expect(typeof monitor.getTemperature).toBe('function');
+    expect(typeof monitor.getHardwareList).toBe('function');
   });
 
   it('returns CPU snapshot shape after baseline warmup', () => {
@@ -97,6 +115,22 @@ describe('windows-performance-monitor', () => {
       expect(reading.category).toBeTypeOf('string');
       expect(reading.temperatureCelsius).toBeTypeOf('number');
       expect(reading.source).toBeTypeOf('string');
+    }
+  });
+
+  it('returns hardware list snapshot shape', () => {
+    const hardwareList = monitor.getHardwareList();
+
+    expect(hardwareList.isAvailable).toBeTypeOf('boolean');
+    expect(Array.isArray(hardwareList.cpus)).toBe(true);
+    expect(Array.isArray(hardwareList.gpus)).toBe(true);
+
+    for (const device of [...hardwareList.cpus, ...hardwareList.gpus]) {
+      expect(device.id).toBeTypeOf('string');
+      expect(device.name).toBeTypeOf('string');
+      expect(device.category === 'cpu' || device.category === 'gpu').toBe(true);
+      expect(device.hardwareType).toBeTypeOf('string');
+      expect(device.source).toBeTypeOf('string');
     }
   });
 });

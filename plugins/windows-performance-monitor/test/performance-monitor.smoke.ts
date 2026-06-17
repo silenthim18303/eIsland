@@ -31,6 +31,7 @@ const snapshot = {
   cpu: monitor.getCpu(),
   memory: monitor.getMemory(),
   temperature: monitor.getTemperature(),
+  hardwareList: monitor.getHardwareList(),
 };
 
 console.log(JSON.stringify(snapshot, null, 2));
