@@ -54,6 +54,9 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
     const mutedColor = light ? '#64748b' : '#94a3b8';
     const gridColor = light ? 'rgba(148, 163, 184, 0.25)' : 'rgba(148, 163, 184, 0.18)';
     const backgroundColor = light ? 'rgba(255, 255, 255, 0.82)' : 'rgba(15, 23, 42, 0.42)';
+    const accentColor = 'rgba(100, 181, 246, 0.14)';
+    const accentBorderColor = 'rgba(100, 181, 246, 0.28)';
+    const accentStrongColor = 'rgba(100, 181, 246, 0.48)';
     const candlestickData = klines.map((item) => [item.timestamp, item.open, item.high, item.low, item.close]);
     const volumeData = klines.map((item) => [item.timestamp, item.volume ?? 0]);
 
@@ -79,8 +82,8 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
           stroke: gridColor,
           style: { color: textColor },
           states: {
-            hover: { fill: 'rgba(239, 94, 166, 0.16)' },
-            select: { fill: '#ef5ea6', style: { color: '#fff' } },
+            hover: { fill: accentColor },
+            select: { fill: accentColor, stroke: accentStrongColor, style: { color: textColor } },
           },
         },
         labelStyle: { color: mutedColor },
@@ -96,12 +99,12 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
         enabled: true,
         outlineColor: gridColor,
         maskFill: 'rgba(0, 0, 0, 0.6)',
-        handles: { backgroundColor: light ? '#fff' : '#1e293b', borderColor: '#ef5ea6' },
+        handles: { backgroundColor: light ? '#fff' : '#1e293b', borderColor: accentStrongColor },
       },
-      scrollbar: { enabled: true, barBackgroundColor: 'rgba(239, 94, 166, 0.32)', trackBackgroundColor: 'rgba(148, 163, 184, 0.14)' },
-      legend: { enabled: true, itemStyle: { color: textColor }, itemHoverStyle: { color: '#ef5ea6' } },
+      scrollbar: { enabled: true, barBackgroundColor: accentBorderColor, trackBackgroundColor: 'rgba(148, 163, 184, 0.14)' },
+      legend: { enabled: true, itemStyle: { color: textColor }, itemHoverStyle: { color: accentStrongColor } },
       xAxis: {
-        crosshair: { color: '#ef5ea6', dashStyle: 'ShortDot' },
+        crosshair: { color: accentStrongColor, dashStyle: 'ShortDot' },
         lineColor: gridColor,
         tickColor: gridColor,
         labels: { style: { color: mutedColor } },
@@ -114,7 +117,7 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
           lineColor: gridColor,
           resize: { enabled: true },
           gridLineColor: gridColor,
-          crosshair: { color: '#ef5ea6', dashStyle: 'ShortDot' },
+          crosshair: { color: accentStrongColor, dashStyle: 'ShortDot' },
         },
         {
           labels: { align: 'right', x: -3, style: { color: mutedColor } },
@@ -129,7 +132,7 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
       tooltip: {
         split: true,
         backgroundColor: light ? 'rgba(255, 255, 255, 0.96)' : 'rgba(15, 23, 42, 0.96)',
-        borderColor: 'rgba(239, 94, 166, 0.36)',
+        borderColor: accentBorderColor,
         style: { color: textColor },
         valueDecimals: 2,
       },
@@ -140,7 +143,7 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
           lineColor: '#16a34a',
           upLineColor: '#dc2626',
         },
-        column: { color: 'rgba(239, 94, 166, 0.42)' },
+        column: { color: accentBorderColor },
         series: { dataGrouping: { enabled: true } },
       },
       series: [
