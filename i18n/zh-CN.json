@@ -1130,6 +1130,68 @@
       "cellAria": "第 {{row}} 行第 {{col}} 列"
     }
   },
+  "stockTab": {
+    "title": "股票行情",
+    "subtitle": "搜索股票代码并查看实时价格、涨跌幅和专业 K 线。",
+    "autoRefresh": "每 30 秒自动刷新",
+    "empty": {
+      "name": "未选择股票",
+      "chart": "暂无 K 线数据"
+    },
+    "loading": {
+      "chart": "正在加载 K 线..."
+    },
+    "actions": {
+      "load": "加载",
+      "search": "搜索",
+      "searching": "搜索中...",
+      "refresh": "刷新",
+      "loading": "加载中..."
+    },
+    "search": {
+      "aria": "股票搜索与筛选",
+      "symbolLabel": "股票代码",
+      "symbolPlaceholder": "例如 SH600519 / SZ000651 / HK00700 / USMSFT",
+      "keywordLabel": "搜索股票",
+      "keywordPlaceholder": "输入名称或代码"
+    },
+    "period": {
+      "aria": "K 线周期",
+      "day": "日 K",
+      "week": "周 K",
+      "month": "月 K"
+    },
+    "metrics": {
+      "aria": "股票关键指标",
+      "updatedAt": "更新于 {{time}}",
+      "previousClose": "昨收",
+      "high": "最高",
+      "low": "最低",
+      "volume": "成交量",
+      "amount": "成交额",
+      "source": "数据源"
+    },
+    "chart": {
+      "aria": "股票 K 线图",
+      "title": "股票 K 线",
+      "candlestick": "K 线",
+      "volume": "成交量",
+      "priceAxis": "价格",
+      "volumeAxis": "成交量",
+      "exportMenu": "图表导出菜单",
+      "range": {
+        "1m": "1月",
+        "3m": "3月",
+        "6m": "6月",
+        "1y": "1年",
+        "all": "全部"
+      }
+    },
+    "error": {
+      "default": "行情加载失败，请稍后重试。",
+      "symbolFormat": "请输入带市场前缀的股票代码，例如 SH600519、SZ000651、HK00700 或 USMSFT。"
+    }
+  },
   "stt": {
     "label": "识别结果",
     "asrQuickAdd": "ASR快速添加",

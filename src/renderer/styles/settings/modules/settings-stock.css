@@ -1,0 +1,411 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+/**
+ * @file settings-stock.css
+ * @description 股票行情分页样式
+ * @author 鸡哥
+ */
+
+.stock-tab-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+  gap: 0;
+  color: rgba(var(--color-text-rgb), 0.88);
+}
+
+.stock-tab-sidebar {
+  display: flex;
+  flex: 0 0 310px;
+  flex-direction: column;
+  width: 310px;
+  min-width: 280px;
+  border-right: 1px solid rgba(var(--color-text-rgb), 0.08);
+  overflow: hidden;
+}
+
+.stock-tab-sidebar-header {
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.stock-tab-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.stock-tab-subtitle {
+  margin: 6px 0 0;
+  color: rgba(var(--color-text-rgb), 0.52);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.stock-tab-main {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.stock-tab-main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.stock-tab-main-title {
+  color: rgba(var(--color-text-rgb), 0.9);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.stock-tab-main-meta,
+.stock-quote-time,
+.stock-refresh-note {
+  color: rgba(var(--color-text-rgb), 0.48);
+  font-size: 12px;
+}
+
+.stock-tab-main-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  text-align: right;
+}
+
+.stock-search-card {
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
+  padding: 12px 14px;
+}
+
+.stock-search-row {
+  display: grid;
+  gap: 10px;
+}
+
+.stock-symbol-form,
+.stock-keyword-form {
+  min-width: 0;
+}
+
+.stock-field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: rgba(var(--color-text-rgb), 0.56);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.stock-inline-control {
+  display: flex;
+  gap: 8px;
+}
+
+.stock-input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 6px;
+  padding: 7px 10px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.86);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.stock-input::placeholder {
+  color: rgba(var(--color-text-rgb), 0.35);
+}
+
+.stock-input:focus {
+  border-color: rgba(var(--color-text-rgb), 0.25);
+  background: rgba(var(--color-text-rgb), 0.08);
+}
+
+.stock-primary-button,
+.stock-secondary-button,
+.stock-period-button,
+.stock-search-result-item {
+  border: 1px solid rgba(var(--color-text-rgb), 0.1);
+  border-radius: 6px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.72);
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.stock-primary-button,
+.stock-secondary-button {
+  min-height: 32px;
+  padding: 0 11px;
+  flex-shrink: 0;
+}
+
+.stock-primary-button {
+  background: rgba(100, 181, 246, 0.14);
+  border-color: rgba(100, 181, 246, 0.28);
+  color: rgba(var(--color-text-rgb), 0.9);
+  font-weight: 600;
+}
+
+.stock-primary-button:hover,
+.stock-secondary-button:hover,
+.stock-period-button:hover,
+.stock-search-result-item:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.stock-primary-button:disabled,
+.stock-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.stock-form-error,
+.stock-error-card {
+  color: rgba(255, 138, 128, 0.95);
+  background: rgba(255, 82, 82, 0.1);
+}
+
+.stock-form-error {
+  margin-top: 7px;
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.stock-error-card {
+  margin: 12px 16px 0;
+  border: 1px solid rgba(255, 82, 82, 0.2);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+
+.stock-toolbar-row {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.stock-period-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.stock-period-button {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+.stock-period-button.active {
+  border-color: rgba(100, 181, 246, 0.48);
+  background: rgba(100, 181, 246, 0.14);
+  color: rgba(var(--color-text-rgb), 0.9);
+}
+
+.stock-search-results {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.stock-search-result-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 9px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.stock-search-result-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.stock-search-result-main strong,
+.stock-search-result-main span,
+.stock-search-result-price {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stock-search-result-main strong {
+  color: rgba(var(--color-text-rgb), 0.84);
+  font-size: 12px;
+}
+
+.stock-search-result-main span,
+.stock-search-result-price {
+  color: rgba(var(--color-text-rgb), 0.48);
+  font-size: 11px;
+}
+
+.stock-metrics-card {
+  flex: 0 0 auto;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
+}
+
+.stock-quote-time {
+  font-size: 11px;
+}
+
+.stock-price-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 14px;
+}
+
+.stock-current-price {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.stock-change-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: rgba(var(--color-text-rgb), 0.06);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stock-search-result-price.up,
+.stock-current-price.up,
+.stock-change-pill.up {
+  color: #ef4444;
+}
+
+.stock-search-result-price.down,
+.stock-current-price.down,
+.stock-change-pill.down {
+  color: #22c55e;
+}
+
+.stock-search-result-price.neutral,
+.stock-current-price.neutral,
+.stock-change-pill.neutral {
+  color: rgba(var(--color-text-rgb), 0.84);
+}
+
+.stock-content-grid {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.stock-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stock-metric-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.06);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: rgba(var(--color-text-rgb), 0.04);
+}
+
+.stock-metric-item span,
+.stock-metric-item strong {
+  font-size: 12px;
+}
+
+.stock-metric-item span {
+  color: rgba(var(--color-text-rgb), 0.52);
+}
+
+.stock-metric-item strong {
+  color: rgba(var(--color-text-rgb), 0.86);
+  text-align: right;
+}
+
+.stock-chart-card {
+  flex: 1 0 430px;
+  min-height: 430px;
+  padding: 14px 16px 16px;
+  overflow: hidden;
+}
+
+.stock-chart-card .highcharts-container,
+.stock-chart-card svg {
+  border-radius: 10px;
+}
+
+@media (max-width: 1100px) {
+  .stock-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .stock-tab-container {
+    flex-direction: column;
+  }
+
+  .stock-tab-sidebar {
+    width: 100%;
+    min-height: 360px;
+    border-right: none;
+    border-bottom: 1px solid rgba(var(--color-text-rgb), 0.08);
+  }
+
+  .stock-tab-main-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .stock-tab-main-status {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

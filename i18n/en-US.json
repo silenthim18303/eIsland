@@ -1130,6 +1130,68 @@
       "cellAria": "Row {{row}}, column {{col}}"
     }
   },
+  "stockTab": {
+    "title": "Stock Market",
+    "subtitle": "Search symbols and view live prices, change rates, and professional candlestick charts.",
+    "autoRefresh": "Auto refreshes every 30 seconds",
+    "empty": {
+      "name": "No stock selected",
+      "chart": "No K-line data"
+    },
+    "loading": {
+      "chart": "Loading K-line data..."
+    },
+    "actions": {
+      "load": "Load",
+      "search": "Search",
+      "searching": "Searching...",
+      "refresh": "Refresh",
+      "loading": "Loading..."
+    },
+    "search": {
+      "aria": "Stock search and filters",
+      "symbolLabel": "Symbol",
+      "symbolPlaceholder": "e.g. SH600519 / SZ000651 / HK00700 / USMSFT",
+      "keywordLabel": "Search Stocks",
+      "keywordPlaceholder": "Enter name or symbol"
+    },
+    "period": {
+      "aria": "K-line period",
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "metrics": {
+      "aria": "Key stock metrics",
+      "updatedAt": "Updated at {{time}}",
+      "previousClose": "Prev Close",
+      "high": "High",
+      "low": "Low",
+      "volume": "Volume",
+      "amount": "Amount",
+      "source": "Source"
+    },
+    "chart": {
+      "aria": "Stock candlestick chart",
+      "title": "Stock K-line",
+      "candlestick": "Candlestick",
+      "volume": "Volume",
+      "priceAxis": "Price",
+      "volumeAxis": "Volume",
+      "exportMenu": "Chart export menu",
+      "range": {
+        "1m": "1M",
+        "3m": "3M",
+        "6m": "6M",
+        "1y": "1Y",
+        "all": "All"
+      }
+    },
+    "error": {
+      "default": "Failed to load market data. Please try again later.",
+      "symbolFormat": "Enter a symbol with market prefix, such as SH600519, SZ000651, HK00700, or USMSFT."
+    }
+  },
   "stt": {
     "label": "Recognition Result",
     "asrQuickAdd": "ASR Quick Add",

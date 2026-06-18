@@ -41,6 +41,7 @@ const NAV_LABEL_MAP: Record<string, string> = {
   alarm: '闹钟',
   toolbox: '工具箱',
   miniGame: '小游戏',
+  stock: '股票行情',
   settings: '设置',
 };
 
