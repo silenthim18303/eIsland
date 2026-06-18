@@ -297,11 +297,12 @@
 
 .stock-price-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: flex-end;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  gap: 2px;
   margin: 0;
+  text-align: right;
 }
 
 .stock-current-price {
@@ -309,20 +310,23 @@
   padding: 0;
   background: transparent;
   cursor: pointer;
-  font-size: 24px;
+  font-size: 23px;
   font-weight: 800;
+  line-height: 1;
   letter-spacing: 0.02em;
 }
 
 .stock-change-pill {
   display: inline-flex;
   align-items: center;
-  min-height: 26px;
+  justify-content: flex-end;
+  min-height: 16px;
   border-radius: 999px;
-  padding: 0 10px;
-  background: rgba(var(--color-text-rgb), 0.06);
-  font-size: 12px;
+  padding: 0;
+  font-size: 11px;
   font-weight: 700;
+  line-height: 1.1;
+  text-align: right;
 }
 
 .stock-search-result-price.up,
@@ -441,11 +445,12 @@
   }
 
   .stock-tab-main-status {
-    align-items: flex-start;
-    text-align: left;
+    align-items: flex-end;
+    text-align: right;
   }
 
   .stock-price-row {
-    justify-content: flex-start;
+    align-items: flex-end;
+    justify-content: flex-end;
   }
 }
