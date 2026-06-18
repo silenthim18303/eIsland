@@ -95,6 +95,7 @@ export function StockKlineChart({ quote, klines, loading }: StockKlineChartProps
       navigator: {
         enabled: true,
         outlineColor: gridColor,
+        maskFill: 'rgba(0, 0, 0, 0.6)',
         handles: { backgroundColor: light ? '#fff' : '#1e293b', borderColor: '#ef5ea6' },
       },
       scrollbar: { enabled: true, barBackgroundColor: 'rgba(239, 94, 166, 0.32)', trackBackgroundColor: 'rgba(148, 163, 184, 0.14)' },
