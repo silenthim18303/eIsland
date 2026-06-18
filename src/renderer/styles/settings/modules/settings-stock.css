@@ -82,9 +82,7 @@
   font-weight: 700;
 }
 
-.stock-tab-main-meta,
-.stock-quote-time,
-.stock-refresh-note {
+.stock-tab-main-meta {
   color: rgba(var(--color-text-rgb), 0.48);
   font-size: 12px;
 }
@@ -283,20 +281,18 @@
   border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
 }
 
-.stock-quote-time {
-  font-size: 11px;
-}
 
 .stock-price-row {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 14px;
+  margin: 0;
 }
 
 .stock-current-price {
-  font-size: 30px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -407,5 +403,9 @@
   .stock-tab-main-status {
     align-items: flex-start;
     text-align: left;
+  }
+
+  .stock-price-row {
+    justify-content: flex-start;
   }
 }

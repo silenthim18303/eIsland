@@ -22,7 +22,12 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStockMarketData } from '../hooks/useStockMarketData';
-import { formatStockTime } from '../utils/formatters';
+import {
+  formatStockChange,
+  formatStockPercent,
+  formatStockPrice,
+  getStockTrendClass,
+} from '../utils/formatters';
 import { StockKlineChart } from './StockKlineChart';
 import { StockMetrics } from './StockMetrics';
 import { StockSearchPanel } from './StockSearchPanel';
@@ -34,6 +39,7 @@ import { StockSearchPanel } from './StockSearchPanel';
 export function StockTab(): ReactElement {
   const { t } = useTranslation();
   const market = useStockMarketData();
+  const trendClass = getStockTrendClass(market.quote?.changePercent);
 
   return (
     <div className="max-expand-settings stock-tab-container">
@@ -66,10 +72,12 @@ export function StockTab(): ReactElement {
             <div className="stock-tab-main-meta">{market.quote?.code ?? market.symbol}</div>
           </div>
           <div className="stock-tab-main-status">
-            <div className="stock-quote-time">
-              {t('stockTab.metrics.updatedAt', { time: formatStockTime(market.lastUpdatedAt) })}
+            <div className="stock-price-row">
+              <span className={`stock-current-price ${trendClass}`}>{formatStockPrice(market.quote?.price)}</span>
+              <span className={`stock-change-pill ${trendClass}`}>
+                {formatStockChange(market.quote?.change)} · {formatStockPercent(market.quote?.changePercent)}
+              </span>
             </div>
-            <div className="stock-refresh-note">{t('stockTab.autoRefresh')}</div>
           </div>
         </div>
 

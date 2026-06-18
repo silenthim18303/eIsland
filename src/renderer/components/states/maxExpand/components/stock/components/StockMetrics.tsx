@@ -23,11 +23,8 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { StockQuote } from '../config/types';
 import {
-  formatStockChange,
-  formatStockPercent,
   formatStockPrice,
   formatStockVolume,
-  getStockTrendClass,
 } from '../utils/formatters';
 
 interface StockMetricsProps {
@@ -41,7 +38,6 @@ interface StockMetricsProps {
  */
 export function StockMetrics({ quote }: StockMetricsProps): ReactElement {
   const { t } = useTranslation();
-  const trendClass = getStockTrendClass(quote?.changePercent);
   const metrics = [
     { key: 'previousClose', label: t('stockTab.metrics.previousClose'), value: formatStockPrice(quote?.previousClose) },
     { key: 'high', label: t('stockTab.metrics.high'), value: formatStockPrice(quote?.high) },
@@ -53,13 +49,6 @@ export function StockMetrics({ quote }: StockMetricsProps): ReactElement {
 
   return (
     <section className="stock-metrics-card" aria-label={t('stockTab.metrics.aria')}>
-      <div className="stock-price-row">
-        <span className={`stock-current-price ${trendClass}`}>{formatStockPrice(quote?.price)}</span>
-        <span className={`stock-change-pill ${trendClass}`}>
-          {formatStockChange(quote?.change)} · {formatStockPercent(quote?.changePercent)}
-        </span>
-      </div>
-
       <div className="stock-metric-grid">
         {metrics.map((item) => (
           <div key={item.key} className="stock-metric-item">
