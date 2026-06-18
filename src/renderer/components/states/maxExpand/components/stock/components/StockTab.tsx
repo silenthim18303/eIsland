@@ -20,6 +20,7 @@
  */
 
 import type { ReactElement } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStockMarketData } from '../hooks/useStockMarketData';
 import {
@@ -38,6 +39,7 @@ import { StockSearchPanel } from './StockSearchPanel';
  */
 export function StockTab(): ReactElement {
   const { t } = useTranslation();
+  const [metricsExpanded, setMetricsExpanded] = useState(false);
   const market = useStockMarketData();
   const trendClass = getStockTrendClass(market.quote?.changePercent);
 
@@ -73,7 +75,15 @@ export function StockTab(): ReactElement {
           </div>
           <div className="stock-tab-main-status">
             <div className="stock-price-row">
-              <span className={`stock-current-price ${trendClass}`}>{formatStockPrice(market.quote?.price)}</span>
+              <button
+                type="button"
+                className={`stock-current-price ${trendClass}`}
+                aria-expanded={metricsExpanded}
+                aria-controls="stock-metrics-panel"
+                onClick={() => { setMetricsExpanded((expanded) => !expanded); }}
+              >
+                {formatStockPrice(market.quote?.price)}
+              </button>
               <span className={`stock-change-pill ${trendClass}`}>
                 {formatStockChange(market.quote?.change)} · {formatStockPercent(market.quote?.changePercent)}
               </span>
@@ -88,7 +98,13 @@ export function StockTab(): ReactElement {
         )}
 
         <div className="stock-content-grid">
-          <StockMetrics quote={market.quote} />
+          <div
+            id="stock-metrics-panel"
+            className={`stock-metrics-collapse${metricsExpanded ? ' expanded' : ''}`}
+            aria-hidden={!metricsExpanded}
+          >
+            <StockMetrics quote={market.quote} />
+          </div>
           <StockKlineChart quote={market.quote} klines={market.klines} loading={market.loading} />
         </div>
       </main>
