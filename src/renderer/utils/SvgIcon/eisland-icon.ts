@@ -107,7 +107,8 @@ export const SvgIcon = {
   NOTIFICATION: './svg/NOTIFICATION.svg',
   CHECKED: './svg/CHECKED.svg',
   FILTER: './svg/FILTER.svg',
-  FIRE: './svg/FIRE.svg'
+  FIRE: './svg/FIRE.svg',
+  STOCK_CHOOSE: './svg/STOCK_CHOOSE.svg'
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;
