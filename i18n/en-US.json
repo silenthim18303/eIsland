@@ -1137,15 +1137,10 @@
     "sidebar": {
       "toggle": "Toggle sidebar",
       "favorites": "Favorites",
-      "addFavorite": "Add Favorite",
       "search": "Search",
       "favoritesHint": "Manage your watchlist",
-      "addFavoriteHint": "Enter a symbol and load market data",
       "searchHint": "Search stocks by name or symbol",
       "noFavorites": "No favorites yet"
-    },
-    "addFavorite": {
-      "aria": "Add stock favorite"
     },
     "empty": {
       "name": "No stock selected",
@@ -1155,27 +1150,16 @@
       "chart": "Loading K-line data..."
     },
     "actions": {
-      "load": "Load",
       "search": "Search",
       "searching": "Searching...",
       "addFavorite": "Add",
       "addFavoriteWithName": "Add {{name}} to favorites",
-      "removeFavorite": "Remove {{name}} from favorites",
-      "refresh": "Refresh",
-      "loading": "Loading..."
+      "removeFavorite": "Remove {{name}} from favorites"
     },
     "search": {
       "aria": "Stock search and filters",
-      "symbolLabel": "Symbol",
-      "symbolPlaceholder": "e.g. SH600519 / SZ000651 / HK00700 / USMSFT",
       "keywordLabel": "Search Stocks",
       "keywordPlaceholder": "Enter name or symbol"
-    },
-    "period": {
-      "aria": "K-line period",
-      "day": "Day",
-      "week": "Week",
-      "month": "Month"
     },
     "metrics": {
       "aria": "Key stock metrics",

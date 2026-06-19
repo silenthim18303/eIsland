@@ -1137,15 +1137,10 @@
     "sidebar": {
       "toggle": "展开/收起侧边栏",
       "favorites": "自选",
-      "addFavorite": "添加自选",
       "search": "搜索",
       "favoritesHint": "管理您的自选股列表",
-      "addFavoriteHint": "输入股票代码并加载行情",
       "searchHint": "按名称或代码搜索股票",
       "noFavorites": "暂无自选股"
-    },
-    "addFavorite": {
-      "aria": "添加自选股票"
     },
     "empty": {
       "name": "未选择股票",
@@ -1155,27 +1150,16 @@
       "chart": "正在加载 K 线..."
     },
     "actions": {
-      "load": "加载",
       "search": "搜索",
       "searching": "搜索中...",
       "addFavorite": "添加",
       "addFavoriteWithName": "添加 {{name}} 到自选",
-      "removeFavorite": "移除 {{name}} 自选",
-      "refresh": "刷新",
-      "loading": "加载中..."
+      "removeFavorite": "移除 {{name}} 自选"
     },
     "search": {
       "aria": "股票搜索与筛选",
-      "symbolLabel": "股票代码",
-      "symbolPlaceholder": "例如 SH600519 / SZ000651 / HK00700 / USMSFT",
       "keywordLabel": "搜索股票",
       "keywordPlaceholder": "输入名称或代码"
-    },
-    "period": {
-      "aria": "K 线周期",
-      "day": "日 K",
-      "week": "周 K",
-      "month": "月 K"
     },
     "metrics": {
       "aria": "股票关键指标",

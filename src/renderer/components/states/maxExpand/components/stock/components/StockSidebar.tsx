@@ -22,53 +22,44 @@
 import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import type { StockFavoriteInput, StockFavoriteItem, StockMarketPeriod, StockSearchItem } from '../config/types';
+import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
 import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
-import { StockAddFavoritePanel } from './StockAddFavoritePanel';
 import { StockSearchPanel } from './StockSearchPanel';
 
-type StockSidebarTab = 'favorites' | 'addFavorite' | 'search';
+type StockSidebarTab = 'favorites' | 'search';
 
 interface StockSidebarProps {
   symbol: string;
-  period: StockMarketPeriod;
-  loading: boolean;
   searching: boolean;
   searchResults: StockSearchItem[];
   favorites: StockFavoriteItem[];
   onSelectSymbol: (symbol: string) => void;
   onAddFavorite: (input: StockFavoriteInput) => void;
   onRemoveFavorite: (symbol: string) => void;
-  onPeriodChange: (period: StockMarketPeriod) => void;
-  onRefresh: () => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
   onClearSearchResults: () => void;
 }
 
 /**
- * 渲染股票自选侧边栏与添加自选入口。
+ * 渲染股票自选侧边栏与搜索入口。
  * @param props - 股票侧边栏属性。
  * @returns 股票侧边栏。
  */
 export function StockSidebar(props: StockSidebarProps): ReactElement {
   const {
     symbol,
-    period,
-    loading,
     searching,
     searchResults,
     favorites,
     onSelectSymbol,
     onAddFavorite,
     onRemoveFavorite,
-    onPeriodChange,
-    onRefresh,
     onSearch,
     onClearSearchResults,
   } = props;
   const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('addFavorite');
+  const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('search');
 
   const openSidebarTab = (tab: StockSidebarTab): void => {
     setSidebarTab(tab);
@@ -85,15 +76,6 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
           onClick={() => openSidebarTab('favorites')}
         >
           <img src={SvgIcon.STOCK_CHOOSE} alt="" className="stock-sidebar-nav-icon stock-sidebar-nav-icon-large" />
-        </button>
-        <button
-          className={`stock-sidebar-nav-btn${sidebarTab === 'addFavorite' && !sidebarCollapsed ? ' active' : ''}`}
-          type="button"
-          title={t('stockTab.sidebar.addFavorite')}
-          aria-label={t('stockTab.sidebar.addFavorite')}
-          onClick={() => openSidebarTab('addFavorite')}
-        >
-          <img src={SvgIcon.PLUS} alt="" className="stock-sidebar-nav-icon stock-sidebar-nav-icon-large" />
         </button>
         <button
           className={`stock-sidebar-nav-btn stock-sidebar-nav-search-btn${sidebarTab === 'search' && !sidebarCollapsed ? ' active' : ''}`}
@@ -158,25 +140,6 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                   </div>
                 )}
               </div>
-            )}
-            {sidebarTab === 'addFavorite' && (
-              <>
-                <div className="stock-tab-sidebar-header">
-                  <div>
-                    <div className="stock-tab-title">{t('stockTab.sidebar.addFavorite')}</div>
-                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.addFavoriteHint')}</p>
-                  </div>
-                </div>
-                <StockAddFavoritePanel
-                  symbol={symbol}
-                  period={period}
-                  loading={loading}
-                  onSelectSymbol={onSelectSymbol}
-                  onAddFavorite={onAddFavorite}
-                  onPeriodChange={onPeriodChange}
-                  onRefresh={onRefresh}
-                />
-              </>
             )}
             {sidebarTab === 'search' && (
               <>

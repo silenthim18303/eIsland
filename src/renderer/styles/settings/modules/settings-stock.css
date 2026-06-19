@@ -251,7 +251,6 @@
   gap: 10px;
 }
 
-.stock-symbol-form,
 .stock-keyword-form {
   min-width: 0;
 }
@@ -291,9 +290,7 @@
   background: rgba(var(--color-text-rgb), 0.08);
 }
 
-.stock-primary-button,
 .stock-secondary-button,
-.stock-period-button,
 .stock-search-result-item,
 .stock-search-result-main-button,
 .stock-search-result-add,
@@ -308,23 +305,13 @@
   transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
 }
 
-.stock-primary-button,
 .stock-secondary-button {
   min-height: 32px;
   padding: 0 11px;
   flex-shrink: 0;
 }
 
-.stock-primary-button {
-  background: rgba(100, 181, 246, 0.14);
-  border-color: rgba(100, 181, 246, 0.28);
-  color: rgba(var(--color-text-rgb), 0.9);
-  font-weight: 600;
-}
-
-.stock-primary-button:hover,
 .stock-secondary-button:hover,
-.stock-period-button:hover,
 .stock-search-result-item:hover,
 .stock-search-result-main-button:hover,
 .stock-search-result-add:hover,
@@ -334,24 +321,9 @@
   color: rgba(var(--color-text-rgb), 0.92);
 }
 
-.stock-primary-button:disabled,
 .stock-secondary-button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
-}
-
-.stock-form-error,
-.stock-error-card {
-  color: rgba(255, 138, 128, 0.95);
-  background: rgba(255, 82, 82, 0.1);
-}
-
-.stock-form-error {
-  margin-top: 7px;
-  padding: 7px 9px;
-  border-radius: 6px;
-  font-size: 11px;
-  line-height: 1.45;
 }
 
 .stock-error-card {
@@ -359,31 +331,9 @@
   border: 1px solid rgba(255, 82, 82, 0.2);
   border-radius: 8px;
   padding: 10px 12px;
+  background: rgba(255, 82, 82, 0.1);
+  color: rgba(255, 138, 128, 0.95);
   font-size: 12px;
-}
-
-.stock-toolbar-row {
-  display: grid;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.stock-period-group {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.stock-period-button {
-  min-height: 28px;
-  padding: 0 10px;
-  font-size: 11px;
-}
-
-.stock-period-button.active {
-  border-color: rgba(100, 181, 246, 0.48);
-  background: rgba(100, 181, 246, 0.14);
-  color: rgba(var(--color-text-rgb), 0.9);
 }
 
 .stock-search-results {

@@ -45,16 +45,12 @@ export function StockTab(): ReactElement {
     <div className="max-expand-settings stock-tab-container">
       <StockSidebar
         symbol={market.symbol}
-        period={market.period}
-        loading={market.loading}
         searching={market.searching}
         searchResults={market.searchResults}
         favorites={market.favorites}
         onSelectSymbol={market.selectSymbol}
         onAddFavorite={market.addFavorite}
         onRemoveFavorite={market.removeFavorite}
-        onPeriodChange={market.setPeriod}
-        onRefresh={() => { void market.refresh(); }}
         onSearch={market.search}
         onClearSearchResults={market.clearSearchResults}
       />
