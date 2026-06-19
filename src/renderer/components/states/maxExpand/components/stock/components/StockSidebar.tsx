@@ -60,8 +60,8 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     onRefresh,
   } = props;
   const { t } = useTranslation();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('search');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('favorites');
 
   const openSidebarTab = (tab: StockSidebarTab): void => {
     setSidebarTab(tab);
