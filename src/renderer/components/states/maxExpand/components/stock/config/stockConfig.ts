@@ -24,6 +24,8 @@ import type { StockMarketPeriod } from './types';
 export const DEFAULT_STOCK_SYMBOL = 'SH600519';
 export const STOCK_AUTO_REFRESH_MS = 30_000;
 export const STOCK_KLINE_COUNT = 160;
+export const STOCK_FAVORITES_STORE_KEY = 'stock-favorites';
+export const STOCK_FAVORITES_LOCAL_STORAGE_KEY = 'eIsland_stock_favorites';
 
 export const STOCK_PERIODS: Array<{ value: StockMarketPeriod; labelKey: string }> = [
   { value: 'day', labelKey: 'stockTab.period.day' },

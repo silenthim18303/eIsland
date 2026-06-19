@@ -21,8 +21,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { stocks } from 'stock-api/browser';
-import { DEFAULT_STOCK_SYMBOL, STOCK_AUTO_REFRESH_MS, STOCK_KLINE_COUNT } from '../config/stockConfig';
-import type { StockMarketPeriod, StockMarketState, StockSearchItem } from '../config/types';
+import { DEFAULT_STOCK_SYMBOL, STOCK_AUTO_REFRESH_MS, STOCK_KLINE_COUNT, STOCK_FAVORITES_STORE_KEY } from '../config/stockConfig';
+import type { StockFavoriteInput, StockMarketPeriod, StockMarketState, StockSearchItem } from '../config/types';
+import { createStockFavorite, persistStockFavorites, readStockFavorites, sanitizeStockFavorites } from '../utils/favoriteStorage';
 import {
   normalizeStockKlines,
   normalizeStockQuote,
@@ -33,6 +34,8 @@ import {
 interface UseStockMarketDataResult extends StockMarketState {
   setPeriod: (period: StockMarketPeriod) => void;
   selectSymbol: (symbol: string) => void;
+  addFavorite: (input: StockFavoriteInput) => void;
+  removeFavorite: (symbol: string) => void;
   refresh: () => Promise<void>;
   search: (keyword: string) => Promise<StockSearchItem[]>;
   clearSearchResults: () => void;
@@ -54,6 +57,7 @@ export function useStockMarketData(): UseStockMarketDataResult {
     quote: null,
     klines: [],
     searchResults: [],
+    favorites: [],
     loading: false,
     searching: false,
     error: null,
@@ -110,6 +114,28 @@ export function useStockMarketData(): UseStockMarketDataResult {
     void fetchMarketData(normalizedSymbol, state.period);
   }, [fetchMarketData, state.period]);
 
+  const addFavorite = useCallback((input: StockFavoriteInput): void => {
+    setState((current) => {
+      const code = normalizeStockSymbol(input.code);
+      const previous = current.favorites.find((item) => item.code === code);
+      const nextFavorite = createStockFavorite({ ...input, code }, previous);
+      const nextFavorites = previous
+        ? current.favorites.map((item) => (item.code === code ? nextFavorite : item))
+        : [nextFavorite, ...current.favorites];
+      persistStockFavorites(nextFavorites);
+      return { ...current, favorites: nextFavorites };
+    });
+  }, []);
+
+  const removeFavorite = useCallback((symbol: string): void => {
+    const normalizedSymbol = normalizeStockSymbol(symbol);
+    setState((current) => {
+      const nextFavorites = current.favorites.filter((item) => item.code !== normalizedSymbol);
+      persistStockFavorites(nextFavorites);
+      return { ...current, favorites: nextFavorites };
+    });
+  }, []);
+
   const search = useCallback(async (keyword: string): Promise<StockSearchItem[]> => {
     const normalizedKeyword = keyword.trim();
     if (!normalizedKeyword) {
@@ -134,6 +160,24 @@ export function useStockMarketData(): UseStockMarketDataResult {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    void readStockFavorites().then((favorites) => {
+      if (!cancelled) setState((current) => ({ ...current, favorites }));
+    });
+
+    const unsubscribe = window.api.onSettingsChanged((channel: string, value: unknown) => {
+      if (channel !== `store:${STOCK_FAVORITES_STORE_KEY}`) return;
+      const favorites = sanitizeStockFavorites(value);
+      setState((current) => ({ ...current, favorites }));
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     void fetchMarketData(DEFAULT_STOCK_SYMBOL, 'day');
   }, [fetchMarketData]);
 
@@ -148,6 +192,8 @@ export function useStockMarketData(): UseStockMarketDataResult {
     ...state,
     setPeriod,
     selectSymbol,
+    addFavorite,
+    removeFavorite,
     refresh,
     search,
     clearSearchResults,

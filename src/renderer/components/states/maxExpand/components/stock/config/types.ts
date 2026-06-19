@@ -54,12 +54,30 @@ export interface StockSearchItem {
   source: string;
 }
 
+export interface StockFavoriteItem {
+  code: string;
+  name: string;
+  price: number | null;
+  changePercent: number | null;
+  source: string;
+  addedAt: number;
+}
+
+export interface StockFavoriteInput {
+  code: string;
+  name?: string;
+  price?: number | null;
+  changePercent?: number | null;
+  source?: string;
+}
+
 export interface StockMarketState {
   symbol: string;
   period: StockMarketPeriod;
   quote: StockQuote | null;
   klines: StockKlinePoint[];
   searchResults: StockSearchItem[];
+  favorites: StockFavoriteItem[];
   loading: boolean;
   searching: boolean;
   error: string | null;

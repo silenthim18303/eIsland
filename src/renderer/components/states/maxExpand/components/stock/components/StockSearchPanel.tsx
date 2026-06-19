@@ -21,13 +21,14 @@
 
 import { useState, type FormEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { StockSearchItem } from '../config/types';
+import type { StockFavoriteInput, StockSearchItem } from '../config/types';
 import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
 
 interface StockSearchPanelProps {
   searching: boolean;
   searchResults: StockSearchItem[];
   onSelectSymbol: (symbol: string) => void;
+  onAddFavorite: (input: StockFavoriteInput) => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
   onClearSearchResults: () => void;
 }
@@ -42,6 +43,7 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
     searching,
     searchResults,
     onSelectSymbol,
+    onAddFavorite,
     onSearch,
     onClearSearchResults,
   } = props;
@@ -57,6 +59,10 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
     setKeyword('');
     onClearSearchResults();
     onSelectSymbol(item.code);
+  };
+
+  const handleAddSearchResult = (item: StockSearchItem): void => {
+    onAddFavorite(item);
   };
 
   return (
@@ -81,20 +87,29 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
         {searchResults.length > 0 && (
           <div className="stock-search-results">
             {searchResults.slice(0, 8).map((item) => (
-              <button
-                key={`${item.source}-${item.code}`}
-                className="stock-search-result-item"
-                type="button"
-                onClick={() => handleSelectSearchResult(item)}
-              >
-                <span className="stock-search-result-main">
-                  <strong>{item.name}</strong>
-                  <span>{item.code}</span>
-                </span>
-                <span className={`stock-search-result-price ${getStockTrendClass(item.changePercent)}`}>
-                  {formatStockPrice(item.price)} · {formatStockPercent(item.changePercent)}
-                </span>
-              </button>
+              <div key={`${item.source}-${item.code}`} className="stock-search-result-item">
+                <button
+                  className="stock-search-result-main-button"
+                  type="button"
+                  onClick={() => handleSelectSearchResult(item)}
+                >
+                  <span className="stock-search-result-main">
+                    <strong>{item.name}</strong>
+                    <span>{item.code}</span>
+                  </span>
+                  <span className={`stock-search-result-price ${getStockTrendClass(item.changePercent)}`}>
+                    {formatStockPrice(item.price)} · {formatStockPercent(item.changePercent)}
+                  </span>
+                </button>
+                <button
+                  className="stock-search-result-add"
+                  type="button"
+                  aria-label={t('stockTab.actions.addFavoriteWithName', { name: item.name })}
+                  onClick={() => handleAddSearchResult(item)}
+                >
+                  {t('stockTab.actions.addFavorite')}
+                </button>
+              </div>
             ))}
           </div>
         )}

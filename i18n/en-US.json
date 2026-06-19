@@ -1158,6 +1158,9 @@
       "load": "Load",
       "search": "Search",
       "searching": "Searching...",
+      "addFavorite": "Add",
+      "addFavoriteWithName": "Add {{name}} to favorites",
+      "removeFavorite": "Remove {{name}} from favorites",
       "refresh": "Refresh",
       "loading": "Loading..."
     },

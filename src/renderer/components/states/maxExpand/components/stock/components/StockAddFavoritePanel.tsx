@@ -22,13 +22,14 @@
 import { useState, type FormEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { STOCK_PERIODS, STOCK_SYMBOL_PATTERN } from '../config/stockConfig';
-import type { StockMarketPeriod } from '../config/types';
+import type { StockFavoriteInput, StockMarketPeriod } from '../config/types';
 
 interface StockAddFavoritePanelProps {
   symbol: string;
   period: StockMarketPeriod;
   loading: boolean;
   onSelectSymbol: (symbol: string) => void;
+  onAddFavorite: (input: StockFavoriteInput) => void;
   onPeriodChange: (period: StockMarketPeriod) => void;
   onRefresh: () => void;
 }
@@ -39,7 +40,7 @@ interface StockAddFavoritePanelProps {
  * @returns 添加自选面板。
  */
 export function StockAddFavoritePanel(props: StockAddFavoritePanelProps): ReactElement {
-  const { symbol, period, loading, onSelectSymbol, onPeriodChange, onRefresh } = props;
+  const { symbol, period, loading, onSelectSymbol, onAddFavorite, onPeriodChange, onRefresh } = props;
   const { t } = useTranslation();
   const [symbolInput, setSymbolInput] = useState(symbol);
   const [inputError, setInputError] = useState<string | null>(null);
@@ -52,6 +53,17 @@ export function StockAddFavoritePanel(props: StockAddFavoritePanelProps): ReactE
       return;
     }
     setInputError(null);
+    onSelectSymbol(nextSymbol);
+  };
+
+  const handleAddFavorite = (): void => {
+    const nextSymbol = symbolInput.trim().toUpperCase();
+    if (!STOCK_SYMBOL_PATTERN.test(nextSymbol)) {
+      setInputError(t('stockTab.error.symbolFormat'));
+      return;
+    }
+    setInputError(null);
+    onAddFavorite({ code: nextSymbol });
     onSelectSymbol(nextSymbol);
   };
 
@@ -73,6 +85,9 @@ export function StockAddFavoritePanel(props: StockAddFavoritePanelProps): ReactE
           />
           <button className="stock-primary-button" type="submit" disabled={loading}>
             {t('stockTab.actions.load')}
+          </button>
+          <button className="stock-secondary-button" type="button" disabled={loading} onClick={handleAddFavorite}>
+            {t('stockTab.actions.addFavorite')}
           </button>
         </div>
         {inputError && <div className="stock-form-error">{inputError}</div>}

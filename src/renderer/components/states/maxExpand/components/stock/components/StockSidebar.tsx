@@ -22,7 +22,8 @@
 import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import type { StockMarketPeriod, StockSearchItem } from '../config/types';
+import type { StockFavoriteInput, StockFavoriteItem, StockMarketPeriod, StockSearchItem } from '../config/types';
+import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
 import { StockAddFavoritePanel } from './StockAddFavoritePanel';
 import { StockSearchPanel } from './StockSearchPanel';
 
@@ -34,7 +35,10 @@ interface StockSidebarProps {
   loading: boolean;
   searching: boolean;
   searchResults: StockSearchItem[];
+  favorites: StockFavoriteItem[];
   onSelectSymbol: (symbol: string) => void;
+  onAddFavorite: (input: StockFavoriteInput) => void;
+  onRemoveFavorite: (symbol: string) => void;
   onPeriodChange: (period: StockMarketPeriod) => void;
   onRefresh: () => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
@@ -53,7 +57,10 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     loading,
     searching,
     searchResults,
+    favorites,
     onSelectSymbol,
+    onAddFavorite,
+    onRemoveFavorite,
     onPeriodChange,
     onRefresh,
     onSearch,
@@ -118,7 +125,38 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                     <p className="stock-tab-subtitle">{t('stockTab.sidebar.favoritesHint')}</p>
                   </div>
                 </div>
-                <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavorites')}</div>
+                {favorites.length === 0 ? (
+                  <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavorites')}</div>
+                ) : (
+                  <div className="stock-favorites-list">
+                    {favorites.map((item) => (
+                      <div
+                        key={item.code}
+                        className={`stock-favorite-item${item.code === symbol ? ' active' : ''}`}
+                      >
+                        <button
+                          className="stock-favorite-main"
+                          type="button"
+                          onClick={() => onSelectSymbol(item.code)}
+                        >
+                          <span className="stock-favorite-name">{item.name}</span>
+                          <span className="stock-favorite-code">{item.code}</span>
+                        </button>
+                        <span className={`stock-favorite-price ${getStockTrendClass(item.changePercent)}`}>
+                          {formatStockPrice(item.price)} · {formatStockPercent(item.changePercent)}
+                        </span>
+                        <button
+                          className="stock-favorite-remove"
+                          type="button"
+                          aria-label={t('stockTab.actions.removeFavorite', { name: item.name })}
+                          onClick={() => onRemoveFavorite(item.code)}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             {sidebarTab === 'addFavorite' && (
@@ -134,6 +172,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                   period={period}
                   loading={loading}
                   onSelectSymbol={onSelectSymbol}
+                  onAddFavorite={onAddFavorite}
                   onPeriodChange={onPeriodChange}
                   onRefresh={onRefresh}
                 />
@@ -151,6 +190,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                   searching={searching}
                   searchResults={searchResults}
                   onSelectSymbol={onSelectSymbol}
+                  onAddFavorite={onAddFavorite}
                   onSearch={onSearch}
                   onClearSearchResults={onClearSearchResults}
                 />
