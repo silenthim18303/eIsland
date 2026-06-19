@@ -407,7 +407,7 @@
   flex: 1 0 430px;
   min-height: 430px;
   padding: 14px 16px 16px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .stock-chart-card .highcharts-container,

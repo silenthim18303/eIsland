@@ -34,7 +34,7 @@ export function buildKlineOptions({
   const textColor = light ? '#1f2937' : '#f8fafc';
   const mutedColor = light ? '#64748b' : '#94a3b8';
   const gridColor = light ? 'rgba(148, 163, 184, 0.25)' : 'rgba(148, 163, 184, 0.18)';
-  const backgroundColor = light ? 'rgba(255, 255, 255, 0.82)' : 'rgba(15, 23, 42, 0.42)';
+  const backgroundColor = light ? 'rgba(255, 255, 255, 0)' : 'rgba(15, 23, 42, 0)';
   const accentColor = 'rgba(100, 181, 246, 0.14)';
   const accentBorderColor = 'rgba(100, 181, 246, 0.28)';
   const accentStrongColor = 'rgba(100, 181, 246, 0.48)';
@@ -54,7 +54,7 @@ export function buildKlineOptions({
       style: { color: textColor, fontSize: '15px', fontWeight: '700' },
     },
     credits: { enabled: false },
-    exporting: { enabled: true },
+    exporting: { enabled: false },
     rangeSelector: {
       selected: 1,
       inputEnabled: false,
