@@ -1134,6 +1134,13 @@
     "title": "股票行情",
     "subtitle": "搜索股票代码并查看实时价格、涨跌幅和专业 K 线。",
     "autoRefresh": "每 30 秒自动刷新",
+    "sidebar": {
+      "toggle": "展开/收起侧边栏",
+      "favorites": "自选",
+      "addFavorite": "添加自选",
+      "favoritesHint": "管理您的自选股列表",
+      "noFavorites": "暂无自选股"
+    },
     "empty": {
       "name": "未选择股票",
       "chart": "暂无 K 线数据"

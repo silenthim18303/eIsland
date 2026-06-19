@@ -1134,6 +1134,13 @@
     "title": "Stock Market",
     "subtitle": "Search symbols and view live prices, change rates, and professional candlestick charts.",
     "autoRefresh": "Auto refreshes every 30 seconds",
+    "sidebar": {
+      "toggle": "Toggle sidebar",
+      "favorites": "Favorites",
+      "addFavorite": "Add Favorite",
+      "favoritesHint": "Manage your watchlist",
+      "noFavorites": "No favorites yet"
+    },
     "empty": {
       "name": "No stock selected",
       "chart": "No K-line data"
