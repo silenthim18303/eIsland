@@ -383,6 +383,10 @@
   display: grid;
   gap: 6px;
   margin-top: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--color-text-rgb), 0.18) rgba(var(--color-text-rgb), 0.04);
 }
 
 .stock-search-result-item {
@@ -391,9 +395,12 @@
   align-items: stretch;
   gap: 8px;
   width: 100%;
+  max-width: 98%;
+  box-sizing: border-box;
   padding: 6px;
   border-radius: 8px;
   text-align: left;
+  overflow: hidden;
 }
 
 .stock-search-result-main-button {
