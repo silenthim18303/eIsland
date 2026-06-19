@@ -43,8 +43,8 @@ export function StockTab(): ReactElement {
   const { t } = useTranslation();
   const market = useStockMarketData();
   const trendClass = getStockTrendClass(market.quote?.changePercent);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('search');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('favorites');
 
   return (
     <div className="max-expand-settings stock-tab-container">
@@ -55,7 +55,7 @@ export function StockTab(): ReactElement {
           aria-label={t('stockTab.sidebar.favorites')}
           onClick={() => { setSidebarTab('favorites'); setSidebarCollapsed(false); }}
         >
-          <img src={SvgIcon.STOCK_CHOOSE} alt="" className="stock-sidebar-nav-icon" />
+          <img src={SvgIcon.STOCK_CHOOSE} alt="" className="stock-sidebar-nav-icon-upper" />
         </button>
         <button
           className={`stock-sidebar-nav-btn${sidebarTab === 'search' && !sidebarCollapsed ? ' active' : ''}`}
@@ -63,7 +63,7 @@ export function StockTab(): ReactElement {
           aria-label={t('stockTab.sidebar.addFavorite')}
           onClick={() => { setSidebarTab('search'); setSidebarCollapsed(false); }}
         >
-          <img src={SvgIcon.PLUS} alt="" className="stock-sidebar-nav-icon" />
+          <img src={SvgIcon.PLUS} alt="" className="stock-sidebar-nav-icon-upper" />
         </button>
         <button
           className="stock-sidebar-nav-btn"
