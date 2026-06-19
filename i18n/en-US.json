@@ -1139,6 +1139,7 @@
       "favorites": "Favorites",
       "addFavorite": "Add Favorite",
       "favoritesHint": "Manage your watchlist",
+      "addFavoriteHint": "Search symbols to add to your watchlist",
       "noFavorites": "No favorites yet"
     },
     "empty": {

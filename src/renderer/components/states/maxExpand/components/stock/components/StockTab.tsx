@@ -92,8 +92,8 @@ export function StockTab(): ReactElement {
               <>
                 <div className="stock-tab-sidebar-header">
                   <div>
-                    <div className="stock-tab-title">{t('stockTab.title')}</div>
-                    <p className="stock-tab-subtitle">{t('stockTab.subtitle')}</p>
+                    <div className="stock-tab-title">{t('stockTab.sidebar.addFavorite')}</div>
+                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.addFavoriteHint')}</p>
                   </div>
                 </div>
                 <StockSearchPanel

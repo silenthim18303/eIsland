@@ -1139,6 +1139,7 @@
       "favorites": "自选",
       "addFavorite": "添加自选",
       "favoritesHint": "管理您的自选股列表",
+      "addFavoriteHint": "搜索股票代码添加到自选",
       "noFavorites": "暂无自选股"
     },
     "empty": {
