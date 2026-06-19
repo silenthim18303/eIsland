@@ -19,7 +19,7 @@
  * @author 鸡哥
  */
 
-import { useState, type ReactElement } from 'react';
+import { useState, type KeyboardEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
@@ -66,6 +66,12 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     setSidebarCollapsed(false);
   };
 
+  const handleFavoriteKeyDown = (event: KeyboardEvent<HTMLDivElement>, item: StockFavoriteItem): void => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    onSelectSymbol(item.code);
+  };
+
   return (
     <>
       <nav className="stock-sidebar-nav">
@@ -109,15 +115,15 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                       <div
                         key={item.code}
                         className={`stock-favorite-item${item.code === symbol ? ' active' : ''}`}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => onSelectSymbol(item.code)}
+                        onKeyDown={(event) => handleFavoriteKeyDown(event, item)}
                       >
-                        <button
-                          className="stock-favorite-main"
-                          type="button"
-                          onClick={() => onSelectSymbol(item.code)}
-                        >
+                        <div className="stock-favorite-main">
                           <span className="stock-favorite-name">{item.name}</span>
                           <span className="stock-favorite-code">{item.code}</span>
-                        </button>
+                        </div>
                         <div className="stock-favorite-price-col">
                           <span className={`stock-favorite-current-price ${getStockTrendClass(item.changePercent)}`}>
                             {formatStockPrice(item.price)}

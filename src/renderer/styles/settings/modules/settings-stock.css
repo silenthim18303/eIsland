@@ -142,6 +142,13 @@
   border-radius: 8px;
   padding: 8px;
   background: rgba(var(--color-text-rgb), 0.04);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+
+.stock-favorite-item:hover {
+  border-color: rgba(var(--color-text-rgb), 0.14);
+  background: rgba(var(--color-text-rgb), 0.08);
 }
 
 .stock-favorite-item.active {
@@ -154,10 +161,6 @@
   flex-direction: column;
   gap: 3px;
   min-width: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  text-align: left;
 }
 
 .stock-favorite-name,
@@ -331,7 +334,6 @@
 .stock-secondary-button,
 .stock-search-result-item,
 .stock-search-result-add,
-.stock-favorite-main,
 .stock-favorite-remove {
   border: 1px solid rgba(var(--color-text-rgb), 0.1);
   border-radius: 6px;
@@ -340,11 +342,6 @@
   cursor: pointer;
   font-size: 12px;
   transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
-}
-
-.stock-favorite-main {
-  background: transparent;
-  border: none;
 }
 
 .stock-secondary-button {
@@ -356,7 +353,6 @@
 .stock-secondary-button:hover,
 .stock-search-result-item:hover,
 .stock-search-result-add:hover,
-.stock-favorite-main:hover,
 .stock-favorite-remove:hover {
   background: rgba(var(--color-text-rgb), 0.1);
   color: rgba(var(--color-text-rgb), 0.92);
