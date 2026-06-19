@@ -406,14 +406,14 @@
 }
 
 .stock-search-result-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: stretch;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 6px;
   width: 100%;
-  max-width: 98%;
+  max-width: 100%;
   box-sizing: border-box;
-  padding: 6px;
+  padding: 6px 6px 6px 8px;
   border-radius: 8px;
   text-align: left;
   overflow: hidden;
@@ -421,10 +421,13 @@
 
 .stock-search-result-main-button {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
   min-width: 0;
   border: 0;
   padding: 2px 3px;
@@ -438,6 +441,64 @@
   min-height: 24px;
   padding: 0 4px;
   font-size: 11px;
+}
+
+.stock-search-result-main-button {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.stock-search-result-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(var(--color-text-rgb), 0.84);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stock-search-result-code {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgba(var(--color-text-rgb), 0.48);
+  font-size: 10px;
+}
+
+.stock-search-result-price-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  padding-right: 4px;
+}
+
+.stock-search-result-current-price {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stock-search-result-change-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 12px;
+  border-radius: 999px;
+  padding: 0;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1;
 }
 
 .stock-search-result-main {
@@ -517,6 +578,8 @@
 }
 
 .stock-search-result-price.up,
+.stock-search-result-current-price.up,
+.stock-search-result-change-pill.up,
 .stock-favorite-price.up,
 .stock-favorite-current-price.up,
 .stock-favorite-change-pill.up,
@@ -526,6 +589,8 @@
 }
 
 .stock-search-result-price.down,
+.stock-search-result-current-price.down,
+.stock-search-result-change-pill.down,
 .stock-favorite-price.down,
 .stock-favorite-current-price.down,
 .stock-favorite-change-pill.down,
@@ -535,6 +600,8 @@
 }
 
 .stock-search-result-price.neutral,
+.stock-search-result-current-price.neutral,
+.stock-search-result-change-pill.neutral,
 .stock-favorite-price.neutral,
 .stock-favorite-current-price.neutral,
 .stock-favorite-change-pill.neutral,

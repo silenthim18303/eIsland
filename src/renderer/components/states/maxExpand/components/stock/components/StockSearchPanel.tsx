@@ -125,14 +125,17 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
                   type="button"
                   onClick={() => handleSelectSearchResult(item)}
                 >
-                  <span className="stock-search-result-main">
-                    <strong>{item.name}</strong>
-                    <span>{item.code}</span>
-                  </span>
-                  <span className={`stock-search-result-price ${getStockTrendClass(item.changePercent)}`}>
-                    {formatStockPrice(item.price)} · {formatStockPercent(item.changePercent)}
-                  </span>
+                  <span className="stock-search-result-name">{item.name}</span>
+                  <span className="stock-search-result-code">{item.code}</span>
                 </button>
+                <div className="stock-search-result-price-col">
+                  <span className={`stock-search-result-current-price ${getStockTrendClass(item.changePercent)}`}>
+                    {formatStockPrice(item.price)}
+                  </span>
+                  <span className={`stock-search-result-change-pill ${getStockTrendClass(item.changePercent)}`}>
+                    {formatStockPercent(item.changePercent)}
+                  </span>
+                </div>
                 <button
                   className="stock-search-result-add"
                   type="button"
