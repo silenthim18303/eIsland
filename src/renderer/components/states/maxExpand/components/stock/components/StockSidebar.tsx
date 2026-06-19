@@ -96,7 +96,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
         </button>
       </nav>
 
-      <aside className={`stock-tab-sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
+      <aside className={`stock-tab-sidebar${sidebarTab === 'search' ? ' search-mode' : ''}${sidebarCollapsed ? ' collapsed' : ''}`}>
         {!sidebarCollapsed && (
           <>
             {sidebarTab === 'favorites' && (

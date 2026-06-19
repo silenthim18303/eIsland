@@ -93,13 +93,19 @@
 
 .stock-tab-sidebar {
   display: flex;
-  flex: 0 0 260px;
+  flex: 0 0 200px;
   flex-direction: column;
-  width: 260px;
-  min-width: 240px;
+  width: 200px;
+  min-width: 180px;
   border-right: 1px solid rgba(var(--color-text-rgb), 0.08);
   overflow: hidden;
   transition: flex-basis 0.2s ease, width 0.2s ease, min-width 0.2s ease;
+}
+
+.stock-tab-sidebar.search-mode {
+  flex: 0 0 260px;
+  width: 260px;
+  min-width: 240px;
 }
 
 .stock-tab-sidebar.collapsed {
@@ -275,7 +281,7 @@
 
 .stock-search-card {
   border-bottom: 1px solid rgba(var(--color-text-rgb), 0.06);
-  padding: 12px 14px;
+  padding: 10px;
 }
 
 .stock-search-row {
