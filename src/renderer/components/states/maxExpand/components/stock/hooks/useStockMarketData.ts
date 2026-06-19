@@ -21,7 +21,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { stocks } from 'stock-api/browser';
-import { DEFAULT_STOCK_SYMBOL, STOCK_AUTO_REFRESH_MS, STOCK_KLINE_COUNT, STOCK_FAVORITES_STORE_KEY } from '../config/stockConfig';
+import { DEFAULT_STOCK_SYMBOL, STOCK_AUTO_REFRESH_MS, STOCK_KLINE_COUNT, STOCK_FAVORITES_STORE_KEY, STOCK_SYMBOL_PATTERN } from '../config/stockConfig';
 import type { StockFavoriteInput, StockMarketPeriod, StockMarketState, StockSearchItem } from '../config/types';
 import { createStockFavorite, persistStockFavorites, readStockFavorites, sanitizeStockFavorites } from '../utils/favoriteStorage';
 import {
@@ -145,6 +145,20 @@ export function useStockMarketData(): UseStockMarketDataResult {
 
     setState((current) => ({ ...current, searching: true }));
     try {
+      const normalizedSymbol = normalizeStockSymbol(normalizedKeyword);
+      if (STOCK_SYMBOL_PATTERN.test(normalizedSymbol)) {
+        const quote = normalizeStockQuote(await stocks.auto.getStock(normalizedSymbol), normalizedSymbol);
+        const results = [{
+          code: quote.code,
+          name: quote.name,
+          price: quote.price,
+          changePercent: quote.changePercent,
+          source: quote.source,
+        }];
+        setState((current) => ({ ...current, searchResults: results, searching: false }));
+        return results;
+      }
+
       const rows = await stocks.auto.searchStocks(normalizedKeyword);
       const results = normalizeStockSearchResults(rows);
       setState((current) => ({ ...current, searchResults: results, searching: false }));
