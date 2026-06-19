@@ -53,6 +53,7 @@ export function StockTab(): ReactElement {
         onRemoveFavorite={market.removeFavorite}
         onSearch={market.search}
         onClearSearchResults={market.clearSearchResults}
+        onRefresh={() => void market.refresh()}
       />
 
       <main className="stock-tab-main">

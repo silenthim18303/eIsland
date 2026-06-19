@@ -38,6 +38,7 @@ interface StockSidebarProps {
   onRemoveFavorite: (symbol: string) => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
   onClearSearchResults: () => void;
+  onRefresh: () => void;
 }
 
 /**
@@ -56,6 +57,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     onRemoveFavorite,
     onSearch,
     onClearSearchResults,
+    onRefresh,
   } = props;
   const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -91,6 +93,14 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
           onClick={() => openSidebarTab('search')}
         >
           <img src={SvgIcon.SEARCH} alt="" className="stock-sidebar-nav-icon stock-sidebar-nav-icon-large" />
+        </button>
+        <button
+          className="stock-sidebar-nav-btn"
+          type="button"
+          aria-label={t('stockTab.actions.refresh')}
+          onClick={onRefresh}
+        >
+          <img src={SvgIcon.UPDATE} alt="" className="stock-sidebar-nav-icon" />
         </button>
         <button
           className="stock-sidebar-nav-btn"
