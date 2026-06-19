@@ -1152,6 +1152,7 @@
     "actions": {
       "search": "搜索",
       "searching": "搜索中...",
+      "clear": "清除",
       "addFavorite": "添加",
       "addFavoriteWithName": "添加 {{name}} 到自选",
       "removeFavorite": "移除 {{name}} 自选"

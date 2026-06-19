@@ -21,7 +21,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { stocks } from 'stock-api/browser';
-import { DEFAULT_STOCK_SYMBOL, STOCK_AUTO_REFRESH_MS, STOCK_KLINE_COUNT, STOCK_FAVORITES_STORE_KEY, STOCK_SYMBOL_PATTERN } from '../config/stockConfig';
+import { DEFAULT_STOCK_SYMBOL, STOCK_AUTO_REFRESH_MS, STOCK_KLINE_COUNT, STOCK_FAVORITES_STORE_KEY, STOCK_SEARCH_RESULTS_LOCAL_STORAGE_KEY, STOCK_SYMBOL_PATTERN } from '../config/stockConfig';
 import type { StockFavoriteInput, StockMarketPeriod, StockMarketState, StockSearchItem } from '../config/types';
 import { createStockFavorite, persistStockFavorites, readStockFavorites, sanitizeStockFavorites } from '../utils/favoriteStorage';
 import {
@@ -46,6 +46,28 @@ function resolveErrorMessage(error: unknown): string {
   return 'stockTab.error.default';
 }
 
+function persistSearchResults(results: StockSearchItem[]): void {
+  try {
+    localStorage.setItem(STOCK_SEARCH_RESULTS_LOCAL_STORAGE_KEY, JSON.stringify(results));
+  } catch {
+    // noop
+  }
+}
+
+function readPersistedSearchResults(): StockSearchItem[] {
+  try {
+    const raw = localStorage.getItem(STOCK_SEARCH_RESULTS_LOCAL_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((item): item is StockSearchItem =>
+      item != null && typeof item === 'object' && typeof (item as StockSearchItem).code === 'string'
+    );
+  } catch {
+    return [];
+  }
+}
+
 /**
  * 管理股票行情、K 线、搜索与自动刷新状态。
  * @returns 股票行情页面状态与操作入口。
@@ -56,7 +78,7 @@ export function useStockMarketData(): UseStockMarketDataResult {
     period: 'day',
     quote: null,
     klines: [],
-    searchResults: [],
+    searchResults: readPersistedSearchResults(),
     favorites: [],
     loading: false,
     searching: false,
@@ -140,6 +162,7 @@ export function useStockMarketData(): UseStockMarketDataResult {
     const normalizedKeyword = keyword.trim();
     if (!normalizedKeyword) {
       setState((current) => ({ ...current, searchResults: [] }));
+      persistSearchResults([]);
       return [];
     }
 
@@ -156,21 +179,25 @@ export function useStockMarketData(): UseStockMarketDataResult {
           source: quote.source,
         }];
         setState((current) => ({ ...current, searchResults: results, searching: false }));
+        persistSearchResults(results);
         return results;
       }
 
       const rows = await stocks.auto.searchStocks(normalizedKeyword);
       const results = normalizeStockSearchResults(rows);
       setState((current) => ({ ...current, searchResults: results, searching: false }));
+      persistSearchResults(results);
       return results;
     } catch {
       setState((current) => ({ ...current, searchResults: [], searching: false }));
+      persistSearchResults([]);
       return [];
     }
   }, []);
 
   const clearSearchResults = useCallback((): void => {
     setState((current) => ({ ...current, searchResults: [] }));
+    persistSearchResults([]);
   }, []);
 
   useEffect(() => {

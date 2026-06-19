@@ -24,5 +24,7 @@ export const STOCK_AUTO_REFRESH_MS = 30_000;
 export const STOCK_KLINE_COUNT = 160;
 export const STOCK_FAVORITES_STORE_KEY = 'stock-favorites';
 export const STOCK_FAVORITES_LOCAL_STORAGE_KEY = 'eIsland_stock_favorites';
+export const STOCK_SEARCH_RESULTS_LOCAL_STORAGE_KEY = 'eIsland_stock_search_results';
+export const STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY = 'eIsland_stock_search_keyword';
 
 export const STOCK_SYMBOL_PATTERN = /^(SH|SZ|HK|US)[A-Z0-9]{2,10}$/i;

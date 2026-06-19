@@ -1152,6 +1152,7 @@
     "actions": {
       "search": "Search",
       "searching": "Searching...",
+      "clear": "Clear",
       "addFavorite": "Add",
       "addFavoriteWithName": "Add {{name}} to favorites",
       "removeFavorite": "Remove {{name}} from favorites"

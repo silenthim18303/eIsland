@@ -21,8 +21,26 @@
 
 import { useState, type FormEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import { STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY } from '../config/stockConfig';
 import type { StockFavoriteInput, StockSearchItem } from '../config/types';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
+
+function readPersistedKeyword(): string {
+  try {
+    return localStorage.getItem(STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function persistKeyword(keyword: string): void {
+  try {
+    localStorage.setItem(STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY, keyword);
+  } catch {
+    // noop
+  }
+}
 
 interface StockSearchPanelProps {
   searching: boolean;
@@ -48,7 +66,7 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
     onClearSearchResults,
   } = props;
   const { t } = useTranslation();
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState(readPersistedKeyword);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -57,8 +75,15 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
 
   const handleSelectSearchResult = (item: StockSearchItem): void => {
     setKeyword('');
+    persistKeyword('');
     onClearSearchResults();
     onSelectSymbol(item.code);
+  };
+
+  const handleClear = (): void => {
+    setKeyword('');
+    persistKeyword('');
+    onClearSearchResults();
   };
 
   const handleAddSearchResult = (item: StockSearchItem): void => {
@@ -78,10 +103,17 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
             type="search"
             value={keyword}
             placeholder={t('stockTab.search.keywordPlaceholder')}
-            onChange={(event) => setKeyword(event.target.value)}
+            onChange={(event) => {
+              const value = event.target.value;
+              setKeyword(value);
+              persistKeyword(value);
+            }}
           />
-          <button className="stock-secondary-button" type="submit" disabled={searching}>
-            {searching ? t('stockTab.actions.searching') : t('stockTab.actions.search')}
+          <button className="stock-secondary-button stock-search-btn" type="submit" disabled={searching} aria-label={t('stockTab.actions.search')}>
+            <img src={SvgIcon.SEARCH} alt="" className="stock-search-btn-icon" />
+          </button>
+          <button className="stock-secondary-button stock-search-btn" type="button" aria-label={t('stockTab.actions.clear')} onClick={handleClear}>
+            <img src={SvgIcon.DELETE} alt="" className="stock-search-btn-icon" />
           </button>
         </div>
         {searchResults.length > 0 && (
@@ -107,7 +139,7 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
                   aria-label={t('stockTab.actions.addFavoriteWithName', { name: item.name })}
                   onClick={() => handleAddSearchResult(item)}
                 >
-                  {t('stockTab.actions.addFavorite')}
+                  <img src={SvgIcon.PLUS} alt="" className="stock-search-result-add-icon" />
                 </button>
               </div>
             ))}
