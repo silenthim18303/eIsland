@@ -101,12 +101,6 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
           <>
             {sidebarTab === 'favorites' && (
               <div className="stock-favorites-panel">
-                <div className="stock-tab-sidebar-header">
-                  <div>
-                    <div className="stock-tab-title">{t('stockTab.sidebar.favorites')}</div>
-                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.favoritesHint')}</p>
-                  </div>
-                </div>
                 {favorites.length === 0 ? (
                   <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavorites')}</div>
                 ) : (
@@ -142,22 +136,14 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
               </div>
             )}
             {sidebarTab === 'search' && (
-              <>
-                <div className="stock-tab-sidebar-header">
-                  <div>
-                    <div className="stock-tab-title">{t('stockTab.sidebar.search')}</div>
-                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.searchHint')}</p>
-                  </div>
-                </div>
-                <StockSearchPanel
-                  searching={searching}
-                  searchResults={searchResults}
-                  onSelectSymbol={onSelectSymbol}
-                  onAddFavorite={onAddFavorite}
-                  onSearch={onSearch}
-                  onClearSearchResults={onClearSearchResults}
-                />
-              </>
+              <StockSearchPanel
+                searching={searching}
+                searchResults={searchResults}
+                onSelectSymbol={onSelectSymbol}
+                onAddFavorite={onAddFavorite}
+                onSearch={onSearch}
+                onClearSearchResults={onClearSearchResults}
+              />
             )}
           </>
         )}

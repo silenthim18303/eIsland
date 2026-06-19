@@ -273,7 +273,7 @@
   min-width: 0;
   border: 1px solid rgba(var(--color-text-rgb), 0.1);
   border-radius: 6px;
-  padding: 7px 10px;
+  padding: 4px 10px;
   background: rgba(var(--color-text-rgb), 0.06);
   color: rgba(var(--color-text-rgb), 0.86);
   font-size: 12px;
