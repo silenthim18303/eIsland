@@ -74,9 +74,6 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
   };
 
   const handleSelectSearchResult = (item: StockSearchItem): void => {
-    setKeyword('');
-    persistKeyword('');
-    onClearSearchResults();
     onSelectSymbol(item.code);
   };
 

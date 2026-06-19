@@ -132,7 +132,7 @@ export function useStockMarketData(): UseStockMarketDataResult {
 
   const selectSymbol = useCallback((symbol: string): void => {
     const normalizedSymbol = normalizeStockSymbol(symbol);
-    setState((current) => ({ ...current, symbol: normalizedSymbol, searchResults: [] }));
+    setState((current) => ({ ...current, symbol: normalizedSymbol }));
     void fetchMarketData(normalizedSymbol, state.period);
   }, [fetchMarketData, state.period]);
 
