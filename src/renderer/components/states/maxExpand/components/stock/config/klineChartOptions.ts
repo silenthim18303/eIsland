@@ -48,11 +48,7 @@ export function buildKlineOptions({
       height: 430,
       style: { fontFamily: 'inherit' },
     },
-    title: {
-      text: quote ? `${quote.name} · ${quote.code}` : t('stockTab.chart.title'),
-      align: 'left',
-      style: { color: textColor, fontSize: '15px', fontWeight: '700' },
-    },
+    title: { text: '' },
     credits: { enabled: false },
     exporting: { enabled: false },
     rangeSelector: {

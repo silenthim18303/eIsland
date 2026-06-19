@@ -406,8 +406,9 @@
 .stock-chart-card {
   flex: 1 0 430px;
   min-height: 430px;
-  padding: 14px 16px 16px;
+  padding: 0 16px 16px;
   overflow: visible;
+  overscroll-behavior: contain;
 }
 
 .stock-chart-card .highcharts-container,
