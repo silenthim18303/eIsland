@@ -118,17 +118,14 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                           <span className="stock-favorite-name">{item.name}</span>
                           <span className="stock-favorite-code">{item.code}</span>
                         </button>
-                        <span className={`stock-favorite-price ${getStockTrendClass(item.changePercent)}`}>
-                          {formatStockPrice(item.price)} · {formatStockPercent(item.changePercent)}
-                        </span>
-                        <button
-                          className="stock-favorite-remove"
-                          type="button"
-                          aria-label={t('stockTab.actions.removeFavorite', { name: item.name })}
-                          onClick={() => onRemoveFavorite(item.code)}
-                        >
-                          ×
-                        </button>
+                        <div className="stock-favorite-price-col">
+                          <span className={`stock-favorite-current-price ${getStockTrendClass(item.changePercent)}`}>
+                            {formatStockPrice(item.price)}
+                          </span>
+                          <span className={`stock-favorite-change-pill ${getStockTrendClass(item.changePercent)}`}>
+                            {formatStockPercent(item.changePercent)}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
