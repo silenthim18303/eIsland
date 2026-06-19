@@ -1,0 +1,164 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+/**
+ * @file StockSidebar.tsx
+ * @description 股票行情侧边栏
+ * @author 鸡哥
+ */
+
+import { useState, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import type { StockMarketPeriod, StockSearchItem } from '../config/types';
+import { StockAddFavoritePanel } from './StockAddFavoritePanel';
+import { StockSearchPanel } from './StockSearchPanel';
+
+type StockSidebarTab = 'favorites' | 'addFavorite' | 'search';
+
+interface StockSidebarProps {
+  symbol: string;
+  period: StockMarketPeriod;
+  loading: boolean;
+  searching: boolean;
+  searchResults: StockSearchItem[];
+  onSelectSymbol: (symbol: string) => void;
+  onPeriodChange: (period: StockMarketPeriod) => void;
+  onRefresh: () => void;
+  onSearch: (keyword: string) => Promise<StockSearchItem[]>;
+  onClearSearchResults: () => void;
+}
+
+/**
+ * 渲染股票自选侧边栏与添加自选入口。
+ * @param props - 股票侧边栏属性。
+ * @returns 股票侧边栏。
+ */
+export function StockSidebar(props: StockSidebarProps): ReactElement {
+  const {
+    symbol,
+    period,
+    loading,
+    searching,
+    searchResults,
+    onSelectSymbol,
+    onPeriodChange,
+    onRefresh,
+    onSearch,
+    onClearSearchResults,
+  } = props;
+  const { t } = useTranslation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('addFavorite');
+
+  const openSidebarTab = (tab: StockSidebarTab): void => {
+    setSidebarTab(tab);
+    setSidebarCollapsed(false);
+  };
+
+  return (
+    <>
+      <nav className="stock-sidebar-nav">
+        <button
+          className={`stock-sidebar-nav-btn${sidebarTab === 'favorites' && !sidebarCollapsed ? ' active' : ''}`}
+          type="button"
+          aria-label={t('stockTab.sidebar.favorites')}
+          onClick={() => openSidebarTab('favorites')}
+        >
+          <img src={SvgIcon.STOCK_CHOOSE} alt="" className="stock-sidebar-nav-icon stock-sidebar-nav-icon-large" />
+        </button>
+        <button
+          className={`stock-sidebar-nav-btn${sidebarTab === 'addFavorite' && !sidebarCollapsed ? ' active' : ''}`}
+          type="button"
+          title={t('stockTab.sidebar.addFavorite')}
+          aria-label={t('stockTab.sidebar.addFavorite')}
+          onClick={() => openSidebarTab('addFavorite')}
+        >
+          <img src={SvgIcon.PLUS} alt="" className="stock-sidebar-nav-icon stock-sidebar-nav-icon-large" />
+        </button>
+        <button
+          className={`stock-sidebar-nav-btn stock-sidebar-nav-search-btn${sidebarTab === 'search' && !sidebarCollapsed ? ' active' : ''}`}
+          type="button"
+          title={t('stockTab.sidebar.search')}
+          aria-label={t('stockTab.sidebar.search')}
+          onClick={() => openSidebarTab('search')}
+        >
+          <img src={SvgIcon.SEARCH} alt="" className="stock-sidebar-nav-icon stock-sidebar-nav-icon-large" />
+        </button>
+        <button
+          className="stock-sidebar-nav-btn"
+          type="button"
+          aria-label={t('stockTab.sidebar.toggle')}
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+        >
+          <img src={sidebarCollapsed ? SvgIcon.EXPAND : SvgIcon.COLLAPSE} alt="" className="stock-sidebar-nav-icon" />
+        </button>
+      </nav>
+
+      <aside className={`stock-tab-sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
+        {!sidebarCollapsed && (
+          <>
+            {sidebarTab === 'favorites' && (
+              <div className="stock-favorites-panel">
+                <div className="stock-tab-sidebar-header">
+                  <div>
+                    <div className="stock-tab-title">{t('stockTab.sidebar.favorites')}</div>
+                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.favoritesHint')}</p>
+                  </div>
+                </div>
+                <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavorites')}</div>
+              </div>
+            )}
+            {sidebarTab === 'addFavorite' && (
+              <>
+                <div className="stock-tab-sidebar-header">
+                  <div>
+                    <div className="stock-tab-title">{t('stockTab.sidebar.addFavorite')}</div>
+                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.addFavoriteHint')}</p>
+                  </div>
+                </div>
+                <StockAddFavoritePanel
+                  symbol={symbol}
+                  period={period}
+                  loading={loading}
+                  onSelectSymbol={onSelectSymbol}
+                  onPeriodChange={onPeriodChange}
+                  onRefresh={onRefresh}
+                />
+              </>
+            )}
+            {sidebarTab === 'search' && (
+              <>
+                <div className="stock-tab-sidebar-header">
+                  <div>
+                    <div className="stock-tab-title">{t('stockTab.sidebar.search')}</div>
+                    <p className="stock-tab-subtitle">{t('stockTab.sidebar.searchHint')}</p>
+                  </div>
+                </div>
+                <StockSearchPanel
+                  searching={searching}
+                  searchResults={searchResults}
+                  onSelectSymbol={onSelectSymbol}
+                  onSearch={onSearch}
+                  onClearSearchResults={onClearSearchResults}
+                />
+              </>
+            )}
+          </>
+        )}
+      </aside>
+    </>
+  );
+}

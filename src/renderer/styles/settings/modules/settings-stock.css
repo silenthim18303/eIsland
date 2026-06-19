@@ -62,18 +62,27 @@
 .stock-sidebar-nav-icon {
   width: 17px;
   height: 17px;
-  filter: invert(0.5);
+  filter: brightness(0) invert(1);
 }
 
-.stock-sidebar-nav-icon-upper {
+.stock-sidebar-nav-icon-large {
   width: 21px;
   height: 21px;
-  filter: invert(0.5);
+}
+
+[data-theme='light'] .stock-sidebar-nav-icon {
+  filter: brightness(0) invert(0);
 }
 
 .stock-sidebar-nav-btn:hover {
   background: rgba(var(--color-text-rgb), 0.1);
   color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.stock-sidebar-nav-search-btn:hover,
+.stock-sidebar-nav-search-btn.active {
+  border-color: rgba(100, 181, 246, 0.58);
+  background: rgba(100, 181, 246, 0.22);
 }
 
 .stock-sidebar-nav-btn.active {

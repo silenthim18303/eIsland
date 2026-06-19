@@ -1138,9 +1138,14 @@
       "toggle": "Toggle sidebar",
       "favorites": "Favorites",
       "addFavorite": "Add Favorite",
+      "search": "Search",
       "favoritesHint": "Manage your watchlist",
-      "addFavoriteHint": "Search symbols to add to your watchlist",
+      "addFavoriteHint": "Enter a symbol and load market data",
+      "searchHint": "Search stocks by name or symbol",
       "noFavorites": "No favorites yet"
+    },
+    "addFavorite": {
+      "aria": "Add stock favorite"
     },
     "empty": {
       "name": "No stock selected",
