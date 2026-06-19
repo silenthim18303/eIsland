@@ -19,7 +19,7 @@
  * @author 鸡哥
  */
 
-import { useState, type FormEvent, type ReactElement } from 'react';
+import { useState, type FormEvent, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY } from '../config/stockConfig';
 import type { StockFavoriteInput, StockSearchItem } from '../config/types';
@@ -77,13 +77,21 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
     onSelectSymbol(item.code);
   };
 
+  const handleSearchResultKeyDown = (event: KeyboardEvent<HTMLDivElement>, item: StockSearchItem): void => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    handleSelectSearchResult(item);
+  };
+
   const handleClear = (): void => {
     setKeyword('');
     persistKeyword('');
     onClearSearchResults();
   };
 
-  const handleAddSearchResult = (item: StockSearchItem): void => {
+  const handleAddSearchResult = (event: MouseEvent<HTMLButtonElement>, item: StockSearchItem): void => {
+    event.stopPropagation();
     onAddFavorite(item);
   };
 
@@ -116,15 +124,18 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
         {searchResults.length > 0 && (
           <div className="stock-search-results">
             {searchResults.slice(0, 8).map((item) => (
-              <div key={`${item.source}-${item.code}`} className="stock-search-result-item">
-                <button
-                  className="stock-search-result-main-button"
-                  type="button"
-                  onClick={() => handleSelectSearchResult(item)}
-                >
+              <div
+                key={`${item.source}-${item.code}`}
+                className="stock-search-result-item"
+                role="button"
+                tabIndex={0}
+                onClick={() => handleSelectSearchResult(item)}
+                onKeyDown={(event) => handleSearchResultKeyDown(event, item)}
+              >
+                <div className="stock-search-result-main">
                   <span className="stock-search-result-name">{item.name}</span>
                   <span className="stock-search-result-code">{item.code}</span>
-                </button>
+                </div>
                 <div className="stock-search-result-price-col">
                   <span className={`stock-search-result-current-price ${getStockTrendClass(item.changePercent)}`}>
                     {formatStockPrice(item.price)}
@@ -137,7 +148,7 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
                   className="stock-search-result-add"
                   type="button"
                   aria-label={t('stockTab.actions.addFavoriteWithName', { name: item.name })}
-                  onClick={() => handleAddSearchResult(item)}
+                  onClick={(event) => handleAddSearchResult(event, item)}
                 >
                   <img src={SvgIcon.PLUS} alt="" className="stock-search-result-add-icon" />
                 </button>

@@ -330,7 +330,6 @@
 
 .stock-secondary-button,
 .stock-search-result-item,
-.stock-search-result-main-button,
 .stock-search-result-add,
 .stock-favorite-main,
 .stock-favorite-remove {
@@ -356,7 +355,6 @@
 
 .stock-secondary-button:hover,
 .stock-search-result-item:hover,
-.stock-search-result-main-button:hover,
 .stock-search-result-add:hover,
 .stock-favorite-main:hover,
 .stock-favorite-remove:hover {
@@ -419,39 +417,12 @@
   overflow: hidden;
 }
 
-.stock-search-result-main-button {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  text-align: left;
-  min-width: 0;
-  border: 0;
-  padding: 2px 3px;
-  background: transparent;
-  text-align: left;
-}
-
 .stock-search-result-add {
   flex-shrink: 0;
   min-width: 24px;
   min-height: 24px;
   padding: 0 4px;
   font-size: 11px;
-}
-
-.stock-search-result-main-button {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  text-align: left;
 }
 
 .stock-search-result-name {
@@ -506,25 +477,6 @@
   flex-direction: column;
   gap: 3px;
   min-width: 0;
-}
-
-.stock-search-result-main strong,
-.stock-search-result-main span,
-.stock-search-result-price {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.stock-search-result-main strong {
-  color: rgba(var(--color-text-rgb), 0.84);
-  font-size: 12px;
-}
-
-.stock-search-result-main span,
-.stock-search-result-price {
-  color: rgba(var(--color-text-rgb), 0.48);
-  font-size: 11px;
 }
 
 .stock-metrics-collapse {
