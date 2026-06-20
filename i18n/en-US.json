@@ -2080,6 +2080,7 @@
           "alarm": "Alarm",
           "toolbox": "Toolbox",
           "miniGame": "Mini Game",
+          "stock": "Stock Market",
           "cli": "CLI Console"
         }
       },
