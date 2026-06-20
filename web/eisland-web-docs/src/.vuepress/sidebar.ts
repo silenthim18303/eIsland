@@ -4,4 +4,24 @@ export default sidebar({
   "/": [
     "",
   ],
+  "/introduction/": [
+    {
+      text: "Introduction",
+      icon: "info",
+      collapsible: false,
+      children: [
+        "README.md",
+      ],
+    },
+    {
+      text: "Tech Stack",
+      icon: "layer-group",
+      collapsible: true,
+      children: [
+        "frontend-tech-stack.md",
+        "backend-tech-stack.md",
+        "plugins-tech-stack.md"
+      ],
+    },
+  ],
 });
