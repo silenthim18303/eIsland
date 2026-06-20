@@ -32,6 +32,15 @@ body {
   display: none;
 }
 
+.vp-sidebar a.active,
+.vp-sidebar .active > a,
+.vp-sidebar .router-link-active,
+.vp-sidebar .router-link-exact-active {
+  color: inherit;
+  background: transparent;
+  background-color: #2062e759;
+}
+
 .vp-project-home {
   min-height: calc(90vh - var(--navbar-height));
   display: flex;
