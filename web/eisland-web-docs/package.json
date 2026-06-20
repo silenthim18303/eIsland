@@ -1,8 +1,9 @@
 {
   "name": "eisland-web-docs",
-  "description": "A project of vuepress-theme-hope",
+  "description": "A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.",
   "version": "26.6.3",
-  "license": "GPL-v3",
+  "author": "JNTMTMTM",
+  "license": "GPL-3.0",
   "type": "module",
   "scripts": {
     "docs:build": "vuepress-vite build src",
