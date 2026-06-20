@@ -61,7 +61,7 @@ function readPersistedSearchResults(): StockSearchItem[] {
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
     return parsed.filter((item): item is StockSearchItem =>
-      item != null && typeof item === 'object' && typeof (item as StockSearchItem).code === 'string'
+      item !== null && item !== undefined && typeof item === 'object' && typeof (item as StockSearchItem).code === 'string'
     );
   } catch {
     return [];
