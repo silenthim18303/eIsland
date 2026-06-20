@@ -28,13 +28,6 @@ import type { MaxExpandTab } from '../../../../store/types';
 
 export type NavDotId = MaxExpandTab | 'expanded';
 
-/** 独立窗口模式下隐藏的 Tab 集合 */
-export const STANDALONE_HIDDEN_TABS: Set<NavDotId> = new Set([
-  'todo', 'countdown', 'urlFavorites', 'album', 'mail',
-  'localFileSearch', 'clipboardHistory', 'memo', 'alarm', 'toolbox', 'stock', 'settings',
-  'cli',
-]);
-
 /** 当前启动模式（集成 / 独立） */
 let _startupMode: 'integrated' | 'standalone' = 'integrated';
 let _startupModeResolved = false;

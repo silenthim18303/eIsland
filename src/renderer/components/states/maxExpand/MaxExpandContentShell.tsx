@@ -28,11 +28,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import type { MaxExpandTab } from '../../../store/types';
-import type { NavDotId } from './config/shellConstants';
-import { STANDALONE_HIDDEN_TABS } from './config/shellConstants';
+import {
+  getStartupMode,
+  getStartupModeReady,
+  isStartupModeResolved,
+  type NavDotId,
+} from './config/shellConstants';
 import { useNavLayout } from './hooks/useNavLayout';
 import { useTabAnimation } from './hooks/useTabAnimation';
-import { useCountdownMode, updateActiveTabRef } from './hooks/useCountdownMode';
 import { useContentReady } from './hooks/useContentReady';
 import { shouldIgnoreWheelEvent } from './hooks/useWheelNavigation';
 import { getDefaultNavLabel } from './utils/getNavLabel';
@@ -59,27 +62,35 @@ export function MaxExpandContentShell({ renderActiveTab, deferContent = true }: 
   const contentRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef(activeTab);
   activeTabRef.current = activeTab;
-  updateActiveTabRef(activeTab);
 
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
+  const [startupMode, setStartupMode] = useState<'integrated' | 'standalone'>(isStartupModeResolved() ? getStartupMode() : 'integrated');
   const { navLayoutConfig, navLayoutLoaded } = useNavLayout();
   const tabAnimation = useTabAnimation();
   const contentReady = useContentReady(deferContent);
-  const countdownMode = useCountdownMode(setActiveTab);
+
+  useEffect(() => {
+    let cancelled = false;
+    getStartupModeReady().then(() => {
+      if (!cancelled) setStartupMode(getStartupMode());
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const NAV_DOTS: NavDotId[] = useMemo(() => {
     const visibleTabs = navLayoutConfig
       .filter((item: { visible: boolean }) => item.visible)
       .map((item: { id: string }) => item.id as NavDotId);
-    return ['expanded' as NavDotId, ...visibleTabs, 'settings' as NavDotId];
-  }, [navLayoutConfig]);
+    return startupMode === 'standalone'
+      ? ['expanded' as NavDotId, ...visibleTabs]
+      : ['expanded' as NavDotId, ...visibleTabs, 'settings' as NavDotId];
+  }, [navLayoutConfig, startupMode]);
   const navDotsRef = useRef(NAV_DOTS);
   navDotsRef.current = NAV_DOTS;
 
   useEffect(() => {
-    if (activeTab === 'settings') return;
     const isVisible = NAV_DOTS.includes(activeTab);
-    if (!isVisible && NAV_DOTS.length > 2) {
+    if (!isVisible && NAV_DOTS.length > 1) {
       setActiveTab(NAV_DOTS[1] as MaxExpandTab);
     }
   }, [NAV_DOTS, activeTab, setActiveTab]);
@@ -88,11 +99,8 @@ export function MaxExpandContentShell({ renderActiveTab, deferContent = true }: 
     const getNavLabel = (id: NavDotId): string => t(`maxExpand.nav.${id}`, {
       defaultValue: getDefaultNavLabel(id),
     });
-    if (countdownMode === 'standalone') {
-      return NAV_DOTS.filter(d => !STANDALONE_HIDDEN_TABS.has(d)).map((id) => ({ id, label: getNavLabel(id) }));
-    }
     return NAV_DOTS.map((id) => ({ id, label: getNavLabel(id) }));
-  }, [countdownMode, t, NAV_DOTS]);
+  }, [t, NAV_DOTS]);
   const filteredNavDotsRef = useRef(filteredNavDots);
   filteredNavDotsRef.current = filteredNavDots;
 

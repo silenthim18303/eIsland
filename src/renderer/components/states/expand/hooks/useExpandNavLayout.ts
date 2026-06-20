@@ -27,9 +27,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_EXPAND_NAV_LAYOUT,
+  DEFAULT_MAXEXPAND_NAV_LAYOUT,
   EXPAND_NAV_LAYOUT_STORE_KEY,
+  MAXEXPAND_NAV_LAYOUT_STORE_KEY,
   normalizeExpandNavLayoutConfig,
+  normalizeMaxExpandNavLayoutConfig,
   type ExpandNavLayoutConfig,
+  type MaxExpandNavLayoutConfig,
 } from '../../maxExpand/components/setting/utils/settingsConfig';
 import {
   MAXEXPAND_PERFORMANCE_MODE_STORE_KEY,
@@ -47,6 +51,7 @@ import { preloadMaxExpandContentEager } from '../../maxExpand/maxExpandContentEa
  */
 export function useExpandNavLayout() {
   const [navLayoutConfig, setNavLayoutConfig] = useState<ExpandNavLayoutConfig>(DEFAULT_EXPAND_NAV_LAYOUT);
+  const [maxExpandNavLayoutConfig, setMaxExpandNavLayoutConfig] = useState<MaxExpandNavLayoutConfig>(DEFAULT_MAXEXPAND_NAV_LAYOUT);
   const [maxExpandPerformanceModeEnabled, setMaxExpandPerformanceModeEnabled] = useState(readCachedMaxExpandPerformanceModeEnabled);
 
   const preloadEagerWhenPerformanceModeDisabled = useCallback((): void => {
@@ -76,6 +81,23 @@ export function useExpandNavLayout() {
     };
     window.addEventListener('expand-nav-layout-changed', handleLocalExpandLayoutChange);
 
+    window.api.storeRead(MAXEXPAND_NAV_LAYOUT_STORE_KEY).then((data: unknown) => {
+      if (cancelled) return;
+      setMaxExpandNavLayoutConfig(normalizeMaxExpandNavLayoutConfig(data));
+    }).catch(() => {});
+    const unsubMaxExpand = window.api.onSettingsChanged((channel: string, value: unknown) => {
+      if (cancelled) return;
+      if (channel === `store:${MAXEXPAND_NAV_LAYOUT_STORE_KEY}`) {
+        setMaxExpandNavLayoutConfig(normalizeMaxExpandNavLayoutConfig(value));
+      }
+    });
+    const handleLocalMaxExpandLayoutChange = (e: Event): void => {
+      if (cancelled) return;
+      const detail = (e as CustomEvent).detail;
+      setMaxExpandNavLayoutConfig(normalizeMaxExpandNavLayoutConfig(detail));
+    };
+    window.addEventListener('maxexpand-nav-layout-changed', handleLocalMaxExpandLayoutChange);
+
     // 读取并监听性能模式设置
     if (!readCachedMaxExpandPerformanceModeEnabled()) {
       preloadMaxExpandContentEager();
@@ -101,9 +123,16 @@ export function useExpandNavLayout() {
       cancelled = true;
       unsubscribe();
       unsubExpand();
+      unsubMaxExpand();
       window.removeEventListener('expand-nav-layout-changed', handleLocalExpandLayoutChange);
+      window.removeEventListener('maxexpand-nav-layout-changed', handleLocalMaxExpandLayoutChange);
     };
   }, []);
 
-  return { navLayoutConfig, maxExpandPerformanceModeEnabled, preloadEagerWhenPerformanceModeDisabled };
+  return {
+    navLayoutConfig,
+    maxExpandNavLayoutConfig,
+    maxExpandPerformanceModeEnabled,
+    preloadEagerWhenPerformanceModeDisabled,
+  };
 }

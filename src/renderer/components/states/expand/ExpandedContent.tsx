@@ -27,13 +27,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
-import type { ExpandTab } from '../../../store/types';
+import type { ExpandTab, MaxExpandTab } from '../../../store/types';
 import '../../../styles/expanded/expanded.css';
 import { OverviewTab } from './components/OverviewTab';
 import { PerformanceMonitorTab } from './components/PerformanceMonitorTab';
 import { SongTab } from './components/SongTab';
 import { ToolsTab } from './components/ToolsTab';
 import { TranslationTab } from './components/TranslationTab';
+import { getStartupMode, getStartupModeReady, isStartupModeResolved } from '../maxExpand/config/shellConstants';
 import type { NavDotId } from './config/types';
 import { useExpandNavLayout } from './hooks/useExpandNavLayout';
 import { useExpandTabAnimation } from './hooks/useExpandTabAnimation';
@@ -46,35 +47,60 @@ import { getNavLabel } from './utils/getNavLabel';
  */
 export function ExpandedContent(): React.ReactElement {
   const { t } = useTranslation();
-  const { expandTab, setExpandTab, setHover, setMaxExpand } = useIslandStore();
+  const { expandTab, setExpandTab, setHover, setMaxExpand, maxExpandTab, setMaxExpandTab } = useIslandStore();
   const contentRef = useRef<HTMLDivElement>(null);
   const expandTabRef = useRef(expandTab);
   expandTabRef.current = expandTab;
 
   const [slideDir, setSlideDir] = useState<'left' | 'right'>('right');
+  const [startupMode, setStartupMode] = useState<'integrated' | 'standalone'>(isStartupModeResolved() ? getStartupMode() : 'integrated');
 
-  const { navLayoutConfig, preloadEagerWhenPerformanceModeDisabled } = useExpandNavLayout();
+  const { navLayoutConfig, maxExpandNavLayoutConfig, preloadEagerWhenPerformanceModeDisabled } = useExpandNavLayout();
   const tabAnimation = useExpandTabAnimation();
+
+  const firstVisibleMaxExpandTab = maxExpandNavLayoutConfig.find((item) => item.visible)?.id as MaxExpandTab | undefined;
+  const hasAvailableMaxExpandTab = startupMode === 'standalone'
+    ? firstVisibleMaxExpandTab !== undefined
+    : true;
+
+  useEffect(() => {
+    let cancelled = false;
+    getStartupModeReady().then(() => {
+      if (!cancelled) setStartupMode(getStartupMode());
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const NAV_DOTS: NavDotId[] = useMemo(() => {
     const visibleTabs = navLayoutConfig
       .filter((item) => item.visible)
       .map((item) => item.id as ExpandTab);
-    return ['hover' as ExpandTab, ...visibleTabs, 'maxExpand' as NavDotId];
-  }, [navLayoutConfig]);
+    const maxExpandDots = hasAvailableMaxExpandTab ? ['maxExpand' as NavDotId] : [];
+    return ['hover' as ExpandTab, ...visibleTabs, ...maxExpandDots];
+  }, [hasAvailableMaxExpandTab, navLayoutConfig]);
 
   const navDotsRef = useRef(NAV_DOTS);
   navDotsRef.current = NAV_DOTS;
 
   const handleSetMaxExpand = useCallback((): void => {
+    if (!hasAvailableMaxExpandTab) return;
+    const targetMaxExpandTab = firstVisibleMaxExpandTab ?? 'settings';
+    if (!targetMaxExpandTab) return;
+    const activeTabVisible = maxExpandTab === 'settings'
+      ? startupMode !== 'standalone'
+      : maxExpandNavLayoutConfig.some((item) => item.id === maxExpandTab && item.visible);
+    if (!activeTabVisible) {
+      setMaxExpandTab(targetMaxExpandTab);
+    }
     preloadEagerWhenPerformanceModeDisabled();
     setMaxExpand();
-  }, [preloadEagerWhenPerformanceModeDisabled, setMaxExpand]);
+  }, [firstVisibleMaxExpandTab, hasAvailableMaxExpandTab, maxExpandNavLayoutConfig, maxExpandTab, preloadEagerWhenPerformanceModeDisabled, setMaxExpand, setMaxExpandTab, startupMode]);
 
   useEffect(() => {
+    const visibleExpandTabs = NAV_DOTS.filter((tab): tab is ExpandTab => tab !== 'hover' && tab !== 'maxExpand');
     const isVisible = NAV_DOTS.includes(expandTab);
-    if (!isVisible && NAV_DOTS.length > 2) {
-      setExpandTab(NAV_DOTS[1] as ExpandTab);
+    if (!isVisible && visibleExpandTabs.length > 0) {
+      setExpandTab(visibleExpandTabs[0]);
     }
   }, [NAV_DOTS, expandTab, setExpandTab]);
 
