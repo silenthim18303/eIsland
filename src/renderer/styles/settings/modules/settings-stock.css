@@ -176,6 +176,7 @@
   border-radius: 7px;
   padding: 6px 6px 4px 8px;
   background: rgba(var(--color-text-rgb), 0.05);
+  animation: stock-delete-control-enter 0.18s ease-out both;
 }
 
 .stock-favorites-delete-count {
@@ -258,6 +259,7 @@
   border: 1px solid rgba(var(--color-text-rgb), 0.28);
   border-radius: 4px;
   background: rgba(var(--color-text-rgb), 0.04);
+  animation: stock-delete-side-control-enter 0.16s ease-out both;
 }
 
 .stock-favorite-checkbox.checked {
@@ -342,6 +344,7 @@
   border-radius: 999px;
   padding: 0;
   line-height: 1;
+  animation: stock-delete-side-control-enter 0.16s ease-out both;
 }
 
 .stock-favorite-remove-icon {
@@ -352,6 +355,38 @@
 
 [data-theme='light'] .stock-favorite-remove-icon {
   filter: brightness(0) invert(0);
+}
+
+@keyframes stock-delete-control-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes stock-delete-side-control-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stock-favorites-delete-bar,
+  .stock-favorite-checkbox,
+  .stock-favorite-remove {
+    animation: none;
+  }
 }
 
 .stock-tab-sidebar-header {
