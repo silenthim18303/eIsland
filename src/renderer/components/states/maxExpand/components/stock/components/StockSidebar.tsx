@@ -35,6 +35,7 @@ interface StockSidebarProps {
   favorites: StockFavoriteItem[];
   onSelectSymbol: (symbol: string) => void;
   onAddFavorite: (input: StockFavoriteInput) => void;
+  onRemoveFavorite: (symbol: string) => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
   onClearSearchResults: () => void;
   onRefresh: () => void;
@@ -53,6 +54,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     favorites,
     onSelectSymbol,
     onAddFavorite,
+    onRemoveFavorite,
     onSearch,
     onClearSearchResults,
     onRefresh,
@@ -98,7 +100,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
           aria-label={t('stockTab.actions.refresh')}
           onClick={onRefresh}
         >
-          <img src={SvgIcon.UPDATE} alt="" className="stock-sidebar-nav-icon" />
+          <img src={SvgIcon.REVERT} alt="" className="stock-sidebar-nav-icon" />
         </button>
         <button
           className="stock-sidebar-nav-btn"
@@ -150,8 +152,10 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
               <StockSearchPanel
                 searching={searching}
                 searchResults={searchResults}
+                favorites={favorites}
                 onSelectSymbol={onSelectSymbol}
                 onAddFavorite={onAddFavorite}
+                onRemoveFavorite={onRemoveFavorite}
                 onSearch={onSearch}
                 onClearSearchResults={onClearSearchResults}
               />

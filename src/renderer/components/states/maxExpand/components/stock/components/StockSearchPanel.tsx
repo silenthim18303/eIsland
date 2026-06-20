@@ -19,10 +19,10 @@
  * @author 鸡哥
  */
 
-import { useState, type FormEvent, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
+import { useMemo, useState, type FormEvent, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY } from '../config/stockConfig';
-import type { StockFavoriteInput, StockSearchItem } from '../config/types';
+import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
 
@@ -45,8 +45,10 @@ function persistKeyword(keyword: string): void {
 interface StockSearchPanelProps {
   searching: boolean;
   searchResults: StockSearchItem[];
+  favorites: StockFavoriteItem[];
   onSelectSymbol: (symbol: string) => void;
   onAddFavorite: (input: StockFavoriteInput) => void;
+  onRemoveFavorite: (symbol: string) => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
   onClearSearchResults: () => void;
 }
@@ -60,13 +62,16 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
   const {
     searching,
     searchResults,
+    favorites,
     onSelectSymbol,
     onAddFavorite,
+    onRemoveFavorite,
     onSearch,
     onClearSearchResults,
   } = props;
   const { t } = useTranslation();
   const [keyword, setKeyword] = useState(readPersistedKeyword);
+  const favoriteSymbols = useMemo(() => new Set(favorites.map((item) => item.code)), [favorites]);
 
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -90,8 +95,12 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
     onClearSearchResults();
   };
 
-  const handleAddSearchResult = (event: MouseEvent<HTMLButtonElement>, item: StockSearchItem): void => {
+  const handleToggleSearchResultFavorite = (event: MouseEvent<HTMLButtonElement>, item: StockSearchItem): void => {
     event.stopPropagation();
+    if (favoriteSymbols.has(item.code)) {
+      onRemoveFavorite(item.code);
+      return;
+    }
     onAddFavorite(item);
   };
 
@@ -123,37 +132,41 @@ export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
         </div>
         {searchResults.length > 0 && (
           <div className="stock-search-results">
-            {searchResults.slice(0, 8).map((item) => (
-              <div
-                key={`${item.source}-${item.code}`}
-                className="stock-search-result-item"
-                role="button"
-                tabIndex={0}
-                onClick={() => handleSelectSearchResult(item)}
-                onKeyDown={(event) => handleSearchResultKeyDown(event, item)}
-              >
-                <div className="stock-search-result-main">
-                  <span className="stock-search-result-name">{item.name}</span>
-                  <span className="stock-search-result-code">{item.code}</span>
-                </div>
-                <div className="stock-search-result-price-col">
-                  <span className={`stock-search-result-current-price ${getStockTrendClass(item.changePercent)}`}>
-                    {formatStockPrice(item.price)}
-                  </span>
-                  <span className={`stock-search-result-change-pill ${getStockTrendClass(item.changePercent)}`}>
-                    {formatStockPercent(item.changePercent)}
-                  </span>
-                </div>
-                <button
-                  className="stock-search-result-add"
-                  type="button"
-                  aria-label={t('stockTab.actions.addFavoriteWithName', { name: item.name })}
-                  onClick={(event) => handleAddSearchResult(event, item)}
+            {searchResults.slice(0, 8).map((item) => {
+              const isFavorite = favoriteSymbols.has(item.code);
+
+              return (
+                <div
+                  key={`${item.source}-${item.code}`}
+                  className="stock-search-result-item"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelectSearchResult(item)}
+                  onKeyDown={(event) => handleSearchResultKeyDown(event, item)}
                 >
-                  <img src={SvgIcon.PLUS} alt="" className="stock-search-result-add-icon" />
-                </button>
-              </div>
-            ))}
+                  <div className="stock-search-result-main">
+                    <span className="stock-search-result-name">{item.name}</span>
+                    <span className="stock-search-result-code">{item.code}</span>
+                  </div>
+                  <div className="stock-search-result-price-col">
+                    <span className={`stock-search-result-current-price ${getStockTrendClass(item.changePercent)}`}>
+                      {formatStockPrice(item.price)}
+                    </span>
+                    <span className={`stock-search-result-change-pill ${getStockTrendClass(item.changePercent)}`}>
+                      {formatStockPercent(item.changePercent)}
+                    </span>
+                  </div>
+                  <button
+                    className="stock-search-result-add"
+                    type="button"
+                    aria-label={t(isFavorite ? 'stockTab.actions.removeFavorite' : 'stockTab.actions.addFavoriteWithName', { name: item.name })}
+                    onClick={(event) => handleToggleSearchResultFavorite(event, item)}
+                  >
+                    <img src={isFavorite ? SvgIcon.DELETE : SvgIcon.PLUS} alt="" className="stock-search-result-add-icon" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </form>
