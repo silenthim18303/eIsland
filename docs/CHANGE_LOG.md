@@ -1,7 +1,25 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-16T18:13:30.347Z
+> 生成时间：2026-06-20T08:10:13.745Z
+
+## 26.6.2
+
+- 2026-06-17 | fa8aefe6 | 鸡哥 | chore: bump version to 26.6.2 in package.json and package-lock.json
+- 2026-06-17 | bb731954 | 鸡哥 | feat: enhance fullscreen auto-hide functionality
+- 2026-06-16 | 19a3155b | github-actions[bot] | docs: auto update CHANGE_LOG.md for #100 by @JNTMTMTM [skip ci]
+- 2026-06-17 | 48aa1593 | 鸡哥 | Merge pull request #100 from JNTMTMTM/dev
+- 2026-06-17 | 24f46125 | 鸡哥 | feat(windows-fullscreen-detector): add comprehensive documentation and type definitions
+- 2026-06-17 | 4b13a468 | 鸡哥 | feat(hide-process): implement fullscreen auto-hide feature
+- 2026-06-17 | d846df00 | 鸡哥 | feat(windows-fullscreen-detector): update to version 26.0.1 and add fullscreen_core.c
+- 2026-06-17 | 5de5b7a4 | 鸡哥 | feat(windows-fullscreen-detector): migrate tests to Vitest and update test scripts
+- 2026-06-17 | 6d2c2aaf | 鸡哥 | feat(windows-fullscreen-detector): add polling test and smoke scripts to package.json
+- 2026-06-17 | 3ff5a927 | 鸡哥 | feat(windows-fullscreen-detector): upgrade to version 26.0.0 and add plugin dependency
+- 2026-06-17 | 6a90a49e | 鸡哥 | feat(windows-fullscreen-detector): update devDependencies and package-lock.json
+- 2026-06-17 | b6aed852 | 鸡哥 | feat(windows-fullscreen-detector): add smoke test script to package.json
+- 2026-06-17 | f1726f49 | 鸡哥 | feat(windows-fullscreen-detector): add test script for fullscreen detector module
+- 2026-06-17 | ab0e7a80 | 鸡哥 | feat(windows-fullscreen-detector): add initial implementation for detecting fullscreen windows on Windows platform
+- 2026-06-13 | 27603588 | 鸡哥 | style(shell): enhance music glow effect with opacity transition on pause #93 @ThinkofRain1213
 
 ## 26.6.1
 
@@ -2195,15 +2213,60 @@
 
 ## Unreleased
 
-- 2026-06-17 | 48aa1593 | 鸡哥 | Merge pull request #100 from JNTMTMTM/dev
-- 2026-06-17 | 24f46125 | 鸡哥 | feat(windows-fullscreen-detector): add comprehensive documentation and type definitions
-- 2026-06-17 | 4b13a468 | 鸡哥 | feat(hide-process): implement fullscreen auto-hide feature
-- 2026-06-17 | d846df00 | 鸡哥 | feat(windows-fullscreen-detector): update to version 26.0.1 and add fullscreen_core.c
-- 2026-06-17 | 5de5b7a4 | 鸡哥 | feat(windows-fullscreen-detector): migrate tests to Vitest and update test scripts
-- 2026-06-17 | 6d2c2aaf | 鸡哥 | feat(windows-fullscreen-detector): add polling test and smoke scripts to package.json
-- 2026-06-17 | 3ff5a927 | 鸡哥 | feat(windows-fullscreen-detector): upgrade to version 26.0.0 and add plugin dependency
-- 2026-06-17 | 6a90a49e | 鸡哥 | feat(windows-fullscreen-detector): update devDependencies and package-lock.json
-- 2026-06-17 | b6aed852 | 鸡哥 | feat(windows-fullscreen-detector): add smoke test script to package.json
-- 2026-06-17 | f1726f49 | 鸡哥 | feat(windows-fullscreen-detector): add test script for fullscreen detector module
-- 2026-06-17 | ab0e7a80 | 鸡哥 | feat(windows-fullscreen-detector): add initial implementation for detecting fullscreen windows on Windows platform
-- 2026-06-13 | 27603588 | 鸡哥 | style(shell): enhance music glow effect with opacity transition on pause #93 @ThinkofRain1213
+- 2026-06-20 | 9694e9bc | 鸡哥 | Merge pull request #106 from JNTMTMTM/dev
+- 2026-06-20 | 87598a1c | 鸡哥 | fix(stock): improve null and undefined checks in stock search results parsing
+- 2026-06-20 | dad3afef | 鸡哥 | feat: add licensing information and file descriptions to multiple components and utilities
+- 2026-06-20 | 8cc29d8f | 鸡哥 | feat(i18n): add stock market translations for English and Chinese
+- 2026-06-20 | 42cbec23 | 鸡哥 | feat(maxExpand): update tab visibility logic to ensure 'overview' remains always visible
+- 2026-06-20 | 6922975f | 鸡哥 | fix(maxExpand): refine tab visibility logic based on startup mode
+- 2026-06-20 | 1d9559a1 | 鸡哥 | feat(maxExpand): enhance maxExpand functionality and layout management
+- 2026-06-20 | 9cce8c27 | 鸡哥 | feat(web): initialize web application structure with essential components and configurations
+- 2026-06-20 | 9d9ebd87 | 鸡哥 | feat(navbar): add GlassNavbar component with styling and logo
+- 2026-06-20 | d4e9fb94 | 鸡哥 | feat(simplex-flow): implement SimplexFlowBackground component and related functionality
+- 2026-06-20 | 10471cf1 | 鸡哥 | feat(stock-sidebar): add period selection functionality and update translations
+- 2026-06-20 | f4315acf | 鸡哥 | feat(stock-sidebar): improve stock deletion experience and accessibility
+- 2026-06-20 | 7a0e5887 | 鸡哥 | feat(stock-sidebar): add animations for stock deletion controls
+- 2026-06-20 | d09cdec7 | 鸡哥 | feat(stock-sidebar): implement favorite deletion functionality and update translations
+- 2026-06-20 | 7b3c261c | 鸡哥 | chore: add .gitkeep file to eisland-web directory for tracking empty folder
+- 2026-06-20 | d6a2f341 | 鸡哥 | feat(stock-sidebar): add delete favorite button and update translations
+- 2026-06-20 | 9b3c246a | 鸡哥 | feat(stock-sidebar): implement favorite search functionality and update translations
+- 2026-06-20 | 096bf0bb | 鸡哥 | feat(stock-search): enhance favorite functionality in StockSearchPanel and StockSidebar
+- 2026-06-20 | de21e98b | 鸡哥 | refactor(issue-auto-label): enhance label categorization and color mapping
+- 2026-06-20 | 8ba4c1eb | 鸡哥 | feat(stock-sidebar): add refresh option and update translations
+- 2026-06-20 | 752c3363 | 鸡哥 | refactor(stock-sidebar): update initial state of sidebar components
+- 2026-06-20 | c4aa9e22 | 鸡哥 | feat(stock-sidebar): add refresh functionality to StockSidebar
+- 2026-06-20 | 236d8d0a | 鸡哥 | refactor(stock-sidebar): enhance keyboard accessibility and styling for favorite items
+- 2026-06-20 | 3b06c738 | 鸡哥 | refactor(stock-search): enhance keyboard and mouse interaction in StockSearchPanel
+- 2026-06-20 | 920d7cd8 | 鸡哥 | refactor(stock-search): simplify StockSearchPanel search result handling
+- 2026-06-20 | 96e53600 | 鸡哥 | refactor(stock-search): enhance StockSearchPanel layout and styling
+- 2026-06-20 | 6b67476e | 鸡哥 | feat(stock-search): implement keyword persistence and clear functionality in StockSearchPanel
+- 2026-06-19 | 4ad2dc71 | 鸡哥 | refactor(stock-sidebar): enhance styling for search results in settings-stock.css
+- 2026-06-19 | 4ba30483 | 鸡哥 | refactor(stock-sidebar): update sidebar styling for search mode and adjust dimensions
+- 2026-06-19 | 14b83e06 | 鸡哥 | refactor(stock-sidebar): enhance layout and styling of stock favorite items
+- 2026-06-19 | df9f302d | 鸡哥 | refactor(stock-sidebar): streamline StockSidebar layout and adjust CSS padding
+- 2026-06-19 | df8dafa6 | 鸡哥 | refactor(stock-module): remove StockAddFavoritePanel and streamline StockSidebar
+- 2026-06-19 | 5a470971 | 鸡哥 | feat(stock-module): add stock symbol normalization and validation in useStockMarketData hook
+- 2026-06-19 | 25574024 | 鸡哥 | feat(stock-module): implement favorites management in Stock components
+- 2026-06-19 | 52655a4c | 鸡哥 | feat(stock-module): enhance StockSearchPanel and translations for improved user experience
+- 2026-06-19 | a99fee94 | 鸡哥 | feat(svg-icons): add SEARCH icon and update SvgIcon references
+- 2026-06-19 | dc5a0f49 | 鸡哥 | feat(stock-module): enhance StockTab with new favorite addition hints
+- 2026-06-19 | d54aa1b4 | 鸡哥 | style(stock-module): update StockTab component and CSS for sidebar enhancements
+- 2026-06-19 | 9dfad40c | 鸡哥 | feat(stock-module): implement sidebar navigation for StockTab with favorites management
+- 2026-06-19 | e41f2eca | 鸡哥 | feat(svg-icons): add STOCK_CHOOSE icon and update SvgIcon references
+- 2026-06-19 | d492f653 | 鸡哥 | style(stock-module): simplify klineChart title and adjust stock chart padding
+- 2026-06-19 | 2b4bf8e9 | 鸡哥 | style(stock-module): update klineChartOptions and settings-stock.css for improved visuals
+- 2026-06-19 | 668a760f | 鸡哥 | refactor(stock-module): simplify StockKlineChart by utilizing helper functions
+- 2026-06-19 | e048e440 | 鸡哥 | style(stock-module): update StockTab layout and CSS for improved presentation
+- 2026-06-19 | 1d1ca58a | 鸡哥 | feat(eisland-windows-processes-attacker): expand module functionality with additional source files
+- 2026-06-19 | 0cb8b52e | 鸡哥 | style(stock-module): refine layout and alignment in settings-stock.css
+- 2026-06-19 | 6a960a87 | 鸡哥 | style(stock-module): adjust padding and height in settings-stock.css
+- 2026-06-19 | 90063239 | 鸡哥 | feat(stock-module): enhance StockKlineChart with accent color styling
+- 2026-06-18 | 34a77e07 | 鸡哥 | feat(stock-module): enhance StockKlineChart with navigator mask styling
+- 2026-06-18 | 9a54b3f7 | 鸡哥 | fix(stock-module): resolve layout issues in StockTab metrics panel
+- 2026-06-18 | e15316a3 | 鸡哥 | feat(stock-module): enhance StockTab with collapsible metrics panel
+- 2026-06-18 | 434a8c6b | 鸡哥 | refactor(stock-module): streamline StockMetrics and StockTab components
+- 2026-06-18 | 5ab11e1f | 鸡哥 | feat(stock-module): introduce stock market tab with live data and metrics
+- 2026-06-17 | 1913fb66 | 鸡哥 | feat(windows-performance-monitor): add hardware list monitoring functionality
+- 2026-06-17 | 9a316eb3 | 鸡哥 | refactor(tests): improve logging in performance monitor smoke tests
+- 2026-06-17 | 2d2603ee | 鸡哥 | feat(windows-performance-monitor): add temperature monitoring functionality
+- 2026-06-17 | eaecc903 | 鸡哥 | feat(windows-performance-monitor): add Windows performance monitoring plugin
