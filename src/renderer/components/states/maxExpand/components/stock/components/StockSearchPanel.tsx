@@ -1,0 +1,175 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
+/**
+ * @file StockSearchPanel.tsx
+ * @description 股票关键词搜索面板
+ * @author 鸡哥
+ */
+
+import { useMemo, useState, type FormEvent, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import { STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY } from '../config/stockConfig';
+import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
+
+function readPersistedKeyword(): string {
+  try {
+    return localStorage.getItem(STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY) ?? '';
+  } catch {
+    return '';
+  }
+}
+
+function persistKeyword(keyword: string): void {
+  try {
+    localStorage.setItem(STOCK_SEARCH_KEYWORD_LOCAL_STORAGE_KEY, keyword);
+  } catch {
+    // noop
+  }
+}
+
+interface StockSearchPanelProps {
+  searching: boolean;
+  searchResults: StockSearchItem[];
+  favorites: StockFavoriteItem[];
+  onSelectSymbol: (symbol: string) => void;
+  onAddFavorite: (input: StockFavoriteInput) => void;
+  onRemoveFavorite: (symbol: string) => void;
+  onSearch: (keyword: string) => Promise<StockSearchItem[]>;
+  onClearSearchResults: () => void;
+}
+
+/**
+ * 渲染股票关键词搜索候选面板。
+ * @param props - 股票搜索面板属性。
+ * @returns 股票搜索面板。
+ */
+export function StockSearchPanel(props: StockSearchPanelProps): ReactElement {
+  const {
+    searching,
+    searchResults,
+    favorites,
+    onSelectSymbol,
+    onAddFavorite,
+    onRemoveFavorite,
+    onSearch,
+    onClearSearchResults,
+  } = props;
+  const { t } = useTranslation();
+  const [keyword, setKeyword] = useState(readPersistedKeyword);
+  const favoriteSymbols = useMemo(() => new Set(favorites.map((item) => item.code)), [favorites]);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    void onSearch(keyword);
+  };
+
+  const handleSelectSearchResult = (item: StockSearchItem): void => {
+    onSelectSymbol(item.code);
+  };
+
+  const handleSearchResultKeyDown = (event: KeyboardEvent<HTMLDivElement>, item: StockSearchItem): void => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    handleSelectSearchResult(item);
+  };
+
+  const handleClear = (): void => {
+    setKeyword('');
+    persistKeyword('');
+    onClearSearchResults();
+  };
+
+  const handleToggleSearchResultFavorite = (event: MouseEvent<HTMLButtonElement>, item: StockSearchItem): void => {
+    event.stopPropagation();
+    if (favoriteSymbols.has(item.code)) {
+      onRemoveFavorite(item.code);
+      return;
+    }
+    onAddFavorite(item);
+  };
+
+  return (
+    <section className="stock-search-card" aria-label={t('stockTab.search.aria')}>
+      <form className="stock-keyword-form" onSubmit={handleSearchSubmit}>
+        <label className="stock-field-label" htmlFor="stock-keyword-input">
+          {t('stockTab.search.keywordLabel')}
+        </label>
+        <div className="stock-inline-control">
+          <input
+            className="stock-input"
+            id="stock-keyword-input"
+            type="search"
+            value={keyword}
+            placeholder={t('stockTab.search.keywordPlaceholder')}
+            onChange={(event) => {
+              const value = event.target.value;
+              setKeyword(value);
+              persistKeyword(value);
+            }}
+          />
+          <button className="stock-secondary-button stock-search-btn" type="submit" disabled={searching} aria-label={t('stockTab.actions.search')}>
+            <img src={SvgIcon.SEARCH} alt="" className="stock-search-btn-icon" />
+          </button>
+          <button className="stock-secondary-button stock-search-btn" type="button" aria-label={t('stockTab.actions.clear')} onClick={handleClear}>
+            <img src={SvgIcon.DELETE} alt="" className="stock-search-btn-icon" />
+          </button>
+        </div>
+        {searchResults.length > 0 && (
+          <div className="stock-search-results">
+            {searchResults.slice(0, 8).map((item) => {
+              const isFavorite = favoriteSymbols.has(item.code);
+
+              return (
+                <div
+                  key={`${item.source}-${item.code}`}
+                  className="stock-search-result-item"
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => handleSelectSearchResult(item)}
+                  onKeyDown={(event) => handleSearchResultKeyDown(event, item)}
+                >
+                  <div className="stock-search-result-main">
+                    <span className="stock-search-result-name">{item.name}</span>
+                    <span className="stock-search-result-code">{item.code}</span>
+                  </div>
+                  <div className="stock-search-result-price-col">
+                    <span className={`stock-search-result-current-price ${getStockTrendClass(item.changePercent)}`}>
+                      {formatStockPrice(item.price)}
+                    </span>
+                    <span className={`stock-search-result-change-pill ${getStockTrendClass(item.changePercent)}`}>
+                      {formatStockPercent(item.changePercent)}
+                    </span>
+                  </div>
+                  <button
+                    className="stock-search-result-add"
+                    type="button"
+                    aria-label={t(isFavorite ? 'stockTab.actions.removeFavorite' : 'stockTab.actions.addFavoriteWithName', { name: item.name })}
+                    onClick={(event) => handleToggleSearchResultFavorite(event, item)}
+                  >
+                    <img src={isFavorite ? SvgIcon.DELETE : SvgIcon.PLUS} alt="" className="stock-search-result-add-icon" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </form>
+    </section>
+  );
+}

@@ -27,7 +27,7 @@
 import { useCallback, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MaxExpandNavLayoutConfig } from '../../../utils/settingsConfig';
-import { MAXEXPAND_TAB_LABELS, MAXEXPAND_ALWAYS_VISIBLE_TABS, DEFAULT_MAXEXPAND_NAV_LAYOUT } from '../../../utils/settingsConfig';
+import { MAXEXPAND_TAB_LABELS, DEFAULT_MAXEXPAND_NAV_LAYOUT } from '../../../utils/settingsConfig';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
 
 interface MaxExpandLayoutSettingsPageProps {
@@ -182,13 +182,10 @@ export function MaxExpandLayoutSettingsPage({
                   <button
                     className={`maxexpand-layout-item-toggle${item.visible ? ' maxexpand-layout-item-toggle--on' : ''}`}
                     type="button"
-                    disabled={MAXEXPAND_ALWAYS_VISIBLE_TABS.has(item.id)}
                     onClick={() => toggleVisible(idx)}
-                    title={MAXEXPAND_ALWAYS_VISIBLE_TABS.has(item.id)
-                      ? t('settings.app.maxExpandLayout.alwaysVisible', { defaultValue: '此页面不可隐藏' })
-                      : item.visible
-                        ? t('settings.app.maxExpandLayout.hideTab', { defaultValue: '隐藏此页面' })
-                        : t('settings.app.maxExpandLayout.showTab', { defaultValue: '显示此页面' })
+                    title={item.visible
+                      ? t('settings.app.maxExpandLayout.hideTab', { defaultValue: '隐藏此页面' })
+                      : t('settings.app.maxExpandLayout.showTab', { defaultValue: '显示此页面' })
                     }
                   >
                     <img src={item.visible ? SvgIcon.VISIBLE : SvgIcon.INVISIBLE} alt="" className="maxexpand-layout-item-btn-icon" />

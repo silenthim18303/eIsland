@@ -205,7 +205,7 @@ export type ExpandNavLayoutConfig = ExpandNavItem[];
 
 export const EXPAND_CONFIGURABLE_TABS: string[] = ['overview', 'song', 'tools', 'translation', 'performanceMonitor'];
 
-export const EXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['overview']);
+export const EXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set<string>(['overview']);
 
 export const EXPAND_TAB_LABELS: Record<string, string> = {
   overview: '总览',
@@ -240,7 +240,7 @@ export function normalizeExpandNavLayoutConfig(raw: unknown): ExpandNavLayoutCon
     seen.add(candidate.id);
     ordered.push({
       id: candidate.id,
-      visible: EXPAND_ALWAYS_VISIBLE_TABS.has(candidate.id) ? true : candidate.visible !== false,
+      visible: EXPAND_ALWAYS_VISIBLE_TABS.has(candidate.id) || candidate.visible !== false,
     });
   });
 
@@ -264,9 +264,9 @@ export interface MaxExpandNavItem {
 
 export type MaxExpandNavLayoutConfig = MaxExpandNavItem[];
 
-export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox', 'miniGame', 'cli'];
+export const MAXEXPAND_CONFIGURABLE_TABS: string[] = ['todo', 'urlFavorites', 'album', 'mail', 'localFileSearch', 'clipboardHistory', 'aiChat', 'memo', 'countdown', 'alarm', 'toolbox', 'miniGame', 'stock', 'cli'];
 
-export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set(['aiChat', 'miniGame']);
+export const MAXEXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set<string>();
 
 export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
   todo: '待办事项',
@@ -281,6 +281,7 @@ export const MAXEXPAND_TAB_LABELS: Record<string, string> = {
   alarm: '闹钟',
   toolbox: '工具箱',
   miniGame: '小游戏',
+  stock: '股票行情',
   cli: 'CLI 控制台',
 };
 
@@ -298,21 +299,32 @@ export function normalizeMaxExpandNavLayoutConfig(raw: unknown): MaxExpandNavLay
   }
 
   const known = new Set(MAXEXPAND_CONFIGURABLE_TABS);
-  const merged = new Map<string, boolean>();
+  const ordered: MaxExpandNavLayoutConfig = [];
+  const seen = new Set<string>();
 
   raw.forEach((item) => {
     if (!item || typeof item !== 'object') return;
     const candidate = item as { id?: unknown; visible?: unknown };
     if (typeof candidate.id !== 'string' || !known.has(candidate.id)) return;
-    merged.set(candidate.id, candidate.visible !== false);
+    if (seen.has(candidate.id)) return;
+    seen.add(candidate.id);
+    ordered.push({
+      id: candidate.id,
+      visible: candidate.visible !== false,
+    });
   });
 
-  return MAXEXPAND_CONFIGURABLE_TABS.map((id) => ({
-    id,
-    visible: MAXEXPAND_ALWAYS_VISIBLE_TABS.has(id)
-      ? true
-      : (merged.has(id) ? (merged.get(id) === true) : true),
-  }));
+  if (ordered.length === 0) {
+    return defaults;
+  }
+
+  MAXEXPAND_CONFIGURABLE_TABS.forEach((id) => {
+    if (!seen.has(id)) {
+      ordered.push({ id, visible: true });
+    }
+  });
+
+  return ordered;
 }
 
 export const APP_SETTINGS_PAGES: AppSettingsPageKey[] = ['layout-preview', 'expand-layout', 'maxexpand-layout', 'album', 'hide-process-list', 'position', 'theme', 'language', 'behavior', 'animation', 'url-parser', 'clipboard-history', 'alarm', 'break-reminder', 'autostart', 'sound', 'notification', 'performance', 'performance-monitor'];

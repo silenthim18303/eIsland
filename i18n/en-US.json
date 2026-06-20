@@ -1130,6 +1130,86 @@
       "cellAria": "Row {{row}}, column {{col}}"
     }
   },
+  "stockTab": {
+    "title": "Stock Market",
+    "subtitle": "Search symbols and view live prices, change rates, and professional candlestick charts.",
+    "autoRefresh": "Auto refreshes every 30 seconds",
+    "sidebar": {
+      "toggle": "Toggle sidebar",
+      "deleteFavorite": "Delete favorite",
+      "favorites": "Favorites",
+      "search": "Search",
+      "favoritesHint": "Manage your watchlist",
+      "searchHint": "Search stocks by name or symbol",
+      "favoriteSearchLabel": "Search Favorites",
+      "favoriteSearchPlaceholder": "Search",
+      "selectedCount": "{{count}} selected",
+      "deleteSelected": "Delete",
+      "noFavoriteMatches": "No matching favorites",
+      "noFavorites": "No favorites yet"
+    },
+    "empty": {
+      "name": "No stock selected",
+      "chart": "No K-line data"
+    },
+    "loading": {
+      "chart": "Loading K-line data..."
+    },
+    "period": {
+      "day": "Daily K-line",
+      "week": "Weekly K-line",
+      "month": "Monthly K-line",
+      "short": {
+        "day": "D",
+        "week": "W",
+        "month": "M"
+      }
+    },
+    "actions": {
+      "search": "Search",
+      "searching": "Searching...",
+      "clear": "Clear",
+      "addFavorite": "Add",
+      "addFavoriteWithName": "Add {{name}} to favorites",
+      "removeFavorite": "Remove {{name}} from favorites",
+      "refresh": "Refresh market data"
+    },
+    "search": {
+      "aria": "Stock search and filters",
+      "keywordLabel": "Search Stocks",
+      "keywordPlaceholder": "Enter name or symbol"
+    },
+    "metrics": {
+      "aria": "Key stock metrics",
+      "updatedAt": "Updated at {{time}}",
+      "previousClose": "Prev Close",
+      "high": "High",
+      "low": "Low",
+      "volume": "Volume",
+      "amount": "Amount",
+      "source": "Source"
+    },
+    "chart": {
+      "aria": "Stock candlestick chart",
+      "title": "Stock K-line",
+      "candlestick": "Candlestick",
+      "volume": "Volume",
+      "priceAxis": "Price",
+      "volumeAxis": "Volume",
+      "exportMenu": "Chart export menu",
+      "range": {
+        "1m": "1M",
+        "3m": "3M",
+        "6m": "6M",
+        "1y": "1Y",
+        "all": "All"
+      }
+    },
+    "error": {
+      "default": "Failed to load market data. Please try again later.",
+      "symbolFormat": "Enter a symbol with market prefix, such as SH600519, SZ000651, HK00700, or USMSFT."
+    }
+  },
   "stt": {
     "label": "Recognition Result",
     "asrQuickAdd": "ASR Quick Add",
@@ -2000,6 +2080,7 @@
           "alarm": "Alarm",
           "toolbox": "Toolbox",
           "miniGame": "Mini Game",
+          "stock": "Stock Market",
           "cli": "CLI Console"
         }
       },

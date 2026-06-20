@@ -1130,6 +1130,86 @@
       "cellAria": "第 {{row}} 行第 {{col}} 列"
     }
   },
+  "stockTab": {
+    "title": "股票行情",
+    "subtitle": "搜索股票代码并查看实时价格、涨跌幅和专业 K 线。",
+    "autoRefresh": "每 30 秒自动刷新",
+    "sidebar": {
+      "toggle": "展开/收起侧边栏",
+      "deleteFavorite": "删除自选",
+      "favorites": "自选",
+      "search": "搜索",
+      "favoritesHint": "管理您的自选股列表",
+      "searchHint": "按名称或代码搜索股票",
+      "favoriteSearchLabel": "搜索自选",
+      "favoriteSearchPlaceholder": "输入自选名称或代码",
+      "selectedCount": "已选 {{count}} 项",
+      "deleteSelected": "删除",
+      "noFavoriteMatches": "未找到匹配的自选股",
+      "noFavorites": "暂无自选股"
+    },
+    "empty": {
+      "name": "未选择股票",
+      "chart": "暂无 K 线数据"
+    },
+    "loading": {
+      "chart": "正在加载 K 线..."
+    },
+    "period": {
+      "day": "日 K 线",
+      "week": "周 K 线",
+      "month": "月 K 线",
+      "short": {
+        "day": "日",
+        "week": "周",
+        "month": "月"
+      }
+    },
+    "actions": {
+      "search": "搜索",
+      "searching": "搜索中...",
+      "clear": "清除",
+      "addFavorite": "添加",
+      "addFavoriteWithName": "添加 {{name}} 到自选",
+      "removeFavorite": "移除 {{name}} 自选",
+      "refresh": "刷新行情"
+    },
+    "search": {
+      "aria": "股票搜索与筛选",
+      "keywordLabel": "搜索股票",
+      "keywordPlaceholder": "输入名称或代码"
+    },
+    "metrics": {
+      "aria": "股票关键指标",
+      "updatedAt": "更新于 {{time}}",
+      "previousClose": "昨收",
+      "high": "最高",
+      "low": "最低",
+      "volume": "成交量",
+      "amount": "成交额",
+      "source": "数据源"
+    },
+    "chart": {
+      "aria": "股票 K 线图",
+      "title": "股票 K 线",
+      "candlestick": "K 线",
+      "volume": "成交量",
+      "priceAxis": "价格",
+      "volumeAxis": "成交量",
+      "exportMenu": "图表导出菜单",
+      "range": {
+        "1m": "1月",
+        "3m": "3月",
+        "6m": "6月",
+        "1y": "1年",
+        "all": "全部"
+      }
+    },
+    "error": {
+      "default": "行情加载失败，请稍后重试。",
+      "symbolFormat": "请输入带市场前缀的股票代码，例如 SH600519、SZ000651、HK00700 或 USMSFT。"
+    }
+  },
   "stt": {
     "label": "识别结果",
     "asrQuickAdd": "ASR快速添加",
@@ -2000,6 +2080,7 @@
           "alarm": "闹钟",
           "toolbox": "工具箱",
           "miniGame": "小游戏",
+          "stock": "股票行情",
           "cli": "CLI 控制台"
         }
       },

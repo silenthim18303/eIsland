@@ -25,27 +25,76 @@ jobs:
 
             const labelsToApply = new Set();
 
-            if (/(bug|错误|异常|崩溃|无法|失败|报错)/i.test(text)) labelsToApply.add('bug');
-            if (/(feature|需求|建议|增强|改进|优化|新功能)/i.test(text)) labelsToApply.add('enhancement');
-            if (/(doc|docs|readme|文档)/i.test(text)) labelsToApply.add('documentation');
-            if (/(ui|renderer|界面|前端)/i.test(text)) labelsToApply.add('frontend');
-            if (/(electron|main process|preload|托盘|主进程)/i.test(text)) labelsToApply.add('electron-core');
-            if (/(workflow|github action|ci|pipeline)/i.test(text)) labelsToApply.add('ci');
-            if (/(question|疑问|请教|咨询|如何)/i.test(text)) labelsToApply.add('question');
+            // ── Type ──────────────────────────────────────
+            if (/(bug|错误|异常|崩溃|无法|失败|报错|闪退|卡死|crash|broken|not\s*work)/i.test(text)) labelsToApply.add('type: bug');
+            if (/(feature|需求|建议|增强|新功能|feat|proposal|rfe)/i.test(text)) labelsToApply.add('type: feature');
+            if (/(improve|改进|优化|优化体验|refine|polish|enhancement)/i.test(text)) labelsToApply.add('type: improvement');
+            if (/(refactor|重构|重写|代码整理|clean\s*up|restructure)/i.test(text)) labelsToApply.add('type: refactor');
+            if (/(perf|性能|卡顿|慢|lag|slow|memory\s*leak|cpu|内存)/i.test(text)) labelsToApply.add('type: performance');
+            if (/(security|安全|漏洞|cve|vulnerability|xss|csrf|injection)/i.test(text)) labelsToApply.add('type: security');
+            if (/(question|疑问|请教|咨询|如何|how\s*to|怎么)/i.test(text)) labelsToApply.add('type: question');
+            if (/(discussion|讨论|提案|RFC|design)/i.test(text)) labelsToApply.add('type: discussion');
+            if (/(dep|依赖|upgrade|更新依赖|bump|package\.json|npm\s*update)/i.test(text)) labelsToApply.add('type: dependency');
 
+            // ── Area ──────────────────────────────────────
+            if (/(ui|界面|前端|renderer|css|样式|布局|layout|component|组件)/i.test(text)) labelsToApply.add('area: frontend');
+            if (/(electron|主进程|main\s*process|preload|托盘|tray|ipc|窗口|window|BrowserWindow)/i.test(text)) labelsToApply.add('area: electron-core');
+            if (/(stock|股票|k线|kline|行情|自选|持仓|ticker|quote)/i.test(text)) labelsToApply.add('area: stock');
+            if (/(chart|图表|highcharts|k线图|candlestick|蜡烛图)/i.test(text)) labelsToApply.add('area: chart');
+            if (/(sidebar|侧边栏|导航栏|nav|抽屉|drawer)/i.test(text)) labelsToApply.add('area: sidebar');
+            if (/(setting|设置|配置|偏好|preference|config)/i.test(text)) labelsToApply.add('area: settings');
+            if (/(i18n|国际化|翻译|locale|zh-CN|en-US|多语言|translation)/i.test(text)) labelsToApply.add('area: i18n');
+            if (/(icon|图标|svg|SvgIcon)/i.test(text)) labelsToApply.add('area: svg-icon');
+            if (/(doc|docs|readme|文档|注释|comment|说明)/i.test(text)) labelsToApply.add('area: docs');
+            if (/(workflow|github\s*action|ci|pipeline|构建|build|release|发布)/i.test(text)) labelsToApply.add('area: ci');
+            if (/(test|测试|unit\s*test|e2e|spec|jest|vitest|测试用例)/i.test(text)) labelsToApply.add('area: testing');
+            if (/(hotkey|快捷键|shortcut|keyboard|键盘|按键)/i.test(text)) labelsToApply.add('area: hotkey');
+            if (/(scroll|滚动|overscroll|wheel|滚轮)/i.test(text)) labelsToApply.add('area: scroll');
+            if (/(theme|主题|暗色|深色|dark\s*mode|light\s*mode|浅色)/i.test(text)) labelsToApply.add('area: theme');
+
+            // ── Priority ──────────────────────────────────
+            if (/(urgent|紧急|严重|critical|blocker|阻塞|生产事故|P0|P1)/i.test(text)) labelsToApply.add('priority: critical');
+            if (/(important|重要|尽快|asap|high\s*priority|P2)/i.test(text)) labelsToApply.add('priority: high');
+            if (/(low\s*priority|低优先|nice\s*to\s*have|锦上添花|P4)/i.test(text)) labelsToApply.add('priority: low');
+
+            // ── Fallback ──────────────────────────────────
             if (labelsToApply.size === 0) {
               labelsToApply.add('needs-triage');
             }
 
+            // ── Color Map ─────────────────────────────────
             const colorMap = {
-              bug: 'd73a4a',
-              enhancement: 'a2eeef',
-              documentation: '0075ca',
-              frontend: '1f6feb',
-              'electron-core': '0e8a16',
-              ci: '5319e7',
-              question: 'd876e3',
-              'needs-triage': 'd4c5f9'
+              // type
+              'type: bug':           'd73a4a',
+              'type: feature':       'a2eeef',
+              'type: improvement':   'c5def5',
+              'type: refactor':      'fbca04',
+              'type: performance':   'e11d48',
+              'type: security':      'b60205',
+              'type: question':      'd876e3',
+              'type: discussion':    'bfdadc',
+              'type: dependency':    '0366d6',
+              // area
+              'area: frontend':      '1f6feb',
+              'area: electron-core': '0e8a16',
+              'area: stock':         'f9a825',
+              'area: chart':         '006b75',
+              'area: sidebar':       '7c3aed',
+              'area: settings':      '4a5568',
+              'area: i18n':          'e66a00',
+              'area: svg-icon':      '8b5cf6',
+              'area: docs':          '0075ca',
+              'area: ci':            '5319e7',
+              'area: testing':       'c2e0c6',
+              'area: hotkey':        'd93f0b',
+              'area: scroll':        'e4e669',
+              'area: theme':         '9333ea',
+              // priority
+              'priority: critical':  'b60205',
+              'priority: high':      'd93f0b',
+              'priority: low':       'c5def5',
+              // fallback
+              'needs-triage':        'd4c5f9'
             };
 
             const labels = [...labelsToApply];

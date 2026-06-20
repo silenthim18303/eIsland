@@ -87,8 +87,10 @@ export function ExpandLayoutSettingsPage({
   };
 
   const toggleVisible = (idx: number): void => {
+    const item = expandNavLayout[idx];
+    if (!item || EXPAND_ALWAYS_VISIBLE_TABS.has(item.id)) return;
     const updated = [...expandNavLayout];
-    updated[idx] = { ...updated[idx], visible: !updated[idx].visible };
+    updated[idx] = { ...item, visible: !item.visible };
     updateExpandNavLayout(updated);
   };
 
@@ -115,7 +117,7 @@ export function ExpandLayoutSettingsPage({
               {expandNavLayout.map((item) => (
                 <div
                   key={item.id}
-                  className={`maxexpand-layout-preview-dot${item.visible ? '' : ' maxexpand-layout-preview-dot--hidden'}${EXPAND_ALWAYS_VISIBLE_TABS.has(item.id) ? ' maxexpand-layout-preview-dot--fixed' : ''}`}
+                  className={`maxexpand-layout-preview-dot${item.visible ? '' : ' maxexpand-layout-preview-dot--hidden'}`}
                   title={getTabLabel(item.id)}
                 >
                   <span className="maxexpand-layout-dot-label">{getTabLabel(item.id)}</span>
@@ -144,7 +146,9 @@ export function ExpandLayoutSettingsPage({
             </div>
           </div>
           <div className="maxexpand-layout-list">
-            {expandNavLayout.map((item, idx) => (
+            {expandNavLayout.map((item, idx) => {
+              const isAlwaysVisible = EXPAND_ALWAYS_VISIBLE_TABS.has(item.id);
+              return (
               <div
                 key={item.id}
                 className={`maxexpand-layout-item${dragOverIdx === idx ? ' maxexpand-layout-item--drag-over' : ''}${!item.visible ? ' maxexpand-layout-item--disabled' : ''}`}
@@ -180,10 +184,10 @@ export function ExpandLayoutSettingsPage({
                   <button
                     className={`maxexpand-layout-item-toggle${item.visible ? ' maxexpand-layout-item-toggle--on' : ''}`}
                     type="button"
-                    disabled={EXPAND_ALWAYS_VISIBLE_TABS.has(item.id)}
+                    disabled={isAlwaysVisible}
                     onClick={() => toggleVisible(idx)}
-                    title={EXPAND_ALWAYS_VISIBLE_TABS.has(item.id)
-                      ? t('settings.app.expandLayout.alwaysVisible', { defaultValue: '此页面不可隐藏' })
+                    title={isAlwaysVisible
+                      ? getTabLabel(item.id)
                       : item.visible
                         ? t('settings.app.expandLayout.hideTab', { defaultValue: '隐藏此页面' })
                         : t('settings.app.expandLayout.showTab', { defaultValue: '显示此页面' })
@@ -193,7 +197,8 @@ export function ExpandLayoutSettingsPage({
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
