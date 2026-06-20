@@ -89,11 +89,16 @@ export function MaxExpandContentShell({ renderActiveTab, deferContent = true }: 
   navDotsRef.current = NAV_DOTS;
 
   useEffect(() => {
+    if (startupMode === 'standalone' && navLayoutLoaded && NAV_DOTS.length === 1) {
+      setExpanded();
+      return;
+    }
+
     const isVisible = NAV_DOTS.includes(activeTab);
     if (!isVisible && NAV_DOTS.length > 1) {
       setActiveTab(NAV_DOTS[1] as MaxExpandTab);
     }
-  }, [NAV_DOTS, activeTab, setActiveTab]);
+  }, [NAV_DOTS, activeTab, navLayoutLoaded, setActiveTab, setExpanded, startupMode]);
 
   const filteredNavDots = useMemo(() => {
     const getNavLabel = (id: NavDotId): string => t(`maxExpand.nav.${id}`, {
