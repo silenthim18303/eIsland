@@ -104,17 +104,18 @@ describe('normalizeExpandNavLayoutConfig', () => {
     ]);
   });
 
-  it('allows overview to be hidden', () => {
+  it('keeps overview visible when raw tries to hide it', () => {
     const input = [{ id: 'overview', visible: false }];
     const result = mod.normalizeExpandNavLayoutConfig(input);
     const overview = result.find((i) => i.id === 'overview');
-    expect(overview?.visible).toBe(false);
+    expect(overview?.visible).toBe(true);
   });
 
-  it('allows every expand page to be hidden', () => {
+  it('keeps overview visible when every expand page is hidden', () => {
     const input = mod.EXPAND_CONFIGURABLE_TABS.map((id) => ({ id, visible: false }));
     const result = mod.normalizeExpandNavLayoutConfig(input);
-    expect(result.filter((i) => i.visible)).toHaveLength(0);
+    expect(result.find((i) => i.id === 'overview')?.visible).toBe(true);
+    expect(result.filter((i) => i.visible)).toHaveLength(1);
   });
 
   it('respects visible=false for non-always-visible tabs', () => {

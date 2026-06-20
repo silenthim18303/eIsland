@@ -27,7 +27,7 @@
 import { useCallback, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExpandNavLayoutConfig } from '../../../utils/settingsConfig';
-import { DEFAULT_EXPAND_NAV_LAYOUT, EXPAND_TAB_LABELS } from '../../../utils/settingsConfig';
+import { DEFAULT_EXPAND_NAV_LAYOUT, EXPAND_ALWAYS_VISIBLE_TABS, EXPAND_TAB_LABELS } from '../../../utils/settingsConfig';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
 
 interface ExpandLayoutSettingsPageProps {
@@ -87,8 +87,10 @@ export function ExpandLayoutSettingsPage({
   };
 
   const toggleVisible = (idx: number): void => {
+    const item = expandNavLayout[idx];
+    if (!item || EXPAND_ALWAYS_VISIBLE_TABS.has(item.id)) return;
     const updated = [...expandNavLayout];
-    updated[idx] = { ...updated[idx], visible: !updated[idx].visible };
+    updated[idx] = { ...item, visible: !item.visible };
     updateExpandNavLayout(updated);
   };
 
@@ -144,7 +146,9 @@ export function ExpandLayoutSettingsPage({
             </div>
           </div>
           <div className="maxexpand-layout-list">
-            {expandNavLayout.map((item, idx) => (
+            {expandNavLayout.map((item, idx) => {
+              const isAlwaysVisible = EXPAND_ALWAYS_VISIBLE_TABS.has(item.id);
+              return (
               <div
                 key={item.id}
                 className={`maxexpand-layout-item${dragOverIdx === idx ? ' maxexpand-layout-item--drag-over' : ''}${!item.visible ? ' maxexpand-layout-item--disabled' : ''}`}
@@ -180,17 +184,21 @@ export function ExpandLayoutSettingsPage({
                   <button
                     className={`maxexpand-layout-item-toggle${item.visible ? ' maxexpand-layout-item-toggle--on' : ''}`}
                     type="button"
+                    disabled={isAlwaysVisible}
                     onClick={() => toggleVisible(idx)}
-                    title={item.visible
-                      ? t('settings.app.expandLayout.hideTab', { defaultValue: '隐藏此页面' })
-                      : t('settings.app.expandLayout.showTab', { defaultValue: '显示此页面' })
+                    title={isAlwaysVisible
+                      ? getTabLabel(item.id)
+                      : item.visible
+                        ? t('settings.app.expandLayout.hideTab', { defaultValue: '隐藏此页面' })
+                        : t('settings.app.expandLayout.showTab', { defaultValue: '显示此页面' })
                     }
                   >
                     <img src={item.visible ? SvgIcon.VISIBLE : SvgIcon.INVISIBLE} alt="" className="maxexpand-layout-item-btn-icon" />
                   </button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

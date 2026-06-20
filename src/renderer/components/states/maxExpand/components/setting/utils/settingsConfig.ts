@@ -205,7 +205,7 @@ export type ExpandNavLayoutConfig = ExpandNavItem[];
 
 export const EXPAND_CONFIGURABLE_TABS: string[] = ['overview', 'song', 'tools', 'translation', 'performanceMonitor'];
 
-export const EXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set<string>();
+export const EXPAND_ALWAYS_VISIBLE_TABS: Set<string> = new Set<string>(['overview']);
 
 export const EXPAND_TAB_LABELS: Record<string, string> = {
   overview: '总览',
@@ -240,7 +240,7 @@ export function normalizeExpandNavLayoutConfig(raw: unknown): ExpandNavLayoutCon
     seen.add(candidate.id);
     ordered.push({
       id: candidate.id,
-      visible: candidate.visible !== false,
+      visible: EXPAND_ALWAYS_VISIBLE_TABS.has(candidate.id) || candidate.visible !== false,
     });
   });
 
