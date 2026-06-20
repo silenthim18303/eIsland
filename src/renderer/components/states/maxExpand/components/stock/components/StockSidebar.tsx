@@ -19,7 +19,7 @@
  * @author 鸡哥
  */
 
-import { useMemo, useState, type KeyboardEvent, type ReactElement } from 'react';
+import { useMemo, useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
@@ -63,6 +63,8 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('favorites');
   const [favoriteKeyword, setFavoriteKeyword] = useState('');
+  const [favoriteDeleteMode, setFavoriteDeleteMode] = useState(false);
+  const [selectedFavoriteCodes, setSelectedFavoriteCodes] = useState<string[]>([]);
   const filteredFavorites = useMemo(() => {
     const keyword = favoriteKeyword.trim().toLowerCase();
     if (!keyword) return favorites;
@@ -70,16 +72,61 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
       item.name.toLowerCase().includes(keyword) || item.code.toLowerCase().includes(keyword)
     );
   }, [favoriteKeyword, favorites]);
+  const selectedFavoriteCount = selectedFavoriteCodes.length;
 
   const openSidebarTab = (tab: StockSidebarTab): void => {
     setSidebarTab(tab);
     setSidebarCollapsed(false);
+    if (tab !== 'favorites') {
+      setFavoriteDeleteMode(false);
+      setSelectedFavoriteCodes([]);
+    }
+  };
+
+  const toggleFavoriteDeleteMode = (): void => {
+    setSidebarTab('favorites');
+    setSidebarCollapsed(false);
+    setFavoriteDeleteMode((current) => {
+      if (current) {
+        setSelectedFavoriteCodes([]);
+      }
+      return !current;
+    });
+  };
+
+  const toggleFavoriteSelection = (code: string): void => {
+    setSelectedFavoriteCodes((current) =>
+      current.includes(code) ? current.filter((selectedCode) => selectedCode !== code) : [...current, code]
+    );
+  };
+
+  const handleRemoveFavorite = (code: string): void => {
+    onRemoveFavorite(code);
+    setSelectedFavoriteCodes((current) => current.filter((selectedCode) => selectedCode !== code));
+  };
+
+  const handleRemoveSelectedFavorites = (): void => {
+    selectedFavoriteCodes.forEach((code) => onRemoveFavorite(code));
+    setSelectedFavoriteCodes([]);
+  };
+
+  const handleFavoriteClick = (item: StockFavoriteItem): void => {
+    if (favoriteDeleteMode) {
+      toggleFavoriteSelection(item.code);
+      return;
+    }
+    onSelectSymbol(item.code);
   };
 
   const handleFavoriteKeyDown = (event: KeyboardEvent<HTMLDivElement>, item: StockFavoriteItem): void => {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
-    onSelectSymbol(item.code);
+    handleFavoriteClick(item);
+  };
+
+  const handleFavoriteRemoveClick = (event: MouseEvent<HTMLButtonElement>, code: string): void => {
+    event.stopPropagation();
+    handleRemoveFavorite(code);
   };
 
   return (
@@ -112,9 +159,10 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
         </button>
         {sidebarTab === 'favorites' && (
           <button
-            className="stock-sidebar-nav-btn stock-sidebar-nav-delete-btn"
+            className={`stock-sidebar-nav-btn stock-sidebar-nav-delete-btn${favoriteDeleteMode ? ' active' : ''}`}
             type="button"
             aria-label={t('stockTab.sidebar.deleteFavorite')}
+            onClick={toggleFavoriteDeleteMode}
           >
             <img src={SvgIcon.DELETE} alt="" className="stock-sidebar-nav-icon" />
           </button>
@@ -129,7 +177,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
         </button>
       </nav>
 
-      <aside className={`stock-tab-sidebar${sidebarTab === 'search' ? ' search-mode' : ''}${sidebarCollapsed ? ' collapsed' : ''}`}>
+      <aside className={`stock-tab-sidebar${sidebarTab === 'search' ? ' search-mode' : ''}${favoriteDeleteMode ? ' delete-mode' : ''}${sidebarCollapsed ? ' collapsed' : ''}`}>
         {!sidebarCollapsed && (
           <>
             {sidebarTab === 'favorites' && (
@@ -151,33 +199,64 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                         onChange={(event) => setFavoriteKeyword(event.target.value)}
                       />
                     </div>
+                    {favoriteDeleteMode && (
+                      <div className="stock-favorites-delete-bar">
+                        <span className="stock-favorites-delete-count">
+                          {t('stockTab.sidebar.selectedCount', { count: selectedFavoriteCount })}
+                        </span>
+                        <button
+                          className="stock-favorites-delete-action"
+                          type="button"
+                          disabled={selectedFavoriteCount === 0}
+                          onClick={handleRemoveSelectedFavorites}
+                        >
+                          {t('stockTab.sidebar.deleteSelected')}
+                        </button>
+                      </div>
+                    )}
                     {filteredFavorites.length === 0 ? (
                       <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavoriteMatches')}</div>
                     ) : (
                       <div className="stock-favorites-list">
-                        {filteredFavorites.map((item) => (
-                          <div
-                            key={item.code}
-                            className={`stock-favorite-item${item.code === symbol ? ' active' : ''}`}
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => onSelectSymbol(item.code)}
-                            onKeyDown={(event) => handleFavoriteKeyDown(event, item)}
-                          >
-                            <div className="stock-favorite-main">
-                              <span className="stock-favorite-name">{item.name}</span>
-                              <span className="stock-favorite-code">{item.code}</span>
+                        {filteredFavorites.map((item) => {
+                          const selected = selectedFavoriteCodes.includes(item.code);
+                          return (
+                            <div
+                              key={item.code}
+                              className={`stock-favorite-item${item.code === symbol ? ' active' : ''}${favoriteDeleteMode ? ' delete-mode' : ''}${selected ? ' selected' : ''}`}
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => handleFavoriteClick(item)}
+                              onKeyDown={(event) => handleFavoriteKeyDown(event, item)}
+                            >
+                              {favoriteDeleteMode && (
+                                <span className={`stock-favorite-checkbox${selected ? ' checked' : ''}`} aria-hidden="true" />
+                              )}
+                              <div className="stock-favorite-main">
+                                <span className="stock-favorite-name">{item.name}</span>
+                                <span className="stock-favorite-code">{item.code}</span>
+                              </div>
+                              <div className="stock-favorite-price-col">
+                                <span className={`stock-favorite-current-price ${getStockTrendClass(item.changePercent)}`}>
+                                  {formatStockPrice(item.price)}
+                                </span>
+                                <span className={`stock-favorite-change-pill ${getStockTrendClass(item.changePercent)}`}>
+                                  {formatStockPercent(item.changePercent)}
+                                </span>
+                              </div>
+                              {favoriteDeleteMode && (
+                                <button
+                                  className="stock-favorite-remove"
+                                  type="button"
+                                  aria-label={t('stockTab.actions.removeFavorite', { name: item.name })}
+                                  onClick={(event) => handleFavoriteRemoveClick(event, item.code)}
+                                >
+                                  <img src={SvgIcon.DELETE} alt="" className="stock-favorite-remove-icon" />
+                                </button>
+                              )}
                             </div>
-                            <div className="stock-favorite-price-col">
-                              <span className={`stock-favorite-current-price ${getStockTrendClass(item.changePercent)}`}>
-                                {formatStockPrice(item.price)}
-                              </span>
-                              <span className={`stock-favorite-change-pill ${getStockTrendClass(item.changePercent)}`}>
-                                {formatStockPercent(item.changePercent)}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </>

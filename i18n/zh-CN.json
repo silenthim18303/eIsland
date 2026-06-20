@@ -1143,6 +1143,8 @@
       "searchHint": "按名称或代码搜索股票",
       "favoriteSearchLabel": "搜索自选",
       "favoriteSearchPlaceholder": "输入自选名称或代码",
+      "selectedCount": "已选 {{count}} 项",
+      "deleteSelected": "删除",
       "noFavoriteMatches": "未找到匹配的自选股",
       "noFavorites": "暂无自选股"
     },

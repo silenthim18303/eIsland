@@ -1143,6 +1143,8 @@
       "searchHint": "Search stocks by name or symbol",
       "favoriteSearchLabel": "Search Favorites",
       "favoriteSearchPlaceholder": "Search",
+      "selectedCount": "{{count}} selected",
+      "deleteSelected": "Delete",
       "noFavoriteMatches": "No matching favorites",
       "noFavorites": "No favorites yet"
     },
