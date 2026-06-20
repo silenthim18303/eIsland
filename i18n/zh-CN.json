@@ -1140,6 +1140,9 @@
       "search": "搜索",
       "favoritesHint": "管理您的自选股列表",
       "searchHint": "按名称或代码搜索股票",
+      "favoriteSearchLabel": "搜索自选",
+      "favoriteSearchPlaceholder": "输入自选名称或代码",
+      "noFavoriteMatches": "未找到匹配的自选股",
       "noFavorites": "暂无自选股"
     },
     "empty": {

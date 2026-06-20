@@ -19,7 +19,7 @@
  * @author 鸡哥
  */
 
-import { useState, type KeyboardEvent, type ReactElement } from 'react';
+import { useMemo, useState, type KeyboardEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
@@ -62,6 +62,14 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
   const { t } = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [sidebarTab, setSidebarTab] = useState<StockSidebarTab>('favorites');
+  const [favoriteKeyword, setFavoriteKeyword] = useState('');
+  const filteredFavorites = useMemo(() => {
+    const keyword = favoriteKeyword.trim().toLowerCase();
+    if (!keyword) return favorites;
+    return favorites.filter((item) =>
+      item.name.toLowerCase().includes(keyword) || item.code.toLowerCase().includes(keyword)
+    );
+  }, [favoriteKeyword, favorites]);
 
   const openSidebarTab = (tab: StockSidebarTab): void => {
     setSidebarTab(tab);
@@ -120,31 +128,50 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
                 {favorites.length === 0 ? (
                   <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavorites')}</div>
                 ) : (
-                  <div className="stock-favorites-list">
-                    {favorites.map((item) => (
-                      <div
-                        key={item.code}
-                        className={`stock-favorite-item${item.code === symbol ? ' active' : ''}`}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => onSelectSymbol(item.code)}
-                        onKeyDown={(event) => handleFavoriteKeyDown(event, item)}
-                      >
-                        <div className="stock-favorite-main">
-                          <span className="stock-favorite-name">{item.name}</span>
-                          <span className="stock-favorite-code">{item.code}</span>
-                        </div>
-                        <div className="stock-favorite-price-col">
-                          <span className={`stock-favorite-current-price ${getStockTrendClass(item.changePercent)}`}>
-                            {formatStockPrice(item.price)}
-                          </span>
-                          <span className={`stock-favorite-change-pill ${getStockTrendClass(item.changePercent)}`}>
-                            {formatStockPercent(item.changePercent)}
-                          </span>
-                        </div>
+                  <>
+                    <div className="stock-favorites-search">
+                      <label className="stock-field-label" htmlFor="stock-favorites-search-input">
+                        {t('stockTab.sidebar.favoriteSearchLabel')}
+                      </label>
+                      <input
+                        className="stock-input"
+                        id="stock-favorites-search-input"
+                        type="search"
+                        value={favoriteKeyword}
+                        placeholder={t('stockTab.sidebar.favoriteSearchPlaceholder')}
+                        onChange={(event) => setFavoriteKeyword(event.target.value)}
+                      />
+                    </div>
+                    {filteredFavorites.length === 0 ? (
+                      <div className="stock-favorites-empty">{t('stockTab.sidebar.noFavoriteMatches')}</div>
+                    ) : (
+                      <div className="stock-favorites-list">
+                        {filteredFavorites.map((item) => (
+                          <div
+                            key={item.code}
+                            className={`stock-favorite-item${item.code === symbol ? ' active' : ''}`}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => onSelectSymbol(item.code)}
+                            onKeyDown={(event) => handleFavoriteKeyDown(event, item)}
+                          >
+                            <div className="stock-favorite-main">
+                              <span className="stock-favorite-name">{item.name}</span>
+                              <span className="stock-favorite-code">{item.code}</span>
+                            </div>
+                            <div className="stock-favorite-price-col">
+                              <span className={`stock-favorite-current-price ${getStockTrendClass(item.changePercent)}`}>
+                                {formatStockPrice(item.price)}
+                              </span>
+                              <span className={`stock-favorite-change-pill ${getStockTrendClass(item.changePercent)}`}>
+                                {formatStockPercent(item.changePercent)}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
