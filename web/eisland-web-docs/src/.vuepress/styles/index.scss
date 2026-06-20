@@ -1,9 +1,41 @@
 // place your custom styles here
 
+html,
+body {
+  min-height: 100%;
+  background: #717377;
+}
+
+#app,
+.theme-container,
+.vp-page,
+.vp-project-home {
+  background: transparent;
+}
+
+#app {
+  position: relative;
+  min-height: 100vh;
+}
+
+.theme-container {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
 .vp-nav-logo {
   height: 4.5rem;
 }
 
 .vp-site-name {
   display: none;
+}
+
+.vp-project-home {
+  min-height: calc(90vh - var(--navbar-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }

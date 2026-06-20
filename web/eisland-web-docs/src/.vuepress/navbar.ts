@@ -1,5 +1,5 @@
 import { navbar } from "vuepress-theme-hope";
 
 export default navbar([
-  { text: "首页", link: "/", icon: "house" },
+  { text: "HOME", link: "/", icon: "house" },
 ]);
