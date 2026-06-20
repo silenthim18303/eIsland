@@ -22,7 +22,7 @@
 import { useMemo, useState, type KeyboardEvent, type MouseEvent, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import type { StockFavoriteInput, StockFavoriteItem, StockSearchItem } from '../config/types';
+import type { StockFavoriteInput, StockFavoriteItem, StockMarketPeriod, StockSearchItem } from '../config/types';
 import { formatStockPercent, formatStockPrice, getStockTrendClass } from '../utils/formatters';
 import { StockSearchPanel } from './StockSearchPanel';
 
@@ -33,6 +33,8 @@ interface StockSidebarProps {
   searching: boolean;
   searchResults: StockSearchItem[];
   favorites: StockFavoriteItem[];
+  period: StockMarketPeriod;
+  onPeriodChange: (period: StockMarketPeriod) => void;
   onSelectSymbol: (symbol: string) => void;
   onAddFavorite: (input: StockFavoriteInput) => void;
   onRemoveFavorite: (symbol: string) => void;
@@ -52,6 +54,8 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     searching,
     searchResults,
     favorites,
+    period,
+    onPeriodChange,
     onSelectSymbol,
     onAddFavorite,
     onRemoveFavorite,
@@ -73,6 +77,7 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     );
   }, [favoriteKeyword, favorites]);
   const selectedFavoriteCount = selectedFavoriteCodes.length;
+  const periodOptions: StockMarketPeriod[] = ['day', 'week', 'month'];
 
   const openSidebarTab = (tab: StockSidebarTab): void => {
     setSidebarTab(tab);
@@ -157,6 +162,18 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
         >
           <img src={SvgIcon.REVERT} alt="" className="stock-sidebar-nav-icon" />
         </button>
+        {sidebarTab === 'favorites' &&
+          periodOptions.map((item) => (
+            <button
+              key={item}
+              className={`stock-sidebar-nav-btn stock-sidebar-period-btn${period === item ? ' active' : ''}`}
+              type="button"
+              aria-label={t(`stockTab.period.${item}`)}
+              onClick={() => onPeriodChange(item)}
+            >
+              {t(`stockTab.period.short.${item}`)}
+            </button>
+          ))}
         {sidebarTab === 'favorites' && (
           <button
             className={`stock-sidebar-nav-btn stock-sidebar-nav-delete-btn${favoriteDeleteMode ? ' active' : ''}`}

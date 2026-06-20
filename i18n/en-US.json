@@ -1155,6 +1155,16 @@
     "loading": {
       "chart": "Loading K-line data..."
     },
+    "period": {
+      "day": "Daily K-line",
+      "week": "Weekly K-line",
+      "month": "Monthly K-line",
+      "short": {
+        "day": "D",
+        "week": "W",
+        "month": "M"
+      }
+    },
     "actions": {
       "search": "Search",
       "searching": "Searching...",

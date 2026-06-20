@@ -70,6 +70,12 @@
   height: 21px;
 }
 
+.stock-sidebar-period-btn {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 [data-theme='light'] .stock-sidebar-nav-icon {
   filter: brightness(0) invert(0);
 }

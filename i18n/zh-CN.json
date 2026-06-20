@@ -1155,6 +1155,16 @@
     "loading": {
       "chart": "正在加载 K 线..."
     },
+    "period": {
+      "day": "日 K 线",
+      "week": "周 K 线",
+      "month": "月 K 线",
+      "short": {
+        "day": "日",
+        "week": "周",
+        "month": "月"
+      }
+    },
     "actions": {
       "search": "搜索",
       "searching": "搜索中...",

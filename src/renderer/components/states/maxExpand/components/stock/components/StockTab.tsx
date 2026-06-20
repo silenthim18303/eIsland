@@ -48,6 +48,8 @@ export function StockTab(): ReactElement {
         searching={market.searching}
         searchResults={market.searchResults}
         favorites={market.favorites}
+        period={market.period}
+        onPeriodChange={market.setPeriod}
         onSelectSymbol={market.selectSymbol}
         onAddFavorite={market.addFavorite}
         onRemoveFavorite={market.removeFavorite}
