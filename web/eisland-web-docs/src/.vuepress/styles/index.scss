@@ -32,6 +32,26 @@ body {
   display: none;
 }
 
+.vp-nav-item .route-link-active,
+.vp-nav-item .route-link-exact-active,
+.vp-nav-item .auto-link.route-link-active,
+.vp-nav-item .auto-link.route-link-exact-active {
+  color: #70a0ff;
+  border-bottom-color: #70a0ff;
+}
+
+.vp-nav-item .route-link-active::before,
+.vp-nav-item .route-link-active::after,
+.vp-nav-item .route-link-exact-active::before,
+.vp-nav-item .route-link-exact-active::after,
+.vp-nav-item .auto-link.route-link-active::before,
+.vp-nav-item .auto-link.route-link-active::after,
+.vp-nav-item .auto-link.route-link-exact-active::before,
+.vp-nav-item .auto-link.route-link-exact-active::after {
+  background: #70a0ff;
+  border-color: #70a0ff;
+}
+
 .vp-sidebar a.active,
 .vp-sidebar .active > a,
 .vp-sidebar .router-link-active,

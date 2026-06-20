@@ -13,6 +13,7 @@ export default hopeTheme({
   logo: "/dark.png",
   logoDark: "/light.png",
   favicon: "/favicon.svg",
+  darkmode: "enable",
 
   docsDir: "src",
 
