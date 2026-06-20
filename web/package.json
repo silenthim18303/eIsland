@@ -1,7 +1,7 @@
 {
-  "name": "eisland-web-report-issue",
+  "name": "eisland-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "26.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
