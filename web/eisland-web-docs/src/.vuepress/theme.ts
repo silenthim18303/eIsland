@@ -19,8 +19,8 @@ export default hopeTheme({
   navbar,
   sidebar,
 
-  footer: false,
-  displayFooter: false,
+  footer: '苏ICP备2026009305号-2  |  <img src="/gabatb.png" alt="" style="height:1em;vertical-align:middle;margin-right:4px">苏公网安备32011502013770号',
+  displayFooter: true,
 
   encrypt: {},
 
