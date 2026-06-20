@@ -1136,6 +1136,7 @@
     "autoRefresh": "Auto refreshes every 30 seconds",
     "sidebar": {
       "toggle": "Toggle sidebar",
+      "deleteFavorite": "Delete favorite",
       "favorites": "Favorites",
       "search": "Search",
       "favoritesHint": "Manage your watchlist",

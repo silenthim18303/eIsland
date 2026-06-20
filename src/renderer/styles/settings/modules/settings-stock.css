@@ -55,7 +55,7 @@
   transition: background 0.2s, border-color 0.2s, color 0.2s;
 }
 
-.stock-sidebar-nav-btn:last-child {
+.stock-sidebar-nav-toggle-btn {
   margin-top: auto;
 }
 

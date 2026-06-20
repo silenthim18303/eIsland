@@ -110,8 +110,17 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
         >
           <img src={SvgIcon.REVERT} alt="" className="stock-sidebar-nav-icon" />
         </button>
+        {sidebarTab === 'favorites' && (
+          <button
+            className="stock-sidebar-nav-btn stock-sidebar-nav-delete-btn"
+            type="button"
+            aria-label={t('stockTab.sidebar.deleteFavorite')}
+          >
+            <img src={SvgIcon.DELETE} alt="" className="stock-sidebar-nav-icon" />
+          </button>
+        )}
         <button
-          className="stock-sidebar-nav-btn"
+          className="stock-sidebar-nav-btn stock-sidebar-nav-toggle-btn"
           type="button"
           aria-label={t('stockTab.sidebar.toggle')}
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
