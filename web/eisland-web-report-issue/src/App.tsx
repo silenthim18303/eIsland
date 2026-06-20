@@ -1,5 +1,7 @@
+import SimplexFlowBackground from './components/SimplexFlowBackground'
+
 function App() {
-  return <></>
+  return <SimplexFlowBackground />
 }
 
 export default App
