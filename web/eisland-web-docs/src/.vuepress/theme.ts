@@ -4,7 +4,7 @@ import navbar from "./navbar.js";
 import sidebar from "./sidebar.js";
 
 export default hopeTheme({
-  hostname: "https://docs.eisland.dev",
+  hostname: "https://dev.pyisland.com",
 
   author: {
     name: "eIsland",
