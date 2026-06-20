@@ -10,7 +10,9 @@ export default hopeTheme({
     name: "eIsland",
   },
 
-  logo: "/logo.svg",
+  logo: "/dark.png",
+  logoDark: "/light.png",
+  favicon: "/favicon.svg",
 
   docsDir: "src",
 
