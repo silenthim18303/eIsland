@@ -11,6 +11,7 @@ export default sidebar({
       collapsible: false,
       children: [
         "README.md",
+        "coc.md",
       ],
     },
     {
