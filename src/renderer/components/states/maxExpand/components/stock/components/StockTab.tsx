@@ -50,7 +50,6 @@ export function StockTab(): ReactElement {
         favorites={market.favorites}
         onSelectSymbol={market.selectSymbol}
         onAddFavorite={market.addFavorite}
-        onRemoveFavorite={market.removeFavorite}
         onSearch={market.search}
         onClearSearchResults={market.clearSearchResults}
         onRefresh={() => void market.refresh()}

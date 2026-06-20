@@ -1155,7 +1155,8 @@
       "clear": "Clear",
       "addFavorite": "Add",
       "addFavoriteWithName": "Add {{name}} to favorites",
-      "removeFavorite": "Remove {{name}} from favorites"
+      "removeFavorite": "Remove {{name}} from favorites",
+      "refresh": "Refresh market data"
     },
     "search": {
       "aria": "Stock search and filters",

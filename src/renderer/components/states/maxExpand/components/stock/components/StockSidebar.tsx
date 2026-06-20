@@ -35,7 +35,6 @@ interface StockSidebarProps {
   favorites: StockFavoriteItem[];
   onSelectSymbol: (symbol: string) => void;
   onAddFavorite: (input: StockFavoriteInput) => void;
-  onRemoveFavorite: (symbol: string) => void;
   onSearch: (keyword: string) => Promise<StockSearchItem[]>;
   onClearSearchResults: () => void;
   onRefresh: () => void;
@@ -54,7 +53,6 @@ export function StockSidebar(props: StockSidebarProps): ReactElement {
     favorites,
     onSelectSymbol,
     onAddFavorite,
-    onRemoveFavorite,
     onSearch,
     onClearSearchResults,
     onRefresh,
