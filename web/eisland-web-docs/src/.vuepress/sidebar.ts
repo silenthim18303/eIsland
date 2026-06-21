@@ -8,7 +8,7 @@ export default sidebar({
     {
       text: "Introduction",
       icon: "info",
-      collapsible: false,
+      collapsible: true,
       children: [
         "README.md",
         "coc.md",
