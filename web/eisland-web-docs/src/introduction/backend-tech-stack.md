@@ -1440,25 +1440,739 @@ The application supports multiple cloud storage providers:
 
 ## AI Integration
 
-### Spring AI + LangChain4j
+### Overview
 
-The agent module integrates AI capabilities using:
+The eIsland AI agent system (codenamed **mihtnelis**) provides intelligent conversational capabilities with tool calling, streaming responses, and multi-provider support. The architecture is designed for extensibility, allowing seamless integration of new LLM providers.
 
-- **Spring AI**: OpenAI-compatible API integration
-- **LangChain4j**: LLM orchestration and tool chaining
-- **Tencent Cloud Speech SDK**: Voice recognition services
+### LLM Gateway Architecture
 
-```xml
-<dependency>
-    <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-openai</artifactId>
-</dependency>
-<dependency>
-    <groupId>dev.langchain4j</groupId>
-    <artifactId>langchain4j</artifactId>
-    <version>0.35.0</version>
-</dependency>
+The system supports two gateway modes for LLM communication:
+
+#### 1. LangChain4j Gateway
+
+**LangChain4j** is a Java framework for building LLM-powered applications. It provides:
+
+- **OpenAI-Compatible API**: Works with any OpenAI-compatible endpoint
+- **Tool Calling**: Native function calling support
+- **Streaming**: Real-time response streaming via SSE
+- **Service Builder**: Declarative AI service creation
+
+```java
+@Service
+@ConditionalOnProperty(prefix = "mihtnelis.agent.llm", name = "gateway", havingValue = "langchain4j")
+public class LangChain4jChatGatewayService implements AgentChatGatewayService {
+    
+    // Build OpenAI-compatible client
+    private OpenAiChatModel buildModelClient(String provider, ChatRequestOptions requestOptions) {
+        MihtnelisAgentProperties.Provider cfg = resolveProvider(provider);
+        
+        return OpenAiChatModel.builder()
+                .baseUrl(cfg.getBaseUrl())           // API endpoint
+                .apiKey(cfg.getApiKey())             // Authentication
+                .modelName(cfg.getModel())           // Model identifier
+                .temperature(0.2)                     // Low temperature for consistency
+                .build();
+    }
+    
+    // Standard chat without tools
+    public String chat(String provider, String systemPrompt, String userPrompt, 
+                       ChatRequestOptions requestOptions) {
+        OpenAiChatModel modelClient = buildModelClient(provider, requestOptions);
+        String prompt = "System:\n" + systemPrompt + "\n\nUser:\n" + userPrompt;
+        return modelClient.generate(prompt);
+    }
+    
+    // Chat with native tool calling
+    public String chatWithNativeTools(String provider, String systemPrompt, String userPrompt,
+                                      AgentToolExecutionService toolExecutionService, ...) {
+        OpenAiChatModel modelClient = buildModelClient(provider, requestOptions);
+        
+        // Create AI service with tool bridge
+        NativeToolAssistant assistant = AiServices.builder(NativeToolAssistant.class)
+                .chatLanguageModel(modelClient)
+                .tools(new NativeToolBridge(toolExecutionService, proUser, context))
+                .build();
+        
+        return assistant.chat(systemPrompt, userPrompt);
+    }
+}
 ```
+
+#### 2. Native HTTP Gateway
+
+For advanced features like **thinking mode** (chain-of-thought), the system bypasses LangChain4j and uses direct HTTP calls:
+
+```java
+// Direct HTTP call to LLM API
+private String chatWithThinkingHttp(String provider, String systemPrompt, String userPrompt,
+                                    ChatRequestOptions requestOptions, ChatStreamListener streamListener) {
+    // Build request payload
+    Map<String, Object> payload = new LinkedHashMap<>();
+    payload.put("model", model);
+    payload.put("messages", new Object[]{
+            Map.of("role", "system", "content", systemPrompt),
+            Map.of("role", "user", "content", userPrompt)
+    });
+    payload.put("temperature", 0.2);
+    payload.put("stream", useStream);
+    
+    // Enable thinking mode for supported providers
+    if (requestOptions.thinkingEnabled() && !isCustomProvider) {
+        payload.put("thinking", Map.of("type", "enabled"));
+        payload.put("reasoning_effort", effort);  // low/medium/high
+    }
+    
+    // Send HTTP request
+    HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+            .header("Authorization", "Bearer " + apiKey)
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+            .build();
+    
+    if (useStream) {
+        return chatWithThinkingStream(request, streamListener, usageAccumulator);
+    }
+    return chatWithThinkingBlocking(request, usageAccumulator);
+}
+```
+
+**Thinking Mode Features:**
+- **Reasoning Content**: Captures chain-of-thought reasoning
+- **Reasoning Effort**: Configurable depth (low/medium/high)
+- **Streaming**: Real-time reasoning and content streaming
+- **Tag Parsing**: Extracts `<think>` tags from responses
+
+### AI Provider Configuration
+
+The system supports multiple LLM providers with independent configuration:
+
+```yaml
+mihtnelis:
+  agent:
+    default-provider: deepseek  # Default provider
+    allowed-providers: deepseek,mimo,minimax  # Allowed providers
+    max-input-chars: 8000  # Maximum input length
+    llm:
+      gateway: langchain4j  # Gateway mode (langchain4j or spring-ai)
+      deepseek:
+        enabled: true
+        base-url: https://api.deepseek.com
+        api-key: ${DEEPSEEK_API_KEY}
+        model: deepseek-chat
+        thinking: false  # Enable thinking mode
+        reasoning-effort: medium  # low/medium/high
+      mimo:
+        enabled: false
+        base-url: https://api.mimo.ai
+        api-key: ${MIMO_API_KEY}
+        model: mimo-v2.5
+      minimax:
+        enabled: false
+        base-url: https://api.minimax.chat
+        api-key: ${MINIMAX_API_KEY}
+        model: MiniMax-M2.5
+```
+
+**Provider Properties:**
+
+| Property | Description | Default |
+|----------|-------------|---------|
+| `enabled` | Whether provider is active | false |
+| `base-url` | API endpoint URL | - |
+| `api-key` | Authentication key | - |
+| `model` | Model identifier | - |
+| `thinking` | Enable chain-of-thought | false |
+| `reasoning-effort` | Thinking depth | medium |
+
+### Provider Routing
+
+The `AiProviderRouterService` handles provider selection:
+
+```java
+@Service
+public class AiProviderRouterService {
+    
+    public String resolveProvider(String requestedProvider) {
+        List<String> allowed = properties.getAllowedProviders();
+        String normalizedDefault = properties.getDefaultProvider();
+        
+        // If no provider requested, use default
+        if (requestedProvider.isBlank()) {
+            return normalizedDefault;
+        }
+        
+        // Allow "custom" for user-provided API keys
+        if ("custom".equals(requestedProvider)) {
+            return requestedProvider;
+        }
+        
+        // Check if requested provider is in allowed list
+        for (String item : allowed) {
+            if (item.equalsIgnoreCase(requestedProvider)) {
+                return requestedProvider;
+            }
+        }
+        
+        return normalizedDefault;
+    }
+}
+```
+
+### Tool Calling System
+
+The AI agent has access to **50+ tools** organized by category:
+
+#### File Operations
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `file.list` | List directory contents | Low |
+| `file.read` | Read text file | Low |
+| `file.write` | Write text file | High |
+| `file.delete` | Delete file/directory | High |
+| `file.rename` | Rename/move file | Medium |
+| `file.copy` | Copy file/directory | Medium |
+| `file.mkdir` | Create directory | Low |
+| `file.search` | Search files by name | Low |
+| `file.grep` | Search file contents | Low |
+| `file.tree` | Directory tree structure | Low |
+| `file.stat` | File metadata | Low |
+| `file.exists` | Check path existence | Low |
+| `file.read.lines` | Read file lines | Low |
+| `file.append` | Append to file | Medium |
+| `file.replace` | Find and replace | Medium |
+| `file.compress` | Create zip archive | Medium |
+| `file.extract` | Extract zip archive | Medium |
+| `file.hash` | Calculate file hash | Low |
+| `file.trash` | Move to recycle bin | Medium |
+
+#### System Operations
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `sys.info` | System information | Low |
+| `sys.env` | Environment variables | Low |
+| `sys.open` | Open system component | Medium |
+| `sys.installed-apps` | List installed programs | Low |
+| `sys.launch` | Launch application | Medium |
+
+#### Command Execution
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `cmd.exec` | Execute CMD command | High |
+| `cmd.powershell` | Execute PowerShell command | High |
+
+#### Window Management
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `win.list` | List visible windows | Low |
+| `win.minimize` | Minimize window | Medium |
+| `win.maximize` | Maximize window | Medium |
+| `win.restore` | Restore window | Medium |
+| `win.close` | Close/terminate process | High |
+| `win.screenshot` | Take screenshot | Low |
+
+#### Network Operations
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `net.ping` | Ping test | Low |
+| `net.dns` | DNS lookup | Low |
+| `net.ports` | List listening ports | Low |
+| `net.proxy` | Manage proxy settings | Medium |
+| `net.hosts` | Manage hosts file | Medium |
+
+#### System Monitoring
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `monitor.cpu` | CPU information | Low |
+| `monitor.memory` | Memory usage | Low |
+| `monitor.disk` | Disk space | Low |
+| `monitor.gpu` | GPU information | Low |
+
+#### Hardware Control
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `volume.get` | Get system volume | Low |
+| `volume.set` | Set system volume | Medium |
+| `brightness.get` | Get screen brightness | Low |
+| `brightness.set` | Set screen brightness | Medium |
+| `display.list` | List displays | Low |
+
+#### Power Management
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `power.sleep` | Sleep computer | High |
+| `power.shutdown` | Shutdown computer | High |
+| `power.restart` | Restart computer | High |
+
+#### Clipboard & Notifications
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `clipboard.read` | Read clipboard | Low |
+| `clipboard.write` | Write clipboard | Medium |
+| `notification.send` | Send Windows notification | Low |
+
+#### eIsland Settings
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `island.settings.list` | List all settings | Low |
+| `island.settings.read` | Read setting value | Low |
+| `island.settings.write` | Write setting value | Medium |
+| `island.theme.get` | Get theme mode | Low |
+| `island.theme.set` | Set theme mode | Medium |
+| `island.opacity.get` | Get opacity | Low |
+| `island.opacity.set` | Set opacity | Medium |
+| `island.restart` | Restart application | High |
+
+#### Alarm & Todo Management
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `alarm.list` | List alarms | Low |
+| `alarm.create` | Create alarm | Low |
+| `alarm.delete` | Delete alarm | Medium |
+| `alarm.toggle` | Toggle alarm | Low |
+| `alarm.update` | Update alarm | Low |
+| `todolist.list` | List todos | Low |
+| `todolist.create` | Create todo | Low |
+| `todolist.delete` | Delete todo | Medium |
+| `todolist.toggle` | Toggle todo | Low |
+| `todolist.update` | Update todo | Low |
+
+#### Weather & Time
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `weather.query` | Query weather | Low |
+| `weather.city.lookup` | Lookup city | Low |
+| `weather.by_city.query` | Weather by city | Low |
+| `weather.quota.status` | API quota status | Low |
+| `time.now` | Current time | Low |
+| `user.ip.get` | Get public IP | Low |
+| `location.by_ip.resolve` | Location from IP | Low |
+
+#### Web Operations
+
+| Tool | Description | Risk Level |
+|------|-------------|------------|
+| `web.search` | Web search | Low |
+| `web.page.read` | Read web page | Medium |
+
+### Tool Execution Architecture
+
+```
+User Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. LLM Receives Prompt + Tool Definitions                  │
+│     - System prompt with tool descriptions                  │
+│     - User message                                          │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. LLM Decides to Call Tool                                │
+│     - Returns tool name + arguments                         │
+│     - May call multiple tools                               │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Server Executes Tool                                    │
+│     - Validate arguments                                    │
+│     - Check permissions (Pro/Admin only tools)              │
+│     - Execute on client via relay (local tools)             │
+│     - Execute on server (weather, web search)               │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Tool Result Returned to LLM                             │
+│     - Success: {tool, success: true, data: ...}             │
+│     - Error: {tool, success: false, error: ...}             │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. LLM Generates Final Response                            │
+│     - Incorporates tool results                             │
+│     - Streams to client via SSE                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Streaming Architecture
+
+The system uses **Server-Sent Events (SSE)** for real-time streaming:
+
+```java
+@Service
+public class MihtnelisAgentStreamService {
+    
+    public SseEmitter openStream(String username, String clientIp, String traceId, 
+                                 MihtnelisStreamRequest request) {
+        SseEmitter emitter = new SseEmitter(0L);  // No timeout
+        
+        // Start async stream processing
+        CompletableFuture.runAsync(() -> emitFlow(emitter, username, clientIp, traceId, request), 
+                                   streamExecutor);
+        
+        return emitter;
+    }
+    
+    private void emitFlow(SseEmitter emitter, ...) {
+        // 1. Validate request
+        // 2. Check user balance
+        // 3. Build system prompt
+        // 4. Call LLM with streaming
+        // 5. Send chunks via SSE
+        // 6. Deduct balance on completion
+        
+        sendEvent(emitter, "thinking", Map.of("text", reasoningContent));
+        sendEvent(emitter, "content", Map.of("text", contentDelta));
+        sendEvent(emitter, "tool_call", Map.of("tool", toolName, "purpose", purpose));
+        sendEvent(emitter, "tool_result", Map.of("tool", toolName, "data", result));
+        sendEvent(emitter, "done", Map.of("usage", tokenUsage));
+    }
+}
+```
+
+**SSE Event Types:**
+
+| Event | Description | Data Format |
+|-------|-------------|-------------|
+| `thinking` | Reasoning content | `{text: "..."}`
+| `content` | Response content | `{text: "..."}`
+| `tool_call` | Tool invocation | `{tool: "...", purpose: "..."}`
+| `tool_result` | Tool result | `{tool: "...", data: {...}}`
+| `error` | Error occurred | `{code: "...", message: "..."}`
+| `done` | Stream complete | `{usage: {prompt: N, completion: N}}`
+
+### Token Usage Tracking
+
+The system tracks token usage for billing:
+
+```java
+public class TokenUsageAccumulator {
+    private int promptTokens = 0;
+    private int completionTokens = 0;
+    private int reasoningTokens = 0;
+    private int cachedTokens = 0;
+    
+    public void add(int prompt, int completion, int reasoning, int cached) {
+        this.promptTokens += prompt;
+        this.completionTokens += completion;
+        this.reasoningTokens += reasoning;
+        this.cachedTokens += cached;
+    }
+}
+```
+
+**Usage Fields:**
+
+| Field | Description |
+|-------|-------------|
+| `prompt_tokens` | Input tokens consumed |
+| `completion_tokens` | Output tokens generated |
+| `reasoning_tokens` | Thinking tokens (for thinking mode) |
+| `cached_tokens` | Cache hit tokens (cost savings) |
+
+### Billing System
+
+The AI billing system uses Redis for atomic operations and RabbitMQ for async persistence:
+
+```java
+@Service
+public class AgentBalanceRedisService {
+    
+    // Lua script for atomic balance deduction
+    private static final String DEDUCT_LUA = """
+            local bal = redis.call('GET', KEYS[1])
+            if bal == false then
+                return '-1'  -- Key not exists, need DB init
+            end
+            local current = tonumber(bal)
+            if current <= 0 then
+                return '-3'  -- Balance zero, reject
+            end
+            local amount = tonumber(ARGV[1])
+            local deducted = math.min(current, amount)
+            local newBal = current - deducted
+            local fmtBal = string.format('%.8f', newBal)
+            local fmtDed = string.format('%.8f', deducted)
+            redis.call('SET', KEYS[1], fmtBal)
+            return fmtBal .. '|' .. fmtDed
+            """;
+    
+    public DeductResult deduct(String username, BigDecimal amountFen, 
+                               String modelName, int inputTokens, int outputTokens) {
+        // 1. Atomic deduction via Redis Lua
+        String result = redisTemplate.execute(DEDUCT_SCRIPT, 
+                List.of("agent:balance:" + username), 
+                String.valueOf(amountFen));
+        
+        // 2. Parse result
+        if ("-1".equals(result)) {
+            // Initialize from DB
+        } else if ("-3".equals(result)) {
+            // Balance zero
+        } else {
+            // Success: async persist to DB via RabbitMQ
+            rabbitTemplate.convertAndSend("agent.billing.deduct", 
+                    new AgentBillingDeductMessage(username, amountFen, modelName, ...));
+        }
+        
+        return new DeductResult(newBalance, actualDeducted, balanceZero);
+    }
+}
+```
+
+**Billing Flow:**
+
+```
+User Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Check Balance (Redis)                                   │
+│     - Key: agent:balance:{username}                         │
+│     - Value: balance in fen (8 decimal places)              │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. Process Request                                         │
+│     - Call LLM                                              │
+│     - Track token usage                                     │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Calculate Cost                                          │
+│     - Model pricing (per 1K tokens)                         │
+│     - Input tokens × input_rate                             │
+│     - Output tokens × output_rate                           │
+│     - Reasoning tokens × reasoning_rate                     │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Atomic Deduction (Redis Lua)                            │
+│     - Cap-at-zero semantics                                 │
+│     - Returns new balance + actual deducted                 │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. Async Persist (RabbitMQ)                                │
+│     - Send deduction message to queue                       │
+│     - Consumer updates MySQL database                       │
+│     - DLQ for failed messages                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Model Pricing Configuration
+
+Dynamic pricing stored in database:
+
+```java
+@Service
+public class AgentModelPricingService {
+    
+    // Pricing per 1K tokens
+    public record ModelPricing(
+        String modelName,
+        BigDecimal inputRate,      // Cost per 1K input tokens
+        BigDecimal outputRate,     // Cost per 1K output tokens
+        BigDecimal reasoningRate,  // Cost per 1K reasoning tokens
+        boolean enabled
+    ) {}
+    
+    public BigDecimal calculateCost(String modelName, int inputTokens, 
+                                    int outputTokens, int reasoningTokens) {
+        ModelPricing pricing = getPricing(modelName);
+        
+        BigDecimal inputCost = pricing.inputRate()
+                .multiply(BigDecimal.valueOf(inputTokens))
+                .divide(BigDecimal.valueOf(1000), 8, RoundingMode.HALF_UP);
+        
+        BigDecimal outputCost = pricing.outputRate()
+                .multiply(BigDecimal.valueOf(outputTokens))
+                .divide(BigDecimal.valueOf(1000), 8, RoundingMode.HALF_UP);
+        
+        BigDecimal reasoningCost = pricing.reasoningRate()
+                .multiply(BigDecimal.valueOf(reasoningTokens))
+                .divide(BigDecimal.valueOf(1000), 8, RoundingMode.HALF_UP);
+        
+        return inputCost.add(outputCost).add(reasoningCost);
+    }
+}
+```
+
+### User Authorization for Custom API Keys
+
+Pro users can provide their own API keys:
+
+```java
+// In MihtnelisAgentStreamService
+if (customApiKey != null || customEndpoint != null) {
+    // Check if user is Pro or Admin
+    User user = userService.getByUsername(username);
+    if (user != null && (User.ROLE_PRO.equals(user.getRole()) || 
+                         User.ROLE_ADMIN.equals(user.getRole()))) {
+        allowCustom = true;
+    }
+    
+    if (!allowCustom) {
+        sendEvent(emitter, "error", Map.of(
+                "code", "CUSTOM_API_FORBIDDEN",
+                "message", "Custom API credentials are for Pro users only"
+        ));
+        return;
+    }
+}
+```
+
+### Speech-to-Text (STT)
+
+Integration with Tencent Cloud Speech SDK:
+
+```java
+// Real-time speech recognition
+public class AgentRealtimeSttWebSocketHandler extends TextWebSocketHandler {
+    
+    // WebSocket endpoint for real-time STT
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
+        // 1. Receive audio chunks from client
+        // 2. Send to Tencent Cloud STT API
+        // 3. Stream transcription results back
+    }
+}
+```
+
+**STT Features:**
+- Real-time audio streaming via WebSocket
+- Tencent Cloud Speech SDK integration
+- Multiple language support
+- Low-latency transcription
+
+### Prompt Engineering
+
+The system uses structured prompt builders:
+
+```java
+@Component
+public class MihtnelisPromptBuilder {
+    
+    public String buildSystemPrompt(String agentMode, boolean proUser, 
+                                     List<String> skills, String location) {
+        StringBuilder prompt = new StringBuilder();
+        
+        // Base personality
+        prompt.append("You are mihtnelis, an AI assistant integrated into eIsland.\n\n");
+        
+        // Capabilities description
+        prompt.append("## Capabilities\n");
+        prompt.append("- File operations (read, write, search)\n");
+        prompt.append("- System control (volume, brightness, power)\n");
+        prompt.append("- Weather queries\n");
+        prompt.append("- Web search\n");
+        prompt.append("- And more...\n\n");
+        
+        // Tool usage instructions
+        prompt.append("## Tool Usage\n");
+        prompt.append("When you need to perform actions, use the appropriate tools.\n");
+        prompt.append("Always explain what you're doing before calling a tool.\n\n");
+        
+        // Location context
+        if (location != null) {
+            prompt.append("## User Location\n");
+            prompt.append("The user is located in: ").append(location).append("\n\n");
+        }
+        
+        // Pro user features
+        if (proUser) {
+            prompt.append("## Pro Features\n");
+            prompt.append("- Custom API key support\n");
+            prompt.append("- Higher rate limits\n");
+            prompt.append("- Priority processing\n\n");
+        }
+        
+        return prompt.toString();
+    }
+}
+```
+
+### Rate Limiting & Protection
+
+AI-specific rate limiting:
+
+```java
+// Per-user rate limiting
+private final int userRateMax;           // 30 requests per minute
+private final int ipRateMax;             // 60 requests per minute
+private final long rateWindowSeconds;    // 60-second window
+
+// Balance check before processing
+public void checkBalance(String username) {
+    BigDecimal balance = balanceRedisService.getBalance(username);
+    if (balance.compareTo(BigDecimal.ZERO) <= 0) {
+        throw new InsufficientBalanceException("Insufficient AI credits");
+    }
+}
+
+// Input length validation
+if (userPrompt.length() > MAX_TOTAL_MESSAGE_CHARS) {
+    sendEvent(emitter, "error", Map.of(
+            "code", "INPUT_TOO_LONG",
+            "message", "Input exceeds maximum length"
+    ));
+    return;
+}
+```
+
+### Error Handling
+
+Comprehensive error handling for AI operations:
+
+```java
+public enum AgentErrorCode {
+    EMPTY_PROMPT("EMPTY_PROMPT", "Message cannot be empty"),
+    INPUT_TOO_LONG("INPUT_TOO_LONG", "Input exceeds maximum length"),
+    PROVIDER_DISABLED("PROVIDER_DISABLED", "LLM provider is disabled"),
+    CUSTOM_API_FORBIDDEN("CUSTOM_API_FORBIDDEN", "Custom API for Pro users only"),
+    INSUFFICIENT_BALANCE("INSUFFICIENT_BALANCE", "Insufficient AI credits"),
+    LLM_INVOKE_FAILED("LLM_INVOKE_FAILED", "LLM invocation failed"),
+    TOOL_EXECUTION_FAILED("TOOL_EXECUTION_FAILED", "Tool execution failed"),
+    TIMEOUT("TIMEOUT", "Request timed out"),
+    RATE_LIMITED("RATE_LIMITED", "Too many requests");
+}
+```
+
+### Performance Optimizations
+
+1. **Connection Pooling**: HTTP client reuse for LLM calls
+2. **Streaming**: Real-time response delivery via SSE
+3. **Async Processing**: Non-blocking tool execution
+4. **Caching**: Redis caching for pricing and configuration
+5. **Batch Operations**: Bulk token usage updates
+
+### Security Considerations
+
+1. **API Key Protection**: Keys stored in environment variables
+2. **Input Sanitization**: Prompt injection prevention
+3. **Tool Permission Control**: High-risk tools require Pro/Admin
+4. **Rate Limiting**: Per-user and per-IP limits
+5. **Balance Enforcement**: Pre-flight balance checks
+6. **Audit Logging**: All tool executions logged
 
 ## Payment Processing
 
