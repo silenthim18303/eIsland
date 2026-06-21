@@ -456,10 +456,21 @@ interface HardwareDevice {
 
 ### .NET Temperature Helper
 
-Temperature and hardware enumeration use a separate **.NET 10 console application** (`eIslandTemperatureReader.exe`) that wraps **LibreHardwareMonitorLib**:
+Temperature and hardware enumeration use a separate **.NET 10 console application** (`eIslandTemperatureReader.exe`) that wraps **LibreHardwareMonitorLib**. It operates as a CLI tool — invoked via `spawnSync`, reads hardware sensors, outputs JSON to stdout, then exits.
+
+#### Why a Separate Process?
+
+- LibreHardwareMonitorLib requires COM interop and WMI access, which can destabilize a long-running process
+- Cannot be safely loaded into the Electron main process (crash risk, memory leaks, handle leaks)
+- Separate process provides crash isolation — if it fails, the main app continues unaffected
+- `spawnSync` with a 5-second timeout ensures the main process never blocks indefinitely
+- Process exits after each invocation — no lingering state or resource accumulation
+
+#### Entry Point
 
 ```csharp
 // Program.cs
+var command = args.FirstOrDefault() ?? "temperature";
 var computer = new Computer
 {
     IsCpuEnabled = true,
@@ -469,20 +480,319 @@ var computer = new Computer
 };
 
 computer.Open();
+
 var payload = command == "hardware-list"
     ? JsonSerializer.Serialize(HardwareListCollector.Collect(computer))
     : JsonSerializer.Serialize(TemperatureCollector.Collect(computer));
+
 Console.WriteLine(payload);
+computer.Close();
 ```
 
-**Why a separate process?**
+**CLI Modes:**
 
-- LibreHardwareMonitorLib requires COM interop and WMI access
-- Cannot be safely loaded into the Electron main process (crash risk, memory leaks)
-- Separate process provides isolation — if it crashes, the main app continues
-- `spawnSync` with a 5-second timeout ensures the main process never blocks indefinitely
+| Invocation | Mode | Output |
+|------------|------|--------|
+| `eIslandTemperatureReader.exe` | Temperature (default) | `TemperatureSnapshot` JSON |
+| `eIslandTemperatureReader.exe temperature` | Temperature | `TemperatureSnapshot` JSON |
+| `eIslandTemperatureReader.exe hardware-list` | Hardware enumeration | `HardwareListSnapshot` JSON |
 
-**Invocation from Node.js:**
+The `Computer` object from LibreHardwareMonitorLib is configured to enable all hardware categories (CPU, GPU, motherboard, storage). `computer.Open()` initializes WMI subscriptions and COM interfaces; `computer.Close()` releases them.
+
+#### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Program.cs                                                 │
+│  CLI entry point — parses args, opens Computer, dispatches  │
+└────────────┬──────────────────────────┬─────────────────────┘
+             │                          │
+    ┌────────▼───────────┐    ┌────────▼──────────────────┐
+    │ TemperatureCollector│    │ HardwareListCollector      │
+    │ .Collect(computer)  │    │ .Collect(computer)         │
+    └────────┬────────────┘    └────────┬──────────────────┘
+             │                          │
+    ┌────────▼──────────────────────────▼──────────────────┐
+    │ HardwareCategoryMapper                               │
+    │ Maps HardwareType → category string                   │
+    └──────────────────────────────────────────────────────┘
+             │
+    ┌────────▼────────────┐
+    │ Snapshots.cs         │
+    │ Data models (POCOs)  │
+    └──────────────────────┘
+```
+
+#### TemperatureCollector
+
+Recursively traverses the hardware tree and collects all temperature sensor readings:
+
+```csharp
+static class TemperatureCollector
+{
+    public static TemperatureSnapshot Collect(Computer computer)
+    {
+        var readings = new List<TemperatureReading>();
+
+        foreach (var hardware in computer.Hardware)
+        {
+            CollectHardwareTemperatures(hardware, readings);
+        }
+
+        return new TemperatureSnapshot
+        {
+            IsAvailable = readings.Count > 0,
+            Readings = readings,
+            MaxTemperatureCelsius = readings.Count == 0
+                ? null
+                : readings.Max(r => r.TemperatureCelsius),
+        };
+    }
+
+    private static void CollectHardwareTemperatures(
+        IHardware hardware, List<TemperatureReading> readings)
+    {
+        hardware.Update();  // Refresh sensor values
+
+        // Recurse into sub-hardware (e.g., CPU cores under a CPU package)
+        foreach (var sub in hardware.SubHardware)
+            CollectHardwareTemperatures(sub, readings);
+
+        // Collect temperature sensors
+        foreach (var sensor in hardware.Sensors)
+        {
+            if (sensor.SensorType != SensorType.Temperature || sensor.Value is null)
+                continue;
+
+            readings.Add(new TemperatureReading
+            {
+                Id = $"{hardware.Identifier}/{sensor.Identifier}",
+                Label = string.IsNullOrWhiteSpace(sensor.Name)
+                    ? hardware.Name
+                    : $"{hardware.Name} {sensor.Name}",
+                Category = HardwareCategoryMapper.Map(hardware.HardwareType),
+                TemperatureCelsius = Math.Round(sensor.Value.Value, 1),
+                Source = "libre-hardware-monitor",
+            });
+        }
+    }
+}
+```
+
+**Key behaviors:**
+
+- **Recursive traversal**: `hardware.SubHardware` contains child devices (e.g., individual CPU cores, GPU memory controllers). The collector walks the full tree.
+- **`hardware.Update()`**: Triggers a fresh read of all sensors for this hardware node. Must be called before accessing `sensor.Value`.
+- **Sensor filtering**: Only `SensorType.Temperature` sensors with non-null values are collected.
+- **ID format**: `{hardware.Identifier}/{sensor.Identifier}` — unique across the hardware tree, e.g., `cpu/0/temperature/2`.
+- **Label fallback**: If `sensor.Name` is empty, uses `hardware.Name` alone.
+- **Precision**: Temperature values are rounded to 1 decimal place (`Math.Round(value, 1)`).
+
+#### HardwareListCollector
+
+Enumerates CPU and GPU devices from the hardware tree:
+
+```csharp
+static class HardwareListCollector
+{
+    public static HardwareListSnapshot Collect(Computer computer)
+    {
+        var cpus = new List<HardwareDevice>();
+        var gpus = new List<HardwareDevice>();
+
+        foreach (var hardware in computer.Hardware)
+        {
+            CollectHardwareDevice(hardware, cpus, gpus);
+        }
+
+        return new HardwareListSnapshot
+        {
+            IsAvailable = cpus.Count > 0 || gpus.Count > 0,
+            Cpus = cpus,
+            Gpus = gpus,
+        };
+    }
+
+    private static void CollectHardwareDevice(
+        IHardware hardware, List<HardwareDevice> cpus, List<HardwareDevice> gpus)
+    {
+        hardware.Update();
+
+        var category = HardwareCategoryMapper.Map(hardware.HardwareType);
+        if (category == "cpu")
+            cpus.Add(CreateHardwareDevice(hardware, category));
+        else if (category == "gpu")
+            gpus.Add(CreateHardwareDevice(hardware, category));
+
+        // Recurse into sub-hardware
+        foreach (var sub in hardware.SubHardware)
+            CollectHardwareDevice(sub, cpus, gpus);
+    }
+
+    private static HardwareDevice CreateHardwareDevice(
+        IHardware hardware, string category) => new()
+    {
+        Id = hardware.Identifier.ToString(),
+        Name = hardware.Name,
+        Category = category,
+        HardwareType = hardware.HardwareType.ToString(),
+        Source = "libre-hardware-monitor",
+    };
+}
+```
+
+**Key behaviors:**
+
+- **Category filtering**: Only `"cpu"` and `"gpu"` devices are collected. Motherboard and storage devices are excluded from the hardware list (but their temperature sensors are still collected by `TemperatureCollector`).
+- **`HardwareType` mapping**: The raw `HardwareType` enum value (e.g., `GpuNvidia`, `GpuAmd`, `GpuIntel`) is preserved as a string in the `HardwareType` field for downstream differentiation.
+
+#### HardwareCategoryMapper
+
+Maps LibreHardwareMonitor's `HardwareType` enum to simplified category strings:
+
+```csharp
+static class HardwareCategoryMapper
+{
+    public static string Map(HardwareType hardwareType) => hardwareType switch
+    {
+        HardwareType.Cpu                            => "cpu",
+        HardwareType.GpuAmd
+            or HardwareType.GpuIntel
+            or HardwareType.GpuNvidia               => "gpu",
+        HardwareType.Motherboard                    => "motherboard",
+        HardwareType.Storage                        => "storage",
+        _                                           => "unknown",
+    };
+}
+```
+
+**Mapping Table:**
+
+| `HardwareType` | Category | Examples |
+|----------------|----------|----------|
+| `Cpu` | `cpu` | Intel Core, AMD Ryzen |
+| `GpuNvidia` | `gpu` | NVIDIA GeForce, RTX series |
+| `GpuAmd` | `gpu` | AMD Radeon, RX series |
+| `GpuIntel` | `gpu` | Intel Arc, integrated graphics |
+| `Motherboard` | `motherboard` | ASUS, MSI, Gigabyte boards |
+| `Storage` | `storage` | NVMe SSDs, SATA drives |
+| _(other)_ | `unknown` | SuperIO, TBalancer, etc. |
+
+#### Snapshots (Data Models)
+
+All data models use C# `required` init-only properties and provide static `Empty` singletons for fallback scenarios:
+
+```csharp
+sealed class TemperatureSnapshot
+{
+    public static TemperatureSnapshot Empty { get; } = new()
+    {
+        IsAvailable = false,
+        Readings = [],
+        MaxTemperatureCelsius = null,
+    };
+
+    public required bool IsAvailable { get; init; }
+    public required List<TemperatureReading> Readings { get; init; }
+    public required double? MaxTemperatureCelsius { get; init; }
+}
+
+sealed class TemperatureReading
+{
+    public required string Id { get; init; }
+    public required string Label { get; init; }
+    public required string Category { get; init; }
+    public required double TemperatureCelsius { get; init; }
+    public required string Source { get; init; }
+}
+
+sealed class HardwareListSnapshot
+{
+    public static HardwareListSnapshot Empty { get; } = new()
+    {
+        IsAvailable = false,
+        Cpus = [],
+        Gpus = [],
+    };
+
+    public required bool IsAvailable { get; init; }
+    public required List<HardwareDevice> Cpus { get; init; }
+    public required List<HardwareDevice> Gpus { get; init; }
+}
+
+sealed class HardwareDevice
+{
+    public required string Id { get; init; }
+    public required string Name { get; init; }
+    public required string Category { get; init; }
+    public required string HardwareType { get; init; }
+    public required string Source { get; init; }
+}
+```
+
+**Design decisions:**
+
+- **`sealed` classes**: No inheritance needed; enables JIT optimizations.
+- **`required` init-only properties**: Enforced at compile time — prevents incomplete construction.
+- **`Empty` singletons**: Used as fallback when the helper binary is missing or crashes. Serialized to JSON as `{"isAvailable":false,"readings":[],...}`.
+- **JSON serialization**: Uses `JsonSerializerDefaults.Web` for camelCase property naming (matching the TypeScript interfaces).
+
+#### JSON Output Format
+
+**Temperature mode** (`eIslandTemperatureReader.exe`):
+
+```json
+{
+  "isAvailable": true,
+  "readings": [
+    {
+      "id": "cpu/0/temperature/0",
+      "label": "CPU Package",
+      "category": "cpu",
+      "temperatureCelsius": 52.3,
+      "source": "libre-hardware-monitor"
+    },
+    {
+      "id": "gpu-nvidia/0/temperature/0",
+      "label": "NVIDIA GeForce RTX 4070 GPU Core",
+      "category": "gpu",
+      "temperatureCelsius": 41.0,
+      "source": "libre-hardware-monitor"
+    }
+  ],
+  "maxTemperatureCelsius": 52.3
+}
+```
+
+**Hardware list mode** (`eIslandTemperatureReader.exe hardware-list`):
+
+```json
+{
+  "isAvailable": true,
+  "cpus": [
+    {
+      "id": "cpu/0",
+      "name": "Intel Core i7-13700K",
+      "category": "cpu",
+      "hardwareType": "Cpu",
+      "source": "libre-hardware-monitor"
+    }
+  ],
+  "gpus": [
+    {
+      "id": "gpu-nvidia/0",
+      "name": "NVIDIA GeForce RTX 4070",
+      "category": "gpu",
+      "hardwareType": "GpuNvidia",
+      "source": "libre-hardware-monitor"
+    }
+  ]
+}
+```
+
+#### Invocation from Node.js
+
+The main plugin's `index.js` bridges the .NET helper via synchronous child process execution:
 
 ```js
 function readHelperSnapshot(args, fallback) {
@@ -491,8 +801,8 @@ function readHelperSnapshot(args, fallback) {
 
   const result = spawnSync(readerPath, args, {
     encoding: 'utf8',
-    windowsHide: true,
-    timeout: 5000,
+    windowsHide: true,    // Hide console window on Windows
+    timeout: 5000,         // 5-second hard timeout
   });
 
   if (result.status !== 0 || result.error || !result.stdout) {
@@ -503,11 +813,60 @@ function readHelperSnapshot(args, fallback) {
 }
 ```
 
+**Binary resolution order:**
+
+```js
+const temperatureReaderCandidates = [
+  path.join(__dirname, 'temperature-helper', 'bin', 'Release', 'net10.0', 'eIslandTemperatureReader.exe'),
+  path.join(__dirname, 'temperature-helper', 'bin', 'Debug', 'net10.0', 'eIslandTemperatureReader.exe'),
+];
+```
+
 **Fallback Behavior:**
 
-- If the .NET helper binary is not found → returns `emptyTemperatureSnapshot`
-- If the helper crashes or times out → returns `emptyTemperatureSnapshot`
-- If JSON parsing fails → returns `emptyTemperatureSnapshot`
+| Condition | Result |
+|-----------|--------|
+| Binary not found | `emptyTemperatureSnapshot` / `emptyHardwareListSnapshot` |
+| Process exits with non-zero status | Fallback |
+| Process times out (>5s) | Fallback |
+| stdout is empty | Fallback |
+| JSON parse error | Fallback |
+| Success | Parsed snapshot object |
+
+#### Dependencies
+
+```xml
+<!-- eIslandTemperatureReader.csproj -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+  </ItemGroup>
+</Project>
+```
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| **.NET** | 10.0 | Runtime |
+| **LibreHardwareMonitorLib** | 0.9.6 | Hardware sensor access via WMI/COM |
+
+#### Build
+
+The .NET helper is built alongside the native addon:
+
+```bash
+# Build native addon + .NET helper
+npm run build
+
+# Equivalent to:
+node-gyp rebuild
+dotnet build temperature-helper/eIslandTemperatureReader.csproj -c Release
+```
+
+Output: `temperature-helper/bin/Release/net10.0/eIslandTemperatureReader.exe`
 
 ### Source Files
 
@@ -518,7 +877,11 @@ function readHelperSnapshot(args, fallback) {
 | `performance_types.h` | Shared type definitions (`CpuSnapshot`, `MemorySnapshot`) |
 | `index.js` | Entry point, loads native binding, adds `getTemperature`/`getHardwareList` |
 | `index.d.ts` | TypeScript type declarations |
-| `temperature-helper/` | .NET 10 console app for temperature/hardware enumeration |
+| `temperature-helper/Program.cs` | .NET CLI entry point, opens `Computer`, dispatches to collectors |
+| `temperature-helper/TemperatureCollector.cs` | Recursive temperature sensor collection |
+| `temperature-helper/HardwareListCollector.cs` | CPU/GPU device enumeration |
+| `temperature-helper/HardwareCategoryMapper.cs` | `HardwareType` → category string mapping |
+| `temperature-helper/Snapshots.cs` | Data models with `Empty` fallback singletons |
 
 ## Testing
 
