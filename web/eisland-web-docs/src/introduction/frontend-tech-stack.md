@@ -5,55 +5,371 @@ icon: layer-group
 
 # Frontend Tech Stack
 
-This document provides an overview of the frontend technologies used in the eIsland project.
+This document provides an overview of the frontend technologies used in the eIsland application.
 
 ## Core Framework
 
 ### Electron + React + TypeScript
 
-eIsland is built as a desktop application using **Electron** as the runtime environment. The UI layer is implemented with **React 19**, leveraging modern hooks-based patterns for component state and lifecycle management.
+The eIsland frontend is built with **Electron** as the desktop shell, **React 19** for the UI layer, and **TypeScript** for type safety. The application follows a multi-process architecture with strict separation between main process, preload bridge, and renderer process.
 
-**TypeScript** is used throughout the project for type safety and improved developer experience. The codebase uses strict type checking with separate configurations for:
+**Key Dependencies:**
 
-- **Web/Renderer**: `tsconfig.web.json` - Configured for React JSX and bundler module resolution
-- **Node/Main**: `tsconfig.node.json` - For Electron main process code
+| Category | Package | Purpose |
+|----------|---------|---------|
+| **Runtime** | `electron` | Desktop application shell |
+| **UI Framework** | `react`, `react-dom` | Component-based UI |
+| **Language** | `typescript` | Static type checking |
+| **Build** | `electron-vite`, `vite` | Build toolchain |
+| **State** | `zustand` | Global state management |
+| **Styling** | `tailwindcss` | Utility-first CSS |
+| **Animation** | `gsap`, `@gsap/react` | Programmatic animations |
+| **i18n** | `i18next`, `react-i18next` | Internationalization |
+| **Icons** | `lucide-react` | Icon library |
+| **Charts** | `highcharts`, `highcharts-react-official` | Data visualization |
+| **Markdown** | `react-markdown`, `remark-gfm`, `dompurify` | Markdown rendering |
+| **Testing** | `vitest`, `@testing-library/jest-dom` | Unit testing |
 
 ## Build System
 
-### Vite + electron-vite
+### Electron-Vite
 
-The project uses **electron-vite**, a specialized build tool that integrates Vite with Electron. This provides:
+The project uses **electron-vite** to configure three separate build targets with a single configuration file:
 
-- Fast hot module replacement during development
-- Optimized production builds
-- Separate build configurations for main, preload, and renderer processes
-
-```typescript
+```ts
 // electron.vite.config.ts
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
-    build: { outDir: 'out/main' }
+    build: {
+      rollupOptions: {
+        input: { index: 'src/main/index.ts', smtcWorker: 'src/main/smtcWorker.ts' },
+      },
+    },
   },
   preload: {
     plugins: [externalizeDepsPlugin()],
-    build: { outDir: 'out/preload' }
   },
   renderer: {
+    root: 'src/renderer',
     plugins: [react(), tailwindcss()],
-    build: { outDir: 'out/renderer' }
-  }
+    build: {
+      rollupOptions: {
+        input: { index: 'index.html', standalone: 'standalone.html', AIbackground: 'AIbackground.html' },
+      },
+    },
+  },
 });
+```
+
+**Build Targets:**
+
+| Target | Entry | Output | Description |
+|--------|-------|--------|-------------|
+| **main** | `src/main/index.ts`, `src/main/smtcWorker.ts` | `out/main` | Node.js main process with SMTC worker |
+| **preload** | `src/preload/index.ts` | `out/preload` | Context bridge between main and renderer |
+| **renderer** | `index.html`, `standalone.html`, `AIbackground.html` | `out/renderer` | Chromium renderer with 3 HTML entry points |
+
+**Key Features:**
+- **externalizeDepsPlugin**: Excludes Node.js dependencies from main/preload bundles
+- **@vitejs/plugin-react**: React Fast Refresh for development
+- **@tailwindcss/vite**: Tailwind CSS v4 integration (no separate config file)
+- **Multiple HTML entries**: Supports main island window, standalone widget, and AI background
+
+## Electron Architecture
+
+### Main Process
+
+The main process manages application lifecycle, window creation, and system-level operations. It is structured around **service factories** and **modular IPC handler registration**.
+
+#### Service Factory Pattern
+
+Services are created via factory functions with dependency injection through getter/setter options:
+
+```ts
+const mainWindowService = createMainWindowService({
+  getMainWindow: () => mainWindow,
+  setMainWindow: (window) => { mainWindow = window; },
+  getIslandPositionOffset: () => islandPositionOffset,
+  sizes: { islandWidth: ISLAND_WIDTH, islandHeight: ISLAND_HEIGHT, ... },
+});
+```
+
+**Benefits:**
+- Loose coupling between services
+- Easy to mock for testing
+- Clear dependency graph
+
+#### IPC Handler Registration
+
+Each domain has its own `register*Handlers()` function that receives a configuration object:
+
+```ts
+// Example: Clipboard domain
+registerClipboardHandlers({ getMainWindow });
+
+// Example: Media domain
+registerMediaHandlers({ getMainWindow, getNowPlayingInfo });
+
+// Example: Hotkey domain
+registerHotkeyHandlers({ getMainWindow, getIslandPositionOffset });
+```
+
+**IPC Domains (25+ modules):**
+
+| Domain | Operations |
+|--------|------------|
+| **clipboard** | Read/write clipboard, URL detection |
+| **capture** | Screen capture, recording |
+| **screenshot** | Screenshot with region selection |
+| **app** | App lifecycle, restart, quit |
+| **system** | System info, environment variables |
+| **updater** | Auto-update, version check |
+| **download** | File download management |
+| **media** | Media playback control |
+| **music** | Music player integration |
+| **hotkey** | Global shortcut registration |
+| **island** | Island window management |
+| **theme** | Theme switching |
+| **window** | Window state management |
+| **wallpaper** | Wallpaper management |
+| **mail** | Email operations |
+| **store** | Persistent storage |
+| **log** | Logging |
+| **format-factory** | Media format conversion |
+| **image-compression** | Image optimization |
+| **net** | Network operations |
+| **hide-process** | Process hiding |
+| **agent** | AI agent status |
+
+#### Transparent Window Architecture
+
+The application uses multiple transparent, frameless, always-on-top windows:
+
+```ts
+const mainWindow = new BrowserWindow({
+  transparent: true,
+  frame: false,
+  alwaysOnTop: true,
+  skipTaskbar: true,
+  hasShadow: false,
+  webPreferences: {
+    preload: join(__dirname, '../preload/index.js'),
+    sandbox: false,
+  },
+});
+```
+
+**Window Types:**
+
+| Window | Properties | Purpose |
+|--------|------------|---------|
+| **Main Island** | `transparent`, `frameless`, `alwaysOnTop` | Primary dynamic island UI |
+| **Agent Voice Input** | `fullscreen`, `transparent`, `setIgnoreMouseEvents(true)` | Voice input overlay |
+| **CLI Glow Overlay** | `transparent`, `alwaysOnTop` | CLI terminal glow effect |
+
+#### Custom Protocol
+
+A custom `eisland-media://` protocol safely serves local wallpaper media files:
+
+```ts
+protocol.registerFileProtocol('eisland-media', (request, callback) => {
+  const url = request.url.replace('eisland-media://', '');
+  const filePath = join(app.getPath('userData'), 'wallpapers', url);
+  // Path sandboxing: only serve files from userData/wallpapers
+  callback({ path: filePath });
+});
+```
+
+#### Chromium Performance Flags
+
+Applied before `app.whenReady()`:
+
+```ts
+function applyChromiumPerformanceFlags(app: Electron.App) {
+  app.commandLine.appendSwitch('enable-features', 'SharedArrayBuffer');
+  app.commandLine.appendSwitch('disable-features', 'HardwareMediaKeyHandling');
+  app.commandLine.appendSwitch('enable-gpu-rasterization');
+}
+```
+
+#### Auto-Updater
+
+Uses `electron-updater` with startup auto-check:
+
+```ts
+import { autoUpdater } from 'electron-updater';
+
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+autoUpdater.on('update-available', (info) => {
+  mainWindow.webContents.send('update-available', info);
+});
+```
+
+### Preload Bridge
+
+The preload script exposes a unified API object through `contextBridge.exposeInMainWorld`:
+
+```ts
+contextBridge.exposeInMainWorld('api', {
+  // Fire-and-forget (one-way)
+  expandWindow: () => ipcRenderer.send('expandWindow'),
+  collapseWindow: () => ipcRenderer.send('collapseWindow'),
+  enableMousePassthrough: () => ipcRenderer.send('enableMousePassthrough'),
+
+  // Request-response (two-way)
+  getMousePosition: () => ipcRenderer.invoke('getMousePosition'),
+  storeRead: (key: string) => ipcRenderer.invoke('storeRead', key),
+  hotkeySet: (action: string, accelerator: string) =>
+    ipcRenderer.invoke('hotkeySet', action, accelerator),
+
+  // Event subscriptions (with unsubscribe)
+  onNowPlayingInfo: (callback: (info: NowPlayingInfo) => void) => {
+    const handler = (_event: any, info: NowPlayingInfo) => callback(info);
+    ipcRenderer.on('nowPlayingInfo', handler);
+    return () => ipcRenderer.removeListener('nowPlayingInfo', handler);
+  },
+  onSettingsChanged: (callback: (settings: Settings) => void) => { ... },
+});
+```
+
+**IPC Patterns:**
+
+| Pattern | Method | Use Case |
+|---------|--------|----------|
+| **Fire-and-forget** | `ipcRenderer.send()` | Window control, one-way notifications |
+| **Request-response** | `ipcRenderer.invoke()` | Data queries, operations with return values |
+| **Event subscription** | `ipcRenderer.on()` + unsubscribe | Real-time updates, state changes |
+
+## React Patterns
+
+### Coordinator Hook Pattern
+
+The island UI is orchestrated by a single **coordinator hook** (`useDynamicIslandCoordinator`) that composes approximately 16 specialized hooks, each managing one concern:
+
+```ts
+function useDynamicIslandCoordinator() {
+  // Shell morphing state machine
+  const { state, shellClassName, shellStyle, handleIslandClick } =
+    useDynamicIslandShell();
+
+  // Media synchronization
+  const { nowPlaying } = useIslandNowPlayingSync();
+  const dominantColor = useIslandDominantColor(nowPlaying?.coverUrl);
+
+  // Time display
+  const { timeStr, dayStr, fullTimeStr, lunarStr } = useIslandTimeStrings();
+
+  // Timer and alarms
+  const { timerState, alarmState } = useIslandTimerAndAlarm();
+
+  // Settings synchronization
+  useIslandSettingsSync();
+
+  // Auto-dimming
+  useIslandAutoDim();
+
+  // State bridges (auto-transitions)
+  useIslandStateBridges();
+
+  // Escape navigation
+  useIslandEscapeNavigation();
+
+  // Startup announcements
+  useIslandStartupAnnouncements();
+
+  // Background video
+  const { bgVideoElementRef, bgVideoHwDecode } = useIslandBackgroundVideoSync();
+
+  // Notification subscriptions
+  useIslandNotificationSubscriptions();
+
+  // Hover interaction
+  useIslandHoverInteraction();
+
+  // CSS presentation
+  const { shellClassName, shellStyle } = useIslandShellPresentation();
+
+  // Runtime refs for cross-hook communication
+  const runtimeRefs = useIslandRuntimeRefs();
+
+  // Background media controller
+  useIslandBackgroundMediaController();
+
+  // Claude CLI session status
+  useClaudeCliSessionStatus();
+
+  return {
+    shellClassName, shellStyle, handleIslandClick,
+    timeStr, dayStr, fullTimeStr, lunarStr,
+    bgMedia, bgVideoElementRef, bgVideoHwDecode,
+  };
+}
+```
+
+**Hook Responsibilities:**
+
+| Hook | Responsibility |
+|------|---------------|
+| `useDynamicIslandShell` | Morphing state machine, click behavior, glow effect |
+| `useIslandNowPlayingSync` | SMTC media info synchronization |
+| `useIslandDominantColor` | Extract dominant color from album art |
+| `useIslandTimeStrings` | Formatted time/date/lunar strings |
+| `useIslandTimerAndAlarm` | Timer countdown and alarm logic |
+| `useIslandBreakReminder` | Periodic break reminders |
+| `useIslandSettingsSync` | IPC settings change listener |
+| `useIslandAutoDim` | Auto-dimming after idle period |
+| `useIslandStateBridges` | Auto-transitions (e.g., lyrics when music plays) |
+| `useIslandEscapeNavigation` | Escape key navigation |
+| `useIslandStartupAnnouncements` | First-run guide and update announcements |
+| `useIslandBackgroundVideoSync` | Background video playback sync |
+| `useIslandNotificationSubscriptions` | IPC notification listeners |
+| `useIslandHoverInteraction` | Mouse enter/leave with debounced timers |
+| `useIslandShellPresentation` | CSS class/style computation |
+| `useIslandRuntimeRefs` | Mutable refs for cross-hook communication |
+| `useIslandBackgroundMediaController` | Wallpaper media state management |
+| `useClaudeCliSessionStatus` | Claude Code CLI session tracking |
+
+### State-Based Component Rendering
+
+Components are rendered based on the current island state:
+
+```tsx
+function DynamicIsland() {
+  const coordinator = useDynamicIslandCoordinator();
+
+  return (
+    <div className={coordinator.shellClassName} style={coordinator.shellStyle}
+         onClick={coordinator.handleIslandClick}>
+      {state === 'idle' && <IdleState />}
+      {state === 'hover' && <HoverState />}
+      {state === 'notification' && <NotificationState />}
+      {state === 'expanded' && <ExpandedState />}
+      {state === 'maxExpand' && <MaxExpandState />}
+      {state === 'lyrics' && <LyricsState />}
+      {state === 'login' && <LoginState />}
+      {state === 'register' && <RegisterState />}
+      {state === 'agent' && <AgentState />}
+      {state === 'agentVoiceInput' && <AgentVoiceInputState />}
+      {state === 'cli' && <CliState />}
+      {/* ... other states */}
+    </div>
+  );
+}
 ```
 
 ## State Management
 
-### Zustand
+### Zustand Store Architecture
 
-**Zustand** is used for global state management. The store is organized using a slice pattern for modularity:
+The application uses **Zustand** with a **slice composition pattern** for global state management. Seven domain-specific slices are composed into a single store:
 
-```typescript
-// store/slices/index.ts
+```ts
+import { create } from 'zustand';
+import type { IIslandStore } from '../types';
+
 const useIslandStore = create<IIslandStore>()((set, get, store) => ({
   ...createIslandSlice(set, get, store),
   ...createWeatherSlice(set, get, store),
@@ -65,111 +381,623 @@ const useIslandStore = create<IIslandStore>()((set, get, store) => ({
 }));
 ```
 
-Key store slices include:
+**Store Type (Intersection):**
 
-| Slice | Responsibility |
-|-------|---------------|
-| `islandSlice` | Core island state and transitions |
-| `weatherSlice` | Weather data and location |
-| `timerSlice` | Timers and alarms |
-| `notificationSlice` | Notification management |
-| `mediaSlice` | Music playback state |
-| `aiSlice` | AI agent configuration |
-| `pomodoroSlice` | Pomodoro timer logic |
-
-## Styling
-
-### Tailwind CSS + CSS Modules
-
-The project uses a hybrid styling approach:
-
-- **Tailwind CSS 4**: Utility-first CSS framework for rapid UI development
-- **Custom CSS**: Modular CSS files for complex component styles
-
-Styles are organized by feature:
-
-```
-src/renderer/styles/
-├── reset/           # CSS reset
-├── shell/           # Island shell styles
-├── hover/           # Hover state styles
-├── expanded/        # Expanded state styles
-├── notification/    # Notification styles
-├── agent/           # AI agent styles
-├── settings/        # Settings panel styles
-└── ...
+```ts
+export type IIslandStore = IslandSlice & WeatherSlice & TimerSlice &
+                           MediaSlice & AiSlice & PomodoroSlice;
 ```
 
-Tailwind is integrated via the `@tailwindcss/vite` plugin for optimal build performance.
+### Slice Pattern
 
-## Internationalization
+Each slice is a `StateCreator` typed function that receives `set`, `get`, and `store`:
 
-### i18next + react-i18next
+```ts
+import type { StateCreator } from 'zustand';
 
-The application supports multiple languages using **i18next**:
+export const createIslandSlice: StateCreator<IslandSlice, [], [], IslandSlice> = (set, get) => ({
+  state: 'idle',
+  uiStateLocked: false,
+  authReturnState: null,
 
-- **Chinese (zh-CN)**: Primary language
-- **English (en-US)**: Secondary language
+  setIdle: (force?: boolean) => set((prev) => {
+    // Guard: check if UI state is locked
+    if (prev.uiStateLocked && prev.state !== 'idle') return prev;
 
-Language detection and switching:
+    // Guard: certain states block non-forced idle transitions
+    if (!force && (prev.state === 'expanded' || prev.state === 'maxExpand' ||
+                   prev.state === 'guide' || prev.state === 'login' ||
+                   prev.state === 'register' || prev.state === 'payment' ||
+                   prev.state === 'announcement')) {
+      return prev;
+    }
 
-```typescript
-// i18n/index.ts
-i18n
-  .use(initReactI18next)
-  .init({
-    resources: {
-      'zh-CN': { translation: zhCN },
-      'en-US': { translation: enUS },
-    },
-    lng: getInitialLanguage(),
-    fallbackLng: 'zh-CN',
-  });
+    // Side effect: call Electron IPC
+    window.api?.collapseWindow();
+    window.api?.enableMousePassthrough();
+
+    return { state: 'idle' as const, authReturnState: null };
+  }),
+
+  setExpanded: () => set({ state: 'expanded' }),
+
+  enterAuth: (targetState: IslandState) => set((prev) => ({
+    state: targetState,
+    authReturnState: prev.state,  // Save current state for return
+  })),
+
+  returnFromAuth: () => set((prev) => ({
+    state: prev.authReturnState || 'idle',
+    authReturnState: null,
+  })),
+});
 ```
 
-Translation files are located in `i18n/` directory and loaded at build time.
+**Key Patterns:**
 
-## Animation
+| Pattern | Description |
+|---------|-------------|
+| **Side effects in set()** | State transitions trigger Electron IPC calls directly within the updater |
+| **Conditional transitions** | Guard logic prevents invalid state changes |
+| **Auth return state** | Saves current state before entering auth flows, restores on return |
+| **Type assertions** | `as const` ensures literal type narrowing |
 
-### GSAP (GreenSock Animation Platform)
+### AI Slice (Persistence Pattern)
 
-**GSAP** is used for smooth, performant animations throughout the island's state transitions:
+The AI slice demonstrates localStorage persistence with robust normalization:
 
-- Morphing between different island states
-- Widget entrance/exit animations
-- Interactive micro-animations
+```ts
+const AI_CONFIG_KEY = 'eIsland_aiConfig';
 
-The animation system supports configurable speeds:
+function loadAiConfig(): AiConfig {
+  const defaults: AiConfig = {
+    apiKey: '',
+    endpoint: 'https://api.openai.com/v1',
+    model: 'gpt-4',
+    // ... other defaults
+  };
 
-```typescript
-const MORPH_DURATION_BY_SPEED = {
-  slow: 1100,    // Dramatic transitions
-  medium: 550,   // Standard interactions
-  fast: 280      // Quick responses
+  try {
+    const raw = localStorage.getItem(AI_CONFIG_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<AiConfig>;
+      // Defensive normalization: merge with defaults
+      const merged = { ...defaults, ...parsed };
+      // Validate each field type
+      if (typeof merged.apiKey !== 'string') merged.apiKey = defaults.apiKey;
+      if (typeof merged.endpoint !== 'string') merged.endpoint = defaults.endpoint;
+      return merged;
+    }
+  } catch {
+    // Ignore parse errors, return defaults
+  }
+  return defaults;
+}
+```
+
+**Persistence Features:**
+
+- **Cross-tab sync**: Listens to `window.addEventListener('storage', ...)` for config changes in other tabs
+- **Deferred writes during streaming**: `if (!get().aiChatStreaming) saveAiChatSessions(...)` prevents excessive writes
+- **Deep normalization**: Nested structures (messages, tool calls, chat sessions) are defensively parsed
+- **Default fallbacks**: Every field has a default value if parsing fails
+
+### Store Utilities
+
+Utility functions for localStorage operations with try/catch wrappers:
+
+```ts
+// store/utils/storage.ts
+export function loadNetworkConfig(): NetworkConfig {
+  try {
+    const raw = localStorage.getItem('eIsland_networkConfig');
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return { proxy: '', timeout: 30000 };
+}
+
+export function saveNetworkConfig(config: NetworkConfig): void {
+  try {
+    localStorage.setItem('eIsland_networkConfig', JSON.stringify(config));
+  } catch { /* ignore */ }
+}
+```
+
+## Island State Machine
+
+### State Configuration
+
+The island has **16 distinct states**, each with defined pixel dimensions and behavior rules:
+
+#### State Areas (Width × Height)
+
+```ts
+export const STATE_AREA: Record<string, number> = {
+  idle: 260 * 42,           // 10,920 px²
+  hover: 500 * 60,          // 30,000 px²
+  notification: 500 * 88,   // 44,000 px²
+  expanded: 860 * 150,      // 129,000 px²
+  maxExpand: 860 * 400,     // 344,000 px²
+  lyrics: 500 * 42,         // 21,000 px²
+  minimal: 260 * 42,        // 10,920 px²
+  agent: 500 * 88,          // 44,000 px²
+  agentVoiceInput: 500 * 88,// 44,000 px²
+  login: 500 * 88,          // 44,000 px²
+  register: 500 * 88,       // 44,000 px²
+  resetPassword: 500 * 88,  // 44,000 px²
+  payment: 500 * 88,        // 44,000 px²
+  guide: 860 * 400,         // 344,000 px²
+  announcement: 860 * 400,  // 344,000 px²
+  stt: 500 * 88,            // 44,000 px²
+  cli: 860 * 400,           // 344,000 px²
 };
 ```
 
-## UI Components
+#### State Behavior Configuration
+
+```ts
+export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
+  idle:         { mousePassthrough: true,  expanded: false, enterDelay: 0,   leaveDelay: 0   },
+  hover:        { mousePassthrough: false, expanded: true,  enterDelay: 60,  leaveDelay: 80  },
+  lyrics:       { mousePassthrough: true,  expanded: true,  enterDelay: 50,  leaveDelay: 0   },
+  notification: { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  expanded:     { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  maxExpand:    { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  minimal:      { mousePassthrough: true,  expanded: false, enterDelay: 0,   leaveDelay: 0   },
+  agent:        { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  agentVoiceInput: { mousePassthrough: false, expanded: true, enterDelay: 0, leaveDelay: 0   },
+  login:        { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  register:     { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  resetPassword:{ mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  payment:      { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  guide:        { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  announcement: { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  stt:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  cli:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+};
+```
+
+**Configuration Properties:**
+
+| Property | Description |
+|----------|-------------|
+| `mousePassthrough` | Whether mouse events pass through to underlying windows |
+| `expanded` | Whether the island is in expanded visual state |
+| `enterDelay` | Delay (ms) before entering the state |
+| `leaveDelay` | Delay (ms) before leaving the state |
+
+### Morphing Animation System
+
+State transitions are animated through CSS class-based morphing:
+
+```ts
+const MORPH_DURATION_BY_SPEED: Record<string, number> = {
+  slow: 1100,    // 1.1 seconds
+  medium: 550,   // 0.55 seconds
+  fast: 280,     // 0.28 seconds
+};
+
+useEffect(() => {
+  if (prevStateRef.current === state) return;
+
+  // Set morphing state
+  setFromState(prevStateRef.current);
+  prevStateRef.current = state;
+  setMorphing(true);
+
+  // Clear morphing after duration
+  const id = setTimeout(() => {
+    setMorphing(false);
+    setFromState('');
+  }, MORPH_DURATION_BY_SPEED[animationSpeed] ?? 550);
+
+  return () => clearTimeout(id);
+}, [state, animationSpeed]);
+```
+
+#### CSS Class Composition
+
+The shell presentation hook builds a composite CSS class name:
+
+```ts
+const shellClassName = [
+  'island-shell',
+  getStateClassName(state),
+  morphing && 'morphing',
+  fromState && `from-${fromState}`,
+  instantResize && 'instant-resize',
+  showGlow && 'music-glow',
+  showGlow === 'paused' && 'music-paused',
+  springAnimation && 'spring-animation',
+  `speed-${animationSpeed}`,
+].filter(Boolean).join(' ');
+```
+
+**CSS Classes:**
+
+| Class | Purpose |
+|-------|---------|
+| `island-shell` | Base shell styles |
+| `{state}` | State-specific dimensions and layout |
+| `morphing` | Active morphing animation |
+| `from-{state}` | Origin state for morph direction |
+| `instant-resize` | Skip animation for size reduction |
+| `music-glow` | Music-reactive glow effect |
+| `music-paused` | Paused music glow state |
+| `spring-animation` | Spring physics animation |
+| `speed-{slow\|medium\|fast}` | Animation speed modifier |
+
+#### Instant Resize Optimization
+
+When morphing from a larger state to a smaller one, an instant resize is applied to avoid visual glitches:
+
+```ts
+const instantResize = morphing && STATE_AREA[fromState] > STATE_AREA[state];
+```
+
+### Click Navigation Flow
+
+State-dependent click handling implements a navigation hierarchy:
+
+```ts
+function handleIslandClick() {
+  switch (state) {
+    case 'idle':
+      if (idleClickExpand) setHover();
+      break;
+    case 'hover':
+      setExpanded();
+      break;
+    case 'expanded':
+    case 'maxExpand':
+    case 'announcement':
+      if (isOnCliTab && hasActiveSession) setCli();
+      else setHover();
+      break;
+    case 'login':
+    case 'register':
+    case 'payment':
+      // Auth states handle their own navigation
+      break;
+    default:
+      setIdle();
+  }
+}
+```
+
+## Animations
+
+### GSAP Integration
+
+**GSAP** (GreenSock Animation Platform) is used for programmatic animations where CSS transitions are insufficient. The project uses `@gsap/react` for React integration:
+
+```ts
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(useGSAP);
+
+function EventRow({ event }: { event: CliEvent }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    gsap.fromTo(
+      card,
+      { autoAlpha: 0, y: 10, scale: 0.985 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.28,
+        ease: 'power2.out',
+      },
+    );
+  }, { scope: cardRef });
+
+  return <div ref={cardRef}>{/* content */}</div>;
+}
+```
+
+**GSAP Properties Used:**
+
+| Property | Description |
+|----------|-------------|
+| `autoAlpha` | Combined opacity + visibility (GSAP-specific) |
+| `y` | Transform translateY |
+| `scale` | Transform scale |
+| `duration` | Animation duration in seconds |
+| `easing` | `power2.out` for smooth deceleration |
+
+**Key Features:**
+- **useGSAP hook**: Automatic cleanup and scoped selector queries
+- **Scope option**: `{ scope: cardRef }` limits GSAP selectors to the ref's subtree
+- **fromTo animation**: Defines explicit start and end states
+
+### CSS-Driven Animations
+
+Most island animations (morphing between states) are CSS-driven rather than GSAP-driven, using class-based transitions:
+
+```css
+.island-shell {
+  transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+}
+
+.island-shell.morphing {
+  transition: width var(--morph-duration) var(--morph-ease),
+              height var(--morph-duration) var(--morph-ease);
+}
+
+.island-shell.instant-resize {
+  transition: none;
+}
+
+.island-shell.spring-animation {
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+```
+
+## Styling
+
+### Tailwind CSS v4
+
+The project uses **Tailwind CSS v4** with CSS-first configuration (no JavaScript config file):
+
+```css
+/* src/renderer/styles/reset/reset.css */
+@import "tailwindcss";
+
+@theme {
+  --color-island-accent: oklch(0.7 0.15 250);
+  --color-island-pill: oklch(0.65 0.12 250);
+}
+```
+
+#### Theme System
+
+Dark and light themes are implemented via CSS custom properties:
+
+```css
+:root {
+  /* Dark theme (default) */
+  --color-text-rgb: 255, 255, 255;
+  --color-island-bg: #000000;
+  --color-island-text: #ffffff;
+  --icon-invert: 1;
+}
+
+[data-theme="light"] {
+  /* Light theme */
+  --color-text-rgb: 0, 0, 0;
+  --color-island-bg: #f5f5f7;
+  --color-island-text: #1d1d1f;
+  --icon-invert: 0;
+}
+```
+
+#### Transparent Background
+
+For Electron's transparent window:
+
+```css
+html, body, #root {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+```
+
+#### Tailwind v4 Features Used
+
+| Feature | Description |
+|---------|-------------|
+| `@import "tailwindcss"` | CSS-first import (no `@tailwind` directives) |
+| `@theme` directive | Theme variable definition in CSS |
+| `oklch()` colors | Modern color space for consistent perception |
+| CSS custom properties | Theme switching without JavaScript |
+| `@tailwindcss/vite` plugin | Vite integration (no PostCSS config) |
+
+## Internationalization
+
+### i18next Configuration
+
+The application uses **i18next** with **react-i18next** for internationalization:
+
+```ts
+// src/renderer/i18n/index.ts
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import zhCN from '../../../i18n/zh-CN.json';
+import enUS from '../../../i18n/en-US.json';
+
+i18n.use(initReactI18next).init({
+  resources: {
+    'zh-CN': { translation: zhCN },
+    'en-US': { translation: enUS },
+  },
+  lng: getInitialLanguage(),
+  fallbackLng: 'zh-CN',
+  interpolation: { escapeValue: false },
+  react: { useSuspense: false },
+});
+```
+
+**Supported Languages:**
+
+| Locale | Language | Role |
+|--------|----------|------|
+| `zh-CN` | Chinese (Simplified) | Default / Fallback |
+| `en-US` | English (US) | Secondary |
+
+#### Language Detection
+
+```ts
+function getInitialLanguage(): string {
+  // 1. Check localStorage for saved preference
+  const saved = localStorage.getItem('i18n-language');
+  if (saved && isValidLocale(saved)) return saved;
+
+  // 2. Check browser language
+  const browserLang = navigator.language;
+  return normalizeLanguage(browserLang);
+}
+
+function normalizeLanguage(lang: string): string {
+  if (lang.startsWith('zh')) return 'zh-CN';
+  if (lang.startsWith('en')) return 'en-US';
+  return 'zh-CN'; // Default fallback
+}
+```
+
+#### Runtime Language Switching
+
+```ts
+export function setLanguage(lang: string): void {
+  i18n.changeLanguage(lang);
+  localStorage.setItem('i18n-language', lang);
+}
+
+// Cross-window synchronization via IPC
+window.api.onSettingsChanged((settings) => {
+  if (settings.i18n?.language) {
+    i18n.changeLanguage(settings.i18n.language);
+  }
+});
+```
+
+#### Translation Usage
+
+Components use the `useTranslation` hook:
+
+```tsx
+import { useTranslation } from 'react-i18next';
+
+function MyComponent() {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <h1>{t('common.appName')}</h1>
+      <p>{t('guide.welcome', { defaultValue: 'Welcome to eIsland' })}</p>
+    </div>
+  );
+}
+```
+
+#### Locale File Structure
+
+```json
+{
+  "common": {
+    "appName": "eIsland",
+    "loading": "Loading...",
+    "error": "Error occurred"
+  },
+  "standalone": {
+    "timer": "Timer",
+    "alarm": "Alarm"
+  },
+  "guide": {
+    "welcome": "Welcome to eIsland",
+    "getStarted": "Get Started"
+  }
+}
+```
+
+## Data Visualization
+
+### Highcharts
+
+**Highcharts** is used for data visualization with React integration:
+
+```tsx
+import Highcharts from 'highcharts';
+import HighchartsReact from 'highcharts-react-official';
+
+function UsageChart({ data }: { data: UsageData[] }) {
+  const options: Highcharts.Options = {
+    chart: { type: 'area', backgroundColor: 'transparent' },
+    title: { text: 'AI Usage Over Time' },
+    xAxis: { categories: data.map(d => d.date) },
+    yAxis: { title: { text: 'Tokens' } },
+    series: [{
+      name: 'Input Tokens',
+      data: data.map(d => d.inputTokens),
+    }, {
+      name: 'Output Tokens',
+      data: data.map(d => d.outputTokens),
+    }],
+  };
+
+  return <HighchartsReact highcharts={Highcharts} options={options} />;
+}
+```
+
+## Markdown Rendering
+
+### React Markdown with Sanitization
+
+Markdown content is rendered with **react-markdown** and sanitized with **DOMPurify**:
+
+```tsx
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import DOMPurify from 'dompurify';
+
+function MarkdownContent({ content }: { content: string }) {
+  const sanitized = DOMPurify.sanitize(content);
+
+  return (
+    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      {sanitized}
+    </ReactMarkdown>
+  );
+}
+```
+
+**Features:**
+- **remark-gfm**: GitHub Flavored Markdown support (tables, strikethrough, task lists)
+- **DOMPurify**: XSS prevention by sanitizing HTML input
+- **Component overrides**: Custom renderers for code blocks, links, images
+
+## Icon System
 
 ### Lucide React
 
-**Lucide React** provides a comprehensive set of customizable icons used throughout the application. The icon library offers:
+**Lucide React** provides a consistent icon set:
 
-- Consistent design language
-- Tree-shakeable imports
-- Easy customization via props
+```tsx
+import { Sun, Moon, Play, Pause, Settings, User } from 'lucide-react';
+
+function Controls() {
+  return (
+    <div>
+      <Sun size={18} />
+      <Moon size={18} />
+      <Play size={18} />
+      <Pause size={18} />
+    </div>
+  );
+}
+```
+
+**Icon Properties:**
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `size` | `number` | Icon dimensions in pixels |
+| `color` | `string` | Icon color |
+| `strokeWidth` | `number` | Stroke width (default: 2) |
+| `className` | `string` | CSS class for styling |
 
 ## Testing
 
-### Vitest
+### Vitest Configuration
 
-**Vitest** is used as the testing framework, configured for:
-
-- Unit testing of utility functions
-- Component testing
-- Mock management with automatic cleanup
-
-```typescript
+```ts
 // vitest.config.ts
 export default {
   test: {
@@ -181,65 +1009,141 @@ export default {
 };
 ```
 
-## Additional Libraries
+### Testing Patterns
 
-### Data Visualization
+The project has approximately **90+ test files** across main process, preload, and renderer. All tests use `.test.ts` (no component rendering tests).
 
-- **Highcharts**: Used for performance monitoring charts and data visualization
-- **Highcharts React Official**: React wrapper for Highcharts
+#### Pattern 1: Slice Unit Testing
 
-### Rich Content
+A custom mock store factory simulates Zustand's `set`/`get` without creating a real store:
 
-- **React Markdown**: Renders markdown content in AI chat responses
-- **Remark GFM**: GitHub Flavored Markdown support
-- **DOMPurify**: Sanitizes HTML content for security
+```ts
+function createSliceState<T>(
+  creator: StateCreator<T, [], [], T>
+): { getState: () => T } {
+  let state = {} as T;
+  const setState = (updater: T | ((prev: T) => T)) => {
+    const patch = typeof updater === 'function' ? updater(state) : updater;
+    state = { ...state, ...patch };
+  };
+  state = creator(setState, () => state, {} as never);
+  return { getState: () => state };
+}
 
-### Date & Time
+// Test usage
+it('transitions to expanded state', () => {
+  const store = createSliceState(createIslandSlice);
+  store.getState().setExpanded();
+  expect(store.getState().state).toBe('expanded');
+});
+```
 
-- **Lunar JavaScript**: Chinese lunar calendar support
-- **React DatePicker**: Date selection components
+#### Pattern 2: Electron Module Mocking
 
-### Media
+Uses `vi.hoisted()` to create mocks before ES module hoisting:
 
-- **Color Thief**: Extracts dominant colors from album artwork
-- **Lyric Resolver**: Parses and synchronizes song lyrics
+```ts
+const { registerMock, unregisterMock, appQuitMock } = vi.hoisted(() => ({
+  registerMock: vi.fn(),
+  unregisterMock: vi.fn(),
+  appQuitMock: vi.fn(),
+}));
 
-### System Integration
+vi.mock('electron', () => ({
+  app: { quit: appQuitMock },
+  globalShortcut: { register: registerMock, unregister: unregisterMock },
+}));
 
-- **System Information**: Retrieves system metrics for performance monitoring
-- **Electron Updater**: Handles application updates
+it('registers global shortcut', () => {
+  registerHotkey('CommandOrControl+Shift+A');
+  expect(registerMock).toHaveBeenCalledWith('CommandOrControl+Shift+A', expect.any(Function));
+});
+```
 
-## Development Tools
+#### Pattern 3: Preload Bridge Testing
 
-### Code Quality
+Tests both context-isolated and non-isolated modes:
 
-- **TypeScript**: Static type checking
-- **ESLint**: Code linting (implied by project structure)
-- **Prettier**: Code formatting (implied by project structure)
+```ts
+it('exposes api in isolated context', async () => {
+  process.contextIsolated = true;
+  vi.resetModules();
+  await import('./index');
+  expect(contextBridge.exposeInMainWorld).toHaveBeenCalledWith('api', expect.any(Object));
+});
 
-### Build & Package
+it('falls back to window assignment in non-isolated context', async () => {
+  process.contextIsolated = false;
+  vi.resetModules();
+  await import('./index');
+  expect(window.api).toBeDefined();
+});
+```
 
-- **Electron Builder**: Packages the application for distribution
-- **Electron Vite**: Development and build tooling
+#### Pattern 4: Store Aggregation Testing
 
-## Performance Considerations
+Mocks all slice creators and verifies composition:
 
-The frontend stack is optimized for:
+```ts
+it('composes all slices into single store', () => {
+  const mockIslandSlice = { state: 'idle', setIdle: vi.fn() };
+  const mockWeatherSlice = { weather: null, setWeather: vi.fn() };
 
-1. **Fast Development**: Vite's HMR provides instant feedback during development
-2. **Small Bundle Size**: Tree-shaking and code splitting reduce application size
-3. **Smooth Animations**: GSAP ensures 60fps animations even on lower-end hardware
-4. **Efficient Rendering**: React's virtual DOM minimizes unnecessary re-renders
+  vi.mock('../slices/islandSlice', () => ({
+    createIslandSlice: () => mockIslandSlice,
+  }));
+  vi.mock('../slices/weatherSlice', () => ({
+    createWeatherSlice: () => mockWeatherSlice,
+  }));
 
-## Browser Compatibility
+  const store = useIslandStore.getState();
+  expect(store.state).toBe('idle');
+  expect(store.weather).toBeNull();
+});
+```
 
-As an Electron application, eIsland runs on:
+#### Pattern 5: Pure Utility Testing
 
-- **Chromium**: Latest stable version (bundled with Electron)
-- **Node.js**: LTS version for main process
+Simple input/output tests for utility functions:
 
-This ensures consistent behavior across all Windows 10/11 systems without browser compatibility concerns.
+```ts
+describe('formatTime', () => {
+  it('formats HH:mm with leading zeros', () => {
+    expect(formatTime(new Date(2026, 0, 5, 7, 3, 9))).toBe('07:03');
+  });
 
----
+  it('handles midnight', () => {
+    expect(formatTime(new Date(2026, 0, 5, 0, 0, 0))).toBe('00:00');
+  });
+});
+```
 
-For detailed API documentation, refer to the source code comments and TypeScript definitions.
+### Test Coverage by Domain
+
+| Domain | Test Files | Coverage |
+|--------|------------|----------|
+| **Main Process** | ~30 files | IPC handlers, services, utilities |
+| **Preload** | ~5 files | Bridge exposure, context isolation |
+| **Renderer Store** | ~20 files | All 7 slices, store aggregation |
+| **Renderer Utils** | ~35 files | Pure functions, helpers, parsers |
+
+## Performance Optimizations
+
+### Window Management
+
+- **Mouse passthrough**: Idle states use `setIgnoreMouseEvents(true)` to reduce event processing
+- **Instant resize**: Larger-to-smaller transitions skip animation to avoid visual glitches
+- **Debounced hover**: Mouse enter/leave uses debounced timers to prevent rapid state changes
+
+### State Management
+
+- **Conditional transitions**: Guard logic prevents unnecessary re-renders
+- **Deferred persistence**: AI slice defers localStorage writes during streaming
+- **Cross-tab sync**: Storage events synchronize config across windows
+
+### Build Optimization
+
+- **Code splitting**: Multiple HTML entries enable lazy loading
+- **External dependencies**: Main/preload bundles exclude Node.js modules
+- **Tree shaking**: Vite eliminates unused exports
+- **GPU rasterization**: Chromium flags enable hardware acceleration
