@@ -2176,9 +2176,13 @@ public enum AgentErrorCode {
 
 ## Payment Processing
 
-### Alipay SDK
+### Overview
 
-Integrated payment processing for Chinese market:
+The payment system supports multiple payment channels for the Chinese market, with **Alipay** as the primary payment method. The architecture is designed for reliability with idempotent operations, async processing, and comprehensive error handling.
+
+### Alipay SDK Integration
+
+The application uses the **Alipay SDK for Java** to integrate with Alipay's payment gateway:
 
 ```xml
 <dependency>
@@ -2188,16 +2192,468 @@ Integrated payment processing for Chinese market:
 </dependency>
 ```
 
-**Features:**
-- Order creation and management
-- Payment callback handling
+#### Alipay Configuration
+
+```yaml
+payment:
+  alipay:
+    enabled: true
+    gateway-url: https://openapi.alipay.com/gateway.do
+    app-id: ${ALIPAY_APP_ID}
+    private-key-path: ${ALIPAY_PRIVATE_KEY_PATH}  # RSA2 private key file
+    public-key-path: ${ALIPAY_PUBLIC_KEY_PATH}    # Alipay public key file
+    notify-url: ${ALIPAY_NOTIFY_URL}              # Async callback URL
+    return-url: ${ALIPAY_RETURN_URL}              # Sync redirect URL
+    sign-type: RSA2                                # Signature algorithm
+    charset: UTF-8
+    query-pending-batch-size: 100
+```
+
+**Configuration Properties:**
+
+| Property | Description | Required |
+|----------|-------------|----------|
+| `enabled` | Enable/disable Alipay | Yes |
+| `gateway-url` | Alipay API endpoint | Yes |
+| `app-id` | Alipay application ID | Yes |
+| `private-key-path` | Path to RSA2 private key file | Yes |
+| `public-key-path` | Path to Alipay public key file | Yes |
+| `notify-url` | Async payment notification URL | Yes |
+| `return-url` | Sync redirect URL after payment | No |
+| `sign-type` | Signature algorithm (RSA2) | Yes |
+| `charset` | Character encoding | Yes |
+
+#### Alipay SDK Client
+
+The `AlipaySdkClient` encapsulates all Alipay API interactions:
+
+```java
+@Component
+public class AlipaySdkClient {
+    
+    private final AlipayProperties properties;
+    private volatile AlipayClient cachedClient;  // Thread-safe cached client
+    
+    // Build Alipay client with RSA2 authentication
+    private AlipayClient buildClient() throws Exception {
+        AlipayClient client = cachedClient;
+        if (client != null) {
+            return client;
+        }
+        synchronized (this) {
+            client = cachedClient;
+            if (client != null) {
+                return client;
+            }
+            
+            // Read RSA keys from file
+            String privateKey = readKey(properties.getPrivateKeyPath());
+            String publicKey = readKey(properties.getPublicKeyPath());
+            
+            // Create Alipay client
+            client = new DefaultAlipayClient(
+                    properties.getGatewayUrl(),    // API endpoint
+                    properties.getAppId(),         // App ID
+                    privateKey,                    // Private key
+                    "json",                        // Format
+                    properties.getCharset(),       // Charset
+                    publicKey,                     // Public key
+                    properties.getSignType()       // Sign type (RSA2)
+            );
+            
+            cachedClient = client;
+            return client;
+        }
+    }
+}
+```
+
+**Key Features:**
+- **Thread-Safe Client**: Double-checked locking for client initialization
+- **RSA2 Authentication**: Secure signature verification
+- **Key File Reading**: Automatic key file loading and parsing
+- **Client Caching**: Reuse client instance for performance
+
+#### Payment Operations
+
+**1. Create Page Order (PC Payment)**
+
+```java
+public PlaceOrderResult createPageOrder(String outTradeNo,
+                                        String description,
+                                        int amountFen,
+                                        int timeoutMinutes) throws Exception {
+    AlipayClient client = buildClient();
+    
+    // Build payment request
+    AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
+    request.setNotifyUrl(properties.getNotifyUrl());
+    request.setReturnUrl(properties.getReturnUrl());
+    
+    // Build payment model
+    AlipayTradePagePayModel model = new AlipayTradePagePayModel();
+    model.setOutTradeNo(outTradeNo);           // Unique order ID
+    model.setSubject(description);              // Order description
+    model.setTotalAmount(toYuan(amountFen));    // Amount in yuan (e.g., "15.00")
+    model.setProductCode("FAST_INSTANT_TRADE_PAY");  // Product code
+    model.setTimeoutExpress(timeoutMinutes + "m");    // Expiration time
+    
+    // Set absolute expiration time
+    String timeExpire = ZonedDateTime.now(ZoneId.of("Asia/Shanghai"))
+            .plusMinutes(timeoutMinutes)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    model.setTimeExpire(timeExpire);
+    
+    request.setBizModel(model);
+    
+    // Execute request (GET method for page payment)
+    AlipayTradePagePayResponse response = client.pageExecute(request, "GET");
+    
+    if (!response.isSuccess()) {
+        throw new IllegalStateException("Alipay order failed: " + response.getSubCode());
+    }
+    
+    return new PlaceOrderResult(null, response.getBody());  // Returns payment URL
+}
+```
+
+**Payment Flow:**
+
+```
+Client Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Create Order in Database                                │
+│     - Generate unique outTradeNo                            │
+│     - Set product, amount, expiration                       │
+│     - Store in payment_order table                          │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. Call Alipay API (createPageOrder)                       │
+│     - Submit order to Alipay                                │
+│     - Receive payment URL                                   │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Redirect User to Alipay                                 │
+│     - User scans QR code or logs in                         │
+│     - Completes payment                                     │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Alipay Async Notification (POST)                        │
+│     - Verify signature                                      │
+│     - Update order status                                   │
+│     - Grant user benefits (Pro subscription)                │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. Send Payment Receipt Email                              │
+│     - Async via RabbitMQ                                    │
+│     - Resend SDK delivery                                   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**2. Query Order Status**
+
+```java
+public QueryResult queryOrder(String outTradeNo) throws Exception {
+    AlipayClient client = buildClient();
+    
+    AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+    AlipayTradeQueryModel model = new AlipayTradeQueryModel();
+    model.setOutTradeNo(outTradeNo);
+    request.setBizModel(model);
+    
+    AlipayTradeQueryResponse response = client.execute(request);
+    
+    if (!response.isSuccess()) {
+        if (isTradeNotExist(response.getSubCode())) {
+            return QueryResult.notFound();
+        }
+        throw new IllegalStateException("Alipay query failed: " + response.getSubMsg());
+    }
+    
+    return new QueryResult(
+            response.getTradeStatus(),      // TRADE_SUCCESS, TRADE_CLOSED, etc.
+            response.getTradeNo(),          // Alipay transaction ID
+            toOffsetDateTime(response.getSendPayDate())  // Payment time
+    );
+}
+```
+
+**Trade Status Values:**
+
+| Status | Description | Action |
+|--------|-------------|--------|
+| `WAIT_BUYER_PAY` | Waiting for payment | Keep polling |
+| `TRADE_SUCCESS` | Payment successful | Grant benefits |
+| `TRADE_FINISHED` | Trade completed | No action needed |
+| `TRADE_CLOSED` | Trade closed/expired | No action needed |
+| `NOT_FOUND` | Trade doesn't exist | Handle error |
+
+**3. Close Order**
+
+```java
+public CloseResult closeOrder(String outTradeNo) {
+    AlipayClient client = buildClient();
+    
+    AlipayTradeCloseRequest request = new AlipayTradeCloseRequest();
+    AlipayTradeCloseModel model = new AlipayTradeCloseModel();
+    model.setOutTradeNo(outTradeNo);
+    request.setBizModel(model);
+    
+    AlipayTradeCloseResponse response = client.execute(request);
+    
+    if (!response.isSuccess()) {
+        if (isTradeNotExist(response.getSubCode())) {
+            return CloseResult.failed("TRADE_NOT_EXIST", "Trade not found");
+        }
+        return CloseResult.failed(response.getSubCode(), response.getSubMsg());
+    }
+    
+    return CloseResult.ok();
+}
+```
+
+**4. Cancel Order**
+
+```java
+public void cancelOrder(String outTradeNo) {
+    AlipayClient client = buildClient();
+    
+    AlipayTradeCancelRequest request = new AlipayTradeCancelRequest();
+    AlipayTradeCancelModel model = new AlipayTradeCancelModel();
+    model.setOutTradeNo(outTradeNo);
+    request.setBizModel(model);
+    
+    AlipayTradeCancelResponse response = client.execute(request);
+    
+    if (!response.isSuccess()) {
+        log.warn("Alipay cancel failed: {}", response.getSubMsg());
+    }
+}
+```
+
+#### Alipay Notification Handling
+
+The system handles Alipay's async payment notifications:
+
+```java
+@RestController
+@RequestMapping("/payment/alipay")
+public class AlipayNotifyController {
+    
+    @PostMapping("/notify")
+    public String handleNotify(HttpServletRequest request) {
+        // 1. Extract notification parameters
+        Map<String, String> params = extractParams(request);
+        
+        // 2. Verify signature using Alipay SDK
+        boolean verified = AlipaySignature.rsaCheckV1(params, publicKey, charset, signType);
+        
+        if (!verified) {
+            log.warn("Alipay notify signature verification failed");
+            return "failure";
+        }
+        
+        // 3. Process payment result
+        String tradeStatus = params.get("trade_status");
+        String outTradeNo = params.get("out_trade_no");
+        String tradeNo = params.get("trade_no");
+        
+        if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
+            // 4. Update order status and grant benefits
+            paymentService.handlePaymentSuccess(outTradeNo, tradeNo, params);
+        }
+        
+        // 5. Return success to Alipay
+        return "success";
+    }
+}
+```
+
+**Notification Security:**
+- **Signature Verification**: RSA2 signature check on every notification
+- **Idempotent Processing**: Redis-based duplicate detection
+- **Async Processing**: RabbitMQ for non-blocking operations
+
+#### Payment Products
+
+| Product | Description | Default Price |
+|---------|-------------|---------------|
+| `PRO_MONTH` | Pro subscription (1 month) | ¥15.00 |
+| `AGENT_RECHARGE` | AI agent credits | Variable |
+| `TEST_PAY` | Test payment | ¥0.01 |
+
+#### Order Lifecycle
+
+```
+Order Created
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Status: PENDING                                            │
+│  - Waiting for user to complete payment                     │
+│  - Timeout: 15 minutes (configurable)                       │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ├─── User Pays ───────────────────────────────────────────┐
+    │                                                         │
+    ▼                                                         ▼
+┌─────────────────────────┐                    ┌─────────────────────────┐
+│  Status: PAID           │                    │  Status: EXPIRED        │
+│  - Payment confirmed    │                    │  - Auto-close on timeout│
+│  - Grant benefits       │                    │  - Release resources    │
+│  - Send receipt email   │                    └─────────────────────────┘
+└─────────────────────────┘
+    │
+    ▼
+┌─────────────────────────┐
+│  Status: COMPLETED      │
+│  - Benefits active      │
+│  - Subscription started │
+└─────────────────────────┘
+```
+
+#### Concurrency Control
+
+The payment system uses multiple mechanisms for concurrency safety:
+
+```java
+// 1. Redis distributed lock for order creation
+String lockKey = "payment:lock:create:pro-month:" + username;
+String lockValue = UUID.randomUUID().toString();
+Boolean locked = paymentRedisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, 15, TimeUnit.SECONDS);
+
+if (!Boolean.TRUE.equals(locked)) {
+    throw new IllegalStateException("Order creation too frequent, please retry");
+}
+
+// 2. Idempotent notification processing
+String notifyDoneKey = "payment:notify:done:" + outTradeNo;
+Boolean alreadyProcessed = paymentRedisTemplate.opsForValue().setIfAbsent(notifyDoneKey, "1", 24, TimeUnit.HOURS);
+
+if (Boolean.TRUE.equals(alreadyProcessed)) {
+    log.info("Notification already processed: {}", outTradeNo);
+    return "success";
+}
+
+// 3. Database transaction for atomic operations
+@Transactional
+public void handlePaymentSuccess(String outTradeNo, String tradeNo, Map<String, String> params) {
+    // Update order status
+    paymentOrderMapper.updateStatus(outTradeNo, "PAID", tradeNo);
+    
+    // Create transaction record
+    paymentTransactionMapper.insert(new PaymentTransaction(...));
+    
+    // Grant user benefits (Pro subscription)
+    userService.updateProExpireAt(username, expireAt);
+}
+```
+
+### WeChat Pay Integration
+
+The system also supports **WeChat Pay** as an alternative payment channel:
+
+```yaml
+payment:
+  wechat:
+    enabled: false
+    mch-id: ${WX_PAY_MCH_ID}
+    app-id: ${WX_PAY_APP_ID}
+    api-v3-key: ${WX_PAY_API_V3_KEY}
+    private-key-path: ${WX_PAY_PRIVATE_KEY_PATH}
+    serial-no: ${WX_PAY_SERIAL_NO}
+    notify-url: ${WX_PAY_NOTIFY_URL}
+    public-key-id: ${WX_PAY_PUBLIC_KEY_ID}
+    public-key-path: ${WX_PAY_PUBLIC_KEY_PATH}
+    platform-cert-path: ${WX_PAY_PLATFORM_CERT_PATH}
+    order-expire-minutes: 15
+```
+
+**WeChat Pay Features:**
+- Native JSAPI payment
+- H5 payment
+- QR code payment
 - Refund processing
+
+### Payment Database Schema
+
+**payment_order Table:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | BIGINT | Primary key |
+| `out_trade_no` | VARCHAR(64) | Unique order ID |
+| `username` | VARCHAR(50) | User who created order |
+| `product_code` | VARCHAR(32) | Product identifier |
+| `amount_fen` | INT | Amount in fen (cents) |
+| `currency` | VARCHAR(3) | Currency code (CNY) |
+| `channel` | VARCHAR(16) | Payment channel (ALIPAY/WECHAT) |
+| `status` | VARCHAR(16) | Order status |
+| `trade_no` | VARCHAR(64) | Payment platform transaction ID |
+| `paid_at` | DATETIME | Payment time |
+| `expire_at` | DATETIME | Order expiration time |
+| `created_at` | DATETIME | Creation time |
+| `updated_at` | DATETIME | Last update time |
+
+**payment_transaction Table:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | BIGINT | Primary key |
+| `out_trade_no` | VARCHAR(64) | Order ID |
+| `trade_no` | VARCHAR(64) | Platform transaction ID |
+| `channel` | VARCHAR(16) | Payment channel |
+| `amount_fen` | INT | Amount |
+| `status` | VARCHAR(16) | Transaction status |
+| `raw_notify` | TEXT | Raw notification data |
+| `created_at` | DATETIME | Creation time |
+
+### Dead Letter Queue (DLQ)
+
+Failed payment operations are routed to DLQ for retry:
+
+```java
+// Payment DLQ message
+public record PaymentDlqMessage(
+    String outTradeNo,
+    String operation,
+    String errorMessage,
+    int retryCount,
+    LocalDateTime failedAt
+) {}
+
+// DLQ consumer with retry logic
+@RabbitListener(queues = "payment.dlq")
+public void handleDlq(PaymentDlqMessage message) {
+    if (message.retryCount() < MAX_RETRIES) {
+        // Retry operation
+        retryOperation(message);
+    } else {
+        // Log to database for manual review
+        paymentDlqLogMapper.insert(new PaymentDlqLog(...));
+    }
+}
+```
+
+---
 
 ## Email Services
 
-### Resend
+### Overview
 
-Modern email delivery service integration:
+The email system uses **Resend** as the primary email delivery service, providing reliable transactional email delivery with high deliverability rates.
+
+### Resend SDK Integration
 
 ```xml
 <dependency>
@@ -2206,10 +2662,375 @@ Modern email delivery service integration:
 </dependency>
 ```
 
-**Use Cases:**
-- Account verification emails
-- Password reset notifications
-- Marketing communications
+#### Resend Configuration
+
+```yaml
+resend:
+  api-key: ${RESEND_API_KEY}           # Resend API key
+  from: noreply@pyisland.com           # Sender email address
+  endpoint: https://api.resend.com/emails  # API endpoint (default)
+```
+
+**Configuration Properties:**
+
+| Property | Description | Required |
+|----------|-------------|----------|
+| `api-key` | Resend API authentication key | Yes |
+| `from` | Sender email address | Yes |
+| `endpoint` | API endpoint URL | No (default: Resend API) |
+
+#### Email Verification Service
+
+The `EmailVerificationService` handles all email verification flows:
+
+```java
+@Service
+public class EmailVerificationService {
+    
+    // Verification scenarios
+    public enum Scene {
+        REGISTER,           // New account registration
+        LOGIN,              // Login verification
+        RESET_PASSWORD,     // Password reset
+        CHANGE_EMAIL,       // Email change
+        UNREGISTER          // Account deletion
+    }
+    
+    // Rate limiting constants
+    private static final int CODE_LENGTH = 6;                    // 6-digit code
+    private static final long CODE_TTL_SECONDS = 5 * 60;         // 5-minute validity
+    private static final long SEND_COOLDOWN_SECONDS = 60;        // 60-second cooldown
+    private static final int MAX_VERIFY_ATTEMPTS = 5;            // 5 attempts max
+    private static final int MAX_IP_SENDS_PER_HOUR = 3;          // 3 per hour per IP
+    private static final int MAX_EMAIL_SENDS_PER_HOUR = 3;       // 3 per hour per email
+    private static final int MAX_EMAIL_SENDS_PER_DAY = 30;       // 30 per day per email
+    
+    public SendCodeResult sendCode(SendCodeCommand command) {
+        // 1. Check rate limits (per IP, per email)
+        if (isRateLimited(command.email(), command.clientIp())) {
+            return SendCodeResult.rateLimited(retryAfterSeconds);
+        }
+        
+        // 2. Generate 6-digit code
+        String code = generateCode();
+        
+        // 3. Store code in Redis with TTL
+        String key = buildKey(command.email(), command.scene());
+        verificationRedisTemplate.opsForValue().set(key, hash(code), 
+                Duration.ofSeconds(CODE_TTL_SECONDS));
+        
+        // 4. Send email via RabbitMQ (async)
+        rabbitTemplate.convertAndSend("email.verification", 
+                new EmailCodeDispatchMessage(command.email(), command.scene(), code, traceId));
+        
+        return SendCodeResult.ok();
+    }
+    
+    public VerifyCodeResult verifyCode(VerifyCodeCommand command) {
+        // 1. Get stored hash from Redis
+        String key = buildKey(command.email(), command.scene());
+        String storedHash = verificationRedisTemplate.opsForValue().get(key);
+        
+        if (storedHash == null) {
+            return VerifyCodeResult.expired();
+        }
+        
+        // 2. Verify code hash
+        if (!storedHash.equals(hash(command.code()))) {
+            recordFailedAttempt(command.email(), command.scene());
+            return VerifyCodeResult.invalid();
+        }
+        
+        // 3. Consume code if requested (one-time use)
+        if (command.consume()) {
+            verificationRedisTemplate.delete(key);
+        }
+        
+        return VerifyCodeResult.ok();
+    }
+}
+```
+
+**Verification Flow:**
+
+```
+User Request (Register/Login/Reset)
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Rate Limit Check                                        │
+│     - Per IP: 3 emails per hour                             │
+│     - Per email: 3 emails per hour, 30 per day              │
+│     - Cooldown: 60 seconds between sends                    │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. Generate Verification Code                              │
+│     - 6-digit numeric code                                  │
+│     - Hash with pepper before storage                       │
+│     - Store in Redis with 5-minute TTL                      │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Async Email Dispatch (RabbitMQ)                         │
+│     - Queue: email.verification                             │
+│     - Consumer calls Resend API                             │
+│     - DLQ for failed deliveries                             │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Resend Email Delivery                                   │
+│     - HTML template with code                               │
+│     - 5-minute expiration notice                            │
+│     - Trace ID for debugging                                │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. User Enters Code                                        │
+│     - Verify against stored hash                            │
+│     - Max 5 attempts before code invalidation               │
+│     - One-time consumption                                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Resend Email Service Implementation
+
+```java
+@Service
+public class ResendEmailService {
+    
+    private final String resendApiKey;
+    private final String resendFrom;
+    
+    public void sendVerificationCode(String email, Scene scene, String code, String traceId) {
+        // Validate configuration
+        if (resendApiKey == null || resendApiKey.isBlank()) {
+            throw new IllegalStateException("resend.api-key is missing");
+        }
+        
+        // Build email content
+        String subject = buildSubject(scene);
+        String html = buildHtml(scene, code, traceId);
+        
+        // Send via Resend SDK
+        Resend resend = new Resend(resendApiKey);
+        CreateEmailOptions options = CreateEmailOptions.builder()
+                .from(resendFrom)                    // Sender address
+                .to(List.of(email))                  // Recipient
+                .subject(subject)                    // Email subject
+                .html(html)                          // HTML content
+                .build();
+        
+        resend.emails().send(options);
+    }
+    
+    private String buildSubject(Scene scene) {
+        return switch (scene) {
+            case REGISTER -> "eIsland Registration Verification Code";
+            case LOGIN -> "eIsland Login Verification Code";
+            case RESET_PASSWORD -> "eIsland Password Reset Code";
+            case CHANGE_EMAIL -> "eIsland Email Change Code";
+            case UNREGISTER -> "eIsland Account Deletion Code";
+        };
+    }
+    
+    private String buildHtml(Scene scene, String code, String traceId) {
+        String sceneLabel = switch (scene) {
+            case REGISTER -> "Register Account";
+            case LOGIN -> "Login to Account";
+            case RESET_PASSWORD -> "Reset Password";
+            case CHANGE_EMAIL -> "Change Email";
+            case UNREGISTER -> "Delete Account";
+        };
+        
+        return """
+                <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111">
+                  <h2 style="margin:0 0 12px 0">eIsland Email Verification</h2>
+                  <p>You are performing: <strong>%s</strong></p>
+                  <p>Your verification code (valid for 5 minutes):</p>
+                  <p style="font-size:24px;letter-spacing:4px;font-weight:700;margin:8px 0 12px">%s</p>
+                  <p style="color:#666">If you did not request this, please ignore this email.</p>
+                  <p style="color:#999;font-size:12px">traceId: %s</p>
+                </div>
+                """.formatted(sceneLabel, code, traceId);
+    }
+}
+```
+
+**Email Template Features:**
+- **HTML Format**: Rich formatting with inline styles
+- **Scene-Specific Content**: Dynamic subject and body based on scenario
+- **Code Display**: Large, prominent verification code
+- **Expiration Notice**: 5-minute validity reminder
+- **Trace ID**: For debugging and support
+
+#### Payment Receipt Email
+
+After successful payment, a receipt email is sent:
+
+```java
+@Service
+public class PaymentReceiptEmailService {
+    
+    public void sendPaymentReceipt(String toEmail,
+                                   String outTradeNo,
+                                   String channel,
+                                   String transactionId,
+                                   Integer amountFen,
+                                   String currency,
+                                   String productCode,
+                                   LocalDateTime paidAt,
+                                   LocalDateTime expireAt) {
+        // Build receipt HTML
+        String subject = "eIsland Payment Receipt - " + outTradeNo;
+        String html = """
+                <div style="font-family:Arial,sans-serif;line-height:1.7;color:#111">
+                  <h2 style="margin:0 0 12px 0">eIsland Payment Successful</h2>
+                  <p>Your order has been paid successfully. Here is your receipt:</p>
+                  <table style="border-collapse:collapse;margin-top:12px">
+                    <tr><td>Order Number</td><td><strong>%s</strong></td></tr>
+                    <tr><td>Payment Channel</td><td>%s</td></tr>
+                    <tr><td>Transaction ID</td><td>%s</td></tr>
+                    <tr><td>Amount</td><td>%s %s</td></tr>
+                    <tr><td>Payment Time</td><td>%s</td></tr>
+                    <tr><td>Expiration</td><td>%s</td></tr>
+                    <tr><td>Product</td><td>%s</td></tr>
+                  </table>
+                </div>
+                """.formatted(outTradeNo, channel, transactionId, 
+                             formatAmount(amountFen), currency,
+                             paidAt, expireAt, productCode);
+        
+        // Send via Resend
+        Resend resend = new Resend(resendApiKey);
+        CreateEmailOptions options = CreateEmailOptions.builder()
+                .from(resendFrom)
+                .to(List.of(toEmail))
+                .subject(subject)
+                .html(html)
+                .build();
+        
+        resend.emails().send(options);
+    }
+}
+```
+
+**Receipt Email Content:**
+- Order number
+- Payment channel (Alipay/WeChat)
+- Transaction ID
+- Amount in yuan
+- Payment timestamp
+- Subscription expiration
+- Product description
+
+### Email Dispatch Architecture
+
+```
+Email Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Service Layer                                           │
+│     - EmailVerificationService                              │
+│     - PaymentReceiptEmailService                            │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. RabbitMQ Queue                                          │
+│     - email.verification (verification codes)               │
+│     - payment.receipt (payment receipts)                    │
+│     - email.dlq (failed deliveries)                         │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Consumer Processing                                     │
+│     - EmailCodeDispatchConsumer                             │
+│     - PaymentReceiptDispatchConsumer                        │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Resend API Call                                         │
+│     - ResendEmailService.sendVerificationCode()             │
+│     - PaymentReceiptEmailService.sendPaymentReceipt()       │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. Email Delivery                                          │
+│     - Resend infrastructure                                 │
+│     - High deliverability                                   │
+│     - Tracking and analytics                                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Rate Limiting
+
+Email sending is rate-limited to prevent abuse:
+
+| Limit Type | Limit | Window |
+|------------|-------|--------|
+| Per IP | 3 emails | 1 hour |
+| Per Email | 3 emails | 1 hour |
+| Per Email | 30 emails | 24 hours |
+| Cooldown | 1 email | 60 seconds |
+| Code Attempts | 5 attempts | Per code |
+
+### Error Handling
+
+```java
+// Email dispatch consumer with retry
+@RabbitListener(queues = "email.verification")
+public void handleEmailDispatch(EmailCodeDispatchMessage message) {
+    try {
+        resendEmailService.sendVerificationCode(
+                message.email(),
+                message.scene(),
+                message.code(),
+                message.traceId()
+        );
+    } catch (Exception ex) {
+        log.error("Email dispatch failed: {}", ex.getMessage());
+        
+        // Retry logic
+        if (message.retryCount() < MAX_RETRIES) {
+            // Requeue with incremented retry count
+            rabbitTemplate.convertAndSend("email.verification",
+                    message.withRetryCount(message.retryCount() + 1));
+        } else {
+            // Send to DLQ
+            rabbitTemplate.convertAndSend("email.dlq", message);
+            
+            // Log to database
+            emailDispatchDlqLogMapper.insert(new EmailDispatchDlqLog(...));
+        }
+    }
+}
+```
+
+### Security Considerations
+
+1. **Code Hashing**: Verification codes hashed with pepper before Redis storage
+2. **Rate Limiting**: Multiple layers (IP, email, cooldown)
+3. **One-Time Use**: Codes consumed after successful verification
+4. **TTL Expiration**: 5-minute code validity
+5. **Attempt Limiting**: 5 failed attempts invalidate code
+6. **Trace ID**: Unique identifier for each email for debugging
+
+### Performance Optimizations
+
+1. **Async Processing**: RabbitMQ for non-blocking email dispatch
+2. **Connection Pooling**: Resend SDK connection reuse
+3. **Batch Operations**: Bulk email capabilities
+4. **DLQ Retry**: Automatic retry for failed deliveries
+5. **Monitoring**: Email delivery tracking and analytics
 
 ## Configuration Management
 
