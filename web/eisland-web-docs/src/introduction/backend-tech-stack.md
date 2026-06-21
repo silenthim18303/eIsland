@@ -755,29 +755,649 @@ Redis optimizations include:
 
 ### JWT (JSON Web Tokens)
 
-The application uses **JJWT** for token-based authentication:
+The application uses **JJWT** (Java JWT) for stateless token-based authentication. JWT tokens are the primary authentication mechanism, eliminating the need for server-side session storage.
 
-```xml
-<dependency>
-    <groupId>io.jsonwebtoken</groupId>
-    <artifactId>jjwt-api</artifactId>
-    <version>0.12.6</version>
-</dependency>
+#### JWT Configuration
+
+```yaml
+jwt:
+  secret: ${JWT_SECRET}  # HMAC-SHA256 key (minimum 256 bits)
+  expiration: ${JWT_EXPIRATION}  # Token validity in milliseconds (default: 7 days)
 ```
 
-**Features:**
-- Stateless authentication
-- Token expiration management
-- Secure token generation and validation
+#### JWT Utility Class
 
-### Spring Security
+The `JwtUtil` class handles token generation, validation, and parsing:
 
-Comprehensive security configuration including:
+```java
+@Component
+public class JwtUtil {
+    private final SecretKey key;
+    private final long expiration;
+    
+    public JwtUtil(@Value("${jwt.secret}") String secret,
+                   @Value("${jwt.expiration}") long expiration) {
+        // Generate HMAC-SHA256 key from secret string
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        this.expiration = expiration;
+    }
+    
+    // Generate token with username and role
+    public String generateToken(String username, String role) {
+        return Jwts.builder()
+                .subject(username)                    // Subject: username
+                .claim("role", role)                  // Custom claim: user role
+                .issuedAt(new Date())                 // Issued at timestamp
+                .expiration(new Date(System.currentTimeMillis() + expiration))  // Expiration
+                .signWith(key)                        // HMAC-SHA256 signature
+                .compact();
+    }
+    
+    // Validate token signature and expiration
+    public boolean validateToken(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;  // Invalid signature, expired, or malformed
+        }
+    }
+    
+    // Extract username from token
+    public String getUsernameFromToken(String token) {
+        return parseClaims(token).getSubject();
+    }
+    
+    // Extract role from token (defaults to "user")
+    public String getRoleFromToken(String token) {
+        Claims claims = parseClaims(token);
+        Object role = claims.get("role");
+        if (role instanceof String roleStr && !roleStr.isBlank()) {
+            return roleStr;
+        }
+        return "user";
+    }
+    
+    // Parse and verify token claims
+    private Claims parseClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+}
+```
 
-- CORS policy management
-- CSRF protection
-- Role-based access control
-- Request filtering
+**Key Features:**
+- **HMAC-SHA256 Signing**: Cryptographic signature verification
+- **Automatic Expiration**: Tokens expire after configurable period
+- **Role-Based Claims**: User role embedded in token
+- **Stateless Validation**: No database lookup required for basic validation
+
+#### JWT Authentication Filter
+
+The `JwtAuthenticationFilter` intercepts every request to validate JWT tokens:
+
+```java
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    
+    // Business error codes for specific scenarios
+    public static final int CODE_SESSION_KICKED = 4011;  // Session invalidated
+    public static final int CODE_USER_BANNED = 4031;     // User banned
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        // 1. Extract token from Authorization header
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        String token = authHeader.substring(7).trim();
+        
+        // 2. Validate token signature and expiration
+        if (token.isEmpty() || !jwtUtil.validateToken(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        // 3. Extract user information from token
+        String username = jwtUtil.getUsernameFromToken(token);
+        String role = jwtUtil.getRoleFromToken(token);
+        
+        // 4. Verify user exists and is active
+        User user = userService.getByUsername(username);
+        if (user == null) {
+            writeError(response, SC_UNAUTHORIZED, 401, "Account deleted");
+            return;
+        }
+        
+        // 5. Check if user is banned (using Bloom Filter for fast lookup)
+        if (userBanBloomService.isBanned(user.getUsername())) {
+            writeError(response, SC_FORBIDDEN, CODE_USER_BANNED, "Account banned");
+            return;
+        }
+        
+        // 6. Check if account is enabled
+        if (Boolean.FALSE.equals(user.getEnabled())) {
+            writeError(response, SC_UNAUTHORIZED, 401, "Account disabled");
+            return;
+        }
+        
+        // 7. Verify session token (single device login enforcement)
+        if (user.getSessionToken() != null && !token.equals(user.getSessionToken())) {
+            writeError(response, SC_UNAUTHORIZED, CODE_SESSION_KICKED, "Logged in elsewhere");
+            return;
+        }
+        
+        // 8. Set security context for downstream controllers
+        String effectiveRole = user.getRole() != null ? user.getRole() : role;
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(
+                "ROLE_" + effectiveRole.toUpperCase(Locale.ROOT));
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user.getUsername(), null, List.of(authority));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        
+        // 9. Expose user info via request attributes
+        request.setAttribute("username", user.getUsername());
+        request.setAttribute("role", effectiveRole);
+        request.setAttribute("userId", user.getId());
+        
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+**Authentication Flow:**
+
+```
+Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Extract Bearer Token from Authorization Header          │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. Validate JWT Signature & Expiration                     │
+│     - HMAC-SHA256 verification                              │
+│     - Check expiration timestamp                            │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Extract Username & Role from Claims                     │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  4. Database Verification                                   │
+│     - User exists?                                          │
+│     - Account enabled?                                      │
+│     - Not banned? (Bloom Filter → Exact Set)                │
+│     - Session token matches? (Single device enforcement)    │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  5. Set Security Context                                    │
+│     - Username                                              │
+│     - Role (ROLE_USER, ROLE_PRO, ROLE_ADMIN)                │
+│     - Request attributes                                    │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+  Continue to Controller
+```
+
+### Spring Security Configuration
+
+Comprehensive security configuration with stateless JWT authentication:
+
+```java
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(12);  // BCrypt with strength 12
+    }
+    
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            // Disable CSRF (stateless JWT doesn't need it)
+            .csrf(AbstractHttpConfigurer::disable)
+            
+            // Enable CORS with configurable origins
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            
+            // Stateless session management (no HTTP Session)
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            
+            // URL-based authorization rules
+            .authorizeHttpRequests(reg -> reg
+                // Public endpoints
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/v1/version/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/v1/service-status/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/v1/announcement/current").permitAll()
+                .requestMatchers(HttpMethod.POST, "/v1/payment/wechat/notify").permitAll()
+                .requestMatchers(HttpMethod.POST, "/v1/payment/alipay/notify").permitAll()
+                
+                // Authenticated user endpoints
+                .requestMatchers("/v1/user/**").hasAnyRole("USER", "PRO", "ADMIN")
+                .requestMatchers("/v1/mini-game/**").hasAnyRole("USER", "PRO", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/v1/upload/**").hasAnyRole("USER", "PRO", "ADMIN")
+                
+                // Admin-only endpoints
+                .anyRequest().hasRole("ADMIN")
+            )
+            
+            // Custom error handlers
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(new JsonAuthenticationEntryPoint())
+                .accessDeniedHandler(new JsonAccessDeniedHandler())
+            )
+            
+            // Security filter chain
+            .addFilterBefore(clientVersionGateFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(replayProtectionFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
+    }
+}
+```
+
+**Security Features:**
+
+| Feature | Implementation | Purpose |
+|---------|----------------|---------|
+| **CSRF Protection** | Disabled | Stateless JWT doesn't require CSRF tokens |
+| **Session Management** | STATELESS | No HTTP Session stored on server |
+| **CORS** | Configurable origins | Cross-origin request control |
+| **Password Hashing** | BCrypt (strength 12) | Secure password storage |
+| **Role-Based Access** | ROLE_USER, ROLE_PRO, ROLE_ADMIN | Endpoint authorization |
+
+### Password Security
+
+#### BCrypt Password Hashing
+
+All passwords are hashed using **BCrypt** with configurable strength:
+
+```java
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(12);  // Strength 12 = 2^12 iterations
+}
+```
+
+**BCrypt Properties:**
+- **Salt**: Automatically generated per password
+- **Iterations**: 2^12 = 4096 rounds (configurable)
+- **Output**: 60-character hash string
+- **One-Way**: Cannot be reversed to plaintext
+
+### Replay Protection
+
+The `ReplayProtectionFilter` prevents replay attacks on sensitive endpoints:
+
+```java
+@Component
+public class ReplayProtectionFilter extends OncePerRequestFilter {
+    
+    private static final long ALLOWED_SKEW_MILLIS = 5 * 60 * 1000L;  // 5-minute window
+    
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        // Only protect write operations (POST, PUT, DELETE)
+        if (!isProtectedRequest(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
+        // Extract timestamp and nonce from headers
+        String timestampHeader = request.getHeader("X-Timestamp");
+        String nonce = request.getHeader("X-Nonce");
+        
+        // Validate timestamp is within allowed window
+        long timestamp = Long.parseLong(timestampHeader.trim());
+        long now = Instant.now().toEpochMilli();
+        if (Math.abs(now - timestamp) > ALLOWED_SKEW_MILLIS) {
+            writeError(response, 4002, "Request timestamp expired");
+            return;
+        }
+        
+        // Check nonce uniqueness in Redis (prevents replay)
+        String key = "auth:replay:" + principal + ":" + method + ":" + uri + ":" + nonce;
+        Boolean accepted = authSecurityRedisTemplate.opsForValue().setIfAbsent(
+                key, String.valueOf(now), Duration.ofMillis(ALLOWED_SKEW_MILLIS));
+        
+        if (!Boolean.TRUE.equals(accepted)) {
+            writeError(response, 4003, "Replay attack detected");
+            return;
+        }
+        
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+**Replay Protection Flow:**
+
+```
+Client Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Include Headers:                                           │
+│    - X-Timestamp: 1719000000000 (Unix milliseconds)        │
+│    - X-Nonce: random-unique-string-128-chars                │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  Server Validation:                                         │
+│    1. Check timestamp within 5-minute window                │
+│    2. Check nonce not used before (Redis SETNX)             │
+│    3. Store nonce with TTL                                  │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+  Request Accepted or Rejected (4003 Replay Detected)
+```
+
+### Rate Limiting
+
+Multiple rate limiting mechanisms protect against abuse:
+
+#### Authentication Rate Limiting
+
+```java
+@Component
+public class AuthRateLimiter {
+    // Login: 5 failures per 5-minute window, 10-minute lockout
+    public static final int LOGIN_MAX_FAILURES = 5;
+    public static final long LOGIN_WINDOW_MS = 5 * 60 * 1000L;
+    public static final long LOGIN_LOCK_MS = 10 * 60 * 1000L;
+    
+    // Registration: 5 attempts per hour per IP
+    public static final int REGISTER_MAX_ATTEMPTS = 5;
+    public static final long REGISTER_WINDOW_MS = 60 * 60 * 1000L;
+    
+    public void recordLoginFailure(String key) {
+        // Sliding window using Redis Sorted Set
+        authSecurityRedisTemplate.opsForZSet().add(failuresKey, member, now);
+        authSecurityRedisTemplate.opsForZSet().removeRangeByScore(failuresKey, 0, now - LOGIN_WINDOW_MS);
+        
+        Long failureCount = authSecurityRedisTemplate.opsForZSet().zCard(failuresKey);
+        if (failureCount >= LOGIN_MAX_FAILURES) {
+            // Lock account for 10 minutes
+            authSecurityRedisTemplate.opsForValue().set(loginLockKey, 
+                String.valueOf(now + LOGIN_LOCK_MS), Duration.ofMillis(LOGIN_LOCK_MS));
+        }
+    }
+}
+```
+
+#### Slider CAPTCHA Rate Limiting
+
+```java
+@Service
+public class SliderCaptchaService {
+    // Token bucket algorithm using Lua script
+    private static final RedisScript<List<Long>> TOKEN_BUCKET_SCRIPT = buildTokenBucketScript();
+    
+    // Rate limits per operation
+    private final int createRateLimitAccount;  // 12 per minute per account
+    private final int createRateLimitIp;       // 24 per minute per IP
+    private final int verifyRateLimitIp;       // 60 per minute per IP
+    private final int verifyFailLimitAccount;  // 3 failures per 10 minutes
+    private final int verifyFailLimitIp;       // 3 failures per 10 minutes
+    
+    public CaptchaChallenge createChallenge(String account, String userIp) {
+        // Check rate limits before creating challenge
+        assertRateLimit(keyCreateRateAccount(normalizedAccount), createRateLimitAccount, ...);
+        assertRateLimit(keyCreateRateIp(normalizedIp), createRateLimitIp, ...);
+        
+        // Limit pending challenges
+        Long pendingCount = sliderCaptchaRedisTemplate.opsForSet().size(keyAccountChallenges(normalizedAccount));
+        if (pendingCount >= MAX_PENDING_CHALLENGES_PER_ACCOUNT) {
+            throw new TooManyPendingChallengesException("Too many pending challenges");
+        }
+        
+        // Create challenge with random target value
+        int target = ThreadLocalRandom.current().nextInt(minValue, maxValue + 1);
+        String challengeId = UUID.randomUUID().toString();
+        
+        // Store challenge in Redis with TTL
+        sliderCaptchaRedisTemplate.opsForValue().set(
+                keyChallenge(challengeId), String.valueOf(target), ttl);
+        
+        return new CaptchaChallenge(challengeId, minValue, maxValue, target, tolerance, captchaSign);
+    }
+}
+```
+
+**Token Bucket Algorithm (Lua Script):**
+
+```lua
+-- Atomic token bucket implementation in Redis
+local key = KEYS[1]
+local now_ms = tonumber(ARGV[1])
+local capacity = tonumber(ARGV[2])
+local refill_per_ms = tonumber(ARGV[3])
+local requested = tonumber(ARGV[4])
+
+-- Load current state
+local state = redis.call('HMGET', key, 'tokens', 'ts')
+local tokens = tonumber(state[1]) or capacity
+local ts = tonumber(state[2]) or now_ms
+
+-- Calculate token refill
+local elapsed = now_ms - ts
+tokens = math.min(capacity, tokens + elapsed * refill_per_ms)
+
+-- Check if request can be fulfilled
+local allowed = 0
+local retry_after_ms = 0
+if tokens >= requested then
+    tokens = tokens - requested
+    allowed = 1
+else
+    local deficit = requested - tokens
+    retry_after_ms = math.ceil(deficit / refill_per_ms)
+end
+
+-- Update state
+redis.call('HSET', key, 'tokens', tokens, 'ts', now_ms)
+redis.call('EXPIRE', key, ttl_seconds)
+
+return { allowed, math.floor(tokens), retry_after_ms }
+```
+
+### TOTP (Time-Based One-Time Password)
+
+Two-Factor Authentication (2FA) using TOTP:
+
+```java
+@Service
+public class TotpSecurityService {
+    public static final int TOTP_DIGITS = 6;
+    public static final long TOTP_PERIOD_SECONDS = 30L;
+    
+    // Security features
+    private final int failMaxAttempts;           // 5 attempts before lockout
+    private final long failWindowSeconds;        // 10-minute window
+    private final int userRateMax;               // 30 per minute per user
+    private final int ipRateMax;                 // 60 per minute per IP
+    private final long replayProtectSeconds;     // 120-second replay protection
+    
+    public String verifyTotpOrMessage(String username, String clientIp, String code) {
+        // 1. Rate limiting check
+        // 2. Decrypt stored TOTP secret (AES-256-GCM)
+        // 3. Generate TOTP codes for current and adjacent windows
+        // 4. Verify code matches
+        // 5. Check replay protection (code not used recently)
+        // 6. Record success or failure
+        return null;  // null = success
+    }
+}
+```
+
+**TOTP Security Features:**
+
+| Feature | Implementation | Purpose |
+|---------|----------------|---------|
+| **Encryption** | AES-256-GCM | Secure secret storage |
+| **Rate Limiting** | Per-user and per-IP | Prevent brute force |
+| **Replay Protection** | Redis-based code tracking | Prevent code reuse |
+| **Failure Tracking** | Sliding window counter | Account lockout |
+| **Time Window** | ±30 seconds | Clock drift tolerance |
+
+### User Ban System
+
+Multi-layer ban checking with Bloom Filter optimization:
+
+```java
+@Service
+public class UserBanBloomService {
+    // Two-layer verification: Bloom Filter → Exact Set
+    public boolean isBanned(String username) {
+        String normalized = normalizeUsername(username);
+        
+        // Layer 1: Bloom Filter (fast rejection)
+        if (!mightContain(normalized)) {
+            return false;  // Definitely not banned
+        }
+        
+        // Layer 2: Exact Set verification
+        Boolean exact = userBanRedisTemplate.opsForSet().isMember(exactSetKey, normalized);
+        return Boolean.TRUE.equals(exact);
+    }
+}
+```
+
+**Ban Check Flow:**
+
+```
+Authentication Request
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  1. Bloom Filter Check (O(k) time, k=6 hash functions)     │
+│     - If "not contained" → User definitely not banned       │
+│     - If "might contain" → Proceed to exact check           │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  2. Redis Set Check (O(1) time)                             │
+│     - Exact membership verification                         │
+│     - No false positives                                     │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  3. Decision                                                │
+│     - Not banned → Continue authentication                  │
+│     - Banned → Return 403 with CODE_USER_BANNED (4031)      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Security Headers & CORS
+
+```java
+@Bean
+public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
+    
+    // Configurable allowed origins
+    config.setAllowedOriginPatterns(List.of("*"));
+    
+    // Allowed HTTP methods
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    
+    // Allowed headers
+    config.setAllowedHeaders(List.of("*"));
+    
+    // Allow credentials (cookies, authorization headers)
+    config.setAllowCredentials(true);
+    
+    // Cache preflight response for 1 hour
+    config.setMaxAge(3600L);
+    
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", config);
+    return source;
+}
+```
+
+### Error Handling
+
+Standardized JSON error responses:
+
+```java
+// Authentication entry point (401 Unauthorized)
+public class JsonAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response,
+                         AuthenticationException authException) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("code", 401);
+        body.put("message", "Authentication required");
+        
+        objectMapper.writeValue(response.getWriter(), body);
+    }
+}
+
+// Access denied handler (403 Forbidden)
+public class JsonAccessDeniedHandler implements AccessDeniedHandler {
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("code", 403);
+        body.put("message", "Access denied");
+        
+        objectMapper.writeValue(response.getWriter(), body);
+    }
+}
+```
+
+### Security Best Practices Summary
+
+| Category | Implementation | Details |
+|----------|----------------|---------|
+| **Authentication** | JWT (HMAC-SHA256) | Stateless, 7-day expiration |
+| **Password Storage** | BCrypt (strength 12) | Salted, 4096 iterations |
+| **Session Management** | Single device enforcement | Session token in DB |
+| **Rate Limiting** | Redis sliding window | Per-user and per-IP limits |
+| **Replay Protection** | Timestamp + Nonce | 5-minute window, Redis SETNX |
+| **Brute Force Protection** | Account lockout | 5 failures → 10-minute lock |
+| **CAPTCHA** | Slider verification | Token bucket rate limiting |
+| **2FA** | TOTP (AES-256-GCM) | 6-digit codes, 30-second window |
+| **User Ban** | Bloom Filter + Exact Set | Fast rejection, no false negatives |
+| **CORS** | Configurable origins | Credential support |
+| **CSRF** | Disabled | Not needed for stateless JWT |
+| **Input Validation** | Bean Validation | @Valid, @NotNull, @Size |
+| **SQL Injection** | MyBatis parameterized queries | #{param} syntax |
+| **XSS Protection** | Output encoding | Jackson JSON serialization |
 
 ## Message Queue
 
