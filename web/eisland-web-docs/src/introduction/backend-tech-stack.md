@@ -44,21 +44,409 @@ server/
 
 ## Database
 
-### MySQL + MyBatis
+### MySQL
 
-**MySQL** is used as the primary relational database, accessed through **MyBatis** for SQL mapping and ORM capabilities.
+**MySQL** is used as the primary relational database for persistent data storage. The application connects to MySQL using the official JDBC driver with optimized connection settings.
+
+#### Database Configuration
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+```
+
+**Key Features:**
+- **UTF-8 Encoding**: Full Unicode support for international content
+- **Asia/Shanghai Timezone**: Consistent timestamp handling
+- **Connection Pooling**: Managed by Spring Boot's HikariCP (default)
+
+#### Database Schema
+
+The database consists of multiple tables organized by domain:
+
+| Domain | Tables | Purpose |
+|--------|--------|---------|
+| **User** | `user_account`, `user_active_daily` | User profiles, authentication, activity tracking |
+| **Mini Game** | `mini_game_score`, `mini_game_score_dlq_log` | Game scores, leaderboards, dead letter queue logs |
+| **Payment** | `payment_order`, `payment_transaction`, `payment_notify_log`, `payment_pricing_config`, `payment_dlq_log` | Payment processing, order management |
+| **Version** | `app_version` | Application version management |
+| **Service Status** | `service_status` | Service health monitoring |
+| **Upload** | `object_outbox`, `object_replication_task`, `object_replication_checkpoint`, `object_replication_backfill` | File upload, object replication |
+| **Agent** | `agent_usage_stats`, `agent_model_pricing`, `agent_billing_dlq_log` | AI agent usage tracking, billing |
+| **Wallpaper** | `wallpaper_market`, `wallpaper_tag` | Wallpaper marketplace |
+| **Auth** | `issue_feedback`, `email_dispatch_dlq_log` | Issue feedback, email dispatch |
+| **Identity** | `identity_verification` | Identity verification |
+
+### MyBatis ORM
+
+**MyBatis** is used as the Object-Relational Mapping (ORM) framework, providing flexible SQL mapping and database interaction.
+
+#### MyBatis Configuration
+
+```yaml
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.pyisland.server.user.entity,com.pyisland.server.version.entity,com.pyisland.server.servicestatus.entity,com.pyisland.server.minigame.entity
+  configuration:
+    map-underscore-to-camel-case: true  # Automatic column-to-property mapping
+```
+
+**Key Configuration:**
+- **Mapper Locations**: XML mapper files in `classpath*:mapper/*.xml`
+- **Type Aliases**: Automatic package scanning for entity classes
+- **Underscore to Camel Case**: Automatic conversion (e.g., `user_id` → `userId`)
+
+#### Mapper Interface Pattern
+
+MyBatis uses a **Mapper Interface** pattern for type-safe database access:
+
+```java
+@Mapper
+public interface UserMapper {
+    
+    // Query by username
+    User selectByUsername(@Param("username") String username);
+    
+    // Query by email
+    User selectByEmail(@Param("email") String email);
+    
+    // Insert new user
+    int insert(User user);
+    
+    // Update profile
+    int updateProfile(@Param("username") String username,
+                      @Param("password") String password,
+                      @Param("avatar") String avatar);
+    
+    // Atomic balance deduction
+    int deductBalance(@Param("username") String username,
+                      @Param("amountFen") BigDecimal amountFen);
+}
+```
+
+#### XML Mapper Files
+
+SQL statements are defined in XML mapper files for complex queries:
 
 ```xml
-<!-- Database Configuration -->
-<dependency>
-    <groupId>com.mysql</groupId>
-    <artifactId>mysql-connector-j</artifactId>
-</dependency>
-<dependency>
-    <groupId>org.mybatis.spring.boot</groupId>
-    <artifactId>mybatis-spring-boot-starter</artifactId>
-</dependency>
+<mapper namespace="com.pyisland.server.user.mapper.UserMapper">
+    
+    <!-- Result mapping for User entity -->
+    <resultMap id="UserResultMap" type="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="email" column="email"/>
+        <result property="password" column="password"/>
+        <result property="role" column="role"/>
+        <result property="proExpireAt" column="pro_expire_at"/>
+        <result property="avatar" column="avatar"/>
+        <result property="balanceFen" column="balance_fen"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+    
+    <!-- Reusable column set -->
+    <sql id="baseColumns">
+        id, username, email, password, role, pro_expire_at, avatar, 
+        gender, gender_custom, birthday, enabled, session_token, 
+        totp_secret_ciphertext, totp_secret_updated_at, balance_fen, created_at
+    </sql>
+    
+    <!-- Select query with parameterized WHERE clause -->
+    <select id="selectByUsername" resultMap="UserResultMap">
+        SELECT <include refid="baseColumns"/>
+        FROM user_account
+        WHERE username = #{username}
+    </select>
+    
+    <!-- Insert with auto-generated key -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_account
+            (username, email, password, role, pro_expire_at, avatar, 
+             gender, gender_custom, birthday, balance_fen, enabled, 
+             session_token, created_at)
+        VALUES
+            (#{username}, #{email}, #{password}, #{role}, #{proExpireAt}, 
+             #{avatar}, #{gender}, #{genderCustom}, #{birthday}, #{balanceFen}, 
+             #{enabled}, #{sessionToken}, #{createdAt})
+    </insert>
+    
+    <!-- Conditional UPDATE with atomic operations -->
+    <update id="deductBalance">
+        UPDATE user_account
+        SET balance_fen = GREATEST(balance_fen - #{amountFen}, 0)
+        WHERE username = #{username}
+          AND balance_fen > 0
+    </update>
+    
+    <!-- Conditional SELECT with dynamic WHERE -->
+    <select id="selectByRole" resultMap="UserResultMap">
+        SELECT <include refid="baseColumns"/>
+        FROM user_account
+        <where>
+            <if test="role != null">role = #{role}</if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+    
+    <!-- INSERT IGNORE for idempotent operations -->
+    <insert id="insertDailyActive">
+        INSERT IGNORE INTO user_active_daily (username, role, active_date, active_at)
+        VALUES (#{username}, #{role}, #{activeDate}, #{activeAt})
+    </insert>
+    
+    <!-- Atomic CAS (Compare-And-Swap) operation -->
+    <update id="updateBestIfGreater">
+        UPDATE mini_game_score
+        SET high_score = #{highScore},
+            best_duration_ms = #{bestDurationMs},
+            best_moves = #{bestMoves},
+            achieved_at = #{achievedAt},
+            updated_at = #{updatedAt}
+        WHERE user_id = #{userId}
+          AND game_id = #{gameId}
+          AND high_score &lt; #{highScore}
+    </update>
+</mapper>
 ```
+
+#### Advanced MyBatis Features Used
+
+**1. Result Maps**
+
+Complex object mapping with nested properties:
+
+```xml
+<resultMap id="MiniGameScoreResultMap" type="com.pyisland.server.minigame.entity.MiniGameScore">
+    <id property="id" column="id"/>
+    <result property="userId" column="user_id"/>
+    <result property="gameId" column="game_id"/>
+    <result property="highScore" column="high_score"/>
+    <result property="bestDurationMs" column="best_duration_ms"/>
+    <result property="bestMoves" column="best_moves"/>
+    <result property="playsCount" column="plays_count"/>
+    <result property="lastPlayedAt" column="last_played_at"/>
+    <result property="achievedAt" column="achieved_at"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+</resultMap>
+```
+
+**2. Dynamic SQL**
+
+Conditional clauses with `<where>`, `<if>`, and `<choose>`:
+
+```xml
+<select id="selectByRole" resultMap="UserResultMap">
+    SELECT <include refid="baseColumns"/>
+    FROM user_account
+    <where>
+        <if test="role != null">role = #{role}</if>
+    </where>
+    ORDER BY created_at DESC
+</select>
+```
+
+**3. SQL Fragments**
+
+Reusable SQL snippets with `<sql>` and `<include>`:
+
+```xml
+<sql id="baseColumns">
+    id, username, email, password, role, pro_expire_at, avatar
+</sql>
+
+<select id="selectByUsername" resultMap="UserResultMap">
+    SELECT <include refid="baseColumns"/>
+    FROM user_account
+    WHERE username = #{username}
+</select>
+```
+
+**4. Auto-Generated Keys**
+
+Automatic primary key retrieval after INSERT:
+
+```xml
+<insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO user_account (username, email, password)
+    VALUES (#{username}, #{email}, #{password})
+</insert>
+```
+
+**5. Atomic Operations**
+
+Database-level atomic updates for concurrency safety:
+
+```xml
+<!-- Atomic balance deduction with floor protection -->
+<update id="deductBalance">
+    UPDATE user_account
+    SET balance_fen = GREATEST(balance_fen - #{amountFen}, 0)
+    WHERE username = #{username}
+      AND balance_fen > 0
+</update>
+
+<!-- CAS (Compare-And-Swap) for high score updates -->
+<update id="updateBestIfGreater">
+    UPDATE mini_game_score
+    SET high_score = #{highScore}
+    WHERE user_id = #{userId}
+      AND game_id = #{gameId}
+      AND high_score &lt; #{highScore}
+</update>
+```
+
+**6. INSERT IGNORE**
+
+Idempotent insert operations:
+
+```xml
+<insert id="insertDailyActive">
+    INSERT IGNORE INTO user_active_daily (username, role, active_date, active_at)
+    VALUES (#{username}, #{role}, #{activeDate}, #{activeAt})
+</insert>
+
+<insert id="insertIfAbsent" useGeneratedKeys="true" keyProperty="id">
+    INSERT IGNORE INTO mini_game_score (user_id, game_id, high_score)
+    VALUES (#{userId}, #{gameId}, #{highScore})
+</insert>
+```
+
+#### Mapper Files by Domain
+
+| Domain | Mapper Files | Key Operations |
+|--------|--------------|----------------|
+| **User** | `UserMapper.xml`, `WallpaperMarketMapper.xml`, `WallpaperTagMapper.xml`, `AnnouncementConfigMapper.xml`, `IdentityVerificationMapper.xml`, `ToolboxSoftwareMapper.xml`, `ToolboxTranslatePricingMapper.xml`, `AgentUsageStatsMapper.xml`, `AgentModelPricingMapper.xml`, `AgentBillingDlqLogMapper.xml` | CRUD, balance operations, daily active tracking |
+| **Mini Game** | `MiniGameScoreMapper.xml`, `MiniGameScoreDlqLogMapper.xml` | Score submission, leaderboard queries, atomic updates |
+| **Payment** | `PaymentOrderMapper.xml`, `PaymentTransactionMapper.xml`, `PaymentNotifyLogMapper.xml`, `PaymentPricingConfigMapper.xml`, `PaymentDlqLogMapper.xml` | Order management, transaction tracking |
+| **Version** | `AppVersionMapper.xml` | Version management |
+| **Service Status** | `ServiceStatusMapper.xml` | Health monitoring |
+| **Upload** | `ObjectOutboxMapper.xml`, `ObjectReplicationTaskMapper.xml`, `ObjectReplicationCheckpointMapper.xml`, `ObjectReplicationBackfillMapper.xml` | File upload, replication |
+| **Auth** | `IssueFeedbackMapper.xml`, `EmailDispatchDlqLogMapper.xml` | Feedback, email dispatch |
+
+#### Entity Classes
+
+MyBatis entity classes are plain Java objects (POJOs) with getters and setters:
+
+```java
+public class User {
+    private Long id;
+    private String username;
+    private String email;
+    private String password;
+    private String role;
+    private LocalDateTime proExpireAt;
+    private String avatar;
+    private String gender;
+    private String genderCustom;
+    private LocalDate birthday;
+    private boolean enabled;
+    private String sessionToken;
+    private String totpSecretCiphertext;
+    private LocalDateTime totpSecretUpdatedAt;
+    private BigDecimal balanceFen;
+    private LocalDateTime createdAt;
+    
+    // Getters and setters...
+}
+
+public class MiniGameScore {
+    private Long id;
+    private Long userId;
+    private String gameId;
+    private long highScore;
+    private long bestDurationMs;
+    private int bestMoves;
+    private int playsCount;
+    private LocalDateTime lastPlayedAt;
+    private LocalDateTime achievedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    
+    // Getters and setters...
+}
+```
+
+#### Database Access Patterns
+
+**1. Repository Pattern**
+
+Each domain has dedicated mapper interfaces:
+
+```java
+@Mapper
+public interface MiniGameScoreMapper {
+    MiniGameScore selectByUserAndGame(@Param("userId") Long userId,
+                                      @Param("gameId") String gameId);
+    int insertIfAbsent(MiniGameScore score);
+    int updateBestIfGreater(@Param("userId") Long userId,
+                            @Param("gameId") String gameId,
+                            @Param("highScore") long highScore, ...);
+    int incrementPlaysCount(@Param("userId") Long userId,
+                            @Param("gameId") String gameId, ...);
+    List<MiniGameScore> selectTopByGame(@Param("gameId") String gameId,
+                                        @Param("limit") int limit);
+}
+```
+
+**2. Service Layer Integration**
+
+Services use mappers with transaction management:
+
+```java
+@Service
+public class MiniGameScoreService {
+    private final MiniGameScoreMapper scoreMapper;
+    
+    public String submit(Long userId, String gameId, ScoreSubmitRequest req) {
+        // 1. Validate request
+        // 2. Check rate limits (Redis)
+        // 3. Check idempotency (Redis)
+        // 4. Insert if absent (MySQL)
+        scoreMapper.insertIfAbsent(score);
+        // 5. Update if greater (atomic CAS)
+        scoreMapper.updateBestIfGreater(userId, gameId, highScore, ...);
+        // 6. Increment plays count
+        scoreMapper.incrementPlaysCount(userId, gameId, ...);
+        return null;
+    }
+}
+```
+
+**3. Transaction Management**
+
+Spring's `@Transactional` annotation for atomic operations:
+
+```java
+@Transactional
+public void transferBalance(String fromUser, String toUser, BigDecimal amount) {
+    userMapper.deductBalance(fromUser, amount);
+    userMapper.addBalance(toUser, amount);
+}
+```
+
+#### MyBatis Best Practices Implemented
+
+1. **Parameterized Queries**: All queries use `#{param}` syntax to prevent SQL injection
+2. **Result Maps**: Explicit column-to-property mapping for complex entities
+3. **SQL Fragments**: Reusable column sets with `<sql>` and `<include>`
+4. **Dynamic SQL**: Conditional clauses for flexible queries
+5. **Atomic Operations**: Database-level CAS for concurrency safety
+6. **Idempotent Inserts**: `INSERT IGNORE` for duplicate prevention
+7. **Auto-Generated Keys**: Automatic primary key retrieval
+8. **Underscore to Camel Case**: Automatic property name conversion
+
+#### Performance Optimizations
+
+1. **Batch Operations**: Bulk inserts for high-throughput scenarios
+2. **Indexed Queries**: Proper indexing on frequently queried columns
+3. **Connection Pooling**: HikariCP for efficient connection management
+4. **Query Caching**: Redis caching layer for frequently accessed data
+5. **Lazy Loading**: Optional deferred loading for large objects
 
 ### Redis
 
