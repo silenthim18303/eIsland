@@ -29,6 +29,7 @@ export default sidebar({
       icon: "building",
       collapsible: false,
       children: [
+        "process-model",
         "states.md",
       ],
     },
