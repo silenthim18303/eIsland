@@ -4,4 +4,5 @@ export default navbar([
   { text: "HOME", link: "/", icon: "house" },
   { text: "OVERALL", link: "/introduction/", icon: "book-open" },
   { text: "API", link: "/api/", icon: "server" },
+  { text: "GitHub", link: "https://github.com/JNTMTMTM/eIsland", icon: "fa6-brands:github" },
 ]);
