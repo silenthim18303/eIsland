@@ -1,5 +1,5 @@
 ---
-title: State Machine
+title: eisland State Machine
 icon: diagram-project
 ---
 

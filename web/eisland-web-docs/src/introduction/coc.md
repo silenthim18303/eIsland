@@ -1,5 +1,5 @@
 ---
-title: Code of Conduct
+title: eisland Code of Conduct
 icon: code
 ---
 
