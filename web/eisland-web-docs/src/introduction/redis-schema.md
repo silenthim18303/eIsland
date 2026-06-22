@@ -202,6 +202,66 @@ The slider CAPTCHA system uses a full lifecycle approach: challenge creation, ow
 | `verify:slider:rate:create:ip:{base64(ip)}` | HASH (`tokens`, `ts`) | 2x window | 24/min | Challenge creation rate per IP |
 | `verify:slider:rate:verify:ip:{base64(ip)}` | HASH (`tokens`, `ts`) | 2x window | 60/min | Challenge verification rate per IP |
 
+:::details Token Bucket Lua Script — `SliderCaptchaService.java`
+Source: `server-auth/.../SliderCaptchaService.java` (lines 317–363)
+
+```lua
+local key = KEYS[1]
+local now_ms = tonumber(ARGV[1])
+local capacity = tonumber(ARGV[2])
+local refill_per_ms = tonumber(ARGV[3])
+local requested = tonumber(ARGV[4])
+local ttl_seconds = tonumber(ARGV[5])
+
+local state = redis.call('HMGET', key, 'tokens', 'ts')
+local tokens = tonumber(state[1])
+local ts = tonumber(state[2])
+
+if tokens == nil then
+  tokens = capacity
+end
+if ts == nil then
+  ts = now_ms
+end
+
+local elapsed = now_ms - ts
+if elapsed < 0 then
+  elapsed = 0
+end
+
+tokens = math.min(capacity, tokens + elapsed * refill_per_ms)
+
+local allowed = 0
+local retry_after_ms = 0
+if tokens >= requested then
+  tokens = tokens - requested
+  allowed = 1
+else
+  local deficit = requested - tokens
+  retry_after_ms = math.ceil(deficit / refill_per_ms)
+end
+
+redis.call('HSET', key, 'tokens', tokens, 'ts', now_ms)
+redis.call('EXPIRE', key, ttl_seconds)
+return { allowed, math.floor(tokens), retry_after_ms }
+```
+
+**Parameters:**
+
+| ARGV | Name | Description |
+|------|------|-------------|
+| `ARGV[1]` | `now_ms` | Current time in milliseconds (`System.currentTimeMillis()`) |
+| `ARGV[2]` | `capacity` | Maximum token bucket capacity (varies by rate limit) |
+| `ARGV[3]` | `refill_per_ms` | Tokens refilled per millisecond (computed as `capacity / windowSeconds / 1000`) |
+| `ARGV[4]` | `requested` | Tokens to consume per request (always `"1"`) |
+| `ARGV[5]` | `ttl_seconds` | Key expiry time (`max(30, refillWindowSeconds * 2)`) |
+
+**Returns:** `List<Long>` — `[allowed, remaining_tokens, retry_after_ms]`
+- `allowed`: `1` = permitted, `0` = denied
+- `remaining_tokens`: tokens left after the operation
+- `retry_after_ms`: milliseconds to wait before retrying (`0` if allowed)
+:::
+
 ### Failure Tracking
 
 | Key Pattern | Data Structure | TTL | Limit | Purpose |
@@ -387,25 +447,51 @@ The agent balance is the most critical Redis key in the billing system. It uses 
 
 ### Lua Deduction Script
 
+:::details Balance Atomic Deduct Lua Script — `AgentBalanceRedisService.java`
+Source: `server-agent/.../AgentBalanceRedisService.java` (lines 41–66)
+
 ```lua
--- Atomic balance deduction with cap-at-zero
--- KEYS[1] = agent:balance:{username}
--- ARGV[1] = amount to deduct (fen, decimal)
---
--- Returns:
---   "-1"                    → key missing (user not initialized)
---   "-3"                    → balance is zero or negative
---   "newBalance|deducted"   → success (deducted may be < amount if balance insufficient)
 local bal = redis.call('GET', KEYS[1])
-if bal == false then return '-1' end
+if bal == false then
+    return '-1'
+end
 local current = tonumber(bal)
-if current <= 0 then return '-3' end
-local amount = tonumber(ARGV[1])
+if current <= 0 then
+    return '-3'
+end
+local amount  = tonumber(ARGV[1])
 local deducted = math.min(current, amount)
 local newBal = current - deducted
-redis.call('SET', KEYS[1], string.format('%.8f', newBal))
-return string.format('%.8f', newBal) .. '|' .. string.format('%.8f', deducted)
+local fmtBal = string.format('%.8f', newBal)
+local fmtDed = string.format('%.8f', deducted)
+redis.call('SET', KEYS[1], fmtBal)
+return fmtBal .. '|' .. fmtDed
 ```
+
+**Parameters:**
+
+| ARGV | Name | Description |
+|------|------|-------------|
+| `ARGV[1]` | `amount` | Deduction amount as a decimal string with 8 decimal places (e.g., `"0.00120000"`) |
+
+**Returns:** `String`
+- `"-1"` — key does not exist (needs initialization from DB via `SETNX`)
+- `"-3"` — balance is already zero, deduction refused
+- `"{newBal}|{deducted}"` — success, pipe-delimited new balance and actual deducted amount (cap-at-zero: deducts `min(current, requested)`)
+
+**Invocation flow:**
+```java
+// AgentBalanceRedisService.java — deduct() method (lines 109–114)
+String key = KEY_PREFIX + username;  // "agent:balance:{username}"
+String amountStr = amountFen.setScale(SCALE, RoundingMode.HALF_UP).toPlainString();
+String result = redisTemplate.execute(DEDUCT_SCRIPT, List.of(key), amountStr);
+if ("-1".equals(result)) {
+    if (initFromDb(username)) {
+        result = redisTemplate.execute(DEDUCT_SCRIPT, List.of(key), amountStr);
+    }
+}
+```
+:::
 
 ### Balance Initialization
 
@@ -497,12 +583,35 @@ Rate limiting uses a Lua script for atomic INCR + conditional EXPIRE (TTL is set
 
 **Rate limit Lua script:**
 
+:::details Rate-Limit INCR+EXPIRE Lua Script — `MiniGameScoreService.java`
+Source: `server-mini-game/.../MiniGameScoreService.java` (lines 48–53)
+
 ```lua
--- Atomic INCR + EXPIRE (set TTL only on first increment)
-local count = redis.call('INCR', KEYS[1])
-if count == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end
-return count
+local count = redis.call('INCR', KEYS[1]); if count == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]); end; return count;
 ```
+
+**Parameters:**
+
+| ARGV | Name | Description |
+|------|------|-------------|
+| `ARGV[1]` | `windowSeconds` | Rate limit window in seconds (e.g., `"60"`) |
+
+**Returns:** `Long` — the incremented count after the INCR operation
+
+**Invocation flow:**
+```java
+// MiniGameScoreService.java — checkRateLimit() method (lines 489–493)
+Long count = miniGameRedisTemplate.execute(
+        RATE_LIMIT_INCR_EXPIRE_SCRIPT,
+        Collections.singletonList(rateKey),         // KEYS[1] = "mg:score:submit:rate:{gameId}:{userId}"
+        String.valueOf(SUBMIT_RATE_WINDOW_SECONDS)  // ARGV[1] = "60"
+);
+```
+
+Used at two call sites:
+1. `checkRateLimit()` — `mg:score:submit:rate:{gameId}:{userId}` (submit rate, 10/min)
+2. `shouldRequireLeaderboardRefreshCaptcha()` — `mg:score:leaderboard:refresh:rate:{gameId}:{userId}` (refresh rate, 5/min)
+:::
 
 ### Game Sessions
 
@@ -564,45 +673,14 @@ Lookup("item")
 ## Lua Scripts
 
 :::info
-Three Lua scripts are used for atomic Redis operations that cannot be achieved with single commands.
+Three Lua scripts are used for atomic Redis operations that cannot be achieved with single commands. Full source code is embedded in the corresponding key sections above.
 :::
 
-### 1. Agent Balance Deduction (DB 12)
-
-**Service:** `AgentBalanceRedisService`
-**Purpose:** Atomic GET + conditional SET with cap-at-zero semantics
-**Returns:** `"-1"` (key missing), `"-3"` (balance zero), or `"newBalance|deducted"`
-
-```lua
-local bal = redis.call('GET', KEYS[1])
-if bal == false then return '-1' end
-local current = tonumber(bal)
-if current <= 0 then return '-3' end
-local amount = tonumber(ARGV[1])
-local deducted = math.min(current, amount)
-local newBal = current - deducted
-redis.call('SET', KEYS[1], string.format('%.8f', newBal))
-return string.format('%.8f', newBal) .. '|' .. string.format('%.8f', deducted)
-```
-
-### 2. Rate Limit INCR + EXPIRE (DB 14)
-
-**Service:** `MiniGameScoreService`
-**Purpose:** Atomic increment with conditional TTL (set only on first increment)
-
-```lua
-local count = redis.call('INCR', KEYS[1])
-if count == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end
-return count
-```
-
-### 3. Token Bucket (DB 4)
-
-**Service:** `SliderCaptchaService`
-**Purpose:** Full token bucket rate limiting algorithm
-**Returns:** `{allowed, remaining_tokens, retry_after_ms}`
-
-Uses `HMGET`/`HSET` for bucket state (`tokens`, `timestamp`) with configurable capacity and refill rate.
+| # | Script Name | Service Class | DB | Keys Operated | Purpose |
+|---|-------------|---------------|-----|---------------|---------|
+| 1 | **Token Bucket Rate Limiter** | `SliderCaptchaService` | 4 | `verify:slider:rate:*` (HASH) | Sliding-window token bucket for CAPTCHA rate limiting. Returns `{allowed, remaining, retry_after_ms}`. See [Rate Limiting (Token Bucket via Lua)](#rate-limiting-token-bucket-via-lua) |
+| 2 | **Agent Balance Atomic Deduct** | `AgentBalanceRedisService` | 12 | `agent:balance:{username}` (STRING) | Atomic GET+SET with cap-at-zero. Returns `"-1"` (missing), `"-3"` (empty), or `"newBal\|deducted"`. See [Lua Deduction Script](#lua-deduction-script) |
+| 3 | **Rate-Limit INCR+EXPIRE** | `MiniGameScoreService` | 14 | `mg:score:submit:rate:*`, `mg:score:leaderboard:refresh:rate:*` (STRING) | Atomic INCR with conditional EXPIRE (TTL set only on first increment). See [Rate Limiting](#rate-limiting) |
 
 ---
 
