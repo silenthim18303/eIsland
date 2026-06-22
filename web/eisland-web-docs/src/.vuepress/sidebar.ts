@@ -25,12 +25,19 @@ export default sidebar({
       ],
     },
     {
-      text: "Architecture",
+      text: "Frontend Architecture",
       icon: "building",
       collapsible: false,
       children: [
         "process-model",
         "states.md",
+      ],
+    },
+    {
+      text: "Backend Architecture",
+      icon: "building",
+      collapsible: false,
+      children: [
         "server-model.md",
         "mysql-schema.md",
         "redis-schema.md",
