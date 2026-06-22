@@ -10,7 +10,7 @@ export default sidebar({
       icon: "info",
       collapsible: false,
       children: [
-        "README.md",
+        "intro/project-overview.md",
         "intro/coc.md",
       ],
     },
