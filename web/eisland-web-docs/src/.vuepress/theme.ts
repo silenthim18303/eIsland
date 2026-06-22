@@ -7,6 +7,8 @@ export default hopeTheme({
   hostname: "https://dev.pyisland.com",
   docsRepo: "JNTMTMTM/eIsland",
   docsDir: "web/eisland-web-docs/src",
+  docsBranch: "dev",
+
   author: {
     name: "eIsland",
   },
