@@ -1,10 +1,53 @@
 # CLAUDE.md
 
+## Documentation Structure
+
+The documentation lives in `src/introduction/` and is organized into subdirectories by category:
+
+```
+src/introduction/
+├── README.md                    # Top-level documentation index
+├── intro/                       # Project introduction
+│   ├── README.md                # Category index
+│   ├── project-overview.md      # eIsland project overview
+│   └── coc.md                   # Code of Conduct
+├── tech-stack/                  # Technology stack
+│   ├── README.md                # Category index
+│   ├── frontend-tech-stack.md
+│   ├── backend-tech-stack.md
+│   └── plugins-tech-stack.md
+├── frontend-arch/               # Frontend architecture
+│   ├── README.md                # Category index
+│   ├── process-model.md
+│   └── states.md
+└── backend-arch/                # Backend architecture
+    ├── README.md                # Category index
+    ├── server-model.md
+    ├── mysql-schema.md
+    ├── redis-schema.md
+    └── rabbitmq-schema.md
+```
+
+### Sidebar Rules
+
+Sidebar is configured in `src/.vuepress/sidebar.ts`.
+
+- **Do NOT register `README.md` files in the sidebar.** VuePress automatically uses each subdirectory's `README.md` as the category index page.
+- Each subdirectory has a `README.md` that introduces the category and links to its documents.
+- The top-level `README.md` serves as the overall documentation index.
+
+### Adding New Documentation
+
+1. Place the file in the appropriate subdirectory.
+2. Add the file path to `sidebar.ts` under the correct group.
+3. Add a link to the file in the subdirectory's `README.md`.
+4. If creating a new subdirectory, create a `README.md` index for it.
+
 ## Documentation Rules
 
 ### Admonition Syntax
 
-Documentation files in `src/introduction` support admonition blocks for emphasizing content:
+Documentation files support admonition blocks for emphasizing content:
 
 ```md
 :::tip
@@ -29,6 +72,18 @@ Important notices and cautions.
 
 :::danger
 Critical security notes and breaking changes.
+:::
+```
+
+Collapsible admonition blocks use `:::details`:
+
+```md
+:::details Title — `ClassName.java`
+Source: `module/.../ClassName.java` (lines 1–10)
+
+```lua
+-- code here
+```
 :::
 ```
 
@@ -65,3 +120,12 @@ When documenting test coverage, use accurate numbers from the latest test run:
 - **2068 tests**
 
 Update these numbers when new test results show different counts.
+
+## Backend Documentation Standards
+
+When documenting database, cache, or message queue schemas:
+
+- **MySQL**: Document every column with Type, Nullable, Default, and Description. Include all indexes with their purpose.
+- **Redis**: Document every key pattern with Data Structure, TTL, and Purpose. Embed Lua scripts inline with `:::details` blocks at the corresponding key section.
+- **RabbitMQ**: Document all exchanges, queues, bindings, and message types. Include producer/consumer flow tables.
+- Cross-reference Java entity classes, mapper XMLs, and service classes as source of truth.
