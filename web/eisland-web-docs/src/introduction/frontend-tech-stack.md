@@ -1004,7 +1004,7 @@ function Controls() {
 ## Testing
 
 :::danger
-All frontend code changes must be verified through tests. The project contains approximately 90+ test files covering main process, preload scripts, and renderer process.
+All frontend code changes must be verified through tests. The project contains **125 test files** with **2068 tests** covering main process, preload scripts, and renderer process.
 :::
 
 ### Vitest Configuration
@@ -1023,7 +1023,7 @@ export default {
 
 ### Testing Patterns
 
-The project has approximately **90+ test files** across main process, preload, and renderer. All tests use `.test.ts` (no component rendering tests).
+The project has **125 test files** with **2068 tests** across main process, preload, and renderer. All tests use `.test.ts` (no component rendering tests).
 
 #### Pattern 1: Slice Unit Testing
 
