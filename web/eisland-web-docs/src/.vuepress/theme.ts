@@ -5,7 +5,8 @@ import sidebar from "./sidebar.js";
 
 export default hopeTheme({
   hostname: "https://dev.pyisland.com",
-
+  docsRepo: "JNTMTMTM/eIsland",
+  docsDir: "web/eisland-web-docs/src",
   author: {
     name: "eIsland",
   },
@@ -14,8 +15,6 @@ export default hopeTheme({
   logoDark: "/light.png",
   favicon: "/favicon.svg",
   darkmode: "enable",
-
-  docsDir: "src",
 
   navbar,
   sidebar,
@@ -26,7 +25,7 @@ export default hopeTheme({
   encrypt: {},
 
   metaLocales: {
-    editLink: "在 GitHub 上编辑此页",
+    editLink: "Edit this page on GitHub",
   },
 
   markdown: {
