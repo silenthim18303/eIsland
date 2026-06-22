@@ -1,4 +1,917 @@
 ---
-title: State Machine Mechanism
-icon: robot
+title: State Machine
+icon: diagram-project
 ---
+
+# eIsland State Machine
+
+:::info
+The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **16 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
+:::
+
+## State Categories
+
+### Primary States
+
+| State | Description | Mouse Passthrough | Dimensions (W×H) |
+|-------|-------------|-------------------|------------------|
+| `idle` | Default resting state | Yes | 260×42 px |
+| `minimal` | Compact display mode | Yes | 260×42 px |
+| `hover` | Mouse interaction state | No | 500×60 px |
+| `expanded` | Full dashboard view | No | 860×150 px |
+| `maxExpand` | Maximum expansion | No | 860×400 px |
+
+### Content States
+
+| State | Description | Mouse Passthrough | Dimensions (W×H) |
+|-------|-------------|-------------------|------------------|
+| `lyrics` | Music lyrics display | Yes | 500×42 px |
+| `notification` | Alert and message display | No | 500×88 px |
+| `announcement` | System announcements | No | 860×400 px |
+
+### User Flow States
+
+| State | Description | Mouse Passthrough | Dimensions (W×H) |
+|-------|-------------|-------------------|------------------|
+| `guide` | First-run tutorial | No | 860×400 px |
+| `login` | Authentication screen | No | 500×88 px |
+| `register` | Account creation | No | 500×88 px |
+| `resetPassword` | Password recovery | No | 500×88 px |
+| `payment` | Payment processing | No | 500×88 px |
+
+### AI & Input States
+
+| State | Description | Mouse Passthrough | Dimensions (W×H) |
+|-------|-------------|-------------------|------------------|
+| `agent` | AI assistant mode | No | 500×88 px |
+| `agentVoiceInput` | Voice command mode | No | 500×88 px |
+| `stt` | Speech-to-text | No | 500×88 px |
+| `cli` | Command line interface | No | 860×400 px |
+
+## State Configuration
+
+:::tip
+Each state defines four key properties that control its behavior:
+:::
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `mousePassthrough` | `boolean` | Whether mouse events pass through to underlying windows |
+| `expanded` | `boolean` | Whether the island is in expanded visual state |
+| `enterDelay` | `number` | Delay (ms) before entering the state |
+| `leaveDelay` | `number` | Delay (ms) before leaving the state |
+
+### Configuration Matrix
+
+```ts
+export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
+  idle:           { mousePassthrough: true,  expanded: false, enterDelay: 0,   leaveDelay: 0   },
+  hover:          { mousePassthrough: false, expanded: true,  enterDelay: 60,  leaveDelay: 80  },
+  lyrics:         { mousePassthrough: true,  expanded: true,  enterDelay: 50,  leaveDelay: 0   },
+  notification:   { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  expanded:       { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  maxExpand:      { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  minimal:        { mousePassthrough: true,  expanded: false, enterDelay: 0,   leaveDelay: 0   },
+  agent:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  agentVoiceInput:{ mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  login:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  register:       { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  resetPassword:  { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  payment:        { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  guide:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  announcement:   { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  stt:            { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  cli:            { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+};
+```
+
+## State Areas
+
+:::info
+State areas define the pixel footprint (Width × Height) for each state, used for layout calculations and transition animations.
+:::
+
+```ts
+export const STATE_AREA: Record<string, number> = {
+  idle: 260 * 42,           // 10,920 px²
+  hover: 500 * 60,          // 30,000 px²
+  notification: 500 * 88,   // 44,000 px²
+  expanded: 860 * 150,      // 129,000 px²
+  maxExpand: 860 * 400,     // 344,000 px²
+  lyrics: 500 * 42,         // 21,000 px²
+  minimal: 260 * 42,        // 10,920 px²
+  agent: 500 * 88,          // 44,000 px²
+  agentVoiceInput: 500 * 88,// 44,000 px²
+  login: 500 * 88,          // 44,000 px²
+  register: 500 * 88,       // 44,000 px²
+  resetPassword: 500 * 88,  // 44,000 px²
+  payment: 500 * 88,        // 44,000 px²
+  guide: 860 * 400,         // 344,000 px²
+  announcement: 860 * 400,  // 344,000 px²
+  stt: 500 * 88,            // 44,000 px²
+  cli: 860 * 400,           // 344,000 px²
+};
+```
+
+## State Transitions
+
+:::warning
+State transitions are triggered by user interactions, system events, and application logic. The state machine enforces guards to prevent invalid transitions.
+:::
+
+### Click Navigation Flow
+
+The island implements a hierarchical click navigation system:
+
+```ts
+function handleIslandClick() {
+  switch (state) {
+    case 'idle':
+      if (idleClickExpand) setHover();
+      break;
+    case 'hover':
+      setExpanded();
+      break;
+    case 'expanded':
+    case 'maxExpand':
+    case 'announcement':
+      if (isOnCliTab && hasActiveSession) setCli();
+      else setHover();
+      break;
+    case 'login':
+    case 'register':
+    case 'payment':
+      // Auth states handle their own navigation
+      break;
+    default:
+      setIdle();
+  }
+}
+```
+
+### Transition Rules
+
+| From State | Trigger | To State | Condition |
+|------------|---------|----------|-----------|
+| `idle` | Click | `hover` | `idleClickExpand` enabled |
+| `hover` | Click | `expanded` | Always |
+| `expanded` | Click | `hover` | Default |
+| `expanded` | Click | `cli` | On CLI tab with active session |
+| `maxExpand` | Click | `hover` | Default |
+| `maxExpand` | Click | `cli` | On CLI tab with active session |
+| `announcement` | Click | `hover` | Default |
+| `announcement` | Click | `cli` | On CLI tab with active session |
+| `login` | Click | — | Self-handled |
+| `register` | Click | — | Self-handled |
+| `payment` | Click | — | Self-handled |
+| Any other | Click | `idle` | Default fallback |
+
+### Auto-Transitions
+
+:::tip
+The state machine includes automatic transitions triggered by system events:
+:::
+
+| Trigger | From | To | Description |
+|---------|------|----|-------------|
+| Music plays | `idle` | `lyrics` | Auto-show lyrics when music starts |
+| Music stops | `lyrics` | `idle` | Return to idle when music stops |
+| Notification arrives | Any | `notification` | Show notification overlay |
+| Mouse hover | `idle` | `hover` | Expand on mouse enter |
+| Mouse leave | `hover` | `idle` | Collapse on mouse leave (with delay) |
+| Voice input | `idle` | `agentVoiceInput` | Activate voice recognition |
+| CLI session | `expanded` | `cli` | Open terminal if session active |
+
+## Animation System
+
+:::info
+State transitions are animated through a morphing animation system with configurable speeds.
+:::
+
+### Animation Speeds
+
+| Speed | Duration | Use Case |
+|-------|----------|----------|
+| `slow` | 1100ms | Dramatic transitions, first-run guide |
+| `medium` | 550ms | Standard interactions |
+| `fast` | 280ms | Quick responses, frequent transitions |
+
+### Morphing Implementation
+
+```ts
+const MORPH_DURATION_BY_SPEED: Record<string, number> = {
+  slow: 1100,
+  medium: 550,
+  fast: 280,
+};
+
+useEffect(() => {
+  if (prevStateRef.current === state) return;
+
+  setFromState(prevStateRef.current);
+  prevStateRef.current = state;
+  setMorphing(true);
+
+  const id = setTimeout(() => {
+    setMorphing(false);
+    setFromState('');
+  }, MORPH_DURATION_BY_SPEED[animationSpeed] ?? 550);
+
+  return () => clearTimeout(id);
+}, [state, animationSpeed]);
+```
+
+### CSS Class Composition
+
+The shell builds a composite CSS class name for styling:
+
+```ts
+const shellClassName = [
+  'island-shell',
+  getStateClassName(state),
+  morphing && 'morphing',
+  fromState && `from-${fromState}`,
+  instantResize && 'instant-resize',
+  showGlow && 'music-glow',
+  showGlow === 'paused' && 'music-paused',
+  springAnimation && 'spring-animation',
+  `speed-${animationSpeed}`,
+].filter(Boolean).join(' ');
+```
+
+| Class | Purpose |
+|-------|---------|
+| `island-shell` | Base shell styles |
+| `{state}` | State-specific dimensions and layout |
+| `morphing` | Active morphing animation |
+| `from-{state}` | Origin state for morph direction |
+| `instant-resize` | Skip animation for size reduction |
+| `music-glow` | Music-reactive glow effect |
+| `music-paused` | Paused music glow state |
+| `spring-animation` | Spring physics animation |
+| `speed-{slow\|medium\|fast}` | Animation speed modifier |
+
+### Instant Resize Optimization
+
+:::warning
+When morphing from a larger state to a smaller one, an instant resize is applied to avoid visual glitches:
+:::
+
+```ts
+const instantResize = morphing && STATE_AREA[fromState] > STATE_AREA[state];
+```
+
+## State-Specific Behaviors
+
+### idle
+
+:::info
+The `idle` state is the default resting state when no user interaction occurs. It serves as the entry point for most state transitions.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 260×42 px |
+| **Mouse** | Pass-through |
+| **Expanded** | No |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Application startup
+- User clicks outside the island
+- Escape key pressed from any state
+- Auth flow completion (returns to saved state)
+- Music stops (from `lyrics` state)
+
+**Exit Conditions:**
+- Mouse hover enters island area → `hover`
+- Notification arrives → `notification`
+- Music playback starts → `lyrics`
+- Voice input activated → `agentVoiceInput`
+
+**UI Components Rendered:**
+- Minimal time display
+- Status indicators (if configured)
+- Music visualization glow (when playing)
+
+**Behavior Details:**
+- Mouse events pass through to underlying windows
+- Minimal visual footprint, nearly invisible
+- Auto-dimming after configurable idle period
+- Supports click-to-expand (if `idleClickExpand` enabled)
+
+---
+
+### hover
+
+:::info
+The `hover` state provides quick information preview on mouse hover, serving as a bridge between idle and expanded states.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×60 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 60ms |
+| **Leave Delay** | 80ms |
+
+**Entry Conditions:**
+- Mouse enters island area from `idle` state
+- Click on `idle` state (if `idleClickExpand` enabled)
+- Return from `expanded`/`maxExpand` on click
+
+**Exit Conditions:**
+- Mouse leaves island area → `idle` (after 80ms delay)
+- Click on island → `expanded`
+- Timeout → `idle` (if configured)
+
+**UI Components Rendered:**
+- Expanded time display with date
+- Quick info snippets (weather, music, notifications)
+- Hover-reveal action buttons
+
+**Behavior Details:**
+- 60ms enter delay prevents accidental activation
+- 80ms leave delay prevents flicker on quick mouse movements
+- Debounced hover detection for smooth transitions
+- Shows essential information without full expansion
+
+---
+
+### expanded
+
+:::info
+The `expanded` state is the full dashboard view with widgets, controls, and interactive elements.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×150 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Click on `hover` state
+- Direct transition from other states (via API)
+
+**Exit Conditions:**
+- Click on island → `hover` (default)
+- Click on CLI tab with active session → `cli`
+- Escape key → `hover`
+- Mouse leave (if configured) → `idle`
+
+**UI Components Rendered:**
+- Left panel: Shortcuts, todo list, song info, countdown, pomodoro
+- Right panel: Weather, calendar, performance monitor, email
+- Clock display: Classic, gradient, or minimal styles
+- Widget controls: Drag-and-drop reordering
+- Tab navigation: Switch between widget groups
+
+**Behavior Details:**
+- Supports drag-and-drop widget reordering
+- Multiple clock style options
+- Custom background images/videos
+- Real-time data updates (weather, music, notifications)
+- Responsive layout based on content
+
+---
+
+### maxExpand
+
+:::info
+The `maxExpand` state provides maximum screen real estate for settings, tools, and detailed views.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- User requests full-screen view from `expanded` state
+- Settings panel access
+- Detailed tool views
+
+**Exit Conditions:**
+- Click on island → `hover`
+- Escape key → `expanded`
+- Close button → `expanded`
+
+**UI Components Rendered:**
+- Full settings interface
+- Detailed tool panels
+- Extended widget configurations
+- System information displays
+
+**Behavior Details:**
+- Maximum visual real estate
+- Full keyboard navigation support
+- Modal-like behavior (blocks underlying interactions)
+- Used for complex configurations and detailed views
+
+---
+
+### lyrics
+
+:::info
+The `lyrics` state displays synchronized music lyrics, automatically activated during music playback.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×42 px |
+| **Mouse** | Pass-through |
+| **Expanded** | Yes |
+| **Enter Delay** | 50ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Music playback starts (auto-trigger)
+- SMTC (System Media Transport Controls) reports playing state
+- Manual activation from music controls
+
+**Exit Conditions:**
+- Music playback stops → `idle`
+- Music paused (stays in `lyrics` with paused indicator)
+- Manual dismiss
+
+**UI Components Rendered:**
+- Synchronized lyrics display
+- Album art thumbnail
+- Song title and artist
+- Playback progress indicator
+- Music glow effect (reactive to playback)
+
+**Behavior Details:**
+- Real-time lyrics synchronization with playback
+- Supports multiple music players (NetEase, QQ Music, Kugou)
+- 50ms enter delay for smooth transition
+- Music-reactive glow effect (`music-glow` CSS class)
+- Paused state indicator (`music-paused` CSS class)
+- SMTC worker integration for system-level media control
+
+---
+
+### notification
+
+:::info
+The `notification` state displays alerts and messages with interactive dismissal.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- System notification arrives
+- Email notification received
+- Application alert triggered
+- IPC notification from main process
+
+**Exit Conditions:**
+- Click on notification → action (if configured)
+- Dismiss gesture → `idle`
+- Timeout → `idle` (auto-dismiss)
+- New notification replaces current
+
+**UI Components Rendered:**
+- Notification icon
+- Title and message text
+- Action buttons (if configured)
+- Dismiss button
+- Timestamp
+
+**Behavior Details:**
+- Immediate transition (no enter delay)
+- Supports multiple notification types
+- Auto-dismiss after configurable timeout
+- Queued notifications (sequential display)
+- Priority-based display order
+
+---
+
+### announcement
+
+:::info
+The `announcement` state displays system announcements, updates, and important information.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- System announcement received
+- Application update available
+- First-run after update
+- Scheduled announcements
+
+**Exit Conditions:**
+- Click dismiss → `hover`
+- Acknowledge button → `hover`
+- Escape key → `hover`
+
+**UI Components Rendered:**
+- Announcement title
+- Rich content (markdown support)
+- Version information (for updates)
+- Action buttons (update, dismiss, remind later)
+- Changelog details
+
+**Behavior Details:**
+- Full announcement panel
+- Supports rich content (images, links, formatting)
+- Version-specific announcements
+- Dismiss tracking (won't show again)
+- Integration with auto-updater
+
+---
+
+### guide
+
+:::info
+The `guide` state provides an interactive first-run tutorial for new users.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- First application launch
+- Manual guide activation
+- Guide reset (from settings)
+
+**Exit Conditions:**
+- Complete all steps → `idle`
+- Skip guide → `idle`
+- Escape key → `idle`
+
+**UI Components Rendered:**
+- Step indicator (progress bar)
+- Tutorial content (per step)
+- Interactive demonstrations
+- Next/Previous/Skip buttons
+- Highlight overlays (pointing to features)
+
+**Behavior Details:**
+- Step-by-step walkthrough
+- Interactive element highlighting
+- Progress tracking
+- Skippable at any point
+- Completion state persistence
+
+---
+
+### login
+
+:::info
+The `login` state provides user authentication interface.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- User requests login
+- Protected action requires authentication
+- Session expired
+
+**Exit Conditions:**
+- Successful authentication → saved state or `idle`
+- Cancel → previous state
+- Register link → `register`
+- Reset password link → `resetPassword`
+
+**UI Components Rendered:**
+- Username/email input
+- Password input
+- Login button
+- Remember me checkbox
+- Register link
+- Forgot password link
+- Error messages
+
+**Behavior Details:**
+- Self-handled navigation (does not follow standard click flow)
+- Saves return state (`authReturnState`) for post-auth redirect
+- Rate limiting (5 failures per 5-minute window)
+- Account lockout protection
+- Session token management
+- Single device enforcement
+
+---
+
+### register
+
+:::info
+The `register` state provides new account creation interface.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- User clicks register from login
+- Direct registration link
+
+**Exit Conditions:**
+- Successful registration → `login` or `idle`
+- Cancel → `login`
+- Login link → `login`
+
+**UI Components Rendered:**
+- Username input
+- Email input
+- Password input
+- Confirm password input
+- Verification code input
+- Register button
+- Login link
+- Terms acceptance checkbox
+
+**Behavior Details:**
+- Email verification required
+- Password strength validation
+- Username availability check
+- Rate limiting (5 attempts per hour per IP)
+- CAPTCHA protection (slider verification)
+
+---
+
+### resetPassword
+
+:::info
+The `resetPassword` state provides password recovery workflow.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- User clicks "Forgot password" from login
+- Direct reset link
+
+**Exit Conditions:**
+- Successful password reset → `login`
+- Cancel → `login`
+- Timeout → `login`
+
+**UI Components Rendered:**
+- Email input
+- Verification code input
+- New password input
+- Confirm password input
+- Reset button
+- Back to login link
+
+**Behavior Details:**
+- Email verification required
+- Password strength validation
+- Rate limiting
+- Token expiration (5-minute validity)
+- One-time use codes
+
+---
+
+### payment
+
+:::info
+The `payment` state handles subscription and payment processing.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- User initiates purchase
+- Subscription renewal
+- Upgrade request
+
+**Exit Conditions:**
+- Payment success → `idle` (with benefits granted)
+- Payment failure → `expanded` (with error)
+- Cancel → previous state
+- Timeout → `idle`
+
+**UI Components Rendered:**
+- Product selection
+- Price display
+- Payment method selection (Alipay, WeChat Pay)
+- QR code (for mobile payment)
+- Payment status indicator
+- Cancel button
+
+**Behavior Details:**
+- Self-handled navigation
+- Multiple payment channels (Alipay, WeChat Pay)
+- Order creation with idempotency
+- Payment timeout (15 minutes default)
+- Async notification handling
+- Receipt email delivery
+
+---
+
+### agent
+
+:::info
+The `agent` state provides the AI assistant chat interface with tool calling capabilities.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- User opens AI assistant
+- Voice command triggers agent
+- Keyboard shortcut
+
+**Exit Conditions:**
+- Close button → `idle`
+- Escape key → `idle`
+- Minimize → `idle`
+
+**UI Components Rendered:**
+- Chat message history
+- Input field
+- Send button
+- Tool call indicators
+- Streaming response display
+- Model selector
+- Settings button
+
+**Behavior Details:**
+- Real-time streaming responses
+- Tool calling (50+ tools available)
+- Multi-provider support (DeepSeek, MiMo, MiniMax)
+- Thinking mode (chain-of-thought)
+- Chat session persistence
+- Token usage tracking
+- Balance management
+
+---
+
+### agentVoiceInput
+
+:::info
+The `agentVoiceInput` state provides voice command recognition interface.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Pass-through |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Voice input hotkey pressed
+- Manual voice activation
+- Agent voice command request
+
+**Exit Conditions:**
+- Voice recognition complete → `agent`
+- Silence timeout → `idle`
+- Cancel gesture → `idle`
+- Escape key → `idle`
+
+**UI Components Rendered:**
+- Voice waveform visualization
+- Recording indicator
+- Cancel button
+- Status text ("Listening...", "Processing...")
+
+**Behavior Details:**
+- Fullscreen transparent overlay
+- Mouse pass-through (does not block interactions)
+- Real-time speech recognition via Tencent Cloud STT
+- WebSocket streaming for low latency
+- Noise cancellation
+- Multi-language support
+
+---
+
+### stt
+
+:::info
+The `stt` (Speech-to-Text) state displays transcription results.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×88 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Speech recognition active
+- Transcription request
+
+**Exit Conditions:**
+- Transcription complete → `agent` or `idle`
+- Cancel → `idle`
+- Timeout → `idle`
+
+**UI Components Rendered:**
+- Real-time transcription text
+- Confidence indicator
+- Edit button
+- Copy button
+- Cancel button
+
+**Behavior Details:**
+- Real-time transcription display
+- Editable results
+- Copy to clipboard
+- Integration with agent for command processing
+
+---
+
+### cli
+
+:::info
+The `cli` state provides a terminal emulator interface for command execution.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Click on CLI tab with active session (from `expanded`, `maxExpand`, or `announcement`)
+- Direct CLI access (if configured)
+- Claude Code CLI session active
+
+**Exit Conditions:**
+- Close button → `expanded`
+- Escape key → `expanded`
+- Exit command → `expanded`
+
+**UI Components Rendered:**
+- Terminal output area
+- Command input field
+- Session selector
+- Tab management
+- Split pane (optional)
+- Status bar
+
+**Behavior Details:**
+- Full terminal emulation
+- Command execution (CMD, PowerShell)
+- Session management (multiple tabs)
+- Claude Code CLI integration
+- Command history
+- Auto-completion
+- Syntax highlighting
+- Only accessible when on CLI tab with active session
