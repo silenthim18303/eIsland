@@ -40,6 +40,19 @@ Use `!!` to wrap spoiler text that requires user interaction to reveal:
 This is !!spoiler content!!.
 ```
 
+### Watermark
+
+Enable watermark on specific pages by adding `watermark: true` to the frontmatter:
+
+```md
+---
+title: Page Title
+watermark: true
+---
+```
+
+The watermark plugin is configured in `src/.vuepress/theme.ts` with default content "eIsland".
+
 ### Language
 
 All documentation content must be written in **English**. No Chinese text is allowed in any documentation files.

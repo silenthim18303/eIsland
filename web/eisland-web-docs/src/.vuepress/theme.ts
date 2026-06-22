@@ -9,8 +9,13 @@ export default hopeTheme({
   docsDir: "web/eisland-web-docs/src",
   docsBranch: "dev",
 
+  contributors: true,
+  changelog: true,
+
   author: {
-    name: "eIsland",
+    name: "JNTMTMTM",
+    url: "https://github.com/JNTMTMTM",
+    email: "work@mail.shicthrs.com",
   },
 
   logo: "/dark.png",
@@ -42,6 +47,21 @@ export default hopeTheme({
     icon: {
       prefix: "fa6-solid:",
     },
+
+    copyright: {
+      global: true,
+      triggerLength: 40,
+      author: "JNTMTMTM",
+      license: "GPL-3.0",
+    },
+
+    watermark: {
+      enabled: false,
+      watermarkOptions: {
+        content: "eIsland developers docs",
+      },
+    },
+
     slimsearch: true
   },
 });

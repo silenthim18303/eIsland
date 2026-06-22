@@ -1,7 +1,6 @@
 ---
 title: Backend Tech Stack
 icon: server
-watermark: true
 ---
 
 # Backend Tech Stack
