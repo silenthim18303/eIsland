@@ -11,7 +11,7 @@ export default sidebar({
       collapsible: false,
       children: [
         "README.md",
-        "coc.md",
+        "intro/coc.md",
       ],
     },
     {
@@ -19,9 +19,9 @@ export default sidebar({
       icon: "book-atlas",
       collapsible: false,
       children: [
-        "frontend-tech-stack.md",
-        "backend-tech-stack.md",
-        "plugins-tech-stack.md"
+        "tech-stack/frontend-tech-stack.md",
+        "tech-stack/backend-tech-stack.md",
+        "tech-stack/plugins-tech-stack.md",
       ],
     },
     {
@@ -29,19 +29,19 @@ export default sidebar({
       icon: "building",
       collapsible: false,
       children: [
-        "process-model",
-        "states.md",
+        "frontend-arch/process-model.md",
+        "frontend-arch/states.md",
       ],
     },
     {
       text: "Backend Architecture",
-      icon: "building",
+      icon: "server",
       collapsible: false,
       children: [
-        "server-model.md",
-        "mysql-schema.md",
-        "redis-schema.md",
-        "rabbitmq-schema.md",
+        "backend-arch/server-model.md",
+        "backend-arch/mysql-schema.md",
+        "backend-arch/redis-schema.md",
+        "backend-arch/rabbitmq-schema.md",
       ],
     },
   ],
