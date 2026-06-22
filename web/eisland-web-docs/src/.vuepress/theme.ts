@@ -62,6 +62,13 @@ export default hopeTheme({
       },
     },
 
+    git: {
+      createdTime: true,
+      updatedTime: true,
+      contributors: true,
+      changelog: true,
+    },
+
     slimsearch: true
   },
 });
