@@ -5,7 +5,9 @@ icon: toolbox
 
 # Plugins Tech Stack
 
-This document provides an overview of the native Node.js addon plugins used in the eIsland application. All plugins are Windows-only, built with **C** and **Node-API (N-API)** via **node-gyp**, and exposed to the Electron main process as synchronous native modules.
+:::warning
+This document provides an overview of the native Node.js addon plugins used in the eIsland application. All plugins are **Windows-only**, built with **C** and **Node-API (N-API)** via **node-gyp**, and exposed to the Electron main process as synchronous native modules.
+:::
 
 ## Overview
 
@@ -82,7 +84,9 @@ All plugins target **NAPI_VERSION=8**, providing:
 
 ### Purpose
 
-Provides the ability to terminate Windows processes by name or process ID. Used by the eIsland AI agent's `win.close` tool and the `hide-process` IPC domain.
+:::danger
+Provides the ability to terminate Windows processes by name or process ID. Used by the eIsland AI agent's `win.close` tool and the `hide-process` IPC domain. This plugin has high-risk operation permissions — use with caution.
+:::
 
 ### Architecture
 
@@ -456,7 +460,9 @@ interface HardwareDevice {
 
 ### .NET Temperature Helper
 
+:::info
 Temperature and hardware enumeration use a separate **.NET 10 console application** (`eIslandTemperatureReader.exe`) that wraps **LibreHardwareMonitorLib**. It operates as a CLI tool — invoked via `spawnSync`, reads hardware sensors, outputs JSON to stdout, then exits.
+:::
 
 #### Why a Separate Process?
 
@@ -1004,6 +1010,10 @@ Plugins power several AI agent tools:
 
 ## Performance Characteristics
 
+:::tip
+Performance characteristics and optimization recommendations for each plugin:
+:::
+
 | Plugin | Call Latency | Notes |
 |--------|-------------|-------|
 | **Processes Attacker** | ~1–5ms | Snapshot-based enumeration, single `TerminateProcess` call per match |
@@ -1017,3 +1027,7 @@ Plugins power several AI agent tools:
 - CPU and memory snapshots are nearly zero-cost — suitable for polling at 1-second intervals
 - Temperature queries are expensive due to the .NET helper process — recommended at 5–10 second intervals
 - The fullscreen detector avoids COM/WMI — pure Win32 window API calls
+
+:::warning
+Temperature queries involve .NET process startup and WMI queries, resulting in high latency (500–2000ms). Recommended polling interval is 5–10 seconds to avoid frequent calls impacting performance.
+:::

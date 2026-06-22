@@ -5,7 +5,9 @@ icon: server
 
 # Backend Tech Stack
 
+:::info
 This document provides an overview of the backend technologies used in the eIsland server application.
+:::
 
 ## Core Framework
 
@@ -507,7 +509,9 @@ Set<ZSetOperations.TypedTuple<String>> topPlayers =
 
 #### Bloom Filters
 
-Redis implements **Bloom Filters** - a space-efficient probabilistic data structure used to test whether an element is a member of a set. This is particularly useful for preventing **cache penetration** (queries for non-existent data that bypass cache and hit the database directly).
+:::tip
+Redis implements **Bloom Filters** — a space-efficient probabilistic data structure used to test whether an element is a member of a set. This is particularly useful for preventing **cache penetration** (queries for non-existent data that bypass cache and hit the database directly).
+:::
 
 ##### How Bloom Filters Work in eIsland
 
@@ -755,7 +759,9 @@ Redis optimizations include:
 
 ### JWT (JSON Web Tokens)
 
-The application uses **JJWT** (Java JWT) for stateless token-based authentication. JWT tokens are the primary authentication mechanism, eliminating the need for server-side session storage.
+:::danger
+The application uses **JJWT** (Java JWT) for stateless token-based authentication. JWT tokens are the primary authentication mechanism, eliminating the need for server-side session storage. JWT Secret must be configured via environment variables — never hardcode in source code.
+:::
 
 #### JWT Configuration
 
@@ -1118,7 +1124,9 @@ Client Request
 
 ### Rate Limiting
 
-Multiple rate limiting mechanisms protect against abuse:
+:::warning
+Multiple rate limiting mechanisms protect against abuse. All authentication-related endpoints are protected by strict rate limiting.
+:::
 
 #### Authentication Rate Limiting
 
@@ -1442,7 +1450,9 @@ The application supports multiple cloud storage providers:
 
 ### Overview
 
+:::tip
 The eIsland AI agent system (codenamed **mihtnelis**) provides intelligent conversational capabilities with tool calling, streaming responses, and multi-provider support. The architecture is designed for extensibility, allowing seamless integration of new LLM providers.
+:::
 
 ### LLM Gateway Architecture
 
@@ -2167,6 +2177,10 @@ public enum AgentErrorCode {
 
 ### Security Considerations
 
+:::warning
+Security of the AI agent system is critical. Key security measures include:
+:::
+
 1. **API Key Protection**: Keys stored in environment variables
 2. **Input Sanitization**: Prompt injection prevention
 3. **Tool Permission Control**: High-risk tools require Pro/Admin
@@ -2178,7 +2192,9 @@ public enum AgentErrorCode {
 
 ### Overview
 
+:::info
 The payment system supports multiple payment channels for the Chinese market, with **Alipay** as the primary payment method. The architecture is designed for reliability with idempotent operations, async processing, and comprehensive error handling.
+:::
 
 ### Alipay SDK Integration
 
@@ -2480,6 +2496,11 @@ public class AlipayNotifyController {
 ```
 
 **Notification Security:**
+
+:::danger
+Payment callback notifications must be signature-verified to prevent forged payment success requests. The system uses RSA2 signature verification + Redis idempotency detection for dual protection.
+:::
+
 - **Signature Verification**: RSA2 signature check on every notification
 - **Idempotent Processing**: Redis-based duplicate detection
 - **Async Processing**: RabbitMQ for non-blocking operations
@@ -2651,7 +2672,9 @@ public void handleDlq(PaymentDlqMessage message) {
 
 ### Overview
 
+:::tip
 The email system uses **Resend** as the primary email delivery service, providing reliable transactional email delivery with high deliverability rates.
+:::
 
 ### Resend SDK Integration
 
@@ -3036,7 +3059,9 @@ public void handleEmailDispatch(EmailCodeDispatchMessage message) {
 
 ### Environment Variables
 
-Sensitive configuration is managed through environment variables:
+:::danger
+Sensitive configuration is managed through environment variables. All keys, passwords, and sensitive configuration must be injected via environment variables — never hardcode in source code.
+:::
 
 ```properties
 # Database Configuration
@@ -3143,6 +3168,10 @@ Structured logging with:
 - **JSON Format**: Machine-readable log output
 
 ## Security Best Practices
+
+:::info
+Security best practices adopted by the eIsland backend:
+:::
 
 ### Data Protection
 

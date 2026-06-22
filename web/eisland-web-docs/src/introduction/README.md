@@ -9,7 +9,9 @@ eIsland is a desktop widget application for Windows that brings the Apple Dynami
 
 ## State Machine Architecture
 
-The core of eIsland is built around a comprehensive state machine that controls the island's appearance and behavior. The system manages **15 distinct states**, each representing a specific user interaction context:
+:::info
+The core of eIsland is built around a comprehensive state machine that controls the island's appearance and behavior. The system manages **15 distinct states**, each representing a specific user interaction context.
+:::
 
 ### Primary States
 
@@ -59,6 +61,10 @@ States transition based on user interactions, system events, and application log
 
 ## Key Features
 
+:::info
+eIsland provides a rich set of functional modules covering music, productivity tools, information display, entertainment, and communication.
+:::
+
 ### Music Integration
 - Real-time lyrics synchronization with playback
 - Support for multiple music players (NetEase, QQ Music, Kugou)
@@ -87,7 +93,9 @@ States transition based on user interactions, system events, and application log
 
 ## Widget System
 
+:::tip
 The expanded state supports a flexible widget system with configurable layouts:
+:::
 
 - **Left/Right panels**: Choose from shortcuts, todo, song, countdown, pomodoro, and more
 - **Clock styles**: Classic, gradient, or minimal time display
@@ -96,7 +104,9 @@ The expanded state supports a flexible widget system with configurable layouts:
 
 ## Animation System
 
+:::tip
 State transitions use a morphing animation system with configurable speeds:
+:::
 
 - **Slow**: 1100ms for dramatic transitions
 - **Medium**: 550ms for standard interactions
@@ -106,4 +116,6 @@ The island smoothly animates between states, creating a fluid user experience si
 
 ---
 
-For technical implementation details, refer to the source code documentation and inline comments.
+:::danger
+This document only covers the project overview. For implementation details, refer to the source code documentation and inline comments.
+:::

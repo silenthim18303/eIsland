@@ -5,7 +5,9 @@ icon: layer-group
 
 # Frontend Tech Stack
 
+:::info
 This document provides an overview of the frontend technologies used in the eIsland application.
+:::
 
 ## Core Framework
 
@@ -144,7 +146,9 @@ registerHotkeyHandlers({ getMainWindow, getIslandPositionOffset });
 
 #### Transparent Window Architecture
 
-The application uses multiple transparent, frameless, always-on-top windows:
+:::warning
+The application uses multiple transparent, frameless, always-on-top windows. These windows require special Electron configuration with sandbox disabled to support native module loading.
+:::
 
 ```ts
 const mainWindow = new BrowserWindow({
@@ -247,7 +251,9 @@ contextBridge.exposeInMainWorld('api', {
 
 ### Coordinator Hook Pattern
 
+:::tip
 The island UI is orchestrated by a single **coordinator hook** (`useDynamicIslandCoordinator`) that composes approximately 16 specialized hooks, each managing one concern:
+:::
 
 ```ts
 function useDynamicIslandCoordinator() {
@@ -364,7 +370,9 @@ function DynamicIsland() {
 
 ### Zustand Store Architecture
 
+:::info
 The application uses **Zustand** with a **slice composition pattern** for global state management. Seven domain-specific slices are composed into a single store:
+:::
 
 ```ts
 import { create } from 'zustand';
@@ -995,6 +1003,10 @@ function Controls() {
 
 ## Testing
 
+:::danger
+All frontend code changes must be verified through tests. The project contains approximately 90+ test files covering main process, preload scripts, and renderer process.
+:::
+
 ### Vitest Configuration
 
 ```ts
@@ -1128,6 +1140,10 @@ describe('formatTime', () => {
 | **Renderer Utils** | ~35 files | Pure functions, helpers, parsers |
 
 ## Performance Optimizations
+
+:::tip
+Key performance optimization strategies adopted by the eIsland frontend:
+:::
 
 ### Window Management
 
