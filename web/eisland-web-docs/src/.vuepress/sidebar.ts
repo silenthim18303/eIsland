@@ -32,6 +32,7 @@ export default sidebar({
         "process-model",
         "states.md",
         "server-model.md",
+        "mysql-schema.md",
       ],
     },
   ],
