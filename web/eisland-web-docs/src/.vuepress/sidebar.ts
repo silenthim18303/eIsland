@@ -31,6 +31,7 @@ export default sidebar({
       children: [
         "process-model",
         "states.md",
+        "server-model.md",
       ],
     },
   ],
