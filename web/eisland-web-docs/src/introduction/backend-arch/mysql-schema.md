@@ -6,7 +6,7 @@ icon: database
 # MySQL Database Schema
 
 :::info
-The eIsland backend uses **MySQL 8.0+** as its primary relational database with **utf8mb4** character set and **InnoDB** engine. All tables follow the **snake_case** naming convention, while Java entity fields use **camelCase** via MyBatis auto-mapping. The database schema is designed with clear domain boundaries, with each module owning its tables.
+The eIsland backend uses **MySQL 8.0+** as its primary relational database with **utf8mb4** character set and **InnoDB** engine. All tables follow the **snake_case** naming convention, while Java entity fields use **camelCase** via MyBatis auto-mapping. The database schema is designed with clear domain boundaries, with each module owning its tables. For the high-level architecture overview, see [Server Architecture](server-model.md). For the Redis caching layer, see [Redis Architecture](redis-schema.md). For the async message processing, see [RabbitMQ Architecture](rabbitmq-schema.md).
 :::
 
 ## Database Overview
@@ -41,7 +41,7 @@ Charset:  utf8mb4 / utf8mb4_unicode_ci
 ### user_account
 
 :::tip
-Unified user table created in April 2026 by merging the legacy `admin_user` and `app_user` tables. The `role` field distinguishes between regular users, Pro subscribers, and administrators. Single-device enforcement is achieved by comparing the `session_token` on each request against the stored value.
+Unified user table created in April 2026 by merging the legacy `admin_user` and `app_user` tables. The `role` field distinguishes between regular users, Pro subscribers, and administrators. Single-device enforcement is achieved by comparing the `session_token` on each request against the stored value. For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the TOTP secret caching, see [Redis — TOTP Security](redis-schema.md#db-5--totp-security). For the agent balance stored in Redis, see [Redis — Agent Balance](redis-schema.md#db-12--agent-balance).
 :::
 
 | Column | Type | Nullable | Default | Description |
@@ -126,7 +126,7 @@ Stores real-name identity verification records using Alipay's face authenticatio
 ### payment_order
 
 :::info
-Payment orders track the full lifecycle of a transaction from creation through payment to completion or closure. Each order has a unique `out_trade_no` used as the idempotency key when communicating with payment gateways (WeChat Pay / Alipay).
+Payment orders track the full lifecycle of a transaction from creation through payment to completion or closure. Each order has a unique `out_trade_no` used as the idempotency key when communicating with payment gateways (WeChat Pay / Alipay). For the payment flow and Alipay SDK integration, see [Payment Processing](../tech-stack/backend-tech-stack.md#payment-processing). For the async notification processing, see [RabbitMQ — Payment Notification](rabbitmq-schema.md#domain-2-payment-notification). For the distributed locks, see [Redis — Payment](redis-schema.md#db-10--payment).
 :::
 
 | Column | Type | Nullable | Default | Description |
@@ -234,7 +234,7 @@ Payment reconciliation records comparing local transaction counts against WeChat
 ### payment_dlq_log
 
 :::warning
-Dead letter queue log for payment notifications that failed processing after maximum retries. Each entry contains the original notification data and error details for manual investigation.
+Dead letter queue log for payment notifications that failed processing after maximum retries. Each entry contains the original notification data and error details for manual investigation. For the RabbitMQ retry pattern, see [RabbitMQ — Payment Notification](rabbitmq-schema.md#domain-2-payment-notification).
 :::
 
 | Column | Type | Nullable | Default | Description |
@@ -328,7 +328,7 @@ Aggregated usage statistics for all AI agent models. Updated atomically via `INS
 ### agent_billing_dlq_log
 
 :::warning
-Dead letter queue log for AI agent billing operations that failed after maximum retries. When a billing deduction cannot be persisted to the database (e.g., due to transient DB errors), the message is routed to this DLQ for manual resolution.
+Dead letter queue log for AI agent billing operations that failed after maximum retries. When a billing deduction cannot be persisted to the database (e.g., due to transient DB errors), the message is routed to this DLQ for manual resolution. For the Redis atomic deduction, see [Redis — Agent Balance](redis-schema.md#db-12--agent-balance). For the MQ topology, see [RabbitMQ — Agent Billing](rabbitmq-schema.md#domain-3-agent-billing).
 :::
 
 | Column | Type | Nullable | Default | Description |
@@ -652,7 +652,7 @@ High score records for mini-games. Each user has one record per game (enforced b
 ### mini_game_score_dlq_log
 
 :::warning
-Dead letter queue for game score submissions that failed processing. Score submissions are first validated (anti-cheat checks), then persisted. If database persistence fails after retries, the submission is logged here for manual review.
+Dead letter queue for game score submissions that failed processing. Score submissions are first validated (anti-cheat checks), then persisted. If database persistence fails after retries, the submission is logged here for manual review. For the Redis leaderboard, see [Redis — Mini Game](redis-schema.md#db-14--mini-game). For the MQ topology, see [RabbitMQ — Mini Game Score](rabbitmq-schema.md#domain-6-mini-game-score).
 :::
 
 | Column | Type | Nullable | Default | Description |
@@ -919,7 +919,7 @@ Singleton configuration table for system-wide announcements. Only one row (id=1)
 ### email_dispatch_dlq_log
 
 :::warning
-Dead letter queue log for email delivery failures. When an email (verification code, receipt, etc.) cannot be delivered after maximum retries via RabbitMQ, the dispatch details are logged here for manual investigation.
+Dead letter queue log for email delivery failures. When an email (verification code, receipt, etc.) cannot be delivered after maximum retries via RabbitMQ, the dispatch details are logged here for manual investigation. For the verification code storage, see [Redis — Email Verification](redis-schema.md#db-2--email-verification--identity-verification). For the MQ topology, see [RabbitMQ — Email Verification](rabbitmq-schema.md#domain-1-email-verification).
 :::
 
 | Column | Type | Nullable | Default | Description |

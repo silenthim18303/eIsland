@@ -48,7 +48,7 @@ server/
 
 ### MySQL
 
-**MySQL** is used as the primary relational database for persistent data storage. The application connects to MySQL using the official JDBC driver with optimized connection settings.
+**MySQL** is used as the primary relational database for persistent data storage. The application connects to MySQL using the official JDBC driver with optimized connection settings. For the complete column-level schema reference, see [MySQL Database Schema](../backend-arch/mysql-schema.md).
 
 #### Database Configuration
 
@@ -452,7 +452,7 @@ public void transferBalance(String fromUser, String toUser, BigDecimal amount) {
 
 ### Redis
 
-**Redis** is a critical infrastructure component serving multiple purposes across the application:
+**Redis** is a critical infrastructure component serving multiple purposes across the application. For the complete key-pattern reference across all 15 databases, see [Redis Architecture](../backend-arch/redis-schema.md).
 
 #### Caching Layer
 
@@ -1411,7 +1411,7 @@ public class JsonAccessDeniedHandler implements AccessDeniedHandler {
 
 ### RabbitMQ
 
-**RabbitMQ** is used for asynchronous processing and event-driven architecture:
+**RabbitMQ** is used for asynchronous processing and event-driven architecture. For the complete queue topology, message definitions, and retry patterns, see [RabbitMQ Architecture](../backend-arch/rabbitmq-schema.md).
 
 - **Email Notifications**: Asynchronous email delivery
 - **Payment Processing**: Order status updates
@@ -2193,7 +2193,7 @@ Security of the AI agent system is critical. Key security measures include:
 ### Overview
 
 :::info
-The payment system supports multiple payment channels for the Chinese market, with **Alipay** as the primary payment method. The architecture is designed for reliability with idempotent operations, async processing, and comprehensive error handling.
+The payment system supports multiple payment channels for the Chinese market, with **Alipay** as the primary payment method. The architecture is designed for reliability with idempotent operations, async processing, and comprehensive error handling. For the database schema, see [MySQL — Payment Domain](../backend-arch/mysql-schema.md#payment-domain). For the async notification processing, see [RabbitMQ — Payment Notification](../backend-arch/rabbitmq-schema.md#domain-2-payment-notification).
 :::
 
 ### Alipay SDK Integration
@@ -2673,7 +2673,7 @@ public void handleDlq(PaymentDlqMessage message) {
 ### Overview
 
 :::tip
-The email system uses **Resend** as the primary email delivery service, providing reliable transactional email delivery with high deliverability rates.
+The email system uses **Resend** as the primary email delivery service, providing reliable transactional email delivery with high deliverability rates. For the verification code storage, see [Redis — Email Verification](../backend-arch/redis-schema.md#db-2--email-verification--identity-verification). For the async dispatch topology, see [RabbitMQ — Email Verification](../backend-arch/rabbitmq-schema.md#domain-1-email-verification).
 :::
 
 ### Resend SDK Integration

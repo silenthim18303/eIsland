@@ -10,7 +10,7 @@ eIsland is a desktop widget application for Windows that brings the Apple Dynami
 ## State Machine Architecture
 
 :::info
-The core of eIsland is built around a comprehensive state machine that controls the island's appearance and behavior. The system manages **15 distinct states**, each representing a specific user interaction context.
+The core of eIsland is built around a comprehensive state machine that controls the island's appearance and behavior. The system manages **15 distinct states**, each representing a specific user interaction context. For the full state configuration matrix, transition rules, and per-state behavior details, see [State Machine](../frontend-arch/states.md).
 :::
 
 ### Primary States
@@ -59,6 +59,8 @@ States transition based on user interactions, system events, and application log
 - **Enter/Leave delays**: Timing for smooth state transitions
 - **Area calculations**: Pixel dimensions for each state
 
+For the complete transition rules and auto-transition logic, see [State Transitions](../frontend-arch/states.md#state-transitions). For the IPC data flow between processes, see [Process Model](../frontend-arch/process-model.md#data-flow).
+
 ## Key Features
 
 :::info
@@ -66,7 +68,7 @@ eIsland provides a rich set of functional modules covering music, productivity t
 :::
 
 ### Music Integration
-- Real-time lyrics synchronization with playback
+- Real-time lyrics synchronization with playback (via [SMTC Worker](../frontend-arch/process-model.md#smtc-worker))
 - Support for multiple music players (NetEase, QQ Music, Kugou)
 - Album art display and music controls
 
@@ -77,24 +79,24 @@ eIsland provides a rich set of functional modules covering music, productivity t
 - Application shortcuts
 
 ### Information Display
-- Weather information with location detection
+- Weather information with location detection (powered by [QWeather API](../backend-arch/redis-schema.md#db-11--qweather-cache--tencent-tmt-quota))
 - Calendar integration with lunar dates
-- Performance monitoring widgets
+- Performance monitoring widgets (via [Performance Monitor Plugin](../tech-stack/plugins-tech-stack.md#plugin-windows-performance-monitor))
 
 ### Entertainment
-- Built-in mini-games (2048, Gomoku)
-- Customizable wallpapers and themes
-- Animation effects and transitions
+- Built-in mini-games (2048, Gomoku) with [leaderboard system](../backend-arch/mysql-schema.md#mini-game-domain)
+- Customizable wallpapers and themes (via [Wallpaper Marketplace](../backend-arch/mysql-schema.md#wallpaper-domain))
+- Animation effects and transitions (see [Animation System](#animation-system) below)
 
 ### Communication
 - Email notification monitoring
-- AI-powered chat assistant
-- Voice command support
+- AI-powered chat assistant (see [AI Agent System](../tech-stack/backend-tech-stack.md#ai-integration))
+- Voice command support (via [Speech-to-Text](../tech-stack/backend-tech-stack.md#speech-to-text-stt))
 
 ## Widget System
 
 :::tip
-The expanded state supports a flexible widget system with configurable layouts:
+The expanded state supports a flexible widget system with configurable layouts (managed via [Zustand Store](../tech-stack/frontend-tech-stack.md#state-management)):
 :::
 
 - **Left/Right panels**: Choose from shortcuts, todo, song, countdown, pomodoro, and more
@@ -105,7 +107,7 @@ The expanded state supports a flexible widget system with configurable layouts:
 ## Animation System
 
 :::tip
-State transitions use a morphing animation system with configurable speeds:
+State transitions use a morphing animation system with configurable speeds (see [GSAP Integration](../tech-stack/frontend-tech-stack.md#gsap-integration) and [CSS-Driven Animations](../tech-stack/frontend-tech-stack.md#css-driven-animations)):
 :::
 
 - **Slow**: 1100ms for dramatic transitions
@@ -116,6 +118,10 @@ The island smoothly animates between states, creating a fluid user experience si
 
 ---
 
-:::danger
-This document only covers the project overview. For implementation details, refer to the source code documentation and inline comments.
+:::tip
+**Related Documents:**
+- [Process Model](../frontend-arch/process-model.md) — Electron multi-process architecture and IPC communication
+- [State Machine](../frontend-arch/states.md) — Full 16-state configuration, transitions, and per-state behavior
+- [Frontend Tech Stack](../tech-stack/frontend-tech-stack.md) — React, TypeScript, Electron, Zustand, GSAP
+- [Backend Tech Stack](../tech-stack/backend-tech-stack.md) — Java, Spring Boot, AI agent, payment processing
 :::

@@ -105,7 +105,7 @@ server-app
 ### MySQL Database
 
 :::info
-**MySQL** is the primary relational database for persistent data storage. The application uses HikariCP connection pooling for efficient connection management and MyBatis ORM for flexible SQL mapping. The database schema is designed with clear domain boundaries, with each module owning its tables and mappers.
+**MySQL** is the primary relational database for persistent data storage. The application uses HikariCP connection pooling for efficient connection management and MyBatis ORM for flexible SQL mapping. The database schema is designed with clear domain boundaries, with each module owning its tables and mappers. For the complete column-level reference, see [MySQL Database Schema](mysql-schema.md).
 :::
 
 #### Database Schema
@@ -149,7 +149,7 @@ public interface UserMapper {
 ### Redis Cache
 
 :::info
-**Redis** serves as the primary caching layer and supports rate limiting, leaderboards, bloom filters, and session management. The application uses multiple Redis instances with dedicated configurations per domain, ensuring isolation and performance. Redis is critical for real-time features like leaderboards, rate limiting, and session management.
+**Redis** serves as the primary caching layer and supports rate limiting, leaderboards, bloom filters, and session management. The application uses multiple Redis instances with dedicated configurations per domain, ensuring isolation and performance. Redis is critical for real-time features like leaderboards, rate limiting, and session management. For the complete key-pattern reference across all 15 databases, see [Redis Architecture](redis-schema.md).
 :::
 
 #### Use Cases
@@ -183,7 +183,7 @@ Redis implements **Bloom Filters** for fast rejection of non-existent queries, p
 ### RabbitMQ Message Queue
 
 :::warning
-**RabbitMQ** handles asynchronous processing and event-driven architecture with dead letter queue (DLQ) support for failed messages. The message queue decouples services, enables reliable delivery, and provides retry mechanisms for failed operations. DLQ ensures that failed messages are not lost and can be retried or logged for manual review.
+**RabbitMQ** handles asynchronous processing and event-driven architecture with dead letter queue (DLQ) support for failed messages. The message queue decouples services, enables reliable delivery, and provides retry mechanisms for failed operations. DLQ ensures that failed messages are not lost and can be retried or logged for manual review. For the complete queue topology, message definitions, and retry patterns, see [RabbitMQ Architecture](rabbitmq-schema.md).
 :::
 
 #### Queue Topology
@@ -363,7 +363,7 @@ CompletableFuture.runAsync(() -> {
 ## AI Agent System
 
 :::info
-The AI agent system (codenamed **mihtnelis**) provides intelligent conversational capabilities with tool calling, streaming responses, and multi-provider support. The system supports 50+ tools for file operations, system control, weather queries, web search, and more.
+The AI agent system (codenamed **mihtnelis**) provides intelligent conversational capabilities with tool calling, streaming responses, and multi-provider support. The system supports 50+ tools for file operations, system control, weather queries, web search, and more. For the detailed LLM gateway implementation and tool calling system, see [AI Integration](../tech-stack/backend-tech-stack.md#ai-integration).
 :::
 
 ### Architecture
@@ -426,7 +426,7 @@ User Request → Check Balance (Redis) → Call LLM → Calculate Cost → Atomi
 ## Payment System
 
 :::info
-The payment system supports multiple payment channels for the Chinese market, with **Alipay** as the primary payment method. The architecture is designed for reliability with idempotent operations, async processing, and comprehensive error handling. All payment notifications are signature-verified to prevent fraud.
+The payment system supports multiple payment channels for the Chinese market, with **Alipay** as the primary payment method. The architecture is designed for reliability with idempotent operations, async processing, and comprehensive error handling. All payment notifications are signature-verified to prevent fraud. For the Alipay SDK integration details, see [Payment Processing](../tech-stack/backend-tech-stack.md#payment-processing). For the database schema, see [Payment Domain](mysql-schema.md#payment-domain). For the async notification topology, see [RabbitMQ — Payment Notification](rabbitmq-schema.md#domain-2-payment-notification).
 :::
 
 ### Payment Flow

@@ -6,7 +6,7 @@ icon: database
 # Redis Architecture
 
 :::info
-The eIsland backend uses **Redis 7.0+** as its primary caching, rate-limiting, and real-time data layer. The application connects via **Lettuce** (bundled with `spring-boot-starter-data-redis`) in standalone mode with **15 isolated databases** (DB 0–14), each dedicated to a specific business domain. This document covers every Redis key pattern, data structure, TTL, and usage rationale across the entire system.
+The eIsland backend uses **Redis 7.0+** as its primary caching, rate-limiting, and real-time data layer. The application connects via **Lettuce** (bundled with `spring-boot-starter-data-redis`) in standalone mode with **15 isolated databases** (DB 0–14), each dedicated to a specific business domain. This document covers every Redis key pattern, data structure, TTL, and usage rationale across the entire system. For the MySQL tables that Redis caches, see [MySQL Database Schema](mysql-schema.md). For the MQ-based async persistence, see [RabbitMQ Architecture](rabbitmq-schema.md).
 :::
 
 ## Architecture Overview
@@ -438,7 +438,7 @@ Weather data is cached to reduce API calls to QWeather's service. The monthly qu
 ## DB 12 — Agent Balance
 
 :::danger
-The agent balance is the most critical Redis key in the billing system. It uses a **Lua script** for atomic deduction with cap-at-zero semantics, ensuring that a user can never be charged more than their remaining balance. The balance is persisted to MySQL every 30 minutes by a reconciliation job.
+The agent balance is the most critical Redis key in the billing system. It uses a **Lua script** for atomic deduction with cap-at-zero semantics, ensuring that a user can never be charged more than their remaining balance. The balance is persisted to MySQL every 30 minutes by a reconciliation job. For the MySQL column, see [user_account.balance_fen](mysql-schema.md#user_account). For the async billing persistence, see [RabbitMQ — Agent Billing](rabbitmq-schema.md#domain-3-agent-billing).
 :::
 
 | Key Pattern | Data Structure | TTL | Purpose |
@@ -537,7 +537,7 @@ Per-model usage statistics are tracked using Redis Hash fields with atomic `HINC
 ## DB 14 — Mini Game
 
 :::info
-The mini-game domain is the most Redis-intensive module, using sorted sets for leaderboards, hashes for metadata, strings for caching and idempotency, and SETNX for distributed locks. All keys are prefixed with `mg:`.
+The mini-game domain is the most Redis-intensive module, using sorted sets for leaderboards, hashes for metadata, strings for caching and idempotency, and SETNX for distributed locks. All keys are prefixed with `mg:`. For the MySQL persistence, see [Mini Game Domain](mysql-schema.md#mini-game-domain). For the async score upsert, see [RabbitMQ — Mini Game Score](rabbitmq-schema.md#domain-6-mini-game-score).
 :::
 
 ### Score Cache & Leaderboard

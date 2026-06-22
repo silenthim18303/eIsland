@@ -112,7 +112,7 @@ registerHotkeyHandlers({ getMainWindow, getIslandPositionOffset });
 ### Native Module Integration
 
 :::warning
-Native modules (C/C++ addons) are loaded in the Main Process with sandbox disabled. These modules provide low-level Windows system capabilities.
+Native modules (C/C++ addons) are loaded in the Main Process with sandbox disabled. These modules provide low-level Windows system capabilities. For detailed plugin implementations, see [Plugins Tech Stack](../tech-stack/plugins-tech-stack.md).
 :::
 
 | Module | Purpose | Platform |
@@ -438,7 +438,7 @@ function useDynamicIslandCoordinator() {
 
 ### State-Based Component Rendering
 
-Components are rendered based on the current island state:
+Components are rendered based on the current island state (see [State Machine](states.md) for the full state definitions):
 
 ```tsx
 function DynamicIsland() {

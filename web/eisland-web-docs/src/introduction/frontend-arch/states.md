@@ -585,7 +585,7 @@ The `guide` state provides an interactive first-run tutorial for new users.
 ### login
 
 :::info
-The `login` state provides user authentication interface.
+The `login` state provides user authentication interface. For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
 :::
 
 | Property | Value |
@@ -629,7 +629,7 @@ The `login` state provides user authentication interface.
 ### register
 
 :::info
-The `register` state provides new account creation interface.
+The `register` state provides new account creation interface. For email verification, see [Redis — Email Verification](../backend-arch/redis-schema.md#db-2--email-verification--identity-verification). For CAPTCHA, see [Redis — Slider CAPTCHA](../backend-arch/redis-schema.md#db-4--slider-captcha).
 :::
 
 | Property | Value |
@@ -711,7 +711,7 @@ The `resetPassword` state provides password recovery workflow.
 ### payment
 
 :::info
-The `payment` state handles subscription and payment processing.
+The `payment` state handles subscription and payment processing. For the Alipay/WeChat integration, see [Payment Processing](../tech-stack/backend-tech-stack.md#payment-processing). For the order lifecycle, see [MySQL — Payment Domain](../backend-arch/mysql-schema.md#payment-domain).
 :::
 
 | Property | Value |
@@ -754,7 +754,7 @@ The `payment` state handles subscription and payment processing.
 ### agent
 
 :::info
-The `agent` state provides the AI assistant chat interface with tool calling capabilities.
+The `agent` state provides the AI assistant chat interface with tool calling capabilities. For the LLM gateway and tool system, see [AI Integration](../tech-stack/backend-tech-stack.md#ai-integration). For the billing balance, see [Redis — Agent Balance](../backend-arch/redis-schema.md#db-12--agent-balance).
 :::
 
 | Property | Value |

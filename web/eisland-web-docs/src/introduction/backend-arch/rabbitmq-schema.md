@@ -6,7 +6,7 @@ icon: envelopes-bulk
 # RabbitMQ Architecture
 
 :::info
-The eIsland backend uses **RabbitMQ 3.12+** for asynchronous processing and event-driven architecture. The application connects via **Spring AMQP** (`spring-boot-starter-amqp`) with **Jackson JSON** message serialization. There are **6 exchanges**, **21 queues**, and **9 message types** across 6 business domains. Every domain follows the same **3-queue retry pattern**: main queue → retry queue (TTL-delayed via DLX) → DLQ.
+The eIsland backend uses **RabbitMQ 3.12+** for asynchronous processing and event-driven architecture. The application connects via **Spring AMQP** (`spring-boot-starter-amqp`) with **Jackson JSON** message serialization. There are **6 exchanges**, **21 queues**, and **9 message types** across 6 business domains. Every domain follows the same **3-queue retry pattern**: main queue → retry queue (TTL-delayed via DLX) → DLQ. For the MySQL DLQ tables, see [MySQL Database Schema](mysql-schema.md). For the Redis caches, see [Redis Architecture](redis-schema.md).
 :::
 
 ## Architecture Overview
@@ -228,7 +228,7 @@ public record PaymentReceiptDispatchMessage(
 ## Domain 3: Agent Billing
 
 :::danger
-The agent billing domain has two queues: one for balance deduction persistence (critical, with retry) and one for usage stats aggregation (fire-and-forget, no retry). The deduction queue has the shortest retry TTL (5 seconds) to minimize billing delay.
+The agent billing domain has two queues: one for balance deduction persistence (critical, with retry) and one for usage stats aggregation (fire-and-forget, no retry). The deduction queue has the shortest retry TTL (5 seconds) to minimize billing delay. For the Redis atomic deduction, see [Redis — Agent Balance](redis-schema.md#db-12--agent-balance). For the MySQL tables, see [Agent Domain](mysql-schema.md#agent-domain).
 :::
 
 ### Queue Topology
@@ -445,7 +445,7 @@ public record ScoreUpsertMessage(
 ## DLQ Persistence
 
 :::warning
-When a message reaches the DLQ (max retries exhausted), the consumer persists the failure details to a MySQL table for manual investigation and potential replay.
+When a message reaches the DLQ (max retries exhausted), the consumer persists the failure details to a MySQL table for manual investigation and potential replay. See the corresponding table definitions in [MySQL Database Schema](mysql-schema.md).
 :::
 
 | Domain | DLQ Log Table | Entity Class | Consumer |
