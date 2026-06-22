@@ -34,6 +34,7 @@ export default sidebar({
         "server-model.md",
         "mysql-schema.md",
         "redis-schema.md",
+        "rabbitmq-schema.md",
       ],
     },
   ],
