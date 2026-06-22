@@ -1,6 +1,6 @@
 ---
 title: Code of Conduct
-icon: info
+icon: code
 ---
 
 # Contributor Covenant Code of Conduct

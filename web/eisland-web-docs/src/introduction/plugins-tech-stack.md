@@ -1,6 +1,6 @@
 ---
 title: Plugins Tech Stack
-icon: layer-group
+icon: toolbox
 ---
 
 # Plugins Tech Stack

@@ -8,7 +8,7 @@ export default sidebar({
     {
       text: "Introduction",
       icon: "info",
-      collapsible: true,
+      collapsible: false,
       children: [
         "README.md",
         "coc.md",
@@ -16,8 +16,8 @@ export default sidebar({
     },
     {
       text: "Tech Stack",
-      icon: "layer-group",
-      collapsible: true,
+      icon: "book-atlas",
+      collapsible: false,
       children: [
         "frontend-tech-stack.md",
         "backend-tech-stack.md",
