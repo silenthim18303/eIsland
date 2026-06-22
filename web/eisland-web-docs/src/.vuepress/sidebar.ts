@@ -33,6 +33,7 @@ export default sidebar({
         "states.md",
         "server-model.md",
         "mysql-schema.md",
+        "redis-schema.md",
       ],
     },
   ],
