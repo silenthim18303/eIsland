@@ -24,5 +24,13 @@ export default sidebar({
         "plugins-tech-stack.md"
       ],
     },
+    {
+      text: "Architecture",
+      icon: "building",
+      collapsible: false,
+      children: [
+        "states.md",
+      ],
+    },
   ],
 });
