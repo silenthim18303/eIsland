@@ -83,7 +83,7 @@ function takeSnapshot(index: number): ToastPollingSnapshot {
 }
 
 describe('windows-toast-listener polling', () => {
-  it('keeps access status, listener state, and notification snapshots valid during polling', async () => {
+  it('keeps access status, listener state, and notification snapshots valid during polling', { timeout: 30000 }, async () => {
     listener.stopListening();
 
     const snapshots: ToastPollingSnapshot[] = [];

@@ -22,13 +22,18 @@
 #include <windows.h>
 #include <roapi.h>
 #include <windows.ui.notifications.management.h>
+#include <windows.ui.notifications.h>
 #include <asyncinfo.h>
+#include <windows.data.xml.dom.h>
+#include <windows.applicationmodel.h>
 
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
 #include <new>
+#include <string>
+#include <vector>
 
 #define TOAST_LISTENER_CLASS_NAME L"Windows.UI.Notifications.Management.UserNotificationListener"
 #define ASYNC_ACCESS_TIMEOUT_MS 60000
@@ -37,10 +42,22 @@
 typedef __x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListener ToastListener;
 typedef __x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListenerStatics ToastListenerStatics;
 typedef __x_ABI_CWindows_CUI_CNotifications_CIUserNotificationChangedEventArgs ToastChangedArgs;
+typedef __x_ABI_CWindows_CUI_CNotifications_CIUserNotification UserNotification;
+typedef __x_ABI_CWindows_CApplicationModel_CIAppInfo AppInfo;
+typedef __x_ABI_CWindows_CApplicationModel_CIAppDisplayInfo AppDisplayInfo;
+typedef __x_ABI_CWindows_CUI_CNotifications_CINotification Notification;
+typedef __x_ABI_CWindows_CUI_CNotifications_CINotificationVisual NotificationVisual;
+typedef __x_ABI_CWindows_CUI_CNotifications_CINotificationBinding NotificationBinding;
+typedef __x_ABI_CWindows_CUI_CNotifications_CIAdaptiveNotificationText AdaptiveNotificationText;
 typedef __FITypedEventHandler_2_Windows__CUI__CNotifications__CManagement__CUserNotificationListener_Windows__CUI__CNotifications__CUserNotificationChangedEventArgs ToastChangedHandler;
 typedef __FIAsyncOperation_1_Windows__CUI__CNotifications__CManagement__CUserNotificationListenerAccessStatus AccessStatusOperation;
+typedef __FIAsyncOperation_1___FIVectorView_1_Windows__CUI__CNotifications__CUserNotification NotificationVectorOperation;
+typedef __FIVectorView_1_Windows__CUI__CNotifications__CUserNotification NotificationVector;
+typedef __FIVectorView_1_Windows__CUI__CNotifications__CAdaptiveNotificationText AdaptiveTextVector;
+typedef __FIVector_1_Windows__CUI__CNotifications__CNotificationBinding BindingVector;
 using AccessStatus = ABI::Windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
 using ToastChangedKind = ABI::Windows::UI::Notifications::UserNotificationChangedKind;
+using NotificationKinds = ABI::Windows::UI::Notifications::NotificationKinds;
 
 typedef struct ToastChangedEvent {
   char kind[16];
@@ -283,6 +300,47 @@ static HRESULT wait_for_access_result(AccessStatusOperation* operation, AccessSt
   return operation->GetResults(status);
 }
 
+static HRESULT wait_for_notification_vector_result(NotificationVectorOperation* operation, NotificationVector** result) {
+  IAsyncInfo* async_info = NULL;
+  AsyncStatus async_status = Started;
+  HRESULT hr;
+  DWORD waited_ms = 0;
+
+  if (operation == NULL || result == NULL) {
+    return E_POINTER;
+  }
+
+  *result = NULL;
+
+  hr = operation->QueryInterface(__uuidof(IAsyncInfo), (void**)&async_info);
+  if (FAILED(hr)) {
+    return hr;
+  }
+
+  while (waited_ms < ASYNC_ACCESS_TIMEOUT_MS) {
+    hr = async_info->get_Status(&async_status);
+    if (FAILED(hr)) {
+      async_info->Release();
+      return hr;
+    }
+
+    if (async_status != Started) {
+      break;
+    }
+
+    Sleep(ASYNC_ACCESS_POLL_MS);
+    waited_ms += ASYNC_ACCESS_POLL_MS;
+  }
+
+  async_info->Release();
+
+  if (async_status != Completed) {
+    return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
+  }
+
+  return operation->GetResults(result);
+}
+
 static napi_value request_access(napi_env env, napi_callback_info callback_info) {
   ToastListener* listener = NULL;
   AccessStatusOperation* operation = NULL;
@@ -342,11 +400,227 @@ static napi_value get_access_status(napi_env env, napi_callback_info callback_in
   return make_string(env, access_status_to_string(status));
 }
 
+static const char* hstring_to_utf8(HSTRING hs) {
+  UINT32 len = 0;
+  const wchar_t* raw = WindowsGetStringRawBuffer(hs, &len);
+  if (raw == NULL || len == 0) {
+    return "";
+  }
+
+  int utf8_len = WideCharToMultiByte(CP_UTF8, 0, raw, (int)len, NULL, 0, NULL, NULL);
+  if (utf8_len <= 0) {
+    return "";
+  }
+
+  char* buf = (char*)malloc((size_t)utf8_len + 1);
+  if (buf == NULL) {
+    return "";
+  }
+
+  WideCharToMultiByte(CP_UTF8, 0, raw, (int)len, buf, utf8_len, NULL, NULL);
+  buf[utf8_len] = '\0';
+  return buf;
+}
+
 static napi_value get_notifications(napi_env env, napi_callback_info callback_info) {
+  ToastListener* listener = NULL;
+  NotificationVectorOperation* vector_operation = NULL;
+  NotificationVector* notifications = NULL;
   napi_value result;
+  HRESULT hr;
+  UINT32 count = 0;
 
   (void)callback_info;
-  napi_create_array_with_length(env, 0, &result);
+  ensure_initialized();
+
+  hr = get_current_listener(&listener);
+  if (FAILED(hr)) {
+    throw_error(env, "Failed to get Windows notification listener.");
+    return NULL;
+  }
+
+  hr = listener->GetNotificationsAsync((NotificationKinds)1, &vector_operation);
+  listener->Release();
+
+  if (FAILED(hr) || vector_operation == NULL) {
+    throw_error(env, "Failed to get Windows notifications.");
+    return NULL;
+  }
+
+  hr = wait_for_notification_vector_result(vector_operation, &notifications);
+  vector_operation->Release();
+
+  if (FAILED(hr) || notifications == NULL) {
+    napi_create_array_with_length(env, 0, &result);
+    return result;
+  }
+
+  notifications->get_Size(&count);
+  napi_create_array_with_length(env, count, &result);
+
+  for (UINT32 i = 0; i < count; i++) {
+    UserNotification* user_notification = NULL;
+    AppInfo* app_info = NULL;
+    Notification* notification = NULL;
+    NotificationVisual* visual = NULL;
+    BindingVector* bindings = NULL;
+    napi_value item;
+    napi_value js_id, js_app_user_model_id, js_app_display_name;
+    napi_value js_title, js_body, js_texts, js_created_at;
+    UINT32 notification_id = 0;
+
+    if (FAILED(notifications->GetAt(i, &user_notification)) || user_notification == NULL) {
+      continue;
+    }
+
+    napi_create_object(env, &item);
+
+    napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_app_user_model_id);
+    napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_app_display_name);
+    napi_set_named_property(env, item, "appUserModelId", js_app_user_model_id);
+    napi_set_named_property(env, item, "appDisplayName", js_app_display_name);
+
+    user_notification->get_Id(&notification_id);
+    napi_create_uint32(env, notification_id, &js_id);
+    napi_set_named_property(env, item, "id", js_id);
+
+    hr = user_notification->get_AppInfo(&app_info);
+
+    if (SUCCEEDED(hr) && app_info != NULL) {
+      HSTRING app_user_model_id_hs = NULL;
+      app_info->get_AppUserModelId(&app_user_model_id_hs);
+      const char* app_user_model_id_str = hstring_to_utf8(app_user_model_id_hs);
+      napi_create_string_utf8(env, app_user_model_id_str, NAPI_AUTO_LENGTH, &js_app_user_model_id);
+      napi_set_named_property(env, item, "appUserModelId", js_app_user_model_id);
+      if (app_user_model_id_str[0] != '\0') {
+        free((void*)app_user_model_id_str);
+      }
+      WindowsDeleteString(app_user_model_id_hs);
+
+      AppDisplayInfo* display_info = NULL;
+      hr = app_info->get_DisplayInfo(&display_info);
+
+      if (SUCCEEDED(hr) && display_info != NULL) {
+        HSTRING display_name_hs = NULL;
+        display_info->get_DisplayName(&display_name_hs);
+        const char* display_name_str = hstring_to_utf8(display_name_hs);
+        napi_create_string_utf8(env, display_name_str, NAPI_AUTO_LENGTH, &js_app_display_name);
+        napi_set_named_property(env, item, "appDisplayName", js_app_display_name);
+        if (display_name_str[0] != '\0') {
+          free((void*)display_name_str);
+        }
+        WindowsDeleteString(display_name_hs);
+        display_info->Release();
+      }
+
+      app_info->Release();
+    }
+
+    napi_create_array_with_length(env, 0, &js_texts);
+    napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_title);
+    napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_body);
+    napi_set_named_property(env, item, "texts", js_texts);
+    napi_set_named_property(env, item, "title", js_title);
+    napi_set_named_property(env, item, "body", js_body);
+
+    hr = user_notification->get_Notification(&notification);
+
+    if (SUCCEEDED(hr) && notification != NULL) {
+      hr = notification->get_Visual(&visual);
+
+      if (SUCCEEDED(hr) && visual != NULL) {
+        hr = visual->get_Bindings(&bindings);
+
+        if (SUCCEEDED(hr) && bindings != NULL) {
+          UINT32 binding_count = 0;
+          bindings->get_Size(&binding_count);
+
+          if (binding_count > 0) {
+            NotificationBinding* first_binding = NULL;
+            if (SUCCEEDED(bindings->GetAt(0, &first_binding)) && first_binding != NULL) {
+              AdaptiveTextVector* text_items = NULL;
+              hr = first_binding->GetTextElements(&text_items);
+
+              if (SUCCEEDED(hr) && text_items != NULL) {
+                UINT32 text_count = 0;
+                text_items->get_Size(&text_count);
+
+                for (UINT32 j = 0; j < text_count; j++) {
+                  AdaptiveNotificationText* text_item = NULL;
+                  if (SUCCEEDED(text_items->GetAt(j, &text_item)) && text_item != NULL) {
+                    HSTRING text_hs = NULL;
+                    text_item->get_Text(&text_hs);
+                    const char* text_str = hstring_to_utf8(text_hs);
+                    napi_value js_text;
+                    napi_create_string_utf8(env, text_str, NAPI_AUTO_LENGTH, &js_text);
+                    napi_set_element(env, js_texts, j, js_text);
+                    if (text_str[0] != '\0') {
+                      free((void*)text_str);
+                    }
+                    WindowsDeleteString(text_hs);
+                    text_item->Release();
+                  }
+                }
+
+                if (text_count > 0) {
+                  AdaptiveNotificationText* first_text = NULL;
+                  if (SUCCEEDED(text_items->GetAt(0, &first_text)) && first_text != NULL) {
+                    HSTRING title_hs = NULL;
+                    first_text->get_Text(&title_hs);
+                    const char* title_str = hstring_to_utf8(title_hs);
+                    napi_create_string_utf8(env, title_str, NAPI_AUTO_LENGTH, &js_title);
+                    napi_set_named_property(env, item, "title", js_title);
+                    if (title_str[0] != '\0') {
+                      free((void*)title_str);
+                    }
+                    WindowsDeleteString(title_hs);
+                    first_text->Release();
+                  }
+                }
+
+                if (text_count > 1) {
+                  AdaptiveNotificationText* second_text = NULL;
+                  if (SUCCEEDED(text_items->GetAt(1, &second_text)) && second_text != NULL) {
+                    HSTRING body_hs = NULL;
+                    second_text->get_Text(&body_hs);
+                    const char* body_str = hstring_to_utf8(body_hs);
+                    napi_create_string_utf8(env, body_str, NAPI_AUTO_LENGTH, &js_body);
+                    napi_set_named_property(env, item, "body", js_body);
+                    if (body_str[0] != '\0') {
+                      free((void*)body_str);
+                    }
+                    WindowsDeleteString(body_hs);
+                    second_text->Release();
+                  }
+                }
+
+                text_items->Release();
+              }
+
+              first_binding->Release();
+            }
+          }
+
+          bindings->Release();
+        }
+
+        visual->Release();
+      }
+
+      notification->Release();
+    }
+
+    ABI::Windows::Foundation::DateTime creation_time;
+    memset(&creation_time, 0, sizeof(creation_time));
+    user_notification->get_CreationTime(&creation_time);
+    napi_create_int64(env, creation_time.UniversalTime, &js_created_at);
+    napi_set_named_property(env, item, "createdAt", js_created_at);
+
+    user_notification->Release();
+    napi_set_element(env, result, i, item);
+  }
+
+  notifications->Release();
   return result;
 }
 
