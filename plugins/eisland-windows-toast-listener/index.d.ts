@@ -24,3 +24,6 @@ export function getNotifications(): ToastNotificationSnapshot[];
 export function startListening(callback: ToastNotificationChangedCallback): boolean;
 export function stopListening(): boolean;
 export function isListening(): boolean;
+export function enableSuppression(): boolean;
+export function disableSuppression(): boolean;
+export function isSuppressionEnabled(): boolean;

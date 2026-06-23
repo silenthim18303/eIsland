@@ -29,6 +29,7 @@ static INIT_ONCE g_init_once = INIT_ONCE_STATIC_INIT;
 static CRITICAL_SECTION g_listener_lock;
 napi_threadsafe_function g_threadsafe_callback = NULL;
 static bool g_is_listening = false;
+static bool g_suppression_enabled = false;
 
 /* Polling-based listener thread */
 static HANDLE g_poll_thread = NULL;
@@ -142,6 +143,12 @@ static DWORD WINAPI poll_thread_proc(LPVOID param) {
           } else {
             free(event);
           }
+
+          /* Suppress: remove notification from action center after callback */
+          if (g_suppression_enabled) {
+            listener->RemoveNotification(curr_ids[i]);
+          }
+
           LeaveCriticalSection(&g_listener_lock);
         }
       }
@@ -531,6 +538,43 @@ static napi_value start_listening(napi_env env, napi_callback_info callback_info
   return make_boolean(env, true);
 }
 
+/* --- NAPI bindings: suppression --- */
+
+static napi_value enable_suppression(napi_env env, napi_callback_info callback_info) {
+  (void)callback_info;
+  ensure_initialized();
+
+  EnterCriticalSection(&g_listener_lock);
+  g_suppression_enabled = true;
+  LeaveCriticalSection(&g_listener_lock);
+
+  return make_boolean(env, true);
+}
+
+static napi_value disable_suppression(napi_env env, napi_callback_info callback_info) {
+  (void)callback_info;
+  ensure_initialized();
+
+  EnterCriticalSection(&g_listener_lock);
+  g_suppression_enabled = false;
+  LeaveCriticalSection(&g_listener_lock);
+
+  return make_boolean(env, true);
+}
+
+static napi_value is_suppression_enabled(napi_env env, napi_callback_info callback_info) {
+  bool enabled;
+
+  (void)callback_info;
+  ensure_initialized();
+
+  EnterCriticalSection(&g_listener_lock);
+  enabled = g_suppression_enabled;
+  LeaveCriticalSection(&g_listener_lock);
+
+  return make_boolean(env, enabled);
+}
+
 static napi_value stop_listening(napi_env env, napi_callback_info callback_info) {
   bool stopped = false;
 
@@ -630,7 +674,10 @@ static napi_value init(napi_env env, napi_value exports) {
     { "getNotifications", NULL, get_notifications, NULL, NULL, NULL, napi_default, NULL },
     { "startListening", NULL, start_listening, NULL, NULL, NULL, napi_default, NULL },
     { "stopListening", NULL, stop_listening, NULL, NULL, NULL, napi_default, NULL },
-    { "isListening", NULL, is_listening, NULL, NULL, NULL, napi_default, NULL }
+    { "isListening", NULL, is_listening, NULL, NULL, NULL, napi_default, NULL },
+    { "enableSuppression", NULL, enable_suppression, NULL, NULL, NULL, napi_default, NULL },
+    { "disableSuppression", NULL, disable_suppression, NULL, NULL, NULL, napi_default, NULL },
+    { "isSuppressionEnabled", NULL, is_suppression_enabled, NULL, NULL, NULL, napi_default, NULL }
   };
 
   ensure_initialized();
