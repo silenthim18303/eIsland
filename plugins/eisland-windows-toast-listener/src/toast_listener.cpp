@@ -18,10 +18,6 @@
  * GNU General Public License for more details.
  */
 
-#define CINTERFACE
-#define COBJMACROS
-#define WIN32_LEAN_AND_MEAN
-
 #include <node_api.h>
 #include <windows.h>
 #include <roapi.h>
@@ -32,6 +28,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <new>
 
 #define TOAST_LISTENER_CLASS_NAME L"Windows.UI.Notifications.Management.UserNotificationListener"
 #define ASYNC_ACCESS_TIMEOUT_MS 60000
@@ -41,20 +38,26 @@ typedef __x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListen
 typedef __x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListenerStatics ToastListenerStatics;
 typedef __x_ABI_CWindows_CUI_CNotifications_CIUserNotificationChangedEventArgs ToastChangedArgs;
 typedef __FITypedEventHandler_2_Windows__CUI__CNotifications__CManagement__CUserNotificationListener_Windows__CUI__CNotifications__CUserNotificationChangedEventArgs ToastChangedHandler;
-typedef __FITypedEventHandler_2_Windows__CUI__CNotifications__CManagement__CUserNotificationListener_Windows__CUI__CNotifications__CUserNotificationChangedEventArgsVtbl ToastChangedHandlerVtbl;
 typedef __FIAsyncOperation_1_Windows__CUI__CNotifications__CManagement__CUserNotificationListenerAccessStatus AccessStatusOperation;
-typedef enum __x_ABI_CWindows_CUI_CNotifications_CManagement_CUserNotificationListenerAccessStatus AccessStatus;
-typedef enum __x_ABI_CWindows_CUI_CNotifications_CUserNotificationChangedKind ToastChangedKind;
+using AccessStatus = ABI::Windows::UI::Notifications::Management::UserNotificationListenerAccessStatus;
+using ToastChangedKind = ABI::Windows::UI::Notifications::UserNotificationChangedKind;
 
 typedef struct ToastChangedEvent {
   char kind[16];
   uint32_t notification_id;
 } ToastChangedEvent;
 
-typedef struct ToastChangedHandlerImpl {
-  const ToastChangedHandlerVtbl* lpVtbl;
+struct ToastChangedHandlerImpl final : ToastChangedHandler {
+  ToastChangedHandlerImpl() : ref_count(1) {}
+
+  HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** object) override;
+  ULONG STDMETHODCALLTYPE AddRef() override;
+  ULONG STDMETHODCALLTYPE Release() override;
+  HRESULT STDMETHODCALLTYPE Invoke(ToastListener* sender, ToastChangedArgs* args) override;
+
+ private:
   LONG ref_count;
-} ToastChangedHandlerImpl;
+};
 
 static INIT_ONCE g_init_once = INIT_ONCE_STATIC_INIT;
 static CRITICAL_SECTION g_listener_lock;
@@ -63,9 +66,6 @@ static ToastListener* g_listener = NULL;
 static ToastChangedHandlerImpl* g_changed_handler = NULL;
 static EventRegistrationToken g_changed_token;
 static bool g_is_listening = false;
-
-static ULONG STDMETHODCALLTYPE handler_add_ref(ToastChangedHandler* this_ptr);
-static ULONG STDMETHODCALLTYPE handler_release(ToastChangedHandler* this_ptr);
 
 static BOOL CALLBACK initialize_once(PINIT_ONCE init_once, PVOID parameter, PVOID* context) {
   (void)init_once;
@@ -152,15 +152,15 @@ static void call_js_changed_callback(napi_env env, napi_value js_callback, void*
   free(event);
 }
 
-static HRESULT STDMETHODCALLTYPE handler_query_interface(ToastChangedHandler* this_ptr, REFIID riid, void** object) {
+HRESULT STDMETHODCALLTYPE ToastChangedHandlerImpl::QueryInterface(REFIID riid, void** object) {
   if (object == NULL) {
     return E_POINTER;
   }
 
-  if (IsEqualIID(riid, &IID_IUnknown) ||
-      IsEqualIID(riid, &IID___FITypedEventHandler_2_Windows__CUI__CNotifications__CManagement__CUserNotificationListener_Windows__CUI__CNotifications__CUserNotificationChangedEventArgs)) {
-    *object = this_ptr;
-    handler_add_ref(this_ptr);
+  if (IsEqualIID(riid, __uuidof(IUnknown)) ||
+      IsEqualIID(riid, __uuidof(ToastChangedHandler))) {
+    *object = static_cast<ToastChangedHandler*>(this);
+    AddRef();
     return S_OK;
   }
 
@@ -168,37 +168,34 @@ static HRESULT STDMETHODCALLTYPE handler_query_interface(ToastChangedHandler* th
   return E_NOINTERFACE;
 }
 
-static ULONG STDMETHODCALLTYPE handler_add_ref(ToastChangedHandler* this_ptr) {
-  ToastChangedHandlerImpl* handler = (ToastChangedHandlerImpl*)this_ptr;
-  return (ULONG)InterlockedIncrement(&handler->ref_count);
+ULONG STDMETHODCALLTYPE ToastChangedHandlerImpl::AddRef() {
+  return (ULONG)InterlockedIncrement(&ref_count);
 }
 
-static ULONG STDMETHODCALLTYPE handler_release(ToastChangedHandler* this_ptr) {
-  ToastChangedHandlerImpl* handler = (ToastChangedHandlerImpl*)this_ptr;
-  LONG count = InterlockedDecrement(&handler->ref_count);
+ULONG STDMETHODCALLTYPE ToastChangedHandlerImpl::Release() {
+  LONG count = InterlockedDecrement(&ref_count);
 
   if (count == 0) {
-    free(handler);
+    delete this;
   }
 
   return (ULONG)count;
 }
 
-static HRESULT STDMETHODCALLTYPE handler_invoke(ToastChangedHandler* this_ptr, ToastListener* sender, ToastChangedArgs* args) {
+HRESULT STDMETHODCALLTYPE ToastChangedHandlerImpl::Invoke(ToastListener* sender, ToastChangedArgs* args) {
   ToastChangedKind kind = (ToastChangedKind)0;
   uint32_t notification_id = 0;
   ToastChangedEvent* event;
   napi_status status;
 
-  (void)this_ptr;
   (void)sender;
 
   if (args == NULL || g_threadsafe_callback == NULL) {
     return S_OK;
   }
 
-  args->lpVtbl->get_ChangeKind(args, &kind);
-  args->lpVtbl->get_UserNotificationId(args, &notification_id);
+  args->get_ChangeKind(&kind);
+  args->get_UserNotificationId(&notification_id);
 
   event = (ToastChangedEvent*)calloc(1, sizeof(ToastChangedEvent));
   if (event == NULL) {
@@ -216,23 +213,8 @@ static HRESULT STDMETHODCALLTYPE handler_invoke(ToastChangedHandler* this_ptr, T
   return S_OK;
 }
 
-static const ToastChangedHandlerVtbl g_changed_handler_vtbl = {
-  handler_query_interface,
-  handler_add_ref,
-  handler_release,
-  handler_invoke
-};
-
 static ToastChangedHandlerImpl* create_changed_handler(void) {
-  ToastChangedHandlerImpl* handler = (ToastChangedHandlerImpl*)calloc(1, sizeof(ToastChangedHandlerImpl));
-
-  if (handler == NULL) {
-    return NULL;
-  }
-
-  handler->lpVtbl = &g_changed_handler_vtbl;
-  handler->ref_count = 1;
-  return handler;
+  return new (std::nothrow) ToastChangedHandlerImpl();
 }
 
 static HRESULT get_current_listener(ToastListener** listener) {
@@ -250,15 +232,15 @@ static HRESULT get_current_listener(ToastListener** listener) {
     return hr;
   }
 
-  hr = RoGetActivationFactory(class_name, &IID___x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListenerStatics, (void**)&statics);
+  hr = RoGetActivationFactory(class_name, __uuidof(ToastListenerStatics), (void**)&statics);
   WindowsDeleteString(class_name);
 
   if (FAILED(hr)) {
     return hr;
   }
 
-  hr = statics->lpVtbl->get_Current(statics, listener);
-  statics->lpVtbl->Release(statics);
+  hr = statics->get_Current(listener);
+  statics->Release();
   return hr;
 }
 
@@ -272,15 +254,15 @@ static HRESULT wait_for_access_result(AccessStatusOperation* operation, AccessSt
     return E_POINTER;
   }
 
-  hr = operation->lpVtbl->QueryInterface(operation, &IID_IAsyncInfo, (void**)&async_info);
+  hr = operation->QueryInterface(__uuidof(IAsyncInfo), (void**)&async_info);
   if (FAILED(hr)) {
     return hr;
   }
 
   while (waited_ms < ASYNC_ACCESS_TIMEOUT_MS) {
-    hr = async_info->lpVtbl->get_Status(async_info, &async_status);
+    hr = async_info->get_Status(&async_status);
     if (FAILED(hr)) {
-      async_info->lpVtbl->Release(async_info);
+      async_info->Release();
       return hr;
     }
 
@@ -292,13 +274,13 @@ static HRESULT wait_for_access_result(AccessStatusOperation* operation, AccessSt
     waited_ms += ASYNC_ACCESS_POLL_MS;
   }
 
-  async_info->lpVtbl->Release(async_info);
+  async_info->Release();
 
   if (async_status != Completed) {
     return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
   }
 
-  return operation->lpVtbl->GetResults(operation, status);
+  return operation->GetResults(status);
 }
 
 static napi_value request_access(napi_env env, napi_callback_info callback_info) {
@@ -316,8 +298,8 @@ static napi_value request_access(napi_env env, napi_callback_info callback_info)
     return NULL;
   }
 
-  hr = listener->lpVtbl->RequestAccessAsync(listener, &operation);
-  listener->lpVtbl->Release(listener);
+  hr = listener->RequestAccessAsync(&operation);
+  listener->Release();
 
   if (FAILED(hr) || operation == NULL) {
     throw_error(env, "Failed to request Windows notification listener access.");
@@ -325,7 +307,7 @@ static napi_value request_access(napi_env env, napi_callback_info callback_info)
   }
 
   hr = wait_for_access_result(operation, &status);
-  operation->lpVtbl->Release(operation);
+  operation->Release();
 
   if (FAILED(hr)) {
     throw_error(env, "Failed to read Windows notification listener access result.");
@@ -349,8 +331,8 @@ static napi_value get_access_status(napi_env env, napi_callback_info callback_in
     return NULL;
   }
 
-  hr = listener->lpVtbl->GetAccessStatus(listener, &status);
-  listener->lpVtbl->Release(listener);
+  hr = listener->GetAccessStatus(&status);
+  listener->Release();
 
   if (FAILED(hr)) {
     throw_error(env, "Failed to read Windows notification listener access status.");
@@ -432,7 +414,7 @@ static napi_value start_listening(napi_env env, napi_callback_info callback_info
 
   handler = create_changed_handler();
   if (handler == NULL) {
-    listener->lpVtbl->Release(listener);
+    listener->Release();
     napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
     g_threadsafe_callback = NULL;
     LeaveCriticalSection(&g_listener_lock);
@@ -441,10 +423,10 @@ static napi_value start_listening(napi_env env, napi_callback_info callback_info
   }
 
   memset(&token, 0, sizeof(token));
-  hr = listener->lpVtbl->add_NotificationChanged(listener, (ToastChangedHandler*)handler, &token);
+  hr = listener->add_NotificationChanged(handler, &token);
   if (FAILED(hr)) {
-    ((ToastChangedHandler*)handler)->lpVtbl->Release((ToastChangedHandler*)handler);
-    listener->lpVtbl->Release(listener);
+    handler->Release();
+    listener->Release();
     napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
     g_threadsafe_callback = NULL;
     LeaveCriticalSection(&g_listener_lock);
@@ -471,13 +453,13 @@ static napi_value stop_listening(napi_env env, napi_callback_info callback_info)
 
   if (g_is_listening) {
     if (g_listener != NULL) {
-      g_listener->lpVtbl->remove_NotificationChanged(g_listener, g_changed_token);
-      g_listener->lpVtbl->Release(g_listener);
+      g_listener->remove_NotificationChanged(g_changed_token);
+      g_listener->Release();
       g_listener = NULL;
     }
 
     if (g_changed_handler != NULL) {
-      ((ToastChangedHandler*)g_changed_handler)->lpVtbl->Release((ToastChangedHandler*)g_changed_handler);
+      g_changed_handler->Release();
       g_changed_handler = NULL;
     }
 
@@ -515,13 +497,13 @@ static void finalize_module(void* data) {
   EnterCriticalSection(&g_listener_lock);
 
   if (g_listener != NULL) {
-    g_listener->lpVtbl->remove_NotificationChanged(g_listener, g_changed_token);
-    g_listener->lpVtbl->Release(g_listener);
+    g_listener->remove_NotificationChanged(g_changed_token);
+    g_listener->Release();
     g_listener = NULL;
   }
 
   if (g_changed_handler != NULL) {
-    ((ToastChangedHandler*)g_changed_handler)->lpVtbl->Release((ToastChangedHandler*)g_changed_handler);
+    g_changed_handler->Release();
     g_changed_handler = NULL;
   }
 
