@@ -144,10 +144,7 @@ static DWORD WINAPI poll_thread_proc(LPVOID param) {
             free(event);
           }
 
-          /* Suppress: remove notification from action center after callback */
-          if (g_suppression_enabled) {
-            listener->RemoveNotification(curr_ids[i]);
-          }
+          /* Suppression: getNotifications() returns [] when g_suppression_enabled */
 
           LeaveCriticalSection(&g_listener_lock);
         }
@@ -443,6 +440,18 @@ static napi_value get_notifications(napi_env env, napi_callback_info callback_in
   }
 
   notifications->get_Size(&count);
+
+  /* When suppression is active, hide all notifications from the caller */
+  EnterCriticalSection(&g_listener_lock);
+  bool suppressing = g_suppression_enabled;
+  LeaveCriticalSection(&g_listener_lock);
+
+  if (suppressing) {
+    notifications->Release();
+    napi_create_array_with_length(env, 0, &result);
+    return result;
+  }
+
   napi_create_array_with_length(env, count, &result);
 
   for (UINT32 i = 0; i < count; i++) {

@@ -42,6 +42,9 @@ const listener = require('../') as {
   startListening: (callback: (event: { kind: 'added' | 'removed' | 'unknown'; notificationId: number }) => void) => boolean;
   stopListening: () => boolean;
   isListening: () => boolean;
+  enableSuppression: () => boolean;
+  disableSuppression: () => boolean;
+  isSuppressionEnabled: () => boolean;
 };
 
 const accessStatuses = ['unspecified', 'allowed', 'denied', 'unknown'];
@@ -54,6 +57,9 @@ describe('windows-toast-listener', () => {
     expect(typeof listener.startListening).toBe('function');
     expect(typeof listener.stopListening).toBe('function');
     expect(typeof listener.isListening).toBe('function');
+    expect(typeof listener.enableSuppression).toBe('function');
+    expect(typeof listener.disableSuppression).toBe('function');
+    expect(typeof listener.isSuppressionEnabled).toBe('function');
   });
 
   it('returns access status and passive notification snapshot shapes', () => {
@@ -81,5 +87,16 @@ describe('windows-toast-listener', () => {
     expect(() => listener.startListening(undefined as unknown as () => void)).toThrow();
     expect(listener.isListening()).toBe(false);
     expect(listener.stopListening()).toBe(false);
+  });
+
+  it('manages suppression state independently', () => {
+    listener.disableSuppression();
+    expect(listener.isSuppressionEnabled()).toBe(false);
+
+    expect(listener.enableSuppression()).toBe(true);
+    expect(listener.isSuppressionEnabled()).toBe(true);
+
+    expect(listener.disableSuppression()).toBe(true);
+    expect(listener.isSuppressionEnabled()).toBe(false);
   });
 });
