@@ -6,7 +6,7 @@ icon: layer-group
 # Frontend Setup
 
 :::info
-This guide covers the environment configuration for eIsland frontend development, including toolchain installation, project setup, and IDE configuration.
+This guide covers the environment configuration for eIsland frontend development, including toolchain installation, project setup, and IDE configuration. For an overview of the frontend technologies, see [Frontend Tech Stack](/introduction/tech-stack/frontend-tech-stack.md).
 :::
 
 ## Prerequisites
@@ -51,17 +51,92 @@ npm -v    # 11.x.x or later
 
 ## Project Setup
 
-### Clone and Install
+### Fork the Repository
+
+:::tip
+1. Visit [https://github.com/JNTMTMTM/eIsland](https://github.com/JNTMTMTM/eIsland)
+2. Click the **Fork** button in the top-right corner
+:::
+
+:::note
+This creates a personal copy of the repository under your account (`your-username/eIsland`).
+:::
+
+:::caution
+You **must** fork the repository before cloning. Do not clone the original `JNTMTMTM/eIsland` repository directly — you will not have push access and cannot create pull requests.
+:::
+
+### Clone Your Fork
 
 ```bash
-# Clone the repository
-git clone https://github.com/JNTMTMTM/eIsland.git
+# Clone your fork (NOT the original repository)
+git clone https://github.com/your-username/eIsland.git
 cd eIsland
+```
 
-# Switch to dev branch
+:::warning
+Replace `your-username` with your actual GitHub username. Do not clone the original repository directly — you will not be able to push changes.
+:::
+
+### Add Upstream Remote
+
+```bash
+# Add the original repository as "upstream"
+git remote add upstream https://github.com/JNTMTMTM/eIsland.git
+
+# Verify remotes
+git remote -v
+# origin    https://github.com/your-username/eIsland.git (fetch)
+# origin    https://github.com/your-username/eIsland.git (push)
+# upstream  https://github.com/JNTMTMTM/eIsland.git (fetch)
+# upstream  https://github.com/JNTMTMTM/eIsland.git (push)
+```
+
+### Switch to Dev Branch
+
+```bash
+# Fetch latest branches from upstream
+git fetch upstream
+
+# Switch to dev branch (main development branch)
 git checkout dev
 
-# Install dependencies
+# Keep your local dev branch in sync with upstream
+git pull upstream dev
+```
+
+:::info
+The `dev` branch is the main development branch. All feature branches should be created from `dev`, and pull requests should target `dev`.
+:::
+
+### Push and Create Pull Request
+
+After completing your changes, push to **your fork** (`origin`) and create a Pull Request on GitHub:
+
+```bash
+# Create a feature branch from dev
+git checkout -b feat/your-feature-name
+
+# ... make your changes and commit ...
+
+# Push to YOUR fork (NOT upstream)
+git push origin feat/your-feature-name
+```
+
+Then on GitHub:
+
+1. Visit your fork: `https://github.com/your-username/eIsland`
+2. Click **Compare & pull request**
+3. Set the base repository to `JNTMTMTM/eIsland` and base branch to `dev`
+4. Fill in the PR title and description, then submit
+
+:::caution
+Always push to `origin` (your fork), never to `upstream` (the main repository). You do not have push access to the main repository. All contributions must go through Pull Request review.
+:::
+
+### Install Dependencies
+
+```bash
 npm install
 ```
 
@@ -193,32 +268,6 @@ Usage in renderer code:
 ```ts
 import { useIslandStore } from '@/store/useIslandStore';
 ```
-
-## Key Dependencies
-
-### Runtime
-
-| Package | Purpose |
-|---------|---------|
-| `electron` | Desktop application shell |
-| `react`, `react-dom` | UI framework |
-| `zustand` | Global state management |
-| `gsap`, `@gsap/react` | Programmatic animations |
-| `tailwindcss` | Utility-first CSS |
-| `i18next`, `react-i18next` | Internationalization |
-| `highcharts` | Data visualization |
-| `react-markdown`, `remark-gfm` | Markdown rendering |
-| `dompurify` | XSS prevention |
-| `electron-updater` | Auto-update |
-
-### Development
-
-| Package | Purpose |
-|---------|---------|
-| `typescript` | Static type checking |
-| `vitest` | Unit testing |
-| `@types/react`, `@types/react-dom` | React type definitions |
-| `lucide-react` | Icon library |
 
 ## IDE Configuration
 
