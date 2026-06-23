@@ -71,43 +71,68 @@ The `postinstall` script automatically runs `electron-builder install-app-deps` 
 
 ## Development Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development mode with hot reload |
-| `npm run build` | Build all three targets (main, preload, renderer) |
-| `npm run preview` | Preview the built application |
-| `npm run test` | Run all tests with Vitest |
-| `npm run test:preload` | Run preload script tests only |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run package` | Build and package into installer (NSIS) |
+### Development
 
-### Development Mode
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `npm run dev` | Start electron-vite dev mode with hot reload | Daily development — launches the app with React Fast Refresh and auto-restart on main process changes |
+| `npm run build` | Build all three targets (main, preload, renderer) into `out/` | Before testing the production build, or when CI needs a clean build artifact |
+| `npm run preview` | Preview the built application without dev server | Verify the production build works correctly before packaging |
 
-```bash
-npm run dev
-```
+:::info
+**`npm run dev` internals:**
 
-This starts **electron-vite** which:
+1. Compiles `src/main/` → `out/main/` (Node.js main process)
+2. Compiles `src/preload/` → `out/preload/` (context bridge)
+3. Starts a Vite dev server for `src/renderer/` with React Fast Refresh
+4. Launches Electron pointing at the dev server
+:::
 
-1. Compiles the main process with Vite
-2. Compiles the preload scripts
-3. Starts a Vite dev server for the renderer with React Fast Refresh
-4. Launches Electron with hot reload
+### Testing
 
-### Running Tests
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `npm run test` | Run all tests once (`vitest run`) | Before committing code, or in CI pipelines |
+| `npm run test:preload` | Run only `src/preload/index.test.ts` | When modifying preload bridge code — faster than running the full suite |
+| `npm run test:coverage` | Run all tests with Istanbul coverage report | Before opening a PR to verify coverage thresholds, or periodically to audit test gaps |
 
-```bash
-# Run all tests
-npm run test
+:::tip
+For iterative development, run `npx vitest` (without `run`) to start Vitest in **watch mode** — it re-runs affected tests on file save.
+:::
 
-# Run tests in watch mode
-npx vitest
+**Test configuration:** Vitest with `node` environment, `clearMocks: true`, `restoreMocks: true`. Test files follow the pattern `src/**/*.test.ts`.
 
-# Run with coverage
-npm run test:coverage
-```
+### Packaging & Release
 
-The project uses **Vitest** with `node` environment. Test files follow the pattern `src/**/*.test.ts`.
+:::danger
+These commands are for **testing and maintainer use only**. Regular developers do not have permission to upload build artifacts to remote storage (COS / MinIO). Use `npm run package` locally to verify the installer build, but do not run `release:upload*` commands.
+:::
+
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `npm run package` | Build + package into NSIS installer (`dist/eIsland-{version}-Setup.exe`) | Local testing — verify the installer builds correctly on your machine |
+| `release:upload` | Package + upload release artifacts to COS (Cloud Object Storage) | **Maintainer only** — publish a new release to CDN |
+| `release:upload-only` | Upload existing build artifacts to COS without rebuilding | **Maintainer only** — re-upload a previously built package |
+| `release:upload-minio` | Upload artifacts to MinIO storage (`--minio-only`) | **Maintainer only** — internal/self-hosted release distribution |
+| `release:notes` | Generate incremental release notes from git history since last tag | After merging PRs — outputs `RELEASE_NOTES_SINCE_LAST_TAG.md` |
+| `changelog:generate` | Generate full changelog from git history | Periodic maintenance — regenerates `docs/CHANGE_LOG.md` |
+
+### Code Quality
+
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `comment:check` | Validate source files comply with comment standards (`scripts/check-comment-standards.ts`) | Before committing — ensures JSDoc/Javadoc headers and inline comments follow project conventions |
+| `i18n:check` | Validate i18n completeness — checks all `t()` keys exist in both `zh-CN.json` and `en-US.json` | After any UI change that adds or modifies `t()` translation calls — catches missing translations |
+
+:::warning
+Both `comment:check` and `i18n:check` use `--experimental-strip-types` (Node.js 22+ native TS execution). Ensure your Node.js version meets the requirement.
+:::
+
+### Lifecycle Hooks
+
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `postinstall` | Runs `electron-builder install-app-deps` automatically after `npm install` | Automatic — rebuilds native modules (e.g., `windows-smtc-monitor`) for Electron's Node.js version. Never run manually.
 
 ## Build System
 
