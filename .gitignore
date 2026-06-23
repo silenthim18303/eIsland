@@ -1,4 +1,5 @@
 /.windsurf
+/coverage
 /.claude/settings.json
 /.claude/settings.local.json
 /CLAUDE.md
