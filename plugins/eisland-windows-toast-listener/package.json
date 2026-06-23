@@ -17,7 +17,9 @@
   "scripts": {
     "build": "node-gyp rebuild",
     "clean": "node-gyp clean",
-    "rebuild": "node-gyp clean && node-gyp rebuild"
+    "rebuild": "node-gyp clean && node-gyp rebuild",
+    "test": "vitest run --config vitest.config.ts",
+    "smoke": "node --experimental-strip-types test/windows-toast-listener.smoke.ts"
   },
   "devDependencies": {
     "@types/node": "^25.9.3",
