@@ -1,5 +1,6 @@
 ---
-title: Environment Setup
+title: Frontend Setup
+icon: layer-group
 ---
 
 # Environment Setup

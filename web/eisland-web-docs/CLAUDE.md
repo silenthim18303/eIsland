@@ -29,10 +29,11 @@ src/
 │       └── rabbitmq-schema.md
 └── developer/                   # Developer guide
     ├── README.md                # Top-level developer index
-    ├── getting-started/         # Environment and project setup
+    ├── environment-setup/       # Environment configuration
     │   ├── README.md            # Category index
-    │   ├── environment-setup.md
-    │   └── project-setup.md
+    │   ├── frontend-setup.md
+    │   ├── backend-setup.md
+    │   └── plugin-setup.md
     ├── guides/                  # Development workflows and practices
     │   ├── README.md            # Category index
     │   ├── development-workflow.md

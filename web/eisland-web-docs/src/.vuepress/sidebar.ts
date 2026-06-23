@@ -47,42 +47,13 @@ export default sidebar({
   ],
   "/developer/": [
     {
-      text: "Getting Started",
-      icon: "rocket",
+      text: "Environment Setup",
+      icon: "globe",
       collapsible: false,
       children: [
-        "getting-started/environment-setup.md",
-        "getting-started/project-setup.md",
-      ],
-    },
-    {
-      text: "Guides",
-      icon: "book",
-      collapsible: false,
-      children: [
-        "guides/development-workflow.md",
-        "guides/plugin-development.md",
-        "guides/debugging-guide.md",
-      ],
-    },
-    {
-      text: "Standards",
-      icon: "scale-balanced",
-      collapsible: false,
-      children: [
-        "standards/coding-standards.md",
-        "standards/documentation-standards.md",
-        "standards/commit-conventions.md",
-      ],
-    },
-    {
-      text: "Testing",
-      icon: "vial",
-      collapsible: false,
-      children: [
-        "testing/testing-overview.md",
-        "testing/frontend-testing.md",
-        "testing/backend-testing.md",
+        "environment-setup/frontend-setup.md",
+        "environment-setup/backend-setup.md",
+        "environment-setup/plugin-setup.md",
       ],
     },
   ],
