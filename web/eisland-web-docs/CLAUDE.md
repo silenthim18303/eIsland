@@ -2,30 +2,52 @@
 
 ## Documentation Structure
 
-The documentation lives in `src/introduction/` and is organized into subdirectories by category:
+The documentation lives in `src/` and is organized into top-level categories:
 
 ```
-src/introduction/
-├── README.md                    # Top-level documentation index
-├── intro/                       # Project introduction
-│   ├── README.md                # Category index
-│   ├── project-overview.md      # eIsland project overview
-│   └── coc.md                   # Code of Conduct
-├── tech-stack/                  # Technology stack
-│   ├── README.md                # Category index
-│   ├── frontend-tech-stack.md
-│   ├── backend-tech-stack.md
-│   └── plugins-tech-stack.md
-├── frontend-arch/               # Frontend architecture
-│   ├── README.md                # Category index
-│   ├── process-model.md
-│   └── states.md
-└── backend-arch/                # Backend architecture
-    ├── README.md                # Category index
-    ├── server-model.md
-    ├── mysql-schema.md
-    ├── redis-schema.md
-    └── rabbitmq-schema.md
+src/
+├── introduction/                # Project introduction and architecture
+│   ├── README.md                # Top-level documentation index
+│   ├── intro/                   # Project introduction
+│   │   ├── README.md            # Category index
+│   │   ├── project-overview.md  # eIsland project overview
+│   │   └── coc.md               # Code of Conduct
+│   ├── tech-stack/              # Technology stack
+│   │   ├── README.md            # Category index
+│   │   ├── frontend-tech-stack.md
+│   │   ├── backend-tech-stack.md
+│   │   └── plugins-tech-stack.md
+│   ├── frontend-arch/           # Frontend architecture
+│   │   ├── README.md            # Category index
+│   │   ├── process-model.md
+│   │   └── states.md
+│   └── backend-arch/            # Backend architecture
+│       ├── README.md            # Category index
+│       ├── server-model.md
+│       ├── mysql-schema.md
+│       ├── redis-schema.md
+│       └── rabbitmq-schema.md
+└── developer/                   # Developer guide
+    ├── README.md                # Top-level developer index
+    ├── getting-started/         # Environment and project setup
+    │   ├── README.md            # Category index
+    │   ├── environment-setup.md
+    │   └── project-setup.md
+    ├── guides/                  # Development workflows and practices
+    │   ├── README.md            # Category index
+    │   ├── development-workflow.md
+    │   ├── plugin-development.md
+    │   └── debugging-guide.md
+    ├── standards/               # Coding and documentation standards
+    │   ├── README.md            # Category index
+    │   ├── coding-standards.md
+    │   ├── documentation-standards.md
+    │   └── commit-conventions.md
+    └── testing/                 # Testing strategies and frameworks
+        ├── README.md            # Category index
+        ├── testing-overview.md
+        ├── frontend-testing.md
+        └── backend-testing.md
 ```
 
 ### Sidebar Rules
