@@ -7,7 +7,10 @@
       "libraries": ["runtimeobject.lib"],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "AdditionalOptions": ["/utf-8"]
+          "AdditionalOptions": ["/utf-8", "/GL-"]
+        },
+        "VCLinkerTool": {
+          "AdditionalOptions": ["/LTCG:OFF"]
         }
       }
     }

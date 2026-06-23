@@ -10,7 +10,15 @@
         "src/napi_binding.c"
       ],
       "defines": ["WIN32_LEAN_AND_MEAN", "NAPI_VERSION=8"],
-      "libraries": ["kernel32.lib"]
+      "libraries": ["kernel32.lib"],
+      "msvs_settings": {
+        "VCCLCompilerTool": {
+          "AdditionalOptions": ["/GL-"]
+        },
+        "VCLinkerTool": {
+          "AdditionalOptions": ["/LTCG:OFF"]
+        }
+      }
     }
   ]
 }
