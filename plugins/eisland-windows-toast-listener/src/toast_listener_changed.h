@@ -23,22 +23,6 @@
 
 #include "toast_listener_types.h"
 
-/* COM event handler for UserNotificationListener::NotificationChanged */
-struct ToastChangedHandlerImpl final : ToastChangedHandler {
-  ToastChangedHandlerImpl() : ref_count(1) {}
-
-  HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** object) override;
-  ULONG STDMETHODCALLTYPE AddRef() override;
-  ULONG STDMETHODCALLTYPE Release() override;
-  HRESULT STDMETHODCALLTYPE Invoke(ToastListener* sender, ToastChangedArgs* args) override;
-
- private:
-  LONG ref_count;
-};
-
-/* Factory function */
-ToastChangedHandlerImpl* create_changed_handler(void);
-
 /* NAPI threadsafe callback bridge for changed events */
 void call_js_changed_callback(napi_env env, napi_value js_callback, void* context, void* data);
 

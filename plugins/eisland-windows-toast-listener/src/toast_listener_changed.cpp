@@ -19,13 +19,8 @@
  */
 
 #include "toast_listener_changed.h"
-#include "toast_listener_helpers.h"
 
-#include <cstring>
-#include <new>
-
-/* Global threadsafe callback — defined in toast_listener.cpp */
-extern napi_threadsafe_function g_threadsafe_callback;
+#include <cstdlib>
 
 napi_value make_changed_event(napi_env env, const ToastChangedEvent* event) {
   napi_value object;
@@ -56,69 +51,4 @@ void call_js_changed_callback(napi_env env, napi_value js_callback, void* contex
   argv[0] = make_changed_event(env, event);
   napi_call_function(env, undefined, js_callback, 1, argv, NULL);
   free(event);
-}
-
-HRESULT STDMETHODCALLTYPE ToastChangedHandlerImpl::QueryInterface(REFIID riid, void** object) {
-  if (object == NULL) {
-    return E_POINTER;
-  }
-
-  if (IsEqualIID(riid, __uuidof(IUnknown)) ||
-      IsEqualIID(riid, __uuidof(ToastChangedHandler))) {
-    *object = static_cast<ToastChangedHandler*>(this);
-    AddRef();
-    return S_OK;
-  }
-
-  *object = NULL;
-  return E_NOINTERFACE;
-}
-
-ULONG STDMETHODCALLTYPE ToastChangedHandlerImpl::AddRef() {
-  return (ULONG)InterlockedIncrement(&ref_count);
-}
-
-ULONG STDMETHODCALLTYPE ToastChangedHandlerImpl::Release() {
-  LONG count = InterlockedDecrement(&ref_count);
-
-  if (count == 0) {
-    delete this;
-  }
-
-  return (ULONG)count;
-}
-
-HRESULT STDMETHODCALLTYPE ToastChangedHandlerImpl::Invoke(ToastListener* sender, ToastChangedArgs* args) {
-  ToastChangedKind kind = (ToastChangedKind)0;
-  uint32_t notification_id = 0;
-  ToastChangedEvent* event;
-  napi_status status;
-
-  (void)sender;
-
-  if (args == NULL || g_threadsafe_callback == NULL) {
-    return S_OK;
-  }
-
-  args->get_ChangeKind(&kind);
-  args->get_UserNotificationId(&notification_id);
-
-  event = (ToastChangedEvent*)calloc(1, sizeof(ToastChangedEvent));
-  if (event == NULL) {
-    return E_OUTOFMEMORY;
-  }
-
-  strncpy(event->kind, changed_kind_to_string(kind), sizeof(event->kind) - 1);
-  event->notification_id = notification_id;
-
-  status = napi_call_threadsafe_function(g_threadsafe_callback, event, napi_tsfn_nonblocking);
-  if (status != napi_ok) {
-    free(event);
-  }
-
-  return S_OK;
-}
-
-ToastChangedHandlerImpl* create_changed_handler(void) {
-  return new (std::nothrow) ToastChangedHandlerImpl();
 }

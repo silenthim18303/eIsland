@@ -40,7 +40,6 @@
 /* WinRT interface typedefs — notification listener */
 typedef __x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListener ToastListener;
 typedef __x_ABI_CWindows_CUI_CNotifications_CManagement_CIUserNotificationListenerStatics ToastListenerStatics;
-typedef __x_ABI_CWindows_CUI_CNotifications_CIUserNotificationChangedEventArgs ToastChangedArgs;
 
 /* WinRT interface typedefs — notification data */
 typedef __x_ABI_CWindows_CUI_CNotifications_CIUserNotification UserNotification;
@@ -50,9 +49,6 @@ typedef __x_ABI_CWindows_CUI_CNotifications_CINotification Notification;
 typedef __x_ABI_CWindows_CUI_CNotifications_CINotificationVisual NotificationVisual;
 typedef __x_ABI_CWindows_CUI_CNotifications_CINotificationBinding NotificationBinding;
 typedef __x_ABI_CWindows_CUI_CNotifications_CIAdaptiveNotificationText AdaptiveNotificationText;
-
-/* WinRT event handler typedef */
-typedef __FITypedEventHandler_2_Windows__CUI__CNotifications__CManagement__CUserNotificationListener_Windows__CUI__CNotifications__CUserNotificationChangedEventArgs ToastChangedHandler;
 
 /* WinRT async operation typedefs */
 typedef __FIAsyncOperation_1_Windows__CUI__CNotifications__CManagement__CUserNotificationListenerAccessStatus AccessStatusOperation;

@@ -28,23 +28,156 @@
 static INIT_ONCE g_init_once = INIT_ONCE_STATIC_INIT;
 static CRITICAL_SECTION g_listener_lock;
 napi_threadsafe_function g_threadsafe_callback = NULL;
-static ToastListener* g_listener = NULL;
-static ToastChangedHandlerImpl* g_changed_handler = NULL;
-static EventRegistrationToken g_changed_token;
 static bool g_is_listening = false;
+
+/* Polling-based listener thread */
+static HANDLE g_poll_thread = NULL;
+static HANDLE g_poll_stop_event = NULL;
+#define POLL_INTERVAL_MS 500
 
 static BOOL CALLBACK initialize_once(PINIT_ONCE init_once, PVOID parameter, PVOID* context) {
   (void)init_once;
   (void)parameter;
   (void)context;
   InitializeCriticalSection(&g_listener_lock);
-  memset(&g_changed_token, 0, sizeof(g_changed_token));
   return TRUE;
 }
 
 static void ensure_initialized(void) {
   InitOnceExecuteOnce(&g_init_once, initialize_once, NULL, NULL);
   RoInitialize(RO_INIT_MULTITHREADED);
+}
+
+/* Collect current notification IDs into a caller-allocated sorted array.
+   Returns count. Caller must free *out_ids. */
+static UINT32 collect_notification_ids(ToastListener* listener, UINT32** out_ids) {
+  NotificationVectorOperation* op = NULL;
+  NotificationVector* vec = NULL;
+  UINT32 count = 0;
+  HRESULT hr;
+
+  *out_ids = NULL;
+
+  hr = listener->GetNotificationsAsync((NotificationKinds)1, &op);
+  if (FAILED(hr) || op == NULL) {
+    return 0;
+  }
+
+  hr = wait_for_notification_vector_result(op, &vec);
+  op->Release();
+
+  if (FAILED(hr) || vec == NULL) {
+    return 0;
+  }
+
+  vec->get_Size(&count);
+  if (count == 0) {
+    vec->Release();
+    return 0;
+  }
+
+  UINT32* ids = (UINT32*)calloc(count, sizeof(UINT32));
+  if (ids == NULL) {
+    vec->Release();
+    return 0;
+  }
+
+  for (UINT32 i = 0; i < count; i++) {
+    UserNotification* un = NULL;
+    if (SUCCEEDED(vec->GetAt(i, &un)) && un != NULL) {
+      un->get_Id(&ids[i]);
+      un->Release();
+    }
+  }
+
+  vec->Release();
+  *out_ids = ids;
+  return count;
+}
+
+/* Find id in sorted array */
+static bool id_in_set(const UINT32* ids, UINT32 count, UINT32 target) {
+  for (UINT32 i = 0; i < count; i++) {
+    if (ids[i] == target) {
+      return true;
+    }
+  }
+  return false;
+}
+
+static DWORD WINAPI poll_thread_proc(LPVOID param) {
+  ToastListener* listener = NULL;
+  UINT32* prev_ids = NULL;
+  UINT32 prev_count = 0;
+  HRESULT hr;
+
+  (void)param;
+
+  hr = get_current_listener(&listener);
+  if (FAILED(hr)) {
+    return 1;
+  }
+
+  /* Snapshot initial state */
+  prev_count = collect_notification_ids(listener, &prev_ids);
+
+  while (WaitForSingleObject(g_poll_stop_event, POLL_INTERVAL_MS) == WAIT_TIMEOUT) {
+    UINT32* curr_ids = NULL;
+    UINT32 curr_count = collect_notification_ids(listener, &curr_ids);
+
+    /* Detect added notifications */
+    for (UINT32 i = 0; i < curr_count; i++) {
+      if (!id_in_set(prev_ids, prev_count, curr_ids[i])) {
+        ToastChangedEvent* event = (ToastChangedEvent*)calloc(1, sizeof(ToastChangedEvent));
+        if (event != NULL) {
+          strncpy(event->kind, "added", sizeof(event->kind) - 1);
+          event->notification_id = curr_ids[i];
+
+          EnterCriticalSection(&g_listener_lock);
+          if (g_threadsafe_callback != NULL) {
+            napi_status s = napi_call_threadsafe_function(g_threadsafe_callback, event, napi_tsfn_nonblocking);
+            if (s != napi_ok) {
+              free(event);
+            }
+          } else {
+            free(event);
+          }
+          LeaveCriticalSection(&g_listener_lock);
+        }
+      }
+    }
+
+    /* Detect removed notifications */
+    for (UINT32 i = 0; i < prev_count; i++) {
+      if (!id_in_set(curr_ids, curr_count, prev_ids[i])) {
+        ToastChangedEvent* event = (ToastChangedEvent*)calloc(1, sizeof(ToastChangedEvent));
+        if (event != NULL) {
+          strncpy(event->kind, "removed", sizeof(event->kind) - 1);
+          event->notification_id = prev_ids[i];
+
+          EnterCriticalSection(&g_listener_lock);
+          if (g_threadsafe_callback != NULL) {
+            napi_status s = napi_call_threadsafe_function(g_threadsafe_callback, event, napi_tsfn_nonblocking);
+            if (s != napi_ok) {
+              free(event);
+            }
+          } else {
+            free(event);
+          }
+          LeaveCriticalSection(&g_listener_lock);
+        }
+      }
+    }
+
+    /* Swap state */
+    free(prev_ids);
+    prev_ids = curr_ids;
+    prev_count = curr_count;
+  }
+
+  free(prev_ids);
+  listener->Release();
+  return 0;
 }
 
 /* --- NAPI bindings: access --- */
@@ -236,7 +369,6 @@ static napi_value build_notification_item(napi_env env, UserNotification* user_n
 
   napi_create_object(env, &item);
 
-  /* Defaults for optional string fields */
   napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_app_user_model_id);
   napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_app_display_name);
   napi_create_string_utf8(env, "", NAPI_AUTO_LENGTH, &js_title);
@@ -248,22 +380,18 @@ static napi_value build_notification_item(napi_env env, UserNotification* user_n
   napi_set_named_property(env, item, "body", js_body);
   napi_set_named_property(env, item, "texts", js_texts);
 
-  /* Notification ID */
   user_notification->get_Id(&notification_id);
   napi_create_uint32(env, notification_id, &js_id);
   napi_set_named_property(env, item, "id", js_id);
 
-  /* App info (appUserModelId, appDisplayName) */
   HRESULT hr = user_notification->get_AppInfo(&app_info);
   if (SUCCEEDED(hr) && app_info != NULL) {
     set_app_info_properties(env, item, app_info);
     app_info->Release();
   }
 
-  /* Notification content (title, body, texts) */
   set_notification_content(env, item, js_texts, user_notification);
 
-  /* Creation time */
   ABI::Windows::Foundation::DateTime creation_time;
   memset(&creation_time, 0, sizeof(creation_time));
   user_notification->get_CreationTime(&creation_time);
@@ -334,10 +462,6 @@ static napi_value start_listening(napi_env env, napi_callback_info callback_info
   napi_valuetype callback_type;
   napi_value resource_name;
   napi_status napi_result;
-  ToastListener* listener = NULL;
-  ToastChangedHandlerImpl* handler = NULL;
-  EventRegistrationToken token;
-  HRESULT hr;
 
   ensure_initialized();
 
@@ -381,43 +505,29 @@ static napi_value start_listening(napi_env env, napi_callback_info callback_info
     return NULL;
   }
 
-  hr = get_current_listener(&listener);
-  if (FAILED(hr)) {
+  g_poll_stop_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+  if (g_poll_stop_event == NULL) {
     napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
     g_threadsafe_callback = NULL;
     LeaveCriticalSection(&g_listener_lock);
-    throw_error(env, "Failed to get Windows notification listener.");
+    throw_error(env, "Failed to create poll stop event.");
     return NULL;
   }
 
-  handler = create_changed_handler();
-  if (handler == NULL) {
-    listener->Release();
+  g_poll_thread = CreateThread(NULL, 0, poll_thread_proc, NULL, 0, NULL);
+  if (g_poll_thread == NULL) {
+    CloseHandle(g_poll_stop_event);
+    g_poll_stop_event = NULL;
     napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
     g_threadsafe_callback = NULL;
     LeaveCriticalSection(&g_listener_lock);
-    throw_error(env, "Failed to create Windows notification changed handler.");
+    throw_error(env, "Failed to start notification listener thread.");
     return NULL;
   }
 
-  memset(&token, 0, sizeof(token));
-  hr = listener->add_NotificationChanged(handler, &token);
-  if (FAILED(hr)) {
-    handler->Release();
-    listener->Release();
-    napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
-    g_threadsafe_callback = NULL;
-    LeaveCriticalSection(&g_listener_lock);
-    throw_error(env, "Failed to start Windows notification listener.");
-    return NULL;
-  }
-
-  g_listener = listener;
-  g_changed_handler = handler;
-  g_changed_token = token;
   g_is_listening = true;
-
   LeaveCriticalSection(&g_listener_lock);
+
   return make_boolean(env, true);
 }
 
@@ -430,23 +540,30 @@ static napi_value stop_listening(napi_env env, napi_callback_info callback_info)
   EnterCriticalSection(&g_listener_lock);
 
   if (g_is_listening) {
-    if (g_listener != NULL) {
-      g_listener->remove_NotificationChanged(g_changed_token);
-      g_listener->Release();
-      g_listener = NULL;
+    if (g_poll_stop_event != NULL) {
+      SetEvent(g_poll_stop_event);
     }
 
-    if (g_changed_handler != NULL) {
-      g_changed_handler->Release();
-      g_changed_handler = NULL;
+    LeaveCriticalSection(&g_listener_lock);
+
+    if (g_poll_thread != NULL) {
+      WaitForSingleObject(g_poll_thread, 5000);
+      CloseHandle(g_poll_thread);
+      g_poll_thread = NULL;
     }
+
+    if (g_poll_stop_event != NULL) {
+      CloseHandle(g_poll_stop_event);
+      g_poll_stop_event = NULL;
+    }
+
+    EnterCriticalSection(&g_listener_lock);
 
     if (g_threadsafe_callback != NULL) {
       napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
       g_threadsafe_callback = NULL;
     }
 
-    memset(&g_changed_token, 0, sizeof(g_changed_token));
     g_is_listening = false;
     stopped = true;
   }
@@ -472,28 +589,36 @@ static napi_value is_listening(napi_env env, napi_callback_info callback_info) {
 
 static void finalize_module(void* data) {
   (void)data;
-  ensure_initialized();
 
   EnterCriticalSection(&g_listener_lock);
 
-  if (g_listener != NULL) {
-    g_listener->remove_NotificationChanged(g_changed_token);
-    g_listener->Release();
-    g_listener = NULL;
-  }
+  if (g_is_listening) {
+    if (g_poll_stop_event != NULL) {
+      SetEvent(g_poll_stop_event);
+    }
 
-  if (g_changed_handler != NULL) {
-    g_changed_handler->Release();
-    g_changed_handler = NULL;
-  }
+    LeaveCriticalSection(&g_listener_lock);
 
-  if (g_threadsafe_callback != NULL) {
-    napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
-    g_threadsafe_callback = NULL;
-  }
+    if (g_poll_thread != NULL) {
+      WaitForSingleObject(g_poll_thread, 5000);
+      CloseHandle(g_poll_thread);
+      g_poll_thread = NULL;
+    }
 
-  memset(&g_changed_token, 0, sizeof(g_changed_token));
-  g_is_listening = false;
+    if (g_poll_stop_event != NULL) {
+      CloseHandle(g_poll_stop_event);
+      g_poll_stop_event = NULL;
+    }
+
+    EnterCriticalSection(&g_listener_lock);
+
+    if (g_threadsafe_callback != NULL) {
+      napi_release_threadsafe_function(g_threadsafe_callback, napi_tsfn_abort);
+      g_threadsafe_callback = NULL;
+    }
+
+    g_is_listening = false;
+  }
 
   LeaveCriticalSection(&g_listener_lock);
 }
