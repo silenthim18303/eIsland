@@ -26,6 +26,7 @@
     "@coooookies/windows-smtc-monitor": "^1.0.12",
     "@eisland/windows-fullscreen-detector": "file:plugins/windows-fullscreen-detector",
     "@eisland/windows-performance-monitor": "file:plugins/windows-performance-monitor",
+    "@eisland/windows-toast-listener": "file:plugins/eisland-windows-toast-listener",
     "@gsap/react": "^2.1.2",
     "@tailwindcss/vite": "^4.2.2",
     "colorthief": "^3.3.1",
