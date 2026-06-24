@@ -12,6 +12,7 @@ export default sidebar({
       children: [
         "intro/project-overview.md",
         "intro/dependencies.md",
+        "intro/backend-dependencies.md",
         "intro/coc.md",
       ],
     },

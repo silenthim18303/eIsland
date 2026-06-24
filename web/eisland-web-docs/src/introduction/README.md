@@ -19,6 +19,7 @@ Overview of the eIsland project, including the state machine architecture, key f
 |----------|-------------|
 | [Project Overview](intro/project-overview.md) | State machine architecture, 15 states, key features, widget system, and animation system |
 | [Project Dependencies](intro/dependencies.md) | Overview of all libraries and tools that power eIsland, explained for non-developers |
+| [Backend Dependencies](intro/backend-dependencies.md) | Overview of all backend server libraries, frameworks, and internal modules |
 | [Code of Conduct](intro/coc.md) | Contributor Covenant Code of Conduct for the eIsland community |
 
 ### Tech Stack
