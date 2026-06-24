@@ -18,6 +18,8 @@ The eIsland frontend is an **Electron + React + TypeScript** desktop application
 | **Node.js** | >= 22.x | JavaScript runtime | 25.6.0 |
 | **npm** | >= 10.x | Package manager | 11.15.0 |
 | **Git** | Latest | Version control | 2.53.0.windows.2 |
+| **VS Build Tools 2022** | Latest | Compile native C/C++ plugins | "Desktop development with C++" workload |
+| **.NET 10 SDK** | >= 10.0 | Build temperature-helper | 10.0 |
 
 :::warning
 Node.js 22+ is required because the project uses `--experimental-strip-types` for native TypeScript execution in build scripts.
@@ -142,6 +144,20 @@ npm install
 
 :::tip
 The `postinstall` script automatically runs `electron-builder install-app-deps` to rebuild native modules for Electron's Node.js version.
+:::
+
+:::warning
+`npm install` will automatically compile four native C/C++ plugins (`windows-fullscreen-detector`, `windows-performance-monitor`, `windows-toast-listener`, `windows-processes-attacker`) and one .NET helper (`temperature-helper`). This requires:
+
+- **Visual Studio Build Tools 2022** — with the **"Desktop development with C++"** workload installed
+- **.NET 10 SDK** — required for building the `eIslandTemperatureReader` helper
+
+If you see `MSB8036: The Windows SDK version was not found` or `node-gyp` build errors, install the build tools:
+
+1. Download [Visual Studio Build Tools 2022](https://visualstudio.microsoft.com/visual-cpp-build-tools/)
+2. In the installer, select **"Desktop development with C++"** workload
+3. Install [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+4. Restart your terminal and run `npm install` again
 :::
 
 ## Development Commands
