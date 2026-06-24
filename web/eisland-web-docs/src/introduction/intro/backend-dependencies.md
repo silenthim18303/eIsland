@@ -124,6 +124,12 @@ Payment processing involves real financial transactions. The Alipay SDK handles 
 |---------|--------------|
 | **CommonMark** | Parses and renders Markdown text on the server side. Used to convert Markdown content (like user profiles or game descriptions) into HTML for display. |
 
+## JSON Processing
+
+| Library | What It Does |
+|---------|--------------|
+| **Jackson Databind** | The core JSON processing library — serializes Java objects into JSON for API responses and deserializes incoming JSON requests into Java objects. Used directly by the user, weather, and mini-game modules for fine-grained JSON control. |
+
 ## HTTP Client
 
 | Library | What It Does |
@@ -171,22 +177,143 @@ The backend uses a layered testing strategy:
 
 The server is organized as a modular monolith with 11 internal modules. These are not external libraries but project components that depend on each other.
 
-| Module | What It Does |
-|--------|--------------|
-| **server-common** | Shared utilities, constants, and exception definitions used by all other modules. |
-| **server-auth** | Handles user authentication — login, registration, JWT token management, email verification, and Spring Security configuration. |
-| **server-user** | Manages user accounts — profiles, preferences, avatar uploads, and admin role assignment. |
-| **server-agent** | Powers the AI assistant — streaming conversations, tool orchestration, speech recognition, and usage billing. |
-| **server-weather** | Provides weather data — proxies requests to the QWeather API, caches results in Redis, and manages Pro-tier access. |
-| **server-payment** | Processes payments — integrates with Alipay and WeChat Pay for subscription purchases and handles payment callbacks. |
-| **server-version** | Manages application versions — stores version metadata, tracks release history, and serves version check requests from the desktop app. |
-| **server-service-status** | Tracks API service health — monitors which backend services are operational and provides status information. |
-| **server-upload** | Handles file uploads — manages avatar uploads, file storage across multiple cloud providers (Alibaba OSS, Tencent COS, Cloudflare R2). |
-| **server-mini-game** | Powers mini-games — handles high score submissions, leaderboard queries, and uses Redis caching with RabbitMQ for reliable data persistence. |
-| **server-app** | The main entry point — aggregates all modules, contains the application configuration, and produces the final deployable package. |
+:::important
+All 11 modules run within a single application but are logically separated. Each module has its own database tables, services, and controllers. Modules communicate through well-defined Java interfaces rather than direct database access.
+:::
 
-:::note
-The modular monolith architecture means all modules run within a single application but are logically separated. Each module has its own database tables, services, and controllers. Modules communicate through well-defined Java interfaces rather than direct database access.
+### Module Overview
+
+| Module | Description | External Dependencies | Internal Dependencies |
+|--------|-------------|----------------------|----------------------|
+| **server-common** | Shared utilities, constants, exception definitions, and IP extraction helpers | Jakarta Servlet API | — |
+| **server-auth** | User authentication, login, registration, JWT tokens, email verification | WebMVC, Security, JSON, Redis, AMQP, JJWT, Resend | common, user, version |
+| **server-user** | User accounts, profiles, preferences, avatar uploads, admin roles | WebMVC, JSON, Security, Redis, AMQP, MyBatis, Jackson, CommonMark, Alipay | common, upload |
+| **server-agent** | AI assistant (mihtnelis), streaming conversations, tool orchestration, speech, billing | WebMVC, JSON, Security, Validation, WebSocket, Redis, AMQP, JJWT, Spring AI, LangChain4j, Tencent Speech | common, user, weather, service-status |
+| **server-weather** | Weather data proxy, QWeather API, Redis cache, Pro-tier access | WebMVC, JSON, Security, Redis, Jackson | — |
+| **server-payment** | Payment processing, Alipay integration, order management, callbacks | WebMVC, JSON, Security, Redis, AMQP, MyBatis, Alipay, Resend | common, user |
+| **server-version** | App version metadata, release history, version check API | WebMVC, Redis, MyBatis | common |
+| **server-service-status** | API service health monitoring, operational status tracking | WebMVC, MyBatis | common |
+| **server-upload** | File uploads, avatar storage, multi-cloud support (OSS, COS, R2) | WebMVC, Security, Redis, AMQP, MyBatis, Aliyun OSS, Tencent COS, AWS S3, HttpClient | common |
+| **server-mini-game** | High scores, leaderboards, Redis cache, RabbitMQ reliable persistence | WebMVC, JSON, Security, Redis, AMQP, MyBatis, Jackson | common, user |
+| **server-app** | Main entry point, aggregates all modules, produces deployable WAR | WebMVC, JSON, Security, Cache, Redis, MyBatis, Tomcat, MySQL, DotEnv, Test | All 9 business modules |
+
+### Module Details
+
+:::details server-common — Foundation Module
+The foundation module that all other modules depend on. Provides:
+
+- **Utility classes** — Common helper methods used across the codebase
+- **Constants** — Shared constant values and enumerations
+- **Exception definitions** — Standard error types and error response formatting
+- **IP extraction** — Client IP address detection from HTTP requests (uses Jakarta Servlet API)
+:::
+
+:::details server-auth — Authentication Module
+Handles all authentication and authorization flows:
+
+- **Login & Registration** — User credential validation, account creation
+- **JWT Token Management** — Token generation, validation, and refresh using JJWT
+- **Email Verification** — Sends verification codes via Resend email service
+- **Spring Security Configuration** — Defines security rules, endpoint permissions, and filter chains
+
+**Internal Dependencies:** server-common, server-user, server-version
+:::
+
+:::details server-user — User Management Module
+Manages user accounts and profiles:
+
+- **User CRUD** — Create, read, update, delete user accounts
+- **Profile Management** — Avatar uploads (via server-upload), display name, preferences
+- **Admin Role** — First-admin bootstrap, role assignment
+- **Markdown Rendering** — Converts user bio/content from Markdown to HTML using CommonMark
+
+**Internal Dependencies:** server-common, server-upload
+:::
+
+:::details server-agent — AI Assistant Module
+Powers the mihtnelis AI agent:
+
+- **Streaming Conversations** — Real-time AI responses via WebSocket using Spring AI OpenAI
+- **Tool Orchestration** — Chains AI calls with external tools using LangChain4j
+- **Speech Recognition** — Voice input processing via Tencent Cloud Speech SDK
+- **Usage Billing** — Tracks API usage and manages billing through RabbitMQ
+
+**Internal Dependencies:** server-common, server-user, server-weather, server-service-status
+:::
+
+:::details server-weather — Weather Module
+Provides weather data services:
+
+- **QWeather Proxy** — Proxies requests to the QWeather API, hiding API keys from the client
+- **Redis Caching** — Caches weather responses to reduce external API calls
+- **Pro-Tier Access** — Manages premium weather features based on user subscription
+
+**Internal Dependencies:** None (standalone module)
+:::
+
+:::details server-payment — Payment Module
+Handles financial transactions:
+
+- **Alipay Integration** — Creates payment orders, generates QR codes, verifies callbacks
+- **Order Management** — Tracks payment status, handles refunds
+- **Email Notifications** — Sends payment confirmations via Resend
+- **Async Processing** — Uses RabbitMQ for reliable payment callback handling
+
+**Internal Dependencies:** server-common, server-user
+:::
+
+:::details server-version — Version Management Module
+Manages application version information:
+
+- **Version Metadata** — Stores version numbers, release dates, changelogs
+- **Release History** — Tracks all published versions
+- **Version Check API** — Serves version check requests from the desktop app for auto-update
+
+**Internal Dependencies:** server-common
+:::
+
+:::details server-service-status — Service Status Module
+Monitors backend service health:
+
+- **Health Checks** — Tracks which API endpoints and services are operational
+- **Status API** — Provides health status information to the desktop app
+- **MyBatis Persistence** — Stores service status history in MySQL
+
+**Internal Dependencies:** server-common
+:::
+
+:::details server-upload — File Upload Module
+Handles file storage across multiple cloud providers:
+
+- **Avatar Uploads** — Processes and stores user profile images
+- **Multi-Cloud Support** — Alibaba Cloud OSS (mainland China), Tencent COS (alternative), Cloudflare R2 (global)
+- **Apache HttpClient** — Manages HTTP connections to cloud storage APIs
+- **RabbitMQ Integration** — Handles async upload processing and retry logic
+
+**Internal Dependencies:** server-common
+:::
+
+:::details server-mini-game — Mini-Game Module
+Powers the mini-game features:
+
+- **High Score Submission** — Accepts and validates game score submissions
+- **Leaderboard Queries** — Retrieves top scores with Redis caching for fast access
+- **Reliable Persistence** — Uses RabbitMQ to ensure scores are eventually saved to MySQL, even if the database is temporarily unavailable
+
+**Internal Dependencies:** server-common, server-user
+:::
+
+:::details server-app — Application Entry Point
+The main module that ties everything together:
+
+- **Module Aggregation** — Imports and wires all 9 business modules
+- **Configuration** — Contains `application.yaml` and Spring Boot configuration
+- **Embedded Tomcat** — Bundles the Tomcat web server (or connects to external Tomcat)
+- **MySQL Driver** — Includes the MySQL Connector/J runtime driver
+- **Environment Config** — Loads secrets from `.env` files via Spring DotEnv
+- **Testing** — Includes test dependencies for integration and security tests
+
+**Internal Dependencies:** All 9 business modules (server-auth, server-user, server-agent, server-weather, server-payment, server-version, server-service-status, server-upload, server-mini-game)
 :::
 
 ## Build Tool
