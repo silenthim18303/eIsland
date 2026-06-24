@@ -6,7 +6,7 @@ icon: box
 # Project Dependencies
 
 :::info
-This document provides a non-technical overview of the libraries and tools that power eIsland. Each dependency is explained by what it does for the user, not how it works internally.
+This document provides a non-technical overview of every library and tool used across the entire eIsland project — the desktop application, native plugins, plugin SDK, issue report website, and documentation website. Each dependency is explained by what it does for the user, not how it works internally.
 :::
 
 ## Core Framework
@@ -17,7 +17,9 @@ These are the foundational technologies that eIsland is built upon.
 |------------|--------------|
 | **Electron** | The engine that lets eIsland run as a native Windows desktop application using web technologies. It combines a browser window with system-level access, so the island can float on your desktop while still interacting with the operating system. |
 | **React** | The UI toolkit used to build all of eIsland's visual components — the island itself, widgets, settings panels, and everything you see and interact with. |
+| **React DOM** | The bridge between React and the browser's display system. It takes React components and renders them as actual visual elements on screen. |
 | **TypeScript** | A safer version of JavaScript that catches errors before the app runs, helping developers write more reliable code. |
+| **Vue** | A JavaScript framework required by VuePress to power the documentation website. |
 
 :::tip
 Electron is the same technology behind popular apps like Discord, VS Code, and Slack. It allows developers to build desktop applications using web technologies while still accessing native Windows features.
@@ -30,9 +32,13 @@ Libraries that make the island look and feel smooth.
 | Library | What It Does |
 |---------|--------------|
 | **GSAP** | A professional animation engine that powers the island's smooth transitions — expanding, collapsing, morphing between states, and widget animations. |
+| **@gsap/react** | Provides React-specific hooks for GSAP, making it easier for developers to connect animations to React components. |
 | **Tailwind CSS** | A styling system that defines the visual appearance of every element, from colors and spacing to layout and typography. |
+| **@tailwindcss/vite** | Integrates Tailwind CSS into the Vite build pipeline, enabling automatic style compilation during development. |
 | **Lucide React** | Provides all the icons you see throughout the app — settings gears, music notes, weather symbols, and more. |
 | **Color Thief** | Extracts the dominant color from album art or images, allowing the island to match its color theme to what you're listening to or viewing. |
+| **PostCSS** | A tool that transforms CSS behind the scenes — it processes stylesheets after they are written, enabling features like automatic vendor prefixes. |
+| **Autoprefixer** | Automatically adds browser-specific prefixes to CSS rules, ensuring styles work correctly across different browser engines. |
 
 :::details How Color Thief Works — Visual Example
 When you play a song with a blue album cover, Color Thief analyzes the image and tells the island to use a matching blue tint. This creates a visually cohesive experience where the island feels like part of the music.
@@ -45,7 +51,9 @@ Libraries that help display information inside the island.
 | Library | What It Does |
 |---------|--------------|
 | **Highcharts** | Renders interactive charts and graphs used in widgets like system monitoring and stock tracking. |
+| **Highcharts React Official** | The official React wrapper for Highcharts, allowing charts to be embedded directly as React components. |
 | **React Markdown** | Displays formatted text (bold, links, lists, code blocks) in areas like the AI assistant's responses. |
+| **Remark GFM** | Adds GitHub Flavored Markdown support to React Markdown — enables tables, strikethrough text, task lists, and other extended formatting. |
 | **React Date Picker** | Provides the calendar and date selection interface used in scheduling and reminder features. |
 
 ## State Management
@@ -83,11 +91,22 @@ Widget data sources that connect to the internet (Weather, Stocks, Email) requir
 The Email Widget connects directly to your email provider's IMAP server. Your email credentials are stored locally on your device and are never sent to eIsland's servers. The `ImapFlow` library handles the secure connection, and `MailParser` processes the message content for display.
 :::
 
+## Windows Integration
+
+Libraries that bridge the gap between eIsland and the Windows operating system.
+
+| Library | What It Does |
+|---------|--------------|
+| **Windows SMTC Monitor** | Monitors Windows System Media Transport Controls — reads now-playing information (song title, artist, album art) from any media player that integrates with Windows. |
+| **Open** | Opens URLs and files with the user's default application. When you click a link in eIsland, this library ensures it opens in your web browser. |
+| **UAPI SDK** | Connects eIsland to cloud services for features that require server-side processing or user account integration. |
+
 ## Internationalization
 
 | Library | What It Does |
 |---------|--------------|
-| **i18next & React i18next** | Powers the app's multi-language support. Allows eIsland to display all text in the user's preferred language. |
+| **i18next** | The core internationalization framework that manages translation files and language switching logic. |
+| **React i18next** | Connects i18next to React, allowing every component in the app to display text in the user's preferred language. |
 
 :::tip
 To contribute a new language translation, developers add translation files to the project's `locales` directory. The i18next library automatically loads the correct language based on your system settings.
@@ -155,13 +174,46 @@ FFmpeg is bundled as a static binary — it does not require a separate installa
 
 These are tools developers use to build, test, and package eIsland. They are not part of the app users interact with.
 
+### Build System
+
 | Tool | What It Does |
 |------|--------------|
-| **Vite & Electron Vite** | The build system that compiles all the source code into the final application. Think of it as the "factory" that assembles eIsland. |
+| **Vite** | The core build tool that compiles source code into the final application. Think of it as the "factory" that assembles eIsland. |
+| **Electron Vite** | A specialized version of Vite tailored for Electron apps, handling the three separate build targets (main process, preload script, renderer). |
 | **Electron Builder** | Packages the compiled application into a Windows installer (`.exe`) that users can download and install. |
+| **Vite React Plugin** | Adds React support to Vite, enabling JSX syntax and fast refresh during development. |
+
+### Testing
+
+| Tool | What It Does |
+|------|--------------|
 | **Vitest** | The testing framework that runs thousands of automated tests to verify everything works correctly before each release. |
-| **Node-Gyp** | Compiles the native C/C++ plugins into binaries that Windows can execute. |
+| **Vitest Coverage V8** | Measures code coverage during tests — tracks which lines of code are tested and which are not, helping developers improve test quality. |
+
+### Code Quality
+
+| Tool | What It Does |
+|------|--------------|
 | **ESLint** | A code quality checker that enforces consistent coding style and catches common mistakes. |
+| **ESLint JS** | Provides ESLint's core set of JavaScript rules for detecting errors and enforcing best practices. |
+| **TypeScript ESLint** | Connects ESLint with TypeScript, enabling linting rules that understand TypeScript-specific syntax. |
+| **ESLint React Hooks** | Enforces rules for React Hooks to prevent common bugs like missing dependencies or incorrect hook usage. |
+| **ESLint React Refresh** | Ensures components are correctly set up for React Fast Refresh, so code changes appear instantly during development. |
+| **Globals** | Provides standard global variable definitions (like `window`, `document`, `console`) for ESLint to recognize. |
+
+### Electron Tooling
+
+| Tool | What It Does |
+|------|--------------|
+| **Electron Toolkit Preload** | Utilities for Electron's preload scripts — the secure bridge between the main process and the renderer. |
+| **Electron Toolkit TSConfig** | Provides shared TypeScript configuration optimized for Electron projects. |
+| **Electron Toolkit Utils** | Common utility functions for Electron apps — simplifies tasks like window management and IPC communication. |
+
+### Native Compilation
+
+| Tool | What It Does |
+|------|--------------|
+| **Node-Gyp** | Compiles the native C/C++ plugins into binaries that Windows can execute. Required for building the four Windows Native Plugins. |
 
 :::details How the Build Pipeline Works
 The build process follows these steps:
@@ -173,6 +225,31 @@ The build process follows these steps:
 5. **Testing** — Vitest runs automated tests to verify the build is correct.
 :::
 
+## Plugin SDK
+
+The SDK used by developers to build third-party plugins for eIsland.
+
+| Tool | What It Does |
+|------|--------------|
+| **eIsland Plugin SDK** | Provides type definitions and manifest validation helpers — ensures plugins follow the correct structure and can communicate with the main application. |
+
+## Issue Report Website
+
+A separate web application where users can report bugs and issues with eIsland.
+
+| Tool | What It Does |
+|------|--------------|
+| **React & React DOM** | Powers the issue report form interface. |
+| **Vite** | Builds and serves the issue report website. |
+| **Vite React Plugin** | Adds React support to the Vite build for the issue report site. |
+| **ESLint** | Enforces code quality in the issue report website's source code. |
+| **ESLint JS** | Core JavaScript linting rules for the issue report site. |
+| **ESLint React Hooks** | Ensures correct React Hooks usage in the issue report site. |
+| **ESLint React Refresh** | Enables fast development feedback for the issue report site. |
+| **TypeScript** | Provides type safety for the issue report website's codebase. |
+| **TypeScript ESLint** | Enables TypeScript-aware linting for the issue report site. |
+| **Globals** | Provides standard global variable definitions for ESLint in the issue report site. |
+
 ## Documentation Website
 
 The tools used to build and host this documentation site.
@@ -181,4 +258,8 @@ The tools used to build and host this documentation site.
 |------|--------------|
 | **VuePress** | The static site generator that turns these Markdown documents into a browsable website with navigation, search, and theming. |
 | **VuePress Theme Hope** | The theme that provides the documentation site's layout, sidebar, dark mode, and additional features like watermarks. |
-| **Slim Search** | Adds client-side search to the documentation, allowing visitors to quickly find information across all pages. |
+| **VuePress Vite Bundler** | Integrates Vite as the bundler for VuePress, enabling faster build times and modern JavaScript support. |
+| **VuePress Git Plugin** | Adds Git integration to the documentation — shows "last updated" timestamps and contributor information for each page. |
+| **VuePress Slim Search** | Adds client-side search to the documentation, allowing visitors to quickly find information across all pages. |
+| **VuePress Watermark Plugin** | Enables watermark support on documentation pages for branding and content protection. |
+| **Sass** | A CSS preprocessor that extends CSS with variables, nesting, and other features — used to style the documentation theme. |
