@@ -70,6 +70,8 @@ Sidebar is configured in `src/.vuepress/sidebar.ts`.
 
 ### Admonition Syntax
 
+**Every documentation file MUST use admonition syntax.** Each file should include at least one admonition block (`:::tip`, `:::info`, `:::note`, `:::important`, `:::warning`, `:::danger`, or `:::details`) to highlight key information. Use a variety of admonition types across the document — do not rely on a single type.
+
 Documentation files support admonition blocks for emphasizing content:
 
 ```md

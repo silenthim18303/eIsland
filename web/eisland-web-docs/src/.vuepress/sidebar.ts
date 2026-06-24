@@ -11,6 +11,7 @@ export default sidebar({
       collapsible: false,
       children: [
         "intro/project-overview.md",
+        "intro/dependencies.md",
         "intro/coc.md",
       ],
     },

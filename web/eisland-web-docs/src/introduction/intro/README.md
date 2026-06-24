@@ -18,4 +18,5 @@ eIsland is a desktop widget application for Windows that brings the Apple Dynami
 | Document | Description |
 |----------|-------------|
 | [Project Introduction](../README.md) | eIsland project overview, state machine architecture, key features, and widget system |
+| [Project Dependencies](dependencies.md) | Overview of all libraries and tools that power eIsland, explained for non-developers |
 | [Code of Conduct](coc.md) | Contributor Covenant Code of Conduct for the eIsland community |
