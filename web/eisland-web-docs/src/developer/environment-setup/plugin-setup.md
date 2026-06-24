@@ -289,6 +289,67 @@ Key settings:
 - `/LTCG:OFF` — Disables link-time code generation (faster linking during development)
 :::
 
+### common.gypi — LTO Configuration
+
+The `eisland-windows-toast-listener` plugin includes a `common.gypi` file that defines project-wide build variables. node-gyp **automatically loads** this file when present in the project root — no explicit `includes` directive is needed.
+
+```json
+{
+  "variables": {
+    "enable_thin_lto": "false",
+    "enable_lto": "false"
+  }
+}
+```
+
+Both LTO modes are **disabled** for this plugin.
+
+:::details What is LTO (Link-Time Optimization)?
+**LTO (Link-Time Optimization)** is a compiler optimization technique that defers optimization to the link stage of the build process, rather than optimizing each source file individually during compilation.
+
+**Standard build (no LTO):**
+
+```
+Source A → Compile → Object A ─┐
+                                ├─ Link → Final Binary
+Source B → Compile → Object B ─┘
+```
+
+Each source file is compiled and optimized independently. The linker combines the object files without cross-file optimization.
+
+**Build with LTO:**
+
+```
+Source A → Compile → IR* A ─┐
+                             ├─ Link + Optimize → Final Binary (smaller/faster)
+Source B → Compile → IR* B ─┘
+```
+
+*IR = Intermediate Representation (LLVM bitcode or MSVC IL)
+
+Each source file is compiled to an intermediate representation. The linker then performs cross-file optimization — inlining functions across files, eliminating unused code paths, and optimizing data layout — before generating the final binary.
+:::
+
+| LTO Variant | MSVC Flag | Description |
+|-------------|-----------|-------------|
+| **Full LTO** | `/GL` + `/LTCG` | All object files merged into one module at link time — maximum optimization, slower build |
+| **Thin LTO** | `/GL` + `/LTCG:thin` | Parallel optimization with incremental caching — faster build, slightly less optimized |
+
+:::important
+LTO is disabled in this plugin because:
+
+1. **Build speed** — The plugin is small (3 C++ source files); LTO overhead outweighs the marginal performance gain
+2. **Debugging** — LTO can inline functions across files and optimize out variables, making debugging harder
+3. **node-gyp compatibility** — node-gyp's MSVC integration does not fully support LTO out of the box
+4. **Binary size** — The plugin runs inside Electron's Chromium engine; size savings are negligible
+
+The `binding.gyp` disables LTO with `/GL-` (compile) and `/LTCG:OFF` (link), which work in conjunction with `common.gypi` to ensure a clean, non-LTO build.
+:::
+
+:::tip
+To enable LTO for a production build, set both variables to `"true"` in `common.gypi` and change the `binding.gyp` flags to `/GL` and `/LTCG`. Expect 2-5x longer build times.
+:::
+
 ## Building Plugins
 
 ### Build All Plugins (via root project)
