@@ -20,3 +20,12 @@ Environment configuration for frontend, backend, and plugin development.
 | [Frontend Setup](environment-setup/frontend-setup.md) | Node.js, pnpm, Electron, React, and frontend IDE configuration |
 | [Backend Setup](environment-setup/backend-setup.md) | Java JDK, Maven, MySQL, Redis, RabbitMQ, and backend IDE configuration |
 | [Plugin Setup](environment-setup/plugin-setup.md) | Plugin development toolchain, scaffolding, and testing environment |
+
+### Git Operations
+
+Git workflows and commands for eIsland development.
+
+| Document | Description |
+|----------|-------------|
+| [Local Operations](git-operations/local-operations.md) | Local Git commands: branching, committing, rebasing, and history management |
+| [GitHub Operations](git-operations/github-operations.md) | GitHub workflows: pull requests, code reviews, issue management, and CI/CD |

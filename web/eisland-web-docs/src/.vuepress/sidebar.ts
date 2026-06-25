@@ -58,5 +58,14 @@ export default sidebar({
         "environment-setup/plugin-setup.md",
       ],
     },
+    {
+      text: "Git Operations",
+      icon: "code-branch",
+      collapsible: false,
+      children: [
+        "git-operations/local-operations.md",
+        "git-operations/github-operations.md",
+      ],
+    },
   ],
 });
