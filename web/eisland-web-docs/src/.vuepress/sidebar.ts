@@ -67,5 +67,13 @@ export default sidebar({
         "git-operations/github-operations.md",
       ],
     },
+    {
+      text: "Development Commands",
+      icon: "terminal",
+      collapsible: false,
+      children: [
+        "commands/npm-scripts.md",
+      ],
+    },
   ],
 });

@@ -17,7 +17,7 @@ Environment configuration for frontend, backend, and plugin development.
 
 | Document | Description |
 |----------|-------------|
-| [Frontend Setup](environment-setup/frontend-setup.md) | Node.js, pnpm, Electron, React, and frontend IDE configuration |
+| [Frontend Setup](environment-setup/frontend-setup.md) | Node.js, npm, Electron, React, and frontend IDE configuration |
 | [Backend Setup](environment-setup/backend-setup.md) | Java JDK, Maven, MySQL, Redis, RabbitMQ, and backend IDE configuration |
 | [Plugin Setup](environment-setup/plugin-setup.md) | Plugin development toolchain, scaffolding, and testing environment |
 
@@ -29,3 +29,11 @@ Git workflows and commands for eIsland development.
 |----------|-------------|
 | [Local Operations](git-operations/local-operations.md) | Local Git commands: branching, committing, rebasing, and history management |
 | [GitHub Operations](git-operations/github-operations.md) | GitHub workflows: pull requests, code reviews, issue management, and CI/CD |
+
+### Development Commands
+
+Detailed reference for npm scripts defined in `package.json`.
+
+| Document | Description |
+|----------|-------------|
+| [NPM Scripts Reference](commands/npm-scripts.md) | All `npm run` commands: development, testing, packaging, code quality, and release workflows |
