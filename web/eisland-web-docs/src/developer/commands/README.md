@@ -6,7 +6,7 @@ icon: terminal
 # Development Commands
 
 :::info
-This section provides detailed documentation for the npm scripts defined in `package.json`, including usage patterns, internals, and troubleshooting.
+This section provides detailed documentation for the npm scripts defined in `package.json`, organized by functionality: development, testing, packaging, code quality, and release workflows.
 :::
 
 ## Overview
@@ -21,4 +21,8 @@ For a quick reference of all commands, see [Frontend Setup — Development Comma
 
 | Document | Description |
 |----------|-------------|
-| [NPM Scripts Reference](npm-scripts.md) | Complete reference for all `npm run` commands: development, testing, packaging, code quality, and release workflows |
+| [Development Commands](dev-commands.md) | `dev`, `build`, `preview` — building, running, and previewing the application |
+| [Testing Commands](test-commands.md) | `test`, `test:preload`, `test:coverage` — running tests and measuring coverage |
+| [Package Commands](package-commands.md) | `package`, `postinstall` — building installers and managing native modules |
+| [Code Quality Commands](quality-commands.md) | `comment:check`, `i18n:check` — validating comment standards and i18n completeness |
+| [Release Commands](release-commands.md) | `release:notes`, `changelog:generate`, `release:upload*` — changelogs and artifact uploads |

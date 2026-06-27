@@ -72,7 +72,11 @@ export default sidebar({
       icon: "terminal",
       collapsible: false,
       children: [
-        "commands/npm-scripts.md",
+        "commands/dev-commands.md",
+        "commands/test-commands.md",
+        "commands/package-commands.md",
+        "commands/quality-commands.md",
+        "commands/release-commands.md",
       ],
     },
   ],
