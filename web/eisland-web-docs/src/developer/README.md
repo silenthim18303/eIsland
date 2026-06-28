@@ -41,3 +41,4 @@ Detailed reference for npm scripts defined in `package.json`.
 | [Package Commands](commands/package-commands.md) | `package`, `postinstall` — building installers and managing native modules |
 | [Code Quality Commands](commands/quality-commands.md) | `comment:check`, `i18n:check` — validating comment standards and i18n completeness |
 | [Release Commands](commands/release-commands.md) | `release:notes`, `changelog:generate`, `release:upload*` — changelogs and artifact uploads |
+| [Plugin Commands](commands/plugin-commands.md) | `build`, `test`, `smoke` — building, testing, and smoke-testing all native plugins |
