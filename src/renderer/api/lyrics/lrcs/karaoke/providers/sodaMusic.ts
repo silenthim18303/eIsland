@@ -20,82 +20,114 @@
 
 /**
  * @file sodaMusic.ts
- * @description 汽水音乐逐字歌词拉取 — 搜歌 → 详情接口 `lyric.content` 已是明文 KRC 风格(无需解密) → 前缀式音节 + 相对偏移解析
+ * @description 汽水音乐逐字歌词拉取 — 多策略搜索 + 评分匹配 → 详情接口 → 明文 KRC 前缀式音节解析
+ *              移植自 Lyrix fetchers/soda_music.rs + searchers/soda_music.rs
  * @author 鸡哥
  * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import { cleanArtist, cleanTitle } from '../../normal/helpers';
 import { requestJsonWithLog } from '../../normal/request';
+import { logger } from '../../../../../utils/logger';
 import { parseSyncedLines } from '../parsers';
+import { searchWithScoring } from '../../normal/matcher';
+import type { SearchCandidate } from '../../normal/searchTypes';
 import type { KaraokeLine } from '../types';
 
-/**
- * 从汽水音乐搜索并获取逐字歌词
- * @param queryTitle - 搜索标题
- * @param queryArtist - 搜索艺术家
- * @returns 逐字歌词行; 无逐字内容或解析失败时返回 null
- */
-async function searchKaraokeSodaMusic(queryTitle: string, queryArtist: string): Promise<KaraokeLine[] | null> {
-  const query = `${queryTitle} ${queryArtist}`.trim();
-  try {
-    const searchUrl =
-      `https://api.qishui.com/luna/pc/search/track?aid=386088&app_name=&region=&geo_region=&os_region=&sim_region=&device_id=&cdid=&iid=&version_name=&version_code=&channel=&build_mode=&network_carrier=&ac=&tz_name=&resolution=&device_platform=&device_type=&os_version=&fp=&q=${encodeURIComponent(query)}&cursor=&search_id=&search_method=input&debug_params=&from_search_id=&search_scene=`;
+const LOG_TAG = '[KaraokeSodaMusic]';
+const SODA_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+  Referer: 'https://api.qishui.com/',
+};
 
-    const searchJson = await requestJsonWithLog<Record<string, unknown>>(searchUrl);
-    if (!searchJson) return null;
+/* ── 搜索 ──────────────────────────────────────────────────────────── */
 
-    const resultGroups = searchJson.result_groups as unknown[] | undefined;
-    if (!resultGroups || resultGroups.length === 0) return null;
-
-    const trackId = resultGroups.reduce<string | null>((acc, group) => {
-      if (acc) return acc;
-      const g = group as Record<string, unknown>;
-      const items = g.data as unknown[] | undefined;
-      if (!items) return null;
-      const matched = items.find((item) => {
-        const entity = (item as Record<string, unknown>).entity as Record<string, unknown> | undefined;
-        const track = entity?.track as Record<string, unknown> | undefined;
-        return Boolean(track?.id);
-      }) as Record<string, unknown> | undefined;
-      if (!matched) return null;
-      const entity = matched.entity as Record<string, unknown> | undefined;
-      const track = entity?.track as Record<string, unknown> | undefined;
-      return track?.id ? String(track.id) : null;
-    }, null);
-    if (!trackId) return null;
-
-    const detailJson = await requestJsonWithLog<Record<string, unknown>>(
-      `https://api.qishui.com/luna/pc/track_v2?track_id=${encodeURIComponent(trackId)}&media_type=track&queue_type=`,
-    );
-    if (!detailJson) return null;
-
-    const lyricInfo = detailJson.lyric as Record<string, unknown> | undefined;
-    const content = typeof lyricInfo?.content === 'string' ? lyricInfo.content : null;
-    if (!content) return null;
-
-    const lines = parseSyncedLines(content, 'prefix', 'relative');
-    const withSyllables = lines.filter((l) => l.syllables.length > 0);
-    return withSyllables.length > 0 ? withSyllables : null;
-  } catch {
-    return null;
-  }
+interface SodaTrack {
+  id?: number | string;
+  name?: string;
+  artists?: Array<{ name?: string }>;
+  album?: { name?: string };
+  duration?: number;
 }
 
-/**
- * 汽水音乐逐字歌词对外入口 — 原词失败则用 cleanTitle/cleanArtist 重试
- * @param title - 原始歌名
- * @param artist - 原始艺术家
- * @returns 逐字歌词行, 无逐字内容时返回 null
- */
-export async function fetchKaraokeFromSodaMusic(title: string, artist: string): Promise<KaraokeLine[] | null> {
-  const raw = await searchKaraokeSodaMusic(title, artist);
-  if (raw) return raw;
+async function searchSodaMusicApi(query: string): Promise<SearchCandidate[]> {
+  const searchUrl =
+    `https://api.qishui.com/luna/pc/search/track?aid=386088&app_name=&region=&geo_region=&os_region=&sim_region=&device_id=&cdid=&iid=&version_name=&version_code=&channel=&build_mode=&network_carrier=&ac=&tz_name=&resolution=&device_platform=&device_type=&os_version=&fp=&q=${encodeURIComponent(query)}&cursor=&search_id=&search_method=input&debug_params=&from_search_id=&search_scene=`;
 
-  const cleanedTitle = cleanTitle(title);
-  const cleanedArtist = cleanArtist(artist);
-  if (cleanedTitle !== title || cleanedArtist !== artist) {
-    return searchKaraokeSodaMusic(cleanedTitle, cleanedArtist);
+  const json = await requestJsonWithLog<Record<string, unknown>>(searchUrl, { headers: SODA_HEADERS });
+  if (!json) return [];
+
+  const resultGroups = json.result_groups as unknown[] | undefined;
+  if (!resultGroups || resultGroups.length === 0) return [];
+
+  const candidates: SearchCandidate[] = [];
+  for (const group of resultGroups) {
+    const g = group as Record<string, unknown>;
+    const items = g.data as unknown[] | undefined;
+    if (!items) continue;
+    for (const item of items) {
+      const it = item as Record<string, unknown>;
+      const entity = it.entity as Record<string, unknown> | undefined;
+      const track = entity?.track as SodaTrack | undefined;
+      if (!track?.id) continue;
+      candidates.push({
+        id: String(track.id),
+        title: track.name ?? '',
+        artists: (track.artists ?? []).map((a) => a.name ?? ''),
+        album: track.album?.name ?? '',
+        durationMs: track.duration,
+      });
+    }
   }
-  return null;
+  return candidates;
+}
+
+/* ── 详情 + 逐字歌词获取 ───────────────────────────────────────────── */
+
+async function fetchKaraokeByTrackId(trackId: string): Promise<KaraokeLine[] | null> {
+  const detailUrl =
+    `https://api.qishui.com/luna/pc/track_v2?track_id=${encodeURIComponent(trackId)}&media_type=track&queue_type=&aid=386088&iid=114514`;
+
+  const detailJson = await requestJsonWithLog<Record<string, unknown>>(detailUrl, { headers: SODA_HEADERS });
+  if (!detailJson) {
+    logger.warn(`${LOG_TAG} 详情接口返回空, trackId=${trackId}`);
+    return null;
+  }
+
+  const lyricInfo = detailJson.lyric as Record<string, unknown> | undefined;
+  const content = typeof lyricInfo?.content === 'string' ? lyricInfo.content : null;
+  if (!content || content.length === 0) {
+    logger.warn(`${LOG_TAG} 歌词内容为空, trackId=${trackId}`);
+    return null;
+  }
+
+  // 汽水音乐 KRC 为前缀式 `<s,d>text` 或 `(s,d)text`，偏移已是相对值
+  const lines = parseSyncedLines(content, 'prefix', 'relative');
+  const withSyllables = lines.filter((l) => l.syllables.length > 0);
+  if (withSyllables.length === 0) {
+    logger.warn(`${LOG_TAG} 解析出 0 行逐字, trackId=${trackId}`);
+    return null;
+  }
+  logger.info(`${LOG_TAG} 获取成功, trackId=${trackId}, 行数=${withSyllables.length}`);
+  return withSyllables;
+}
+
+/* ── 对外入口 ──────────────────────────────────────────────────────── */
+
+export async function fetchKaraokeFromSodaMusic(title: string, artist: string): Promise<KaraokeLine[] | null> {
+  logger.info(`${LOG_TAG} 开始获取逐字, title="${title}", artist="${artist}"`);
+
+  const matched = await searchWithScoring(
+    { title, artist },
+    searchSodaMusicApi,
+    5, // minScore
+    7, // wowScore
+  );
+
+  if (!matched) {
+    logger.warn(`${LOG_TAG} 无匹配歌曲`);
+    return null;
+  }
+
+  logger.info(`${LOG_TAG} 匹配到: "${matched.title}" - "${matched.artists.join(', ')}" (id=${matched.id})`);
+  return fetchKaraokeByTrackId(matched.id);
 }
