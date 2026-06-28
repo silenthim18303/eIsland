@@ -1030,7 +1030,7 @@ Performance characteristics and optimization recommendations for each plugin:
 - CPU and memory snapshots are nearly zero-cost — suitable for polling at 1-second intervals
 - Temperature queries are expensive due to the .NET helper process — recommended at 5–10 second intervals
 - The fullscreen detector avoids COM/WMI — pure Win32 window API calls
-- SMTC queries spawn a .NET process; recommended polling interval is 1–2 seconds for status updates
+- SMTC commands are direct DLL calls (~1-5ms via koffi FFI); monitoring is event-driven (zero polling)
 
 :::warning
 Temperature queries involve .NET process startup and WMI queries, resulting in high latency (500–2000ms). Recommended polling interval is 5–10 seconds to avoid frequent calls impacting performance.
@@ -1052,39 +1052,43 @@ Provides control over Windows System Media Transport Controls (SMTC) — the sta
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  JavaScript Layer (index.js)                                │
-│  play() / pause() / next() / previous() / getStatus()       │
+│  JavaScript Layer (index.js + smtc-monitor.js + ffi-loader) │
+│  Commands: play / pause / next / previous / seek / stop ... │
+│  Monitor:  SmtcMonitor (EventEmitter) via koffi FFI         │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ spawnSync (JSON-over-stdout)
+                           │ koffi FFI (direct DLL calls)
 ┌──────────────────────────▼──────────────────────────────────┐
-│  eIslandSmtcHelper.exe                                      │
+│  eIslandSmtcCtypes.dll (NativeAOT)                          │
 │  .NET 10 + Windows.Media.Control                            │
 ├─────────────────────────────────────────────────────────────┤
-│  SmtcController.cs                                          │
-│  GlobalSystemMediaTransportControlsSessionManager           │
-│  → GetCurrentSession() → TryPlayAsync / TryPauseAsync / ... │
+│  SmtcExports.cs        — C-style exported functions         │
+│  SmtcController.cs     — Command execution (play/pause/…)   │
+│  SmtcSessionMonitor.cs — Event-driven session monitoring    │
+│  SmtcJsonContext.cs    — Source-generated JSON serialization│
+│  Snapshots.cs          — Data models                        │
 └─────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────┐
-│  eIslandSmtcCtypes.dll (NativeAOT)                          │
-│  Python ctypes / C / FFI / any language                     │
-├─────────────────────────────────────────────────────────────┤
-│  SmtcExports.cs                                             │
-│  UnmanagedCallersOnly → smtc_play / smtc_pause / ...        │
-│  SmtcJsonContext.cs (source-generated JSON serialization)    │
-└─────────────────────────────────────────────────────────────┘
+        ▲                           ▲
+        │                           │
+  ┌─────┴──────┐            ┌───────┴────────┐
+  │  Node.js   │            │ Python / C /   │
+  │  (koffi)   │            │ any FFI lang   │
+  └────────────┘            └────────────────┘
 ```
 
 :::info
-Unlike other plugins that use C + N-API, the SMTC Helper is a **pure C# .NET application** with two output targets:
+Unlike other plugins that use C + N-API, the SMTC Helper is a **pure C# .NET application** compiled as a NativeAOT DLL. Node.js accesses it via **koffi** (a zero-compile FFI library), eliminating native addon build issues. The DLL also works from Python ctypes or any language with C FFI support.
+:::
 
-1. **`eIslandSmtcHelper.exe`** — Console app invoked via `spawnSync` from Node.js
-2. **`eIslandSmtcCtypes.dll`** — NativeAOT DLL with C-style exported functions for Python ctypes / C / FFI
+:::tip
+The plugin provides two integration modes:
 
-Both share the same core logic (`SmtcController.cs`, `Snapshots.cs`).
+1. **Commands** — synchronous function calls (`play`, `pause`, `seek`, etc.) for media control
+2. **Monitor** — event-driven session tracking (`SmtcMonitor` class) for real-time state updates, replacing the need for a separate monitoring package
 :::
 
 ### Exported Functions
+
+#### Commands
 
 | Function | Signature | Description |
 |----------|-----------|-------------|
@@ -1093,6 +1097,27 @@ Both share the same core logic (`SmtcController.cs`, `Snapshots.cs`).
 | `next` | `() → CommandResult` | Skip to the next track |
 | `previous` | `() → CommandResult` | Skip to the previous track |
 | `getStatus` | `() → MediaStatus` | Get the full snapshot of the current media session |
+| `seek` | `(seconds: number) → CommandResult` | Seek to a position in seconds |
+| `stop` | `() → CommandResult` | Stop playback |
+| `setShuffle` | `(active: boolean) → CommandResult` | Toggle shuffle mode |
+| `setRepeatMode` | `(mode: number) → CommandResult` | Set repeat mode (0=None, 1=Track, 2=List) |
+| `setPlaybackRate` | `(rate: number) → CommandResult` | Set playback rate (1.0 = normal) |
+
+#### SmtcMonitor
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `SmtcMonitor` | `class extends EventEmitter` | Real-time SMTC session monitor |
+
+**Events** (compatible with `@coooookies/windows-smtc-monitor`):
+
+| Event | Callback | Description |
+|-------|----------|-------------|
+| `session-added` | `(sourceAppId: string, media: MediaProps) => void` | New media session detected |
+| `session-removed` | `(sourceAppId: string) => void` | Media session closed |
+| `session-media-changed` | `(sourceAppId: string, media: MediaProps) => void` | Track metadata changed |
+| `session-playback-changed` | `(sourceAppId: string, playback: PlaybackInfo) => void` | Play/pause/stop state changed |
+| `session-timeline-changed` | `(sourceAppId: string, timeline: TimelineProps) => void` | Playback position updated |
 
 ### MediaStatus
 
@@ -1214,6 +1239,34 @@ var controls = new PlaybackControls
 };
 ```
 
+### SmtcMonitor Usage
+
+```typescript
+import { SmtcMonitor } from '@eisland/windows-smtc-helper';
+
+const monitor = new SmtcMonitor();
+
+monitor.on('session-added', (sourceAppId, media) => {
+  console.log(`Now playing: ${media.title} — ${media.artist}`);
+});
+
+monitor.on('session-playback-changed', (sourceAppId, playback) => {
+  console.log(`Status: ${playback.playbackStatus}`); // 4=playing, 5=paused
+});
+
+monitor.on('session-timeline-changed', (sourceAppId, timeline) => {
+  console.log(`Position: ${timeline.position.toFixed(1)}s`);
+});
+
+monitor.start();
+// ... later
+monitor.stop();
+```
+
+:::note
+The `SmtcMonitor` uses WinRT event callbacks (`MediaPropertiesChanged`, `PlaybackInfoChanged`, `TimelinePropertiesChanged`) for zero-polling real-time updates. Timeline events are throttled to 200ms intervals. The `getMediaSessions()` method returns a synchronous snapshot of all active sessions.
+:::
+
 ### CLI Modes
 
 | Invocation | Mode | Output |
@@ -1223,14 +1276,23 @@ var controls = new PlaybackControls
 | `eIslandSmtcHelper.exe pause` | Pause | `CommandResult` JSON |
 | `eIslandSmtcHelper.exe next` | Next | `CommandResult` JSON |
 | `eIslandSmtcHelper.exe previous` | Previous | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe seek <seconds>` | Seek | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe stop` | Stop | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe set-shuffle <0|1>` | Shuffle | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe set-repeat-mode <0|1|2>` | Repeat | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe set-playback-rate <rate>` | Rate | `CommandResult` JSON |
 
 ### Source Files
 
 | File | Responsibility |
 |------|---------------|
 | `src/Program.cs` | CLI entry point, argument parsing, JSON output |
-| `src/SmtcController.cs` | SMTC session management and command execution |
-| `src/Snapshots.cs` | Data models (`MediaStatus`, `CommandResult`, `TimelineProperties`, `PlaybackControls`) |
+| `src/SmtcController.cs` | SMTC command execution (play, pause, seek, stop, shuffle, repeat, rate) |
+| `src/SmtcSessionMonitor.cs` | Event-driven session monitoring engine (WinRT callbacks + Win32 events) |
+| `src/Snapshots.cs` | Data models (`MediaStatus`, `CommandResult`, `SessionInfo`, `MediaMetadata`, etc.) |
+| `ffi-loader.js` | koffi FFI loader — defines all DLL function signatures |
+| `smtc-monitor.js` | `SmtcMonitor` EventEmitter — wraps DLL monitoring into Node.js events |
+| `index.js` | Public API — exports commands + `SmtcMonitor` |
 
 ### Build
 
@@ -1324,18 +1386,36 @@ export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
 
 #### Exported C Functions
 
+**Commands:**
+
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `smtc_play` | `() → int` | Play. Returns 0=success, 1=failure |
 | `smtc_pause` | `() → int` | Pause. Returns 0=success, 1=failure |
 | `smtc_next` | `() → int` | Next track. Returns 0=success, 1=failure |
 | `smtc_previous` | `() → int` | Previous track. Returns 0=success, 1=failure |
+| `smtc_seek` | `(double seconds) → int` | Seek to position. Returns 0=success |
+| `smtc_stop` | `() → int` | Stop playback. Returns 0=success |
+| `smtc_set_shuffle` | `(int active) → int` | Set shuffle (0=off, 1=on). Returns 0=success |
+| `smtc_set_repeat_mode` | `(int mode) → int` | Set repeat (0=None, 1=Track, 2=List). Returns 0=success |
+| `smtc_set_playback_rate` | `(double rate) → int` | Set playback rate. Returns 0=success |
 | `smtc_get_status` | `() → char*` | Get status JSON. Returns NULL on failure |
-| `smtc_free_string` | `(char*) → void` | Free a string returned by `smtc_get_status` |
+| `smtc_free_string` | `(char*) → void` | Free a string returned by status/error functions |
 | `smtc_get_last_error` | `() → char*` | Get last error message |
 
+**Monitoring:**
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `smtc_start_monitoring` | `() → int` | Start session monitoring. Returns 0=success |
+| `smtc_stop_monitoring` | `() → int` | Stop session monitoring. Returns 0=success |
+| `smtc_wait_for_changes` | `(int timeoutMs) → int` | Block until change or timeout. 0=changed, 1=timeout |
+| `smtc_get_sessions_changed` | `() → int` | Read change counter (atomic) |
+| `smtc_get_all_sessions` | `() → char*` | Get all sessions as JSON array |
+| `smtc_get_session` | `(char* appId) → char*` | Get specific session by source app ID |
+
 :::danger
-You **must** call `smtc_free_string()` on any pointer returned by `smtc_get_status()` or `smtc_get_last_error()` to avoid memory leaks.
+You **must** call `smtc_free_string()` on any pointer returned by `smtc_get_status()`, `smtc_get_last_error()`, `smtc_get_all_sessions()`, or `smtc_get_session()` to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
 :::
 
 #### Python Usage
@@ -1400,8 +1480,18 @@ internal partial class SmtcJsonContext : JsonSerializerContext { }
 | File | Responsibility |
 |------|---------------|
 | `smtc-ctypes/eIslandSmtcCtypes.csproj` | NativeAOT class library project |
-| `smtc-ctypes/SmtcExports.cs` | C-style exported functions with STA threading |
+| `smtc-ctypes/SmtcExports.cs` | C-style exported functions (commands + monitoring) |
 | `smtc-ctypes/SmtcJsonContext.cs` | JSON source generator for NativeAOT serialization |
+
+#### Performance
+
+| Metric | Value |
+|--------|-------|
+| Command latency (FFI) | ~1-5ms (direct DLL call, no process spawn) |
+| Command latency (EXE CLI) | ~50-200ms (process startup overhead) |
+| Session detection | Event-driven (WinRT `SessionsChanged` callback) |
+| Timeline updates | Event-driven (`TimelinePropertiesChanged`, 200ms throttle) |
+| Memory | Single DLL loaded once; ~5MB resident |
 
 #### Testing
 

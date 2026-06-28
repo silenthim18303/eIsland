@@ -169,8 +169,9 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 |---------|--------|-------------|
 | `npm run build` | `dotnet build src/eIslandSmtcHelper.csproj -c Release` | Build the .NET console exe |
 | `npm run build:ctypes` | `dotnet publish smtc-ctypes/eIslandSmtcCtypes.csproj -c Release -r win-x64` | Build the NativeAOT DLL for ctypes |
+| `npm run build:all` | `npm run build && npm run build:ctypes` | Build both exe and DLL |
 | `npm run clean` | `dotnet clean src/... + dotnet clean smtc-ctypes/...` | Remove all build artifacts |
-| `npm run rebuild` | `dotnet clean + dotnet build -c Release` | Full clean build (exe only) |
+| `npm run rebuild` | `npm run clean && npm run build:all` | Full clean build (exe + DLL) |
 
 ### Test
 
@@ -193,6 +194,8 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | `npm run smoke:next` | `node --experimental-strip-types test/smtc-helper.next.smoke.ts` | Next smoke — `getStatus()` → `next()` → `getStatus()` |
 | `npm run smoke:previous` | `node --experimental-strip-types test/smtc-helper.previous.smoke.ts` | Previous smoke — `getStatus()` → `previous()` → `getStatus()` |
 | `npm run smoke:status` | `node --experimental-strip-types test/smtc-helper.status.smoke.ts` | Status-only smoke — `getStatus()` with formatted output |
+| `npm run smoke:seek` | `node --experimental-strip-types test/smtc-helper.seek.smoke.ts` | Seek + extended controls — seek, stop, shuffle, repeat, rate |
+| `npm run smoke:monitor` | `node --experimental-strip-types test/smtc-helper.monitor.smoke.ts` | Monitor smoke — event-driven session tracking for 8s |
 
 ---
 
@@ -208,6 +211,7 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | Toast Listener | `cd plugins/eisland-windows-toast-listener && npm run build` |
 | SMTC Helper (exe) | `cd plugins/eisland-windows-smtc-helper && npm run build` |
 | SMTC Helper (DLL) | `cd plugins/eisland-windows-smtc-helper && npm run build:ctypes` |
+| SMTC Helper (all) | `cd plugins/eisland-windows-smtc-helper && npm run build:all` |
 | **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
@@ -228,4 +232,4 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | Performance Monitor | `npm run smoke` · `npm run smoke:polling` |
 | Processes Attacker | _(no smoke)_ |
 | Toast Listener | `npm run smoke` · `npm run smoke:polling` · `npm run smoke:event` · `npm run smoke:suppression` |
-| SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` |
+| SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` · `npm run smoke:seek` · `npm run smoke:monitor` |
