@@ -20,38 +20,14 @@
 
 /**
  * @file smtcWorker.ts
- * @description SMTC 媒体监听 Worker 线程，运行 SMTCMonitor 并将会话变更推送至主进程
+ * @description SMTC 媒体监听 Worker 线程，运行 SmtcMonitor 并将会话变更推送至主进程
  * @author 鸡哥
  */
 
 import { parentPort } from 'worker_threads';
-import { SMTCMonitor } from '@coooookies/windows-smtc-monitor';
+import { SmtcMonitor, type MediaProps, type PlaybackInfo, type TimelineProps } from '@eisland/windows-smtc-helper';
 
 if (!parentPort) throw new Error('smtcWorker must be run as a Worker thread');
-
-/** 媒体属性 */
-interface MediaProps {
-  title: string;
-  artist: string;
-  albumTitle: string;
-  albumArtist: string;
-  genres: string[];
-  albumTrackCount: number;
-  trackNumber: number;
-  thumbnail: Buffer | null;
-}
-
-/** 播放状态属性 */
-interface PlaybackInfo {
-  playbackStatus: number;
-  playbackType: number;
-}
-
-/** 时间线属性（秒） */
-interface TimelineProps {
-  position: number;
-  duration: number;
-}
 
 /** Worker 本地会话缓存条目 */
 interface CacheEntry {
@@ -60,27 +36,8 @@ interface CacheEntry {
   timeline: TimelineProps | null;
 }
 
-/** SMTCMonitor.getMediaSessions() 返回的单条会话结构 */
-interface RawSession {
-  sourceAppId: string;
-  media: MediaProps;
-  playback: PlaybackInfo;
-  timeline: TimelineProps;
-}
-
 /** 会话本地缓存（以 sourceAppId 为键） */
 const sessionCache = new Map<string, CacheEntry>();
-
-/**
- * 将缩略图 Buffer 转换为 base64 data URL
- * @param buf - 原始图片 Buffer（BMP 或 PNG）
- * @returns data URL 字符串，或 null
- */
-function thumbnailToDataUrl(buf: Buffer | null | undefined): string | null {
-  if (!buf || buf.length === 0) return null;
-  const mime = (buf[0] === 0x42 && buf[1] === 0x4d) ? 'image/bmp' : 'image/png';
-  return `data:${mime};base64,${buf.toString('base64')}`;
-}
 
 /**
  * 序列化当前缓存中的会话并通过 parentPort 推送给主进程
@@ -99,7 +56,7 @@ function postSessionUpdate(sourceAppId: string): void {
         title: media.title,
         artist: media.artist,
         albumTitle: media.albumTitle,
-        thumbnail: thumbnailToDataUrl(media.thumbnail),
+        thumbnail: media.thumbnail,
       } : null,
       playback,
       timeline,
@@ -107,88 +64,78 @@ function postSessionUpdate(sourceAppId: string): void {
   });
 }
 
-const smtc = new SMTCMonitor();
-const smtcAny = smtc as unknown as {
-  on(event: string, listener: (...args: unknown[]) => void): void;
-};
+const smtc = new SmtcMonitor();
 
-smtcAny.on('session-added', (sourceAppId: unknown, mediaProps: unknown) => {
-  const appId = sourceAppId as string;
-  const props = mediaProps as MediaProps;
-  const entry: CacheEntry = { media: props, playback: null, timeline: null };
+smtc.on('session-added', (sourceAppId: string, mediaProps: MediaProps) => {
+  const entry: CacheEntry = { media: mediaProps, playback: null, timeline: null };
 
   /**
    * 刷新 playback / timeline，避免自动连播时缓存的播放状态过期（fix #41）
    * @docs https://github.com/JNTMTMTM/eIsland/issues/41
    */
   try {
-    const sessions = SMTCMonitor.getMediaSessions() as RawSession[];
-    const fresh = sessions.find((s) => s.sourceAppId === appId);
+    const sessions = smtc.getMediaSessions();
+    const fresh = sessions.find((s) => s.sourceAppId === sourceAppId);
     if (fresh) {
       entry.playback = fresh.playback;
       entry.timeline = fresh.timeline;
     }
   } catch { /* 忽略 */ }
-  sessionCache.set(appId, entry);
-  postSessionUpdate(appId);
+  sessionCache.set(sourceAppId, entry);
+  postSessionUpdate(sourceAppId);
 });
 
-smtcAny.on('session-removed', (sourceAppId: unknown) => {
-  const appId = sourceAppId as string;
-  sessionCache.delete(appId);
-  parentPort!.postMessage({ type: 'session-removed', sourceAppId: appId });
+smtc.on('session-removed', (sourceAppId: string) => {
+  sessionCache.delete(sourceAppId);
+  parentPort!.postMessage({ type: 'session-removed', sourceAppId });
 });
 
-smtcAny.on('session-media-changed', (sourceAppId: unknown, mediaProps: unknown) => {
-  const appId = sourceAppId as string;
-  const existing = sessionCache.get(appId) ?? { media: null, playback: null, timeline: null };
-  const updated: CacheEntry = { ...existing, media: mediaProps as MediaProps };
+smtc.on('session-media-changed', (sourceAppId: string, mediaProps: MediaProps) => {
+  const existing = sessionCache.get(sourceAppId) ?? { media: null, playback: null, timeline: null };
+  const updated: CacheEntry = { ...existing, media: mediaProps };
 
   /**
    * 刷新 playback / timeline，避免自动连播时缓存的播放状态过期（fix #41）
    * @docs https://github.com/JNTMTMTM/eIsland/issues/41
    */
   try {
-    const sessions = SMTCMonitor.getMediaSessions() as RawSession[];
-    const fresh = sessions.find((s) => s.sourceAppId === appId);
+    const sessions = smtc.getMediaSessions();
+    const fresh = sessions.find((s) => s.sourceAppId === sourceAppId);
     if (fresh) {
       updated.playback = fresh.playback;
       updated.timeline = fresh.timeline;
     }
   } catch { /* 忽略 */ }
-  sessionCache.set(appId, updated);
-  postSessionUpdate(appId);
+  sessionCache.set(sourceAppId, updated);
+  postSessionUpdate(sourceAppId);
 });
 
-smtcAny.on('session-playback-changed', (sourceAppId: unknown, playbackInfo: unknown) => {
-  const appId = sourceAppId as string;
-  const existing = sessionCache.get(appId) ?? { media: null, playback: null, timeline: null };
-  sessionCache.set(appId, { ...existing, playback: playbackInfo as PlaybackInfo });
-  postSessionUpdate(appId);
+smtc.on('session-playback-changed', (sourceAppId: string, playbackInfo: PlaybackInfo) => {
+  const existing = sessionCache.get(sourceAppId) ?? { media: null, playback: null, timeline: null };
+  sessionCache.set(sourceAppId, { ...existing, playback: playbackInfo });
+  postSessionUpdate(sourceAppId);
 });
 
-smtcAny.on('session-timeline-changed', (sourceAppId: unknown, timelineProps: unknown) => {
-  const appId = sourceAppId as string;
-  const existing = sessionCache.get(appId) ?? { media: null, playback: null, timeline: null };
-  sessionCache.set(appId, { ...existing, timeline: timelineProps as TimelineProps });
-  postSessionUpdate(appId);
+smtc.on('session-timeline-changed', (sourceAppId: string, timelineProps: TimelineProps) => {
+  const existing = sessionCache.get(sourceAppId) ?? { media: null, playback: null, timeline: null };
+  sessionCache.set(sourceAppId, { ...existing, timeline: timelineProps });
+  postSessionUpdate(sourceAppId);
 });
 
 /** 接收主进程请求：主动查询当前所有 SMTC 会话（用于播放源检测按钮） */
 parentPort.on('message', (msg: { type: string }) => {
   if (msg.type === 'detect-sources') {
     try {
-      const sessions = SMTCMonitor.getMediaSessions() as RawSession[];
+      const sessions = smtc.getMediaSessions();
       parentPort!.postMessage({
         type: 'detect-sources-result',
         sources: sessions.map((s) => {
           const cached = sessionCache.get(s.sourceAppId);
-          const thumb = cached?.media?.thumbnail ?? s.media?.thumbnail ?? null;
           return {
             sourceAppId: s.sourceAppId,
             isPlaying: (s.playback?.playbackStatus ?? 0) === 4,
             hasTitle: Boolean(s.media?.title),
-            thumbnail: thumbnailToDataUrl(thumb),
+            thumbnail: cached?.media?.thumbnail ?? s.media?.thumbnail ?? null,
           };
         }),
       });
@@ -198,9 +145,12 @@ parentPort.on('message', (msg: { type: string }) => {
   }
 });
 
+/** 初始化：启动监控 */
+smtc.start();
+
 /** 初始化：读取当前已存在的会话并推送快照 */
 try {
-  const initialSessions = SMTCMonitor.getMediaSessions() as RawSession[];
+  const initialSessions = smtc.getMediaSessions();
   initialSessions.forEach((s) => {
     sessionCache.set(s.sourceAppId, {
       media: s.media,
@@ -212,3 +162,8 @@ try {
 } catch {
   // 初始化读取失败时忽略，依赖后续事件驱动更新
 }
+
+/** 进程退出时清理 */
+process.on('exit', () => {
+  smtc.stop();
+});

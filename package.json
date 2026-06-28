@@ -23,7 +23,6 @@
     "i18n:check": "node --experimental-strip-types scripts/check-i18n-completeness.ts"
   },
   "dependencies": {
-    "@coooookies/windows-smtc-monitor": "^1.0.12",
     "@eisland/windows-fullscreen-detector": "file:plugins/windows-fullscreen-detector",
     "@eisland/windows-performance-monitor": "file:plugins/windows-performance-monitor",
     "@eisland/windows-smtc-helper": "file:plugins/eisland-windows-smtc-helper",
