@@ -43,27 +43,16 @@ const emptyMediaStatus = Object.freeze({
   controls: null,
 });
 
-const statusMap = {
-  0: 'closed',
-  1: 'opened',
-  2: 'changing',
-  3: 'stopped',
-  4: 'playing',
-  5: 'paused',
-};
-
 /**
- * 将 DLL 返回的 MediaStatus 数值枚举转为字符串
+ * 将 DLL 返回的 MediaStatus 标准化
+ * 注意：getStatus 的 DLL 返回 playbackStatus 已是字符串（如 "playing"/"paused"）
  * @param {object} raw
  * @returns {object}
  */
 function normalizeMediaStatus(raw) {
   if (!raw || typeof raw.isAvailable !== 'boolean') return emptyMediaStatus;
   if (!raw.isAvailable) return emptyMediaStatus;
-  return {
-    ...raw,
-    playbackStatus: statusMap[raw.playbackStatus] || 'unknown',
-  };
+  return raw;
 }
 
 // ── 原有命令（通过 FFI 调用，无进程启动开销） ─────────────────

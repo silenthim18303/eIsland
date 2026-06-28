@@ -202,14 +202,6 @@ public static class SmtcExports
         }
     }
 
-    /// <summary>调试：返回会话数量</summary>
-    [UnmanagedCallersOnly(EntryPoint = "smtc_debug_session_count")]
-    public static int DebugSessionCount()
-    {
-        try { return SmtcSessionMonitor.GetSessionCount(); }
-        catch { return -1; }
-    }
-
     /// <summary>获取指定会话 JSON。sourceAppId 为 UTF-8 C 字符串</summary>
     [UnmanagedCallersOnly(EntryPoint = "smtc_get_session")]
     public static IntPtr GetSession(IntPtr sourceAppIdPtr)

@@ -82,9 +82,6 @@ const smtc = {
   smtc_set_shuffle:        lib.func('int smtc_set_shuffle(int)'),
   smtc_set_repeat_mode:    lib.func('int smtc_set_repeat_mode(int)'),
   smtc_set_playback_rate:  lib.func('int smtc_set_playback_rate(double)'),
-
-  // ── 调试 ──
-  smtc_debug_session_count: lib.func('int smtc_debug_session_count()'),
 };
 
 /**

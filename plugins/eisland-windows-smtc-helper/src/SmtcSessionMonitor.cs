@@ -155,9 +155,6 @@ public static class SmtcSessionMonitor
     /// </summary>
     public static int GetChangeCounter() => _changeCounter;
 
-    /// <summary>调试：返回当前会话数量</summary>
-    public static int GetSessionCount() => _sessions.Count;
-
     /// <summary>
     /// 获取所有会话快照的 JSON 字符串
     /// </summary>
@@ -211,20 +208,10 @@ public static class SmtcSessionMonitor
             RegisterManagerCallbacks();
             InitExistingSessions();
 
-            var lastTimelinePoll = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
             while (_monitoring)
             {
                 if (WaitForSingleObject(_stopEvent, 0) == WAIT_OBJECT_0) break;
                 Thread.Sleep(200);
-
-                // 轮询时间线变化（TimelineChanged 事件在 NativeAOT 下不可用）
-                var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                if (now - lastTimelinePoll >= TimelineThrottleMs)
-                {
-                    lastTimelinePoll = now;
-                    if (PollTimelineChanges()) SignalChange();
-                }
             }
         }
         catch (Exception ex)
@@ -278,49 +265,6 @@ public static class SmtcSessionMonitor
             if (_sessions.Count > 0) SignalChange();
         }
         catch { /* 忽略初始化错误 */ }
-    }
-
-    #endregion
-
-    #region 时间线轮询
-
-    /// <summary>
-    /// 轮询所有会话的时间线变化，返回是否有变化
-    /// </summary>
-    private static bool PollTimelineChanges()
-    {
-        if (_manager == null) return false;
-        bool changed = false;
-        try
-        {
-            foreach (var session in _manager.GetSessions())
-            {
-                var id = session.SourceAppUserModelId;
-                if (string.IsNullOrEmpty(id)) continue;
-
-                var newTimeline = BuildTimelineInfo(session);
-                if (_sessions.TryGetValue(id, out var existing))
-                {
-                    var oldTimeline = existing.Timeline;
-                    if (oldTimeline == null && newTimeline == null) continue;
-                    if (oldTimeline != null && newTimeline != null
-                        && Math.Abs(oldTimeline.Position - newTimeline.Position) < 0.5
-                        && Math.Abs(oldTimeline.Duration - newTimeline.Duration) < 0.5)
-                        continue;
-
-                    _sessions[id] = new SessionInfo
-                    {
-                        SourceAppId = id,
-                        Media = existing.Media,
-                        Playback = existing.Playback,
-                        Timeline = newTimeline,
-                    };
-                    changed = true;
-                }
-            }
-        }
-        catch { /* 忽略 */ }
-        return changed;
     }
 
     #endregion
@@ -380,6 +324,22 @@ public static class SmtcSessionMonitor
         {
             try
             {
+                var info = BuildSessionInfo(session);
+                _sessions[id] = info;
+                SignalChange();
+            }
+            catch { /* 忽略 */ }
+        };
+
+        session.TimelinePropertiesChanged += (_, _) =>
+        {
+            try
+            {
+                var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                var last = _lastTimelineSignal.GetOrAdd(id, 0);
+                if (now - last < TimelineThrottleMs) return;
+                _lastTimelineSignal[id] = now;
+
                 var info = BuildSessionInfo(session);
                 _sessions[id] = info;
                 SignalChange();
