@@ -1061,13 +1061,27 @@ Provides control over Windows System Media Transport Controls (SMTC) — the sta
 │  .NET 10 + Windows.Media.Control                            │
 ├─────────────────────────────────────────────────────────────┤
 │  SmtcController.cs                                          │
-│  GlobalSystemMediaTransportControlsSessionManager            │
+│  GlobalSystemMediaTransportControlsSessionManager           │
 │  → GetCurrentSession() → TryPlayAsync / TryPauseAsync / ... │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│  eIslandSmtcCtypes.dll (NativeAOT)                          │
+│  Python ctypes / C / FFI / any language                     │
+├─────────────────────────────────────────────────────────────┤
+│  SmtcExports.cs                                             │
+│  UnmanagedCallersOnly → smtc_play / smtc_pause / ...        │
+│  SmtcJsonContext.cs (source-generated JSON serialization)    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 :::info
-Unlike other plugins that use C + N-API, the SMTC Helper is a **pure C# .NET console application** invoked via `spawnSync`. No native addon or `binding.gyp` is needed — the `GlobalSystemMediaTransportControlsSessionManager` API is only available through WinRT projections in .NET.
+Unlike other plugins that use C + N-API, the SMTC Helper is a **pure C# .NET application** with two output targets:
+
+1. **`eIslandSmtcHelper.exe`** — Console app invoked via `spawnSync` from Node.js
+2. **`eIslandSmtcCtypes.dll`** — NativeAOT DLL with C-style exported functions for Python ctypes / C / FFI
+
+Both share the same core logic (`SmtcController.cs`, `Snapshots.cs`).
 :::
 
 ### Exported Functions
@@ -1286,4 +1300,115 @@ The SMTC helper targets `net10.0-windows10.0.19041.0` to access WinRT APIs. This
     "isChannelDownEnabled": false
   }
 }
+```
+
+### ctypes DLL (NativeAOT)
+
+The plugin also ships a **NativeAOT-compiled DLL** (`eIslandSmtcCtypes.dll`) that exports C-style functions for use from Python, C, or any language with FFI support.
+
+#### Build
+
+```bash
+cd plugins/eisland-windows-smtc-helper
+npm run build:ctypes    # dotnet publish smtc-ctypes/eIslandSmtcCtypes.csproj -c Release -r win-x64
+```
+
+Output: `smtc-ctypes/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish/eIslandSmtcCtypes.dll`
+
+:::warning
+Building the NativeAOT DLL requires `vswhere.exe` in PATH. If the build fails with `'vswhere.exe' is not recognized`, add it:
+```bash
+export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
+```
+:::
+
+#### Exported C Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `smtc_play` | `() → int` | Play. Returns 0=success, 1=failure |
+| `smtc_pause` | `() → int` | Pause. Returns 0=success, 1=failure |
+| `smtc_next` | `() → int` | Next track. Returns 0=success, 1=failure |
+| `smtc_previous` | `() → int` | Previous track. Returns 0=success, 1=failure |
+| `smtc_get_status` | `() → char*` | Get status JSON. Returns NULL on failure |
+| `smtc_free_string` | `(char*) → void` | Free a string returned by `smtc_get_status` |
+| `smtc_get_last_error` | `() → char*` | Get last error message |
+
+:::danger
+You **must** call `smtc_free_string()` on any pointer returned by `smtc_get_status()` or `smtc_get_last_error()` to avoid memory leaks.
+:::
+
+#### Python Usage
+
+```python
+import ctypes, json
+
+dll = ctypes.CDLL("./eIslandSmtcCtypes.dll")
+
+dll.smtc_get_status.restype = ctypes.c_void_p
+dll.smtc_free_string.argtypes = [ctypes.c_void_p]
+
+ptr = dll.smtc_get_status()
+if ptr:
+    status = json.loads(ctypes.string_at(ptr).decode("utf-8"))
+    dll.smtc_free_string(ptr)
+    print(status["title"], status["artist"])
+
+dll.smtc_play()    # Returns 0 on success
+dll.smtc_pause()   # Returns 0 on success
+```
+
+#### NativeAOT Implementation Notes
+
+The NativeAOT DLL has two key implementation details:
+
+**1. STA Thread for WinRT**
+
+WinRT async APIs require COM STA initialization. Each exported function spawns a dedicated STA thread:
+
+```csharp
+private static T RunOnSTAThread<T>(Func<Task<T>> asyncFunc)
+{
+    T result = default!;
+    Exception? ex = null;
+    var thread = new Thread(() =>
+    {
+        CoInitializeEx(IntPtr.Zero, COINIT_APARTMENTTHREADED);
+        result = asyncFunc().GetAwaiter().GetResult();
+    });
+    thread.SetApartmentState(ApartmentState.STA);
+    thread.Start();
+    thread.Join();
+    if (ex != null) throw ex;
+    return result;
+}
+```
+
+**2. JSON Source Generation**
+
+NativeAOT disables reflection-based serialization. A source generator context provides compile-time JSON serialization:
+
+```csharp
+[JsonSerializable(typeof(MediaStatus))]
+[JsonSerializable(typeof(CommandResult))]
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+internal partial class SmtcJsonContext : JsonSerializerContext { }
+```
+
+#### Source Files (ctypes)
+
+| File | Responsibility |
+|------|---------------|
+| `smtc-ctypes/eIslandSmtcCtypes.csproj` | NativeAOT class library project |
+| `smtc-ctypes/SmtcExports.cs` | C-style exported functions with STA threading |
+| `smtc-ctypes/SmtcJsonContext.cs` | JSON source generator for NativeAOT serialization |
+
+#### Testing
+
+```bash
+# Build the DLL first
+npm run build:ctypes
+
+# Run Python test
+npm run test:ctypes    # python test/smtc_ctypes_test.py
 ```

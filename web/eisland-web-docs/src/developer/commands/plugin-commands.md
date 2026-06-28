@@ -157,19 +157,20 @@ This plugin has no automated tests or smoke scripts. Test manually by running th
 
 ## Windows SMTC Helper
 
-**Directory:** `plugins/eisland-windows-smtc-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build`
+**Directory:** `plugins/eisland-windows-smtc-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build` / `dotnet publish`
 
 :::info
-This is a pure .NET plugin — no native addon or `node-gyp`. Uses `Windows.Media.Control` WinRT APIs.
+This is a pure .NET plugin with two build targets: a console exe (for Node.js) and a NativeAOT DLL (for Python ctypes / FFI).
 :::
 
 ### Build
 
 | Command | Script | Description |
 |---------|--------|-------------|
-| `npm run build` | `dotnet build src/eIslandSmtcHelper.csproj -c Release` | Build the .NET helper |
-| `npm run clean` | `dotnet clean src/eIslandSmtcHelper.csproj` | Remove `src/bin/` and `src/obj/` |
-| `npm run rebuild` | `dotnet clean + dotnet build -c Release` | Full clean build |
+| `npm run build` | `dotnet build src/eIslandSmtcHelper.csproj -c Release` | Build the .NET console exe |
+| `npm run build:ctypes` | `dotnet publish smtc-ctypes/eIslandSmtcCtypes.csproj -c Release -r win-x64` | Build the NativeAOT DLL for ctypes |
+| `npm run clean` | `dotnet clean src/... + dotnet clean smtc-ctypes/...` | Remove all build artifacts |
+| `npm run rebuild` | `dotnet clean + dotnet build -c Release` | Full clean build (exe only) |
 
 ### Test
 
@@ -180,6 +181,7 @@ This is a pure .NET plugin — no native addon or `node-gyp`. Uses `Windows.Medi
 | `npm run test:pause` | `vitest run test/smtc-helper.pause.test.ts` | Pause command tests only |
 | `npm run test:next` | `vitest run test/smtc-helper.next.test.ts` | Next command tests only |
 | `npm run test:previous` | `vitest run test/smtc-helper.previous.test.ts` | Previous command tests only |
+| `npm run test:ctypes` | `python test/smtc_ctypes_test.py` | Python ctypes test (requires `build:ctypes` first) |
 
 ### Smoke
 
@@ -204,7 +206,8 @@ This is a pure .NET plugin — no native addon or `node-gyp`. Uses `Windows.Medi
 | Performance Monitor | `cd plugins/windows-performance-monitor && npm run build` |
 | Processes Attacker | `cd plugins/eisland-windows-processes-attacker && npm run build` |
 | Toast Listener | `cd plugins/eisland-windows-toast-listener && npm run build` |
-| SMTC Helper | `cd plugins/eisland-windows-smtc-helper && npm run build` |
+| SMTC Helper (exe) | `cd plugins/eisland-windows-smtc-helper && npm run build` |
+| SMTC Helper (DLL) | `cd plugins/eisland-windows-smtc-helper && npm run build:ctypes` |
 | **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
@@ -215,7 +218,7 @@ This is a pure .NET plugin — no native addon or `node-gyp`. Uses `Windows.Medi
 | Performance Monitor | `npm test` |
 | Processes Attacker | _(no tests)_ |
 | Toast Listener | `npm test` · `npm run test:polling` |
-| SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` |
+| SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` · `npm run test:ctypes` |
 
 ### All Smoke Commands
 

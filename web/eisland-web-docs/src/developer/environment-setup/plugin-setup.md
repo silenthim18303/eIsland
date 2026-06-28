@@ -33,6 +33,7 @@ All plugins are compiled using **node-gyp**, which requires Visual Studio Build 
 | **npm** | >= 10.x | Package manager |
 | **Visual Studio Build Tools 2022** | Latest | C/C++ compiler toolchain |
 | **.NET 10 SDK** | >= 10.0 | Build temperature-helper (.NET component) |
+| **Python** | >= 3.10 | SMTC ctypes DLL testing |
 | **Git** | Latest | Version control |
 
 :::warning
@@ -177,22 +178,27 @@ windows-performance-monitor/
 2. **dotnet build** compiles the .NET console application using .NET 10 SDK
 3. At runtime, the C plugin calls the .NET executable to read temperature data
 
-The SMTC helper is a pure .NET application:
+The SMTC helper is a pure .NET application with two build targets:
 
 ```
 eisland-windows-smtc-helper/
 ├── package.json
 ├── index.js               # JS entry point, spawns .NET helper
 ├── index.d.ts             # TypeScript type declarations
-└── src/
-    └── eIslandSmtcHelper.csproj   # .NET console app
+├── src/
+│   └── eIslandSmtcHelper.csproj   # .NET console app (for Node.js)
+│       └── TargetFramework: net10.0-windows10.0.19041.0
+│       └── Uses: Windows.Media.Control (WinRT)
+└── smtc-ctypes/
+    └── eIslandSmtcCtypes.csproj   # NativeAOT DLL (for Python ctypes / FFI)
         └── TargetFramework: net10.0-windows10.0.19041.0
-        └── Uses: Windows.Media.Control (WinRT)
+        └── PublishAot: true
 ```
 
 1. **dotnet build** compiles the .NET console application using .NET 10 SDK + Windows SDK
-2. At runtime, `index.js` spawns the .NET executable via `spawnSync` with CLI arguments
-3. The .NET app outputs JSON to stdout and exits
+2. **dotnet publish** compiles the NativeAOT DLL (requires `vswhere.exe` in PATH)
+3. At runtime, `index.js` spawns the .NET executable via `spawnSync` with CLI arguments
+4. The .NET app outputs JSON to stdout and exits
 :::
 
 ### Installation Summary
@@ -553,19 +559,22 @@ node -v  # Should be v22+ (v25 recommended)
 # 2. Check .NET SDK
 dotnet --version  # Should be 10.x.x or later
 
-# 3. Verify MSVC compiler is available
+# 3. Check Python version
+python --version  # Should be 3.10+
+
+# 4. Verify MSVC compiler is available
 # Open "x64 Native Tools Command Prompt for VS 2022" and run:
 cl  # Should print Microsoft (R) C/C++ Optimizing Compiler version info
 
-# 4. Build the SDK
+# 5. Build the SDK
 cd sdk
 npm run build
 
-# 5. Build a plugin
+# 6. Build a plugin
 cd ../plugins/windows-fullscreen-detector
 npm run build
 
-# 6. Run tests
+# 7. Run tests
 npm run test
 ```
 
