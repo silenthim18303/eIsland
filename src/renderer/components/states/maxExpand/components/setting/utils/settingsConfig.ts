@@ -34,6 +34,9 @@ export const LYRICS_SOURCE_OPTIONS = [
   { value: 'qqmusic-only', label: '仅 QQ音乐' },
   { value: 'kugou-only', label: '仅酷狗' },
   { value: 'sodamusic-only', label: '仅汽水音乐' },
+  { value: 'applemusic-only', label: '仅 Apple Music' },
+  { value: 'spotify-only', label: '仅 Spotify' },
+  { value: 'moekoe-only', label: '仅 MoeKoe' },
   { value: 'lrclib-only', label: '仅 LRCLIB' },
 ];
 

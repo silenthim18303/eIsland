@@ -83,6 +83,9 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
     'qqmusic-only': 'settings.music.lyrics.sourceOptions.qqmusicOnly',
     'kugou-only': 'settings.music.lyrics.sourceOptions.kugouOnly',
     'sodamusic-only': 'settings.music.lyrics.sourceOptions.sodamusicOnly',
+    'applemusic-only': 'settings.music.lyrics.sourceOptions.applemusicOnly',
+    'spotify-only': 'settings.music.lyrics.sourceOptions.spotifyOnly',
+    'moekoe-only': 'settings.music.lyrics.sourceOptions.moekoeOnly',
     'lrclib-only': 'settings.music.lyrics.sourceOptions.lrclibOnly',
   };
   const {
