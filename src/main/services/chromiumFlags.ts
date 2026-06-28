@@ -42,7 +42,7 @@ export function applyChromiumPerformanceFlags(app: App): void {
   app.commandLine.appendSwitch('disable-default-apps');
   app.commandLine.appendSwitch('disable-client-side-phishing-detection');
   app.commandLine.appendSwitch('enable-gpu-rasterization');
-  app.commandLine.appendSwitch('disable-frame-rate-limit');
+  // app.commandLine.appendSwitch('disable-frame-rate-limit');
 
   app.commandLine.appendSwitch(
     'disable-features',
