@@ -11,13 +11,14 @@ This document provides an overview of the native Node.js addon plugins used in t
 
 ## Overview
 
-The eIsland plugin system consists of three native addons that provide low-level Windows system capabilities unavailable through standard Node.js APIs:
+The eIsland plugin system consists of four native addons that provide low-level Windows system capabilities unavailable through standard Node.js APIs:
 
 | Plugin | Package | Purpose |
 |--------|---------|---------|
 | **Processes Attacker** | `@eisland/windows-processes-attacker` | Terminate processes by name or PID |
 | **Fullscreen Detector** | `@eisland/windows-fullscreen-detector` | Detect foreground fullscreen windows |
 | **Performance Monitor** | `@eisland/windows-performance-monitor` | CPU, memory, and temperature snapshots |
+| **SMTC Helper** | `@eisland/windows-smtc-helper` | System Media Transport Controls (play, pause, next, previous, status) |
 
 **Common Characteristics:**
 
@@ -964,6 +965,7 @@ expect(foreground === null || typeof foreground === 'object').toBe(true);
 | **Processes Attacker** | _(manual testing)_ | — |
 | **Fullscreen Detector** | `fullscreen-detector.test.ts`, `fullscreen-detector.polling.test.ts` | Shape validation, export verification |
 | **Performance Monitor** | `performance-monitor.test.ts` | Shape validation, range checks |
+| **SMTC Helper** | `smtc-helper.test.ts`, `smtc-helper.play.test.ts`, `smtc-helper.pause.test.ts`, `smtc-helper.next.test.ts`, `smtc-helper.previous.test.ts` | Shape validation, export verification, command tests |
 
 ## Integration with Electron
 
@@ -1021,13 +1023,267 @@ Performance characteristics and optimization recommendations for each plugin:
 | **Performance Monitor (CPU)** | <0.1ms | `GetSystemTimes` is a single kernel call |
 | **Performance Monitor (Memory)** | <0.1ms | `GlobalMemoryStatusEx` is a single kernel call |
 | **Performance Monitor (Temperature)** | ~500–2000ms | Spawns a .NET process; includes process startup + WMI queries |
+| **SMTC Helper** | ~50–200ms | Spawns a .NET process; WinRT session manager + media property reads |
 
 **Optimization Notes:**
 
 - CPU and memory snapshots are nearly zero-cost — suitable for polling at 1-second intervals
 - Temperature queries are expensive due to the .NET helper process — recommended at 5–10 second intervals
 - The fullscreen detector avoids COM/WMI — pure Win32 window API calls
+- SMTC queries spawn a .NET process; recommended polling interval is 1–2 seconds for status updates
 
 :::warning
 Temperature queries involve .NET process startup and WMI queries, resulting in high latency (500–2000ms). Recommended polling interval is 5–10 seconds to avoid frequent calls impacting performance.
 :::
+
+## Plugin: Windows SMTC Helper
+
+### Package
+
+```
+@eisland/windows-smtc-helper
+```
+
+### Purpose
+
+Provides control over Windows System Media Transport Controls (SMTC) — the standard media playback interface that appears in the Windows notification center and on the lock screen. Used by eIsland to display and control currently playing media from any source (Spotify, QQ Music, Chrome, etc.).
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  JavaScript Layer (index.js)                                │
+│  play() / pause() / next() / previous() / getStatus()       │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ spawnSync (JSON-over-stdout)
+┌──────────────────────────▼──────────────────────────────────┐
+│  eIslandSmtcHelper.exe                                      │
+│  .NET 10 + Windows.Media.Control                            │
+├─────────────────────────────────────────────────────────────┤
+│  SmtcController.cs                                          │
+│  GlobalSystemMediaTransportControlsSessionManager            │
+│  → GetCurrentSession() → TryPlayAsync / TryPauseAsync / ... │
+└─────────────────────────────────────────────────────────────┘
+```
+
+:::info
+Unlike other plugins that use C + N-API, the SMTC Helper is a **pure C# .NET console application** invoked via `spawnSync`. No native addon or `binding.gyp` is needed — the `GlobalSystemMediaTransportControlsSessionManager` API is only available through WinRT projections in .NET.
+:::
+
+### Exported Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `play` | `() → CommandResult` | Resume playback of the current media session |
+| `pause` | `() → CommandResult` | Pause the current media session |
+| `next` | `() → CommandResult` | Skip to the next track |
+| `previous` | `() → CommandResult` | Skip to the previous track |
+| `getStatus` | `() → MediaStatus` | Get the full snapshot of the current media session |
+
+### MediaStatus
+
+```ts
+interface MediaStatus {
+  isAvailable: boolean;
+  title: string | null;
+  artist: string | null;
+  albumTitle: string | null;
+  albumArtist: string | null;
+  trackNumber: number | null;
+  genres: string[] | null;
+  playbackStatus: 'playing' | 'paused' | 'stopped' | 'closed' | 'opened' | 'changing' | 'unknown';
+  isShuffleActive: boolean | null;
+  repeatMode: number | null;
+  playbackRate: number | null;
+  sourceAppUserModelId: string | null;
+  thumbnail: string | null;               // data:image/jpeg;base64,...
+  timeline: TimelineProperties | null;
+  controls: PlaybackControls | null;
+}
+
+interface TimelineProperties {
+  startTime: number;       // seconds
+  endTime: number;         // seconds
+  position: number;        // seconds
+  minSeekTime: number;     // seconds
+  maxSeekTime: number;     // seconds
+}
+
+interface PlaybackControls {
+  isPlayEnabled: boolean;
+  isPauseEnabled: boolean;
+  isNextEnabled: boolean;
+  isPreviousEnabled: boolean;
+  isStopEnabled: boolean;
+  isRecordEnabled: boolean;
+  isFastForwardEnabled: boolean;
+  isRewindEnabled: boolean;
+  isChannelUpEnabled: boolean;
+  isChannelDownEnabled: boolean;
+}
+
+interface CommandResult {
+  success: boolean;
+  error: string | null;
+}
+```
+
+### C# Implementation
+
+#### SmtcController
+
+The core controller uses `GlobalSystemMediaTransportControlsSessionManager` to access the active media session:
+
+```csharp
+public static class SmtcController
+{
+    private static async Task<GlobalSystemMediaTransportControlsSession?> GetCurrentSessionAsync()
+    {
+        var manager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
+        return manager.GetCurrentSession();
+    }
+
+    public static async Task<CommandResult> PlayAsync()
+    {
+        var session = await GetCurrentSessionAsync();
+        if (session == null)
+            return CommandResult.Fail("No active media session.");
+
+        var success = await session.TryPlayAsync();
+        return success ? CommandResult.Ok : CommandResult.Fail("Play command was rejected.");
+    }
+
+    // Pause, Next, Previous follow the same pattern...
+}
+```
+
+**Key behaviors:**
+
+- `RequestAsync()` acquires the session manager — requires a UI thread or `CoreApplication` context
+- `GetCurrentSession()` returns `null` if no app is currently playing media
+- `TryPlayAsync()` / `TryPauseAsync()` return `false` if the media source rejects the command
+- `SourceAppUserModelId` identifies the media source (e.g., `"QQMusic.exe"`, `"Spotify.exe"`)
+- Thumbnail is read as a stream, converted to base64, and returned as a `data:image/jpeg;base64,...` data URI
+
+#### Timeline Properties
+
+Timeline data is read from `session.GetTimelineProperties()` and converted to seconds:
+
+```csharp
+var timeline = session.GetTimelineProperties();
+var timelineProperties = new TimelineProperties
+{
+    StartTime = timeline.StartTime.TotalSeconds,
+    EndTime = timeline.EndTime.TotalSeconds,
+    Position = timeline.Position.TotalSeconds,
+    MinSeekTime = timeline.MinSeekTime.TotalSeconds,
+    MaxSeekTime = timeline.MaxSeekTime.TotalSeconds,
+};
+```
+
+:::note
+Some media sources (like QQ Music) report `minSeekTime` and `maxSeekTime` as 0, even though seeking works. This is a limitation of the media source's SMTC implementation, not the plugin.
+:::
+
+#### Playback Controls
+
+The `PlaybackControls` object reports which transport buttons the media source has enabled:
+
+```csharp
+var controls = new PlaybackControls
+{
+    IsPlayEnabled = playbackInfo.Controls.IsPlayEnabled,
+    IsPauseEnabled = playbackInfo.Controls.IsPauseEnabled,
+    IsNextEnabled = playbackInfo.Controls.IsNextEnabled,
+    IsPreviousEnabled = playbackInfo.Controls.IsPreviousEnabled,
+    // ... and so on
+};
+```
+
+### CLI Modes
+
+| Invocation | Mode | Output |
+|------------|------|--------|
+| `eIslandSmtcHelper.exe status` | Status (default) | `MediaStatus` JSON |
+| `eIslandSmtcHelper.exe play` | Play | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe pause` | Pause | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe next` | Next | `CommandResult` JSON |
+| `eIslandSmtcHelper.exe previous` | Previous | `CommandResult` JSON |
+
+### Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `src/Program.cs` | CLI entry point, argument parsing, JSON output |
+| `src/SmtcController.cs` | SMTC session management and command execution |
+| `src/Snapshots.cs` | Data models (`MediaStatus`, `CommandResult`, `TimelineProperties`, `PlaybackControls`) |
+
+### Build
+
+```bash
+cd plugins/eisland-windows-smtc-helper
+npm run build    # Runs: dotnet build src/eIslandSmtcHelper.csproj -c Release
+```
+
+Output: `src/bin/Release/net10.0-windows10.0.19041.0/eIslandSmtcHelper.exe`
+
+:::warning
+The SMTC helper targets `net10.0-windows10.0.19041.0` to access WinRT APIs. This requires the Windows 10 SDK (10.0.19041.0) or later installed alongside the .NET 10 SDK.
+:::
+
+### Dependencies
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+  </PropertyGroup>
+</Project>
+```
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| **.NET** | 10.0 | Runtime |
+| **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.Media.Control` |
+
+### Example Output
+
+**getStatus() with QQ Music playing:**
+
+```json
+{
+  "isAvailable": true,
+  "title": "Chasing Gold and Gloory",
+  "artist": "Gruup24",
+  "albumTitle": "Chasing Gold and Gloory",
+  "albumArtist": "",
+  "trackNumber": 0,
+  "genres": null,
+  "playbackStatus": "playing",
+  "isShuffleActive": null,
+  "repeatMode": null,
+  "playbackRate": null,
+  "sourceAppUserModelId": "QQMusic.exe",
+  "thumbnail": "data:image/jpeg;base64,/9j/4AAQ...",
+  "timeline": {
+    "startTime": 0,
+    "endTime": 229.277,
+    "position": 134.091,
+    "minSeekTime": 0,
+    "maxSeekTime": 0
+  },
+  "controls": {
+    "isPlayEnabled": false,
+    "isPauseEnabled": true,
+    "isNextEnabled": true,
+    "isPreviousEnabled": true,
+    "isStopEnabled": false,
+    "isRecordEnabled": false,
+    "isFastForwardEnabled": false,
+    "isRewindEnabled": false,
+    "isChannelUpEnabled": false,
+    "isChannelDownEnabled": false
+  }
+}
+```

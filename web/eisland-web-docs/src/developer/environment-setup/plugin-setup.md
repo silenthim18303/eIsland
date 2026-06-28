@@ -11,7 +11,7 @@ This guide covers the environment configuration for eIsland plugin development. 
 
 ## Overview
 
-eIsland uses four native plugins to access Windows features that web technologies cannot provide:
+eIsland uses five native plugins to access Windows features that web technologies cannot provide:
 
 | Plugin | Language | Windows Libraries | Purpose |
 |--------|----------|-------------------|---------|
@@ -19,6 +19,7 @@ eIsland uses four native plugins to access Windows features that web technologie
 | **windows-performance-monitor** | C + .NET | — | CPU, memory, and temperature monitoring |
 | **eisland-windows-processes-attacker** | C | kernel32 | Process management |
 | **eisland-windows-toast-listener** | C++ | runtimeobject | Windows notification listener |
+| **eisland-windows-smtc-helper** | C# (.NET) | — | System Media Transport Controls (play, pause, next, previous, status) |
 
 :::important
 All plugins are compiled using **node-gyp**, which requires Visual Studio Build Tools 2022 as the native compiler. The `.npm install` process in the root project automatically triggers these builds.
@@ -149,7 +150,7 @@ vcpkg automatically downloads the source, compiles it with MSVC, and installs he
 
 #### .NET Components
 
-The `windows-performance-monitor` plugin includes a .NET helper application (`eIslandTemperatureReader`) that reads hardware temperature sensors using LibreHardwareMonitorLib.
+The `windows-performance-monitor` plugin includes a .NET helper application (`eIslandTemperatureReader`) that reads hardware temperature sensors using LibreHardwareMonitorLib. The `eisland-windows-smtc-helper` plugin is a pure .NET console application that controls Windows media playback via SMTC APIs.
 
 | Component | ID | Description |
 |-----------|-----|-------------|
@@ -175,6 +176,23 @@ windows-performance-monitor/
 1. **node-gyp** compiles the C source files using MSVC v143
 2. **dotnet build** compiles the .NET console application using .NET 10 SDK
 3. At runtime, the C plugin calls the .NET executable to read temperature data
+
+The SMTC helper is a pure .NET application:
+
+```
+eisland-windows-smtc-helper/
+├── package.json
+├── index.js               # JS entry point, spawns .NET helper
+├── index.d.ts             # TypeScript type declarations
+└── src/
+    └── eIslandSmtcHelper.csproj   # .NET console app
+        └── TargetFramework: net10.0-windows10.0.19041.0
+        └── Uses: Windows.Media.Control (WinRT)
+```
+
+1. **dotnet build** compiles the .NET console application using .NET 10 SDK + Windows SDK
+2. At runtime, `index.js` spawns the .NET executable via `spawnSync` with CLI arguments
+3. The .NET app outputs JSON to stdout and exits
 :::
 
 ### Installation Summary
@@ -206,7 +224,7 @@ Use this checklist in the Visual Studio Build Tools 2022 installer (**Individual
 
 ## .NET 10 SDK
 
-The `temperature-helper` component targets .NET 10.0. Install the .NET 10 SDK separately if not included with the Build Tools installer.
+The `temperature-helper` and `smtc-helper` components target .NET 10.0. Install the .NET 10 SDK separately if not included with the Build Tools installer.
 
 ### Installation
 
@@ -247,6 +265,10 @@ plugin-name/
     ├── *.smoke.ts         # Smoke tests (manual verification)
     └── *.polling.test.ts  # Polling-mode tests (where applicable)
 ```
+
+:::note
+The `eisland-windows-smtc-helper` plugin uses C# instead of C/C++. Its `src/` directory contains `.cs` files and a `.csproj` project file instead of C sources and `binding.gyp`.
+:::
 
 ### binding.gyp Configuration
 
@@ -439,6 +461,26 @@ npm run smoke:polling
 | **Polling tests** | `*.polling.test.ts` | Tests that verify the plugin works correctly in polling (non-event) mode |
 :::
 
+### SMTC Helper Tests
+
+The `eisland-windows-smtc-helper` plugin has per-command test files:
+
+```bash
+cd plugins/eisland-windows-smtc-helper
+
+npm run test                    # All tests
+npm run test:play               # Play command tests
+npm run test:pause              # Pause command tests
+npm run test:next               # Next command tests
+npm run test:previous           # Previous command tests
+npm run smoke                   # Full smoke test
+npm run smoke:play              # Play smoke test
+npm run smoke:pause             # Pause smoke test
+npm run smoke:next              # Next smoke test
+npm run smoke:previous          # Previous smoke test
+npm run smoke:status            # Status-only smoke test
+```
+
 ### Toast Listener Special Tests
 
 The `eisland-windows-toast-listener` plugin has additional test modes:
@@ -580,6 +622,10 @@ dotnet --list-sdks  # Should show 10.x.x
 # Rebuild the temperature helper
 cd plugins/windows-performance-monitor/temperature-helper
 dotnet build
+
+# Or rebuild the SMTC helper
+cd plugins/eisland-windows-smtc-helper
+npm run build
 ```
 
 ### Plugin Loads but Returns undefined
