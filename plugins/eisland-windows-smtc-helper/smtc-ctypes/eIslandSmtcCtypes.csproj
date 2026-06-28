@@ -6,10 +6,12 @@
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
     <RuntimeIdentifiers>win-x64;win-arm64;win-x86</RuntimeIdentifiers>
+    <DefineConstants>$(DefineConstants);NATIVEAOT</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="../src/Snapshots.cs" Link="Snapshots.cs" />
     <Compile Include="../src/SmtcController.cs" Link="SmtcController.cs" />
+    <Compile Include="../src/SmtcSessionMonitor.cs" Link="SmtcSessionMonitor.cs" />
   </ItemGroup>
 </Project>

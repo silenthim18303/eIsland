@@ -19,6 +19,7 @@
  */
 
 using System.Text.Json;
+using Windows.Media;
 using eIslandSmtcHelper;
 
 var command = args.Length > 0 ? args[0].ToLowerInvariant() : "status";
@@ -57,6 +58,51 @@ try
         case "previous":
         {
             var result = await SmtcController.PreviousAsync();
+            Console.WriteLine(JsonSerializer.Serialize(result, options));
+            Environment.Exit(result.Success ? 0 : 1);
+            break;
+        }
+        case "seek":
+        {
+            var pos = args.Length > 1 && double.TryParse(args[1], out var p) ? p : 0;
+            var result = await SmtcController.SeekAsync(pos);
+            Console.WriteLine(JsonSerializer.Serialize(result, options));
+            Environment.Exit(result.Success ? 0 : 1);
+            break;
+        }
+        case "stop":
+        {
+            var result = await SmtcController.StopAsync();
+            Console.WriteLine(JsonSerializer.Serialize(result, options));
+            Environment.Exit(result.Success ? 0 : 1);
+            break;
+        }
+        case "set-shuffle":
+        {
+            var active = args.Length > 1 && args[1] == "1";
+            var result = await SmtcController.SetShuffleAsync(active);
+            Console.WriteLine(JsonSerializer.Serialize(result, options));
+            Environment.Exit(result.Success ? 0 : 1);
+            break;
+        }
+        case "set-repeat-mode":
+        {
+            var mode = args.Length > 1 && int.TryParse(args[1], out var m) ? m : 0;
+            var autoRepeat = mode switch
+            {
+                1 => MediaPlaybackAutoRepeatMode.Track,
+                2 => MediaPlaybackAutoRepeatMode.List,
+                _ => MediaPlaybackAutoRepeatMode.None,
+            };
+            var result = await SmtcController.SetRepeatModeAsync(autoRepeat);
+            Console.WriteLine(JsonSerializer.Serialize(result, options));
+            Environment.Exit(result.Success ? 0 : 1);
+            break;
+        }
+        case "set-playback-rate":
+        {
+            var rate = args.Length > 1 && double.TryParse(args[1], out var r) ? r : 1.0;
+            var result = await SmtcController.SetPlaybackRateAsync(rate);
             Console.WriteLine(JsonSerializer.Serialize(result, options));
             Environment.Exit(result.Success ? 0 : 1);
             break;

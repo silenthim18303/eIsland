@@ -72,3 +72,56 @@ public class CommandResult
     public static CommandResult Ok => new() { Success = true };
     public static CommandResult Fail(string error) => new() { Success = false, Error = error };
 }
+
+/// <summary>
+/// 会话媒体元数据（用于实时监控推送）
+/// </summary>
+public class MediaMetadata
+{
+    public string? Title { get; init; }
+    public string? Artist { get; init; }
+    public string? AlbumTitle { get; init; }
+    public string? AlbumArtist { get; init; }
+    public int? TrackNumber { get; init; }
+    public int? AlbumTrackCount { get; init; }
+    public string[]? Genres { get; init; }
+    public string? Thumbnail { get; init; }
+}
+
+/// <summary>
+/// 播放状态快照（用于实时监控推送）
+/// </summary>
+public class PlaybackInfoSnapshot
+{
+    /// <summary>播放状态数值，与 SMTCMonitor 对齐：0=Closed, 1=Opened, 2=Changing, 3=Stopped, 4=Playing, 5=Paused</summary>
+    public int PlaybackStatus { get; init; }
+    public int PlaybackType { get; init; }
+    public bool? IsShuffleActive { get; init; }
+    public int? RepeatMode { get; init; }
+    public double? PlaybackRate { get; init; }
+    public PlaybackControls? Controls { get; init; }
+}
+
+/// <summary>
+/// 时间线信息（用于实时监控推送）
+/// </summary>
+public class TimelineInfo
+{
+    public double Position { get; init; }
+    public double Duration { get; init; }
+    public double StartTime { get; init; }
+    public double EndTime { get; init; }
+    public double MinSeekTime { get; init; }
+    public double MaxSeekTime { get; init; }
+}
+
+/// <summary>
+/// 完整会话信息（用于 getAllSessions / getSession 查询）
+/// </summary>
+public class SessionInfo
+{
+    public required string SourceAppId { get; init; }
+    public MediaMetadata? Media { get; init; }
+    public PlaybackInfoSnapshot? Playback { get; init; }
+    public TimelineInfo? Timeline { get; init; }
+}

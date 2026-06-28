@@ -14,41 +14,16 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
-const path = require('node:path');
-const { spawnSync } = require('node:child_process');
 
 if (process.platform !== 'win32') {
   throw new Error('@eisland/windows-smtc-helper only supports Windows.');
 }
 
-const TFM = 'net10.0-windows10.0.19041.0';
-
-const helperCandidates = [
-  path.join(__dirname, 'src', 'bin', 'Release', TFM, 'eIslandSmtcHelper.exe'),
-  path.join(__dirname, 'src', 'bin', 'Debug', TFM, 'eIslandSmtcHelper.exe'),
-];
-
-let helperPath;
-
-for (const candidate of helperCandidates) {
-  try {
-    require('node:fs').accessSync(candidate);
-    helperPath = candidate;
-    break;
-  } catch {
-    // try next
-  }
-}
-
-if (!helperPath) {
-  throw new Error(
-    'Unable to find eIslandSmtcHelper executable. Run "npm run build" first.'
-  );
-}
+const { smtc, callJson, getLastError } = require('./ffi-loader');
+const { SmtcMonitor } = require('./smtc-monitor');
 
 const emptyMediaStatus = Object.freeze({
   isAvailable: false,
@@ -68,77 +43,97 @@ const emptyMediaStatus = Object.freeze({
   controls: null,
 });
 
-const emptyCommandResult = Object.freeze({
-  success: false,
-  error: 'Unknown error.',
-});
+const statusMap = {
+  0: 'closed',
+  1: 'opened',
+  2: 'changing',
+  3: 'stopped',
+  4: 'playing',
+  5: 'paused',
+};
 
-function runCommand(args) {
-  const result = spawnSync(helperPath, args, {
-    encoding: 'utf8',
-    windowsHide: true,
-    timeout: 5000,
-  });
-
-  if (result.error) {
-    return { success: false, error: result.error.message };
-  }
-
-  if (!result.stdout || result.stdout.trim() === '') {
-    return { success: false, error: 'No output from helper process.' };
-  }
-
-  try {
-    return JSON.parse(result.stdout.trim());
-  } catch {
-    return { success: false, error: 'Failed to parse helper output.' };
-  }
+/**
+ * 将 DLL 返回的 MediaStatus 数值枚举转为字符串
+ * @param {object} raw
+ * @returns {object}
+ */
+function normalizeMediaStatus(raw) {
+  if (!raw || typeof raw.isAvailable !== 'boolean') return emptyMediaStatus;
+  if (!raw.isAvailable) return emptyMediaStatus;
+  return {
+    ...raw,
+    playbackStatus: statusMap[raw.playbackStatus] || 'unknown',
+  };
 }
 
-function runStatusCommand(args) {
-  const result = spawnSync(helperPath, args, {
-    encoding: 'utf8',
-    windowsHide: true,
-    timeout: 5000,
-  });
-
-  if (result.error) {
-    return emptyMediaStatus;
-  }
-
-  if (!result.stdout || result.stdout.trim() === '') {
-    return emptyMediaStatus;
-  }
-
-  try {
-    const parsed = JSON.parse(result.stdout.trim());
-    if (typeof parsed.isAvailable !== 'boolean') {
-      return emptyMediaStatus;
-    }
-    return parsed;
-  } catch {
-    return emptyMediaStatus;
-  }
-}
+// ── 原有命令（通过 FFI 调用，无进程启动开销） ─────────────────
 
 function play() {
-  return runCommand(['play']);
+  const r = smtc.smtc_play();
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Play failed.' };
 }
 
 function pause() {
-  return runCommand(['pause']);
+  const r = smtc.smtc_pause();
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Pause failed.' };
 }
 
 function next() {
-  return runCommand(['next']);
+  const r = smtc.smtc_next();
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Next failed.' };
 }
 
 function previous() {
-  return runCommand(['previous']);
+  const r = smtc.smtc_previous();
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Previous failed.' };
 }
 
 function getStatus() {
-  return runStatusCommand(['status']);
+  const raw = callJson('smtc_get_status');
+  return normalizeMediaStatus(raw);
 }
 
-module.exports = { play, pause, next, previous, getStatus };
+// ── 新增控制命令 ──────────────────────────────────────────────
+
+function seek(positionSeconds) {
+  const r = smtc.smtc_seek(positionSeconds);
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Seek failed.' };
+}
+
+function stop() {
+  const r = smtc.smtc_stop();
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Stop failed.' };
+}
+
+function setShuffle(active) {
+  const r = smtc.smtc_set_shuffle(active ? 1 : 0);
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Set shuffle failed.' };
+}
+
+function setRepeatMode(mode) {
+  // mode: 0=None, 1=Track, 2=List
+  const r = smtc.smtc_set_repeat_mode(mode);
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Set repeat mode failed.' };
+}
+
+function setPlaybackRate(rate) {
+  const r = smtc.smtc_set_playback_rate(rate);
+  return r === 0 ? { success: true, error: null } : { success: false, error: getLastError() || 'Set playback rate failed.' };
+}
+
+module.exports = {
+  // 原有命令
+  play,
+  pause,
+  next,
+  previous,
+  getStatus,
+  // 新增控制
+  seek,
+  stop,
+  setShuffle,
+  setRepeatMode,
+  setPlaybackRate,
+  // 实时监控
+  SmtcMonitor,
+};

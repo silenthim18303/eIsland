@@ -101,6 +101,91 @@ public static class SmtcController
         }
     }
 
+    public static async Task<CommandResult> SeekAsync(double positionSeconds)
+    {
+        try
+        {
+            var session = await GetCurrentSessionAsync();
+            if (session == null)
+                return CommandResult.Fail("No active media session.");
+
+            var success = await session.TryChangePlaybackPositionAsync((long)(positionSeconds * TimeSpan.TicksPerSecond));
+            return success ? CommandResult.Ok : CommandResult.Fail("Seek command was rejected.");
+        }
+        catch (Exception ex)
+        {
+            return CommandResult.Fail(ex.Message);
+        }
+    }
+
+    public static async Task<CommandResult> StopAsync()
+    {
+        try
+        {
+            var session = await GetCurrentSessionAsync();
+            if (session == null)
+                return CommandResult.Fail("No active media session.");
+
+            var success = await session.TryStopAsync();
+            return success ? CommandResult.Ok : CommandResult.Fail("Stop command was rejected.");
+        }
+        catch (Exception ex)
+        {
+            return CommandResult.Fail(ex.Message);
+        }
+    }
+
+    public static async Task<CommandResult> SetShuffleAsync(bool active)
+    {
+        try
+        {
+            var session = await GetCurrentSessionAsync();
+            if (session == null)
+                return CommandResult.Fail("No active media session.");
+
+            var success = await session.TryChangeShuffleActiveAsync(active);
+            return success ? CommandResult.Ok : CommandResult.Fail("Shuffle command was rejected.");
+        }
+        catch (Exception ex)
+        {
+            return CommandResult.Fail(ex.Message);
+        }
+    }
+
+    public static async Task<CommandResult> SetRepeatModeAsync(MediaPlaybackAutoRepeatMode mode)
+    {
+        try
+        {
+            var session = await GetCurrentSessionAsync();
+            if (session == null)
+                return CommandResult.Fail("No active media session.");
+
+            var success = await session.TryChangeAutoRepeatModeAsync(mode);
+            return success ? CommandResult.Ok : CommandResult.Fail("Repeat mode command was rejected.");
+        }
+        catch (Exception ex)
+        {
+            return CommandResult.Fail(ex.Message);
+        }
+    }
+
+    public static async Task<CommandResult> SetPlaybackRateAsync(double rate)
+    {
+        try
+        {
+            var session = await GetCurrentSessionAsync();
+            if (session == null)
+                return CommandResult.Fail("No active media session.");
+
+            var success = await session.TryChangePlaybackRateAsync(rate);
+            return success ? CommandResult.Ok : CommandResult.Fail("Playback rate command was rejected.");
+        }
+        catch (Exception ex)
+        {
+            return CommandResult.Fail(ex.Message);
+        }
+    }
+
     private static string? ReadThumbnailAsBase64(IRandomAccessStreamReference? thumbnail)
     {
         if (thumbnail == null)

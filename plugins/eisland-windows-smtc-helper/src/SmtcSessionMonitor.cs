@@ -1,0 +1,571 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+
+using System.Collections.Concurrent;
+using System.IO;
+using System.Runtime.InteropServices;
+using Windows.Media;
+using Windows.Media.Control;
+using Windows.Storage.Streams;
+
+namespace eIslandSmtcHelper;
+
+/// <summary>
+/// SMTC 会话监控引擎
+/// 长驻 STA 线程监听 WinRT 事件，通过 Win32 事件通知 Node 侧轮询
+/// </summary>
+public static class SmtcSessionMonitor
+{
+    #region Win32 P/Invoke
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern IntPtr CreateEventW(IntPtr lpEventAttributes, bool bManualReset, bool bInitialState, IntPtr lpName);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool SetEvent(IntPtr hEvent);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool ResetEvent(IntPtr hEvent);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool CloseHandle(IntPtr hObject);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+    [DllImport("ole32.dll")]
+    private static extern int CoInitializeEx(IntPtr pvReserved, uint dwCoInit);
+
+    private const uint COINIT_APARTMENTTHREADED = 0x2;
+    private const uint WAIT_OBJECT_0 = 0;
+    private const uint WAIT_TIMEOUT = 258;
+    private const uint WAIT_FAILED = 0xFFFFFFFF;
+    private const uint INFINITE = 0xFFFFFFFF;
+    private const uint ERROR_SUCCESS = 0;
+
+    #endregion
+
+    /// <summary>所有活跃会话快照（线程安全）</summary>
+    private static readonly ConcurrentDictionary<string, SessionInfo> _sessions = new();
+
+    /// <summary>变更计数器，Node 侧通过原子读取判断是否有新变更</summary>
+    private static volatile int _changeCounter;
+
+    /// <summary>有变更时置位，Node 等待此事件</summary>
+    private static IntPtr _changeEvent = IntPtr.Zero;
+
+    /// <summary>停止信号，置位后监控线程退出</summary>
+    private static IntPtr _stopEvent = IntPtr.Zero;
+
+    private static volatile bool _monitoring;
+    private static GlobalSystemMediaTransportControlsSessionManager? _manager;
+
+    /// <summary>Timeline 变更节流：每会话 200ms 最多触发一次</summary>
+    private static readonly ConcurrentDictionary<string, long> _lastTimelineSignal = new();
+    private const long TimelineThrottleMs = 200;
+
+    /// <summary>初始化 Win32 事件</summary>
+    private static bool EnsureEvents()
+    {
+        if (_changeEvent == IntPtr.Zero)
+        {
+            _changeEvent = CreateEventW(IntPtr.Zero, true, false, IntPtr.Zero);
+            if (_changeEvent == IntPtr.Zero) return false;
+        }
+        if (_stopEvent == IntPtr.Zero)
+        {
+            _stopEvent = CreateEventW(IntPtr.Zero, true, false, IntPtr.Zero);
+            if (_stopEvent == IntPtr.Zero) return false;
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// 启动会话监控（幂等）
+    /// </summary>
+    /// <returns>0=成功, 1=失败</returns>
+    public static int StartMonitoring()
+    {
+        if (_monitoring) return 0;
+        if (!EnsureEvents()) return 1;
+        ResetEvent(_stopEvent);
+        _monitoring = true;
+
+        var thread = new Thread(MonitorLoop)
+        {
+            IsBackground = true,
+            Name = "SMTC-Monitor"
+        };
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        return 0;
+    }
+
+    /// <summary>
+    /// 停止会话监控（幂等）
+    /// </summary>
+    /// <returns>0=成功</returns>
+    public static int StopMonitoring()
+    {
+        if (!_monitoring) return 0;
+        _monitoring = false;
+        if (_stopEvent != IntPtr.Zero)
+            SetEvent(_stopEvent);
+        return 0;
+    }
+
+    /// <summary>
+    /// 阻塞等待会话变更
+    /// </summary>
+    /// <param name="timeoutMs">超时毫秒数，0=立即返回，-1=无限等待</param>
+    /// <returns>0=有变更, 1=超时, -1=错误/未启动</returns>
+    public static int WaitForChanges(int timeoutMs)
+    {
+        if (!_monitoring || _changeEvent == IntPtr.Zero) return -1;
+        ResetEvent(_changeEvent);
+        var ms = timeoutMs < 0 ? INFINITE : (uint)timeoutMs;
+        var result = WaitForSingleObject(_changeEvent, ms);
+        return result switch
+        {
+            WAIT_OBJECT_0 => 0,
+            WAIT_TIMEOUT => 1,
+            _ => -1
+        };
+    }
+
+    /// <summary>
+    /// 读取当前变更计数（原子操作）
+    /// </summary>
+    public static int GetChangeCounter() => _changeCounter;
+
+    /// <summary>调试：返回当前会话数量</summary>
+    public static int GetSessionCount() => _sessions.Count;
+
+    /// <summary>
+    /// 获取所有会话快照的 JSON 字符串
+    /// </summary>
+    public static string? GetAllSessionsJson()
+    {
+        var list = _sessions.Values.ToArray();
+#if NATIVEAOT
+        return System.Text.Json.JsonSerializer.Serialize(list, SmtcJsonContext.Default.SessionInfoArray);
+#else
+        return System.Text.Json.JsonSerializer.Serialize(list, JsonOptions);
+#endif
+    }
+
+    /// <summary>
+    /// 获取指定会话快照的 JSON 字符串
+    /// </summary>
+    public static string? GetSessionJson(string sourceAppId)
+    {
+        if (!_sessions.TryGetValue(sourceAppId, out var session)) return null;
+#if NATIVEAOT
+        return System.Text.Json.JsonSerializer.Serialize(session, SmtcJsonContext.Default.SessionInfo);
+#else
+        return System.Text.Json.JsonSerializer.Serialize(session, JsonOptions);
+#endif
+    }
+
+#if !NATIVEAOT
+    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+        WriteIndented = false,
+    };
+#endif
+
+    /// <summary>通知 Node 侧有变更</summary>
+    private static void SignalChange()
+    {
+        Interlocked.Increment(ref _changeCounter);
+        if (_changeEvent != IntPtr.Zero)
+            SetEvent(_changeEvent);
+    }
+
+    #region 监控线程主循环
+
+    private static void MonitorLoop()
+    {
+        try
+        {
+            CoInitializeEx(IntPtr.Zero, COINIT_APARTMENTTHREADED);
+            if (!InitSessionManager()) return;
+            RegisterManagerCallbacks();
+            InitExistingSessions();
+
+            var lastTimelinePoll = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            while (_monitoring)
+            {
+                if (WaitForSingleObject(_stopEvent, 0) == WAIT_OBJECT_0) break;
+                Thread.Sleep(200);
+
+                // 轮询时间线变化（TimelineChanged 事件在 NativeAOT 下不可用）
+                var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                if (now - lastTimelinePoll >= TimelineThrottleMs)
+                {
+                    lastTimelinePoll = now;
+                    if (PollTimelineChanges()) SignalChange();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[SMTC-Monitor] Fatal: {ex}");
+        }
+        finally
+        {
+            Cleanup();
+        }
+    }
+
+    private static bool InitSessionManager()
+    {
+        try
+        {
+            _manager = GlobalSystemMediaTransportControlsSessionManager.RequestAsync()
+                .GetAwaiter().GetResult();
+            return _manager != null;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private static void RegisterManagerCallbacks()
+    {
+        if (_manager == null) return;
+        _manager.SessionsChanged += (_, _) =>
+        {
+            SyncSessions();
+            SignalChange();
+        };
+    }
+
+    private static void InitExistingSessions()
+    {
+        if (_manager == null) return;
+        try
+        {
+            var sessions = _manager.GetSessions();
+            foreach (var session in sessions)
+            {
+                var id = session.SourceAppUserModelId;
+                if (string.IsNullOrEmpty(id)) continue;
+                var info = BuildSessionInfo(session);
+                _sessions[id] = info;
+                RegisterSessionCallbacks(session, id);
+            }
+            if (_sessions.Count > 0) SignalChange();
+        }
+        catch { /* 忽略初始化错误 */ }
+    }
+
+    #endregion
+
+    #region 时间线轮询
+
+    /// <summary>
+    /// 轮询所有会话的时间线变化，返回是否有变化
+    /// </summary>
+    private static bool PollTimelineChanges()
+    {
+        if (_manager == null) return false;
+        bool changed = false;
+        try
+        {
+            foreach (var session in _manager.GetSessions())
+            {
+                var id = session.SourceAppUserModelId;
+                if (string.IsNullOrEmpty(id)) continue;
+
+                var newTimeline = BuildTimelineInfo(session);
+                if (_sessions.TryGetValue(id, out var existing))
+                {
+                    var oldTimeline = existing.Timeline;
+                    if (oldTimeline == null && newTimeline == null) continue;
+                    if (oldTimeline != null && newTimeline != null
+                        && Math.Abs(oldTimeline.Position - newTimeline.Position) < 0.5
+                        && Math.Abs(oldTimeline.Duration - newTimeline.Duration) < 0.5)
+                        continue;
+
+                    _sessions[id] = new SessionInfo
+                    {
+                        SourceAppId = id,
+                        Media = existing.Media,
+                        Playback = existing.Playback,
+                        Timeline = newTimeline,
+                    };
+                    changed = true;
+                }
+            }
+        }
+        catch { /* 忽略 */ }
+        return changed;
+    }
+
+    #endregion
+
+    #region 会话同步与回调
+
+    /// <summary>
+    /// 同步会话列表：添加新会话、移除已消失的会话
+    /// </summary>
+    private static void SyncSessions()
+    {
+        if (_manager == null) return;
+        try
+        {
+            var currentSessions = _manager.GetSessions();
+            var currentIds = new HashSet<string>();
+
+            foreach (var session in currentSessions)
+            {
+                var id = session.SourceAppUserModelId;
+                if (string.IsNullOrEmpty(id)) continue;
+                currentIds.Add(id);
+
+                if (!_sessions.ContainsKey(id))
+                {
+                    var info = BuildSessionInfo(session);
+                    _sessions[id] = info;
+                    RegisterSessionCallbacks(session, id);
+                }
+            }
+
+            var removedIds = _sessions.Keys.Where(k => !currentIds.Contains(k)).ToArray();
+            foreach (var id in removedIds)
+            {
+                _sessions.TryRemove(id, out _);
+                _lastTimelineSignal.TryRemove(id, out _);
+            }
+        }
+        catch { /* 忽略同步错误 */ }
+    }
+
+    private static void RegisterSessionCallbacks(
+        GlobalSystemMediaTransportControlsSession session, string id)
+    {
+        session.MediaPropertiesChanged += (_, _) =>
+        {
+            try
+            {
+                var info = BuildSessionInfo(session);
+                _sessions[id] = info;
+                SignalChange();
+            }
+            catch { /* 忽略 */ }
+        };
+
+        session.PlaybackInfoChanged += (_, _) =>
+        {
+            try
+            {
+                var info = BuildSessionInfo(session);
+                _sessions[id] = info;
+                SignalChange();
+            }
+            catch { /* 忽略 */ }
+        };
+    }
+
+    #endregion
+
+    #region 数据构建
+
+    private static SessionInfo BuildSessionInfo(GlobalSystemMediaTransportControlsSession session)
+    {
+        var id = session.SourceAppUserModelId;
+        var media = BuildMediaMetadata(session);
+        var playback = BuildPlaybackInfo(session);
+        var timeline = BuildTimelineInfo(session);
+
+        return new SessionInfo
+        {
+            SourceAppId = id,
+            Media = media,
+            Playback = playback,
+            Timeline = timeline,
+        };
+    }
+
+    private static MediaMetadata? BuildMediaMetadata(GlobalSystemMediaTransportControlsSession session)
+    {
+        try
+        {
+            var props = session.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
+            string[]? genres = null;
+            try
+            {
+                var genreList = new List<string>();
+                foreach (var genre in props.Genres)
+                    genreList.Add(genre);
+                genres = genreList.Count > 0 ? genreList.ToArray() : null;
+            }
+            catch { /* 部分应用不支持 */ }
+
+            string? thumbnail = null;
+            try
+            {
+                thumbnail = ReadThumbnailAsBase64(props.Thumbnail);
+            }
+            catch { /* 忽略 */ }
+
+            return new MediaMetadata
+            {
+                Title = props.Title,
+                Artist = props.Artist,
+                AlbumTitle = props.AlbumTitle,
+                AlbumArtist = props.AlbumArtist,
+                TrackNumber = props.TrackNumber,
+                Genres = genres,
+                Thumbnail = thumbnail,
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static PlaybackInfoSnapshot? BuildPlaybackInfo(GlobalSystemMediaTransportControlsSession session)
+    {
+        try
+        {
+            var info = session.GetPlaybackInfo();
+
+            // 数值映射：与 SMTCMonitor (Rust) 对齐
+            // SMTCMonitor 使用 GlobalSystemMediaTransportControlsSessionPlaybackStatus 枚举数值：
+            // 0=Closed, 1=Opened, 2=Changing, 3=Stopped, 4=Playing, 5=Paused, 6=Unknown
+            int status = info.PlaybackStatus switch
+            {
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Closed => 0,
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Opened => 1,
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Changing => 2,
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Stopped => 3,
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing => 4,
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused => 5,
+                _ => 6,
+            };
+
+            int playbackType = (int)(info.PlaybackType ?? Windows.Media.MediaPlaybackType.Unknown);
+
+            PlaybackControls? controls = null;
+            try
+            {
+                controls = new PlaybackControls
+                {
+                    IsPlayEnabled = info.Controls.IsPlayEnabled,
+                    IsPauseEnabled = info.Controls.IsPauseEnabled,
+                    IsNextEnabled = info.Controls.IsNextEnabled,
+                    IsPreviousEnabled = info.Controls.IsPreviousEnabled,
+                    IsStopEnabled = info.Controls.IsStopEnabled,
+                    IsRecordEnabled = info.Controls.IsRecordEnabled,
+                    IsFastForwardEnabled = info.Controls.IsFastForwardEnabled,
+                    IsRewindEnabled = info.Controls.IsRewindEnabled,
+                    IsChannelUpEnabled = info.Controls.IsChannelUpEnabled,
+                    IsChannelDownEnabled = info.Controls.IsChannelDownEnabled,
+                };
+            }
+            catch { /* 忽略 */ }
+
+            return new PlaybackInfoSnapshot
+            {
+                PlaybackStatus = status,
+                PlaybackType = playbackType,
+                IsShuffleActive = info.IsShuffleActive,
+                RepeatMode = (int?)info.AutoRepeatMode,
+                PlaybackRate = info.PlaybackRate,
+                Controls = controls,
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static TimelineInfo? BuildTimelineInfo(GlobalSystemMediaTransportControlsSession session)
+    {
+        try
+        {
+            var t = session.GetTimelineProperties();
+            return new TimelineInfo
+            {
+                Position = t.Position.TotalSeconds,
+                Duration = t.EndTime.TotalSeconds - t.StartTime.TotalSeconds,
+                StartTime = t.StartTime.TotalSeconds,
+                EndTime = t.EndTime.TotalSeconds,
+                MinSeekTime = t.MinSeekTime.TotalSeconds,
+                MaxSeekTime = t.MaxSeekTime.TotalSeconds,
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string? ReadThumbnailAsBase64(IRandomAccessStreamReference? thumbnail)
+    {
+        if (thumbnail == null) return null;
+        try
+        {
+            using var stream = thumbnail.OpenReadAsync().GetAwaiter().GetResult();
+            if (stream == null || stream.Size == 0) return null;
+            using var memoryStream = new MemoryStream();
+            stream.AsStreamForRead().CopyTo(memoryStream);
+            var bytes = memoryStream.ToArray();
+            var base64 = Convert.ToBase64String(bytes);
+            return $"data:image/jpeg;base64,{base64}";
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    #endregion
+
+    #region 清理
+
+    private static void Cleanup()
+    {
+        _manager = null;
+        _sessions.Clear();
+        _lastTimelineSignal.Clear();
+        _changeCounter = 0;
+
+        if (_changeEvent != IntPtr.Zero)
+        {
+            CloseHandle(_changeEvent);
+            _changeEvent = IntPtr.Zero;
+        }
+        if (_stopEvent != IntPtr.Zero)
+        {
+            CloseHandle(_stopEvent);
+            _stopEvent = IntPtr.Zero;
+        }
+    }
+
+    #endregion
+}

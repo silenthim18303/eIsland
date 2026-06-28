@@ -14,9 +14,13 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
+import { EventEmitter } from 'events';
+
+// ── 数据类型 ──────────────────────────────────────────────────
 
 export interface TimelineProperties {
   /** Start time of the media in seconds */
@@ -57,9 +61,9 @@ export interface MediaStatus {
   repeatMode: number | null;
   /** Playback rate (1.0 = normal speed) */
   playbackRate: number | null;
-  /** App User Model ID of the media source (e.g. "Microsoft.ZuneMusic_8wekyb3d8bbwe!Microsoft.ZuneMusic") */
+  /** App User Model ID of the media source */
   sourceAppUserModelId: string | null;
-  /** Album art as a data URI (always image/jpeg, data:image/jpeg;base64,...) */
+  /** Album art as a data URI (data:image/jpeg;base64,...) */
   thumbnail: string | null;
   timeline: TimelineProperties | null;
   controls: PlaybackControls | null;
@@ -70,8 +74,101 @@ export interface CommandResult {
   error: string | null;
 }
 
+// ── 监控器类型 ────────────────────────────────────────────────
+
+export interface MediaProps {
+  title: string;
+  artist: string;
+  albumTitle: string;
+  albumArtist: string;
+  genres: string[];
+  albumTrackCount: number;
+  trackNumber: number;
+  thumbnail: string | null;
+}
+
+export interface PlaybackInfo {
+  playbackStatus: number;
+  playbackType: number;
+}
+
+export interface TimelineProps {
+  position: number;
+  duration: number;
+}
+
+export interface SessionSnapshot {
+  sourceAppId: string;
+  media: MediaProps | null;
+  playback: PlaybackInfo | null;
+  timeline: TimelineProps | null;
+}
+
+// ── 命令函数 ──────────────────────────────────────────────────
+
+/** 发送播放命令 */
 export function play(): CommandResult;
+/** 发送暂停命令 */
 export function pause(): CommandResult;
+/** 跳到下一首 */
 export function next(): CommandResult;
+/** 跳到上一首 */
 export function previous(): CommandResult;
+/** 获取当前媒体状态 */
 export function getStatus(): MediaStatus;
+
+/** Seek 到指定位置（秒） */
+export function seek(positionSeconds: number): CommandResult;
+/** 停止播放 */
+export function stop(): CommandResult;
+/** 设置随机播放 (true=开启, false=关闭) */
+export function setShuffle(active: boolean): CommandResult;
+/** 设置循环模式 (0=None, 1=Track, 2=List) */
+export function setRepeatMode(mode: number): CommandResult;
+/** 设置播放速率 (1.0=正常速度) */
+export function setPlaybackRate(rate: number): CommandResult;
+
+// ── 监控器类 ──────────────────────────────────────────────────
+
+/**
+ * SMTC 会话实时监控器
+ * 替代 @coooookies/windows-smtc-monitor，通过 DLL FFI 监听 WinRT 事件
+ *
+ * @example
+ * ```js
+ * const monitor = new SmtcMonitor();
+ * monitor.on('session-added', (sourceAppId, mediaProps) => { ... });
+ * monitor.on('session-removed', (sourceAppId) => { ... });
+ * monitor.on('session-media-changed', (sourceAppId, mediaProps) => { ... });
+ * monitor.on('session-playback-changed', (sourceAppId, playbackInfo) => { ... });
+ * monitor.on('session-timeline-changed', (sourceAppId, timelineProps) => { ... });
+ * monitor.start();
+ * // ...
+ * monitor.stop();
+ * ```
+ */
+export class SmtcMonitor extends EventEmitter {
+  constructor();
+  /** 启动监控 */
+  start(): void;
+  /** 停止监控 */
+  stop(): void;
+  /** 获取当前所有会话快照 */
+  getMediaSessions(): SessionSnapshot[];
+
+  on(event: 'session-added', listener: (sourceAppId: string, mediaProps: MediaProps) => void): this;
+  on(event: 'session-removed', listener: (sourceAppId: string) => void): this;
+  on(event: 'session-media-changed', listener: (sourceAppId: string, mediaProps: MediaProps) => void): this;
+  on(event: 'session-playback-changed', listener: (sourceAppId: string, playbackInfo: PlaybackInfo) => void): this;
+  on(event: 'session-timeline-changed', listener: (sourceAppId: string, timelineProps: TimelineProps) => void): this;
+  on(event: 'error', listener: (err: Error) => void): this;
+  on(event: string, listener: (...args: any[]) => void): this;
+
+  emit(event: 'session-added', sourceAppId: string, mediaProps: MediaProps): boolean;
+  emit(event: 'session-removed', sourceAppId: string): boolean;
+  emit(event: 'session-media-changed', sourceAppId: string, mediaProps: MediaProps): boolean;
+  emit(event: 'session-playback-changed', sourceAppId: string, playbackInfo: PlaybackInfo): boolean;
+  emit(event: 'session-timeline-changed', sourceAppId: string, timelineProps: TimelineProps): boolean;
+  emit(event: 'error', err: Error): boolean;
+  emit(event: string, ...args: any[]): boolean;
+}

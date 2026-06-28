@@ -1,7 +1,7 @@
 {
   "name": "@eisland/windows-smtc-helper",
   "version": "26.0.0",
-  "description": "Windows System Media Transport Controls (SMTC) helper for play, pause, next, previous, and status.",
+  "description": "Windows SMTC (System Media Transport Controls) all-in-one: commands, status, and real-time session monitoring via Native AOT DLL.",
   "author": "JNTMTMTM",
   "license": "GPL-3.0",
   "main": "index.js",
@@ -17,8 +17,9 @@
   "scripts": {
     "build": "dotnet build src/eIslandSmtcHelper.csproj -c Release",
     "build:ctypes": "dotnet publish smtc-ctypes/eIslandSmtcCtypes.csproj -c Release -r win-x64",
+    "build:all": "npm run build && npm run build:ctypes",
     "clean": "dotnet clean src/eIslandSmtcHelper.csproj && dotnet clean smtc-ctypes/eIslandSmtcCtypes.csproj",
-    "rebuild": "dotnet clean src/eIslandSmtcHelper.csproj && dotnet build src/eIslandSmtcHelper.csproj -c Release",
+    "rebuild": "npm run clean && npm run build:all",
     "test": "vitest run --config vitest.config.ts",
     "test:play": "vitest run --config vitest.config.ts test/smtc-helper.play.test.ts",
     "test:pause": "vitest run --config vitest.config.ts test/smtc-helper.pause.test.ts",
@@ -32,12 +33,18 @@
     "smoke:status": "node --experimental-strip-types test/smtc-helper.status.smoke.ts",
     "test:ctypes": "python test/smtc_ctypes_test.py"
   },
+  "dependencies": {
+    "koffi": "^2.9.1"
+  },
   "devDependencies": {
     "@types/node": "^25.9.3"
   },
   "files": [
     "index.js",
     "index.d.ts",
-    "src"
+    "ffi-loader.js",
+    "smtc-monitor.js",
+    "src",
+    "smtc-ctypes"
   ]
 }

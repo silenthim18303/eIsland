@@ -20,6 +20,7 @@
 
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using Windows.Media;
 
 namespace eIslandSmtcHelper;
 
@@ -148,5 +149,149 @@ public static class SmtcExports
     public static IntPtr GetLastError()
     {
         return StringToCoTaskMem(lastError);
+    }
+
+    // ── 会话监控 ──────────────────────────────────────────────────
+
+    /// <summary>启动会话监控（幂等）。0=成功, 1=失败</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_start_monitoring")]
+    public static int StartMonitoring()
+    {
+        try { return SmtcSessionMonitor.StartMonitoring(); }
+        catch { return 1; }
+    }
+
+    /// <summary>停止会话监控（幂等）。0=成功</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_stop_monitoring")]
+    public static int StopMonitoring()
+    {
+        try { return SmtcSessionMonitor.StopMonitoring(); }
+        catch { return 0; }
+    }
+
+    /// <summary>阻塞等待会话变更。0=有变更, 1=超时, -1=错误</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_wait_for_changes")]
+    public static int WaitForChanges(int timeoutMs)
+    {
+        try { return SmtcSessionMonitor.WaitForChanges(timeoutMs); }
+        catch { return -1; }
+    }
+
+    /// <summary>原子读取变更计数器</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_get_sessions_changed")]
+    public static int GetSessionsChanged()
+    {
+        try { return SmtcSessionMonitor.GetChangeCounter(); }
+        catch { return -1; }
+    }
+
+    /// <summary>获取所有会话 JSON（SessionInfo[]）。返回 CoTaskMem 分配的 UTF-8 字符串，需 smtc_free_string 释放</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_get_all_sessions")]
+    public static IntPtr GetAllSessions()
+    {
+        try
+        {
+            var json = SmtcSessionMonitor.GetAllSessionsJson();
+            if (json == null) lastError = "GetAllSessionsJson returned null";
+            return json != null ? StringToCoTaskMem(json) : IntPtr.Zero;
+        }
+        catch (Exception ex)
+        {
+            lastError = ex.ToString();
+            return IntPtr.Zero;
+        }
+    }
+
+    /// <summary>调试：返回会话数量</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_debug_session_count")]
+    public static int DebugSessionCount()
+    {
+        try { return SmtcSessionMonitor.GetSessionCount(); }
+        catch { return -1; }
+    }
+
+    /// <summary>获取指定会话 JSON。sourceAppId 为 UTF-8 C 字符串</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_get_session")]
+    public static IntPtr GetSession(IntPtr sourceAppIdPtr)
+    {
+        try
+        {
+            var sourceAppId = Marshal.PtrToStringUTF8(sourceAppIdPtr) ?? "";
+            var json = SmtcSessionMonitor.GetSessionJson(sourceAppId);
+            return json != null ? StringToCoTaskMem(json) : IntPtr.Zero;
+        }
+        catch (Exception ex)
+        {
+            lastError = ex.ToString();
+            return IntPtr.Zero;
+        }
+    }
+
+    // ── 扩展控制命令 ──────────────────────────────────────────────
+
+    /// <summary>Seek 到指定位置（秒）。0=成功, 1=失败</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_seek")]
+    public static int Seek(double positionSeconds)
+    {
+        try
+        {
+            var result = RunOnSTAThread(() => SmtcController.SeekAsync(positionSeconds));
+            return result.Success ? 0 : 1;
+        }
+        catch { return 1; }
+    }
+
+    /// <summary>停止播放。0=成功, 1=失败</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_stop")]
+    public static int Stop()
+    {
+        try
+        {
+            var result = RunOnSTAThread(() => SmtcController.StopAsync());
+            return result.Success ? 0 : 1;
+        }
+        catch { return 1; }
+    }
+
+    /// <summary>设置随机播放。0=关闭, 1=开启。返回 0=成功, 1=失败</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_set_shuffle")]
+    public static int SetShuffle(int active)
+    {
+        try
+        {
+            var result = RunOnSTAThread(() => SmtcController.SetShuffleAsync(active != 0));
+            return result.Success ? 0 : 1;
+        }
+        catch { return 1; }
+    }
+
+    /// <summary>设置循环模式。0=None, 1=Track, 2=List。返回 0=成功, 1=失败</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_set_repeat_mode")]
+    public static int SetRepeatMode(int mode)
+    {
+        try
+        {
+            var autoRepeat = mode switch
+            {
+                1 => MediaPlaybackAutoRepeatMode.Track,
+                2 => MediaPlaybackAutoRepeatMode.List,
+                _ => MediaPlaybackAutoRepeatMode.None,
+            };
+            var result = RunOnSTAThread(() => SmtcController.SetRepeatModeAsync(autoRepeat));
+            return result.Success ? 0 : 1;
+        }
+        catch { return 1; }
+    }
+
+    /// <summary>设置播放速率。返回 0=成功, 1=失败</summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_set_playback_rate")]
+    public static int SetPlaybackRate(double rate)
+    {
+        try
+        {
+            var result = RunOnSTAThread(() => SmtcController.SetPlaybackRateAsync(rate));
+            return result.Success ? 0 : 1;
+        }
+        catch { return 1; }
     }
 }
