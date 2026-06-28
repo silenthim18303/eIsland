@@ -1,6 +1,6 @@
 ---
 title: Plugin Commands
-icon: toolbox
+icon: plug
 ---
 
 # Plugin Commands
@@ -18,23 +18,23 @@ cd plugins/<plugin-name>
 npm run <script>
 ```
 
-| Plugin | Directory | Build Tool | Has Tests |
-|--------|-----------|------------|-----------|
-| **Fullscreen Detector** | `windows-fullscreen-detector` | node-gyp (C) | ✅ |
-| **Performance Monitor** | `windows-performance-monitor` | node-gyp (C) + dotnet (.NET) | ✅ |
-| **Processes Attacker** | `eisland-windows-processes-attacker` | node-gyp (C) | ❌ |
-| **Toast Listener** | `eisland-windows-toast-listener` | node-gyp (C++) | ✅ |
-| **SMTC Helper** | `eisland-windows-smtc-helper` | dotnet (.NET) | ✅ |
+| Plugin | Directory | Language | Build Tool | Tests | Smoke |
+|--------|-----------|----------|------------|-------|-------|
+| **Fullscreen Detector** | `windows-fullscreen-detector` | C | node-gyp | ✅ | ✅ |
+| **Performance Monitor** | `windows-performance-monitor` | C + C# | node-gyp + dotnet | ✅ | ✅ |
+| **Processes Attacker** | `eisland-windows-processes-attacker` | C | node-gyp | ❌ | ❌ |
+| **Toast Listener** | `eisland-windows-toast-listener` | C++ | node-gyp | ✅ | ✅ |
+| **SMTC Helper** | `eisland-windows-smtc-helper` | C# | dotnet | ✅ | ✅ |
 
 ## Common Commands
 
 All plugins share these three build commands:
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Build the plugin (compile native code / .NET project) |
-| `npm run clean` | Remove build artifacts |
-| `npm run rebuild` | Clean + build (required after changing `binding.gyp` or `.csproj`) |
+| Command | Description | When to Use |
+|---------|-------------|-------------|
+| `npm run build` | Build the plugin | First build, or after source code changes |
+| `npm run clean` | Remove build artifacts | Free disk space, or troubleshoot build issues |
+| `npm run rebuild` | Clean + build | After modifying `binding.gyp`, `.csproj`, or adding new source files |
 
 :::warning
 After modifying `binding.gyp` (e.g., adding a new source file or library), always run `npm run rebuild` — a regular `npm run build` may use cached artifacts.
@@ -44,39 +44,35 @@ After modifying `binding.gyp` (e.g., adding a new source file or library), alway
 
 ## Windows Fullscreen Detector
 
-**Directory:** `plugins/windows-fullscreen-detector`
-
-**Build command:** `node-gyp rebuild`
+**Directory:** `plugins/windows-fullscreen-detector` &nbsp;|&nbsp; **Language:** C &nbsp;|&nbsp; **Build:** `node-gyp rebuild`
 
 ### Build
 
-```bash
-npm run build       # node-gyp rebuild
-npm run clean       # node-gyp clean
-npm run rebuild     # node-gyp clean && node-gyp rebuild
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `node-gyp rebuild` | Compile the native addon |
+| `npm run clean` | `node-gyp clean` | Remove `build/` directory |
+| `npm run rebuild` | `node-gyp clean && node-gyp rebuild` | Full clean build |
 
 ### Test
 
-```bash
-npm test            # vitest run — shape validation, export verification
-npm run test:polling # vitest run — polling-mode tests
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — shape validation, export verification |
+| `npm run test:polling` | `vitest run test/fullscreen-detector.polling.test.ts` | Polling-mode tests only |
 
 ### Smoke
 
-```bash
-npm run smoke          # Full smoke test — getFullscreenWindows(), isAnyFullscreenWindow()
-npm run smoke:polling  # Polling smoke test — multiple reads over time
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/fullscreen-detector.smoke.ts` | Full smoke — `getFullscreenWindows()`, `isAnyFullscreenWindow()` |
+| `npm run smoke:polling` | `node --experimental-strip-types test/fullscreen-detector.polling.smoke.ts` | Polling smoke — multiple reads over time |
 
 ---
 
 ## Windows Performance Monitor
 
-**Directory:** `plugins/windows-performance-monitor`
-
-**Build command:** `node-gyp rebuild && dotnet build temperature-helper/eIslandTemperatureReader.csproj -c Release`
+**Directory:** `plugins/windows-performance-monitor` &nbsp;|&nbsp; **Language:** C + C# &nbsp;|&nbsp; **Build:** `node-gyp rebuild && dotnet build`
 
 :::note
 This plugin has a dual build: the C addon is compiled by node-gyp, and the .NET temperature helper is compiled by `dotnet build`.
@@ -84,32 +80,30 @@ This plugin has a dual build: the C addon is compiled by node-gyp, and the .NET 
 
 ### Build
 
-```bash
-npm run build       # node-gyp rebuild + dotnet build
-npm run clean       # node-gyp clean + dotnet clean
-npm run rebuild     # node-gyp clean + rebuild + dotnet build
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `node-gyp rebuild && dotnet build temperature-helper/...csproj -c Release` | Build C addon + .NET helper |
+| `npm run clean` | `node-gyp clean && dotnet clean temperature-helper/...csproj` | Remove all build artifacts |
+| `npm run rebuild` | `node-gyp clean && node-gyp rebuild && dotnet build temperature-helper/...csproj -c Release` | Full clean build |
 
 ### Test
 
-```bash
-npm test            # vitest run — CPU, memory, temperature, hardware shape validation
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — CPU, memory, temperature, hardware shape validation |
 
 ### Smoke
 
-```bash
-npm run smoke          # Full smoke test — getCpu(), getMemory(), getTemperature(), getHardwareList()
-npm run smoke:polling  # Polling smoke test — multiple reads over time
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/performance-monitor.smoke.ts` | Full smoke — `getCpu()`, `getMemory()`, `getTemperature()`, `getHardwareList()` |
+| `npm run smoke:polling` | `node --experimental-strip-types test/performance-monitor.polling.smoke.ts` | Polling smoke — multiple reads over time |
 
 ---
 
 ## Windows Processes Attacker
 
-**Directory:** `plugins/eisland-windows-processes-attacker`
-
-**Build command:** `node-gyp rebuild`
+**Directory:** `plugins/eisland-windows-processes-attacker` &nbsp;|&nbsp; **Language:** C &nbsp;|&nbsp; **Build:** `node-gyp rebuild`
 
 :::warning
 This plugin has no automated tests or smoke scripts. Test manually by running the built module.
@@ -117,57 +111,53 @@ This plugin has no automated tests or smoke scripts. Test manually by running th
 
 ### Build
 
-```bash
-npm run build       # node-gyp rebuild
-npm run clean       # node-gyp clean
-npm run rebuild     # node-gyp clean && node-gyp rebuild
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `node-gyp rebuild` | Compile the native addon |
+| `npm run clean` | `node-gyp clean` | Remove `build/` directory |
+| `npm run rebuild` | `node-gyp clean && node-gyp rebuild` | Full clean build |
 
 ---
 
 ## Windows Toast Listener
 
-**Directory:** `plugins/eisland-windows-toast-listener`
-
-**Build command:** `node-gyp rebuild`
+**Directory:** `plugins/eisland-windows-toast-listener` &nbsp;|&nbsp; **Language:** C++ &nbsp;|&nbsp; **Build:** `node-gyp rebuild`
 
 ### Build
 
-```bash
-npm run build       # node-gyp rebuild
-npm run clean       # node-gyp clean
-npm run rebuild     # node-gyp clean && node-gyp rebuild
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `node-gyp rebuild` | Compile the native addon |
+| `npm run clean` | `node-gyp clean` | Remove `build/` directory |
+| `npm run rebuild` | `node-gyp clean && node-gyp rebuild` | Full clean build |
 
 ### Test
 
-```bash
-npm test            # vitest run — all tests (polling mode)
-npm run test:polling # vitest run — polling-mode tests only
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests (polling mode) |
+| `npm run test:polling` | `vitest run test/windows-toast-listener.polling.test.ts` | Polling-mode tests only |
 
 ### Smoke
 
-```bash
-npm run smoke              # Basic smoke test — getNotifications(), access status
-npm run smoke:polling      # Polling smoke test — watch for notification changes
-npm run smoke:event        # Event-driven smoke test — startListening() callback
-npm run smoke:suppression  # Toast suppression test — enableSuppression()/disableSuppression()
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/windows-toast-listener.smoke.ts` | Basic smoke — `getNotifications()`, access status |
+| `npm run smoke:polling` | `node --experimental-strip-types test/windows-toast-listener.polling.smoke.ts` | Polling smoke — watch for notification changes |
+| `npm run smoke:event` | `node --experimental-strip-types test/windows-toast-listener.event.smoke.ts` | Event-driven smoke — `startListening()` callback |
+| `npm run smoke:suppression` | `node --experimental-strip-types test/windows-toast-listener.suppression.smoke.ts` | Suppression smoke — `enableSuppression()`/`disableSuppression()` |
 
 ### CLI Tools
 
-```bash
-npm run cli:suppression    # CLI tool for interactive toast suppression testing
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run cli:suppression` | `node --experimental-strip-types test/windows-toast-listener.suppression.cli.ts` | Interactive CLI for toast suppression testing |
 
 ---
 
 ## Windows SMTC Helper
 
-**Directory:** `plugins/eisland-windows-smtc-helper`
-
-**Build command:** `dotnet build src/eIslandSmtcHelper.csproj -c Release`
+**Directory:** `plugins/eisland-windows-smtc-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build`
 
 :::info
 This is a pure .NET plugin — no native addon or `node-gyp`. Uses `Windows.Media.Control` WinRT APIs.
@@ -175,32 +165,32 @@ This is a pure .NET plugin — no native addon or `node-gyp`. Uses `Windows.Medi
 
 ### Build
 
-```bash
-npm run build       # dotnet build -c Release
-npm run clean       # dotnet clean
-npm run rebuild     # dotnet clean + dotnet build -c Release
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `dotnet build src/eIslandSmtcHelper.csproj -c Release` | Build the .NET helper |
+| `npm run clean` | `dotnet clean src/eIslandSmtcHelper.csproj` | Remove `src/bin/` and `src/obj/` |
+| `npm run rebuild` | `dotnet clean + dotnet build -c Release` | Full clean build |
 
 ### Test
 
-```bash
-npm test            # vitest run — all tests (export, status shape, commands)
-npm run test:play     # vitest run — play command tests only
-npm run test:pause    # vitest run — pause command tests only
-npm run test:next     # vitest run — next command tests only
-npm run test:previous # vitest run — previous command tests only
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — export verification, status shape, all commands |
+| `npm run test:play` | `vitest run test/smtc-helper.play.test.ts` | Play command tests only |
+| `npm run test:pause` | `vitest run test/smtc-helper.pause.test.ts` | Pause command tests only |
+| `npm run test:next` | `vitest run test/smtc-helper.next.test.ts` | Next command tests only |
+| `npm run test:previous` | `vitest run test/smtc-helper.previous.test.ts` | Previous command tests only |
 
 ### Smoke
 
-```bash
-npm run smoke           # Full smoke test — getStatus(), play(), pause(), next(), previous()
-npm run smoke:play      # Play smoke — getStatus → play → getStatus
-npm run smoke:pause     # Pause smoke — getStatus → pause → getStatus
-npm run smoke:next      # Next smoke — getStatus → next → getStatus
-npm run smoke:previous  # Previous smoke — getStatus → previous → getStatus
-npm run smoke:status    # Status-only smoke — getStatus() with formatted output
-```
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/smtc-helper.smoke.ts` | Full smoke — all 5 commands + formatted output |
+| `npm run smoke:play` | `node --experimental-strip-types test/smtc-helper.play.smoke.ts` | Play smoke — `getStatus()` → `play()` → `getStatus()` |
+| `npm run smoke:pause` | `node --experimental-strip-types test/smtc-helper.pause.smoke.ts` | Pause smoke — `getStatus()` → `pause()` → `getStatus()` |
+| `npm run smoke:next` | `node --experimental-strip-types test/smtc-helper.next.smoke.ts` | Next smoke — `getStatus()` → `next()` → `getStatus()` |
+| `npm run smoke:previous` | `node --experimental-strip-types test/smtc-helper.previous.smoke.ts` | Previous smoke — `getStatus()` → `previous()` → `getStatus()` |
+| `npm run smoke:status` | `node --experimental-strip-types test/smtc-helper.status.smoke.ts` | Status-only smoke — `getStatus()` with formatted output |
 
 ---
 
@@ -208,54 +198,31 @@ npm run smoke:status    # Status-only smoke — getStatus() with formatted outpu
 
 ### All Build Commands
 
-```bash
-# Build all plugins (from root)
-npm install    # triggers electron-builder install-app-deps → node-gyp rebuild for each
-
-# Build individual plugins
-cd plugins/windows-fullscreen-detector && npm run build
-cd plugins/windows-performance-monitor && npm run build
-cd plugins/eisland-windows-processes-attacker && npm run build
-cd plugins/eisland-windows-toast-listener && npm run build
-cd plugins/eisland-windows-smtc-helper && npm run build
-```
+| Plugin | Command |
+|--------|---------|
+| Fullscreen Detector | `cd plugins/windows-fullscreen-detector && npm run build` |
+| Performance Monitor | `cd plugins/windows-performance-monitor && npm run build` |
+| Processes Attacker | `cd plugins/eisland-windows-processes-attacker && npm run build` |
+| Toast Listener | `cd plugins/eisland-windows-toast-listener && npm run build` |
+| SMTC Helper | `cd plugins/eisland-windows-smtc-helper && npm run build` |
+| **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
 
-```bash
-# Fullscreen Detector
-cd plugins/windows-fullscreen-detector
-npm test && npm run test:polling
-
-# Performance Monitor
-cd plugins/windows-performance-monitor
-npm test
-
-# Toast Listener
-cd plugins/eisland-windows-toast-listener
-npm test && npm run test:polling
-
-# SMTC Helper
-cd plugins/eisland-windows-smtc-helper
-npm test && npm run test:play && npm run test:pause && npm run test:next && npm run test:previous
-```
+| Plugin | Commands |
+|--------|----------|
+| Fullscreen Detector | `npm test` · `npm run test:polling` |
+| Performance Monitor | `npm test` |
+| Processes Attacker | _(no tests)_ |
+| Toast Listener | `npm test` · `npm run test:polling` |
+| SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` |
 
 ### All Smoke Commands
 
-```bash
-# Fullscreen Detector
-cd plugins/windows-fullscreen-detector
-npm run smoke && npm run smoke:polling
-
-# Performance Monitor
-cd plugins/windows-performance-monitor
-npm run smoke && npm run smoke:polling
-
-# Toast Listener
-cd plugins/eisland-windows-toast-listener
-npm run smoke && npm run smoke:polling && npm run smoke:event && npm run smoke:suppression
-
-# SMTC Helper
-cd plugins/eisland-windows-smtc-helper
-npm run smoke && npm run smoke:status && npm run smoke:play && npm run smoke:pause && npm run smoke:next && npm run smoke:previous
-```
+| Plugin | Commands |
+|--------|----------|
+| Fullscreen Detector | `npm run smoke` · `npm run smoke:polling` |
+| Performance Monitor | `npm run smoke` · `npm run smoke:polling` |
+| Processes Attacker | _(no smoke)_ |
+| Toast Listener | `npm run smoke` · `npm run smoke:polling` · `npm run smoke:event` · `npm run smoke:suppression` |
+| SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` |
