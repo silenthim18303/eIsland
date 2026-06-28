@@ -70,7 +70,7 @@ import { setSmtcAccessor } from './music/smtcAccessor';
 import { createAutoHideWatcher } from './system/autoHideWatcher';
 import { createExternalAgentWatcher } from './system/externalAgentWatcher';
 import { createClaudeCodeStatusService } from './system/claudeCodeStatusService';
-import { sendMediaVirtualKey } from './system/mediaKey';
+import { play, pause, next } from '@eisland/windows-smtc-helper';
 import {
   queryFocusedWindow,
   queryOpenWindowsWithIcons,
@@ -398,10 +398,13 @@ const hotkeyService = createHotkeyService({
   },
   onNextSongHotkey: () => {
     if (!smtcService.isWhitelisted()) return;
-    sendMediaVirtualKey(0xB0);
+    next();
   },
   onPlayPauseSongHotkey: () => {
-    sendMediaVirtualKey(0xB3);
+    // 根据当前播放状态决定 play 还是 pause
+    const entry = smtcService.getSmtcSessionRuntime()?.get(smtcService.getCurrentDeviceId());
+    const isPlaying = Boolean(entry && (entry.payload as Record<string, unknown>)?.isPlaying);
+    if (isPlaying) pause(); else play();
   },
   onResetPositionHotkey: () => {
     mainWindowService.applyIslandPositionOffset(DEFAULT_ISLAND_POSITION_OFFSET);
@@ -498,7 +501,6 @@ function registerIpcHandlers(): void {
 
   registerMediaIpcHandlers({
     getMainWindow: () => mainWindow,
-    sendMediaVirtualKey,
     isWhitelisted: smtcService.isWhitelisted,
     getPendingSourceSwitchId: smtcService.getPendingSourceSwitchId,
     setPendingSourceSwitchId: smtcService.setPendingSourceSwitchId,

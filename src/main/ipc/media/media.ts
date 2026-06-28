@@ -26,6 +26,7 @@
  */
 
 import { BrowserWindow, ipcMain } from 'electron';
+import { play, pause, next, previous, seek } from '@eisland/windows-smtc-helper';
 
 interface MediaSessionRuntimeEntry {
   payload: unknown;
@@ -34,7 +35,6 @@ interface MediaSessionRuntimeEntry {
 
 interface RegisterMediaIpcHandlersOptions {
   getMainWindow: () => BrowserWindow | null;
-  sendMediaVirtualKey: (vkCode: number) => void;
   isWhitelisted: () => boolean;
   getPendingSourceSwitchId: () => string;
   setPendingSourceSwitchId: (id: string) => void;
@@ -57,17 +57,19 @@ export function registerMediaIpcHandlers(options: RegisterMediaIpcHandlersOption
   });
 
   ipcMain.handle('media:play-pause', () => {
-    options.sendMediaVirtualKey(0xB3);
+    const entry = options.getSmtcSessionRuntime()?.get(options.getCurrentDeviceId());
+    const isPlaying = Boolean(entry && (entry.payload as Record<string, unknown>)?.isPlaying);
+    if (isPlaying) pause(); else play();
   });
 
   ipcMain.handle('media:next', () => {
     if (!options.isWhitelisted()) return;
-    options.sendMediaVirtualKey(0xB0);
+    next();
   });
 
   ipcMain.handle('media:prev', () => {
     if (!options.isWhitelisted()) return;
-    options.sendMediaVirtualKey(0xB1);
+    previous();
   });
 
   ipcMain.handle('media:accept-source-switch', () => {
@@ -92,13 +94,14 @@ export function registerMediaIpcHandlers(options: RegisterMediaIpcHandlersOption
     options.clearPendingSourceSwitchEntry();
   });
 
-  ipcMain.handle('media:seek', (_event, _positionMs: number) => {
-    // SMTCMonitor 暂不支持 seek 操作
+  ipcMain.handle('media:seek', (_event, positionMs: number) => {
+    if (!options.isWhitelisted()) return;
+    seek(positionMs / 1000);
   });
 
   ipcMain.handle('media:get-volume', () => 0.5);
 
   ipcMain.handle('media:set-volume', (_event, _volume: number) => {
-    // SMTCMonitor 暂不支持设置音量
+    // SMTC 不支持应用级音量控制
   });
 }
