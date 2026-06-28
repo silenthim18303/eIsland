@@ -3,6 +3,9 @@ build/
 src/bin/
 src/obj/
 src/.vs/
+smtc-ctypes/bin/
+smtc-ctypes/obj/
+smtc-ctypes/.vs/
 *.log
 *.pdb
 *.ipdb

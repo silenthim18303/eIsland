@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "build": "dotnet build src/eIslandSmtcHelper.csproj -c Release",
-    "clean": "dotnet clean src/eIslandSmtcHelper.csproj",
+    "build:ctypes": "dotnet publish smtc-ctypes/eIslandSmtcCtypes.csproj -c Release -r win-x64",
+    "clean": "dotnet clean src/eIslandSmtcHelper.csproj && dotnet clean smtc-ctypes/eIslandSmtcCtypes.csproj",
     "rebuild": "dotnet clean src/eIslandSmtcHelper.csproj && dotnet build src/eIslandSmtcHelper.csproj -c Release",
     "test": "vitest run --config vitest.config.ts",
     "test:play": "vitest run --config vitest.config.ts test/smtc-helper.play.test.ts",
@@ -28,7 +29,8 @@
     "smoke:pause": "node --experimental-strip-types test/smtc-helper.pause.smoke.ts",
     "smoke:next": "node --experimental-strip-types test/smtc-helper.next.smoke.ts",
     "smoke:previous": "node --experimental-strip-types test/smtc-helper.previous.smoke.ts",
-    "smoke:status": "node --experimental-strip-types test/smtc-helper.status.smoke.ts"
+    "smoke:status": "node --experimental-strip-types test/smtc-helper.status.smoke.ts",
+    "test:ctypes": "python test/smtc_ctypes_test.py"
   },
   "devDependencies": {
     "@types/node": "^25.9.3"
