@@ -10,6 +10,7 @@
 /.env
 /RELEASE_NOTES_SINCE_LAST_TAG.md
 /docs/developer
+/.mcp.json
 
 node_modules/
 dist/
