@@ -31,6 +31,8 @@
     "smoke:next": "node --experimental-strip-types test/smtc-helper.next.smoke.ts",
     "smoke:previous": "node --experimental-strip-types test/smtc-helper.previous.smoke.ts",
     "smoke:status": "node --experimental-strip-types test/smtc-helper.status.smoke.ts",
+    "smoke:monitor": "node --experimental-strip-types test/smtc-helper.monitor.smoke.ts",
+    "smoke:seek": "node --experimental-strip-types test/smtc-helper.seek.smoke.ts",
     "test:ctypes": "python test/smtc_ctypes_test.py"
   },
   "dependencies": {
