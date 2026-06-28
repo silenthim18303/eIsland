@@ -18,8 +18,10 @@
  * GNU General Public License for more details.
  */
 
+using System.IO;
 using Windows.Media;
 using Windows.Media.Control;
+using Windows.Storage.Streams;
 
 namespace eIslandSmtcHelper;
 
@@ -99,6 +101,30 @@ public static class SmtcController
         }
     }
 
+    private static string? ReadThumbnailAsBase64(IRandomAccessStreamReference? thumbnail)
+    {
+        if (thumbnail == null)
+            return null;
+
+        try
+        {
+            using var stream = thumbnail.OpenReadAsync().GetAwaiter().GetResult();
+            if (stream == null || stream.Size == 0)
+                return null;
+
+            using var memoryStream = new MemoryStream();
+            stream.AsStreamForRead().CopyTo(memoryStream);
+            var bytes = memoryStream.ToArray();
+
+            var base64 = Convert.ToBase64String(bytes);
+            return $"data:image/jpeg;base64,{base64}";
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public static async Task<MediaStatus> GetStatusAsync()
     {
         try
@@ -108,23 +134,37 @@ public static class SmtcController
                 return MediaStatus.Empty;
 
             var playbackInfo = session.GetPlaybackInfo();
-            var timelineProperties = session.GetTimelineProperties();
+            var timeline = session.GetTimelineProperties();
 
             string? title = null;
             string? artist = null;
-            string? album = null;
+            string? albumTitle = null;
+            string? albumArtist = null;
+            int? trackNumber = null;
+            string[]? genres = null;
+            string? thumbnail = null;
 
             try
             {
                 var mediaProperties = await session.TryGetMediaPropertiesAsync();
                 title = mediaProperties.Title;
                 artist = mediaProperties.Artist;
-                album = mediaProperties.AlbumTitle;
+                albumTitle = mediaProperties.AlbumTitle;
+                albumArtist = mediaProperties.AlbumArtist;
+                trackNumber = mediaProperties.TrackNumber;
+
+                try
+                {
+                    var genreList = new List<string>();
+                    foreach (var genre in mediaProperties.Genres)
+                        genreList.Add(genre);
+                    genres = genreList.Count > 0 ? genreList.ToArray() : null;
+                }
+                catch { }
+
+                thumbnail = ReadThumbnailAsBase64(mediaProperties.Thumbnail);
             }
-            catch
-            {
-                // Media properties may not be available
-            }
+            catch { }
 
             var playbackStatus = playbackInfo.PlaybackStatus switch
             {
@@ -137,15 +177,46 @@ public static class SmtcController
                 _ => "unknown"
             };
 
+            var controls = new PlaybackControls
+            {
+                IsPlayEnabled = playbackInfo.Controls.IsPlayEnabled,
+                IsPauseEnabled = playbackInfo.Controls.IsPauseEnabled,
+                IsNextEnabled = playbackInfo.Controls.IsNextEnabled,
+                IsPreviousEnabled = playbackInfo.Controls.IsPreviousEnabled,
+                IsStopEnabled = playbackInfo.Controls.IsStopEnabled,
+                IsRecordEnabled = playbackInfo.Controls.IsRecordEnabled,
+                IsFastForwardEnabled = playbackInfo.Controls.IsFastForwardEnabled,
+                IsRewindEnabled = playbackInfo.Controls.IsRewindEnabled,
+                IsChannelUpEnabled = playbackInfo.Controls.IsChannelUpEnabled,
+                IsChannelDownEnabled = playbackInfo.Controls.IsChannelDownEnabled,
+            };
+
+            var timelineProperties = new TimelineProperties
+            {
+                StartTime = timeline.StartTime.TotalSeconds,
+                EndTime = timeline.EndTime.TotalSeconds,
+                Position = timeline.Position.TotalSeconds,
+                MinSeekTime = timeline.MinSeekTime.TotalSeconds,
+                MaxSeekTime = timeline.MaxSeekTime.TotalSeconds,
+            };
+
             return new MediaStatus
             {
                 IsAvailable = true,
                 Title = title,
                 Artist = artist,
-                Album = album,
+                AlbumTitle = albumTitle,
+                AlbumArtist = albumArtist,
+                TrackNumber = trackNumber,
+                Genres = genres,
                 PlaybackStatus = playbackStatus,
                 IsShuffleActive = playbackInfo.IsShuffleActive,
-                RepeatMode = (int?)playbackInfo.AutoRepeatMode
+                RepeatMode = (int?)playbackInfo.AutoRepeatMode,
+                PlaybackRate = playbackInfo.PlaybackRate,
+                SourceAppUserModelId = session.SourceAppUserModelId,
+                Thumbnail = thumbnail,
+                Timeline = timelineProperties,
+                Controls = controls,
             };
         }
         catch

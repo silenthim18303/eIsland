@@ -18,14 +18,51 @@
  * GNU General Public License for more details.
  */
 
+export interface TimelineProperties {
+  /** Start time of the media in seconds */
+  startTime: number;
+  /** End time of the media in seconds */
+  endTime: number;
+  /** Current playback position in seconds */
+  position: number;
+  /** Minimum seekable time in seconds */
+  minSeekTime: number;
+  /** Maximum seekable time in seconds */
+  maxSeekTime: number;
+}
+
+export interface PlaybackControls {
+  isPlayEnabled: boolean;
+  isPauseEnabled: boolean;
+  isNextEnabled: boolean;
+  isPreviousEnabled: boolean;
+  isStopEnabled: boolean;
+  isRecordEnabled: boolean;
+  isFastForwardEnabled: boolean;
+  isRewindEnabled: boolean;
+  isChannelUpEnabled: boolean;
+  isChannelDownEnabled: boolean;
+}
+
 export interface MediaStatus {
   isAvailable: boolean;
   title: string | null;
   artist: string | null;
-  album: string | null;
+  albumTitle: string | null;
+  albumArtist: string | null;
+  trackNumber: number | null;
+  genres: string[] | null;
   playbackStatus: 'playing' | 'paused' | 'stopped' | 'closed' | 'opened' | 'changing' | 'unknown';
   isShuffleActive: boolean | null;
   repeatMode: number | null;
+  /** Playback rate (1.0 = normal speed) */
+  playbackRate: number | null;
+  /** App User Model ID of the media source (e.g. "Microsoft.ZuneMusic_8wekyb3d8bbwe!Microsoft.ZuneMusic") */
+  sourceAppUserModelId: string | null;
+  /** Album art as a data URI (always image/jpeg, data:image/jpeg;base64,...) */
+  thumbnail: string | null;
+  timeline: TimelineProperties | null;
+  controls: PlaybackControls | null;
 }
 
 export interface CommandResult {

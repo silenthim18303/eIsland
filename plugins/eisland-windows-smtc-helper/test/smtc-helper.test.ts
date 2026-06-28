@@ -46,19 +46,60 @@ describe('@eisland/windows-smtc-helper', () => {
       expect(typeof status.isAvailable).toBe('boolean');
 
       if (status.isAvailable) {
-        expect(typeof status.playbackStatus).toBe('string');
-        expect(['playing', 'paused', 'stopped', 'closed', 'opened', 'changing', 'unknown']).toContain(status.playbackStatus);
-
-        // title, artist, album are string or null
+        // Media info
         if (status.title !== null) expect(typeof status.title).toBe('string');
         if (status.artist !== null) expect(typeof status.artist).toBe('string');
-        if (status.album !== null) expect(typeof status.album).toBe('string');
+        if (status.albumTitle !== null) expect(typeof status.albumTitle).toBe('string');
+        if (status.albumArtist !== null) expect(typeof status.albumArtist).toBe('string');
+        if (status.trackNumber !== null) expect(typeof status.trackNumber).toBe('number');
+        if (status.genres !== null) {
+          expect(Array.isArray(status.genres)).toBe(true);
+          for (const genre of status.genres) expect(typeof genre).toBe('string');
+        }
 
-        // isShuffleActive is boolean or null
+        // Playback state
+        expect(typeof status.playbackStatus).toBe('string');
+        expect(['playing', 'paused', 'stopped', 'closed', 'opened', 'changing', 'unknown']).toContain(status.playbackStatus);
         if (status.isShuffleActive !== null) expect(typeof status.isShuffleActive).toBe('boolean');
-
-        // repeatMode is number or null
         if (status.repeatMode !== null) expect(typeof status.repeatMode).toBe('number');
+        if (status.playbackRate !== null) expect(typeof status.playbackRate).toBe('number');
+
+        // Source
+        if (status.sourceAppUserModelId !== null) expect(typeof status.sourceAppUserModelId).toBe('string');
+
+        // Thumbnail (data URI or null)
+        if (status.thumbnail !== null) {
+          expect(typeof status.thumbnail).toBe('string');
+          expect(status.thumbnail).toMatch(/^data:image\/.+;base64,/);
+        }
+
+        // Timeline
+        expect(status.timeline).not.toBeNull();
+        if (status.timeline) {
+          expect(typeof status.timeline.startTime).toBe('number');
+          expect(typeof status.timeline.endTime).toBe('number');
+          expect(typeof status.timeline.position).toBe('number');
+          expect(typeof status.timeline.minSeekTime).toBe('number');
+          expect(typeof status.timeline.maxSeekTime).toBe('number');
+          expect(status.timeline.endTime).toBeGreaterThanOrEqual(status.timeline.startTime);
+          expect(status.timeline.position).toBeGreaterThanOrEqual(status.timeline.startTime);
+          expect(status.timeline.position).toBeLessThanOrEqual(status.timeline.endTime);
+        }
+
+        // Controls
+        expect(status.controls).not.toBeNull();
+        if (status.controls) {
+          expect(typeof status.controls.isPlayEnabled).toBe('boolean');
+          expect(typeof status.controls.isPauseEnabled).toBe('boolean');
+          expect(typeof status.controls.isNextEnabled).toBe('boolean');
+          expect(typeof status.controls.isPreviousEnabled).toBe('boolean');
+          expect(typeof status.controls.isStopEnabled).toBe('boolean');
+          expect(typeof status.controls.isRecordEnabled).toBe('boolean');
+          expect(typeof status.controls.isFastForwardEnabled).toBe('boolean');
+          expect(typeof status.controls.isRewindEnabled).toBe('boolean');
+          expect(typeof status.controls.isChannelUpEnabled).toBe('boolean');
+          expect(typeof status.controls.isChannelDownEnabled).toBe('boolean');
+        }
       }
     });
 

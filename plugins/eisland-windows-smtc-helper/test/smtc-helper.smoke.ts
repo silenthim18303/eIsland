@@ -26,28 +26,35 @@ console.log('1. getStatus():');
 const status = smtc.getStatus();
 console.log(JSON.stringify(status, null, 2));
 
+if (status.isAvailable) {
+  console.log('\n   Timeline:');
+  if (status.timeline) {
+    console.log(`     Position: ${status.timeline.position.toFixed(1)}s / ${status.timeline.endTime.toFixed(1)}s`);
+    console.log(`     Seek range: [${status.timeline.minSeekTime.toFixed(1)}s, ${status.timeline.maxSeekTime.toFixed(1)}s]`);
+  }
+
+  console.log('\n   Controls:');
+  if (status.controls) {
+    const enabled = Object.entries(status.controls)
+      .filter(([, v]) => v)
+      .map(([k]) => k);
+    console.log(`     Enabled: ${enabled.join(', ') || 'none'}`);
+  }
+
+  console.log(`\n   Source: ${status.sourceAppUserModelId ?? 'N/A'}`);
+  console.log(`   Thumbnail: ${status.thumbnail ? `(${status.thumbnail.length} chars data URI)` : 'N/A'}`);
+}
+
 console.log('\n2. play():');
-const playResult = smtc.play();
-console.log(JSON.stringify(playResult, null, 2));
+console.log(JSON.stringify(smtc.play(), null, 2));
 
-console.log('\n3. getStatus() after play:');
-const statusAfterPlay = smtc.getStatus();
-console.log(JSON.stringify(statusAfterPlay, null, 2));
+console.log('\n3. pause():');
+console.log(JSON.stringify(smtc.pause(), null, 2));
 
-console.log('\n4. pause():');
-const pauseResult = smtc.pause();
-console.log(JSON.stringify(pauseResult, null, 2));
+console.log('\n4. next():');
+console.log(JSON.stringify(smtc.next(), null, 2));
 
-console.log('\n5. getStatus() after pause:');
-const statusAfterPause = smtc.getStatus();
-console.log(JSON.stringify(statusAfterPause, null, 2));
-
-console.log('\n6. next():');
-const nextResult = smtc.next();
-console.log(JSON.stringify(nextResult, null, 2));
-
-console.log('\n7. previous():');
-const prevResult = smtc.previous();
-console.log(JSON.stringify(prevResult, null, 2));
+console.log('\n5. previous():');
+console.log(JSON.stringify(smtc.previous(), null, 2));
 
 console.log('\n=== Smoke Test Complete ===');

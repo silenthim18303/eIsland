@@ -20,15 +20,46 @@
 
 namespace eIslandSmtcHelper;
 
+public class TimelineProperties
+{
+    public double StartTime { get; init; }
+    public double EndTime { get; init; }
+    public double Position { get; init; }
+    public double MinSeekTime { get; init; }
+    public double MaxSeekTime { get; init; }
+}
+
+public class PlaybackControls
+{
+    public bool IsPlayEnabled { get; init; }
+    public bool IsPauseEnabled { get; init; }
+    public bool IsNextEnabled { get; init; }
+    public bool IsPreviousEnabled { get; init; }
+    public bool IsStopEnabled { get; init; }
+    public bool IsRecordEnabled { get; init; }
+    public bool IsFastForwardEnabled { get; init; }
+    public bool IsRewindEnabled { get; init; }
+    public bool IsChannelUpEnabled { get; init; }
+    public bool IsChannelDownEnabled { get; init; }
+}
+
 public class MediaStatus
 {
     public required bool IsAvailable { get; init; }
     public string? Title { get; init; }
     public string? Artist { get; init; }
-    public string? Album { get; init; }
+    public string? AlbumTitle { get; init; }
+    public string? AlbumArtist { get; init; }
+    public int? TrackNumber { get; init; }
+    public string[]? Genres { get; init; }
     public string? PlaybackStatus { get; init; }
     public bool? IsShuffleActive { get; init; }
     public int? RepeatMode { get; init; }
+    public double? PlaybackRate { get; init; }
+    public string? SourceAppUserModelId { get; init; }
+    public string? Thumbnail { get; init; }
+    public TimelineProperties? Timeline { get; init; }
+    public PlaybackControls? Controls { get; init; }
 
     public static MediaStatus Empty => new() { IsAvailable = false };
 }

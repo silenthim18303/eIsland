@@ -54,10 +54,18 @@ const emptyMediaStatus = Object.freeze({
   isAvailable: false,
   title: null,
   artist: null,
-  album: null,
+  albumTitle: null,
+  albumArtist: null,
+  trackNumber: null,
+  genres: null,
   playbackStatus: 'unknown',
   isShuffleActive: null,
   repeatMode: null,
+  playbackRate: null,
+  sourceAppUserModelId: null,
+  thumbnail: null,
+  timeline: null,
+  controls: null,
 });
 
 const emptyCommandResult = Object.freeze({
