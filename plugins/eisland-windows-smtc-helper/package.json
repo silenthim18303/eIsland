@@ -27,7 +27,8 @@
     "smoke:play": "node --experimental-strip-types test/smtc-helper.play.smoke.ts",
     "smoke:pause": "node --experimental-strip-types test/smtc-helper.pause.smoke.ts",
     "smoke:next": "node --experimental-strip-types test/smtc-helper.next.smoke.ts",
-    "smoke:previous": "node --experimental-strip-types test/smtc-helper.previous.smoke.ts"
+    "smoke:previous": "node --experimental-strip-types test/smtc-helper.previous.smoke.ts",
+    "smoke:status": "node --experimental-strip-types test/smtc-helper.status.smoke.ts"
   },
   "devDependencies": {
     "@types/node": "^25.9.3"
