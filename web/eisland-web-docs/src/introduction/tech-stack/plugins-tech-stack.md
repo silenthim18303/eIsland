@@ -6,12 +6,12 @@ icon: toolbox
 # Plugins Tech Stack
 
 :::warning
-This document provides an overview of the native Node.js addon plugins used in the eIsland application. All plugins are **Windows-only**, built with **C** and **Node-API (N-API)** via **node-gyp**, and exposed to the Electron main process as synchronous native modules.
+This document provides an overview of the native Node.js addon plugins used in the eIsland application. Plugins are **Windows-only**. Most are built with **C** and **Node-API (N-API)** via **node-gyp**, while the SMTC Helper and Bluetooth Helper use **C# .NET Native AOT** with **koffi FFI**.
 :::
 
 ## Overview
 
-The eIsland plugin system consists of four native addons that provide low-level Windows system capabilities unavailable through standard Node.js APIs:
+The eIsland plugin system consists of five native addons that provide low-level Windows system capabilities unavailable through standard Node.js APIs:
 
 | Plugin | Package | Purpose |
 |--------|---------|---------|
@@ -19,6 +19,7 @@ The eIsland plugin system consists of four native addons that provide low-level 
 | **Fullscreen Detector** | `@eisland/windows-fullscreen-detector` | Detect foreground fullscreen windows |
 | **Performance Monitor** | `@eisland/windows-performance-monitor` | CPU, memory, and temperature snapshots |
 | **SMTC Helper** | `@eisland/windows-smtc-helper` | System Media Transport Controls (play, pause, next, previous, status) |
+| **Bluetooth Helper** | `@eisland/windows-bluetooth-helper` | Bluetooth device enumeration and real-time connection monitoring |
 
 **Common Characteristics:**
 
@@ -890,6 +891,185 @@ Output: `temperature-helper/bin/Release/net10.0/eIslandTemperatureReader.exe`
 | `temperature-helper/HardwareCategoryMapper.cs` | `HardwareType` → category string mapping |
 | `temperature-helper/Snapshots.cs` | Data models with `Empty` fallback singletons |
 
+## Plugin: Windows Bluetooth Helper
+
+### Package
+
+```
+@eisland/windows-bluetooth-helper
+```
+
+### Purpose
+
+Provides Bluetooth device enumeration and real-time connection state monitoring. Used by eIsland to detect paired/connected Bluetooth devices (headphones, speakers, etc.) and respond to connection/disconnection events.
+
+:::info
+Like the SMTC Helper, this plugin uses the **koffi FFI + .NET Native AOT DLL** architecture. It wraps the `Windows.Devices.Bluetooth` and `Windows.Devices.Enumeration` WinRT APIs.
+:::
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  JavaScript Layer (index.js + bluetooth-monitor.js + ffi)   │
+│  Queries: getPairedDevices / getConnectedDevices / ...      │
+│  Monitor: BluetoothMonitor (EventEmitter) via koffi FFI     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ koffi FFI (direct DLL calls)
+┌──────────────────────────▼──────────────────────────────────┐
+│  eIslandBluetoothCtypes.dll (NativeAOT)                     │
+│  .NET 10 + Windows.Devices.Bluetooth                        │
+├─────────────────────────────────────────────────────────────┤
+│  BtExports.cs            — C-style exported functions       │
+│  BluetoothController.cs  — Device enumeration & queries     │
+│  BluetoothDeviceMonitor.cs — DeviceWatcher + ConnectionStatus│
+│  BtJsonContext.cs        — Source-generated JSON serialization│
+│  Snapshots.cs            — Data models                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+:::tip
+The plugin uses **two DeviceWatchers** (classic Bluetooth + BLE) to cover all device types. Connection state changes are tracked via `BluetoothDevice.ConnectionStatusChanged` events, not just DeviceWatcher enumeration events.
+:::
+
+### Exported Functions
+
+#### Queries
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `getPairedDevices` | `() → BluetoothDeviceInfo[]` | All paired Bluetooth devices |
+| `getConnectedDevices` | `() → BluetoothDeviceInfo[]` | Currently connected devices |
+| `getAllDevices` | `() → BluetoothDeviceInfo[]` | All visible devices (paired + nearby BLE) |
+| `getDevice` | `(deviceId: string) → BluetoothDeviceInfo \| null` | Single device snapshot by ID |
+
+#### BluetoothMonitor
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `BluetoothMonitor` | `class extends EventEmitter` | Real-time Bluetooth device monitor |
+
+**Events:**
+
+| Event | Callback | Description |
+|-------|----------|-------------|
+| `device-added` | `(device: BluetoothDeviceInfo) => void` | New device discovered |
+| `device-removed` | `(deviceId: string) => void` | Device no longer visible |
+| `device-connected` | `(device: BluetoothDeviceInfo) => void` | Device connected |
+| `device-disconnected` | `(deviceId: string) => void` | Device disconnected |
+| `device-updated` | `(device: BluetoothDeviceInfo) => void` | Device properties changed |
+
+### Result Structure
+
+```ts
+interface BluetoothDeviceInfo {
+  deviceId: string;              // Windows DeviceInformation ID
+  name: string | null;           // Device friendly name
+  bluetoothAddress: string | null; // MAC address as hex string
+  isConnected: boolean;          // Currently connected
+  isPaired: boolean;             // Paired with this PC
+  signalStrength: number | null; // RSSI in dBm
+  deviceClass: number | null;    // Class of Device (CoD)
+  appearance: number | null;     // BLE appearance category
+  serviceUuids: string[];        // GATT service UUIDs
+}
+```
+
+### Key Implementation Details
+
+**Device Discovery:**
+
+The plugin uses `BluetoothDevice.GetDeviceSelector()` and `BluetoothLEDevice.GetDeviceSelector()` to get the correct AQS filter strings, then creates two `DeviceWatcher` instances to cover both classic and BLE devices:
+
+```csharp
+// Classic Bluetooth watcher
+_classicWatcher = DeviceInformation.CreateWatcher(BluetoothController.GetClassicSelector());
+
+// BLE watcher
+_bleWatcher = DeviceInformation.CreateWatcher(BluetoothController.GetBleSelector());
+```
+
+:::warning
+Hardcoded AQS filters like `System.Devices.Aep.ProtocolId:="{e0cbf06c-...}"` do **not** work reliably. Always use the WinRT selector methods.
+:::
+
+**Connection Status Monitoring:**
+
+`DeviceWatcher` only reports enumeration changes (device appeared/disappeared). Connection state changes require subscribing to `BluetoothDevice.ConnectionStatusChanged`:
+
+```csharp
+var bt = BluetoothDevice.FromIdAsync(deviceId).GetAwaiter().GetResult();
+bt.ConnectionStatusChanged += (_, _) =>
+{
+    RefreshDeviceJson(deviceId);
+    SignalChange();
+};
+```
+
+**NativeAOT Property Limitation:**
+
+In NativeAOT, `string[]` and `List<string>` cannot be converted to WinRT `IIterable<string>`. The plugin works around this by not passing `additionalProperties` to `FindAllAsync`, and instead enriching device data via `BluetoothDevice.FromIdAsync()`.
+
+### Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `src/Snapshots.cs` | `BluetoothDeviceInfo` data model |
+| `src/BluetoothController.cs` | Device enumeration, `GetDeviceSelector()`, `BuildDeviceInfo()` |
+| `src/BluetoothDeviceMonitor.cs` | Dual `DeviceWatcher` engine + `ConnectionStatusChanged` subscriptions |
+| `bt-ctypes/BtExports.cs` | C-style exported functions for koffi FFI |
+| `bt-ctypes/BtJsonContext.cs` | JSON source generator for NativeAOT serialization |
+| `ffi-loader.js` | koffi FFI loader — defines all DLL function signatures |
+| `bluetooth-monitor.js` | `BluetoothMonitor` EventEmitter — wraps DLL monitoring into Node.js events |
+| `index.js` | Public API — exports queries + `BluetoothMonitor` |
+
+### Build
+
+```bash
+cd plugins/eisland-windows-bluetooth-helper
+npm run build          # dotnet build src/eIslandBluetoothHelper.csproj
+npm run build:ctypes   # dotnet publish bt-ctypes/... (NativeAOT DLL)
+npm run build:all      # Both
+```
+
+### Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| **.NET** | 10.0 | Runtime |
+| **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.Devices.Bluetooth` |
+| **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
+
+### Performance
+
+| Metric | Value |
+|--------|-------|
+| Query latency | ~10–50ms (WinRT `FindAllAsync` + `FromIdAsync`) |
+| Monitor startup | ~100ms (two `DeviceWatcher.Start()` calls) |
+| Event detection | Event-driven (zero polling) |
+| Memory | Single DLL loaded once; ~5MB resident |
+
+### Exported C Functions (ctypes DLL)
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `bt_free_string` | `(void*) → void` | Free a CoTaskMem-allocated string |
+| `bt_get_last_error` | `() → char*` | Get last error message |
+| `bt_get_paired_devices` | `() → char*` | JSON array of paired devices |
+| `bt_get_connected_devices` | `() → char*` | JSON array of connected devices |
+| `bt_get_all_devices` | `() → char*` | JSON array of all visible devices |
+| `bt_get_device` | `(char* id) → char*` | JSON object of single device |
+| `bt_start_monitoring` | `() → int` | Start device watcher. 0=success |
+| `bt_stop_monitoring` | `() → int` | Stop watcher. 0=success |
+| `bt_wait_for_changes` | `(int timeoutMs) → int` | Block until change. 0=changed, 1=timeout |
+| `bt_get_changes_count` | `() → int` | Read change counter (atomic) |
+| `bt_get_monitored_devices` | `() → char*` | JSON array from watcher cache |
+| `bt_get_monitored_device` | `(char* id) → char*` | JSON object from watcher cache |
+
+:::danger
+You **must** call `bt_free_string()` on any pointer returned by `bt_get_*` functions to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
+:::
+
 ## Testing
 
 ### Test Framework
@@ -966,6 +1146,7 @@ expect(foreground === null || typeof foreground === 'object').toBe(true);
 | **Fullscreen Detector** | `fullscreen-detector.test.ts`, `fullscreen-detector.polling.test.ts` | Shape validation, export verification |
 | **Performance Monitor** | `performance-monitor.test.ts` | Shape validation, range checks |
 | **SMTC Helper** | `smtc-helper.test.ts`, `smtc-helper.play.test.ts`, `smtc-helper.pause.test.ts`, `smtc-helper.next.test.ts`, `smtc-helper.previous.test.ts` | Shape validation, export verification, command tests |
+| **Bluetooth Helper** | `bluetooth.test.ts`, `bluetooth.monitor.test.ts` | Shape validation, export verification, monitor state management |
 
 ## Integration with Electron
 
@@ -1024,6 +1205,7 @@ Performance characteristics and optimization recommendations for each plugin:
 | **Performance Monitor (Memory)** | <0.1ms | `GlobalMemoryStatusEx` is a single kernel call |
 | **Performance Monitor (Temperature)** | ~500–2000ms | Spawns a .NET process; includes process startup + WMI queries |
 | **SMTC Helper** | ~50–200ms | Spawns a .NET process; WinRT session manager + media property reads |
+| **Bluetooth Helper** | ~10–50ms | WinRT `FindAllAsync` + `FromIdAsync`; event-driven monitoring |
 
 **Optimization Notes:**
 

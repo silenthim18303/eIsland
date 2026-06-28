@@ -11,7 +11,7 @@ This guide covers the environment configuration for eIsland plugin development. 
 
 ## Overview
 
-eIsland uses five native plugins to access Windows features that web technologies cannot provide:
+eIsland uses six native plugins to access Windows features that web technologies cannot provide:
 
 | Plugin | Language | Windows Libraries | Purpose |
 |--------|----------|-------------------|---------|
@@ -20,6 +20,7 @@ eIsland uses five native plugins to access Windows features that web technologie
 | **eisland-windows-processes-attacker** | C | kernel32 | Process management |
 | **eisland-windows-toast-listener** | C++ | runtimeobject | Windows notification listener |
 | **eisland-windows-smtc-helper** | C# (.NET) | — | System Media Transport Controls (play, pause, next, previous, status) |
+| **eisland-windows-bluetooth-helper** | C# (.NET) | — | Bluetooth device enumeration and real-time connection monitoring |
 
 :::important
 All plugins are compiled using **node-gyp**, which requires Visual Studio Build Tools 2022 as the native compiler. The `.npm install` process in the root project automatically triggers these builds.
@@ -199,6 +200,29 @@ eisland-windows-smtc-helper/
 2. **dotnet publish** compiles the NativeAOT DLL (requires `vswhere.exe` in PATH)
 3. At runtime, `index.js` spawns the .NET executable via `spawnSync` with CLI arguments
 4. The .NET app outputs JSON to stdout and exits
+
+The Bluetooth helper follows the same architecture as the SMTC helper:
+
+```
+eisland-windows-bluetooth-helper/
+├── package.json
+├── index.js               # JS entry point (exports queries + BluetoothMonitor)
+├── index.d.ts             # TypeScript type declarations
+├── ffi-loader.js          # koffi FFI loader for the NativeAOT DLL
+├── bluetooth-monitor.js   # EventEmitter wrapper for device monitoring
+├── src/
+│   └── eIslandBluetoothHelper.csproj  # .NET class library
+│       └── TargetFramework: net10.0-windows10.0.19041.0
+│       └── Uses: Windows.Devices.Bluetooth (WinRT)
+└── bt-ctypes/
+    └── eIslandBluetoothCtypes.csproj  # NativeAOT DLL (for koffi FFI)
+        └── TargetFramework: net10.0-windows10.0.19041.0
+        └── PublishAot: true
+```
+
+1. **dotnet build** compiles the .NET class library
+2. **dotnet publish** compiles the NativeAOT DLL (requires `vswhere.exe` in PATH)
+3. At runtime, `index.js` loads the DLL via koffi FFI and calls C-style exported functions
 :::
 
 ### Installation Summary
@@ -502,6 +526,24 @@ npm run smoke:event             # Event-driven smoke test
 npm run smoke:suppression       # Toast suppression smoke test
 npm run cli:suppression         # CLI tool for testing toast suppression
 ```
+
+### Bluetooth Helper Tests
+
+The `eisland-windows-bluetooth-helper` plugin has query and monitor test files:
+
+```bash
+cd plugins/eisland-windows-bluetooth-helper
+
+npm run test                    # All tests
+npm run test:query              # Query function tests (getPairedDevices, etc.)
+npm run test:monitor            # Monitor state management tests
+npm run smoke                   # Full smoke test — all query functions
+npm run smoke:monitor           # Monitor smoke test — event-driven tracking for 8s
+```
+
+:::tip
+The Bluetooth Helper smoke tests require a real Bluetooth adapter and at least one paired device to produce meaningful results. Without Bluetooth hardware, queries return empty arrays and the monitor reports no events.
+:::
 
 ## IDE Configuration
 

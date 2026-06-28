@@ -25,6 +25,7 @@ npm run <script>
 | **Processes Attacker** | `eisland-windows-processes-attacker` | C | node-gyp | ❌ | ❌ |
 | **Toast Listener** | `eisland-windows-toast-listener` | C++ | node-gyp | ✅ | ✅ |
 | **SMTC Helper** | `eisland-windows-smtc-helper` | C# | dotnet | ✅ | ✅ |
+| **Bluetooth Helper** | `eisland-windows-bluetooth-helper` | C# | dotnet | ✅ | ✅ |
 
 ## Common Commands
 
@@ -199,6 +200,41 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 
 ---
 
+## Windows Bluetooth Helper
+
+**Directory:** `plugins/eisland-windows-bluetooth-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build` / `dotnet publish`
+
+:::info
+This is a pure .NET plugin with two build targets: a class library (for development) and a NativeAOT DLL (for Node.js via koffi FFI).
+:::
+
+### Build
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `dotnet build src/eIslandBluetoothHelper.csproj -c Release` | Build the .NET class library |
+| `npm run build:ctypes` | `dotnet publish bt-ctypes/eIslandBluetoothCtypes.csproj -c Release -r win-x64` | Build the NativeAOT DLL for koffi FFI |
+| `npm run build:all` | `npm run build && npm run build:ctypes` | Build both |
+| `npm run clean` | `dotnet clean src/... + dotnet clean bt-ctypes/...` | Remove all build artifacts |
+| `npm run rebuild` | `npm run clean && npm run build:all` | Full clean build |
+
+### Test
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — export verification, shape validation, monitor tests |
+| `npm run test:query` | `vitest run test/bluetooth.test.ts` | Query function tests only |
+| `npm run test:monitor` | `vitest run test/bluetooth.monitor.test.ts` | Monitor tests only |
+
+### Smoke
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/bluetooth.smoke.ts` | Full smoke — all query functions + formatted output |
+| `npm run smoke:monitor` | `node --experimental-strip-types test/bluetooth.monitor.smoke.ts` | Monitor smoke — event-driven device tracking for 8s |
+
+---
+
 ## Quick Reference
 
 ### All Build Commands
@@ -212,6 +248,9 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | SMTC Helper (exe) | `cd plugins/eisland-windows-smtc-helper && npm run build` |
 | SMTC Helper (DLL) | `cd plugins/eisland-windows-smtc-helper && npm run build:ctypes` |
 | SMTC Helper (all) | `cd plugins/eisland-windows-smtc-helper && npm run build:all` |
+| Bluetooth Helper (exe) | `cd plugins/eisland-windows-bluetooth-helper && npm run build` |
+| Bluetooth Helper (DLL) | `cd plugins/eisland-windows-bluetooth-helper && npm run build:ctypes` |
+| Bluetooth Helper (all) | `cd plugins/eisland-windows-bluetooth-helper && npm run build:all` |
 | **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
@@ -223,6 +262,7 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | Processes Attacker | _(no tests)_ |
 | Toast Listener | `npm test` · `npm run test:polling` |
 | SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` · `npm run test:ctypes` |
+| Bluetooth Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 
 ### All Smoke Commands
 
@@ -233,3 +273,4 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | Processes Attacker | _(no smoke)_ |
 | Toast Listener | `npm run smoke` · `npm run smoke:polling` · `npm run smoke:event` · `npm run smoke:suppression` |
 | SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` · `npm run smoke:seek` · `npm run smoke:monitor` |
+| Bluetooth Helper | `npm run smoke` · `npm run smoke:monitor` |
