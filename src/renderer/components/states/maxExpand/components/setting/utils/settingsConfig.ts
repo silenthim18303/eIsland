@@ -511,6 +511,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   // ── 歌曲设置 > 歌词源 ──
   { label: '歌词源', desc: '自动模式根据 SMTC 检测到的播放器进程选择对应源，失败后依次尝试其他源，最后使用 LRCLIB 兜底', labelKey: 'settings.music.lyrics.title', descKey: 'settings.music.lyrics.hint', tab: 'music', musicPage: 'lyrics' },
   { label: '歌词显示', desc: '控制歌词界面的展示效果', labelKey: 'settings.music.lyrics.displayTitle', descKey: 'settings.music.lyrics.displayHint', tab: 'music', musicPage: 'lyrics' },
+  { label: '歌词校准', desc: '歌词获取后延迟读取 SMTC 时间戳，修正歌词时间偏移', labelKey: 'settings.music.lyrics.calibrateTitle', descKey: 'settings.music.lyrics.calibrateHint', tab: 'music', musicPage: 'lyrics' },
   // ── 歌曲设置 > SMTC ──
   { label: 'SMTC 自动取消订阅', desc: '用于清理长时间无更新的播放会话，默认永不取消订阅', labelKey: 'settings.music.smtc.title', descKey: 'settings.music.smtc.hint', tab: 'music', musicPage: 'smtc' },
   // ── AI Agent ──
