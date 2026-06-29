@@ -1241,6 +1241,173 @@ npm run build:all      # Both
 You **must** call `pw_free_string()` on any pointer returned by `pw_get_*` functions to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
 :::
 
+## Plugin: Windows WiFi Helper
+
+### Package
+
+```
+@eisland/windows-wifi-helper
+```
+
+### Purpose
+
+Provides real-time WiFi connection status monitoring. Used by eIsland to detect WiFi connect/disconnect events, track SSID changes, and monitor signal strength. Works on both WiFi-connected laptops and desktops using Ethernet (reports non-WiFi connections with `isWifiAdapter: false`).
+
+:::info
+This plugin follows the same **koffi FFI + .NET Native AOT DLL** architecture as the Bluetooth and Power Helpers. It wraps the `Windows.Networking.Connectivity.NetworkInformation` WinRT API.
+:::
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  JavaScript Layer (index.js + wifi-monitor.js + ffi)        │
+│  Query: getWifiInfo()                                       │
+│  Monitor: WifiMonitor (EventEmitter) via koffi FFI          │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ koffi FFI (direct DLL calls)
+┌──────────────────────────▼──────────────────────────────────┐
+│  eIslandWifiCtypes.dll (NativeAOT)                          │
+│  .NET 10 + Windows.Networking.Connectivity                  │
+├─────────────────────────────────────────────────────────────┤
+│  WfExports.cs          — C-style exported functions         │
+│  WifiController.cs     — Connection profile queries         │
+│  WifiMonitor.cs        — NetworkStatusChanged subscriptions │
+│  WfJsonContext.cs      — Source-generated JSON serialization│
+│  WifiInfo.cs           — Data model                         │
+└─────────────────────────────────────────────────────────────┘
+```
+
+:::tip
+The plugin uses `NetworkInformation.NetworkStatusChanged` — a single event subscription that covers all network changes. WiFi-specific filtering is done by checking `NetworkAdapter.IanaInterfaceType == 71` (WiFi).
+:::
+
+### Exported Functions
+
+#### Queries
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `getWifiInfo` | `() → WifiInfo \| null` | Current WiFi connection status snapshot |
+
+#### WifiMonitor
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `WifiMonitor` | `class extends EventEmitter` | Real-time WiFi status monitor |
+
+**Events:**
+
+| Event | Callback | Description |
+|-------|----------|-------------|
+| `wifi-connected` | `(info: WifiInfo) => void` | WiFi connected |
+| `wifi-disconnected` | `(info: WifiInfo) => void` | WiFi disconnected |
+| `ssid-changed` | `(info: WifiInfo) => void` | SSID changed (network switch) |
+| `signal-changed` | `(info: WifiInfo) => void` | Signal strength changed |
+| `wifi-changed` | `(info: WifiInfo) => void` | Any WiFi status change (generic event) |
+
+### Result Structure
+
+```ts
+interface WifiInfo {
+  isConnected: boolean;          // Whether connected to a network
+  ssid: string | null;           // WiFi network name, null if not connected or not WiFi
+  signalBars: number;            // 0-5 bars, -1 if unavailable
+  connectivityLevel: number;     // 0=None, 1=LocalAccess, 2=ConstrainedInternet, 3=InternetAccess
+  adapterName: string | null;    // Network adapter GUID, null if no adapter
+  isWifiAdapter: boolean;        // true if adapter is WiFi (IANA type 71)
+}
+```
+
+:::important
+When connected via Ethernet (not WiFi), `isWifiAdapter` is `false` and `ssid` is `null`. The `isConnected` and `connectivityLevel` fields still reflect the Ethernet connection state. This allows the plugin to be useful on desktop machines without WiFi hardware.
+:::
+
+### Key Implementation Details
+
+**NetworkInformation API:**
+
+The plugin uses `NetworkInformation.GetInternetConnectionProfile()` to get the active connection profile, then inspects the `NetworkAdapter` to determine if it is WiFi:
+
+```csharp
+var profile = NetworkInformation.GetInternetConnectionProfile();
+var adapter = profile.NetworkAdapter;
+var isWifi = adapter?.IanaInterfaceType == 71;
+var connectivityLevel = (int)profile.GetNetworkConnectivityLevel();
+```
+
+**Event Subscription:**
+
+A single `NetworkStatusChanged` event covers all network state changes. The JavaScript layer diffs previous and current state to emit specific events:
+
+```csharp
+NetworkInformation.NetworkStatusChanged += _statusChangedHandler;
+```
+
+:::note
+Like the Power Helper, the `NetworkInformation` API works directly on any thread — no STA thread wrapper is needed. This simplifies the monitor implementation compared to the Bluetooth Helper.
+:::
+
+**SSID Extraction:**
+
+The SSID is extracted via `ConnectionProfile.WlanConnectionProfileDetails.GetConnectedSsid()`. This method is only available for WiFi connections; for Ethernet or other adapters, it returns `null`.
+
+### Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `src/WifiInfo.cs` | `WifiInfo` data model |
+| `src/WifiController.cs` | Connection profile queries via `NetworkInformation` |
+| `src/WifiMonitor.cs` | `NetworkStatusChanged` event subscription + Win32 event signaling |
+| `wf-ctypes/WfExports.cs` | C-style exported functions for koffi FFI |
+| `wf-ctypes/WfJsonContext.cs` | JSON source generator for NativeAOT serialization |
+| `ffi-loader.js` | koffi FFI loader — defines all DLL function signatures |
+| `wifi-monitor.js` | `WifiMonitor` EventEmitter — wraps DLL monitoring into Node.js events |
+| `index.js` | Public API — exports `getWifiInfo()` + `WifiMonitor` |
+
+### Build
+
+```bash
+cd plugins/eisland-windows-wifi-helper
+npm run build          # dotnet build src/eIslandWifiHelper.csproj
+npm run build:ctypes   # dotnet publish wf-ctypes/... (NativeAOT DLL)
+npm run build:all      # Both
+```
+
+### Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| **.NET** | 10.0 | Runtime |
+| **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.Networking.Connectivity` |
+| **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
+
+### Performance
+
+| Metric | Value |
+|--------|-------|
+| Query latency | ~1ms (in-memory `NetworkInformation` profile reads) |
+| Monitor startup | ~5ms (single event subscription) |
+| Event detection | Event-driven (zero polling) |
+| Memory | Single DLL loaded once; ~4MB resident |
+
+### Exported C Functions (ctypes DLL)
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `wf_free_string` | `(void*) → void` | Free a CoTaskMem-allocated string |
+| `wf_get_last_error` | `() → char*` | Get last error message |
+| `wf_get_wifi_info` | `() → char*` | JSON object of current WiFi status |
+| `wf_start_monitoring` | `() → int` | Start WiFi monitoring. 0=success |
+| `wf_stop_monitoring` | `() → int` | Stop monitoring. 0=success |
+| `wf_wait_for_changes` | `(int timeoutMs) → int` | Block until change. 0=changed, 1=timeout |
+| `wf_get_changes_count` | `() → int` | Read change counter (atomic) |
+| `wf_get_monitored_wifi_info` | `() → char*` | JSON object of latest monitored WiFi status |
+
+:::danger
+You **must** call `wf_free_string()` on any pointer returned by `wf_get_*` functions to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
+:::
+
 ## Testing
 
 ### Test Framework

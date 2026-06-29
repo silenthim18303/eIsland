@@ -270,6 +270,41 @@ This plugin follows the same dual-build pattern as the Bluetooth Helper: a .NET 
 
 ---
 
+## Windows WiFi Helper
+
+**Directory:** `plugins/eisland-windows-wifi-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build` / `dotnet publish`
+
+:::info
+This plugin follows the same dual-build pattern as the Bluetooth and Power Helpers: a .NET class library for development and a NativeAOT DLL for Node.js via koffi FFI.
+:::
+
+### Build
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `dotnet build src/eIslandWifiHelper.csproj -c Release` | Build the .NET class library |
+| `npm run build:ctypes` | `dotnet publish wf-ctypes/eIslandWifiCtypes.csproj -c Release -r win-x64` | Build the NativeAOT DLL for koffi FFI |
+| `npm run build:all` | `npm run build && npm run build:ctypes` | Build both |
+| `npm run clean` | `dotnet clean src/... + dotnet clean wf-ctypes/...` | Remove all build artifacts |
+| `npm run rebuild` | `npm run clean && npm run build:all` | Full clean build |
+
+### Test
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — shape validation, consistency, monitor tests |
+| `npm run test:query` | `vitest run test/wifi.test.ts` | Query function tests only |
+| `npm run test:monitor` | `vitest run test/wifi.monitor.test.ts` | Monitor tests only |
+
+### Smoke
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/wifi.smoke.ts` | Full smoke — query WiFi info with formatted output |
+| `npm run smoke:monitor` | `node --experimental-strip-types test/wifi.monitor.smoke.ts` | Monitor smoke — event-driven WiFi tracking for 8s |
+
+---
+
 ## Quick Reference
 
 ### All Build Commands
@@ -289,6 +324,9 @@ This plugin follows the same dual-build pattern as the Bluetooth Helper: a .NET 
 | Power Helper (exe) | `cd plugins/eisland-windows-power-helper && npm run build` |
 | Power Helper (DLL) | `cd plugins/eisland-windows-power-helper && npm run build:ctypes` |
 | Power Helper (all) | `cd plugins/eisland-windows-power-helper && npm run build:all` |
+| WiFi Helper (exe) | `cd plugins/eisland-windows-wifi-helper && npm run build` |
+| WiFi Helper (DLL) | `cd plugins/eisland-windows-wifi-helper && npm run build:ctypes` |
+| WiFi Helper (all) | `cd plugins/eisland-windows-wifi-helper && npm run build:all` |
 | **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
@@ -302,6 +340,7 @@ This plugin follows the same dual-build pattern as the Bluetooth Helper: a .NET 
 | SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` · `npm run test:ctypes` |
 | Bluetooth Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | Power Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
+| WiFi Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 
 ### All Smoke Commands
 
@@ -314,3 +353,4 @@ This plugin follows the same dual-build pattern as the Bluetooth Helper: a .NET 
 | SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` · `npm run smoke:seek` · `npm run smoke:monitor` |
 | Bluetooth Helper | `npm run smoke` · `npm run smoke:monitor` |
 | Power Helper | `npm run smoke` · `npm run smoke:monitor` |
+| WiFi Helper | `npm run smoke` · `npm run smoke:monitor` |
