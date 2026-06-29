@@ -1070,6 +1070,177 @@ npm run build:all      # Both
 You **must** call `bt_free_string()` on any pointer returned by `bt_get_*` functions to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
 :::
 
+## Plugin: Windows Power Helper
+
+### Package
+
+```
+@eisland/windows-power-helper
+```
+
+### Purpose
+
+Provides real-time battery status and power event monitoring. Used by eIsland to display battery level, detect AC power connection/disconnection, and respond to low battery conditions. Works on both laptops (with battery) and desktops (no battery).
+
+:::info
+This plugin follows the same **koffi FFI + .NET Native AOT DLL** architecture as the Bluetooth Helper. It wraps the `Windows.System.Power.PowerManager` WinRT API.
+:::
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  JavaScript Layer (index.js + power-monitor.js + ffi)       │
+│  Query: getPowerInfo()                                      │
+│  Monitor: PowerMonitor (EventEmitter) via koffi FFI         │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ koffi FFI (direct DLL calls)
+┌──────────────────────────▼──────────────────────────────────┐
+│  eIslandPowerCtypes.dll (NativeAOT)                         │
+│  .NET 10 + Windows.System.Power.PowerManager                │
+├─────────────────────────────────────────────────────────────┤
+│  PwExports.cs          — C-style exported functions         │
+│  PowerController.cs    — Power status queries               │
+│  PowerMonitor.cs       — PowerManager event subscriptions   │
+│  PwJsonContext.cs      — Source-generated JSON serialization│
+│  PowerInfo.cs          — Data model                         |
+└─────────────────────────────────────────────────────────────┘
+```
+
+:::tip
+The `PowerManager` class is entirely static — no instance creation needed. All properties and events are accessed directly via `PowerManager.RemainingChargePercent`, `PowerManager.BatteryStatusChanged`, etc.
+:::
+
+### Exported Functions
+
+#### Queries
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `getPowerInfo` | `() → PowerInfo \| null` | Current power status snapshot |
+
+#### PowerMonitor
+
+| Export | Type | Description |
+|--------|------|-------------|
+| `PowerMonitor` | `class extends EventEmitter` | Real-time power status monitor |
+
+**Events:**
+
+| Event | Callback | Description |
+|-------|----------|-------------|
+| `ac-connected` | `(info: PowerInfo) => void` | AC power connected |
+| `ac-disconnected` | `(info: PowerInfo) => void` | AC power disconnected (running on battery) |
+| `battery-low` | `(info: PowerInfo) => void` | Battery level dropped to 15% or below |
+| `charging` | `(info: PowerInfo) => void` | Started charging |
+| `discharging` | `(info: PowerInfo) => void` | Stopped charging (unplugged or fully charged) |
+| `power-changed` | `(info: PowerInfo) => void` | Any power status change (generic event) |
+
+### Result Structure
+
+```ts
+interface PowerInfo {
+  remainingChargePercent: number;  // 0-100, or 100 on desktops with no battery
+  batteryStatus: number;           // 0=NotPresent, 1=Discharging, 2=Idle, 3=Charging
+  powerSupplyStatus: number;       // 0=NotPresent, 1=Adequate, 2=Inadequate, 3=Unknown
+  energySaverStatus: number;       // 0=Disabled, 1=Off, 2=On
+  hasBattery: boolean;             // false on desktops
+  isCharging: boolean;             // true when batteryStatus is Charging
+  isOnAcPower: boolean;            // true when batteryStatus is not Discharging
+}
+```
+
+:::important
+On desktops without a battery, `hasBattery` is `false`, `batteryStatus` is `0` (NotPresent), and `remainingChargePercent` is `100`. The `isOnAcPower` field uses `batteryStatus != Discharging` rather than `powerSupplyStatus` to correctly handle cases where the power supply is "Inadequate" (e.g., a low-wattage charger still provides AC power).
+:::
+
+### Key Implementation Details
+
+**PowerManager API:**
+
+The plugin uses the WinRT `Windows.System.Power.PowerManager` static class. All properties are read-only and event-driven:
+
+```csharp
+var batteryStatus = (int)PowerManager.BatteryStatus;
+var remainingChargePercent = PowerManager.RemainingChargePercent;
+var energySaverStatus = (int)PowerManager.EnergySaverStatus;
+```
+
+**Event Subscriptions:**
+
+The monitor subscribes to four `PowerManager` events. Event handler references are stored to prevent GC collection and enable clean unsubscription:
+
+```csharp
+PowerManager.RemainingChargePercentChanged += _chargePercentHandler;
+PowerManager.BatteryStatusChanged += _batteryStatusHandler;
+PowerManager.PowerSupplyStatusChanged += _powerSupplyHandler;
+PowerManager.EnergySaverStatusChanged += _energySaverHandler;
+```
+
+:::note
+Unlike the Bluetooth Helper which requires STA threads for WinRT COM, the `PowerManager` API works directly on any thread. No `RunOnSTAThread` wrapper is needed.
+:::
+
+**Low Battery Detection:**
+
+The JavaScript layer implements low battery detection by comparing current and previous states. The threshold is 15% — the `battery-low` event fires only when the percentage crosses below this threshold while on battery power (not charging).
+
+### Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `src/PowerInfo.cs` | `PowerInfo` data model |
+| `src/PowerController.cs` | Power status queries via `PowerManager` |
+| `src/PowerMonitor.cs` | `PowerManager` event subscriptions + Win32 event signaling |
+| `pw-ctypes/PwExports.cs` | C-style exported functions for koffi FFI |
+| `pw-ctypes/PwJsonContext.cs` | JSON source generator for NativeAOT serialization |
+| `ffi-loader.js` | koffi FFI loader — defines all DLL function signatures |
+| `power-monitor.js` | `PowerMonitor` EventEmitter — wraps DLL monitoring into Node.js events |
+| `index.js` | Public API — exports `getPowerInfo()` + `PowerMonitor` |
+
+### Build
+
+```bash
+cd plugins/eisland-windows-power-helper
+npm run build          # dotnet build src/eIslandPowerHelper.csproj
+npm run build:ctypes   # dotnet publish pw-ctypes/... (NativeAOT DLL)
+npm run build:all      # Both
+```
+
+### Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| **.NET** | 10.0 | Runtime |
+| **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.System.Power` |
+| **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
+
+### Performance
+
+| Metric | Value |
+|--------|-------|
+| Query latency | ~1ms (in-memory `PowerManager` property reads) |
+| Monitor startup | ~5ms (event subscription only, no watcher) |
+| Event detection | Event-driven (zero polling) |
+| Memory | Single DLL loaded once; ~4MB resident |
+
+### Exported C Functions (ctypes DLL)
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `pw_free_string` | `(void*) → void` | Free a CoTaskMem-allocated string |
+| `pw_get_last_error` | `() → char*` | Get last error message |
+| `pw_get_power_info` | `() → char*` | JSON object of current power status |
+| `pw_start_monitoring` | `() → int` | Start power monitoring. 0=success |
+| `pw_stop_monitoring` | `() → int` | Stop monitoring. 0=success |
+| `pw_wait_for_changes` | `(int timeoutMs) → int` | Block until change. 0=changed, 1=timeout |
+| `pw_get_changes_count` | `() → int` | Read change counter (atomic) |
+| `pw_get_monitored_power_info` | `() → char*` | JSON object of latest monitored power status |
+
+:::danger
+You **must** call `pw_free_string()` on any pointer returned by `pw_get_*` functions to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
+:::
+
 ## Testing
 
 ### Test Framework

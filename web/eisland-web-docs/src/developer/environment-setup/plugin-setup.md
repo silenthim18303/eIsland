@@ -11,7 +11,7 @@ This guide covers the environment configuration for eIsland plugin development. 
 
 ## Overview
 
-eIsland uses six native plugins to access Windows features that web technologies cannot provide:
+eIsland uses seven native plugins to access Windows features that web technologies cannot provide:
 
 | Plugin | Language | Windows Libraries | Purpose |
 |--------|----------|-------------------|---------|
@@ -21,6 +21,7 @@ eIsland uses six native plugins to access Windows features that web technologies
 | **eisland-windows-toast-listener** | C++ | runtimeobject | Windows notification listener |
 | **eisland-windows-smtc-helper** | C# (.NET) | — | System Media Transport Controls (play, pause, next, previous, status) |
 | **eisland-windows-bluetooth-helper** | C# (.NET) | — | Bluetooth device enumeration and real-time connection monitoring |
+| **eisland-windows-power-helper** | C# (.NET) | — | Battery status and power event monitoring |
 
 :::important
 All plugins are compiled using **node-gyp**, which requires Visual Studio Build Tools 2022 as the native compiler. The `.npm install` process in the root project automatically triggers these builds.

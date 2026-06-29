@@ -235,6 +235,41 @@ This is a pure .NET plugin with two build targets: a class library (for developm
 
 ---
 
+## Windows Power Helper
+
+**Directory:** `plugins/eisland-windows-power-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build` / `dotnet publish`
+
+:::info
+This plugin follows the same dual-build pattern as the Bluetooth Helper: a .NET class library for development and a NativeAOT DLL for Node.js via koffi FFI.
+:::
+
+### Build
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `dotnet build src/eIslandPowerHelper.csproj -c Release` | Build the .NET class library |
+| `npm run build:ctypes` | `dotnet publish pw-ctypes/eIslandPowerCtypes.csproj -c Release -r win-x64` | Build the NativeAOT DLL for koffi FFI |
+| `npm run build:all` | `npm run build && npm run build:ctypes` | Build both |
+| `npm run clean` | `dotnet clean src/... + dotnet clean pw-ctypes/...` | Remove all build artifacts |
+| `npm run rebuild` | `npm run clean && npm run build:all` | Full clean build |
+
+### Test
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — shape validation, consistency, monitor tests |
+| `npm run test:query` | `vitest run test/power.test.ts` | Query function tests only |
+| `npm run test:monitor` | `vitest run test/power.monitor.test.ts` | Monitor tests only |
+
+### Smoke
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/power.smoke.ts` | Full smoke — query power info with formatted output |
+| `npm run smoke:monitor` | `node --experimental-strip-types test/power.monitor.smoke.ts` | Monitor smoke — event-driven power tracking for 8s |
+
+---
+
 ## Quick Reference
 
 ### All Build Commands
@@ -251,6 +286,9 @@ This is a pure .NET plugin with two build targets: a class library (for developm
 | Bluetooth Helper (exe) | `cd plugins/eisland-windows-bluetooth-helper && npm run build` |
 | Bluetooth Helper (DLL) | `cd plugins/eisland-windows-bluetooth-helper && npm run build:ctypes` |
 | Bluetooth Helper (all) | `cd plugins/eisland-windows-bluetooth-helper && npm run build:all` |
+| Power Helper (exe) | `cd plugins/eisland-windows-power-helper && npm run build` |
+| Power Helper (DLL) | `cd plugins/eisland-windows-power-helper && npm run build:ctypes` |
+| Power Helper (all) | `cd plugins/eisland-windows-power-helper && npm run build:all` |
 | **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
@@ -263,6 +301,7 @@ This is a pure .NET plugin with two build targets: a class library (for developm
 | Toast Listener | `npm test` · `npm run test:polling` |
 | SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` · `npm run test:ctypes` |
 | Bluetooth Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
+| Power Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 
 ### All Smoke Commands
 
@@ -274,3 +313,4 @@ This is a pure .NET plugin with two build targets: a class library (for developm
 | Toast Listener | `npm run smoke` · `npm run smoke:polling` · `npm run smoke:event` · `npm run smoke:suppression` |
 | SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` · `npm run smoke:seek` · `npm run smoke:monitor` |
 | Bluetooth Helper | `npm run smoke` · `npm run smoke:monitor` |
+| Power Helper | `npm run smoke` · `npm run smoke:monitor` |
