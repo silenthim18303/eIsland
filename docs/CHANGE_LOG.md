@@ -1,7 +1,70 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-20T08:10:13.745Z
+> 生成时间：2026-06-29T11:52:24.893Z
+
+## 26.6.3
+
+- 2026-06-20 | abf96eca | 鸡哥 | chore: update version to 26.6.3 in package.json and package-lock.json
+- 2026-06-20 | 15e0eda7 | 鸡哥 | docs(announcement): add V26.6.3 release notes
+- 2026-06-20 | c9ab5bc7 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #106 by @JNTMTMTM [skip ci]
+- 2026-06-20 | 9694e9bc | 鸡哥 | Merge pull request #106 from JNTMTMTM/dev
+- 2026-06-20 | 87598a1c | 鸡哥 | fix(stock): improve null and undefined checks in stock search results parsing
+- 2026-06-20 | dad3afef | 鸡哥 | feat: add licensing information and file descriptions to multiple components and utilities
+- 2026-06-20 | 8cc29d8f | 鸡哥 | feat(i18n): add stock market translations for English and Chinese
+- 2026-06-20 | 42cbec23 | 鸡哥 | feat(maxExpand): update tab visibility logic to ensure 'overview' remains always visible
+- 2026-06-20 | 6922975f | 鸡哥 | fix(maxExpand): refine tab visibility logic based on startup mode
+- 2026-06-20 | 1d9559a1 | 鸡哥 | feat(maxExpand): enhance maxExpand functionality and layout management
+- 2026-06-20 | 9cce8c27 | 鸡哥 | feat(web): initialize web application structure with essential components and configurations
+- 2026-06-20 | 9d9ebd87 | 鸡哥 | feat(navbar): add GlassNavbar component with styling and logo
+- 2026-06-20 | d4e9fb94 | 鸡哥 | feat(simplex-flow): implement SimplexFlowBackground component and related functionality
+- 2026-06-20 | 10471cf1 | 鸡哥 | feat(stock-sidebar): add period selection functionality and update translations
+- 2026-06-20 | f4315acf | 鸡哥 | feat(stock-sidebar): improve stock deletion experience and accessibility
+- 2026-06-20 | 7a0e5887 | 鸡哥 | feat(stock-sidebar): add animations for stock deletion controls
+- 2026-06-20 | d09cdec7 | 鸡哥 | feat(stock-sidebar): implement favorite deletion functionality and update translations
+- 2026-06-20 | 7b3c261c | 鸡哥 | chore: add .gitkeep file to eisland-web directory for tracking empty folder
+- 2026-06-20 | d6a2f341 | 鸡哥 | feat(stock-sidebar): add delete favorite button and update translations
+- 2026-06-20 | 9b3c246a | 鸡哥 | feat(stock-sidebar): implement favorite search functionality and update translations
+- 2026-06-20 | 096bf0bb | 鸡哥 | feat(stock-search): enhance favorite functionality in StockSearchPanel and StockSidebar
+- 2026-06-20 | de21e98b | 鸡哥 | refactor(issue-auto-label): enhance label categorization and color mapping
+- 2026-06-20 | 8ba4c1eb | 鸡哥 | feat(stock-sidebar): add refresh option and update translations
+- 2026-06-20 | 752c3363 | 鸡哥 | refactor(stock-sidebar): update initial state of sidebar components
+- 2026-06-20 | c4aa9e22 | 鸡哥 | feat(stock-sidebar): add refresh functionality to StockSidebar
+- 2026-06-20 | 236d8d0a | 鸡哥 | refactor(stock-sidebar): enhance keyboard accessibility and styling for favorite items
+- 2026-06-20 | 3b06c738 | 鸡哥 | refactor(stock-search): enhance keyboard and mouse interaction in StockSearchPanel
+- 2026-06-20 | 920d7cd8 | 鸡哥 | refactor(stock-search): simplify StockSearchPanel search result handling
+- 2026-06-20 | 96e53600 | 鸡哥 | refactor(stock-search): enhance StockSearchPanel layout and styling
+- 2026-06-20 | 6b67476e | 鸡哥 | feat(stock-search): implement keyword persistence and clear functionality in StockSearchPanel
+- 2026-06-19 | 4ad2dc71 | 鸡哥 | refactor(stock-sidebar): enhance styling for search results in settings-stock.css
+- 2026-06-19 | 4ba30483 | 鸡哥 | refactor(stock-sidebar): update sidebar styling for search mode and adjust dimensions
+- 2026-06-19 | 14b83e06 | 鸡哥 | refactor(stock-sidebar): enhance layout and styling of stock favorite items
+- 2026-06-19 | df9f302d | 鸡哥 | refactor(stock-sidebar): streamline StockSidebar layout and adjust CSS padding
+- 2026-06-19 | df8dafa6 | 鸡哥 | refactor(stock-module): remove StockAddFavoritePanel and streamline StockSidebar
+- 2026-06-19 | 5a470971 | 鸡哥 | feat(stock-module): add stock symbol normalization and validation in useStockMarketData hook
+- 2026-06-19 | 25574024 | 鸡哥 | feat(stock-module): implement favorites management in Stock components
+- 2026-06-19 | 52655a4c | 鸡哥 | feat(stock-module): enhance StockSearchPanel and translations for improved user experience
+- 2026-06-19 | a99fee94 | 鸡哥 | feat(svg-icons): add SEARCH icon and update SvgIcon references
+- 2026-06-19 | dc5a0f49 | 鸡哥 | feat(stock-module): enhance StockTab with new favorite addition hints
+- 2026-06-19 | d54aa1b4 | 鸡哥 | style(stock-module): update StockTab component and CSS for sidebar enhancements
+- 2026-06-19 | 9dfad40c | 鸡哥 | feat(stock-module): implement sidebar navigation for StockTab with favorites management
+- 2026-06-19 | e41f2eca | 鸡哥 | feat(svg-icons): add STOCK_CHOOSE icon and update SvgIcon references
+- 2026-06-19 | d492f653 | 鸡哥 | style(stock-module): simplify klineChart title and adjust stock chart padding
+- 2026-06-19 | 2b4bf8e9 | 鸡哥 | style(stock-module): update klineChartOptions and settings-stock.css for improved visuals
+- 2026-06-19 | 668a760f | 鸡哥 | refactor(stock-module): simplify StockKlineChart by utilizing helper functions
+- 2026-06-19 | e048e440 | 鸡哥 | style(stock-module): update StockTab layout and CSS for improved presentation
+- 2026-06-19 | 1d1ca58a | 鸡哥 | feat(eisland-windows-processes-attacker): expand module functionality with additional source files
+- 2026-06-19 | 0cb8b52e | 鸡哥 | style(stock-module): refine layout and alignment in settings-stock.css
+- 2026-06-19 | 6a960a87 | 鸡哥 | style(stock-module): adjust padding and height in settings-stock.css
+- 2026-06-19 | 90063239 | 鸡哥 | feat(stock-module): enhance StockKlineChart with accent color styling
+- 2026-06-18 | 34a77e07 | 鸡哥 | feat(stock-module): enhance StockKlineChart with navigator mask styling
+- 2026-06-18 | 9a54b3f7 | 鸡哥 | fix(stock-module): resolve layout issues in StockTab metrics panel
+- 2026-06-18 | e15316a3 | 鸡哥 | feat(stock-module): enhance StockTab with collapsible metrics panel
+- 2026-06-18 | 434a8c6b | 鸡哥 | refactor(stock-module): streamline StockMetrics and StockTab components
+- 2026-06-18 | 5ab11e1f | 鸡哥 | feat(stock-module): introduce stock market tab with live data and metrics
+- 2026-06-17 | 1913fb66 | 鸡哥 | feat(windows-performance-monitor): add hardware list monitoring functionality
+- 2026-06-17 | 9a316eb3 | 鸡哥 | refactor(tests): improve logging in performance monitor smoke tests
+- 2026-06-17 | 2d2603ee | 鸡哥 | feat(windows-performance-monitor): add temperature monitoring functionality
+- 2026-06-17 | eaecc903 | 鸡哥 | feat(windows-performance-monitor): add Windows performance monitoring plugin
 
 ## 26.6.2
 
@@ -2213,60 +2276,115 @@
 
 ## Unreleased
 
-- 2026-06-20 | 9694e9bc | 鸡哥 | Merge pull request #106 from JNTMTMTM/dev
-- 2026-06-20 | 87598a1c | 鸡哥 | fix(stock): improve null and undefined checks in stock search results parsing
-- 2026-06-20 | dad3afef | 鸡哥 | feat: add licensing information and file descriptions to multiple components and utilities
-- 2026-06-20 | 8cc29d8f | 鸡哥 | feat(i18n): add stock market translations for English and Chinese
-- 2026-06-20 | 42cbec23 | 鸡哥 | feat(maxExpand): update tab visibility logic to ensure 'overview' remains always visible
-- 2026-06-20 | 6922975f | 鸡哥 | fix(maxExpand): refine tab visibility logic based on startup mode
-- 2026-06-20 | 1d9559a1 | 鸡哥 | feat(maxExpand): enhance maxExpand functionality and layout management
-- 2026-06-20 | 9cce8c27 | 鸡哥 | feat(web): initialize web application structure with essential components and configurations
-- 2026-06-20 | 9d9ebd87 | 鸡哥 | feat(navbar): add GlassNavbar component with styling and logo
-- 2026-06-20 | d4e9fb94 | 鸡哥 | feat(simplex-flow): implement SimplexFlowBackground component and related functionality
-- 2026-06-20 | 10471cf1 | 鸡哥 | feat(stock-sidebar): add period selection functionality and update translations
-- 2026-06-20 | f4315acf | 鸡哥 | feat(stock-sidebar): improve stock deletion experience and accessibility
-- 2026-06-20 | 7a0e5887 | 鸡哥 | feat(stock-sidebar): add animations for stock deletion controls
-- 2026-06-20 | d09cdec7 | 鸡哥 | feat(stock-sidebar): implement favorite deletion functionality and update translations
-- 2026-06-20 | 7b3c261c | 鸡哥 | chore: add .gitkeep file to eisland-web directory for tracking empty folder
-- 2026-06-20 | d6a2f341 | 鸡哥 | feat(stock-sidebar): add delete favorite button and update translations
-- 2026-06-20 | 9b3c246a | 鸡哥 | feat(stock-sidebar): implement favorite search functionality and update translations
-- 2026-06-20 | 096bf0bb | 鸡哥 | feat(stock-search): enhance favorite functionality in StockSearchPanel and StockSidebar
-- 2026-06-20 | de21e98b | 鸡哥 | refactor(issue-auto-label): enhance label categorization and color mapping
-- 2026-06-20 | 8ba4c1eb | 鸡哥 | feat(stock-sidebar): add refresh option and update translations
-- 2026-06-20 | 752c3363 | 鸡哥 | refactor(stock-sidebar): update initial state of sidebar components
-- 2026-06-20 | c4aa9e22 | 鸡哥 | feat(stock-sidebar): add refresh functionality to StockSidebar
-- 2026-06-20 | 236d8d0a | 鸡哥 | refactor(stock-sidebar): enhance keyboard accessibility and styling for favorite items
-- 2026-06-20 | 3b06c738 | 鸡哥 | refactor(stock-search): enhance keyboard and mouse interaction in StockSearchPanel
-- 2026-06-20 | 920d7cd8 | 鸡哥 | refactor(stock-search): simplify StockSearchPanel search result handling
-- 2026-06-20 | 96e53600 | 鸡哥 | refactor(stock-search): enhance StockSearchPanel layout and styling
-- 2026-06-20 | 6b67476e | 鸡哥 | feat(stock-search): implement keyword persistence and clear functionality in StockSearchPanel
-- 2026-06-19 | 4ad2dc71 | 鸡哥 | refactor(stock-sidebar): enhance styling for search results in settings-stock.css
-- 2026-06-19 | 4ba30483 | 鸡哥 | refactor(stock-sidebar): update sidebar styling for search mode and adjust dimensions
-- 2026-06-19 | 14b83e06 | 鸡哥 | refactor(stock-sidebar): enhance layout and styling of stock favorite items
-- 2026-06-19 | df9f302d | 鸡哥 | refactor(stock-sidebar): streamline StockSidebar layout and adjust CSS padding
-- 2026-06-19 | df8dafa6 | 鸡哥 | refactor(stock-module): remove StockAddFavoritePanel and streamline StockSidebar
-- 2026-06-19 | 5a470971 | 鸡哥 | feat(stock-module): add stock symbol normalization and validation in useStockMarketData hook
-- 2026-06-19 | 25574024 | 鸡哥 | feat(stock-module): implement favorites management in Stock components
-- 2026-06-19 | 52655a4c | 鸡哥 | feat(stock-module): enhance StockSearchPanel and translations for improved user experience
-- 2026-06-19 | a99fee94 | 鸡哥 | feat(svg-icons): add SEARCH icon and update SvgIcon references
-- 2026-06-19 | dc5a0f49 | 鸡哥 | feat(stock-module): enhance StockTab with new favorite addition hints
-- 2026-06-19 | d54aa1b4 | 鸡哥 | style(stock-module): update StockTab component and CSS for sidebar enhancements
-- 2026-06-19 | 9dfad40c | 鸡哥 | feat(stock-module): implement sidebar navigation for StockTab with favorites management
-- 2026-06-19 | e41f2eca | 鸡哥 | feat(svg-icons): add STOCK_CHOOSE icon and update SvgIcon references
-- 2026-06-19 | d492f653 | 鸡哥 | style(stock-module): simplify klineChart title and adjust stock chart padding
-- 2026-06-19 | 2b4bf8e9 | 鸡哥 | style(stock-module): update klineChartOptions and settings-stock.css for improved visuals
-- 2026-06-19 | 668a760f | 鸡哥 | refactor(stock-module): simplify StockKlineChart by utilizing helper functions
-- 2026-06-19 | e048e440 | 鸡哥 | style(stock-module): update StockTab layout and CSS for improved presentation
-- 2026-06-19 | 1d1ca58a | 鸡哥 | feat(eisland-windows-processes-attacker): expand module functionality with additional source files
-- 2026-06-19 | 0cb8b52e | 鸡哥 | style(stock-module): refine layout and alignment in settings-stock.css
-- 2026-06-19 | 6a960a87 | 鸡哥 | style(stock-module): adjust padding and height in settings-stock.css
-- 2026-06-19 | 90063239 | 鸡哥 | feat(stock-module): enhance StockKlineChart with accent color styling
-- 2026-06-18 | 34a77e07 | 鸡哥 | feat(stock-module): enhance StockKlineChart with navigator mask styling
-- 2026-06-18 | 9a54b3f7 | 鸡哥 | fix(stock-module): resolve layout issues in StockTab metrics panel
-- 2026-06-18 | e15316a3 | 鸡哥 | feat(stock-module): enhance StockTab with collapsible metrics panel
-- 2026-06-18 | 434a8c6b | 鸡哥 | refactor(stock-module): streamline StockMetrics and StockTab components
-- 2026-06-18 | 5ab11e1f | 鸡哥 | feat(stock-module): introduce stock market tab with live data and metrics
-- 2026-06-17 | 1913fb66 | 鸡哥 | feat(windows-performance-monitor): add hardware list monitoring functionality
-- 2026-06-17 | 9a316eb3 | 鸡哥 | refactor(tests): improve logging in performance monitor smoke tests
-- 2026-06-17 | 2d2603ee | 鸡哥 | feat(windows-performance-monitor): add temperature monitoring functionality
-- 2026-06-17 | eaecc903 | 鸡哥 | feat(windows-performance-monitor): add Windows performance monitoring plugin
+- 2026-06-29 | b3059d72 | 鸡哥 | Merge pull request #108 from JNTMTMTM/dev
+- 2026-06-29 | e9323391 | 鸡哥 | feat: add TypeScript configuration files for Bluetooth, Power, and WiFi helper plugins
+- 2026-06-29 | 25ee379b | 鸡哥 | chore: update dependencies and improve test documentation
+- 2026-06-29 | d078f0ca | 鸡哥 | refactor: remove unused event handlers and optimize session management in SmtcSessionMonitor
+- 2026-06-29 | 7d836ce9 | 鸡哥 | refactor: optimize track matching and search logic in karaoke and lyrics providers
+- 2026-06-29 | c791ca73 | 鸡哥 | feat: add Windows WiFi Helper plugin documentation and commands
+- 2026-06-29 | d563cba8 | 鸡哥 | feat: add Windows WiFi helper plugin
+- 2026-06-29 | bc3df620 | 鸡哥 | feat: add Windows Power Helper plugin documentation and commands
+- 2026-06-29 | 90b30e70 | 鸡哥 | feat: improve logging messages in power monitoring tests for clarity
+- 2026-06-29 | 4a6ec5c1 | 鸡哥 | feat: add Windows power helper plugin with power monitoring capabilities
+- 2026-06-29 | 2a5cfd20 | 鸡哥 | feat: add Bluetooth Helper plugin documentation and update tech stack overview
+- 2026-06-29 | f3967d19 | 鸡哥 | feat: add Windows Bluetooth helper plugin with device monitoring capabilities
+- 2026-06-29 | 14488049 | 鸡哥 | feat: add searchWithScoring mock for improved lyric and media fetching tests
+- 2026-06-29 | 3e1ab5fb | 鸡哥 | feat: enhance session management with event unsubscription and thumbnail caching
+- 2026-06-29 | 92d9c367 | 鸡哥 | feat: comment out frame rate limit switch in Chromium performance flags
+- 2026-06-29 | ccb16037 | 鸡哥 | feat: integrate media control functions from @eisland/windows-smtc-helper and remove legacy virtual key handling
+- 2026-06-28 | a677e3e1 | 鸡哥 | feat: replace @coooookies/windows-smtc-monitor with @eisland/windows-smtc-helper and update related code
+- 2026-06-28 | d9c27863 | 鸡哥 | feat: enhance SMTC Helper documentation with new commands and monitoring features
+- 2026-06-28 | 893a2d98 | 鸡哥 | feat: add smoke tests for session monitoring and seeking functionality
+- 2026-06-28 | c9874b2c | 鸡哥 | feat: remove debug session count functions and streamline media status normalization
+- 2026-06-28 | 06ea59d5 | 鸡哥 | feat: Implement session monitoring and control commands
+- 2026-06-28 | ce38a685 | 鸡哥 | feat: add CodeGraph documentation and MCP server configuration
+- 2026-06-28 | 49bcc4ed | 鸡哥 | feat: add documentation skill for eIsland VuePress updates and establish core rules
+- 2026-06-28 | 2b0dbe25 | 鸡哥 | feat: enhance SMTC helper documentation with NativeAOT DLL details and build instructions
+- 2026-06-28 | a3d5ca81 | 鸡哥 | feat: add SMTC ctypes support with new DLL integration and testing framework
+- 2026-06-28 | f38cdd52 | 鸡哥 | feat: update plugin commands documentation with detailed tables and improved structure
+- 2026-06-28 | be82f0ea | 鸡哥 | feat: add plugin commands documentation and update sidebar
+- 2026-06-28 | 5d4b074a | 鸡哥 | feat: update documentation to include SMTC helper plugin and its functionalities
+- 2026-06-28 | 092d518e | 鸡哥 | feat: add smoke test for SMTC status functionality
+- 2026-06-28 | 03b2de89 | 鸡哥 | feat: enhance media status and playback controls with detailed properties and methods
+- 2026-06-28 | 276efec8 | 鸡哥 | feat: add Windows SMTC helper plugin to package.json and package-lock.json
+- 2026-06-28 | 3cfd84b3 | 鸡哥 | feat: add comprehensive testing and smoke tests for SMTC play, pause, next, and previous functionalities
+- 2026-06-28 | aabd04ab | 鸡哥 | feat: add Windows SMTC helper with core functionality and tests
+- 2026-06-28 | 4958c6e4 | 鸡哥 | feat: enhance lyrics fetching with multi-strategy search and scoring
+- 2026-06-28 | 80554d2b | 鸡哥 | feat: add support for fetching lyrics from MoeKoe Music via WebSocket
+- 2026-06-27 | d4bd77e0 | 鸡哥 | feat: reorganize and enhance documentation for development, testing, packaging, quality, and release commands
+- 2026-06-27 | 792ecd19 | 鸡哥 | feat: add Development Commands documentation and NPM Scripts reference
+- 2026-06-27 | b68aedd2 | 鸡哥 | feat: expand GitHub operations documentation with detailed workflows, prerequisites, and pull request guidelines
+- 2026-06-26 | f7c274a8 | 鸡哥 | feat: enhance local Git operations documentation with detailed commands and workflows
+- 2026-06-25 | d0a4c6c9 | 鸡哥 | feat: add Git operations documentation and update README with links to local and GitHub workflows
+- 2026-06-25 | c44b73db | 鸡哥 | feat: add LTO configuration details and explanation to plugin setup documentation
+- 2026-06-25 | 6bd40bf7 | 鸡哥 | feat: enhance plugin setup documentation with detailed installation instructions and component requirements
+- 2026-06-25 | 2a2ec51c | 鸡哥 | feat: update frontend setup documentation with additional prerequisites and installation instructions for build tools
+- 2026-06-24 | 0171a517 | 鸡哥 | feat: enhance backend setup documentation with comprehensive environment configuration details
+- 2026-06-24 | b5e9e9de | 鸡哥 | feat: add JSON processing section and module details to backend dependencies documentation
+- 2026-06-24 | 78d4682c | 鸡哥 | feat: add backend dependencies documentation and update sidebar links
+- 2026-06-24 | d4dc99da | 鸡哥 | feat: update project dependencies documentation with comprehensive descriptions and new libraries
+- 2026-06-24 | ec4bdc39 | 鸡哥 | feat: add project dependencies documentation and enforce admonition syntax in all files
+- 2026-06-23 | 83647a43 | 鸡哥 | feat: enhance suppression functionality in toast listener
+- 2026-06-23 | 3ca7cef1 | 鸡哥 | feat: add suppression functionality to toast listener
+- 2026-06-23 | 6855a1c6 | 鸡哥 | feat: update frontend setup documentation with forking and cloning instructions
+- 2026-06-23 | e20264b5 | 鸡哥 | feat: enhance toast listener with polling mechanism and event-driven testing
+- 2026-06-23 | fabb0316 | 鸡哥 | chore: update .gitignore and package files for coverage tools
+- 2026-06-23 | b0bbbe3c | 鸡哥 | feat: enhance frontend setup documentation with detailed command usage
+- 2026-06-23 | 93393dfc | 鸡哥 | feat: expand frontend setup documentation for eIsland development
+- 2026-06-23 | 87a01e31 | 鸡哥 | feat: reorganize developer documentation for improved clarity and structure
+- 2026-06-23 | 5eb201e0 | 鸡哥 | feat: introduce developer documentation section with comprehensive guides
+- 2026-06-23 | 5b0184a6 | 鸡哥 | chore: remove commit message rules file
+- 2026-06-23 | 38f9a427 | 鸡哥 | feat: extend toast listener functionality with additional source files
+- 2026-06-23 | 85740c24 | 鸡哥 | feat: enhance toast listener functionality with notification retrieval improvements
+- 2026-06-23 | eef02d9b | 鸡哥 | feat: add common.gypi files for multiple Windows plugins
+- 2026-06-23 | 999df193 | 鸡哥 | chore: enhance testing scripts for eisland-windows-toast-listener plugin
+- 2026-06-23 | c898d4d7 | 鸡哥 | chore: update binding.gyp files for Windows plugins to disable link-time code generation
+- 2026-06-23 | 5101543b | 鸡哥 | chore: update package-lock.json to remove unused dependencies and add new ones
+- 2026-06-23 | 95928792 | 鸡哥 | feat: add testing framework and configuration for windows-toast-listener plugin
+- 2026-06-23 | 2233fed3 | 鸡哥 | refactor: simplify toast listener implementation and improve memory management
+- 2026-06-23 | 9937e39a | 鸡哥 | feat: add windows-toast-listener plugin to package configuration
+- 2026-06-23 | 11ed89df | 鸡哥 | feat: enhance documentation with additional references and links for clarity
+- 2026-06-22 | fd34752f | 鸡哥 | feat: expand CLAUDE.md with comprehensive documentation structure and standards
+- 2026-06-22 | 31390b91 | 鸡哥 | feat: update README title and restructure introduction for clarity
+- 2026-06-22 | df2cb0ed | 鸡哥 | feat: reorganize sidebar and remove outdated documents for improved navigation
+- 2026-06-22 | 6eff4e5a | 鸡哥 | feat: refine sidebar structure by adding Frontend and Backend Architecture sections
+- 2026-06-22 | 2f2c4cc6 | 鸡哥 | feat: add "rabbitmq-schema.md" to sidebar for improved documentation navigation
+- 2026-06-22 | e92e9280 | 鸡哥 | feat: enhance redis-schema.md with detailed Lua scripts and parameters
+- 2026-06-22 | c60f7e7f | 鸡哥 | feat: add "redis-schema.md" to sidebar for improved documentation navigation
+- 2026-06-22 | 492380d1 | 鸡哥 | feat: add "mysql-schema.md" to sidebar for improved documentation navigation
+- 2026-06-22 | 44321aa0 | 鸡哥 | feat: add "server-model.md" to sidebar for improved documentation navigation
+- 2026-06-22 | c653cd21 | 鸡哥 | feat: update titles in documentation for consistency and clarity
+- 2026-06-22 | fe22b93f | 鸡哥 | feat: add "process-model" to sidebar for enhanced documentation navigation
+- 2026-06-22 | 4d6dd9a7 | 鸡哥 | feat: expand state machine documentation with detailed state definitions and configurations
+- 2026-06-22 | 88a4e8c4 | 鸡哥 | feat: add Architecture section to sidebar for improved documentation structure
+- 2026-06-22 | c94b3ee2 | 鸡哥 | feat: update navbar and theme configuration for enhanced accessibility and branding
+- 2026-06-22 | e20363b6 | 鸡哥 | feat: add @vuepress/plugin-git for enhanced version control in documentation
+- 2026-06-22 | ac733898 | 鸡哥 | feat: add watermark feature and update theme configuration for improved documentation aesthetics
+- 2026-06-22 | 98c22f06 | 鸡哥 | feat: add docsBranch property to theme configuration for better version control
+- 2026-06-22 | 8570c1a8 | 鸡哥 | feat: update theme configuration for documentation repository and edit link
+- 2026-06-22 | 7ead3b60 | 鸡哥 | feat: add slimsearch and watermark plugins to enhance search and watermarking capabilities
+- 2026-06-22 | b02f104c | 鸡哥 | fix: update testing documentation with accurate test file and test count
+- 2026-06-22 | 84fd6156 | 鸡哥 | feat: enhance documentation across multiple tech stack sections with improved clarity and security guidelines
+- 2026-06-22 | 964a88c2 | 鸡哥 | feat: enhance styling for navbar, sidebar, and footer with frosted glass effect
+- 2026-06-22 | 1cab848e | 鸡哥 | feat: update navbar and sidebar icons for improved clarity and organization
+- 2026-06-21 | 849bf837 | 鸡哥 | feat: enhance documentation for .NET Temperature Helper and hardware enumeration
+- 2026-06-21 | 59a79bec | 鸡哥 | feat: add comprehensive documentation for eIsland's native Node.js addon plugins
+- 2026-06-21 | e9ca3734 | 鸡哥 | feat: update frontend tech stack documentation with detailed architecture and key dependencies
+- 2026-06-21 | a4642c56 | 鸡哥 | feat: enhance backend tech stack documentation with Alipay integration details
+- 2026-06-21 | a018ce41 | 鸡哥 | feat: enhance AI integration documentation with detailed architecture and tool execution overview
+- 2026-06-21 | dd01c2a7 | 鸡哥 | feat: enhance backend tech stack documentation with detailed JWT authentication implementation
+- 2026-06-21 | fbf1050c | 鸡哥 | feat: enhance backend tech stack documentation with detailed MySQL and MyBatis configurations
+- 2026-06-21 | d4ba5312 | 鸡哥 | feat: update backend tech stack documentation with Redis integration details and caching strategies
+- 2026-06-21 | eaf9d5b5 | 鸡哥 | fix: update API link in navbar for accurate navigation
+- 2026-06-21 | 148baed7 | 鸡哥 | feat: update navbar and sidebar for improved navigation and documentation clarity
+- 2026-06-20 | 12ae4b56 | 鸡哥 | feat: add Code of Conduct link to sidebar for improved community guidelines
+- 2026-06-20 | 81ae4aed | 鸡哥 | style: enable dark mode and enhance active link styles
+- 2026-06-20 | dd8e5383 | 鸡哥 | style: enhance sidebar link styles for improved visibility
+- 2026-06-20 | 7d3fc29d | 鸡哥 | feat: enhance navigation with introduction section in navbar and sidebar
+- 2026-06-20 | c5bfa305 | 鸡哥 | style: update navbar text and enhance page styles
+- 2026-06-20 | 9800fe6a | 鸡哥 | refactor: update navbar and theme hostname in VuePress configuration
+- 2026-06-20 | e001db57 | 鸡哥 | fix: update footer configuration in VuePress theme
+- 2026-06-20 | e25c2353 | 鸡哥 | refactor: update documentation site configuration and styles
+- 2026-06-20 | 29026003 | 鸡哥 | chore: update project metadata and remove unused files
+- 2026-06-20 | a27b1e42 | 鸡哥 | feat: initialize eisland-web-docs with essential files and configurations
+- 2026-06-20 | 08b54fdc | 鸡哥 | feat: initialize eisland-web project with core files and configurations
