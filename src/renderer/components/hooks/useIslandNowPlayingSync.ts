@@ -82,19 +82,18 @@ async function calibrateLyrics(lyrics: SyncedLyricLine[]): Promise<SyncedLyricLi
   }
 }
 
-/** 校准延迟时间（毫秒），等待播放进入歌词区域后再校准 */
-const CALIBRATE_DELAY_MS = 20_000;
-
 /**
- * 延迟校准：先设置歌词，20 秒后再读取 SMTC 时间戳校准
+ * 延迟校准：先设置歌词，延迟后再读取 SMTC 时间戳校准
  * @param lyrics - 原始歌词数据
  * @param capturedKey - 当前歌曲标识，用于检测切歌
+ * @param delayMs - 延迟毫秒数
  * @param songKeyRef - 歌曲标识 ref
  * @param setSyncedLyricsRef - 设置歌词的 ref
  */
 function scheduleCalibration(
   lyrics: SyncedLyricLine[],
   capturedKey: string,
+  delayMs: number,
   songKeyRef: React.MutableRefObject<string>,
   setSyncedLyricsRef: React.MutableRefObject<(lyrics: SyncedLyricLine[] | null) => void>,
 ): void {
@@ -103,7 +102,7 @@ function scheduleCalibration(
     const calibrated = await calibrateLyrics(lyrics);
     if (songKeyRef.current !== capturedKey) return;
     setSyncedLyricsRef.current(calibrated);
-  }, CALIBRATE_DELAY_MS);
+  }, delayMs);
 }
 
 interface UseIslandNowPlayingSyncOptions {
@@ -175,6 +174,15 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             karaokeEnabled = false;
           }
 
+          let calibrateEnabled = true;
+          let calibrateDelaySec = 20;
+          try {
+            calibrateEnabled = await window.api.musicLyricsCalibrateEnabledGet();
+            calibrateDelaySec = await window.api.musicLyricsCalibrateDelayGet();
+          } catch {
+            // use defaults
+          }
+
           if (karaokeEnabled) {
             try {
               const karaoke = await fetchKaraokeLyrics(title, artist, deviceId);
@@ -187,7 +195,9 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
                   syllables: line.syllables,
                 }));
                 setSyncedLyricsRef.current(mapped);
-                scheduleCalibration(mapped, capturedKey, songKeyRef, setSyncedLyricsRef);
+                if (calibrateEnabled) {
+                  scheduleCalibration(mapped, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef);
+                }
                 return;
               }
             } catch {
@@ -200,8 +210,8 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             const result = await fetchLyrics(title, artist, deviceId);
             if (songKeyRef.current !== capturedKey) return;
             setSyncedLyricsRef.current(result);
-            if (result && result.length > 0) {
-              scheduleCalibration(result, capturedKey, songKeyRef, setSyncedLyricsRef);
+            if (result && result.length > 0 && calibrateEnabled) {
+              scheduleCalibration(result, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef);
             }
           } catch {
             if (songKeyRef.current === capturedKey) setSyncedLyricsRef.current(null);

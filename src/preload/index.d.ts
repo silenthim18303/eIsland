@@ -412,6 +412,10 @@ declare global {
       musicLyricsKaraokeSet: (enabled: boolean) => Promise<boolean>;
       musicLyricsClockGet: () => Promise<boolean>;
       musicLyricsClockSet: (enabled: boolean) => Promise<boolean>;
+      musicLyricsCalibrateEnabledGet: () => Promise<boolean>;
+      musicLyricsCalibrateEnabledSet: (enabled: boolean) => Promise<boolean>;
+      musicLyricsCalibrateDelayGet: () => Promise<number>;
+      musicLyricsCalibrateDelaySet: (delaySec: number) => Promise<boolean>;
       musicSmtcUnsubscribeMsGet: () => Promise<number>;
       musicSmtcUnsubscribeMsSet: (valueMs: number) => Promise<boolean>;
       musicDetectSourceAppId: () => Promise<{ ok: boolean; sources: Array<{ sourceAppId: string; isPlaying: boolean; hasTitle: boolean; thumbnail: string | null }>; message: string }>;

@@ -1043,6 +1043,36 @@ const api = {
     return ipcRenderer.invoke('music:lyrics-clock:set', enabled);
   },
   /**
+   * 获取歌词校准开关
+   * @returns 是否启用歌词校准
+   */
+  musicLyricsCalibrateEnabledGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-enabled:get');
+  },
+  /**
+   * 设置歌词校准开关
+   * @param enabled - 是否启用
+   * @returns 是否保存成功
+   */
+  musicLyricsCalibrateEnabledSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-enabled:set', enabled);
+  },
+  /**
+   * 获取歌词校准触发延迟（秒）
+   * @returns 延迟秒数
+   */
+  musicLyricsCalibrateDelayGet: (): Promise<number> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-delay:get');
+  },
+  /**
+   * 设置歌词校准触发延迟（秒）
+   * @param delaySec - 延迟秒数
+   * @returns 是否保存成功
+   */
+  musicLyricsCalibrateDelaySet: (delaySec: number): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-delay:set', delaySec);
+  },
+  /**
    * 获取 SMTC 自动取消订阅时间（毫秒），0 表示永不取消
    */
   musicSmtcUnsubscribeMsGet: (): Promise<number> => {

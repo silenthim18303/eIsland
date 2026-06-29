@@ -328,6 +328,8 @@ export function SettingsTab(): ReactElement {
   const [lyricsSource, setLyricsSource] = useState<string>('auto');
   const [lyricsKaraoke, setLyricsKaraoke] = useState<boolean>(false);
   const [lyricsClock, setLyricsClock] = useState<boolean>(true);
+  const [lyricsCalibrateEnabled, setLyricsCalibrateEnabled] = useState<boolean>(true);
+  const [lyricsCalibrateDelay, setLyricsCalibrateDelay] = useState<number>(20);
   const [expandLeaveIdle, setExpandLeaveIdle] = useState<boolean>(false);
   const [maxExpandLeaveIdle, setMaxExpandLeaveIdle] = useState<boolean>(false);
   const [clipboardUrlMonitorEnabled, setClipboardUrlMonitorEnabled] = useState<boolean>(true);
@@ -1021,6 +1023,14 @@ export function SettingsTab(): ReactElement {
     window.api.musicLyricsClockGet().then((enabled) => {
       if (cancelled) return;
       setLyricsClock(enabled);
+    }).catch(() => {});
+    window.api.musicLyricsCalibrateEnabledGet().then((enabled) => {
+      if (cancelled) return;
+      setLyricsCalibrateEnabled(enabled);
+    }).catch(() => {});
+    window.api.musicLyricsCalibrateDelayGet().then((delay) => {
+      if (cancelled) return;
+      setLyricsCalibrateDelay(delay);
     }).catch(() => {});
     window.api.expandMouseleaveIdleGet().then((v) => {
       if (cancelled) return;
@@ -2658,6 +2668,10 @@ export function SettingsTab(): ReactElement {
               setLyricsKaraoke={setLyricsKaraoke}
               lyricsClock={lyricsClock}
               setLyricsClock={setLyricsClock}
+              lyricsCalibrateEnabled={lyricsCalibrateEnabled}
+              setLyricsCalibrateEnabled={setLyricsCalibrateEnabled}
+              lyricsCalibrateDelay={lyricsCalibrateDelay}
+              setLyricsCalibrateDelay={setLyricsCalibrateDelay}
               musicSmtcUnsubscribeInput={musicSmtcUnsubscribeInput}
               setMusicSmtcUnsubscribeInput={setMusicSmtcUnsubscribeInput}
               musicSmtcNeverUnsubscribe={musicSmtcNeverUnsubscribe}

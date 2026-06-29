@@ -35,9 +35,13 @@ interface RegisterMusicIpcHandlersOptions {
   lyricsSourceStoreKey: string;
   lyricsKaraokeStoreKey: string;
   lyricsClockStoreKey: string;
+  lyricsCalibrateEnabledStoreKey: string;
+  lyricsCalibrateDelayStoreKey: string;
   smtcUnsubscribeStoreKey: string;
   defaultLyricsKaraoke: boolean;
   defaultLyricsClock: boolean;
+  defaultLyricsCalibrateEnabled: boolean;
+  defaultLyricsCalibrateDelay: number;
   getWhitelist: () => string[];
   setWhitelist: (list: string[]) => void;
   readLyricsSourceConfig: () => string;
@@ -126,6 +130,53 @@ export function registerMusicIpcHandlers(options: RegisterMusicIpcHandlersOption
       return true;
     } catch (err) {
       console.error('[LyricsClock] persist error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('music:lyrics-calibrate-enabled:get', () => {
+    try {
+      const filePath = join(options.storeDir, `${options.lyricsCalibrateEnabledStoreKey}.json`);
+      if (!existsSync(filePath)) return options.defaultLyricsCalibrateEnabled;
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+      return typeof data === 'boolean' ? data : options.defaultLyricsCalibrateEnabled;
+    } catch {
+      return options.defaultLyricsCalibrateEnabled;
+    }
+  });
+
+  ipcMain.handle('music:lyrics-calibrate-enabled:set', (_event, enabled: boolean) => {
+    try {
+      const filePath = join(options.storeDir, `${options.lyricsCalibrateEnabledStoreKey}.json`);
+      writeFileSync(filePath, JSON.stringify(enabled, null, 2), 'utf-8');
+      return true;
+    } catch (err) {
+      console.error('[LyricsCalibrateEnabled] persist error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('music:lyrics-calibrate-delay:get', () => {
+    try {
+      const filePath = join(options.storeDir, `${options.lyricsCalibrateDelayStoreKey}.json`);
+      if (!existsSync(filePath)) return options.defaultLyricsCalibrateDelay;
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+      return typeof data === 'number' && data >= 0 ? data : options.defaultLyricsCalibrateDelay;
+    } catch {
+      return options.defaultLyricsCalibrateDelay;
+    }
+  });
+
+  ipcMain.handle('music:lyrics-calibrate-delay:set', (_event, delaySec: number) => {
+    try {
+      const sanitized = typeof delaySec === 'number' && delaySec >= 0 ? Math.floor(delaySec) : options.defaultLyricsCalibrateDelay;
+      const filePath = join(options.storeDir, `${options.lyricsCalibrateDelayStoreKey}.json`);
+      writeFileSync(filePath, JSON.stringify(sanitized, null, 2), 'utf-8');
+      return true;
+    } catch (err) {
+      console.error('[LyricsCalibrateDelay] persist error:', err);
       return false;
     }
   });
