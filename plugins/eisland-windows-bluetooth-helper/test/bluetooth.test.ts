@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file bluetooth.test.ts
+ * @description @eisland/windows-bluetooth-helper 单元测试
+ * @author 鸡哥
+ */
+
 import { describe, it, expect } from 'vitest';
 import type { BluetoothDeviceInfo } from '../index';
 

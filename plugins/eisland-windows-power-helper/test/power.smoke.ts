@@ -20,7 +20,8 @@
 
 /**
  * @file power.smoke.ts
- * @description 手动冒烟测试：node --experimental-strip-types test/power.smoke.ts
+ * @description 电源信息手动冒烟测试：node --experimental-strip-types test/power.smoke.ts
+ * @author 鸡哥
  */
 
 const { getPowerInfo } = require('../');

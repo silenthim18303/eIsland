@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file smtc-helper.monitor.smoke.ts
+ * @description SMTC 会话监听器手动冒烟测试
+ * @author 鸡哥
+ */
+
 import type * as smtcTypes from '../';
 
 const smtc = require('../') as typeof smtcTypes;

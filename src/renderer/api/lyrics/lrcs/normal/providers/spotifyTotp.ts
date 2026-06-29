@@ -182,6 +182,11 @@ function totpGenerate(config: TotpConfig, timestampMs: number): string {
   return hotp(config.secret, counter, config.digits);
 }
 
+/**
+ * 使用当前时间生成 TOTP 验证码
+ * @param config - TOTP 配置参数
+ * @returns 当前时间对应的 TOTP 验证码字符串
+ */
 export function totpGenerateNow(config: TotpConfig): string {
   return totpGenerate(config, Date.now());
 }
@@ -225,6 +230,12 @@ const TOTP_CONFIGS: TotpConfig[] = [
   },
 ];
 
+/**
+ * 根据索引获取预置的 TOTP 配置
+ * @param index - TOTP 配置索引（0=v61, 1=v60, 2=v59）
+ * @returns 对应版本的 TOTP 配置
+ * @throws 索引超出范围时抛出错误
+ */
 export function buildTotp(index: number): TotpConfig {
   const config = TOTP_CONFIGS[index];
   if (!config) throw new Error(`Invalid TOTP index: ${index}`);

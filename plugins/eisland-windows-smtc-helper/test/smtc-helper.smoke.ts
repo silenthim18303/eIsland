@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file smtc-helper.smoke.ts
+ * @description SMTC Helper 综合手动冒烟测试
+ * @author 鸡哥
+ */
+
 const smtc = require('../');
 
 console.log('=== SMTC Helper Smoke Test ===\n');

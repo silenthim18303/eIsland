@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file power.test.ts
+ * @description @eisland/windows-power-helper 单元测试
+ * @author 鸡哥
+ */
+
 import { describe, it, expect } from 'vitest';
 import type { PowerInfo } from '../index';
 

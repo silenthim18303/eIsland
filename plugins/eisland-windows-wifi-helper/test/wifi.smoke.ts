@@ -20,7 +20,8 @@
 
 /**
  * @file wifi.smoke.ts
- * @description Manual smoke test: node --experimental-strip-types test/wifi.smoke.ts
+ * @description WiFi 信息手动冒烟测试：node --experimental-strip-types test/wifi.smoke.ts
+ * @author 鸡哥
  */
 
 const { getWifiInfo } = require('../');

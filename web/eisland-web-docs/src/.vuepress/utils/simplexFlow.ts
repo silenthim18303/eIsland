@@ -1,3 +1,30 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file simplexFlow.ts
+ * @description Simplex Flow 背景动画工具函数
+ * @description 实现 simplex noise、fbm、颜色采样、指针光效等
+ * @author 鸡哥
+ */
+
 import {
   GRADIENTS,
   PALETTE,
@@ -25,6 +52,13 @@ const PERMUTATION: readonly number[] = (() => {
   return [...table]
 })()
 
+/**
+ * 将数值限制在指定范围内
+ * @param value - 输入值
+ * @param min - 最小值
+ * @param max - 最大值
+ * @returns 限制后的值
+ */
 export const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
 
 const smoothstep = (edge0: number, edge1: number, value: number) => {

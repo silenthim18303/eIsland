@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file bluetooth.smoke.ts
+ * @description 蓝牙设备查询手动冒烟测试
+ * @author 鸡哥
+ */
+
 const bt = require('../');
 
 console.log('=== Bluetooth Helper Smoke Test ===\n');

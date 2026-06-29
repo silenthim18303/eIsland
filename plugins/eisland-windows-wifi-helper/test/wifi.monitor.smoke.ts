@@ -20,8 +20,9 @@
 
 /**
  * @file wifi.monitor.smoke.ts
- * @description Manual smoke test: node --experimental-strip-types test/wifi.monitor.smoke.ts
- * Monitors WiFi events for 8 seconds.
+ * @description WiFi 监听器手动冒烟测试：node --experimental-strip-types test/wifi.monitor.smoke.ts
+ * @description 监听 8 秒内的 WiFi 事件变化
+ * @author 鸡哥
  */
 
 const { WifiMonitor } = require('../');

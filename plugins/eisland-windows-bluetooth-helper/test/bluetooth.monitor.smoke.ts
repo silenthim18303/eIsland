@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file bluetooth.monitor.smoke.ts
+ * @description 蓝牙设备监听器手动冒烟测试
+ * @author 鸡哥
+ */
+
 import type * as btTypes from '../';
 
 const bt = require('../') as typeof btTypes;

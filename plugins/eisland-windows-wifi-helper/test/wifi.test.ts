@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file wifi.test.ts
+ * @description @eisland/windows-wifi-helper 单元测试
+ * @author 鸡哥
+ */
+
 import { describe, it, expect } from 'vitest';
 import type { WifiInfo } from '../index';
 

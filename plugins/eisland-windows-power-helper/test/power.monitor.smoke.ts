@@ -20,8 +20,9 @@
 
 /**
  * @file power.monitor.smoke.ts
- * @description 手动冒烟测试：node --experimental-strip-types test/power.monitor.smoke.ts
- * 监听 8 秒内的电源事件变化
+ * @description 电源监听器手动冒烟测试：node --experimental-strip-types test/power.monitor.smoke.ts
+ * @description 监听 8 秒内的电源事件变化
+ * @author 鸡哥
  */
 
 const { PowerMonitor } = require('../');
