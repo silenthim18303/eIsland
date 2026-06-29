@@ -183,6 +183,7 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | `npm run test:pause` | `vitest run test/smtc-helper.pause.test.ts` | Pause command tests only |
 | `npm run test:next` | `vitest run test/smtc-helper.next.test.ts` | Next command tests only |
 | `npm run test:previous` | `vitest run test/smtc-helper.previous.test.ts` | Previous command tests only |
+| `npm run test:timestamp` | `vitest run test/smtc-helper.timestamp.test.ts` | Timestamp (getTimestamp) tests |
 | `npm run test:ctypes` | `python test/smtc_ctypes_test.py` | Python ctypes test (requires `build:ctypes` first) |
 
 ### Smoke
@@ -197,6 +198,7 @@ This is a pure .NET plugin with two build targets: a console exe (for Node.js) a
 | `npm run smoke:status` | `node --experimental-strip-types test/smtc-helper.status.smoke.ts` | Status-only smoke — `getStatus()` with formatted output |
 | `npm run smoke:seek` | `node --experimental-strip-types test/smtc-helper.seek.smoke.ts` | Seek + extended controls — seek, stop, shuffle, repeat, rate |
 | `npm run smoke:monitor` | `node --experimental-strip-types test/smtc-helper.monitor.smoke.ts` | Monitor smoke — event-driven session tracking for 8s |
+| `npm run smoke:timestamp` | `node --experimental-strip-types test/smtc-helper.timestamp.smoke.ts` | Timestamp smoke — lightweight timestamp query, compares with `getStatus()` |
 
 ---
 
@@ -337,7 +339,7 @@ This plugin follows the same dual-build pattern as the Bluetooth and Power Helpe
 | Performance Monitor | `npm test` |
 | Processes Attacker | _(no tests)_ |
 | Toast Listener | `npm test` · `npm run test:polling` |
-| SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` · `npm run test:ctypes` |
+| SMTC Helper | `npm test` · `npm run test:play` · `npm run test:pause` · `npm run test:next` · `npm run test:previous` · `npm run test:timestamp` · `npm run test:ctypes` |
 | Bluetooth Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | Power Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | WiFi Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
@@ -350,7 +352,7 @@ This plugin follows the same dual-build pattern as the Bluetooth and Power Helpe
 | Performance Monitor | `npm run smoke` · `npm run smoke:polling` |
 | Processes Attacker | _(no smoke)_ |
 | Toast Listener | `npm run smoke` · `npm run smoke:polling` · `npm run smoke:event` · `npm run smoke:suppression` |
-| SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` · `npm run smoke:seek` · `npm run smoke:monitor` |
+| SMTC Helper | `npm run smoke` · `npm run smoke:play` · `npm run smoke:pause` · `npm run smoke:next` · `npm run smoke:previous` · `npm run smoke:status` · `npm run smoke:seek` · `npm run smoke:monitor` · `npm run smoke:timestamp` |
 | Bluetooth Helper | `npm run smoke` · `npm run smoke:monitor` |
 | Power Helper | `npm run smoke` · `npm run smoke:monitor` |
 | WiFi Helper | `npm run smoke` · `npm run smoke:monitor` |

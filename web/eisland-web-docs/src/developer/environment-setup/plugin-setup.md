@@ -505,12 +505,14 @@ npm run test:play               # Play command tests
 npm run test:pause              # Pause command tests
 npm run test:next               # Next command tests
 npm run test:previous           # Previous command tests
+npm run test:timestamp          # Timestamp (getTimestamp) tests
 npm run smoke                   # Full smoke test
 npm run smoke:play              # Play smoke test
 npm run smoke:pause             # Pause smoke test
 npm run smoke:next              # Next smoke test
 npm run smoke:previous          # Previous smoke test
 npm run smoke:status            # Status-only smoke test
+npm run smoke:timestamp         # Timestamp smoke test
 ```
 
 ### Toast Listener Special Tests
