@@ -75,6 +75,7 @@ const smtc = {
   smtc_get_sessions_changed: lib.func('int smtc_get_sessions_changed()'),
   smtc_get_all_sessions:   lib.func('str smtc_get_all_sessions()'),
   smtc_get_session:        lib.func('str smtc_get_session(str)'),
+  smtc_get_timestamp:      lib.func('str smtc_get_timestamp()'),
 
   // ── 扩展控制 ──
   smtc_seek:               lib.func('int smtc_seek(double)'),

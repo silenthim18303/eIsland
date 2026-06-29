@@ -1043,6 +1043,36 @@ const api = {
     return ipcRenderer.invoke('music:lyrics-clock:set', enabled);
   },
   /**
+   * 获取歌词校准开关
+   * @returns 是否启用歌词校准
+   */
+  musicLyricsCalibrateEnabledGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-enabled:get');
+  },
+  /**
+   * 设置歌词校准开关
+   * @param enabled - 是否启用
+   * @returns 是否保存成功
+   */
+  musicLyricsCalibrateEnabledSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-enabled:set', enabled);
+  },
+  /**
+   * 获取歌词校准触发延迟（秒）
+   * @returns 延迟秒数
+   */
+  musicLyricsCalibrateDelayGet: (): Promise<number> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-delay:get');
+  },
+  /**
+   * 设置歌词校准触发延迟（秒）
+   * @param delaySec - 延迟秒数
+   * @returns 是否保存成功
+   */
+  musicLyricsCalibrateDelaySet: (delaySec: number): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-calibrate-delay:set', delaySec);
+  },
+  /**
    * 获取 SMTC 自动取消订阅时间（毫秒），0 表示永不取消
    */
   musicSmtcUnsubscribeMsGet: (): Promise<number> => {
@@ -1060,6 +1090,14 @@ const api = {
    */
   musicDetectSourceAppId: (): Promise<{ ok: boolean; sources: Array<{ sourceAppId: string; isPlaying: boolean; hasTitle: boolean; thumbnail: string | null }>; message: string }> => {
     return ipcRenderer.invoke('music:detect-source-app-id');
+  },
+  /**
+   * 轻量级获取当前 SMTC 播放时间戳（不含媒体元数据）
+   * 用于歌词校准等仅需播放位置的场景
+   * @returns 时间戳信息
+   */
+  smtcGetTimestamp: (): Promise<{ isAvailable: boolean; playbackStatus: string; timeline: { startTime: number; endTime: number; position: number; minSeekTime: number; maxSeekTime: number } | null }> => {
+    return ipcRenderer.invoke('smtc:get-timestamp');
   },
   /** 获取当前运行中的非系统进程列表 */
   getRunningNonSystemProcesses: (): Promise<string[]> => {

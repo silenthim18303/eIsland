@@ -82,6 +82,24 @@ function getStatus() {
   return normalizeMediaStatus(raw);
 }
 
+const emptyTimestampInfo = Object.freeze({
+  isAvailable: false,
+  playbackStatus: 'unknown',
+  timeline: null,
+});
+
+/**
+ * 轻量级获取当前播放时间戳（不含媒体元数据）
+ * 用于歌词校准等仅需播放位置的场景
+ * @returns {{ isAvailable: boolean, playbackStatus: string, timeline: object|null }}
+ */
+function getTimestamp() {
+  const raw = callJson('smtc_get_timestamp');
+  if (!raw || typeof raw.isAvailable !== 'boolean') return emptyTimestampInfo;
+  if (!raw.isAvailable) return emptyTimestampInfo;
+  return raw;
+}
+
 // ── 新增控制命令 ──────────────────────────────────────────────
 
 function seek(positionSeconds) {
@@ -123,6 +141,8 @@ module.exports = {
   setShuffle,
   setRepeatMode,
   setPlaybackRate,
+  // 时间戳查询
+  getTimestamp,
   // 实时监控
   SmtcMonitor,
 };

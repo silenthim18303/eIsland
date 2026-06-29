@@ -93,6 +93,7 @@ import {
   DEFAULT_ISLAND_DISPLAY_SELECTION,
   WHITELIST_STORE_KEY, LYRICS_SOURCE_STORE_KEY,
   LYRICS_KARAOKE_STORE_KEY, LYRICS_CLOCK_STORE_KEY,
+  LYRICS_CALIBRATE_ENABLED_STORE_KEY, LYRICS_CALIBRATE_DELAY_STORE_KEY,
   SMTC_UNSUBSCRIBE_MS_STORE_KEY, HIDE_PROCESS_LIST_STORE_KEY,
   AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY,
   THEME_MODE_STORE_KEY, ISLAND_OPACITY_STORE_KEY,
@@ -563,9 +564,13 @@ function registerIpcHandlers(): void {
     lyricsSourceStoreKey: LYRICS_SOURCE_STORE_KEY,
     lyricsKaraokeStoreKey: LYRICS_KARAOKE_STORE_KEY,
     lyricsClockStoreKey: LYRICS_CLOCK_STORE_KEY,
+    lyricsCalibrateEnabledStoreKey: LYRICS_CALIBRATE_ENABLED_STORE_KEY,
+    lyricsCalibrateDelayStoreKey: LYRICS_CALIBRATE_DELAY_STORE_KEY,
     smtcUnsubscribeStoreKey: SMTC_UNSUBSCRIBE_MS_STORE_KEY,
     defaultLyricsKaraoke: false,
     defaultLyricsClock: true,
+    defaultLyricsCalibrateEnabled: true,
+    defaultLyricsCalibrateDelay: 20,
     getWhitelist: () => nowPlayingWhitelist,
     setWhitelist: (list) => {
       nowPlayingWhitelist = list;

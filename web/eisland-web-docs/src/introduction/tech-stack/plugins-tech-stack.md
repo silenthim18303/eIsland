@@ -1617,6 +1617,7 @@ The plugin provides two integration modes:
 | `next` | `() → CommandResult` | Skip to the next track |
 | `previous` | `() → CommandResult` | Skip to the previous track |
 | `getStatus` | `() → MediaStatus` | Get the full snapshot of the current media session |
+| `getTimestamp` | `() → TimestampInfo` | Lightweight playback timestamp (no media metadata), optimized for lyrics calibration |
 | `seek` | `(seconds: number) → CommandResult` | Seek to a position in seconds |
 | `stop` | `() → CommandResult` | Stop playback |
 | `setShuffle` | `(active: boolean) → CommandResult` | Toggle shuffle mode |
@@ -1685,7 +1686,17 @@ interface CommandResult {
   success: boolean;
   error: string | null;
 }
+
+interface TimestampInfo {
+  isAvailable: boolean;
+  playbackStatus: 'playing' | 'paused' | 'stopped' | 'closed' | 'opened' | 'changing' | 'unknown';
+  timeline: TimelineProperties | null;
+}
 ```
+
+:::tip
+`getTimestamp()` is a lightweight alternative to `getStatus()` — it returns only playback status and timeline position without fetching media metadata (title, artist, album art, etc.). This makes it ideal for lyrics calibration where only the playback position is needed.
+:::
 
 ### C# Implementation
 
@@ -1920,6 +1931,7 @@ export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
 | `smtc_set_repeat_mode` | `(int mode) → int` | Set repeat (0=None, 1=Track, 2=List). Returns 0=success |
 | `smtc_set_playback_rate` | `(double rate) → int` | Set playback rate. Returns 0=success |
 | `smtc_get_status` | `() → char*` | Get status JSON. Returns NULL on failure |
+| `smtc_get_timestamp` | `() → char*` | Get lightweight timestamp JSON (no media metadata). Returns NULL on failure |
 | `smtc_free_string` | `(char*) → void` | Free a string returned by status/error functions |
 | `smtc_get_last_error` | `() → char*` | Get last error message |
 
@@ -1935,7 +1947,7 @@ export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
 | `smtc_get_session` | `(char* appId) → char*` | Get specific session by source app ID |
 
 :::danger
-You **must** call `smtc_free_string()` on any pointer returned by `smtc_get_status()`, `smtc_get_last_error()`, `smtc_get_all_sessions()`, or `smtc_get_session()` to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
+You **must** call `smtc_free_string()` on any pointer returned by `smtc_get_status()`, `smtc_get_timestamp()`, `smtc_get_last_error()`, `smtc_get_all_sessions()`, or `smtc_get_session()` to avoid memory leaks. The koffi FFI layer in Node.js handles this automatically.
 :::
 
 #### Python Usage
@@ -1946,13 +1958,22 @@ import ctypes, json
 dll = ctypes.CDLL("./eIslandSmtcCtypes.dll")
 
 dll.smtc_get_status.restype = ctypes.c_void_p
+dll.smtc_get_timestamp.restype = ctypes.c_void_p
 dll.smtc_free_string.argtypes = [ctypes.c_void_p]
 
+# Full status (includes media metadata)
 ptr = dll.smtc_get_status()
 if ptr:
     status = json.loads(ctypes.string_at(ptr).decode("utf-8"))
     dll.smtc_free_string(ptr)
     print(status["title"], status["artist"])
+
+# Lightweight timestamp (playback position only, no metadata)
+ptr = dll.smtc_get_timestamp()
+if ptr:
+    ts = json.loads(ctypes.string_at(ptr).decode("utf-8"))
+    dll.smtc_free_string(ptr)
+    print(ts["playbackStatus"], ts["timeline"]["position"])
 
 dll.smtc_play()    # Returns 0 on success
 dll.smtc_pause()   # Returns 0 on success

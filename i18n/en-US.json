@@ -2517,7 +2517,11 @@
         "karaokeToggle": "Enable karaoke highlight",
         "clockTitle": "Lyrics Clock",
         "clockHint": "Show current Beijing time between cover and lyrics",
-        "clockToggle": "Show current time"
+        "clockToggle": "Show current time",
+        "calibrateTitle": "Lyrics Calibration",
+        "calibrateHint": "Read SMTC timestamp after lyrics fetch to correct timing offset",
+        "calibrateToggle": "Enable lyrics calibration",
+        "calibrateDelayLabel": "Trigger delay (seconds)"
       },
       "smtc": {
         "title": "SMTC Auto Unsubscribe",

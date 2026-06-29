@@ -58,6 +58,10 @@ interface MusicSettingsSectionProps {
   setLyricsKaraoke: (value: boolean) => void;
   lyricsClock: boolean;
   setLyricsClock: (value: boolean) => void;
+  lyricsCalibrateEnabled: boolean;
+  setLyricsCalibrateEnabled: (value: boolean) => void;
+  lyricsCalibrateDelay: number;
+  setLyricsCalibrateDelay: (value: number) => void;
   musicSmtcUnsubscribeInput: string;
   setMusicSmtcUnsubscribeInput: (value: string) => void;
   musicSmtcNeverUnsubscribe: boolean;
@@ -108,6 +112,10 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
     setLyricsKaraoke,
     lyricsClock,
     setLyricsClock,
+    lyricsCalibrateEnabled,
+    setLyricsCalibrateEnabled,
+    lyricsCalibrateDelay,
+    setLyricsCalibrateDelay,
     musicSmtcUnsubscribeInput,
     setMusicSmtcUnsubscribeInput,
     musicSmtcNeverUnsubscribe,
@@ -305,6 +313,45 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
                     </label>
                   </div>
                 </div>
+
+                <div className="settings-card-subgroup">
+                  <div className="settings-card-subgroup-title">{t('settings.music.lyrics.calibrateTitle', { defaultValue: '歌词校准' })}</div>
+                  <div className="settings-music-hint">{t('settings.music.lyrics.calibrateHint', { defaultValue: '歌词获取后延迟读取 SMTC 时间戳，修正歌词时间偏移' })}</div>
+                  <div className="settings-card-inline-row">
+                    <label className="settings-card-check">
+                      <input
+                        type="checkbox"
+                        checked={lyricsCalibrateEnabled}
+                        onChange={(e) => {
+                          setLyricsCalibrateEnabled(e.target.checked);
+                          window.api.musicLyricsCalibrateEnabledSet(e.target.checked).catch(() => {});
+                        }}
+                      />
+                      {t('settings.music.lyrics.calibrateToggle', { defaultValue: '启用歌词校准' })}
+                    </label>
+                  </div>
+                </div>
+                {lyricsCalibrateEnabled && (
+                  <div className="settings-card-subgroup">
+                    <div className="settings-hotkey-row" style={{ alignItems: 'center' }}>
+                      <label className="settings-field" style={{ flex: 1 }}>
+                        <span className="settings-field-label">{t('settings.music.lyrics.calibrateDelayLabel', { defaultValue: '触发延迟（秒）' })}</span>
+                        <input
+                          className="settings-field-input"
+                          type="number"
+                          min={0}
+                          max={120}
+                          value={lyricsCalibrateDelay}
+                          onChange={(e) => {
+                            const val = Math.max(0, Math.min(120, Math.floor(Number(e.target.value) || 0)));
+                            setLyricsCalibrateDelay(val);
+                            window.api.musicLyricsCalibrateDelaySet(val).catch(() => {});
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
               </div>
 
             </div>

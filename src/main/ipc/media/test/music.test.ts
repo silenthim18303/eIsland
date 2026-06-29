@@ -66,9 +66,13 @@ describe('registerMusicIpcHandlers', () => {
       lyricsSourceStoreKey: 'lyricsSource',
       lyricsKaraokeStoreKey: 'lyricsKaraoke',
       lyricsClockStoreKey: 'lyricsClock',
+      lyricsCalibrateEnabledStoreKey: 'lyricsCalibrateEnabled',
+      lyricsCalibrateDelayStoreKey: 'lyricsCalibrateDelay',
       smtcUnsubscribeStoreKey: 'smtcUnsubscribe',
       defaultLyricsKaraoke: true,
       defaultLyricsClock: false,
+      defaultLyricsCalibrateEnabled: true,
+      defaultLyricsCalibrateDelay: 20,
       getWhitelist: () => ['app-a', 'app-b'],
       setWhitelist: vi.fn(),
       readLyricsSourceConfig: () => 'netease',
@@ -431,9 +435,9 @@ describe('registerMusicIpcHandlers', () => {
   // ipcMain.handle registration
   // ---------------------------------------------------------------
   describe('channel registration', () => {
-    it('registers exactly 11 IPC channels', () => {
+    it('registers exactly 15 IPC channels', () => {
       register();
-      expect(handleMock).toHaveBeenCalledTimes(11);
+      expect(handleMock).toHaveBeenCalledTimes(15);
     });
 
     it('registers all expected channels', () => {
@@ -446,6 +450,10 @@ describe('registerMusicIpcHandlers', () => {
         'music:lyrics-karaoke:set',
         'music:lyrics-clock:get',
         'music:lyrics-clock:set',
+        'music:lyrics-calibrate-enabled:get',
+        'music:lyrics-calibrate-enabled:set',
+        'music:lyrics-calibrate-delay:get',
+        'music:lyrics-calibrate-delay:set',
         'music:smtc-unsubscribe-ms:get',
         'music:smtc-unsubscribe-ms:set',
         'music:detect-source-app-id',

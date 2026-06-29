@@ -74,6 +74,16 @@ export interface CommandResult {
   error: string | null;
 }
 
+/**
+ * 轻量级时间戳信息（不含媒体元数据）
+ * 用于歌词校准等仅需播放位置的场景
+ */
+export interface TimestampInfo {
+  isAvailable: boolean;
+  playbackStatus: 'playing' | 'paused' | 'stopped' | 'closed' | 'opened' | 'changing' | 'unknown';
+  timeline: TimelineProperties | null;
+}
+
 // ── 监控器类型 ────────────────────────────────────────────────
 
 export interface MediaProps {
@@ -116,6 +126,9 @@ export function next(): CommandResult;
 export function previous(): CommandResult;
 /** 获取当前媒体状态 */
 export function getStatus(): MediaStatus;
+
+/** 轻量级获取当前播放时间戳（不含媒体元数据），用于歌词校准 */
+export function getTimestamp(): TimestampInfo;
 
 /** Seek 到指定位置（秒） */
 export function seek(positionSeconds: number): CommandResult;

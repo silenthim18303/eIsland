@@ -26,7 +26,7 @@
  */
 
 import { BrowserWindow, ipcMain } from 'electron';
-import { play, pause, next, previous, seek } from '@eisland/windows-smtc-helper';
+import { play, pause, next, previous, seek, getTimestamp } from '@eisland/windows-smtc-helper';
 
 interface MediaSessionRuntimeEntry {
   payload: unknown;
@@ -103,5 +103,9 @@ export function registerMediaIpcHandlers(options: RegisterMediaIpcHandlersOption
 
   ipcMain.handle('media:set-volume', (_event, _volume: number) => {
     // SMTC 不支持应用级音量控制
+  });
+
+  ipcMain.handle('smtc:get-timestamp', () => {
+    return getTimestamp();
   });
 }

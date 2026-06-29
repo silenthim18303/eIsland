@@ -31,6 +31,80 @@ import { fetchLyrics } from '../../api/lyrics/lrcApi';
 import { fetchKaraokeLyrics } from '../../api/lyrics/lrcs/karaoke';
 import type { KaraokeLine } from '../../api/lyrics/lrcs/karaoke';
 
+/**
+ * 歌词校准：歌词获取完成后，读取 SMTC 当前播放位置，修正歌词时间偏移
+ * @description 解决歌词源时间轴与 SMTC 播放位置不对齐的问题
+ * @param lyrics - 原始歌词数据
+ * @returns 校准后的歌词数据
+ */
+async function calibrateLyrics(lyrics: SyncedLyricLine[]): Promise<SyncedLyricLine[]> {
+  try {
+    const ts = await window.api.smtcGetTimestamp();
+    if (!ts?.isAvailable || !ts.timeline) {
+      console.log('[LyricsCalibrate] SMTC 时间戳不可用，跳过校准');
+      return lyrics;
+    }
+
+    const smtcPositionMs = ts.timeline.position * 1000;
+
+    // 找到当前播放位置对应的歌词行
+    let matchedLine: SyncedLyricLine | undefined;
+    for (let i = 0; i < lyrics.length; i++) {
+      const line = lyrics[i];
+      const next = lyrics[i + 1];
+      if (smtcPositionMs >= line.time_ms && (!next || smtcPositionMs < next.time_ms)) {
+        matchedLine = line;
+        break;
+      }
+    }
+    if (!matchedLine) {
+      console.log('[LyricsCalibrate] 未找到匹配歌词行，跳过校准');
+      return lyrics;
+    }
+
+    // 计算偏差：SMTC 位置 vs 歌词期望位置
+    const offsetMs = smtcPositionMs - matchedLine.time_ms;
+    // 仅当偏差超过 100ms 时校准，避免无意义的微调
+    if (Math.abs(offsetMs) < 100) {
+      console.log(`[LyricsCalibrate] 偏差 ${offsetMs.toFixed(0)}ms 在容忍范围内，无需校准`);
+      return lyrics;
+    }
+
+    console.log(`[LyricsCalibrate] 校准触发: offset=${offsetMs.toFixed(0)}ms, SMTC=${smtcPositionMs.toFixed(0)}ms, 歌词=${matchedLine.time_ms.toFixed(0)}ms, 行="${matchedLine.text}"`);
+
+    // 应用偏移量到所有歌词行
+    return lyrics.map((line) => ({
+      ...line,
+      time_ms: line.time_ms + offsetMs,
+    }));
+  } catch {
+    return lyrics;
+  }
+}
+
+/**
+ * 延迟校准：先设置歌词，延迟后再读取 SMTC 时间戳校准
+ * @param lyrics - 原始歌词数据
+ * @param capturedKey - 当前歌曲标识，用于检测切歌
+ * @param delayMs - 延迟毫秒数
+ * @param songKeyRef - 歌曲标识 ref
+ * @param setSyncedLyricsRef - 设置歌词的 ref
+ */
+function scheduleCalibration(
+  lyrics: SyncedLyricLine[],
+  capturedKey: string,
+  delayMs: number,
+  songKeyRef: React.MutableRefObject<string>,
+  setSyncedLyricsRef: React.MutableRefObject<(lyrics: SyncedLyricLine[] | null) => void>,
+): void {
+  setTimeout(async () => {
+    if (songKeyRef.current !== capturedKey) return;
+    const calibrated = await calibrateLyrics(lyrics);
+    if (songKeyRef.current !== capturedKey) return;
+    setSyncedLyricsRef.current(calibrated);
+  }, delayMs);
+}
+
 interface UseIslandNowPlayingSyncOptions {
   handleNowPlayingUpdate: (info: NowPlayingInfo | null) => void;
   updateProgress: (positionMs: number) => void;
@@ -100,6 +174,15 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             karaokeEnabled = false;
           }
 
+          let calibrateEnabled = true;
+          let calibrateDelaySec = 20;
+          try {
+            calibrateEnabled = await window.api.musicLyricsCalibrateEnabledGet();
+            calibrateDelaySec = await window.api.musicLyricsCalibrateDelayGet();
+          } catch {
+            // use defaults
+          }
+
           if (karaokeEnabled) {
             try {
               const karaoke = await fetchKaraokeLyrics(title, artist, deviceId);
@@ -112,6 +195,9 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
                   syllables: line.syllables,
                 }));
                 setSyncedLyricsRef.current(mapped);
+                if (calibrateEnabled) {
+                  scheduleCalibration(mapped, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef);
+                }
                 return;
               }
             } catch {
@@ -124,6 +210,9 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             const result = await fetchLyrics(title, artist, deviceId);
             if (songKeyRef.current !== capturedKey) return;
             setSyncedLyricsRef.current(result);
+            if (result && result.length > 0 && calibrateEnabled) {
+              scheduleCalibration(result, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef);
+            }
           } catch {
             if (songKeyRef.current === capturedKey) setSyncedLyricsRef.current(null);
           }

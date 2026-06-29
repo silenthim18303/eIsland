@@ -31,6 +31,8 @@ interface UseLyricsSettingsResult {
   karaokeEnabled: boolean;
   clockEnabled: boolean;
   musicOuterGlowEffectEnabled: boolean;
+  calibrateEnabled: boolean;
+  calibrateDelaySec: number;
 }
 
 /**
@@ -41,11 +43,15 @@ export function useLyricsSettings(): UseLyricsSettingsResult {
   const [karaokeEnabled, setKaraokeEnabled] = useState(false);
   const [clockEnabled, setClockEnabled] = useState(true);
   const [musicOuterGlowEffectEnabled, setMusicOuterGlowEffectEnabled] = useState(true);
+  const [calibrateEnabled, setCalibrateEnabled] = useState(true);
+  const [calibrateDelaySec, setCalibrateDelaySec] = useState(20);
 
   /** 加载逐字扫光与时钟配置 */
   useEffect(() => {
     window.api?.musicLyricsKaraokeGet().then(setKaraokeEnabled).catch(() => {});
     window.api?.musicLyricsClockGet().then(setClockEnabled).catch(() => {});
+    window.api?.musicLyricsCalibrateEnabledGet().then(setCalibrateEnabled).catch(() => {});
+    window.api?.musicLyricsCalibrateDelayGet().then(setCalibrateDelaySec).catch(() => {});
   }, []);
 
   /** 监听外发光效果开关 */
@@ -69,5 +75,5 @@ export function useLyricsSettings(): UseLyricsSettingsResult {
     };
   }, []);
 
-  return { karaokeEnabled, clockEnabled, musicOuterGlowEffectEnabled };
+  return { karaokeEnabled, clockEnabled, musicOuterGlowEffectEnabled, calibrateEnabled, calibrateDelaySec };
 }

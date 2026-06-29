@@ -202,6 +202,26 @@ public static class SmtcExports
         }
     }
 
+    /// <summary>
+    /// 获取轻量级时间戳信息 JSON（不含媒体元数据）。
+    /// 用于歌词校准等仅需播放位置的场景。
+    /// </summary>
+    [UnmanagedCallersOnly(EntryPoint = "smtc_get_timestamp")]
+    public static IntPtr GetTimestamp()
+    {
+        try
+        {
+            var info = RunOnSTAThread(() => SmtcController.GetTimestampAsync());
+            var json = JsonSerializer.Serialize(info, SmtcJsonContext.Default.TimestampInfo);
+            return StringToCoTaskMem(json);
+        }
+        catch (Exception ex)
+        {
+            lastError = ex.ToString();
+            return IntPtr.Zero;
+        }
+    }
+
     /// <summary>获取指定会话 JSON。sourceAppId 为 UTF-8 C 字符串</summary>
     [UnmanagedCallersOnly(EntryPoint = "smtc_get_session")]
     public static IntPtr GetSession(IntPtr sourceAppIdPtr)
