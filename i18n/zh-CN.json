@@ -2517,7 +2517,11 @@
         "karaokeToggle": "启用逐字扫光效果",
         "clockTitle": "歌词时钟",
         "clockHint": "在歌词界面封面与歌词之间显示当前北京时间",
-        "clockToggle": "显示当前时间"
+        "clockToggle": "显示当前时间",
+        "calibrateTitle": "歌词校准",
+        "calibrateHint": "歌词获取后延迟读取 SMTC 时间戳，修正歌词时间偏移",
+        "calibrateToggle": "启用歌词校准",
+        "calibrateDelayLabel": "触发延迟（秒）"
       },
       "smtc": {
         "title": "SMTC 自动取消订阅",
