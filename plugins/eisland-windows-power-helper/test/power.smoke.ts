@@ -43,9 +43,9 @@ console.log(`  Is Charging:      ${info.isCharging}`);
 console.log(`  Is On AC Power:   ${info.isOnAcPower}`);
 
 if (!info.hasBattery) {
-  console.log('\nℹ️  This appears to be a desktop (no battery detected).');
+  console.log('\nThis appears to be a desktop (no battery detected).');
 } else {
-  console.log(`\n🔋 Battery: ${info.remainingChargePercent}% ${info.isCharging ? '⚡ Charging' : '🔌 On Battery'}`);
+  console.log(`\nBattery: ${info.remainingChargePercent}% ${info.isCharging ? 'Charging' : 'On Battery'}`);
 }
 
 console.log('\n✅ Smoke test passed.');

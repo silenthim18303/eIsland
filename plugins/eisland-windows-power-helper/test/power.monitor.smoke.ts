@@ -43,23 +43,23 @@ monitor.on('power-changed', (info: any) => {
 });
 
 monitor.on('ac-connected', (info: any) => {
-  console.log(`[ac-connected] 🔌 AC power connected! Battery: ${info.remainingChargePercent}%`);
+  console.log(`[ac-connected] AC power connected! Battery: ${info.remainingChargePercent}%`);
 });
 
 monitor.on('ac-disconnected', (info: any) => {
-  console.log(`[ac-disconnected] 🔋 Running on battery. Battery: ${info.remainingChargePercent}%`);
+  console.log(`[ac-disconnected] Running on battery. Battery: ${info.remainingChargePercent}%`);
 });
 
 monitor.on('charging', (info: any) => {
-  console.log(`[charging] ⚡ Started charging. Battery: ${info.remainingChargePercent}%`);
+  console.log(`[charging] Started charging. Battery: ${info.remainingChargePercent}%`);
 });
 
 monitor.on('discharging', (info: any) => {
-  console.log(`[discharging] 🔋 Stopped charging. Battery: ${info.remainingChargePercent}%`);
+  console.log(`[discharging] Stopped charging. Battery: ${info.remainingChargePercent}%`);
 });
 
 monitor.on('battery-low', (info: any) => {
-  console.log(`[battery-low] ⚠️ Battery low! ${info.remainingChargePercent}%`);
+  console.log(`[battery-low] Battery low! ${info.remainingChargePercent}%`);
 });
 
 monitor.on('error', (err: Error) => {
