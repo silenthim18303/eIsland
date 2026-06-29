@@ -21,7 +21,6 @@
 using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
-using Windows.Foundation;
 using Windows.Media;
 using Windows.Media.Control;
 using Windows.Storage.Streams;
@@ -78,18 +77,9 @@ public static class SmtcSessionMonitor
     private static volatile bool _monitoring;
     private static GlobalSystemMediaTransportControlsSessionManager? _manager;
 
-    /// <summary>SessionsChanged 回调引用（用于 -= 取消订阅）</summary>
-    private static TypedEventHandler<GlobalSystemMediaTransportControlsSessionManager, SessionsChangedEventArgs>? _managerSessionsChangedHandler;
-
-    /// <summary>每会话的事件取消订阅动作（防止回调闭包持有 session 引用导致内存泄漏）</summary>
-    private static readonly ConcurrentDictionary<string, Action> _sessionUnsubscribers = new();
-
     /// <summary>Timeline 变更节流：每会话 200ms 最多触发一次</summary>
     private static readonly ConcurrentDictionary<string, long> _lastTimelineSignal = new();
     private const long TimelineThrottleMs = 200;
-
-    /// <summary>缩略图缓存：避免每次事件都重新分配 ~100KB 的 base64 字符串</summary>
-    private static readonly ConcurrentDictionary<string, (string thumbnail, string mediaId)> _thumbnailCache = new();
 
     /// <summary>初始化 Win32 事件</summary>
     private static bool EnsureEvents()
@@ -251,12 +241,11 @@ public static class SmtcSessionMonitor
     private static void RegisterManagerCallbacks()
     {
         if (_manager == null) return;
-        _managerSessionsChangedHandler = (_, _) =>
+        _manager.SessionsChanged += (_, _) =>
         {
             SyncSessions();
             SignalChange();
         };
-        _manager.SessionsChanged += _managerSessionsChangedHandler;
     }
 
     private static void InitExistingSessions()
@@ -312,13 +301,6 @@ public static class SmtcSessionMonitor
             {
                 _sessions.TryRemove(id, out _);
                 _lastTimelineSignal.TryRemove(id, out _);
-                _thumbnailCache.TryRemove(id, out _);
-
-                // 取消订阅 WinRT 事件，释放回调闭包对 session 的引用
-                if (_sessionUnsubscribers.TryRemove(id, out var unsub))
-                {
-                    try { unsub(); } catch { }
-                }
             }
         }
         catch { /* 忽略同步错误 */ }
@@ -327,7 +309,7 @@ public static class SmtcSessionMonitor
     private static void RegisterSessionCallbacks(
         GlobalSystemMediaTransportControlsSession session, string id)
     {
-        TypedEventHandler<GlobalSystemMediaTransportControlsSession, MediaPropertiesChangedEventArgs> mediaHandler = (_, _) =>
+        session.MediaPropertiesChanged += (_, _) =>
         {
             try
             {
@@ -338,7 +320,7 @@ public static class SmtcSessionMonitor
             catch { /* 忽略 */ }
         };
 
-        TypedEventHandler<GlobalSystemMediaTransportControlsSession, PlaybackInfoChangedEventArgs> playbackHandler = (_, _) =>
+        session.PlaybackInfoChanged += (_, _) =>
         {
             try
             {
@@ -349,7 +331,7 @@ public static class SmtcSessionMonitor
             catch { /* 忽略 */ }
         };
 
-        TypedEventHandler<GlobalSystemMediaTransportControlsSession, TimelinePropertiesChangedEventArgs> timelineHandler = (_, _) =>
+        session.TimelinePropertiesChanged += (_, _) =>
         {
             try
             {
@@ -363,18 +345,6 @@ public static class SmtcSessionMonitor
                 SignalChange();
             }
             catch { /* 忽略 */ }
-        };
-
-        session.MediaPropertiesChanged += mediaHandler;
-        session.PlaybackInfoChanged += playbackHandler;
-        session.TimelinePropertiesChanged += timelineHandler;
-
-        // 存储取消订阅动作，供 session 移除时调用
-        _sessionUnsubscribers[id] = () =>
-        {
-            try { session.MediaPropertiesChanged -= mediaHandler; } catch { }
-            try { session.PlaybackInfoChanged -= playbackHandler; } catch { }
-            try { session.TimelinePropertiesChanged -= timelineHandler; } catch { }
         };
     }
 
@@ -413,21 +383,12 @@ public static class SmtcSessionMonitor
             }
             catch { /* 部分应用不支持 */ }
 
-            // 用 title+artist+album 作为缩略图缓存键，避免重复分配 ~100KB 字符串
-            var id = session.SourceAppUserModelId;
-            var mediaId = $"{props.Title}|{props.Artist}|{props.AlbumTitle}";
             string? thumbnail = null;
-
-            if (_thumbnailCache.TryGetValue(id, out var cached) && cached.mediaId == mediaId)
+            try
             {
-                thumbnail = cached.thumbnail;
+                thumbnail = ReadThumbnailAsBase64(props.Thumbnail);
             }
-            else
-            {
-                try { thumbnail = ReadThumbnailAsBase64(props.Thumbnail); }
-                catch { /* 忽略 */ }
-                _thumbnailCache[id] = (thumbnail, mediaId);
-            }
+            catch { /* 忽略 */ }
 
             return new MediaMetadata
             {
@@ -549,24 +510,9 @@ public static class SmtcSessionMonitor
 
     private static void Cleanup()
     {
-        // 取消所有会话的 WinRT 事件订阅
-        foreach (var kvp in _sessionUnsubscribers)
-        {
-            try { kvp.Value(); } catch { }
-        }
-        _sessionUnsubscribers.Clear();
-
-        // 取消管理器事件订阅
-        if (_manager != null && _managerSessionsChangedHandler != null)
-        {
-            try { _manager.SessionsChanged -= _managerSessionsChangedHandler; } catch { }
-            _managerSessionsChangedHandler = null;
-        }
-
         _manager = null;
         _sessions.Clear();
         _lastTimelineSignal.Clear();
-        _thumbnailCache.Clear();
         _changeCounter = 0;
 
         if (_changeEvent != IntPtr.Zero)
