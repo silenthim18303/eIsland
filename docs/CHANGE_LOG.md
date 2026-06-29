@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-29T11:52:24.893Z
+> 生成时间：2026-06-29T16:29:09.909Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,14 @@
 
 ## Unreleased
 
+- 2026-06-30 | d2833d3b | 鸡哥 | Merge pull request #109 from JNTMTMTM/dev
+- 2026-06-30 | bdf9245c | 鸡哥 | feat: add lyrics calibration settings and update search registration rules for settings UI
+- 2026-06-29 | 8969f07c | 鸡哥 | feat: add lightweight timestamp tests and update documentation for getTimestamp functionality
+- 2026-06-29 | 5057e132 | 鸡哥 | feat: add lyrics calibration settings and hints for improved timing accuracy
+- 2026-06-29 | 25cc0e03 | 鸡哥 | feat: add lyrics calibration settings and IPC handlers for enabling and delay
+- 2026-06-29 | 83cbeb10 | 鸡哥 | feat: implement lightweight timestamp retrieval for SMTC playback synchronization
+- 2026-06-29 | 3a629c22 | 鸡哥 | feat: add lightweight timestamp retrieval for media playback status and timeline
+- 2026-06-29 | 8ca7e2f9 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #108 by @JNTMTMTM [skip ci]
 - 2026-06-29 | b3059d72 | 鸡哥 | Merge pull request #108 from JNTMTMTM/dev
 - 2026-06-29 | e9323391 | 鸡哥 | feat: add TypeScript configuration files for Bluetooth, Power, and WiFi helper plugins
 - 2026-06-29 | 25ee379b | 鸡哥 | chore: update dependencies and improve test documentation
