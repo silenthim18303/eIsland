@@ -74,28 +74,24 @@ function matchTrack(tracks: AppleMusicTrack[], title: string, artist: string): A
   const lowArtist = artist.toLowerCase();
 
   // 精确匹配
-  for (const t of tracks) {
-    if (t.trackName.toLowerCase() === lowTitle && t.artistName.toLowerCase().includes(lowArtist)) {
-      return t;
-    }
-  }
+  const exact = tracks.find(
+    (t) => t.trackName.toLowerCase() === lowTitle && t.artistName.toLowerCase().includes(lowArtist),
+  );
+  if (exact) return exact;
+
   // 标题包含
-  for (const t of tracks) {
-    if (
+  const fuzzy = tracks.find(
+    (t) =>
       (t.trackName.toLowerCase().includes(lowTitle) || lowTitle.includes(t.trackName.toLowerCase())) &&
-      (t.artistName.toLowerCase().includes(lowArtist) || lowArtist.includes(t.artistName.toLowerCase()))
-    ) {
-      return t;
-    }
-  }
+      (t.artistName.toLowerCase().includes(lowArtist) || lowArtist.includes(t.artistName.toLowerCase())),
+  );
+  if (fuzzy) return fuzzy;
+
   // 仅标题匹配
-  for (const t of tracks) {
-    if (t.trackName.toLowerCase().includes(lowTitle) || lowTitle.includes(t.trackName.toLowerCase())) {
-      return t;
-    }
-  }
-  // 返回第一首
-  return tracks[0] ?? null;
+  const titleOnly = tracks.find(
+    (t) => t.trackName.toLowerCase().includes(lowTitle) || lowTitle.includes(t.trackName.toLowerCase()),
+  );
+  return titleOnly ?? tracks[0] ?? null;
 }
 
 /**

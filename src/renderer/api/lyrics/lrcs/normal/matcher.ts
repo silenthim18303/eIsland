@@ -68,14 +68,11 @@ export function makeSearchQueries(title: string, artist: string, album?: string)
 
   // 去重（保持顺序）
   const seen = new Set<string>();
-  const result: string[] = [];
-  for (const s of candidates) {
-    if (s.length > 0 && !seen.has(s)) {
-      seen.add(s);
-      result.push(s);
-    }
-  }
-  return result;
+  return candidates.filter((s) => {
+    if (s.length === 0 || seen.has(s)) return false;
+    seen.add(s);
+    return true;
+  });
 }
 
 /**
@@ -83,16 +80,12 @@ export function makeSearchQueries(title: string, artist: string, album?: string)
  * 截断于 ( / [ /  -  ，移除特殊标点
  */
 function cleanForScore(title: string): string {
-  let result = title;
-  for (const pattern of ['(', '[', ' - ']) {
-    const idx = result.indexOf(pattern);
-    if (idx !== -1) {
-      result = result.substring(0, idx).trim();
-    }
-  }
+  const truncated = ['(', '[', ' - '].reduce((acc, pattern) => {
+    const idx = acc.indexOf(pattern);
+    return idx !== -1 ? acc.substring(0, idx).trim() : acc;
+  }, title);
   // 移除特殊标点
-  result = result.replace(/[《》「」『』！!?。、·•…]/g, '');
-  return result.trim();
+  return truncated.replace(/[《》「」『』！!?。、·•…]/g, '').trim();
 }
 
 /**
@@ -143,16 +136,12 @@ export function scoreTrack(input: ScoreInput, candidate: SearchCandidate, splitC
     .map((s) => s.trim().toLowerCase())
     .filter((s) => s.length > 0);
 
-  for (const a of artists) {
-    if (
-      candidate.artists.some((b) => {
-        const bl = b.toLowerCase();
-        return a === bl || a.includes(bl) || bl.includes(a);
-      })
-    ) {
-      score += 1;
-    }
-  }
+  score += artists.filter((a) =>
+    candidate.artists.some((b) => {
+      const bl = b.toLowerCase();
+      return a === bl || a.includes(bl) || bl.includes(a);
+    }),
+  ).length;
 
   // ── 专辑匹配 ──
   const trackAlbum = (input.album ?? '').toLowerCase();
@@ -194,14 +183,10 @@ export function bestMatch(
   minScore: number = DEFAULT_MIN_SCORE,
   splitChar: string = ' ',
 ): { candidate: SearchCandidate; score: number } | null {
-  let best: { candidate: SearchCandidate; score: number } | null = null;
-
-  for (const c of candidates) {
+  const best = candidates.reduce<{ candidate: SearchCandidate; score: number } | null>((acc, c) => {
     const s = scoreTrack(input, c, splitChar);
-    if (s >= minScore && (!best || s > best.score)) {
-      best = { candidate: c, score: s };
-    }
-  }
+    return s >= minScore && (!acc || s > acc.score) ? { candidate: c, score: s } : acc;
+  }, null);
 
   if (best) {
     logger.info('[Matcher]', `best match: "${best.candidate.title}" score=${best.score} min=${minScore}`);
@@ -229,38 +214,45 @@ export async function searchWithScoring(
   const queries = makeSearchQueries(input.title, input.artist, input.album);
   const seen = new Set<string>();
 
-  for (const query of queries) {
-    if (seen.has(query)) continue;
-    seen.add(query);
-
+  const processQuery = async (query: string): Promise<SearchCandidate | null> => {
     logger.info('[Matcher]', `query: "${query}"`);
     let candidates: SearchCandidate[];
     try {
       candidates = await searchFn(query);
     } catch {
-      continue;
+      return null;
     }
-    if (candidates.length === 0) continue;
+    if (candidates.length === 0) return null;
 
-    let groupBest: { candidate: SearchCandidate; score: number } | null = null;
+    const wowMatch = candidates.find((c) => scoreTrack(input, c, splitChar) > wowScore);
+    if (wowMatch) {
+      const s = scoreTrack(input, wowMatch, splitChar);
+      logger.info('[Matcher]', `wow match: "${wowMatch.title}" score=${s} wow=${wowScore}`);
+      return wowMatch;
+    }
 
-    for (const c of candidates) {
+    const groupBest = candidates.reduce<{ candidate: SearchCandidate; score: number } | null>((acc, c) => {
       const s = scoreTrack(input, c, splitChar);
-      if (s > wowScore) {
-        logger.info('[Matcher]', `wow match: "${c.title}" score=${s} wow=${wowScore}`);
-        return c;
-      }
-      if (s >= minScore && (!groupBest || s > groupBest.score)) {
-        groupBest = { candidate: c, score: s };
-      }
-    }
+      return s >= minScore && (!acc || s > acc.score) ? { candidate: c, score: s } : acc;
+    }, null);
 
     if (groupBest) {
       logger.info('[Matcher]', `group best: "${groupBest.candidate.title}" score=${groupBest.score}`);
       return groupBest.candidate;
     }
-  }
+    return null;
+  };
 
-  logger.warn('[Matcher]', `no acceptable result for "${input.title}" / "${input.artist}"`);
-  return null;
+  const result = await queries.reduce(async (prevPromise, query) => {
+    const prev = await prevPromise;
+    if (prev) return prev;
+    if (seen.has(query)) return null;
+    seen.add(query);
+    return processQuery(query);
+  }, Promise.resolve<SearchCandidate | null>(null));
+
+  if (!result) {
+    logger.warn('[Matcher]', `no acceptable result for "${input.title}" / "${input.artist}"`);
+  }
+  return result;
 }

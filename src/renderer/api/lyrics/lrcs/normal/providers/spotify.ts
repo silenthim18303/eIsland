@@ -255,14 +255,12 @@ async function fetchTrackLyrics(trackId: string): Promise<LyricLine[] | null> {
     return null;
   }
 
-  const result: LyricLine[] = [];
-  for (const line of lines) {
-    const words = line.words ?? '';
-    if (!words) continue;
-
-    const timeMs = parseInt(line.startTimeMs ?? '0', 10);
-    result.push({ time_ms: timeMs, text: words });
-  }
+  const result = lines
+    .filter((line) => (line.words ?? '').length > 0)
+    .map((line) => ({
+      time_ms: parseInt(line.startTimeMs ?? '0', 10),
+      text: line.words ?? '',
+    }));
 
   return result.length > 0 ? result : null;
 }

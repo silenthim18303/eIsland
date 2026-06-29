@@ -66,25 +66,22 @@ function matchTrack(tracks: AppleMusicTrack[], title: string, artist: string): A
   const lowTitle = title.toLowerCase();
   const lowArtist = artist.toLowerCase();
 
-  for (const t of tracks) {
-    if (t.trackName.toLowerCase() === lowTitle && t.artistName.toLowerCase().includes(lowArtist)) {
-      return t;
-    }
-  }
-  for (const t of tracks) {
-    if (
+  const exact = tracks.find(
+    (t) => t.trackName.toLowerCase() === lowTitle && t.artistName.toLowerCase().includes(lowArtist),
+  );
+  if (exact) return exact;
+
+  const fuzzy = tracks.find(
+    (t) =>
       (t.trackName.toLowerCase().includes(lowTitle) || lowTitle.includes(t.trackName.toLowerCase())) &&
-      (t.artistName.toLowerCase().includes(lowArtist) || lowArtist.includes(t.artistName.toLowerCase()))
-    ) {
-      return t;
-    }
-  }
-  for (const t of tracks) {
-    if (t.trackName.toLowerCase().includes(lowTitle) || lowTitle.includes(t.trackName.toLowerCase())) {
-      return t;
-    }
-  }
-  return tracks[0] ?? null;
+      (t.artistName.toLowerCase().includes(lowArtist) || lowArtist.includes(t.artistName.toLowerCase())),
+  );
+  if (fuzzy) return fuzzy;
+
+  const titleOnly = tracks.find(
+    (t) => t.trackName.toLowerCase().includes(lowTitle) || lowTitle.includes(t.trackName.toLowerCase()),
+  );
+  return titleOnly ?? tracks[0] ?? null;
 }
 
 async function fetchTTML(trackId: number): Promise<string | null> {

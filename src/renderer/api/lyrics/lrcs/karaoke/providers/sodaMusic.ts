@@ -59,26 +59,26 @@ async function searchSodaMusicApi(query: string): Promise<SearchCandidate[]> {
   const resultGroups = json.result_groups as unknown[] | undefined;
   if (!resultGroups || resultGroups.length === 0) return [];
 
-  const candidates: SearchCandidate[] = [];
-  for (const group of resultGroups) {
+  return resultGroups.flatMap((group) => {
     const g = group as Record<string, unknown>;
     const items = g.data as unknown[] | undefined;
-    if (!items) continue;
-    for (const item of items) {
-      const it = item as Record<string, unknown>;
-      const entity = it.entity as Record<string, unknown> | undefined;
-      const track = entity?.track as SodaTrack | undefined;
-      if (!track?.id) continue;
-      candidates.push({
-        id: String(track.id),
-        title: track.name ?? '',
-        artists: (track.artists ?? []).map((a) => a.name ?? ''),
-        album: track.album?.name ?? '',
-        durationMs: track.duration,
-      });
-    }
-  }
-  return candidates;
+    if (!items) return [];
+    return items
+      .map((item) => {
+        const it = item as Record<string, unknown>;
+        const entity = it.entity as Record<string, unknown> | undefined;
+        const track = entity?.track as SodaTrack | undefined;
+        if (!track?.id) return null;
+        return {
+          id: String(track.id),
+          title: track.name ?? '',
+          artists: (track.artists ?? []).map((a) => a.name ?? ''),
+          album: track.album?.name ?? '',
+          durationMs: track.duration,
+        };
+      })
+      .filter((c): c is SearchCandidate => c !== null);
+  });
 }
 
 /* ── 详情 + 逐字歌词获取 ───────────────────────────────────────────── */
