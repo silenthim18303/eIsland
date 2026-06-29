@@ -12,6 +12,7 @@ namespace eIslandSmtcHelper;
 [JsonSerializable(typeof(MediaMetadata))]
 [JsonSerializable(typeof(PlaybackInfoSnapshot))]
 [JsonSerializable(typeof(TimelineInfo))]
+[JsonSerializable(typeof(TimestampInfo))]
 [JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
 internal partial class SmtcJsonContext : JsonSerializerContext
 {

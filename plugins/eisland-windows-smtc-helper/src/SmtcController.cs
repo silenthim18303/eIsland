@@ -309,4 +309,51 @@ public static class SmtcController
             return MediaStatus.Empty;
         }
     }
+
+    /// <summary>
+    /// 轻量级获取当前播放时间戳（不含媒体元数据），用于歌词校准等场景
+    /// </summary>
+    public static async Task<TimestampInfo> GetTimestampAsync()
+    {
+        try
+        {
+            var session = await GetCurrentSessionAsync();
+            if (session == null)
+                return TimestampInfo.Empty;
+
+            var playbackInfo = session.GetPlaybackInfo();
+            var timeline = session.GetTimelineProperties();
+
+            var playbackStatus = playbackInfo.PlaybackStatus switch
+            {
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing => "playing",
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Paused => "paused",
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Stopped => "stopped",
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Closed => "closed",
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Opened => "opened",
+                GlobalSystemMediaTransportControlsSessionPlaybackStatus.Changing => "changing",
+                _ => "unknown"
+            };
+
+            var timelineProperties = new TimelineProperties
+            {
+                StartTime = timeline.StartTime.TotalSeconds,
+                EndTime = timeline.EndTime.TotalSeconds,
+                Position = timeline.Position.TotalSeconds,
+                MinSeekTime = timeline.MinSeekTime.TotalSeconds,
+                MaxSeekTime = timeline.MaxSeekTime.TotalSeconds,
+            };
+
+            return new TimestampInfo
+            {
+                IsAvailable = true,
+                PlaybackStatus = playbackStatus,
+                Timeline = timelineProperties,
+            };
+        }
+        catch
+        {
+            return TimestampInfo.Empty;
+        }
+    }
 }

@@ -29,6 +29,19 @@ public class TimelineProperties
     public double MaxSeekTime { get; init; }
 }
 
+/// <summary>
+/// 轻量级时间戳信息（不含媒体元数据，用于歌词校准等场景）
+/// </summary>
+public class TimestampInfo
+{
+    public bool IsAvailable { get; init; }
+    /// <summary>播放状态字符串，与 MediaStatus.PlaybackStatus 格式一致</summary>
+    public string? PlaybackStatus { get; init; }
+    public TimelineProperties? Timeline { get; init; }
+
+    public static TimestampInfo Empty => new() { IsAvailable = false };
+}
+
 public class PlaybackControls
 {
     public bool IsPlayEnabled { get; init; }
