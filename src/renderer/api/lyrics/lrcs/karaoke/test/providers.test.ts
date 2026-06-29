@@ -38,7 +38,8 @@ const mockCleanArtist = vi.hoisted(() => vi.fn((a: string) => a));
 const mockDecryptKRC = vi.hoisted(() => vi.fn());
 const mockDecryptQRC = vi.hoisted(() => vi.fn());
 
-const mockParseSyncedLines = vi.hoisted(() => vi.fn(() => []));
+const mockParseSyncedLines = vi.hoisted(() => vi.fn((): KaraokeLine[] => []));
+const mockSearchWithScoring = vi.hoisted(() => vi.fn<(input: unknown, searchFn: unknown, minScore?: number, wowScore?: number, splitChar?: string) => Promise<unknown | null>>());
 
 /* ---------- module mocks ---------- */
 
@@ -50,6 +51,13 @@ vi.mock('../../normal/request', () => ({
 vi.mock('../../normal/helpers', () => ({
   cleanTitle: mockCleanTitle,
   cleanArtist: mockCleanArtist,
+}));
+
+vi.mock('../../normal/matcher', () => ({
+  searchWithScoring: mockSearchWithScoring,
+  makeSearchQueries: vi.fn((t: string, a: string) => [`${t} ${a}`]),
+  scoreTrack: vi.fn(() => 0),
+  bestMatch: vi.fn(() => null),
 }));
 
 vi.mock('../decrypt/krc', () => ({
@@ -344,66 +352,24 @@ describe('fetchKaraokeFromQQMusic', () => {
     mockCleanArtist.mockImplementation((a: string) => a);
   });
 
-  it('posts to musicu.fcg with correct payload structure', async () => {
-    mockRequestJsonWithLog.mockResolvedValue(null);
-
-    await fetchKaraokeFromQQMusic('t', 'a');
-
-    const callArgs = mockRequestJsonWithLog.mock.calls[0];
-    expect(callArgs[0]).toBe('https://u.y.qq.com/cgi-bin/musicu.fcg');
-    expect(callArgs[1]?.method).toBe('POST');
-    expect(callArgs[1]?.headers?.['Content-Type']).toBe('application/json');
-
-    const payload = JSON.parse(callArgs[1]?.body);
-    expect(payload.req_1.module).toBe('music.search.SearchCgiService');
-    expect(payload.req_1.param.query).toBe('t a');
-  });
-
-  it('returns null when search returns null', async () => {
-    mockRequestJsonWithLog.mockResolvedValue(null);
+  it('returns null when no match found', async () => {
+    mockSearchWithScoring.mockResolvedValue(null);
     expect(await fetchKaraokeFromQQMusic('t', 'a')).toBeNull();
   });
 
-  it('returns null when search returns no songs', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [] } } } },
-    });
+  it('returns null when matched song has no id', async () => {
+    mockSearchWithScoring.mockResolvedValue({ id: '', mid: 'm', title: 't', artists: ['a'] });
     expect(await fetchKaraokeFromQQMusic('t', 'a')).toBeNull();
-  });
-
-  it('returns null when search result body is missing', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({ req_1: { data: {} } });
-    expect(await fetchKaraokeFromQQMusic('t', 'a')).toBeNull();
-  });
-
-  it('posts to lyric_download.fcg with musicid for each candidate', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 101 }, { id: 102 }] } } } },
-    });
-    mockRequestTextWithLog.mockResolvedValue(null);
-
-    await fetchKaraokeFromQQMusic('t', 'a');
-
-    expect(mockRequestTextWithLog).toHaveBeenCalledTimes(2);
-    const firstCall = mockRequestTextWithLog.mock.calls[0];
-    expect(firstCall[0]).toBe('https://c.y.qq.com/qqmusic/fcgi-bin/lyric_download.fcg');
-    expect(firstCall[1]?.body).toContain('musicid=101');
-    const secondCall = mockRequestTextWithLog.mock.calls[1];
-    expect(secondCall[1]?.body).toContain('musicid=102');
   });
 
   it('returns null when QRC text response is null', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 1 }] } } } },
-    });
+    mockSearchWithScoring.mockResolvedValue({ id: '1', mid: 'm', title: 't', artists: ['a'] });
     mockRequestTextWithLog.mockResolvedValue(null);
     expect(await fetchKaraokeFromQQMusic('t', 'a')).toBeNull();
   });
 
   it('returns null when XML has no CDATA hex cipher', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 1 }] } } } },
-    });
+    mockSearchWithScoring.mockResolvedValue({ id: '1', mid: 'm', title: 't', artists: ['a'] });
     mockRequestTextWithLog.mockResolvedValueOnce('<root>no-cdata-here</root>');
     expect(await fetchKaraokeFromQQMusic('t', 'a')).toBeNull();
   });
@@ -413,9 +379,7 @@ describe('fetchKaraokeFromQQMusic', () => {
     const qrcPlaintext = '[0000,3000]Hel(0,1000)lo(1000,1000)!<2000,1000>';
     const expected = [makeKaraokeLine('Hello!')];
 
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 77 }] } } } },
-    });
+    mockSearchWithScoring.mockResolvedValue({ id: '77', mid: 'm', title: 't', artists: ['a'] });
     mockRequestTextWithLog.mockResolvedValueOnce(
       `<lyric><![CDATA[${hexCipher}]]></lyric>`,
     );
@@ -429,9 +393,7 @@ describe('fetchKaraokeFromQQMusic', () => {
   });
 
   it('returns null when decryptQRC throws', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 1 }] } } } },
-    });
+    mockSearchWithScoring.mockResolvedValue({ id: '1', mid: 'm', title: 't', artists: ['a'] });
     mockRequestTextWithLog.mockResolvedValueOnce(
       '<lyric><![CDATA[AABB]]></lyric>',
     );
@@ -441,9 +403,7 @@ describe('fetchKaraokeFromQQMusic', () => {
   });
 
   it('returns null when parseSyncedLines yields no syllable lines', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 1 }] } } } },
-    });
+    mockSearchWithScoring.mockResolvedValue({ id: '1', mid: 'm', title: 't', artists: ['a'] });
     mockRequestTextWithLog.mockResolvedValueOnce(
       '<lyric><![CDATA[AABB]]></lyric>',
     );
@@ -453,35 +413,14 @@ describe('fetchKaraokeFromQQMusic', () => {
     expect(await fetchKaraokeFromQQMusic('t', 'a')).toBeNull();
   });
 
-  it('tries next candidate when current one yields no QRC', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      req_1: { data: { body: { song: { list: [{ id: 1 }, { id: 2 }] } } } },
-    });
-    // First candidate: null text
-    mockRequestTextWithLog.mockResolvedValueOnce(null);
-    // Second candidate: valid QRC
-    mockRequestTextWithLog.mockResolvedValueOnce(
-      '<lyric><![CDATA[AABB]]></lyric>',
+  it('calls searchWithScoring with correct input', async () => {
+    mockSearchWithScoring.mockResolvedValue(null);
+    await fetchKaraokeFromQQMusic('Song', 'Artist');
+    expect(mockSearchWithScoring).toHaveBeenCalledWith(
+      { title: 'Song', artist: 'Artist' },
+      expect.any(Function),
+      5, 7, '/',
     );
-    const expected = [makeKaraokeLine('ok')];
-    mockDecryptQRC.mockResolvedValueOnce('ok-plaintext');
-    mockParseSyncedLines.mockReturnValueOnce(expected);
-
-    const result = await fetchKaraokeFromQQMusic('t', 'a');
-    expect(result).toEqual(expected);
-    expect(mockRequestTextWithLog).toHaveBeenCalledTimes(2);
-  });
-
-  it('retries with cleaned title/artist when first attempt fails', async () => {
-    mockCleanTitle.mockImplementation((t: string) => t.trim());
-    mockCleanArtist.mockImplementation((a: string) => a.trim());
-    mockRequestJsonWithLog.mockResolvedValue(null);
-
-    await fetchKaraokeFromQQMusic('Song ', ' Artist');
-
-    expect(mockCleanTitle).toHaveBeenCalledWith('Song ');
-    expect(mockCleanArtist).toHaveBeenCalledWith(' Artist');
-    expect(mockRequestJsonWithLog).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -496,62 +435,20 @@ describe('fetchKaraokeFromSodaMusic', () => {
     mockCleanArtist.mockImplementation((a: string) => a);
   });
 
-  it('constructs search URL with q= query', async () => {
-    mockRequestJsonWithLog.mockResolvedValue(null);
-
-    await fetchKaraokeFromSodaMusic('MySong', 'MyArtist');
-
-    const searchUrl: string = mockRequestJsonWithLog.mock.calls[0][0];
-    expect(searchUrl).toContain('api.qishui.com/luna/pc/search/track');
-    expect(searchUrl).toContain(`q=${encodeURIComponent('MySong MyArtist')}`);
-  });
-
-  it('returns null when search returns null', async () => {
-    mockRequestJsonWithLog.mockResolvedValue(null);
+  it('returns null when no match found', async () => {
+    mockSearchWithScoring.mockResolvedValue(null);
     expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
-  });
-
-  it('returns null when search returns no result_groups', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({ result_groups: [] });
-    expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
-  });
-
-  it('returns null when no track ID found in result_groups', async () => {
-    mockRequestJsonWithLog.mockResolvedValueOnce({
-      result_groups: [{ data: [{ entity: {} }] }],
-    });
-    expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
-  });
-
-  it('constructs detail URL with track_id', async () => {
-    mockRequestJsonWithLog
-      .mockResolvedValueOnce({
-        result_groups: [{ data: [{ entity: { track: { id: '42' } } }] }],
-      })
-      .mockResolvedValueOnce(null);
-
-    await fetchKaraokeFromSodaMusic('t', 'a');
-
-    const detailUrl: string = mockRequestJsonWithLog.mock.calls[1][0];
-    expect(detailUrl).toContain('api.qishui.com/luna/pc/track_v2');
-    expect(detailUrl).toContain('track_id=42');
   });
 
   it('returns null when detail response has no lyric content', async () => {
-    mockRequestJsonWithLog
-      .mockResolvedValueOnce({
-        result_groups: [{ data: [{ entity: { track: { id: '100' } } }] }],
-      })
-      .mockResolvedValueOnce({ lyric: {} });
+    mockSearchWithScoring.mockResolvedValue({ id: '100', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({ lyric: {} });
     expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
   });
 
   it('returns null when detail response has no lyric field', async () => {
-    mockRequestJsonWithLog
-      .mockResolvedValueOnce({
-        result_groups: [{ data: [{ entity: { track: { id: '100' } } }] }],
-      })
-      .mockResolvedValueOnce({});
+    mockSearchWithScoring.mockResolvedValue({ id: '100', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({});
     expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
   });
 
@@ -559,11 +456,8 @@ describe('fetchKaraokeFromSodaMusic', () => {
     const lyricContent = '[0000,2000](0,1000)He(1000,1000)llo';
     const expected = [makeKaraokeLine('Hello')];
 
-    mockRequestJsonWithLog
-      .mockResolvedValueOnce({
-        result_groups: [{ data: [{ entity: { track: { id: '42' } } }] }],
-      })
-      .mockResolvedValueOnce({ lyric: { content: lyricContent } });
+    mockSearchWithScoring.mockResolvedValue({ id: '42', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({ lyric: { content: lyricContent } });
     mockParseSyncedLines.mockReturnValueOnce(expected);
 
     const result = await fetchKaraokeFromSodaMusic('t', 'a');
@@ -572,53 +466,26 @@ describe('fetchKaraokeFromSodaMusic', () => {
   });
 
   it('returns null when parseSyncedLines yields no syllable lines', async () => {
-    mockRequestJsonWithLog
-      .mockResolvedValueOnce({
-        result_groups: [{ data: [{ entity: { track: { id: '1' } } }] }],
-      })
-      .mockResolvedValueOnce({ lyric: { content: 'bad-data' } });
+    mockSearchWithScoring.mockResolvedValue({ id: '1', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({ lyric: { content: 'bad-data' } });
     mockParseSyncedLines.mockReturnValueOnce([]);
 
     expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
   });
 
-  it('picks the first valid track across multiple groups', async () => {
-    const expected = [makeKaraokeLine('picked')];
-    mockRequestJsonWithLog
-      .mockResolvedValueOnce({
-        result_groups: [
-          { data: [{ entity: {} }] },
-          { data: [{ entity: { track: { id: '99' } } }] },
-        ],
-      })
-      .mockResolvedValueOnce({ lyric: { content: 'data' } });
-    mockParseSyncedLines.mockReturnValueOnce(expected);
-
-    const result = await fetchKaraokeFromSodaMusic('t', 'a');
-    expect(result).toEqual(expected);
-
-    const detailUrl: string = mockRequestJsonWithLog.mock.calls[1][0];
-    expect(detailUrl).toContain('track_id=99');
+  it('returns null when detail response is null', async () => {
+    mockSearchWithScoring.mockResolvedValue({ id: '99', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce(null);
+    expect(await fetchKaraokeFromSodaMusic('t', 'a')).toBeNull();
   });
 
-  it('retries with cleaned title/artist when first attempt fails', async () => {
-    mockCleanTitle.mockImplementation((t: string) => t.trim());
-    mockCleanArtist.mockImplementation((a: string) => a.trim());
-    mockRequestJsonWithLog.mockResolvedValue(null);
-
-    await fetchKaraokeFromSodaMusic('Song ', ' Artist');
-
-    expect(mockCleanTitle).toHaveBeenCalledWith('Song ');
-    expect(mockCleanArtist).toHaveBeenCalledWith(' Artist');
-    expect(mockRequestJsonWithLog).toHaveBeenCalledTimes(2);
-  });
-
-  it('does not retry when title/artist are already clean', async () => {
-    mockRequestJsonWithLog.mockResolvedValue(null);
-
-    await fetchKaraokeFromSodaMusic('Clean', 'Artist');
-
-    // Only 1 search call (returns null, no detail call made), no retry
-    expect(mockRequestJsonWithLog).toHaveBeenCalledTimes(1);
+  it('calls searchWithScoring with correct input', async () => {
+    mockSearchWithScoring.mockResolvedValue(null);
+    await fetchKaraokeFromSodaMusic('Song', 'Artist');
+    expect(mockSearchWithScoring).toHaveBeenCalledWith(
+      { title: 'Song', artist: 'Artist' },
+      expect.any(Function),
+      5, 7,
+    );
   });
 });

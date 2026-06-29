@@ -2507,6 +2507,9 @@
           "qqmusicOnly": "仅 QQ音乐",
           "kugouOnly": "仅酷狗",
           "sodamusicOnly": "仅汽水音乐",
+          "applemusicOnly": "仅 Apple Music",
+          "spotifyOnly": "仅 Spotify",
+          "moekoeOnly": "仅 MoeKoe",
           "lrclibOnly": "仅 LRCLIB"
         },
         "karaokeTitle": "逐字扫光",

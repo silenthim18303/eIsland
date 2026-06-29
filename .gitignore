@@ -1,4 +1,5 @@
 /.windsurf
+/coverage
 /.claude/settings.json
 /.claude/settings.local.json
 /CLAUDE.md
@@ -9,6 +10,7 @@
 /.env
 /RELEASE_NOTES_SINCE_LAST_TAG.md
 /docs/developer
+/.mcp.json
 
 node_modules/
 dist/

@@ -2507,6 +2507,9 @@
           "qqmusicOnly": "QQ Music Only",
           "kugouOnly": "KuGou Only",
           "sodamusicOnly": "Soda Music Only",
+          "applemusicOnly": "Apple Music Only",
+          "spotifyOnly": "Spotify Only",
+          "moekoeOnly": "MoeKoe Only",
           "lrclibOnly": "LRCLIB Only"
         },
         "karaokeTitle": "Karaoke Highlight",

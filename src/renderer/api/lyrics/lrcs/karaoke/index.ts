@@ -31,14 +31,19 @@ import { fetchKaraokeFromNetease } from './providers/netease';
 import { fetchKaraokeFromQQMusic } from './providers/qqmusic';
 import { fetchKaraokeFromKugou } from './providers/kugou';
 import { fetchKaraokeFromSodaMusic } from './providers/sodaMusic';
+import { fetchKaraokeFromAppleMusic } from './providers/appleMusic';
+import { fetchKaraokeFromMoeKoe } from './providers/moeKoe';
 
 export type { KaraokeLine, KaraokeSyllable } from './types';
 export { fetchKaraokeFromNetease } from './providers/netease';
 export { fetchKaraokeFromQQMusic } from './providers/qqmusic';
 export { fetchKaraokeFromKugou } from './providers/kugou';
 export { fetchKaraokeFromSodaMusic } from './providers/sodaMusic';
+export { fetchKaraokeFromAppleMusic } from './providers/appleMusic';
+export { fetchKaraokeFromMoeKoe } from './providers/moeKoe';
 
-type Provider = 'netease' | 'qqmusic' | 'kugou' | 'sodamusic';
+/** Spotify 仅支持行级同步，无逐字数据，不纳入 karaoke provider */
+type Provider = 'netease' | 'qqmusic' | 'kugou' | 'sodamusic' | 'applemusic' | 'moekoe';
 
 type FetchFn = (title: string, artist: string) => Promise<KaraokeLine[] | null>;
 
@@ -47,9 +52,11 @@ const PROVIDER_MAP: Record<Provider, FetchFn> = {
   qqmusic: fetchKaraokeFromQQMusic,
   kugou: fetchKaraokeFromKugou,
   sodamusic: fetchKaraokeFromSodaMusic,
+  applemusic: fetchKaraokeFromAppleMusic,
+  moekoe: fetchKaraokeFromMoeKoe,
 };
 
-const ALL_PROVIDERS: Provider[] = ['netease', 'qqmusic', 'kugou', 'sodamusic'];
+const ALL_PROVIDERS: Provider[] = ['netease', 'qqmusic', 'kugou', 'sodamusic', 'applemusic', 'moekoe'];
 
 const PROCESS_TO_PROVIDER: Array<{ pattern: RegExp; provider: Provider }> = [
   { pattern: /cloudmusic/i, provider: 'netease' },
@@ -58,6 +65,8 @@ const PROCESS_TO_PROVIDER: Array<{ pattern: RegExp; provider: Provider }> = [
   { pattern: /汽水音乐/i, provider: 'sodamusic' },
   { pattern: /qishui/i, provider: 'sodamusic' },
   { pattern: /soda.?music/i, provider: 'sodamusic' },
+  { pattern: /AppleMusicWin|AppleInc\.AppleMusic/i, provider: 'applemusic' },
+  { pattern: /MoeKoe/i, provider: 'moekoe' },
 ];
 
 const SOURCE_SETTING_TO_PROVIDER: Record<string, Provider> = {
@@ -65,6 +74,8 @@ const SOURCE_SETTING_TO_PROVIDER: Record<string, Provider> = {
   'qqmusic-only': 'qqmusic',
   'kugou-only': 'kugou',
   'sodamusic-only': 'sodamusic',
+  'applemusic-only': 'applemusic',
+  'moekoe-only': 'moekoe',
 };
 
 /**

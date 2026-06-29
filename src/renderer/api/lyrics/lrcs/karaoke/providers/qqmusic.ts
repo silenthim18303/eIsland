@@ -20,39 +20,133 @@
 
 /**
  * @file qqmusic.ts
- * @description QQ 音乐逐字歌词(QRC)拉取 — 搜索 → `lyric_download.fcg` 取密文 → TripleDES+inflate → 后缀式音节 + 绝对偏移解析
+ * @description QQ 音乐逐字歌词(QRC)拉取 — 多策略搜索 + 评分匹配 → QRC 密文 → TripleDES+inflate → 后缀式音节解析
+ *              移植自 Lyrix fetchers/qqmusic.rs + searchers/qqmusic.rs + parsers/qqmusic.rs
  * @author 鸡哥
  * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import { cleanArtist, cleanTitle } from '../../normal/helpers';
 import { requestJsonWithLog, requestTextWithLog } from '../../normal/request';
 import { logger } from '../../../../../utils/logger';
 import { decryptQRC } from '../decrypt/qrc';
 import { parseSyncedLines } from '../parsers';
+import { searchWithScoring } from '../../normal/matcher';
+import type { SearchCandidate } from '../../normal/searchTypes';
 import type { KaraokeLine } from '../types';
 
-/** 从接口返回的 XML 中提取 `CDATA[...]` 内的 hex 密文 */
-const CDATA_RE = /CDATA\[([0-9A-F]+)\]/i;
-
 const LOG_TAG = '[KaraokeQQMusic]';
-const QQ_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
-const QQ_REFERER = 'https://c.y.qq.com/';
-const MAX_QRC_CANDIDATES = 6;
+const CDATA_RE = /CDATA\[([0-9A-F]+)\]/i;
+const QQ_HEADERS = {
+  Referer: 'https://c.y.qq.com/',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+};
 
-function resolveSongId(song: unknown): string {
-  const s = song as Record<string, unknown>;
-  return typeof s.id === 'number' ? String(s.id) : String(s.id ?? '');
+/* ── 主搜索接口（page 1 → page 2 回退）────────────────────────────── */
+
+interface QQSong {
+  id?: number;
+  mid?: string;
+  title?: string;
+  name?: string;
+  singer?: Array<{ title?: string; name?: string }>;
+  album?: { title?: string; name?: string };
+  interval?: number;
 }
 
-async function fetchQrcBySongId(id: string): Promise<KaraokeLine[] | null> {
+async function searchPrimary(query: string, page: string = '1'): Promise<SearchCandidate[]> {
+  const searchPayload = {
+    req_1: {
+      method: 'DoSearchForQQMusicDesktop',
+      module: 'music.search.SearchCgiService',
+      param: {
+        num_per_page: '20',
+        page_num: page,
+        query,
+        search_type: 0,
+      },
+    },
+  };
+
+  const json = await requestJsonWithLog<Record<string, unknown>>(
+    'https://u.y.qq.com/cgi-bin/musicu.fcg',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...QQ_HEADERS },
+      body: JSON.stringify(searchPayload),
+    },
+  );
+  if (!json) return [];
+
+  const req1 = json.req_1 as Record<string, unknown> | undefined;
+  const data = req1?.data as Record<string, unknown> | undefined;
+  const body = data?.body as Record<string, unknown> | undefined;
+  const songList = body?.song as Record<string, unknown> | undefined;
+  const songs = songList?.list as QQSong[] | undefined;
+  if (!songs || songs.length === 0) return [];
+
+  return songs.map((song) => ({
+    id: String(song.id ?? ''),
+    mid: song.mid ?? '',
+    title: song.title ?? song.name ?? '',
+    artists: (song.singer ?? []).map((s) => s.title ?? s.name ?? ''),
+    album: song.album?.title ?? song.album?.name ?? '',
+    durationMs: song.interval !== undefined ? song.interval * 1000 : undefined,
+  }));
+}
+
+/* ── 备用搜索接口 ─────────────────────────────────────────────────── */
+
+interface QQSong2 {
+  songname?: string;
+  albumname?: string;
+  songid?: number;
+  songmid?: string;
+  singer?: Array<{ name?: string }>;
+  interval?: number;
+}
+
+async function searchFallback(query: string): Promise<SearchCandidate[]> {
+  const url = `https://shc.y.qq.com/soso/fcgi-bin/search_for_qq_cp?_=1657641526460&g_tk=1037878909&uin=1804681355&format=json&inCharset=utf-8&outCharset=utf-8&notice=0&platform=h5&needNewCode=1&zhidaqu=1&catZhida=1&t=0&flag=1&ie=utf-8&sem=&aggr=0&perpage=20&n=20&p=1&remoteplace=txt.mqq.all&w=${encodeURIComponent(query)}`;
+
+  const json = await requestJsonWithLog<Record<string, unknown>>(url, { headers: QQ_HEADERS });
+  if (!json) return [];
+
+  const data = json.data as Record<string, unknown> | undefined;
+  const song = data?.song as Record<string, unknown> | undefined;
+  const list = song?.list as QQSong2[] | undefined;
+  if (!list || list.length === 0) return [];
+
+  return list.map((song) => ({
+    id: String(song.songid ?? ''),
+    mid: song.songmid ?? '',
+    title: song.songname ?? '',
+    artists: (song.singer ?? []).map((s) => s.name ?? ''),
+    album: song.albumname ?? '',
+    durationMs: song.interval !== undefined ? song.interval * 1000 : undefined,
+  }));
+}
+
+/* ── 统一搜索函数 ─────────────────────────────────────────────────── */
+
+async function searchQQMusicAll(query: string): Promise<SearchCandidate[]> {
+  let results = await searchPrimary(query, '1');
+  if (results.length > 0) return results;
+
+  results = await searchPrimary(query, '2');
+  if (results.length > 0) return results;
+
+  return searchFallback(query);
+}
+
+/* ── QRC 获取与解密 ────────────────────────────────────────────────── */
+
+async function fetchQrc(id: string): Promise<KaraokeLine[] | null> {
   const form = `version=15&miniversion=82&lrctype=4&musicid=${encodeURIComponent(id)}`;
   const qrcXml = await requestTextWithLog('https://c.y.qq.com/qqmusic/fcgi-bin/lyric_download.fcg', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-      Referer: QQ_REFERER,
-      'User-Agent': QQ_USER_AGENT,
+      ...QQ_HEADERS,
     },
     body: form,
   });
@@ -63,7 +157,7 @@ async function fetchQrcBySongId(id: string): Promise<KaraokeLine[] | null> {
 
   const m = CDATA_RE.exec(qrcXml);
   if (!m) {
-    logger.warn(`${LOG_TAG} 未在返回 XML 中找到 CDATA 密文, id=${id}, xml 前 300 字=`, qrcXml.slice(0, 300));
+    logger.warn(`${LOG_TAG} 未在返回 XML 中找到 CDATA 密文, id=${id}`);
     return null;
   }
 
@@ -78,92 +172,39 @@ async function fetchQrcBySongId(id: string): Promise<KaraokeLine[] | null> {
   const lines = parseSyncedLines(plaintext, 'suffix', 'absolute');
   const withSyllables = lines.filter((l) => l.syllables.length > 0);
   if (withSyllables.length === 0) {
-    logger.warn(`${LOG_TAG} 解密成功但解析出 0 行逐字, id=${id}, 明文长度=${plaintext.length}, 前 200 字=`, plaintext.slice(0, 200));
+    logger.warn(`${LOG_TAG} 解密成功但解析出 0 行逐字, id=${id}`);
     return null;
   }
-  logger.info(`${LOG_TAG} 获取成功, id=${id}, 行数=${withSyllables.length}`);
+  logger.info(`${LOG_TAG} QRC 获取成功, id=${id}, 行数=${withSyllables.length}`);
   return withSyllables;
 }
 
-/**
- * 根据关键字在 QQ 音乐搜索并下载 QRC 密文,解密为明文逐字歌词
- * @param queryTitle - 搜索标题
- * @param queryArtist - 搜索艺术家
- * @returns 逐字歌词行; 无 QRC 或解析失败时返回 null
- */
-async function searchKaraokeQQMusic(queryTitle: string, queryArtist: string): Promise<KaraokeLine[] | null> {
-  const query = `${queryTitle} ${queryArtist}`.trim();
-  logger.info(`${LOG_TAG} 开始获取 QRC, query="${query}"`);
-  try {
-    const searchJson = await requestJsonWithLog<Record<string, unknown>>(
-      'https://u.y.qq.com/cgi-bin/musicu.fcg',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Referer: QQ_REFERER,
-          'User-Agent': QQ_USER_AGENT,
-        },
-        body: JSON.stringify({
-          req_1: {
-            method: 'DoSearchForQQMusicDesktop',
-            module: 'music.search.SearchCgiService',
-            param: { num_per_page: '20', page_num: '1', query, search_type: 0 },
-          },
-        }),
-      },
-    );
-    if (!searchJson) {
-      logger.warn(`${LOG_TAG} 搜索接口返回空, query="${query}"`);
-      return null;
-    }
+/* ── 对外入口 ──────────────────────────────────────────────────────── */
 
-    const req1 = searchJson.req_1 as Record<string, unknown> | undefined;
-    const data = req1?.data as Record<string, unknown> | undefined;
-    const body = data?.body as Record<string, unknown> | undefined;
-    const songList = body?.song as Record<string, unknown> | undefined;
-    const songs = songList?.list as unknown[] | undefined;
-    if (!songs || songs.length === 0) {
-      logger.warn(`${LOG_TAG} 搜索无结果, query="${query}"`);
-      return null;
-    }
-
-    const candidates = songs.slice(0, MAX_QRC_CANDIDATES);
-    for (let i = 0; i < candidates.length; i += 1) {
-      const id = resolveSongId(candidates[i]);
-      if (!id) {
-        logger.warn(`${LOG_TAG} 候选 ${i + 1}/${candidates.length} 缺少歌曲 id, query="${query}"`);
-        continue;
-      }
-      const lines = await fetchQrcBySongId(id);
-      if (lines && lines.length > 0) {
-        logger.info(`${LOG_TAG} 命中候选 ${i + 1}/${candidates.length}, id=${id}`);
-        return lines;
-      }
-    }
-
-    logger.warn(`${LOG_TAG} 候选前 ${candidates.length} 首均未拿到可用 QRC, query="${query}"`);
-    return null;
-  } catch (err) {
-    logger.error(`${LOG_TAG} 未预期异常, query="${query}":`, err);
-    return null;
-  }
-}
-
-/**
- * QQ 音乐逐字歌词对外入口 — 原词失败则用 cleanTitle/cleanArtist 重试
- * @param title - 原始歌名
- * @param artist - 原始艺术家
- * @returns 逐字歌词行, 无 QRC 时返回 null
- */
 export async function fetchKaraokeFromQQMusic(title: string, artist: string): Promise<KaraokeLine[] | null> {
-  const raw = await searchKaraokeQQMusic(title, artist);
-  if (raw) return raw;
+  logger.info(`${LOG_TAG} 开始获取 QRC, title="${title}", artist="${artist}"`);
 
-  const cleanedTitle = cleanTitle(title);
-  const cleanedArtist = cleanArtist(artist);
-  if (cleanedTitle !== title || cleanedArtist !== artist) {
-    return searchKaraokeQQMusic(cleanedTitle, cleanedArtist);
+  const matched = await searchWithScoring(
+    { title, artist },
+    searchQQMusicAll,
+    5,   // minScore
+    7,   // wowScore
+    '/', // splitChar
+  );
+
+  if (!matched) {
+    logger.warn(`${LOG_TAG} 无匹配歌曲`);
+    return null;
   }
+
+  logger.info(`${LOG_TAG} 匹配到: "${matched.title}" - "${matched.artists.join(', ')}" (id=${matched.id})`);
+
+  // 用数字 id 获取 QRC
+  if (matched.id) {
+    const lines = await fetchQrc(matched.id);
+    if (lines) return lines;
+  }
+
+  logger.warn(`${LOG_TAG} QRC 获取失败, id=${matched.id}`);
   return null;
 }

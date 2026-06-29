@@ -41,6 +41,20 @@ const {
   writeFileSyncMock: vi.fn(),
 }));
 
+const {
+  playMock,
+  pauseMock,
+  nextMock,
+  previousMock,
+  seekMock,
+} = vi.hoisted(() => ({
+  playMock: vi.fn(),
+  pauseMock: vi.fn(),
+  nextMock: vi.fn(),
+  previousMock: vi.fn(),
+  seekMock: vi.fn(),
+}));
+
 vi.mock('electron', () => ({
   ipcMain: {
     handle: handleMock,
@@ -54,6 +68,14 @@ vi.mock('fs', () => ({
   existsSync: existsSyncMock,
   readFileSync: readFileSyncMock,
   writeFileSync: writeFileSyncMock,
+}));
+
+vi.mock('@eisland/windows-smtc-helper', () => ({
+  play: playMock,
+  pause: pauseMock,
+  next: nextMock,
+  previous: previousMock,
+  seek: seekMock,
 }));
 
 import { registerMediaIpcHandlers } from '../media';
@@ -76,10 +98,13 @@ describe('media ipc handlers', () => {
   });
 
   it('handles media keys with whitelist guard', () => {
-    const sendMediaVirtualKey = vi.fn();
+    playMock.mockClear();
+    pauseMock.mockClear();
+    nextMock.mockClear();
+    previousMock.mockClear();
+
     registerMediaIpcHandlers({
       getMainWindow: () => null,
-      sendMediaVirtualKey,
       isWhitelisted: () => false,
       getPendingSourceSwitchId: () => '',
       setPendingSourceSwitchId: vi.fn(),
@@ -94,8 +119,10 @@ describe('media ipc handlers', () => {
     handlers.get('media:next')?.({});
     handlers.get('media:prev')?.({});
 
-    expect(sendMediaVirtualKey).toHaveBeenCalledTimes(1);
-    expect(sendMediaVirtualKey).toHaveBeenCalledWith(0xB3);
+    // 无播放会话时 isPlaying=false，应调用 play()
+    expect(playMock).toHaveBeenCalledTimes(1);
+    expect(nextMock).not.toHaveBeenCalled();
+    expect(previousMock).not.toHaveBeenCalled();
   });
 
   it('returns current info and applies source switch updates', () => {
@@ -122,7 +149,6 @@ describe('media ipc handlers', () => {
 
     registerMediaIpcHandlers({
       getMainWindow: () => null,
-      sendMediaVirtualKey: vi.fn(),
       isWhitelisted: () => true,
       getPendingSourceSwitchId: () => 'device-2',
       setPendingSourceSwitchId,

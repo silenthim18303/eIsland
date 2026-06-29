@@ -30,6 +30,9 @@ import { fetchLyricsFromNetease } from './normal/providers/netease';
 import { fetchLyricsFromQQMusic } from './normal/providers/qqmusic';
 import { fetchLyricsFromKugou } from './normal/providers/kugou';
 import { fetchLyricsFromSodaMusic } from './normal/providers/sodaMusic';
+import { fetchLyricsFromAppleMusic } from './normal/providers/appleMusic';
+import { fetchLyricsFromSpotify } from './normal/providers/spotify';
+import { fetchLyricsFromMoeKoe } from './normal/providers/moeKoe';
 
 export type { LyricLine } from './normal/types';
 export { fetchLyricsFromLrclib } from './normal/providers/lrclib';
@@ -37,8 +40,11 @@ export { fetchLyricsFromNetease } from './normal/providers/netease';
 export { fetchLyricsFromQQMusic } from './normal/providers/qqmusic';
 export { fetchLyricsFromKugou } from './normal/providers/kugou';
 export { fetchLyricsFromSodaMusic } from './normal/providers/sodaMusic';
+export { fetchLyricsFromAppleMusic } from './normal/providers/appleMusic';
+export { fetchLyricsFromSpotify } from './normal/providers/spotify';
+export { fetchLyricsFromMoeKoe } from './normal/providers/moeKoe';
 
-type Provider = 'netease' | 'qqmusic' | 'kugou' | 'sodamusic';
+type Provider = 'netease' | 'qqmusic' | 'kugou' | 'sodamusic' | 'applemusic' | 'spotify' | 'moekoe';
 
 type FetchFn = (title: string, artist: string) => Promise<LyricLine[] | null>;
 
@@ -47,9 +53,12 @@ const PROVIDER_MAP: Record<Provider, FetchFn> = {
   qqmusic: fetchLyricsFromQQMusic,
   kugou: fetchLyricsFromKugou,
   sodamusic: fetchLyricsFromSodaMusic,
+  applemusic: fetchLyricsFromAppleMusic,
+  spotify: fetchLyricsFromSpotify,
+  moekoe: fetchLyricsFromMoeKoe,
 };
 
-const ALL_PROVIDERS: Provider[] = ['netease', 'qqmusic', 'kugou', 'sodamusic'];
+const ALL_PROVIDERS: Provider[] = ['netease', 'qqmusic', 'kugou', 'sodamusic', 'applemusic', 'spotify', 'moekoe'];
 
 const PROCESS_TO_PROVIDER: Array<{ pattern: RegExp; provider: Provider }> = [
   { pattern: /cloudmusic/i, provider: 'netease' },
@@ -58,6 +67,9 @@ const PROCESS_TO_PROVIDER: Array<{ pattern: RegExp; provider: Provider }> = [
   { pattern: /汽水音乐/i, provider: 'sodamusic' },
   { pattern: /qishui/i, provider: 'sodamusic' },
   { pattern: /soda.?music/i, provider: 'sodamusic' },
+  { pattern: /AppleMusicWin|AppleInc\.AppleMusic/i, provider: 'applemusic' },
+  { pattern: /Spotify/i, provider: 'spotify' },
+  { pattern: /MoeKoe/i, provider: 'moekoe' },
 ];
 
 function detectProviderFromProcess(sourceAppId: string): Provider | null {
@@ -89,6 +101,9 @@ const SOURCE_SETTING_TO_PROVIDER: Record<string, Provider> = {
   'qqmusic-only': 'qqmusic',
   'kugou-only': 'kugou',
   'sodamusic-only': 'sodamusic',
+  'applemusic-only': 'applemusic',
+  'spotify-only': 'spotify',
+  'moekoe-only': 'moekoe',
 };
 
 async function readLyricsSourceSetting(): Promise<string> {

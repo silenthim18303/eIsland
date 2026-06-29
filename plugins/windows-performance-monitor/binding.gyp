@@ -6,7 +6,10 @@
       "defines": ["WIN32_LEAN_AND_MEAN", "NAPI_VERSION=8"],
       "msvs_settings": {
         "VCCLCompilerTool": {
-          "AdditionalOptions": ["/utf-8"]
+          "AdditionalOptions": ["/utf-8", "/GL-"]
+        },
+        "VCLinkerTool": {
+          "AdditionalOptions": ["/LTCG:OFF"]
         }
       }
     }
