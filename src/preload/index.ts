@@ -1061,6 +1061,14 @@ const api = {
   musicDetectSourceAppId: (): Promise<{ ok: boolean; sources: Array<{ sourceAppId: string; isPlaying: boolean; hasTitle: boolean; thumbnail: string | null }>; message: string }> => {
     return ipcRenderer.invoke('music:detect-source-app-id');
   },
+  /**
+   * 轻量级获取当前 SMTC 播放时间戳（不含媒体元数据）
+   * 用于歌词校准等仅需播放位置的场景
+   * @returns 时间戳信息
+   */
+  smtcGetTimestamp: (): Promise<{ isAvailable: boolean; playbackStatus: string; timeline: { startTime: number; endTime: number; position: number; minSeekTime: number; maxSeekTime: number } | null }> => {
+    return ipcRenderer.invoke('smtc:get-timestamp');
+  },
   /** 获取当前运行中的非系统进程列表 */
   getRunningNonSystemProcesses: (): Promise<string[]> => {
     return ipcRenderer.invoke('system:running-processes:get');

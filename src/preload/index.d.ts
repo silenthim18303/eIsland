@@ -415,6 +415,7 @@ declare global {
       musicSmtcUnsubscribeMsGet: () => Promise<number>;
       musicSmtcUnsubscribeMsSet: (valueMs: number) => Promise<boolean>;
       musicDetectSourceAppId: () => Promise<{ ok: boolean; sources: Array<{ sourceAppId: string; isPlaying: boolean; hasTitle: boolean; thumbnail: string | null }>; message: string }>;
+      smtcGetTimestamp: () => Promise<{ isAvailable: boolean; playbackStatus: string; timeline: { startTime: number; endTime: number; position: number; minSeekTime: number; maxSeekTime: number } | null }>;
       getRunningNonSystemProcesses: () => Promise<string[]>;
       getRunningNonSystemProcessesWithIcons: () => Promise<RunningProcessInfo[]>;
       getOpenWindowsWithIcons: () => Promise<RunningWindowInfo[]>;
