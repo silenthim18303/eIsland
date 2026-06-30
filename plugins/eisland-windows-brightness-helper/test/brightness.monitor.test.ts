@@ -30,7 +30,6 @@ const bright = require('../') as {
   BrightnessMonitor: new () => {
     start(): void;
     stop(): void;
-    getLastBrightness(): number;
     isRunning(): boolean;
     on(event: string, listener: (...args: any[]) => void): any;
   };
@@ -45,7 +44,6 @@ describe('BrightnessMonitor', () => {
     const monitor = new bright.BrightnessMonitor();
     expect(typeof monitor.start).toBe('function');
     expect(typeof monitor.stop).toBe('function');
-    expect(typeof monitor.getLastBrightness).toBe('function');
     expect(typeof monitor.isRunning).toBe('function');
     expect(typeof monitor.on).toBe('function');
   });
@@ -72,15 +70,6 @@ describe('BrightnessMonitor', () => {
     expect(monitor.isRunning()).toBe(true);
     monitor.stop();
     expect(monitor.isRunning()).toBe(false);
-  });
-
-  it('getLastBrightness() returns -1 before any event', () => {
-    const monitor = new bright.BrightnessMonitor();
-    monitor.start();
-    const brightness = monitor.getLastBrightness();
-    // 尚未收到事件时返回初始值
-    expect(typeof brightness).toBe('number');
-    monitor.stop();
   });
 
   it('emits error event on double start does not crash', () => {

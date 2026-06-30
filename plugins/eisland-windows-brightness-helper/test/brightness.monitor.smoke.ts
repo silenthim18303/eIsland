@@ -38,13 +38,17 @@ console.log('Try adjusting screen brightness during the test...\n');
 const monitor = new BrightnessMonitor();
 
 let changeCount = 0;
+let lastBrightness = -1;
 
-monitor.on('brightness-changed', (brightness: number, prevBrightness?: number) => {
+monitor.on('brightness-changed', (brightness: number, timestamp: number) => {
   changeCount++;
-  if (prevBrightness !== undefined) {
-    console.log(`[changed] ${prevBrightness}% → ${brightness}% (total: ${changeCount})`);
+  const prev = lastBrightness;
+  lastBrightness = brightness;
+  const ts = new Date(timestamp).toLocaleTimeString();
+  if (prev >= 0) {
+    console.log(`[${ts}] ${prev}% → ${brightness}% (total: ${changeCount})`);
   } else {
-    console.log(`[changed] ${brightness}% (first event, total: ${changeCount})`);
+    console.log(`[${ts}] ${brightness}% (first event, total: ${changeCount})`);
   }
 });
 
@@ -54,12 +58,11 @@ monitor.on('error', (err: Error) => {
 
 monitor.start();
 console.log(`Monitor running: ${monitor.isRunning()}`);
-console.log(`Last brightness: ${monitor.getLastBrightness()}`);
 
 setTimeout(() => {
   console.log(`\n--- Final State ---`);
   console.log(`  isRunning:       ${monitor.isRunning()}`);
-  console.log(`  lastBrightness:  ${monitor.getLastBrightness()}%`);
+  console.log(`  lastBrightness:  ${lastBrightness >= 0 ? lastBrightness + '%' : 'N/A'}`);
   console.log(`  changeCount:     ${changeCount}`);
 
   monitor.stop();

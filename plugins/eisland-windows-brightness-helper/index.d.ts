@@ -45,12 +45,12 @@ export function setBrightness(brightness: number): boolean;
 
 /**
  * 屏幕亮度实时监控器
- * 通过 DLL FFI 监听 WmiMonitorBrightnessEvent
+ * 通过 WmiMonitorBrightnessEvent 监听亮度变化
  *
  * @example
  * ```js
  * const monitor = new BrightnessMonitor();
- * monitor.on('brightness-changed', (brightness, prevBrightness) => { ... });
+ * monitor.on('brightness-changed', (brightness, timestamp) => { ... });
  * monitor.on('error', (err) => { ... });
  * monitor.start();
  * // ...
@@ -63,16 +63,14 @@ export class BrightnessMonitor extends EventEmitter {
   start(): void;
   /** 停止监控 */
   stop(): void;
-  /** 获取最后一次事件中的亮度值 (0-100)，-1 表示尚未收到事件 */
-  getLastBrightness(): number;
   /** 是否正在监控 */
   isRunning(): boolean;
 
-  on(event: 'brightness-changed', listener: (brightness: number, prevBrightness?: number) => void): this;
+  on(event: 'brightness-changed', listener: (brightness: number, timestamp: number) => void): this;
   on(event: 'error', listener: (err: Error) => void): this;
   on(event: string, listener: (...args: any[]) => void): this;
 
-  emit(event: 'brightness-changed', brightness: number, prevBrightness?: number): boolean;
+  emit(event: 'brightness-changed', brightness: number, timestamp: number): boolean;
   emit(event: 'error', err: Error): boolean;
   emit(event: string, ...args: any[]): boolean;
 }
