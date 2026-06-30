@@ -1,0 +1,44 @@
+{
+  "name": "@eisland/windows-brightness-helper",
+  "version": "26.0.0",
+  "description": "Windows screen brightness query, control and real-time monitoring via WMI and Native AOT DLL.",
+  "author": "JNTMTMTM",
+  "license": "GPL-3.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64",
+    "ia32"
+  ],
+  "scripts": {
+    "build": "dotnet build src/eIslandBrightnessHelper.csproj -c Release",
+    "build:ctypes": "dotnet publish bright-ctypes/eIslandBrightnessCtypes.csproj -c Release -r win-x64",
+    "build:all": "npm run build && npm run build:ctypes",
+    "clean": "dotnet clean src/eIslandBrightnessHelper.csproj && dotnet clean bright-ctypes/eIslandBrightnessCtypes.csproj",
+    "rebuild": "npm run clean && npm run build:all",
+    "test": "vitest run --config vitest.config.ts",
+    "test:query": "vitest run --config vitest.config.ts test/brightness.test.ts",
+    "test:monitor": "vitest run --config vitest.config.ts test/brightness.monitor.test.ts",
+    "smoke": "node --experimental-strip-types test/brightness.smoke.ts",
+    "smoke:monitor": "node --experimental-strip-types test/brightness.monitor.smoke.ts"
+  },
+  "dependencies": {
+    "koffi": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.4",
+    "vitest": "^3.2.1"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "ffi-loader.js",
+    "brightness-monitor.js",
+    "src",
+    "bright-ctypes"
+  ]
+}
