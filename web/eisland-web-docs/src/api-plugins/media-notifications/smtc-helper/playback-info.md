@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: PlaybackInfo
 icon: circle-info
 ---

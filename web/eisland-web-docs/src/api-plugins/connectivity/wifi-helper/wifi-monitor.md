@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: WifiMonitor
 icon: circle-info
 ---

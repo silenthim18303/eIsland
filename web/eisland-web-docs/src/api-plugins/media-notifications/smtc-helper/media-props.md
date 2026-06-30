@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: MediaProps
 icon: circle-info
 ---

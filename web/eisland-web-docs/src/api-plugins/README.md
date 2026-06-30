@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Plugin API Reference
 icon: plug
 ---

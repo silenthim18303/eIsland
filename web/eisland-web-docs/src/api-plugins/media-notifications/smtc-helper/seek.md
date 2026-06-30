@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: seek
 icon: circle-info
 ---

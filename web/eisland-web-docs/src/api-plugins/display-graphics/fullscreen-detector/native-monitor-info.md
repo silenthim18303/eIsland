@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: NativeMonitorInfo
 icon: circle-info
 ---

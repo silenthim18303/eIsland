@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: CpuSnapshot
 icon: circle-info
 ---

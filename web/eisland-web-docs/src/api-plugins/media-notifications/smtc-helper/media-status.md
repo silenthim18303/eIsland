@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: MediaStatus
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: PowerInfo
 icon: circle-info
 ---

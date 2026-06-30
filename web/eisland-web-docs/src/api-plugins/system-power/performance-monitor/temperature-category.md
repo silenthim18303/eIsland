@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: TemperatureCategory
 icon: circle-info
 ---

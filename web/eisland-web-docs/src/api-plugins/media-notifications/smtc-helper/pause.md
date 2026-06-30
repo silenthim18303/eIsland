@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: pause
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getTemperature
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getBrightness
 icon: circle-info
 ---

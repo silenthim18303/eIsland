@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows Power Helper
 icon: battery-half
 ---

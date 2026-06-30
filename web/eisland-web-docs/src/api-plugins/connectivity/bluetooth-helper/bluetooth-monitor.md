@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: BluetoothMonitor
 icon: circle-info
 ---

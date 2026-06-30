@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows Performance Monitor
 icon: gauge-high
 ---

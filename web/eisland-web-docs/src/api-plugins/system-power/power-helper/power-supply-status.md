@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: PowerSupplyStatus
 icon: circle-info
 ---

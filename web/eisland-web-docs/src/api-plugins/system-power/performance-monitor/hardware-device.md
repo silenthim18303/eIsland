@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: HardwareDevice
 icon: circle-info
 ---

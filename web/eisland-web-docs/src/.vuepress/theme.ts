@@ -84,7 +84,7 @@ export default hopeTheme({
     watermark: {
       enabled: false,
       watermarkOptions: {
-        content: "eIsland developers docs",
+        content: "eIsland API Docs",
       },
     },
 

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: System & Power
 icon: gear
 ---

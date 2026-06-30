@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: SessionSnapshot
 icon: circle-info
 ---

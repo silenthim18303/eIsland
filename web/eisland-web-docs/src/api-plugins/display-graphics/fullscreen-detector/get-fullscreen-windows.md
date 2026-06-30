@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getFullscreenWindows
 icon: circle-info
 ---

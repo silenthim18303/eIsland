@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: setPlaybackRate
 icon: circle-info
 ---

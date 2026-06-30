@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: setShuffle
 icon: circle-info
 ---

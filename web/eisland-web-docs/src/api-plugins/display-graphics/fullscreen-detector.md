@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows Fullscreen Detector
 icon: maximize
 ---

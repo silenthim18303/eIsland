@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows Bluetooth Helper
 icon: bluetooth
 ---

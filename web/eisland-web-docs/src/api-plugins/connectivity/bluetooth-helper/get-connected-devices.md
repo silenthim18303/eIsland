@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getConnectedDevices
 icon: circle-info
 ---

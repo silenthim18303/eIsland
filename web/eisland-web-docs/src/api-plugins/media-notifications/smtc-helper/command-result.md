@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: CommandResult
 icon: circle-info
 ---

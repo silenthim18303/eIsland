@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getTimestamp
 icon: circle-info
 ---

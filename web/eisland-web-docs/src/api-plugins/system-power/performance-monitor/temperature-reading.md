@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: TemperatureReading
 icon: circle-info
 ---

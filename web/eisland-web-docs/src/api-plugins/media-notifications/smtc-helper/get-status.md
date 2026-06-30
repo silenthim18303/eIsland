@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getStatus
 icon: circle-info
 ---

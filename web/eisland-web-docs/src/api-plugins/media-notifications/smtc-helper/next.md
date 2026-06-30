@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: next
 icon: circle-info
 ---

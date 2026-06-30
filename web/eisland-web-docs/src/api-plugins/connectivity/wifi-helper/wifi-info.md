@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: WifiInfo
 icon: circle-info
 ---

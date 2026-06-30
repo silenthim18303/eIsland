@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getPairedDevices
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: MemorySnapshot
 icon: circle-info
 ---

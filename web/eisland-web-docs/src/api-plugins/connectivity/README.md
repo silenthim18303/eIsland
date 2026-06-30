@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Connectivity
 icon: wifi
 ---

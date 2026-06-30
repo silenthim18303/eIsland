@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getHardwareList
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: NativeRect
 icon: circle-info
 ---

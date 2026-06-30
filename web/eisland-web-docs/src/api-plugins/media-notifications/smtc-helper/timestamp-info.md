@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: TimestampInfo
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: TemperatureSnapshot
 icon: circle-info
 ---

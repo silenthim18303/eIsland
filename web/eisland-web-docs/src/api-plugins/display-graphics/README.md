@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Display & Graphics
 icon: display
 ---

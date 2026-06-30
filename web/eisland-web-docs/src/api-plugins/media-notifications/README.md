@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Media & Notifications
 icon: bell
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows Brightness Helper
 icon: sun
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: isSuppressionEnabled
 icon: circle-info
 ---

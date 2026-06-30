@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: closeProcesses
 icon: circle-info
 ---

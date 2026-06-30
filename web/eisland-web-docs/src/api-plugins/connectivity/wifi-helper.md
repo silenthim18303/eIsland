@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows WiFi Helper
 icon: wifi
 ---

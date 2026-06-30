@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getNotifications
 icon: circle-info
 ---

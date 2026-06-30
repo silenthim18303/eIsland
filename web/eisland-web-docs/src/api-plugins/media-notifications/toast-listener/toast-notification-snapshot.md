@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: ToastNotificationSnapshot
 icon: circle-info
 ---

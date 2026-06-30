@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: Windows SMTC Helper
 icon: music
 ---

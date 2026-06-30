@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: ToastNotificationChangedEvent
 icon: circle-info
 ---

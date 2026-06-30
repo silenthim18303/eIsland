@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: BrightnessMonitor
 icon: circle-info
 ---

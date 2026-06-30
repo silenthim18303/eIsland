@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: EnergySaverStatus
 icon: circle-info
 ---

@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: BatteryStatus
 icon: circle-info
 ---

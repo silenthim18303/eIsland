@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: ConnectivityLevel
 icon: circle-info
 ---

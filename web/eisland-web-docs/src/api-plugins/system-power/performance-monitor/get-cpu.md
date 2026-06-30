@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getCpu
 icon: circle-info
 ---

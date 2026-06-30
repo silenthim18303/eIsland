@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: ToastAccessStatus
 icon: circle-info
 ---

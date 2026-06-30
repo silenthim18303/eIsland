@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: ProcessFailure
 icon: circle-info
 ---

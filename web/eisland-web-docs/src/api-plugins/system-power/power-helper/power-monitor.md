@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: PowerMonitor
 icon: circle-info
 ---

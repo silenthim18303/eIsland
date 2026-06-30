@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: setRepeatMode
 icon: circle-info
 ---

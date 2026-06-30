@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: SmtcMonitor
 icon: circle-info
 ---

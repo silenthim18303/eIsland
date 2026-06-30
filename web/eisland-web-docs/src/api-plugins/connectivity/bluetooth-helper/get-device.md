@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: getDevice
 icon: circle-info
 ---

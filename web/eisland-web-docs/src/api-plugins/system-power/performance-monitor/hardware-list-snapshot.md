@@ -1,4 +1,5 @@
 ---
+watermark: true
 title: HardwareListSnapshot
 icon: circle-info
 ---
