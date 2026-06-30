@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-29T16:29:09.909Z
+> 生成时间：2026-06-30T15:21:35.900Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,13 @@
 
 ## Unreleased
 
+- 2026-06-30 | f25fbe20 | 鸡哥 | Merge pull request #110 from JNTMTMTM/dev
+- 2026-06-30 | 9f63e421 | 鸡哥 | docs: remove reference to full testing strategy in testing commands documentation
+- 2026-06-30 | 66906efb | 鸡哥 | docs: update documentation for Windows Brightness Helper plugin
+- 2026-06-30 | 890f5c5a | 鸡哥 | fix: correct package name for Windows brightness helper plugin
+- 2026-06-30 | 84ed4211 | 鸡哥 | refactor: restructure brightness helper plugin to use standalone executable for brightness control and monitoring - Removed FFI and related files - Added new executable for brightness operations - Updated documentation and tests accordingly
+- 2026-06-30 | ab895443 | 鸡哥 | feat: add Windows brightness helper plugin with brightness control and monitoring
+- 2026-06-29 | 1c76a8da | github-actions[bot] | docs: auto update CHANGE_LOG.md for #109 by @JNTMTMTM [skip ci]
 - 2026-06-30 | d2833d3b | 鸡哥 | Merge pull request #109 from JNTMTMTM/dev
 - 2026-06-30 | bdf9245c | 鸡哥 | feat: add lyrics calibration settings and update search registration rules for settings UI
 - 2026-06-29 | 8969f07c | 鸡哥 | feat: add lightweight timestamp tests and update documentation for getTimestamp functionality
