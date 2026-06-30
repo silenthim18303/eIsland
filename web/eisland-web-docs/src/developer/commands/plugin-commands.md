@@ -26,6 +26,7 @@ npm run <script>
 | **Toast Listener** | `eisland-windows-toast-listener` | C++ | node-gyp | ✅ | ✅ |
 | **SMTC Helper** | `eisland-windows-smtc-helper` | C# | dotnet | ✅ | ✅ |
 | **Bluetooth Helper** | `eisland-windows-bluetooth-helper` | C# | dotnet | ✅ | ✅ |
+| **Brightness Helper** | `eisland-windows-brightness-helper` | C# | dotnet | ✅ | ✅ |
 
 ## Common Commands
 
@@ -307,6 +308,39 @@ This plugin follows the same dual-build pattern as the Bluetooth and Power Helpe
 
 ---
 
+## Windows Brightness Helper
+
+**Directory:** `plugins/eisland-windows-brightness-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet build`
+
+:::info
+This is a pure .NET plugin that spawns a console EXE for WMI brightness operations. Unlike the Bluetooth/Power/WiFi Helpers, it does not use NativeAOT or koffi FFI — `System.Management` (WMI) is incompatible with NativeAOT.
+:::
+
+### Build
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `dotnet build src/eIslandBrightnessReader.csproj -c Release` | Build the .NET console exe |
+| `npm run clean` | `dotnet clean src/eIslandBrightnessReader.csproj` | Remove build artifacts |
+| `npm run rebuild` | `npm run clean && npm run build` | Full clean build |
+
+### Test
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All tests — export verification, shape validation, boundary values, monitor tests |
+| `npm run test:query` | `vitest run test/brightness.test.ts` | Query function tests only |
+| `npm run test:monitor` | `vitest run test/brightness.monitor.test.ts` | Monitor tests only |
+
+### Smoke
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/brightness.smoke.ts` | Full smoke — `getBrightness()`, `setBrightness()` |
+| `npm run smoke:monitor` | `node --experimental-strip-types test/brightness.monitor.smoke.ts` | Monitor smoke — WMI event tracking for 15s |
+
+---
+
 ## Quick Reference
 
 ### All Build Commands
@@ -329,6 +363,7 @@ This plugin follows the same dual-build pattern as the Bluetooth and Power Helpe
 | WiFi Helper (exe) | `cd plugins/eisland-windows-wifi-helper && npm run build` |
 | WiFi Helper (DLL) | `cd plugins/eisland-windows-wifi-helper && npm run build:ctypes` |
 | WiFi Helper (all) | `cd plugins/eisland-windows-wifi-helper && npm run build:all` |
+| Brightness Helper | `cd plugins/eisland-windows-brightness-helper && npm run build` |
 | **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
 
 ### All Test Commands
@@ -343,6 +378,7 @@ This plugin follows the same dual-build pattern as the Bluetooth and Power Helpe
 | Bluetooth Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | Power Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | WiFi Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
+| Brightness Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 
 ### All Smoke Commands
 
@@ -356,3 +392,4 @@ This plugin follows the same dual-build pattern as the Bluetooth and Power Helpe
 | Bluetooth Helper | `npm run smoke` · `npm run smoke:monitor` |
 | Power Helper | `npm run smoke` · `npm run smoke:monitor` |
 | WiFi Helper | `npm run smoke` · `npm run smoke:monitor` |
+| Brightness Helper | `npm run smoke` · `npm run smoke:monitor` |

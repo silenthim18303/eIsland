@@ -123,7 +123,7 @@ git commit -m "feat: add dynamic island animation
 ```
 
 :::important
-Follow the [Commit Conventions](/developer/standards/commit-conventions.md) for commit message format. All commits must use the `type: description` format (e.g., `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`).
+All commits must use the `type: description` format (e.g., `feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`).
 :::
 
 ### Amend the Last Commit
