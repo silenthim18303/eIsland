@@ -100,7 +100,7 @@ export default sidebar({
     },
     {
       text: "Windows Bluetooth Helper",
-      icon: "bluetooth",
+      icon: "server",
       collapsible: true,
       children: [
         "connectivity/bluetooth-helper/bluetooth-device-info.md",
