@@ -73,6 +73,45 @@ export default sidebar({
       ],
     },
   ],
+  "/api-plugins/": [
+    {
+      text: "Display & Graphics",
+      icon: "display",
+      collapsible: false,
+      children: [
+        "display-graphics/brightness-helper.md",
+        "display-graphics/fullscreen-detector.md",
+      ],
+    },
+    {
+      text: "Connectivity",
+      icon: "wifi",
+      collapsible: false,
+      children: [
+        "connectivity/bluetooth-helper.md",
+        "connectivity/wifi-helper.md",
+      ],
+    },
+    {
+      text: "System & Power",
+      icon: "gear",
+      collapsible: false,
+      children: [
+        "system-power/power-helper.md",
+        "system-power/performance-monitor.md",
+        "system-power/processes-attacker.md",
+      ],
+    },
+    {
+      text: "Media & Notifications",
+      icon: "bell",
+      collapsible: false,
+      children: [
+        "media-notifications/smtc-helper.md",
+        "media-notifications/toast-listener.md",
+      ],
+    },
+  ],
   "/developer/": [
     {
       text: "Environment Setup",
