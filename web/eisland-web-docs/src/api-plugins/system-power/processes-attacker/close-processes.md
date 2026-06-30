@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: closeProcesses
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # closeProcesses

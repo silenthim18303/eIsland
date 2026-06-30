@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: BrightnessInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # BrightnessInfo

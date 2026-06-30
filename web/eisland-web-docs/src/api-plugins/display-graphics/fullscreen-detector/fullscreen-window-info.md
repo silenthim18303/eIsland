@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: FullscreenWindowInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # FullscreenWindowInfo

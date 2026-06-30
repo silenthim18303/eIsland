@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: MediaStatus
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # MediaStatus

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: ToastAccessStatus
-icon: circle-info
+icon: fa6-solid:list
 ---
 
 # ToastAccessStatus

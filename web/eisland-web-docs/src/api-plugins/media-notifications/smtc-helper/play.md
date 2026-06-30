@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: play
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # play

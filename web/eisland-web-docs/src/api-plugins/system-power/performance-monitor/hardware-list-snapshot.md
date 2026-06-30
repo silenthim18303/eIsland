@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: HardwareListSnapshot
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # HardwareListSnapshot

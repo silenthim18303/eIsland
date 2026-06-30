@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: previous
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # previous

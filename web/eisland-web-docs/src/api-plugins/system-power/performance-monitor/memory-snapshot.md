@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: MemorySnapshot
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # MemorySnapshot

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: NativeMonitorInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # NativeMonitorInfo

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: BatteryStatus
-icon: circle-info
+icon: fa6-solid:list
 ---
 
 # BatteryStatus

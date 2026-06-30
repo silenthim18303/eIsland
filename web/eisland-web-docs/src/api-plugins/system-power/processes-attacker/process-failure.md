@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: ProcessFailure
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # ProcessFailure

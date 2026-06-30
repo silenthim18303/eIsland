@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: isSuppressionEnabled
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # isSuppressionEnabled

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getMemory
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getMemory

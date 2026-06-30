@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: PowerInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # PowerInfo

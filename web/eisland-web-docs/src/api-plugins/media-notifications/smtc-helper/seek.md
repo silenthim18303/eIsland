@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: seek
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # seek

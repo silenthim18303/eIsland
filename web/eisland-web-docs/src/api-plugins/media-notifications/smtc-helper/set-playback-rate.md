@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: setPlaybackRate
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # setPlaybackRate

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getHardwareList
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getHardwareList

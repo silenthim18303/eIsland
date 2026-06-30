@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: NativeRect
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # NativeRect

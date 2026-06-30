@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getWifiInfo
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getWifiInfo

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: MediaProps
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # MediaProps

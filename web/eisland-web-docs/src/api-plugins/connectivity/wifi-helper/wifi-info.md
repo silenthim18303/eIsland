@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: WifiInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # WifiInfo

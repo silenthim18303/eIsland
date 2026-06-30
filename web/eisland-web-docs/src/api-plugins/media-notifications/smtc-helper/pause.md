@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: pause
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # pause

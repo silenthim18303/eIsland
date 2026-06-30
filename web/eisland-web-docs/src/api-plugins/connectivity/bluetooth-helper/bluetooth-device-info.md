@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: BluetoothDeviceInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # BluetoothDeviceInfo

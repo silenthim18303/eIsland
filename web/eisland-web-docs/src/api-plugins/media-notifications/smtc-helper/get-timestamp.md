@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getTimestamp
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getTimestamp

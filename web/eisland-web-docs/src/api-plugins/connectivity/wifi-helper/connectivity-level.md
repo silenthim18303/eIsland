@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: ConnectivityLevel
-icon: circle-info
+icon: fa6-solid:list
 ---
 
 # ConnectivityLevel

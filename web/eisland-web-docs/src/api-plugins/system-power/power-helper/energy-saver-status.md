@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: EnergySaverStatus
-icon: circle-info
+icon: fa6-solid:list
 ---
 
 # EnergySaverStatus

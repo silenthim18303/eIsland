@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getPairedDevices
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getPairedDevices

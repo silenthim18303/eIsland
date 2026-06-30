@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: isListening
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # isListening

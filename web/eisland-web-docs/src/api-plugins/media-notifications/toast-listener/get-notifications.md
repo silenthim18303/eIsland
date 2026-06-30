@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getNotifications
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getNotifications

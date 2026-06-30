@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getStatus
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getStatus

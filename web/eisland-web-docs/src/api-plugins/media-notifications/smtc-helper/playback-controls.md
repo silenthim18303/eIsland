@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: PlaybackControls
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # PlaybackControls

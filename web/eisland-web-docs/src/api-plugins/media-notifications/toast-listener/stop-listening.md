@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: stopListening
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # stopListening

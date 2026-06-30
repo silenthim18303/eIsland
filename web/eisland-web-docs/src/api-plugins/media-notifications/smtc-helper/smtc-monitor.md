@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: SmtcMonitor
-icon: circle-info
+icon: fa6-solid:cubes
 ---
 
 # SmtcMonitor

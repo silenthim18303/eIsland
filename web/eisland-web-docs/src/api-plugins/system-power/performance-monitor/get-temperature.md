@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getTemperature
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getTemperature

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: TimelineProperties
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # TimelineProperties

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getBrightness
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getBrightness

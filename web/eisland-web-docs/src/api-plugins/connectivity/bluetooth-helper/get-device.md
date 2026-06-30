@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getDevice
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getDevice

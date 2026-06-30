@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: WifiMonitor
-icon: circle-info
+icon: fa6-solid:cubes
 ---
 
 # WifiMonitor

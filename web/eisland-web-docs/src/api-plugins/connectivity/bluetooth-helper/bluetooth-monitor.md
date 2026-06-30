@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: BluetoothMonitor
-icon: circle-info
+icon: fa6-solid:cubes
 ---
 
 # BluetoothMonitor

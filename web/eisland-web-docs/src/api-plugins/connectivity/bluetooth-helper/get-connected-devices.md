@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: getConnectedDevices
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # getConnectedDevices

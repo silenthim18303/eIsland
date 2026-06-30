@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: ToastNotificationChangedEvent
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # ToastNotificationChangedEvent

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: setShuffle
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # setShuffle

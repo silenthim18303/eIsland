@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: CpuSnapshot
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # CpuSnapshot

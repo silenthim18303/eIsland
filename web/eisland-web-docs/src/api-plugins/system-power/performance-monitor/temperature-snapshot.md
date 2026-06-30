@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: TemperatureSnapshot
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # TemperatureSnapshot

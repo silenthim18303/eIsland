@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: TemperatureCategory
-icon: circle-info
+icon: fa6-solid:list
 ---
 
 # TemperatureCategory

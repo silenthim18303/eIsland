@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: Windows Bluetooth Helper
-icon: bluetooth
+icon: server
 ---
 
 # Windows Bluetooth Helper

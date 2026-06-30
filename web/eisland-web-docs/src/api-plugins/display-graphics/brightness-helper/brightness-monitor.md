@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: BrightnessMonitor
-icon: circle-info
+icon: fa6-solid:cubes
 ---
 
 # BrightnessMonitor

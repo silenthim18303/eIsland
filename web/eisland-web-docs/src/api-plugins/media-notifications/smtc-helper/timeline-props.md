@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: TimelineProps
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # TimelineProps

@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: TimestampInfo
-icon: circle-info
+icon: fa6-solid:table
 ---
 
 # TimestampInfo

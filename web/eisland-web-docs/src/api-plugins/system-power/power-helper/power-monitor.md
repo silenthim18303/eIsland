@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: PowerMonitor
-icon: circle-info
+icon: fa6-solid:cubes
 ---
 
 # PowerMonitor

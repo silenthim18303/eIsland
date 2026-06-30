@@ -1,7 +1,7 @@
 ---
 watermark: true
 title: setRepeatMode
-icon: circle-info
+icon: fa6-solid:code
 ---
 
 # setRepeatMode
