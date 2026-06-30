@@ -1,5 +1,5 @@
 {
-  "name": "@eisland/windows-src",
+  "name": "@eisland/windows-brightness-helper",
   "version": "26.0.0",
   "description": "Windows screen brightness query, control and real-time monitoring via WMI.",
   "author": "JNTMTMTM",
