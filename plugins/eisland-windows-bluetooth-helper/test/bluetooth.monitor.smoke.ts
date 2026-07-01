@@ -87,6 +87,8 @@ setTimeout(() => {
     console.log(`    connected: ${d.isConnected}`);
     console.log(`    paired:    ${d.isPaired}`);
     console.log(`    rssi:      ${d.signalStrength ?? 'N/A'} dBm`);
+    console.log(`    type:      ${d.deviceType ?? 'N/A'}`);
+    console.log(`    battery:   ${d.batteryLevel !== null ? d.batteryLevel + '%' : 'N/A'}`);
     console.log(`    services:  ${d.serviceUuids.length > 0 ? d.serviceUuids.join(', ') : 'none'}`);
   }
 

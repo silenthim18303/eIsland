@@ -53,6 +53,13 @@ function expectValidDeviceShape(device: BluetoothDeviceInfo) {
   if (device.deviceClass !== null) expect(typeof device.deviceClass).toBe('number');
   if (device.appearance !== null) expect(typeof device.appearance).toBe('number');
 
+  if (device.deviceType != null) expect(typeof device.deviceType).toBe('string');
+  if (device.batteryLevel != null) {
+    expect(typeof device.batteryLevel).toBe('number');
+    expect(device.batteryLevel).toBeGreaterThanOrEqual(0);
+    expect(device.batteryLevel).toBeLessThanOrEqual(100);
+  }
+
   expect(Array.isArray(device.serviceUuids)).toBe(true);
   for (const uuid of device.serviceUuids) {
     expect(typeof uuid).toBe('string');

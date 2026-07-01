@@ -51,4 +51,12 @@ public class BluetoothDeviceInfo
 
     /// <summary>设备支持的 GATT 服务 UUID 列表</summary>
     public string[] ServiceUuids { get; init; } = [];
+
+    /// <summary>
+    /// 设备类型：BLE 从 Appearance 推导（如 "HID"、"Watch"），经典蓝牙从 CoD 推导（如 "Audio"、"Phone"）
+    /// </summary>
+    public string? DeviceType { get; init; }
+
+    /// <summary>电池电量百分比 (0–100)，仅 BLE 设备可用，不可用时为 null</summary>
+    public int? BatteryLevel { get; init; }
 }
