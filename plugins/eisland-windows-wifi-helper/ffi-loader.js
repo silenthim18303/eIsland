@@ -30,8 +30,8 @@ const TFM = 'net10.0-windows10.0.19041.0';
 
 /** DLL 搜索路径（优先 native 自包含版本） */
 const dllCandidates = [
-  path.join(__dirname, 'wf-ctypes', 'bin', 'Release', TFM, 'win-x64', 'native', 'eIslandWifiCtypes.dll'),
-  path.join(__dirname, 'wf-ctypes', 'bin', 'Release', TFM, 'win-x64', 'eIslandWifiCtypes.dll'),
+  path.join(__dirname, 'src', 'bin', 'Release', TFM, 'win-x64', 'native', 'eIslandWifiHelper.dll'),
+  path.join(__dirname, 'src', 'bin', 'Release', TFM, 'win-x64', 'eIslandWifiHelper.dll'),
 ];
 
 let dllPath;
@@ -45,7 +45,7 @@ for (const candidate of dllCandidates) {
 
 if (!dllPath) {
   throw new Error(
-    'Unable to find eIslandWifiCtypes.dll. Run "npm run build:ctypes" first.'
+    'Unable to find eIslandWifiHelper.dll. Run "npm run build" first.'
   );
 }
 

@@ -30,8 +30,8 @@ const TFM = 'net10.0-windows10.0.19041.0';
 
 /** DLL 搜索路径（优先 native 自包含版本） */
 const dllCandidates = [
-  path.join(__dirname, 'smtc-ctypes', 'bin', 'Release', TFM, 'win-x64', 'native', 'eIslandSmtcCtypes.dll'),
-  path.join(__dirname, 'smtc-ctypes', 'bin', 'Release', TFM, 'win-x64', 'eIslandSmtcCtypes.dll'),
+  path.join(__dirname, 'src', 'bin', 'Release', TFM, 'win-x64', 'native', 'eIslandSmtcHelper.dll'),
+  path.join(__dirname, 'src', 'bin', 'Release', TFM, 'win-x64', 'eIslandSmtcHelper.dll'),
 ];
 
 let dllPath;
@@ -45,7 +45,7 @@ for (const candidate of dllCandidates) {
 
 if (!dllPath) {
   throw new Error(
-    'Unable to find eIslandSmtcCtypes.dll. Run "npm run build:ctypes" first.'
+    'Unable to find eIslandSmtcHelper.dll. Run "npm run build" first.'
   );
 }
 

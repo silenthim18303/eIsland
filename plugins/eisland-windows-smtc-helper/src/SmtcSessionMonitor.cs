@@ -161,11 +161,7 @@ public static class SmtcSessionMonitor
     public static string? GetAllSessionsJson()
     {
         var list = _sessions.Values.ToArray();
-#if NATIVEAOT
         return System.Text.Json.JsonSerializer.Serialize(list, SmtcJsonContext.Default.SessionInfoArray);
-#else
-        return System.Text.Json.JsonSerializer.Serialize(list, JsonOptions);
-#endif
     }
 
     /// <summary>
@@ -174,20 +170,8 @@ public static class SmtcSessionMonitor
     public static string? GetSessionJson(string sourceAppId)
     {
         if (!_sessions.TryGetValue(sourceAppId, out var session)) return null;
-#if NATIVEAOT
         return System.Text.Json.JsonSerializer.Serialize(session, SmtcJsonContext.Default.SessionInfo);
-#else
-        return System.Text.Json.JsonSerializer.Serialize(session, JsonOptions);
-#endif
     }
-
-#if !NATIVEAOT
-    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        WriteIndented = false,
-    };
-#endif
 
     /// <summary>通知 Node 侧有变更</summary>
     private static void SignalChange()

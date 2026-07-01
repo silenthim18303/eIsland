@@ -15,7 +15,7 @@
     "ia32"
   ],
   "scripts": {
-    "build": "dotnet build src/eIslandWifiHelper.csproj -c Release",
+    "build": "dotnet publish src/eIslandWifiHelper.csproj -c Release -r win-x64",
     "build:ctypes": "dotnet publish wf-ctypes/eIslandWifiCtypes.csproj -c Release -r win-x64",
     "build:all": "npm run build && npm run build:ctypes",
     "clean": "dotnet clean src/eIslandWifiHelper.csproj && dotnet clean wf-ctypes/eIslandWifiCtypes.csproj",
