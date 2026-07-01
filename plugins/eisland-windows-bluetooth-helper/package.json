@@ -15,7 +15,7 @@
     "ia32"
   ],
   "scripts": {
-    "build": "dotnet build src/eIslandBluetoothHelper.csproj -c Release",
+    "build": "dotnet publish src/eIslandBluetoothHelper.csproj -c Release -r win-x64",
     "build:ctypes": "dotnet publish bt-ctypes/eIslandBluetoothCtypes.csproj -c Release -r win-x64",
     "build:all": "npm run build && npm run build:ctypes",
     "clean": "dotnet clean src/eIslandBluetoothHelper.csproj && dotnet clean bt-ctypes/eIslandBluetoothCtypes.csproj",

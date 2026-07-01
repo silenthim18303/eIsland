@@ -399,20 +399,8 @@ public static class BluetoothDeviceMonitor
 
     private static string SerializeDevice(BluetoothDeviceInfo device)
     {
-#if NATIVEAOT
         return System.Text.Json.JsonSerializer.Serialize(device, BtJsonContext.Default.BluetoothDeviceInfo);
-#else
-        return System.Text.Json.JsonSerializer.Serialize(device, JsonOptions);
-#endif
     }
-
-#if !NATIVEAOT
-    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        WriteIndented = false,
-    };
-#endif
 
     #endregion
 
