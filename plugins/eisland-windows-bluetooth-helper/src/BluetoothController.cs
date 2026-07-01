@@ -150,17 +150,12 @@ public static class BluetoothController
         // 尝试从 Properties 读取（需要 ExtraProperties 才有值）
         try { if (device.Properties["System.Devices.Aep.DeviceAddress"] is string addr && !string.IsNullOrEmpty(addr)) address = addr; } catch { }
         try { if (device.Properties["System.Devices.Aep.SignalStrength"] is int signal) rssi = signal; } catch { }
-        try { if (device.Properties["System.Devices.Aep.Bluetooth.Cod"] is uint cod) deviceClass = (int)cod; } catch { }
-        try { if (device.Properties["System.Devices.Aep.Bluetooth.Appearance"] is uint app) appearance = (int)app; } catch { }
-        try { if (device.Properties["System.Devices.Aep.Bluetooth.ServiceGuids"] is string[] guids) serviceUuids = guids; } catch { }
         try { if (device.Properties["System.Devices.Aep.IsConnected"] is bool conn) isConnected = conn; } catch { }
         try { if (device.Properties["System.Devices.Aep.IsPaired"] is bool paired) isPaired = paired; } catch { }
 
-        // 如果 Properties 没有值，尝试通过 BluetoothDevice 对象获取；BLE 设备同时读取电量
-        if (!isConnected || address == null)
-        {
-            EnrichFromBluetoothDevice(device.Id, ref isConnected, ref isPaired, ref address, ref rssi, ref batteryLevel);
-        }
+        // CoD、Appearance、ServiceGuids 不支持 FindAllAsync 的规范名，通过 EnrichFromBluetoothDevice 补充
+        EnrichFromBluetoothDevice(device.Id, ref isConnected, ref isPaired, ref address, ref rssi,
+            ref deviceClass, ref appearance, ref serviceUuids, ref batteryLevel);
 
         return new BluetoothDeviceInfo
         {
@@ -248,9 +243,12 @@ public static class BluetoothController
         ref bool isPaired,
         ref string? address,
         ref int? rssi,
+        ref int? deviceClass,
+        ref int? appearance,
+        ref string[] serviceUuids,
         ref int? batteryLevel)
     {
-        // 尝试 BLE（优先，可获取电量）
+        // 尝试 BLE（优先，可获取电量、Appearance、ServiceUuids）
         try
         {
             var ble = BluetoothLEDevice.FromIdAsync(deviceId).GetAwaiter().GetResult();
@@ -259,6 +257,19 @@ public static class BluetoothController
                 isConnected = ble.ConnectionStatus == BluetoothConnectionStatus.Connected;
                 isPaired = true;
                 address = ble.BluetoothAddress.ToString("X12");
+
+                // BLE Appearance（BluetoothLEAppearance）
+                try { if (ble.Appearance != null) appearance = ble.Appearance.RawValue; } catch { }
+
+                // GATT Service UUIDs
+                try
+                {
+                    var svcResult = ble.GetGattServicesAsync(BluetoothCacheMode.Cached).GetAwaiter().GetResult();
+                    if (svcResult.Status == GattCommunicationStatus.Success && svcResult.Services.Count > 0)
+                        serviceUuids = svcResult.Services.Select(s => s.Uuid.ToString()).ToArray();
+                }
+                catch { }
+
                 batteryLevel = ReadBleBatteryLevel(ble);
                 return;
             }
@@ -272,8 +283,12 @@ public static class BluetoothController
             if (bt != null)
             {
                 isConnected = bt.ConnectionStatus == BluetoothConnectionStatus.Connected;
-                isPaired = true; // 能打开 BluetoothDevice 说明已配对
+                isPaired = true;
                 address = bt.BluetoothAddress.ToString("X12");
+
+                // 经典蓝牙 Class of Device
+                try { if (bt.ClassOfDevice != null) deviceClass = (int)bt.ClassOfDevice.RawValue; } catch { }
+
                 return;
             }
         }
