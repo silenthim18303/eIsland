@@ -20,6 +20,15 @@ function getBrightness(): BrightnessInfo | null
 
 [BrightnessInfo](brightness-info.md) object, or `null` if brightness cannot be read.
 
+```typescript
+// Example return value
+{
+  currentBrightness: 75,
+  levels: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+  instanceName: 'DISPLAY\DEL4190\4&1a…',
+}
+```
+
 :::warning
 Returns `null` if the system has no WMI-compatible display or the brightness query fails.
 :::

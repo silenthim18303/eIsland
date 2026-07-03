@@ -26,6 +26,11 @@ function setBrightness(brightness: number): boolean
 
 `true` if brightness was set successfully, `false` otherwise.
 
+```typescript
+// Example return value
+true
+```
+
 :::tip
 Brightness changes are applied immediately and persist until the next change or system sleep.
 :::
