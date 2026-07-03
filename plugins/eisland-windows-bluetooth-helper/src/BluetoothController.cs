@@ -223,13 +223,17 @@ public static class BluetoothController
                 0x01 => "Computer",
                 0x02 => "Phone",
                 0x03 => "LAN",
-                0x04 => minor switch // Audio — 细分 Minor Class
+                0x04 => minor switch // Audio/Video — 细分 Minor Class（蓝牙 SIG Assigned Numbers）
                 {
-                    0x01 => "Headset",
-                    0x02 => "Headphones",
-                    0x03 => "Speaker",
-                    0x04 => "HiFiAudio",
-                    0x05 => "VCR",
+                    0x01 => "Headset",       // Wearable Headset
+                    0x02 => "Handsfree",     // Hands-free
+                    0x04 => "Microphone",    // Microphone
+                    0x05 => "Speaker",       // Loudspeaker
+                    0x06 => "Headphones",    // Headphones
+                    0x07 => "PortableAudio", // Portable Audio
+                    0x08 => "CarAudio",      // Car Audio
+                    0x0A => "HiFiAudio",     // HiFi Audio Device
+                    0x0B => "VCR",           // VCR
                     _ => "Audio",
                 },
                 0x05 => minor switch // Peripheral — 细分 Minor Class
