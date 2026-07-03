@@ -6,15 +6,21 @@ icon: fa6-solid:table
 
 # NativeRect
 
-> Placeholder — content to be added.
+:::info
+Rectangle bounds structure representing a window or monitor area.
+:::
 
-```ts
-interface NativeRect {
-  left: number;
-  top: number;
-  right: number;
-  bottom: number;
-  width: number;
-  height: number;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `left` | `number` | Left edge coordinate (pixels) |
+| `top` | `number` | Top edge coordinate (pixels) |
+| `right` | `number` | Right edge coordinate (pixels) |
+| `bottom` | `number` | Bottom edge coordinate (pixels) |
+| `width` | `number` | Width in pixels (`right - left`) |
+| `height` | `number` | Height in pixels (`bottom - top`) |
+
+:::note
+Coordinates are in screen pixels. `width` and `height` are convenience fields derived from `right - left` and `bottom - top`.
+:::

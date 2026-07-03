@@ -6,8 +6,20 @@ icon: fa6-solid:code
 
 # isAnyFullscreenWindow
 
-> Placeholder — content to be added.
+:::info
+Quick boolean check for any fullscreen window. More efficient than calling getFullscreenWindows().length > 0.
+:::
 
-```ts
+## Signature
+
+```typescript
 function isAnyFullscreenWindow(): boolean
 ```
+
+## Return Value
+
+`true` if at least one window is fullscreen, `false` otherwise.
+
+:::tip
+This is more efficient than `getFullscreenWindows().length > 0` as it returns early on the first match.
+:::

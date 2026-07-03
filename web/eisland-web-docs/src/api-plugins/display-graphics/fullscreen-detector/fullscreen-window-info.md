@@ -6,15 +6,21 @@ icon: fa6-solid:table
 
 # FullscreenWindowInfo
 
-> Placeholder — content to be added.
+:::info
+Details about a window that is currently in fullscreen mode.
+:::
 
-```ts
-interface FullscreenWindowInfo {
-  hwnd: string;
-  title: string;
-  processId: number;
-  bounds: NativeRect;
-  monitor: NativeMonitorInfo;
-  isForeground: boolean;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `hwnd` | `string` | Window handle (hex string) |
+| `title` | `string` | Window title text |
+| `processId` | `number` | Owning process ID |
+| `bounds` | [NativeRect](native-rect.md) | Window bounding rectangle |
+| `monitor` | [NativeMonitorInfo](native-monitor-info.md) | Monitor the window occupies |
+| `isForeground` | `boolean` | Whether the window is the foreground window |
+
+:::note
+The `hwnd` value is a hex string representation of the Win32 window handle (HWND).
+:::
