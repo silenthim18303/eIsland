@@ -19,3 +19,15 @@ Information about a detected hardware device (CPU or GPU).
 | `category` | `"cpu" \| "gpu"` | Device category |
 | `hardwareType` | `string` | Hardware type string from LibreHardwareMonitor |
 | `source` | `"libre-hardware-monitor"` | Data source identifier |
+
+## Example
+
+```typescript
+import { getHardwareList } from '@eisland/windows-performance-monitor';
+
+const hw = getHardwareList();
+if (hw.isAvailable) {
+  hw.cpus.forEach(cpu => console.log(`CPU: ${cpu.name} (${cpu.hardwareType})`));
+  hw.gpus.forEach(gpu => console.log(`GPU: ${gpu.name} (${gpu.hardwareType})`));
+}
+```

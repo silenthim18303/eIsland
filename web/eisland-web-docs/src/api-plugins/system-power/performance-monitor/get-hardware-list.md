@@ -23,3 +23,16 @@ function getHardwareList(): HardwareListSnapshot
 :::warning
 Requires the LibreHardwareMonitor helper EXE. Returns `isAvailable: false` if the helper is unavailable.
 :::
+
+## Example
+
+```typescript
+import { getHardwareList } from '@eisland/windows-performance-monitor';
+
+const hw = getHardwareList();
+if (hw.isAvailable) {
+  console.log('=== Hardware ===');
+  hw.cpus.forEach(c => console.log(`  CPU: ${c.name}`));
+  hw.gpus.forEach(g => console.log(`  GPU: ${g.name}`));
+}
+```

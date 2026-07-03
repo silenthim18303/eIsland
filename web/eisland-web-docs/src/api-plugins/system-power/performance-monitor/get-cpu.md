@@ -23,3 +23,20 @@ function getCpu(): CpuSnapshot
 :::warning
 The first call establishes a baseline and returns `hasBaseline: false`. Call again after a short interval for accurate usage data.
 :::
+
+## Example
+
+```typescript
+import { getCpu } from '@eisland/windows-performance-monitor';
+
+// First call establishes baseline
+getCpu();
+
+// Subsequent calls return meaningful data
+setInterval(() => {
+  const cpu = getCpu();
+  if (cpu.hasBaseline) {
+    console.log(`CPU: ${cpu.usagePercent.toFixed(1)}%`);
+  }
+}, 2000);
+```
