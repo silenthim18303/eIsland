@@ -25,3 +25,17 @@ Complete power status snapshot including battery, supply, and energy saver state
 :::tip
 On desktop systems without a battery, `hasBattery` is `false` and `remainingChargePercent` defaults to `100`.
 :::
+
+## Example
+
+```typescript
+import { getPowerInfo } from '@eisland/windows-power-helper';
+
+const info = getPowerInfo();
+if (info) {
+  console.log(`Battery: ${info.remainingChargePercent}%`);
+  console.log(`Charging: ${info.isCharging}`);
+  console.log(`AC Power: ${info.isOnAcPower}`);
+  console.log(`Has Battery: ${info.hasBattery}`);
+}
+```

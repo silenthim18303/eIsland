@@ -23,3 +23,17 @@ function getPowerInfo(): PowerInfo | null
 :::warning
 Returns `null` if the power status cannot be read from the system.
 :::
+
+## Example
+
+```typescript
+import { getPowerInfo } from '@eisland/windows-power-helper';
+
+const info = getPowerInfo();
+if (info) {
+  const status = info.isCharging ? '⚡ Charging' : '🔋 On battery';
+  console.log(`${status}: ${info.remainingChargePercent}%`);
+} else {
+  console.log('Unable to read power info');
+}
+```

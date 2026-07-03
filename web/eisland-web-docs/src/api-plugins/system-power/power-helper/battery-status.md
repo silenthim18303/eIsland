@@ -22,3 +22,27 @@ Battery charge status values.
 :::note
 Desktop systems without a battery report `NotPresent`. The `Idle` state means the battery is full and AC is connected.
 :::
+
+## Example
+
+```typescript
+import { getPowerInfo, BatteryStatus } from '@eisland/windows-power-helper';
+
+const info = getPowerInfo();
+if (info) {
+  switch (info.batteryStatus) {
+    case BatteryStatus.Charging:
+      console.log(`Charging: ${info.remainingChargePercent}%`);
+      break;
+    case BatteryStatus.Discharging:
+      console.log(`On battery: ${info.remainingChargePercent}%`);
+      break;
+    case BatteryStatus.Idle:
+      console.log('Battery full, AC connected');
+      break;
+    case BatteryStatus.NotPresent:
+      console.log('No battery (desktop)');
+      break;
+  }
+}
+```

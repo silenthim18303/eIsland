@@ -22,3 +22,14 @@ Power supply status values.
 :::note
 The `Inadequate` status may appear with underpowered USB-C chargers that cannot supply enough current.
 :::
+
+## Example
+
+```typescript
+import { getPowerInfo, PowerSupplyStatus } from '@eisland/windows-power-helper';
+
+const info = getPowerInfo();
+if (info?.powerSupplyStatus === PowerSupplyStatus.Inadequate) {
+  console.warn('Charger provides insufficient power');
+}
+```
