@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # stopListening
 
-> Placeholder — content to be added.
+:::info
+Stops listening for notification changes.
+:::
 
-```ts
+## Signature
+
+```typescript
 function stopListening(): boolean
 ```
+
+## Return Value
+
+`true` if listening was stopped, `false` if not currently listening.

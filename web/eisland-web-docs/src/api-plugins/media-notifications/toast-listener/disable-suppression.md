@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # disableSuppression
 
-> Placeholder — content to be added.
+:::info
+Disables toast notification suppression.
+:::
 
-```ts
+## Signature
+
+```typescript
 function disableSuppression(): boolean
 ```
+
+## Return Value
+
+`true` if suppression was disabled, `false` if already disabled.

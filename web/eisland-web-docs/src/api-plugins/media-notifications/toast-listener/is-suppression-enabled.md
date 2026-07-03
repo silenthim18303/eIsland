@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # isSuppressionEnabled
 
-> Placeholder — content to be added.
+:::info
+Checks whether toast notification suppression is currently active.
+:::
 
-```ts
+## Signature
+
+```typescript
 function isSuppressionEnabled(): boolean
 ```
+
+## Return Value
+
+`true` if suppression is enabled, `false` otherwise.

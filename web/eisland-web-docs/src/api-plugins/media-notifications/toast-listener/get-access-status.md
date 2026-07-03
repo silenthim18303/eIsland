@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getAccessStatus
 
-> Placeholder — content to be added.
+:::info
+Returns the current notification listener access status without prompting the user.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getAccessStatus(): ToastAccessStatus
 ```
+
+## Return Value
+
+[ToastAccessStatus](toast-access-status.md).

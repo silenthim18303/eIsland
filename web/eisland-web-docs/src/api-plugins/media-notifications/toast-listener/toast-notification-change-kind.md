@@ -6,8 +6,18 @@ icon: fa6-solid:list
 
 # ToastNotificationChangeKind
 
-> Placeholder — content to be added.
+:::info
+Type of change in a toast notification event.
+:::
 
-```ts
-type ToastNotificationChangeKind = 'added' | 'removed' | 'unknown'
-```
+## Values
+
+| Value | Description |
+|-------|-------------|
+| `"added"` | A new notification was added |
+| `"removed"` | A notification was removed |
+| `"unknown"` | Change type could not be determined |
+
+:::note
+This value is part of the [ToastNotificationChangedEvent](toast-notification-changed-event.md) passed to your listener callback.
+:::

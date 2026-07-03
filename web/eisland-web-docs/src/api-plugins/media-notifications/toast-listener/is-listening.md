@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # isListening
 
-> Placeholder — content to be added.
+:::info
+Checks whether the notification listener is currently active.
+:::
 
-```ts
+## Signature
+
+```typescript
 function isListening(): boolean
 ```
+
+## Return Value
+
+`true` if listening, `false` otherwise.

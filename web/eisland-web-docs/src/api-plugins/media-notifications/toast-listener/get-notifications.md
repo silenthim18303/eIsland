@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getNotifications
 
-> Placeholder — content to be added.
+:::info
+Returns all current toast notifications as snapshots. Returns an empty array if suppression is enabled.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getNotifications(): ToastNotificationSnapshot[]
 ```
+
+## Return Value
+
+Array of [ToastNotificationSnapshot](toast-notification-snapshot.md) objects.
