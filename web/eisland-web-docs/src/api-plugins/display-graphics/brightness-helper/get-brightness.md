@@ -23,3 +23,16 @@ function getBrightness(): BrightnessInfo | null
 :::warning
 Returns `null` if the system has no WMI-compatible display or the brightness query fails.
 :::
+
+## Example
+
+```typescript
+import { getBrightness } from '@eisland/windows-brightness-helper';
+
+const info = getBrightness();
+if (info) {
+  console.log(`Current brightness: ${info.currentBrightness}%`);
+} else {
+  console.log('Unable to read brightness — no WMI-compatible display found');
+}
+```

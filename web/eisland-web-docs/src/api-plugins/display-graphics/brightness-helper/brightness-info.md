@@ -21,3 +21,17 @@ Screen brightness data returned by brightness query functions.
 :::tip
 The `levels` array may be `null` on some displays that do not report supported brightness levels via WMI.
 :::
+
+## Example
+
+```typescript
+import { getBrightness } from '@eisland/windows-brightness-helper';
+
+const info = getBrightness();
+if (info) {
+  console.log(`Brightness: ${info.currentBrightness}%`);
+  if (info.levels) {
+    console.log(`Supported levels: ${info.levels.join(', ')}`);
+  }
+}
+```

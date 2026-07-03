@@ -29,3 +29,17 @@ function setBrightness(brightness: number): boolean
 :::tip
 Brightness changes are applied immediately and persist until the next change or system sleep.
 :::
+
+## Example
+
+```typescript
+import { setBrightness, getBrightness } from '@eisland/windows-brightness-helper';
+
+// Set brightness to 75%
+const success = setBrightness(75);
+console.log(success ? 'Brightness updated' : 'Failed to set brightness');
+
+// Verify
+const info = getBrightness();
+console.log(`Now at: ${info?.currentBrightness}%`);
+```

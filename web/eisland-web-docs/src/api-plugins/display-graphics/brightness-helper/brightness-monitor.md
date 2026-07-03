@@ -34,3 +34,25 @@ constructor()
 :::tip
 Uses WMI WmiMonitorBrightnessEvent for real-time detection. No polling required — brightness changes are pushed as events.
 :::
+
+## Example
+
+```typescript
+import { BrightnessMonitor } from '@eisland/windows-brightness-helper';
+
+const monitor = new BrightnessMonitor();
+
+monitor.on('brightness-changed', (brightness, timestamp) => {
+  console.log(`Brightness changed to ${brightness}% at ${new Date(timestamp)}`);
+});
+
+monitor.on('error', (err) => {
+  console.error('Brightness monitor error:', err);
+});
+
+monitor.start();
+console.log(`Monitoring: ${monitor.isRunning()}`);
+
+// ... later
+monitor.stop();
+```
