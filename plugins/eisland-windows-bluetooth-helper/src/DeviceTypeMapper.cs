@@ -89,6 +89,13 @@ public static class DeviceTypeMapper
         0x1F => "WindowCovering",
         0x20 => "AudioSink",
         0x21 => "AudioSource",
+        0x22 => "Robot",
+        0x23 => "Display",
+        0x30 => "Keyboard",
+        0x31 => "Mouse",
+        0x32 => "Joystick",
+        0x33 => "Gamepad",
+        0x40 => "RemoteControl",
         0x51 => "PulseOximeter",
         0x52 => "WeightScale",
         0x53 => "OutdoorSports",
@@ -170,7 +177,7 @@ public static class DeviceTypeMapper
         _ => "Audio",
     };
 
-    /// <summary>Major 0x05 — Peripheral</summary>
+    /// <summary>Major 0x05 — Peripheral（minor 高 4 位 = 类型，低 2 位 = 子类型；Keyboard + Pointing = 0x0C 组合）</summary>
     private static string CodPeripheralMap(int minor) => minor switch
     {
         0x04 => "Joystick",
@@ -179,18 +186,38 @@ public static class DeviceTypeMapper
         0x10 => "SensingDevice",
         0x14 => "DigitizerTablet",
         0x18 => "CardReader",
+        0x1C => "DigitalPen",
+        0x20 => "HandheldScanner",
+        0x24 => "HandheldGesturalInput",
         _ => "Peripheral",
     };
 
-    /// <summary>Major 0x06 — Imaging（bit flags: bit5=Display, bit4=Camera, bit3=Scanner, bit2=Printer）</summary>
-    private static string CodImagingMap(int minor) => minor switch
+    /// <summary>Major 0x06 — Imaging（bit flags: bit2=Display, bit3=Camera, bit4=Scanner, bit5=Printer；允许组合）</summary>
+    private static string CodImagingMap(int minor)
     {
-        0x04 => "Printer",
-        0x08 => "Scanner",
-        0x10 => "Camera",
-        0x20 => "ImagingDisplay",
-        _ => "Imaging",
-    };
+        if (minor == 0) return "Imaging";
+
+        // 拆解位掩码
+        bool display = (minor & 0x04) != 0;
+        bool camera  = (minor & 0x08) != 0;
+        bool scanner = (minor & 0x10) != 0;
+        bool printer = (minor & 0x20) != 0;
+
+        // 收集已设置的 flag 名称
+        var parts = new List<string>(4);
+        if (display) parts.Add("Display");
+        if (camera)  parts.Add("Camera");
+        if (scanner) parts.Add("Scanner");
+        if (printer) parts.Add("Printer");
+
+        // 单个 flag → 直接返回名称；多个 → 用 "+" 连接；无已知 flag → "Imaging"
+        return parts.Count switch
+        {
+            1 => parts[0],
+            > 1 => string.Join("+", parts),
+            _ => "Imaging",
+        };
+    }
 
     /// <summary>Major 0x07 — Wearable</summary>
     private static string CodWearableMap(int minor) => minor switch
