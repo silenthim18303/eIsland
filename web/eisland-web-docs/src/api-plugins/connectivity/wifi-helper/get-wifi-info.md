@@ -20,6 +20,18 @@ function getWifiInfo(): WifiInfo | null
 
 [WifiInfo](wifi-info.md) object, or `null` if no WiFi adapter is present.
 
+```typescript
+// Example return value
+{
+  isConnected: true,
+  ssid: 'MyHomeWiFi',
+  signalBars: 4,
+  connectivityLevel: 3, // ConnectivityLevel.InternetAccess
+  adapterName: 'Intel Wi-Fi 6E AX211',
+  isWifiAdapter: true,
+}
+```
+
 :::warning
 Returns `null` on systems without a WiFi adapter (e.g., desktop with Ethernet only).
 :::
