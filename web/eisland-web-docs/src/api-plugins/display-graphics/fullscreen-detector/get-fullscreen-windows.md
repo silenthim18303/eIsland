@@ -19,3 +19,17 @@ function getFullscreenWindows(): FullscreenWindowInfo[]
 ## Return Value
 
 Array of [FullscreenWindowInfo](fullscreen-window-info.md) objects. Empty array if no windows are fullscreen.
+
+## Example
+
+```typescript
+import { getFullscreenWindows } from '@eisland/windows-fullscreen-detector';
+
+const windows = getFullscreenWindows();
+if (windows.length > 0) {
+  console.log(`${windows.length} fullscreen window(s):`);
+  windows.forEach(w => console.log(`  - "${w.title}" (PID ${w.processId})`));
+} else {
+  console.log('No fullscreen windows');
+}
+```

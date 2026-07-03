@@ -20,3 +20,15 @@ Monitor information including display bounds. Extends [NativeRect](native-rect.m
 :::info
 Extends [NativeRect](native-rect.md) with monitor identification.
 :::
+
+## Example
+
+```typescript
+import { getFullscreenWindows } from '@eisland/windows-fullscreen-detector';
+
+const windows = getFullscreenWindows();
+for (const win of windows) {
+  console.log(`"${win.title}" on ${win.monitor.isPrimary ? 'primary' : 'secondary'} monitor`);
+  console.log(`  Monitor: ${win.monitor.width}×${win.monitor.height}`);
+}
+```

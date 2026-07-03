@@ -24,3 +24,16 @@ Details about a window that is currently in fullscreen mode.
 :::note
 The `hwnd` value is a hex string representation of the Win32 window handle (HWND).
 :::
+
+## Example
+
+```typescript
+import { getFullscreenWindows } from '@eisland/windows-fullscreen-detector';
+
+const windows = getFullscreenWindows();
+windows.forEach(win => {
+  console.log(`"${win.title}" (PID: ${win.processId})`);
+  console.log(`  Foreground: ${win.isForeground}`);
+  console.log(`  Monitor: ${win.monitor.width}×${win.monitor.height}`);
+});
+```

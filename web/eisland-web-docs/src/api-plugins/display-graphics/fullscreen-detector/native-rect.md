@@ -24,3 +24,16 @@ Rectangle bounds structure representing a window or monitor area.
 :::note
 Coordinates are in screen pixels. `width` and `height` are convenience fields derived from `right - left` and `bottom - top`.
 :::
+
+## Example
+
+```typescript
+import { getForegroundFullscreenWindow } from '@eisland/windows-fullscreen-detector';
+
+const win = getForegroundFullscreenWindow();
+if (win) {
+  const { bounds } = win;
+  console.log(`Window bounds: ${bounds.width}×${bounds.height}`);
+  console.log(`Position: (${bounds.left}, ${bounds.top})`);
+}
+```

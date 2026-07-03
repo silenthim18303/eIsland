@@ -23,3 +23,16 @@ function isAnyFullscreenWindow(): boolean
 :::tip
 This is more efficient than `getFullscreenWindows().length > 0` as it returns early on the first match.
 :::
+
+## Example
+
+```typescript
+import { isAnyFullscreenWindow } from '@eisland/windows-fullscreen-detector';
+
+// Quick check — useful for toggling overlay visibility
+if (isAnyFullscreenWindow()) {
+  console.log('A window is fullscreen — hiding overlay');
+} else {
+  console.log('No fullscreen window — showing overlay');
+}
+```
