@@ -6,13 +6,19 @@ icon: fa6-solid:list
 
 # PowerSupplyStatus
 
-> Placeholder — content to be added.
+:::info
+Power supply status values.
+:::
 
-```ts
-const enum PowerSupplyStatus {
-  NotPresent = 0,
-  Adequate = 1,
-  Inadequate = 2,
-  Unknown = 3,
-}
-```
+## Values
+
+| Value | Name | Description |
+|-------|------|-------------|
+| `0` | `NotPresent` | No power supply connected |
+| `1` | `Adequate` | Adequate power (AC connected) |
+| `2` | `Inadequate` | Insufficient power supply |
+| `3` | `Unknown` | Power supply status unknown |
+
+:::note
+The `Inadequate` status may appear with underpowered USB-C chargers that cannot supply enough current.
+:::
