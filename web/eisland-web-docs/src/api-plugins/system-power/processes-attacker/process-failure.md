@@ -6,12 +6,14 @@ icon: fa6-solid:table
 
 # ProcessFailure
 
-> Placeholder — content to be added.
+:::info
+Details about a single process termination failure.
+:::
 
-```ts
-interface ProcessFailure {
-  pid: number;
-  name: string;
-  errorCode: number;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `pid` | `number` | Process ID that failed to terminate |
+| `name` | `string` | Process name |
+| `errorCode` | `number` | Windows error code from the termination attempt |
