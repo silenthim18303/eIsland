@@ -19,3 +19,13 @@ function getAccessStatus(): ToastAccessStatus
 ## Return Value
 
 [ToastAccessStatus](toast-access-status.md).
+
+## Example
+
+```typescript
+import { getAccessStatus } from '@eisland/windows-toast-listener';
+
+const status = getAccessStatus();
+console.log(`Notification access: ${status}`);
+// "allowed" | "denied" | "unspecified" | "unknown"
+```

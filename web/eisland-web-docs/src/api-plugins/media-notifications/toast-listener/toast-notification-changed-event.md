@@ -20,3 +20,13 @@ Event data passed to the callback registered with startListening().
 :::info
 This event is passed to the callback registered with [startListening()](start-listening.md).
 :::
+
+## Example
+
+```typescript
+import { startListening, ToastNotificationChangedEvent } from '@eisland/windows-toast-listener';
+
+startListening((event: ToastNotificationChangedEvent) => {
+  console.log(`Change: ${event.kind} — ID ${event.notificationId}`);
+});
+```

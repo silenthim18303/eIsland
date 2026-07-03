@@ -19,3 +19,12 @@ function stopListening(): boolean
 ## Return Value
 
 `true` if listening was stopped, `false` if not currently listening.
+
+## Example
+
+```typescript
+import { stopListening } from '@eisland/windows-toast-listener';
+
+const stopped = stopListening();
+console.log(stopped ? 'Stopped listening' : 'Was not listening');
+```

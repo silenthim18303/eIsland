@@ -23,3 +23,19 @@ function requestAccess(): ToastAccessStatus
 :::warning
 This is a blocking call. The system may show a permission dialog to the user. Call [getAccessStatus()](get-access-status.md) first to check if access is already granted.
 :::
+
+## Example
+
+```typescript
+import { requestAccess, getAccessStatus } from '@eisland/windows-toast-listener';
+
+// Check first to avoid unnecessary prompt
+if (getAccessStatus() !== 'allowed') {
+  const status = requestAccess();
+  if (status === 'allowed') {
+    console.log('Access granted — you can now listen for notifications');
+  } else {
+    console.log(`Access denied: ${status}`);
+  }
+}
+```

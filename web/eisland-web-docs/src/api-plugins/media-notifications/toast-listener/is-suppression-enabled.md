@@ -19,3 +19,17 @@ function isSuppressionEnabled(): boolean
 ## Return Value
 
 `true` if suppression is enabled, `false` otherwise.
+
+## Example
+
+```typescript
+import { isSuppressionEnabled, enableSuppression, disableSuppression } from '@eisland/windows-toast-listener';
+
+console.log(`Suppressed: ${isSuppressionEnabled()}`); // false
+
+enableSuppression();
+console.log(`Suppressed: ${isSuppressionEnabled()}`); // true
+
+disableSuppression();
+console.log(`Suppressed: ${isSuppressionEnabled()}`); // false
+```

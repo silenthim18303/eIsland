@@ -25,3 +25,16 @@ Snapshot of a single toast notification.
 :::note
 The `createdAt` timestamp uses Unix epoch milliseconds. The `texts` array contains all text fields flattened for convenience.
 :::
+
+## Example
+
+```typescript
+import { getNotifications } from '@eisland/windows-toast-listener';
+
+const notifications = getNotifications();
+notifications.forEach(n => {
+  const time = new Date(n.createdAt).toLocaleTimeString();
+  console.log(`[${time}] ${n.appDisplayName}: ${n.title}`);
+  console.log(`  ${n.body}`);
+});
+```
