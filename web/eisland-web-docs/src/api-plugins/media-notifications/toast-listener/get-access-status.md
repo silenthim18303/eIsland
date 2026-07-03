@@ -20,6 +20,11 @@ function getAccessStatus(): ToastAccessStatus
 
 [ToastAccessStatus](toast-access-status.md).
 
+```typescript
+// Example return value
+'allowed'
+```
+
 ## Example
 
 ```typescript

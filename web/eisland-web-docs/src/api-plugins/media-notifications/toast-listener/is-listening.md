@@ -20,6 +20,11 @@ function isListening(): boolean
 
 `true` if listening, `false` otherwise.
 
+```typescript
+// Example return value
+true
+```
+
 ## Example
 
 ```typescript

@@ -20,6 +20,11 @@ function stopListening(): boolean
 
 `true` if listening was stopped, `false` if not currently listening.
 
+```typescript
+// Example return value
+true
+```
+
 ## Example
 
 ```typescript

@@ -20,6 +20,11 @@ function requestAccess(): ToastAccessStatus
 
 [ToastAccessStatus](toast-access-status.md) indicating the outcome.
 
+```typescript
+// Example return value
+'allowed'
+```
+
 :::warning
 This is a blocking call. The system may show a permission dialog to the user. Call [getAccessStatus()](get-access-status.md) first to check if access is already granted.
 :::

@@ -20,6 +20,11 @@ function enableSuppression(): boolean
 
 `true` if suppression was enabled, `false` if already enabled.
 
+```typescript
+// Example return value
+true
+```
+
 :::warning
 While suppression is active, [getNotifications()](get-notifications.md) returns an empty array. Call [disableSuppression()](disable-suppression.md) to restore normal behavior.
 :::

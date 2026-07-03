@@ -20,6 +20,11 @@ function disableSuppression(): boolean
 
 `true` if suppression was disabled, `false` if already disabled.
 
+```typescript
+// Example return value
+true
+```
+
 ## Example
 
 ```typescript

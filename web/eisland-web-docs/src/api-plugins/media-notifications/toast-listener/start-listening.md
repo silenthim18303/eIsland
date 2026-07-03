@@ -26,6 +26,11 @@ function startListening(callback: ToastNotificationChangedCallback): boolean
 
 `true` if listening started, `false` if already listening.
 
+```typescript
+// Example return value
+true
+```
+
 :::note
 The callback is invoked from a background poll thread via a thread-safe bridge. Only one listener can be active at a time.
 :::

@@ -20,6 +20,21 @@ function getNotifications(): ToastNotificationSnapshot[]
 
 Array of [ToastNotificationSnapshot](toast-notification-snapshot.md) objects.
 
+```typescript
+// Example return value
+[
+  {
+    id: 42,
+    appUserModelId: 'Microsoft.WindowsTerminal_8wekyb3d8bbwe!App',
+    appDisplayName: 'Windows Terminal',
+    title: 'Build Complete',
+    body: 'Project compiled successfully.',
+    texts: ['Build Complete', 'Project compiled successfully.'],
+    createdAt: 1719984000000,
+  },
+]
+```
+
 ## Example
 
 ```typescript
