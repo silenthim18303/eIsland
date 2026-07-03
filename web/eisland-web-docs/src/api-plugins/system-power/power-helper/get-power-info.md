@@ -20,6 +20,19 @@ function getPowerInfo(): PowerInfo | null
 
 [PowerInfo](power-info.md) object, or `null` if power info cannot be read.
 
+```typescript
+// Example return value
+{
+  remainingChargePercent: 78,
+  batteryStatus: 3,     // BatteryStatus.Charging
+  powerSupplyStatus: 1, // PowerSupplyStatus.Adequate
+  energySaverStatus: 1, // EnergySaverStatus.Off
+  hasBattery: true,
+  isCharging: true,
+  isOnAcPower: true,
+}
+```
+
 :::warning
 Returns `null` if the power status cannot be read from the system.
 :::
