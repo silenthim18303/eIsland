@@ -180,7 +180,7 @@ public static class BluetoothController
     /// <param name="appearance">BLE Appearance（BluetoothLEAppearance 原始值）</param>
     private static string? DeriveDeviceType(int? cod, int? appearance)
     {
-        // BLE 设备：从 Appearance 的 Category 字段（bits 6-15）推导
+        // BLE 设备：从 Appearance 的 Category 字段（bits 6-15）推导（蓝牙 SIG Assigned Numbers）
         if (appearance is > 0)
         {
             int category = appearance.Value >> 6;
@@ -204,6 +204,21 @@ public static class BluetoothController
                 0x10 => "Glucose",
                 0x11 => "RunningWalking",
                 0x12 => "Cycling",
+                0x13 => "ControlDevice",
+                0x14 => "Sensor",
+                0x15 => "LightFixtures",
+                0x16 => "Fan",
+                0x17 => "HVAC",
+                0x18 => "AirConditioning",
+                0x19 => "Humidifier",
+                0x1A => "Heating",
+                0x1B => "AccessControl",
+                0x1C => "MotorizedDevice",
+                0x1D => "PowerTool",
+                0x1E => "LightSource",
+                0x1F => "WindowCovering",
+                0x20 => "AudioSink",
+                0x21 => "AudioSource",
                 0x51 => "PulseOximeter",
                 0x52 => "WeightScale",
                 0x53 => "OutdoorSports",
@@ -213,6 +228,7 @@ public static class BluetoothController
         }
 
         // 经典蓝牙：从 CoD 的 Major Device Class（bits 8-12）+ Minor Device Class（bits 2-7）推导
+        // 参考：蓝牙 SIG Assigned Numbers — Device Class
         if (cod is > 0)
         {
             int major = (cod.Value >> 8) & 0x1F;
@@ -220,38 +236,104 @@ public static class BluetoothController
 
             return major switch
             {
-                0x01 => "Computer",
-                0x02 => "Phone",
-                0x03 => "LAN",
-                0x04 => minor switch // Audio/Video — 细分 Minor Class（蓝牙 SIG Assigned Numbers）
+                0x00 => "Miscellaneous",
+                0x01 => minor switch // Computer
                 {
-                    0x01 => "Headset",       // Wearable Headset
-                    0x02 => "Handsfree",     // Hands-free
-                    0x04 => "Microphone",    // Microphone
-                    0x05 => "Speaker",       // Loudspeaker
-                    0x06 => "Headphones",    // Headphones
-                    0x07 => "PortableAudio", // Portable Audio
-                    0x08 => "CarAudio",      // Car Audio
-                    0x0A => "HiFiAudio",     // HiFi Audio Device
-                    0x0B => "VCR",           // VCR
+                    0x01 => "Desktop",
+                    0x02 => "Server",
+                    0x03 => "Laptop",
+                    0x04 => "HandheldPC",
+                    0x05 => "PalmSizePC",
+                    0x06 => "WearableComputer",
+                    0x07 => "Tablet",
+                    _ => "Computer",
+                },
+                0x02 => minor switch // Phone
+                {
+                    0x01 => "Cellular",
+                    0x02 => "Cordless",
+                    0x03 => "Smartphone",
+                    0x04 => "WiredModem",
+                    0x05 => "ISDNAccess",
+                    _ => "Phone",
+                },
+                0x03 => "LAN",
+                0x04 => minor switch // Audio/Video
+                {
+                    0x01 => "Headset",         // Wearable Headset
+                    0x02 => "Handsfree",       // Hands-free
+                    0x04 => "Microphone",      // Microphone
+                    0x05 => "Speaker",         // Loudspeaker
+                    0x06 => "Headphones",      // Headphones
+                    0x07 => "PortableAudio",   // Portable Audio
+                    0x08 => "CarAudio",        // Car Audio
+                    0x09 => "SetTopBox",       // Set-top box
+                    0x0A => "HiFiAudio",       // HiFi Audio Device
+                    0x0B => "VCR",             // VCR
+                    0x0C => "VideoCamera",     // Video Camera
+                    0x0D => "Camcorder",       // Camcorder
+                    0x0E => "VideoMonitor",    // Video Monitor
+                    0x0F => "VideoLoudspeaker",// Video Display and Loudspeaker
+                    0x10 => "VideoConferencing",// Video Conferencing
+                    0x12 => "GamingToy",       // Gaming/Toy
                     _ => "Audio",
                 },
-                0x05 => minor switch // Peripheral — 细分 Minor Class
+                0x05 => minor switch // Peripheral
                 {
-                    0x01 => "Joystick",
-                    0x02 => "Gamepad",
-                    0x03 => "RemoteControl",
-                    0x04 => "Keyboard",
+                    0x04 => "Joystick",
+                    0x08 => "Gamepad",
+                    0x0C => "RemoteControl",
+                    0x10 => "SensingDevice",
+                    0x14 => "DigitizerTablet",
+                    0x18 => "CardReader",
                     _ => "Peripheral",
                 },
-                0x06 => minor switch // Imaging — 细分 Minor Class
+                0x06 => minor switch // Imaging — bit flags: bit5=Display, bit4=Camera, bit3=Scanner, bit2=Printer
                 {
                     0x04 => "Printer",
+                    0x08 => "Scanner",
+                    0x10 => "Camera",
+                    0x20 => "ImagingDisplay",
                     _ => "Imaging",
                 },
-                0x07 => "Wearable",
-                0x08 => "Toy",
-                0x09 => "Health",
+                0x07 => minor switch // Wearable
+                {
+                    0x01 => "Wristwatch",
+                    0x02 => "Pager",
+                    0x03 => "Jacket",
+                    0x04 => "Helmet",
+                    0x05 => "Glasses",
+                    _ => "Wearable",
+                },
+                0x08 => minor switch // Toy
+                {
+                    0x01 => "Robot",
+                    0x02 => "Vehicle",
+                    0x03 => "Doll",
+                    0x04 => "ToyController",
+                    0x05 => "ToyGame",
+                    _ => "Toy",
+                },
+                0x09 => minor switch // Health
+                {
+                    0x01 => "BloodPressureMonitor",
+                    0x02 => "HealthThermometer",
+                    0x03 => "WeighingScale",
+                    0x04 => "GlucoseMeter",
+                    0x05 => "PulseOximeter",
+                    0x06 => "HeartRateMonitor",
+                    0x07 => "HealthDataDisplay",
+                    0x08 => "StepCounter",
+                    0x09 => "BodyComposition",
+                    0x0A => "PeakFlowMonitor",
+                    0x0B => "MedicationMonitor",
+                    0x0C => "KneeProsthesis",
+                    0x0D => "AnkleProsthesis",
+                    0x0E => "GenericHealthManager",
+                    0x0F => "PersonalMobilityDevice",
+                    0x10 => "ContinuousGlucoseMonitor",
+                    _ => "Health",
+                },
                 _ => null,
             };
         }
