@@ -25,3 +25,13 @@ function setRepeatMode(mode: number): CommandResult
 ## Return Value
 
 [CommandResult](command-result.md) indicating success or failure.
+
+## Example
+
+```typescript
+import { setRepeatMode } from '@eisland/windows-smtc-helper';
+
+setRepeatMode(0); // None — no repeat
+setRepeatMode(1); // Track — repeat current track
+setRepeatMode(2); // List  — repeat entire playlist
+```

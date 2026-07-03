@@ -19,3 +19,16 @@ function play(): CommandResult
 ## Return Value
 
 [CommandResult](command-result.md) indicating success or failure.
+
+## Example
+
+```typescript
+import { play } from '@eisland/windows-smtc-helper';
+
+const result = play();
+if (result.success) {
+  console.log('▶️ Playback resumed');
+} else {
+  console.error(`Play failed: ${result.error}`);
+}
+```

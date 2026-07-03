@@ -19,3 +19,15 @@ function next(): CommandResult
 ## Return Value
 
 [CommandResult](command-result.md) indicating success or failure.
+
+## Example
+
+```typescript
+import { next, getStatus } from '@eisland/windows-smtc-helper';
+
+const result = next();
+if (result.success) {
+  const status = getStatus();
+  console.log(`⏭️ Now playing: ${status.title ?? 'Unknown'}`);
+}
+```

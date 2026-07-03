@@ -42,3 +42,40 @@ Use `getMediaSessions()` to get an immediate snapshot of all active media sessio
 :::note
 Multiple media sessions can coexist (e.g., browser + Spotify). Each session is identified by its `sourceAppId`.
 :::
+
+## Example
+
+```typescript
+import { SmtcMonitor } from '@eisland/windows-smtc-helper';
+
+const monitor = new SmtcMonitor();
+
+monitor.on('session-added', (appId, media) => {
+  console.log(`🎵 New session: ${appId} — ${media.title}`);
+});
+
+monitor.on('session-media-changed', (appId, media) => {
+  console.log(`🔄 [${appId}] Now playing: ${media.title} — ${media.artist}`);
+});
+
+monitor.on('session-playback-changed', (appId, playback) => {
+  console.log(`⏯️ [${appId}] Status: ${playback.playbackStatus}`);
+});
+
+monitor.on('session-removed', (appId) => {
+  console.log(`❌ Session closed: ${appId}`);
+});
+
+monitor.on('error', (err) => {
+  console.error('SMTC error:', err);
+});
+
+monitor.start();
+
+// List current sessions
+const sessions = monitor.getMediaSessions();
+console.log(`${sessions.length} active session(s)`);
+
+// ... later
+monitor.stop();
+```

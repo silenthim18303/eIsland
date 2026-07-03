@@ -19,3 +19,14 @@ function stop(): CommandResult
 ## Return Value
 
 [CommandResult](command-result.md) indicating success or failure.
+
+## Example
+
+```typescript
+import { stop } from '@eisland/windows-smtc-helper';
+
+const result = stop();
+if (result.success) {
+  console.log('⏹️ Playback stopped');
+}
+```

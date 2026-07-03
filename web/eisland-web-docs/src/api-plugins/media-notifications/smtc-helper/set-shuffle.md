@@ -25,3 +25,16 @@ function setShuffle(active: boolean): CommandResult
 ## Return Value
 
 [CommandResult](command-result.md) indicating success or failure.
+
+## Example
+
+```typescript
+import { setShuffle, getStatus } from '@eisland/windows-smtc-helper';
+
+// Enable shuffle
+setShuffle(true);
+console.log(`Shuffle: ${getStatus().isShuffleActive}`);
+
+// Disable shuffle
+setShuffle(false);
+```

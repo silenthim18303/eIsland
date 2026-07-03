@@ -33,3 +33,21 @@ Complete media status snapshot including metadata, playback state, and timeline.
 :::note
 Fields returning `null` indicate the media source has not provided that information.
 :::
+
+## Example
+
+```typescript
+import { getStatus } from '@eisland/windows-smtc-helper';
+
+const status = getStatus();
+if (status.isAvailable) {
+  console.log(`Now playing: ${status.title} — ${status.artist}`);
+  console.log(`Album: ${status.albumTitle}`);
+  console.log(`Status: ${status.playbackStatus}`);
+  if (status.timeline) {
+    console.log(`Position: ${status.timeline.position}s / ${status.timeline.endTime}s`);
+  }
+} else {
+  console.log('No media session active');
+}
+```

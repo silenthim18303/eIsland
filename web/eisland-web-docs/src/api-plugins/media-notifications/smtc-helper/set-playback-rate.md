@@ -25,3 +25,14 @@ function setPlaybackRate(rate: number): CommandResult
 ## Return Value
 
 [CommandResult](command-result.md) indicating success or failure.
+
+## Example
+
+```typescript
+import { setPlaybackRate } from '@eisland/windows-smtc-helper';
+
+setPlaybackRate(1.0); // Normal speed
+setPlaybackRate(1.5); // 1.5× speed
+setPlaybackRate(2.0); // Double speed
+setPlaybackRate(0.5); // Half speed
+```

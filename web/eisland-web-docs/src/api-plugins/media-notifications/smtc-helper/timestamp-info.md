@@ -21,3 +21,16 @@ Lightweight timestamp data without media metadata. Optimized for lyrics synchron
 :::tip
 Use `getTimestamp()` instead of `getStatus()` when you only need playback position — it skips media metadata for lower latency.
 :::
+
+## Example
+
+```typescript
+import { getTimestamp } from '@eisland/windows-smtc-helper';
+
+// Lightweight check for lyrics sync
+const ts = getTimestamp();
+if (ts.isAvailable && ts.timeline) {
+  console.log(`Position: ${ts.timeline.position}s`);
+  console.log(`Status: ${ts.playbackStatus}`);
+}
+```

@@ -26,3 +26,19 @@ Media metadata properties emitted by SmtcMonitor events.
 :::note
 The `thumbnail` field is a data URI (`data:image/jpeg;base64,...`) when available, or `null` if no album art exists.
 :::
+
+## Example
+
+```typescript
+import { SmtcMonitor } from '@eisland/windows-smtc-helper';
+
+const monitor = new SmtcMonitor();
+monitor.start();
+
+monitor.on('session-media-changed', (appId, media) => {
+  console.log(`[${appId}] Now playing: ${media.title} — ${media.artist}`);
+  if (media.thumbnail) {
+    console.log(`  Album art: ${media.thumbnail.substring(0, 50)}...`);
+  }
+});
+```
