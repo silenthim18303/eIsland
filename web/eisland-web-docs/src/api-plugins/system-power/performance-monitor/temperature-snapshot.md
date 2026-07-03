@@ -6,12 +6,14 @@ icon: fa6-solid:table
 
 # TemperatureSnapshot
 
-> Placeholder — content to be added.
+:::info
+Collection of temperature readings from all available sensors.
+:::
 
-```ts
-interface TemperatureSnapshot {
-  isAvailable: boolean;
-  readings: TemperatureReading[];
-  maxTemperatureCelsius: number | null;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isAvailable` | `boolean` | Whether temperature data is available (requires LibreHardwareMonitor) |
+| `readings` | [TemperatureReading](temperature-reading.md)`[]` | Array of sensor readings |
+| `maxTemperatureCelsius` | `number \| null` | Highest temperature across all sensors, `null` if no readings |

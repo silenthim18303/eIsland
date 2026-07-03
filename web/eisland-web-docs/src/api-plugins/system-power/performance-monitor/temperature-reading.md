@@ -6,14 +6,16 @@ icon: fa6-solid:table
 
 # TemperatureReading
 
-> Placeholder — content to be added.
+:::info
+A single temperature sensor reading.
+:::
 
-```ts
-interface TemperatureReading {
-  id: string;
-  label: string;
-  category: TemperatureCategory;
-  temperatureCelsius: number;
-  source: 'libre-hardware-monitor';
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique sensor identifier |
+| `label` | `string` | Human-readable sensor name |
+| `category` | [TemperatureCategory](temperature-category.md) | Sensor category |
+| `temperatureCelsius` | `number` | Temperature in degrees Celsius |
+| `source` | `"libre-hardware-monitor"` | Data source identifier |

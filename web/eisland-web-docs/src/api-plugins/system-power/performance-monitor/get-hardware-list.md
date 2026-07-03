@@ -6,8 +6,20 @@ icon: fa6-solid:code
 
 # getHardwareList
 
-> Placeholder — content to be added.
+:::info
+Returns the list of detected CPUs and GPUs via the LibreHardwareMonitor helper EXE.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getHardwareList(): HardwareListSnapshot
 ```
+
+## Return Value
+
+[HardwareListSnapshot](hardware-list-snapshot.md) object.
+
+:::warning
+Requires the LibreHardwareMonitor helper EXE. Returns `isAvailable: false` if the helper is unavailable.
+:::

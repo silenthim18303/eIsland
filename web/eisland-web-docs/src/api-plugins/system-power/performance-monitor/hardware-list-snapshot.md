@@ -6,12 +6,14 @@ icon: fa6-solid:table
 
 # HardwareListSnapshot
 
-> Placeholder — content to be added.
+:::info
+List of detected CPU and GPU hardware devices.
+:::
 
-```ts
-interface HardwareListSnapshot {
-  isAvailable: boolean;
-  cpus: HardwareDevice[];
-  gpus: HardwareDevice[];
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isAvailable` | `boolean` | Whether hardware data is available |
+| `cpus` | [HardwareDevice](hardware-device.md)`[]` | Detected CPUs |
+| `gpus` | [HardwareDevice](hardware-device.md)`[]` | Detected GPUs |

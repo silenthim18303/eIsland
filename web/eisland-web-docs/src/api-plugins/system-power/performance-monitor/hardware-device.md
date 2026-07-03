@@ -6,14 +6,16 @@ icon: fa6-solid:table
 
 # HardwareDevice
 
-> Placeholder — content to be added.
+:::info
+Information about a detected hardware device (CPU or GPU).
+:::
 
-```ts
-interface HardwareDevice {
-  id: string;
-  name: string;
-  category: 'cpu' | 'gpu';
-  hardwareType: string;
-  source: 'libre-hardware-monitor';
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | `string` | Unique hardware identifier |
+| `name` | `string` | Device name (e.g., "Intel Core i7-12700K") |
+| `category` | `"cpu" \| "gpu"` | Device category |
+| `hardwareType` | `string` | Hardware type string from LibreHardwareMonitor |
+| `source` | `"libre-hardware-monitor"` | Data source identifier |

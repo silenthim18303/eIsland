@@ -6,13 +6,15 @@ icon: fa6-solid:table
 
 # MemorySnapshot
 
-> Placeholder — content to be added.
+:::info
+System memory usage data returned by getMemory().
+:::
 
-```ts
-interface MemorySnapshot {
-  totalBytes: number;
-  usedBytes: number;
-  availableBytes: number;
-  usagePercent: number;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `totalBytes` | `number` | Total physical memory in bytes |
+| `usedBytes` | `number` | Used memory in bytes |
+| `availableBytes` | `number` | Available memory in bytes |
+| `usagePercent` | `number` | Memory usage percentage (0–100) |

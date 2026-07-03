@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getMemory
 
-> Placeholder — content to be added.
+:::info
+Returns the current system memory usage.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getMemory(): MemorySnapshot
 ```
+
+## Return Value
+
+[MemorySnapshot](memory-snapshot.md) object.
