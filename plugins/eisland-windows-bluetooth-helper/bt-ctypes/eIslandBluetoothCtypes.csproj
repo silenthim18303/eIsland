@@ -13,5 +13,6 @@
     <Compile Include="../src/Snapshots.cs" Link="Snapshots.cs" />
     <Compile Include="../src/BluetoothController.cs" Link="BluetoothController.cs" />
     <Compile Include="../src/BluetoothDeviceMonitor.cs" Link="BluetoothDeviceMonitor.cs" />
+    <Compile Include="../src/DeviceTypeMapper.cs" Link="DeviceTypeMapper.cs" />
   </ItemGroup>
 </Project>
