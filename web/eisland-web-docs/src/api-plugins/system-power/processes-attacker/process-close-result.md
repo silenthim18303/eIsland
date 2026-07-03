@@ -23,3 +23,20 @@ Result of a process termination operation.
 :::note
 When targeting by process name, `matchedCount` may be greater than 1 if multiple instances are running.
 :::
+
+## Example
+
+```typescript
+import { closeProcess } from '@eisland/windows-processes-attacker';
+
+const result = closeProcess('notepad.exe');
+console.log(`Matched: ${result.matchedCount}`);
+console.log(`Terminated: ${result.terminatedCount}`);
+console.log(`Failed: ${result.failedCount}`);
+
+if (result.failures.length > 0) {
+  result.failures.forEach(f => {
+    console.error(`  PID ${f.pid} (${f.name}): error ${f.errorCode}`);
+  });
+}
+```

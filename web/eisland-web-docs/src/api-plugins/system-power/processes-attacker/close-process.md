@@ -29,3 +29,17 @@ function closeProcess(target: string | number): ProcessCloseResult
 :::warning
 Terminating system processes may require elevated privileges. The function uses `OpenProcess` + `TerminateProcess` internally.
 :::
+
+## Example
+
+```typescript
+import { closeProcess } from '@eisland/windows-processes-attacker';
+
+// By process name (kills all instances)
+const result = closeProcess('notepad.exe');
+console.log(`Terminated ${result.terminatedCount} of ${result.matchedCount} process(es)`);
+
+// By PID
+const pidResult = closeProcess(12345);
+console.log(`Terminated: ${pidResult.terminatedCount > 0}`);
+```
