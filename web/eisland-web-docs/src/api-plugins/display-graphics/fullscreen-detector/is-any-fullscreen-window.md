@@ -20,6 +20,11 @@ function isAnyFullscreenWindow(): boolean
 
 `true` if at least one window is fullscreen, `false` otherwise.
 
+```typescript
+// Example return value
+true
+```
+
 :::tip
 This is more efficient than `getFullscreenWindows().length > 0` as it returns early on the first match.
 :::

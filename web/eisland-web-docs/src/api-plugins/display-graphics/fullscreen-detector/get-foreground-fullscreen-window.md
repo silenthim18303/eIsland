@@ -20,6 +20,18 @@ function getForegroundFullscreenWindow(): FullscreenWindowInfo | null
 
 [FullscreenWindowInfo](fullscreen-window-info.md) object, or `null` if the foreground window is not fullscreen.
 
+```typescript
+// Example return value
+{
+  hwnd: '00000000001A0B2C',
+  title: 'Cyberpunk 2077',
+  processId: 12345,
+  bounds: { left: 0, top: 0, right: 2560, bottom: 1440, width: 2560, height: 1440 },
+  monitor: { left: 0, top: 0, right: 2560, bottom: 1440, width: 2560, height: 1440, isPrimary: true },
+  isForeground: true,
+}
+```
+
 :::tip
 Returns `null` if the foreground window is not fullscreen. Use [isAnyFullscreenWindow()](is-any-fullscreen-window.md) for a quick boolean check.
 :::

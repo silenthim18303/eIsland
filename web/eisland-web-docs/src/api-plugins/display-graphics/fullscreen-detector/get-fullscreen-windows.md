@@ -20,6 +20,20 @@ function getFullscreenWindows(): FullscreenWindowInfo[]
 
 Array of [FullscreenWindowInfo](fullscreen-window-info.md) objects. Empty array if no windows are fullscreen.
 
+```typescript
+// Example return value
+[
+  {
+    hwnd: '00000000001A0B2C',
+    title: 'Cyberpunk 2077',
+    processId: 12345,
+    bounds: { left: 0, top: 0, right: 2560, bottom: 1440, width: 2560, height: 1440 },
+    monitor: { left: 0, top: 0, right: 2560, bottom: 1440, width: 2560, height: 1440, isPrimary: true },
+    isForeground: true,
+  },
+]
+```
+
 ## Example
 
 ```typescript
