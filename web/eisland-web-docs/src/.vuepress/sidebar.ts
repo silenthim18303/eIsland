@@ -246,5 +246,14 @@ export default sidebar({
         "commands/plugin-commands.md",
       ],
     },
+    {
+      text: "Code Quality",
+      icon: "check-double",
+      collapsible: false,
+      children: [
+        "code-quality/code-review.md",
+        "code-quality/comment-quality.md",
+      ],
+    },
   ],
 });

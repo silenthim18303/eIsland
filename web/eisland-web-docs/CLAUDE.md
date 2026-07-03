@@ -44,6 +44,10 @@ src/
     │   ├── coding-standards.md
     │   ├── documentation-standards.md
     │   └── commit-conventions.md
+    ├── code-quality/            # Coding and comment quality standards
+    │   ├── README.md            # Category index
+    │   ├── code-review.md       # Frontend coding standards
+    │   └── comment-quality.md   # JSDoc comment standards
     └── testing/                 # Testing strategies and frameworks
         ├── README.md            # Category index
         ├── testing-overview.md

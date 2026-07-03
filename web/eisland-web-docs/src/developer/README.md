@@ -42,3 +42,12 @@ Detailed reference for npm scripts defined in `package.json`.
 | [Code Quality Commands](commands/quality-commands.md) | `comment:check`, `i18n:check` — validating comment standards and i18n completeness |
 | [Release Commands](commands/release-commands.md) | `release:notes`, `changelog:generate`, `release:upload*` — changelogs and artifact uploads |
 | [Plugin Commands](commands/plugin-commands.md) | `build`, `test`, `smoke` — building, testing, and smoke-testing all native plugins |
+
+### Code Quality
+
+Coding standards and comment quality requirements for the eIsland project.
+
+| Document | Description |
+|----------|-------------|
+| [Code Quality Review](code-quality/code-review.md) | Frontend coding standards covering HTML, CSS, JavaScript, TypeScript, React, and Next.js conventions |
+| [Comment Quality Review](code-quality/comment-quality.md) | JSDoc comment standards, file headers, function documentation, and annotation best practices |
