@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getPairedDevices
 
-> Placeholder — content to be added.
+:::info
+Returns all Bluetooth devices that are currently paired with the system.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getPairedDevices(): BluetoothDeviceInfo[]
 ```
+
+## Return Value
+
+Array of [BluetoothDeviceInfo](bluetooth-device-info.md) objects. Empty array if no paired devices.

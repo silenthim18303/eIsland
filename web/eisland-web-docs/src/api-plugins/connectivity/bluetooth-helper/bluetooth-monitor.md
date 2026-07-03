@@ -6,23 +6,39 @@ icon: fa6-solid:cubes
 
 # BluetoothMonitor
 
-> Placeholder — content to be added.
+:::info
+Real-time Bluetooth device change monitor. Uses .NET NativeAOT DLL via koffi FFI to subscribe to WinRT Bluetooth device watcher events.
+:::
 
-```ts
-class BluetoothMonitor extends EventEmitter {
-  start(): void;
-  stop(): void;
-  getDevices(): BluetoothDeviceInfo[];
-}
+## Constructor
+
+```typescript
+constructor()
 ```
+
+## Methods
+
+| Method | Return | Description |
+|--------|--------|-------------|
+| `start()` | `void` | Start monitoring (idempotent) |
+| `stop()` | `void` | Stop monitoring (idempotent) |
+| `isRunning()` | `boolean` | Whether the monitor is currently active |
 
 ## Events
 
 | Event | Payload | Description |
 |-------|---------|-------------|
 | `device-added` | `device: BluetoothDeviceInfo` | New device discovered |
-| `device-removed` | `deviceId: string` | Device removed |
+| `device-removed` | `deviceId: string` | Device removed from range |
 | `device-connected` | `device: BluetoothDeviceInfo` | Device connected |
 | `device-disconnected` | `deviceId: string` | Device disconnected |
 | `device-updated` | `device: BluetoothDeviceInfo` | Device info updated |
 | `error` | `err: Error` | Monitor error |
+
+:::tip
+The monitor uses a Bluetooth DeviceWatcher internally. Call `start()` once and listen for events — do not poll with `getAllDevices()` in a loop.
+:::
+
+:::note
+The `isRunning()` method returns the current monitoring state. Calling `start()` on an already-running monitor is a no-op.
+:::

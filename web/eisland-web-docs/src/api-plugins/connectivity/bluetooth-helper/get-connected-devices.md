@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getConnectedDevices
 
-> Placeholder — content to be added.
+:::info
+Returns all Bluetooth devices that are currently connected.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getConnectedDevices(): BluetoothDeviceInfo[]
 ```
+
+## Return Value
+
+Array of [BluetoothDeviceInfo](bluetooth-device-info.md) objects. Empty array if no connected devices.

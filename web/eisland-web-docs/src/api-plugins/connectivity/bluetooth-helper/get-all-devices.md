@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getAllDevices
 
-> Placeholder — content to be added.
+:::info
+Returns all visible Bluetooth devices (paired, connected, and discoverable).
+:::
 
-```ts
+## Signature
+
+```typescript
 function getAllDevices(): BluetoothDeviceInfo[]
 ```
+
+## Return Value
+
+Array of [BluetoothDeviceInfo](bluetooth-device-info.md) objects.

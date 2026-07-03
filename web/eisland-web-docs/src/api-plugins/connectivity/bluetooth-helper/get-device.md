@@ -6,8 +6,22 @@ icon: fa6-solid:code
 
 # getDevice
 
-> Placeholder — content to be added.
+:::info
+Returns a snapshot of a single Bluetooth device by its Windows DeviceInformation ID.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getDevice(deviceId: string): BluetoothDeviceInfo | null
 ```
+
+## Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `deviceId` | `string` | Windows DeviceInformation ID of the target device |
+
+## Return Value
+
+[BluetoothDeviceInfo](bluetooth-device-info.md) object, or `null` if the device was not found.
