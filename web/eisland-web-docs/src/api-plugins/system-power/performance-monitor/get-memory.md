@@ -20,6 +20,16 @@ function getMemory(): MemorySnapshot
 
 [MemorySnapshot](memory-snapshot.md) object.
 
+```typescript
+// Example return value
+{
+  totalBytes: 17179869184,
+  usedBytes: 10737418240,
+  availableBytes: 6442450944,
+  usagePercent: 62.5,
+}
+```
+
 ## Example
 
 ```typescript

@@ -20,6 +20,19 @@ function getTemperature(): TemperatureSnapshot
 
 [TemperatureSnapshot](temperature-snapshot.md) object. `isAvailable` is `false` if the helper EXE is not running or has no sensors.
 
+```typescript
+// Example return value
+{
+  isAvailable: true,
+  readings: [
+    { id: 'cpu-0', label: 'CPU Core #1', category: 'cpu', temperatureCelsius: 58, source: 'libre-hardware-monitor' },
+    { id: 'cpu-1', label: 'CPU Core #2', category: 'cpu', temperatureCelsius: 61, source: 'libre-hardware-monitor' },
+    { id: 'gpu-0', label: 'GPU Core', category: 'gpu', temperatureCelsius: 72, source: 'libre-hardware-monitor' },
+  ],
+  maxTemperatureCelsius: 72,
+}
+```
+
 :::warning
 Requires the LibreHardwareMonitor helper EXE (`eIslandTemperatureReader.exe`) to be running. Returns `isAvailable: false` if the helper is unavailable.
 :::

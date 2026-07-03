@@ -20,6 +20,19 @@ function getHardwareList(): HardwareListSnapshot
 
 [HardwareListSnapshot](hardware-list-snapshot.md) object.
 
+```typescript
+// Example return value
+{
+  isAvailable: true,
+  cpus: [
+    { id: 'cpu-0', name: 'Intel Core i7-12700K', category: 'cpu', hardwareType: 'Cpu', source: 'libre-hardware-monitor' },
+  ],
+  gpus: [
+    { id: 'gpu-0', name: 'NVIDIA GeForce RTX 4070', category: 'gpu', hardwareType: 'GpuNvidia', source: 'libre-hardware-monitor' },
+  ],
+}
+```
+
 :::warning
 Requires the LibreHardwareMonitor helper EXE. Returns `isAvailable: false` if the helper is unavailable.
 :::

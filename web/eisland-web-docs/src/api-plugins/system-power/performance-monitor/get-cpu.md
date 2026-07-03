@@ -20,6 +20,14 @@ function getCpu(): CpuSnapshot
 
 [CpuSnapshot](cpu-snapshot.md) object.
 
+```typescript
+// Example return value (after baseline established)
+{
+  usagePercent: 42.5,
+  hasBaseline: true,
+}
+```
+
 :::warning
 The first call establishes a baseline and returns `hasBaseline: false`. Call again after a short interval for accurate usage data.
 :::
