@@ -79,6 +79,12 @@ describe('BluetoothMonitor', () => {
       expect(typeof device.isConnected).toBe('boolean');
       expect(typeof device.isPaired).toBe('boolean');
       expect(Array.isArray(device.serviceUuids)).toBe(true);
+      if (device.deviceType != null) expect(typeof device.deviceType).toBe('string');
+      if (device.batteryLevel != null) {
+        expect(typeof device.batteryLevel).toBe('number');
+        expect(device.batteryLevel).toBeGreaterThanOrEqual(0);
+        expect(device.batteryLevel).toBeLessThanOrEqual(100);
+      }
     }
 
     monitor.stop();

@@ -15,7 +15,7 @@
     "ia32"
   ],
   "scripts": {
-    "build": "dotnet build src/eIslandSmtcHelper.csproj -c Release",
+    "build": "dotnet publish src/eIslandSmtcHelper.csproj -c Release -r win-x64",
     "build:ctypes": "dotnet publish smtc-ctypes/eIslandSmtcCtypes.csproj -c Release -r win-x64",
     "build:all": "npm run build && npm run build:ctypes",
     "clean": "dotnet clean src/eIslandSmtcHelper.csproj && dotnet clean smtc-ctypes/eIslandSmtcCtypes.csproj",

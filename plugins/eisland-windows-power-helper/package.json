@@ -15,7 +15,7 @@
     "ia32"
   ],
   "scripts": {
-    "build": "dotnet build src/eIslandPowerHelper.csproj -c Release",
+    "build": "dotnet publish src/eIslandPowerHelper.csproj -c Release -r win-x64",
     "build:ctypes": "dotnet publish pw-ctypes/eIslandPowerCtypes.csproj -c Release -r win-x64",
     "build:all": "npm run build && npm run build:ctypes",
     "clean": "dotnet clean src/eIslandPowerHelper.csproj && dotnet clean pw-ctypes/eIslandPowerCtypes.csproj",

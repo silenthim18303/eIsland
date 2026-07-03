@@ -228,20 +228,8 @@ public static class PowerMonitor
 
     private static string SerializePowerInfo(PowerInfo info)
     {
-#if NATIVEAOT
         return System.Text.Json.JsonSerializer.Serialize(info, PwJsonContext.Default.PowerInfo);
-#else
-        return System.Text.Json.JsonSerializer.Serialize(info, JsonOptions);
-#endif
     }
-
-#if !NATIVEAOT
-    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        WriteIndented = false,
-    };
-#endif
 
     #endregion
 

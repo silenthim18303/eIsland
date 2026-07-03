@@ -200,20 +200,8 @@ public static class WifiMonitor
 
     private static string SerializeWifiInfo(WifiInfo info)
     {
-#if NATIVEAOT
         return System.Text.Json.JsonSerializer.Serialize(info, WfJsonContext.Default.WifiInfo);
-#else
-        return System.Text.Json.JsonSerializer.Serialize(info, JsonOptions);
-#endif
     }
-
-#if !NATIVEAOT
-    private static readonly System.Text.Json.JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        WriteIndented = false,
-    };
-#endif
 
     #endregion
 
