@@ -6,15 +6,23 @@ icon: fa6-solid:cubes
 
 # BrightnessMonitor
 
-> Placeholder — content to be added.
+:::info
+Real-time screen brightness monitor. Uses WMI WmiMonitorBrightnessEvent to detect brightness changes.
+:::
 
-```ts
-class BrightnessMonitor extends EventEmitter {
-  start(): void;
-  stop(): void;
-  isRunning(): boolean;
-}
+## Constructor
+
+```typescript
+constructor()
 ```
+
+## Methods
+
+| Method | Return | Description |
+|--------|--------|-------------|
+| `start()` | `void` | Start monitoring (idempotent) |
+| `stop()` | `void` | Stop monitoring (idempotent) |
+| `isRunning()` | `boolean` | Whether the monitor is currently active |
 
 ## Events
 
@@ -22,3 +30,7 @@ class BrightnessMonitor extends EventEmitter {
 |-------|---------|-------------|
 | `brightness-changed` | `brightness: number, timestamp: number` | Brightness value changed |
 | `error` | `err: Error` | Monitor error |
+
+:::tip
+Uses WMI WmiMonitorBrightnessEvent for real-time detection. No polling required — brightness changes are pushed as events.
+:::
