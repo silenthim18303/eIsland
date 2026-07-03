@@ -20,6 +20,11 @@ function next(): CommandResult
 
 [CommandResult](command-result.md) indicating success or failure.
 
+```typescript
+// Example return value
+{ success: true, error: null }
+```
+
 ## Example
 
 ```typescript

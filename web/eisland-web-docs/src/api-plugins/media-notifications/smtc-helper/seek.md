@@ -26,6 +26,11 @@ function seek(positionSeconds: number): CommandResult
 
 [CommandResult](command-result.md) indicating success or failure.
 
+```typescript
+// Example return value
+{ success: true, error: null }
+```
+
 :::note
 The position is clamped to the range `[minSeekTime, maxSeekTime]` from [TimelineProperties](timeline-properties.md).
 :::

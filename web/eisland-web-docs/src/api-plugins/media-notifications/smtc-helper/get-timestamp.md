@@ -20,6 +20,15 @@ function getTimestamp(): TimestampInfo
 
 [TimestampInfo](timestamp-info.md) object.
 
+```typescript
+// Example return value
+{
+  isAvailable: true,
+  playbackStatus: 'playing',
+  timeline: { startTime: 0, endTime: 354, position: 127.45, minSeekTime: 0, maxSeekTime: 354 },
+}
+```
+
 ## Example
 
 ```typescript
