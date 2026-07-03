@@ -174,7 +174,7 @@ public static class BluetoothController
     }
 
     /// <summary>
-    /// 推导可读设备类型；优先 BLE Appearance，回退到经典蓝牙 CoD
+    /// 推导可读设备类型；优先 BLE Appearance，回退到经典蓝牙 CoD（Major + Minor Class）
     /// </summary>
     /// <param name="cod">经典蓝牙 Class of Device（BluetoothClassOfDevice 原始值）</param>
     /// <param name="appearance">BLE Appearance（BluetoothLEAppearance 原始值）</param>
@@ -212,18 +212,39 @@ public static class BluetoothController
             if (bleType != null) return bleType;
         }
 
-        // 经典蓝牙：从 CoD 的 Major Device Class 字段（bits 8-12）推导
+        // 经典蓝牙：从 CoD 的 Major Device Class（bits 8-12）+ Minor Device Class（bits 2-7）推导
         if (cod is > 0)
         {
             int major = (cod.Value >> 8) & 0x1F;
+            int minor = (cod.Value >> 2) & 0x3F;
+
             return major switch
             {
                 0x01 => "Computer",
                 0x02 => "Phone",
                 0x03 => "LAN",
-                0x04 => "Audio",
-                0x05 => "Peripheral",
-                0x06 => "Imaging",
+                0x04 => minor switch // Audio — 细分 Minor Class
+                {
+                    0x01 => "Headset",
+                    0x02 => "Headphones",
+                    0x03 => "Speaker",
+                    0x04 => "HiFiAudio",
+                    0x05 => "VCR",
+                    _ => "Audio",
+                },
+                0x05 => minor switch // Peripheral — 细分 Minor Class
+                {
+                    0x01 => "Joystick",
+                    0x02 => "Gamepad",
+                    0x03 => "RemoteControl",
+                    0x04 => "Keyboard",
+                    _ => "Peripheral",
+                },
+                0x06 => minor switch // Imaging — 细分 Minor Class
+                {
+                    0x04 => "Printer",
+                    _ => "Imaging",
+                },
                 0x07 => "Wearable",
                 0x08 => "Toy",
                 0x09 => "Health",

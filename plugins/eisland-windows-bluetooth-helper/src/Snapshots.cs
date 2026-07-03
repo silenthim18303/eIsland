@@ -53,7 +53,7 @@ public class BluetoothDeviceInfo
     public string[] ServiceUuids { get; init; } = [];
 
     /// <summary>
-    /// 设备类型：BLE 从 Appearance 推导（如 "HID"、"Watch"），经典蓝牙从 CoD 推导（如 "Audio"、"Phone"）
+    /// 设备类型：BLE 从 Appearance 推导（如 "HID"、"Watch"），经典蓝牙从 CoD 推导（如 "Headphones"、"Speaker"、"Printer"、"Phone"）
     /// </summary>
     public string? DeviceType { get; init; }
 
