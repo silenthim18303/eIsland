@@ -92,6 +92,13 @@ If neither source yields a value, `deviceType` is `null`.
 | `0x1F` | `"WindowCovering"` | Window Covering |
 | `0x20` | `"AudioSink"` | Audio Sink |
 | `0x21` | `"AudioSource"` | Audio Source |
+| `0x22` | `"Robot"` | Robot |
+| `0x23` | `"Display"` | Display |
+| `0x30` | `"Keyboard"` | Keyboard |
+| `0x31` | `"Mouse"` | Mouse |
+| `0x32` | `"Joystick"` | Joystick |
+| `0x33` | `"Gamepad"` | Gamepad |
+| `0x40` | `"RemoteControl"` | Remote Control |
 | `0x51` | `"PulseOximeter"` | Pulse Oximeter |
 | `0x52` | `"WeightScale"` | Weight Scale |
 | `0x53` | `"OutdoorSports"` | Outdoor Sports Activity |
@@ -168,21 +175,27 @@ If neither source yields a value, `deviceType` is `null`.
 | `0x10` | `"SensingDevice"` | Sensing device |
 | `0x14` | `"DigitizerTablet"` | Digitizer tablet |
 | `0x18` | `"CardReader"` | Card reader (e.g., SIM) |
+| `0x1C` | `"DigitalPen"` | Digital pen |
+| `0x20` | `"HandheldScanner"` | Handheld scanner |
+| `0x24` | `"HandheldGesturalInput"` | Handheld gestural input device |
 | _(other)_ | `"Peripheral"` | Other peripheral device |
 
 #### Major Class `0x06` — Imaging
 
 :::note
-The Imaging minor class uses bit flags: bit 5 = Display, bit 4 = Camera, bit 3 = Scanner, bit 2 = Printer. Multiple flags can be set simultaneously.
+The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera (`0x08`), bit 4 = Scanner (`0x10`), bit 5 = Printer (`0x20`). Multiple flags can be set simultaneously — e.g., `0x24` (Display + Printer) yields `"Display+Printer"`.
 :::
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
-| `0x04` | `"Printer"` | Printer |
-| `0x08` | `"Scanner"` | Scanner |
-| `0x10` | `"Camera"` | Camera |
-| `0x20` | `"ImagingDisplay"` | Display |
-| _(other)_ | `"Imaging"` | Other imaging device or combination |
+| `0x04` | `"Display"` | Display |
+| `0x08` | `"Camera"` | Camera |
+| `0x10` | `"Scanner"` | Scanner |
+| `0x20` | `"Printer"` | Printer |
+| `0x24` | `"Display+Printer"` | Display + Printer |
+| `0x28` | `"Camera+Printer"` | Camera + Printer |
+| _(combination)_ | `"<flag>+<flag>..."` | Any combination of the above flags |
+| _(other)_ | `"Imaging"` | Other imaging device (no recognized flags) |
 
 #### Major Class `0x07` — Wearable
 
@@ -229,7 +242,7 @@ The Imaging minor class uses bit flags: bit 5 = Display, bit 4 = Camera, bit 3 =
 | _(other)_ | `"Health"` | Other health device |
 
 :::tip
-BLE devices report types via the Appearance standard (35 categories). Classic Bluetooth devices use CoD Major + Minor Class (9 major classes, 80+ minor types). Both produce consistent type strings where the standards overlap — e.g., `"Phone"`, `"Computer"`, `"Headphones"`.
+BLE devices report types via the Appearance standard (43 categories). Classic Bluetooth devices use CoD Major + Minor Class (9 major classes, 80+ minor types). Both produce consistent type strings where the standards overlap — e.g., `"Phone"`, `"Computer"`, `"Headphones"`.
 :::
 
 :::warning
