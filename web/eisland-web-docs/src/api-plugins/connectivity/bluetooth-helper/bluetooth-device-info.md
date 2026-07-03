@@ -104,10 +104,14 @@ If neither source yields a value, `deviceType` is `null`.
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
 | `0x01` | `"Headset"` | Wearable headset |
-| `0x02` | `"Headphones"` | Headphones |
-| `0x03` | `"Speaker"` | Loudspeaker / portable speaker |
-| `0x04` | `"HiFiAudio"` | Hi-Fi audio device |
-| `0x05` | `"VCR"` | VCR / video recorder |
+| `0x02` | `"Handsfree"` | Hands-free device |
+| `0x04` | `"Microphone"` | Microphone |
+| `0x05` | `"Speaker"` | Loudspeaker |
+| `0x06` | `"Headphones"` | Headphones |
+| `0x07` | `"PortableAudio"` | Portable audio device |
+| `0x08` | `"CarAudio"` | Car audio device |
+| `0x0A` | `"HiFiAudio"` | Hi-Fi audio device |
+| `0x0B` | `"VCR"` | VCR / video recorder |
 | _(other)_ | `"Audio"` | Other audio/video device |
 
 #### Major Class `0x05` — Peripheral
