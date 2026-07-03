@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-03T12:11:36.970Z
+> 生成时间：2026-07-03T18:23:00.932Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,10 @@
 
 ## Unreleased
 
+- 2026-07-04 | b5b7c85b | 鸡哥 | Merge pull request #113 from JNTMTMTM/dev
+- 2026-07-04 | f831c3ca | 鸡哥 | ci: upgrade upload and download artifact actions to v5
+- 2026-07-04 | db97005d | 鸡哥 | docs: update i18n-check workflow permissions and upgrade download-artifact action to v5
+- 2026-07-03 | d7303d80 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #111 by @JNTMTMTM [skip ci]
 - 2026-07-03 | 5d328d40 | 鸡哥 | Merge pull request #111 from JNTMTMTM/dev
 - 2026-07-03 | 3929127d | 鸡哥 | docs(api-plugins): add return value examples to toast-listener documentation
 - 2026-07-03 | e5897b09 | 鸡哥 | docs(api-plugins): add return value examples to smtc-helper documentation
