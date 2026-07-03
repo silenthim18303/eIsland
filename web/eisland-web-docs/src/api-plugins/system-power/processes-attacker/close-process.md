@@ -26,6 +26,17 @@ function closeProcess(target: string | number): ProcessCloseResult
 
 [ProcessCloseResult](process-close-result.md) with termination details.
 
+```typescript
+// Example return value
+{
+  target: 'notepad.exe',
+  matchedCount: 2,
+  terminatedCount: 2,
+  failedCount: 0,
+  failures: [],
+}
+```
+
 :::warning
 Terminating system processes may require elevated privileges. The function uses `OpenProcess` + `TerminateProcess` internally.
 :::

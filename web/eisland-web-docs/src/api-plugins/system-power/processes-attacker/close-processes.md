@@ -26,6 +26,16 @@ function closeProcesses(targets: (string | number)[]): ProcessCloseResult[]
 
 Array of [ProcessCloseResult](process-close-result.md), one per target.
 
+```typescript
+// Example return value
+[
+  { target: 'notepad.exe', matchedCount: 2, terminatedCount: 2, failedCount: 0, failures: [] },
+  { target: 12345, matchedCount: 1, terminatedCount: 0, failedCount: 1, failures: [
+    { pid: 12345, name: 'svchost.exe', errorCode: 5 },
+  ]},
+]
+```
+
 :::tip
 Targets are processed sequentially. Use this over multiple `closeProcess()` calls for batch operations.
 :::
