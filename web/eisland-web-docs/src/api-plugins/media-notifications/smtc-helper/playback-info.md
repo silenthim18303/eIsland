@@ -6,11 +6,17 @@ icon: fa6-solid:table
 
 # PlaybackInfo
 
-> Placeholder — content to be added.
+:::info
+Playback state information emitted by SmtcMonitor events.
+:::
 
-```ts
-interface PlaybackInfo {
-  playbackStatus: number;
-  playbackType: number;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `playbackStatus` | `number` | Playback status code |
+| `playbackType` | `number` | Playback type code |
+
+:::note
+Status and type values are raw numeric codes from the Windows SMTC API.
+:::

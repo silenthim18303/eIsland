@@ -6,12 +6,18 @@ icon: fa6-solid:table
 
 # TimestampInfo
 
-> Placeholder — content to be added.
+:::info
+Lightweight timestamp data without media metadata. Optimized for lyrics synchronization and similar use cases.
+:::
 
-```ts
-interface TimestampInfo {
-  isAvailable: boolean;
-  playbackStatus: number;
-  timeline: TimelineProperties;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isAvailable` | `boolean` | Whether timestamp data is available |
+| `playbackStatus` | `"playing" \| "paused" \| "stopped" \| "closed" \| "opened" \| "changing" \| "unknown"` | Current playback state |
+| `timeline` | [TimelineProperties](timeline-properties.md) `\| null` | Timeline data |
+
+:::tip
+Use `getTimestamp()` instead of `getStatus()` when you only need playback position — it skips media metadata for lower latency.
+:::

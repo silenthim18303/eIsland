@@ -6,11 +6,17 @@ icon: fa6-solid:table
 
 # TimelineProps
 
-> Placeholder — content to be added.
+:::info
+Simplified timeline position and duration for SmtcMonitor events.
+:::
 
-```ts
-interface TimelineProps {
-  position: number;
-  duration: number;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `position` | `number` | Current playback position in seconds |
+| `duration` | `number` | Total duration in seconds |
+
+:::tip
+This is a simplified version of [TimelineProperties](timeline-properties.md) used by SmtcMonitor events. Use `getStatus()` for full timeline data.
+:::

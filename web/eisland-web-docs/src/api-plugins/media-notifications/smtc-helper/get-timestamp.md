@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # getTimestamp
 
-> Placeholder — content to be added.
+:::info
+Returns lightweight timestamp data without media metadata. Optimized for lyrics synchronization.
+:::
 
-```ts
+## Signature
+
+```typescript
 function getTimestamp(): TimestampInfo
 ```
+
+## Return Value
+
+[TimestampInfo](timestamp-info.md) object.

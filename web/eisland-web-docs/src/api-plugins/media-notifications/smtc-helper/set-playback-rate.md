@@ -6,8 +6,22 @@ icon: fa6-solid:code
 
 # setPlaybackRate
 
-> Placeholder — content to be added.
+:::info
+Sets the playback speed rate.
+:::
 
-```ts
+## Signature
+
+```typescript
 function setPlaybackRate(rate: number): CommandResult
 ```
+
+## Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `rate` | `number` | Playback rate (`1.0` = normal speed) |
+
+## Return Value
+
+[CommandResult](command-result.md) indicating success or failure.

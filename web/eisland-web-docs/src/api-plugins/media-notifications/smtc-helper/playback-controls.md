@@ -6,19 +6,21 @@ icon: fa6-solid:table
 
 # PlaybackControls
 
-> Placeholder — content to be added.
+:::info
+Flags indicating which playback controls are currently available.
+:::
 
-```ts
-interface PlaybackControls {
-  isPlayEnabled: boolean;
-  isPauseEnabled: boolean;
-  isNextEnabled: boolean;
-  isPreviousEnabled: boolean;
-  isStopEnabled: boolean;
-  isRecordEnabled: boolean;
-  isFastForwardEnabled: boolean;
-  isRewindEnabled: boolean;
-  isChannelUpEnabled: boolean;
-  isChannelDownEnabled: boolean;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isPlayEnabled` | `boolean` | Play button available |
+| `isPauseEnabled` | `boolean` | Pause button available |
+| `isNextEnabled` | `boolean` | Next track available |
+| `isPreviousEnabled` | `boolean` | Previous track available |
+| `isStopEnabled` | `boolean` | Stop available |
+| `isRecordEnabled` | `boolean` | Record available |
+| `isFastForwardEnabled` | `boolean` | Fast forward available |
+| `isRewindEnabled` | `boolean` | Rewind available |
+| `isChannelUpEnabled` | `boolean` | Channel up available |
+| `isChannelDownEnabled` | `boolean` | Channel down available |

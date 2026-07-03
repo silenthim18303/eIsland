@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # pause
 
-> Placeholder — content to be added.
+:::info
+Sends a pause command to the active media session.
+:::
 
-```ts
+## Signature
+
+```typescript
 function pause(): CommandResult
 ```
+
+## Return Value
+
+[CommandResult](command-result.md) indicating success or failure.

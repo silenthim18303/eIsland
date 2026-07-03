@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # next
 
-> Placeholder — content to be added.
+:::info
+Sends a next-track command to the active media session.
+:::
 
-```ts
+## Signature
+
+```typescript
 function next(): CommandResult
 ```
+
+## Return Value
+
+[CommandResult](command-result.md) indicating success or failure.

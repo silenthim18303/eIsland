@@ -6,11 +6,13 @@ icon: fa6-solid:table
 
 # CommandResult
 
-> Placeholder — content to be added.
+:::info
+Result of a media control command execution.
+:::
 
-```ts
-interface CommandResult {
-  success: boolean;
-  error: string | null;
-}
-```
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `success` | `boolean` | Whether the command succeeded |
+| `error` | `string \| null` | Error message if failed, `null` on success |

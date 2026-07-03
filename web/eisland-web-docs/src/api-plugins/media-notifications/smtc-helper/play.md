@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # play
 
-> Placeholder — content to be added.
+:::info
+Sends a play command to the active media session.
+:::
 
-```ts
+## Signature
+
+```typescript
 function play(): CommandResult
 ```
+
+## Return Value
+
+[CommandResult](command-result.md) indicating success or failure.

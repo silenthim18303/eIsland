@@ -6,8 +6,16 @@ icon: fa6-solid:code
 
 # stop
 
-> Placeholder — content to be added.
+:::info
+Sends a stop command to the active media session.
+:::
 
-```ts
+## Signature
+
+```typescript
 function stop(): CommandResult
 ```
+
+## Return Value
+
+[CommandResult](command-result.md) indicating success or failure.
