@@ -42,3 +42,34 @@ The `start()` method returns the initial WiFi state immediately. Use this snapsh
 :::note
 The `wifi-changed` event fires on any state change. Use specific events (`wifi-connected`, `signal-changed`, etc.) for targeted handling.
 :::
+
+## Example
+
+```typescript
+import { WifiMonitor } from '@eisland/windows-wifi-helper';
+
+const monitor = new WifiMonitor();
+
+// Start returns the initial state immediately
+const initial = monitor.start();
+console.log(`Initial state: ${initial.isConnected ? initial.ssid : 'Disconnected'}`);
+
+monitor.on('wifi-connected', (info) => {
+  console.log(`Connected to ${info.ssid}`);
+});
+
+monitor.on('wifi-disconnected', () => {
+  console.log('WiFi disconnected');
+});
+
+monitor.on('signal-changed', (info) => {
+  console.log(`Signal: ${info.signalBars}/5 bars`);
+});
+
+monitor.on('error', (err) => {
+  console.error('WiFi monitor error:', err);
+});
+
+// ... later
+monitor.stop();
+```

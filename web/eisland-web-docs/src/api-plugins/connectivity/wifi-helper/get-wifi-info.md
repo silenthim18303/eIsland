@@ -23,3 +23,18 @@ function getWifiInfo(): WifiInfo | null
 :::warning
 Returns `null` on systems without a WiFi adapter (e.g., desktop with Ethernet only).
 :::
+
+## Example
+
+```typescript
+import { getWifiInfo } from '@eisland/windows-wifi-helper';
+
+const info = getWifiInfo();
+if (!info) {
+  console.log('No WiFi adapter found');
+} else if (info.isConnected) {
+  console.log(`Connected to ${info.ssid} (${info.signalBars}/5 bars)`);
+} else {
+  console.log('WiFi is disconnected');
+}
+```

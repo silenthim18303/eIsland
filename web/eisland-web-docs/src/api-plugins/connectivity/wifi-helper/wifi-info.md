@@ -24,3 +24,17 @@ WiFi connection status data returned by query functions and monitor events.
 :::note
 The `connectivityLevel` field uses the [ConnectivityLevel](connectivity-level.md) enum to indicate the degree of internet access.
 :::
+
+## Example
+
+```typescript
+import { getWifiInfo } from '@eisland/windows-wifi-helper';
+
+const info = getWifiInfo();
+if (info?.isConnected) {
+  console.log(`Connected to ${info.ssid}`);
+  console.log(`Signal: ${info.signalBars}/5 bars`);
+} else {
+  console.log('WiFi disconnected');
+}
+```

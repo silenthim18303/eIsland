@@ -22,3 +22,27 @@ Network connectivity level indicating the degree of internet access.
 :::note
 The `ConstrainedInternetAccess` level typically indicates a captive portal (e.g., hotel WiFi login page).
 :::
+
+## Example
+
+```typescript
+import { getWifiInfo, ConnectivityLevel } from '@eisland/windows-wifi-helper';
+
+const info = getWifiInfo();
+if (info) {
+  switch (info.connectivityLevel) {
+    case ConnectivityLevel.InternetAccess:
+      console.log('Full internet access');
+      break;
+    case ConnectivityLevel.ConstrainedInternetAccess:
+      console.log('Captive portal detected — login may be required');
+      break;
+    case ConnectivityLevel.LocalAccess:
+      console.log('Local network only — no internet');
+      break;
+    case ConnectivityLevel.None:
+      console.log('No network connection');
+      break;
+  }
+}
+```
