@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-06-30T15:21:35.900Z
+> 生成时间：2026-07-03T12:11:36.970Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,59 @@
 
 ## Unreleased
 
+- 2026-07-03 | 5d328d40 | 鸡哥 | Merge pull request #111 from JNTMTMTM/dev
+- 2026-07-03 | 3929127d | 鸡哥 | docs(api-plugins): add return value examples to toast-listener documentation
+- 2026-07-03 | e5897b09 | 鸡哥 | docs(api-plugins): add return value examples to smtc-helper documentation
+- 2026-07-03 | 4313540c | 鸡哥 | docs(api-plugins): add return value examples to processes-attacker documentation
+- 2026-07-03 | ade368ff | 鸡哥 | docs(api-plugins): add return value examples to performance-monitor documentation
+- 2026-07-03 | 0acb714b | 鸡哥 | docs(api-plugins): add return value examples to power-helper documentation
+- 2026-07-03 | a6ffde41 | 鸡哥 | docs(api-plugins): add return value examples to fullscreen-detector documentation
+- 2026-07-03 | c8245eca | 鸡哥 | docs(api-plugins): add return value examples to brightness-helper documentation
+- 2026-07-03 | 90515d00 | 鸡哥 | docs(api-plugins): add return value examples to wifi-helper documentation
+- 2026-07-03 | cefba8df | 鸡哥 | docs(api-plugins): add return value examples to bluetooth-helper documentation
+- 2026-07-03 | 0ac4c1ee | 鸡哥 | docs(api-plugins): add code examples to toast-listener documentation
+- 2026-07-03 | 2e603211 | 鸡哥 | docs(api-plugins): add code examples to smtc-helper documentation
+- 2026-07-03 | a94cd461 | 鸡哥 | docs(api-plugins): add code examples to processes-attacker documentation
+- 2026-07-03 | 5efd29b9 | 鸡哥 | docs(api-plugins): add code examples to performance-monitor documentation
+- 2026-07-03 | 3411c2fa | 鸡哥 | docs(api-plugins): add code examples to power-helper documentation
+- 2026-07-03 | 073192c8 | 鸡哥 | docs(api-plugins): add code examples to fullscreen-detector documentation
+- 2026-07-03 | 5b625e6f | 鸡哥 | docs(api-plugins): add code examples to brightness-helper documentation
+- 2026-07-03 | 999f5b80 | 鸡哥 | docs(api-plugins): add code examples to wifi-helper documentation
+- 2026-07-03 | 16c088bf | 鸡哥 | docs(api-plugins): add code examples to bluetooth-helper documentation
+- 2026-07-03 | 635fa223 | 鸡哥 | docs(api-plugins): complete toast-listener API documentation
+- 2026-07-03 | a8f51aed | 鸡哥 | docs(api-plugins): complete smtc-helper API documentation
+- 2026-07-03 | 0c3227c5 | 鸡哥 | docs(api-plugins): complete processes-attacker API documentation
+- 2026-07-03 | 010d4bad | 鸡哥 | docs(api-plugins): complete performance-monitor API documentation
+- 2026-07-03 | e60e6861 | 鸡哥 | docs(api-plugins): complete power-helper API documentation
+- 2026-07-03 | 39011a04 | 鸡哥 | docs(api-plugins): complete fullscreen-detector API documentation
+- 2026-07-03 | 809bba46 | 鸡哥 | docs(api-plugins): complete brightness-helper API documentation
+- 2026-07-03 | a1f326e0 | 鸡哥 | docs(api-plugins): complete wifi-helper API documentation
+- 2026-07-03 | 54a1a9f5 | 鸡哥 | docs(api-plugins): complete bluetooth-helper API documentation
+- 2026-07-03 | 4115a803 | 鸡哥 | feat: add SidebarBadges component for automatic badge injection in sidebar API documentation
+- 2026-07-03 | 2925bd63 | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with additional device type classifications for robots, displays, keyboards, and more
+- 2026-07-03 | 17f9c5db | 鸡哥 | feat: enhance device type mappings in DeviceTypeMapper with additional classifications for peripherals and imaging devices
+- 2026-07-03 | 8f26fb36 | 鸡哥 | feat: add code quality documentation and standards for the eIsland project
+- 2026-07-03 | 33b36524 | 鸡哥 | feat: add DeviceTypeMapper for improved device type inference in BluetoothController
+- 2026-07-03 | 7b9f922a | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with additional device type classifications and clarifications
+- 2026-07-03 | 5584c8da | 鸡哥 | feat: enhance device type inference in DeriveDeviceType with additional BLE and classic Bluetooth classifications
+- 2026-07-03 | 46691a08 | 鸡哥 | feat: update device type descriptions in BluetoothDeviceInfo for audio/video devices
+- 2026-07-03 | ef34a3e5 | 鸡哥 | feat: enhance audio/video device classification in BluetoothController with detailed minor class descriptions
+- 2026-07-03 | e2e66de7 | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with detailed interface and device type derivation
+- 2026-07-03 | 5f84bf44 | 鸡哥 | feat: enhance device type description in BluetoothDeviceInfo and improve device type inference logic
+- 2026-07-02 | b04fa4ed | 鸡哥 | feat: refactor DLL paths and build scripts for SMTC and WiFi helpers, add AOT support, and implement JSON serialization context
+- 2026-07-02 | 50599a84 | 鸡哥 | feat: update power helper to use new DLL, improve serialization, and add AOT publishing support
+- 2026-07-02 | 0cd0b052 | 鸡哥 | feat: update Bluetooth helper to use new DLL and improve serialization with source generation
+- 2026-07-02 | e7b74a22 | 鸡哥 | feat: enhance Bluetooth device information retrieval by adding support for Appearance and Service UUIDs
+- 2026-07-01 | 80bde8c5 | 鸡哥 | feat: add deviceType and batteryLevel properties to BluetoothDeviceInfo and update related functionality
+- 2026-07-01 | 1365dc11 | 鸡哥 | Update icons for various API documentation pages to enhance visual representation
+- 2026-07-01 | 9a61bdc3 | 鸡哥 | Add watermark metadata to documentation files and create new README files for various plugins
+- 2026-07-01 | f1b8a040 | 鸡哥 | feat: update icon for Windows Bluetooth Helper in sidebar
+- 2026-07-01 | 0b1b91ff | 鸡哥 | feat: enable vertical scrolling for sidebar and restrict navbar overflow
+- 2026-06-30 | 58cf8f12 | 鸡哥 | feat: add sidebar width variable to root styles
+- 2026-06-30 | d4618363 | 鸡哥 | feat: enhance sidebar with new Windows helpers and reorganize sections
+- 2026-06-30 | 926d8e71 | 鸡哥 | Add documentation for media notifications and system power plugins
+- 2026-06-30 | 1ed2d825 | 鸡哥 | feat: update navbar to include [API] PLUGINS link and add .gitkeep for api-plugins directory
+- 2026-06-30 | 138d7229 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #110 by @JNTMTMTM [skip ci]
 - 2026-06-30 | f25fbe20 | 鸡哥 | Merge pull request #110 from JNTMTMTM/dev
 - 2026-06-30 | 9f63e421 | 鸡哥 | docs: remove reference to full testing strategy in testing commands documentation
 - 2026-06-30 | 66906efb | 鸡哥 | docs: update documentation for Windows Brightness Helper plugin
