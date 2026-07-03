@@ -95,6 +95,80 @@ body {
   display: none;
 }
 
+// ── Sidebar type badges ──────────────────────────────────────────────
+.sidebar-badge {
+  display: inline-block;
+  padding: 0 5px;
+  margin-left: 6px;
+  margin-right: 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  border-radius: 3px;
+  vertical-align: middle;
+  position: relative;
+  top: -0.05em;
+}
+
+.sidebar-badge--interface {
+  color: #93c5fd;
+  background: rgba(59, 130, 246, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.28);
+}
+
+.sidebar-badge--enum {
+  color: #c4b5fd;
+  background: rgba(139, 92, 246, 0.18);
+  border: 1px solid rgba(139, 92, 246, 0.28);
+}
+
+.sidebar-badge--function {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.18);
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.sidebar-badge--monitor {
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.18);
+  border: 1px solid rgba(249, 115, 22, 0.28);
+}
+
+.sidebar-badge--type {
+  color: #f9a8d4;
+  background: rgba(236, 72, 153, 0.18);
+  border: 1px solid rgba(236, 72, 153, 0.28);
+}
+
+[data-theme='light'] {
+  .sidebar-badge--interface {
+    color: #1d4ed8;
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.22);
+  }
+  .sidebar-badge--enum {
+    color: #6d28d9;
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.22);
+  }
+  .sidebar-badge--function {
+    color: #15803d;
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.22);
+  }
+  .sidebar-badge--monitor {
+    color: #c2410c;
+    background: rgba(249, 115, 22, 0.1);
+    border-color: rgba(249, 115, 22, 0.22);
+  }
+  .sidebar-badge--type {
+    color: #be185d;
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.22);
+  }
+}
+
 .vp-nav-item .route-link-active,
 .vp-nav-item .route-link-exact-active,
 .vp-nav-item .auto-link.route-link-active,

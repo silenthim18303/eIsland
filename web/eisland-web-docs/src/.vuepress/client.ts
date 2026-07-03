@@ -27,7 +27,8 @@
 import { defineClientConfig } from 'vuepress/client'
 
 import SimplexFlowBackground from './components/SimplexFlowBackground.vue'
+import SidebarBadges from './components/SidebarBadges.vue'
 
 export default defineClientConfig({
-  rootComponents: [SimplexFlowBackground],
+  rootComponents: [SimplexFlowBackground, SidebarBadges],
 })
