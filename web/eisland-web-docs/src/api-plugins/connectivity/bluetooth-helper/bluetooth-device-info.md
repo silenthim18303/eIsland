@@ -248,3 +248,18 @@ BLE devices report types via the Appearance standard (43 categories). Classic Bl
 :::warning
 Some BLE headphones or speakers may not advertise a specific Appearance category, in which case `deviceType` will be `null`. The CoD-based classification only applies to Classic Bluetooth devices.
 :::
+
+## Example
+
+```typescript
+import { getPairedDevices } from '@eisland/windows-bluetooth-helper';
+
+const devices = getPairedDevices();
+for (const device of devices) {
+  console.log(`${device.name ?? 'Unknown'} (${device.deviceType ?? 'N/A'})`);
+  console.log(`  Connected: ${device.isConnected}, Paired: ${device.isPaired}`);
+  if (device.batteryLevel !== null) {
+    console.log(`  Battery: ${device.batteryLevel}%`);
+  }
+}
+```

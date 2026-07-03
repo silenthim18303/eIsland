@@ -19,3 +19,16 @@ function getPairedDevices(): BluetoothDeviceInfo[]
 ## Return Value
 
 Array of [BluetoothDeviceInfo](bluetooth-device-info.md) objects. Empty array if no paired devices.
+
+## Example
+
+```typescript
+import { getPairedDevices } from '@eisland/windows-bluetooth-helper';
+
+const paired = getPairedDevices();
+console.log(`Found ${paired.length} paired device(s)`);
+
+paired.forEach(d => {
+  console.log(`- ${d.name ?? 'Unknown'} [${d.deviceType ?? 'Unknown type'}]`);
+});
+```

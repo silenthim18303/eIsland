@@ -42,3 +42,31 @@ The monitor uses a Bluetooth DeviceWatcher internally. Call `start()` once and l
 :::note
 The `isRunning()` method returns the current monitoring state. Calling `start()` on an already-running monitor is a no-op.
 :::
+
+## Example
+
+```typescript
+import { BluetoothMonitor } from '@eisland/windows-bluetooth-helper';
+
+const monitor = new BluetoothMonitor();
+
+monitor.on('device-added', (device) => {
+  console.log(`Discovered: ${device.name ?? 'Unknown'} (${device.deviceType ?? 'N/A'})`);
+});
+
+monitor.on('device-connected', (device) => {
+  console.log(`Connected: ${device.name}`);
+});
+
+monitor.on('device-disconnected', (deviceId) => {
+  console.log(`Disconnected: ${deviceId}`);
+});
+
+monitor.on('error', (err) => {
+  console.error('Bluetooth monitor error:', err);
+});
+
+monitor.start();
+// ... later
+monitor.stop();
+```

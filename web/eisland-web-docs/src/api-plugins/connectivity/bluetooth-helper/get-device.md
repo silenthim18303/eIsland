@@ -25,3 +25,18 @@ function getDevice(deviceId: string): BluetoothDeviceInfo | null
 ## Return Value
 
 [BluetoothDeviceInfo](bluetooth-device-info.md) object, or `null` if the device was not found.
+
+## Example
+
+```typescript
+import { getDevice, getPairedDevices } from '@eisland/windows-bluetooth-helper';
+
+// Get a specific device by ID
+const paired = getPairedDevices();
+if (paired.length > 0) {
+  const snapshot = getDevice(paired[0].deviceId);
+  if (snapshot) {
+    console.log(`${snapshot.name}: ${snapshot.isConnected ? 'Online' : 'Offline'}`);
+  }
+}
+```
