@@ -25,24 +25,12 @@
  */
 
 import type { ReactElement } from 'react';
-import { useEffect, useState } from 'react';
 import eislandSvg from '../../../resources/icon/eisland.svg';
+import { useSplash } from './hooks/useSplash';
 
 /** 启动画面组件 */
 export function SplashScreen(): ReactElement {
-  const [fadeOut, setFadeOut] = useState(false);
-  const [version] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('version') || '';
-  });
-
-  /** 监听主进程发送的淡出指令 */
-  useEffect(() => {
-    const removeListener = window.electron.ipcRenderer.on('splash:fade-out', () => {
-      setFadeOut(true);
-    });
-    return removeListener;
-  }, []);
+  const { fadeOut, version } = useSplash();
 
   return (
     <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
