@@ -34,7 +34,6 @@ import type { AppSettingsSectionProps } from './types';
 type HoverScreenshotMode = 'region' | 'display';
 
 const HOVER_SCREENSHOT_MODE_STORE_KEY = 'hover-screenshot-mode';
-const STARTUP_ANIMATION_ENABLED_STORE_KEY = 'startup-animation-enabled';
 
 type BehaviorSettingsPageProps = Pick<
   AppSettingsSectionProps,
@@ -60,7 +59,6 @@ export function BehaviorSettingsPage({
 
   const [standaloneWindowMode, setStandaloneWindowMode] = useState<'integrated' | 'standalone'>('integrated');
   const [hoverScreenshotMode, setHoverScreenshotMode] = useState<HoverScreenshotMode>('region');
-  const [startupAnimationEnabled, setStartupAnimationEnabled] = useState<boolean>(true);
   const [idleClickExpand, setIdleClickExpand] = useState<boolean>(false);
 
   useEffect(() => {
@@ -88,18 +86,6 @@ export function BehaviorSettingsPage({
       if (cancelled) return;
       setIdleClickExpand(v);
     }).catch(() => {});
-    return () => { cancelled = true; };
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    window.api.storeRead(STARTUP_ANIMATION_ENABLED_STORE_KEY).then((data) => {
-      if (cancelled) return;
-      setStartupAnimationEnabled(typeof data === 'boolean' ? data : true);
-    }).catch(() => {
-      if (cancelled) return;
-      setStartupAnimationEnabled(true);
-    });
     return () => { cancelled = true; };
   }, []);
 
@@ -140,11 +126,6 @@ export function BehaviorSettingsPage({
   const handleHoverScreenshotModeChange = (mode: HoverScreenshotMode): void => {
     setHoverScreenshotMode(mode);
     window.api.storeWrite(HOVER_SCREENSHOT_MODE_STORE_KEY, mode).catch(() => {});
-  };
-
-  const handleStartupAnimationEnabledChange = (enabled: boolean): void => {
-    setStartupAnimationEnabled(enabled);
-    window.api.storeWrite(STARTUP_ANIMATION_ENABLED_STORE_KEY, enabled).catch(() => {});
   };
 
   return (
@@ -197,25 +178,6 @@ export function BehaviorSettingsPage({
                 }}
               />
               {t('settings.app.behavior.idleClickExpandToggle', { defaultValue: '空闲状态下点击展开（禁用悬停自动展开）' })}
-            </label>
-          </div>
-        </div>
-
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <div className="settings-card-title">{t('settings.app.behavior.startupAnimationTitle', { defaultValue: '是否显示启动动画' })}</div>
-            <div className="settings-card-subtitle">{t('settings.app.behavior.startupAnimationHint', { defaultValue: '开启后每次启动显示启动动画，关闭后不显示' })}</div>
-          </div>
-          <div className="settings-card-inline-row">
-            <label className="settings-card-check">
-              <input
-                type="checkbox"
-                checked={startupAnimationEnabled}
-                onChange={(e) => {
-                  handleStartupAnimationEnabledChange(e.target.checked);
-                }}
-              />
-              {t('settings.app.behavior.startupAnimationToggle', { defaultValue: '显示启动动画' })}
             </label>
           </div>
         </div>

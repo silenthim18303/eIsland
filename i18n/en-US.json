@@ -2185,9 +2185,6 @@
         "idleClickExpandTitle": "Click to expand from idle",
         "idleClickExpandHint": "When enabled, hovering over Dynamic Island will not auto-expand. Click to expand instead; later interactions stay the same.",
         "idleClickExpandToggle": "Click to expand in idle state (disable hover auto-expand)",
-        "startupAnimationTitle": "Show startup animation",
-        "startupAnimationHint": "When enabled, the startup animation is shown every time the app starts. When disabled, it is skipped.",
-        "startupAnimationToggle": "Show startup animation",
         "windowModeTitle": "Todo / Countdown / Settings open mode",
         "windowModeHint": "Choose embedded in island or standalone window",
         "integratedMode": "Embedded in Dynamic Island",
@@ -2212,7 +2209,15 @@
         "expandTabSwitchToggle": "Enable tab switch animation",
         "maxExpandTabSwitchTitle": "MaxExpand Tab Switch Animation",
         "maxExpandTabSwitchHint": "Enable slide transition when switching pages in MaxExpand mode",
-        "maxExpandTabSwitchToggle": "Enable tab switch animation"
+        "maxExpandTabSwitchToggle": "Enable tab switch animation",
+        "startupAnimationTitle": "Show startup animation",
+        "startupAnimationHint": "When enabled, the startup animation is shown every time the app starts. When disabled, it is skipped.",
+        "startupAnimationToggle": "Show startup animation",
+        "splashBgColorTitle": "Splash background color",
+        "splashBgColorHint": "Customize the background color of the splash screen",
+        "resetDefault": "Restore Defaults",
+        "previewPlay": "Preview",
+        "previewStop": "Stop"
       },
       "album": {
         "carouselTitle": "Album Carousel Mode",

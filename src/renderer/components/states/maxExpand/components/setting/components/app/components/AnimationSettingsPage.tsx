@@ -24,13 +24,19 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../../../../../store/slices';
+import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
+import { SPLASH_VIDEO_SRC } from '../../../../../../../config/splashConfig';
+import { SplashWaveEffect } from '../../../../../../../components/SplashWaveEffect';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
+const STARTUP_ANIMATION_ENABLED_STORE_KEY = 'startup-animation-enabled';
+const SPLASH_BG_COLOR_STORE_KEY = 'splash-bg-color';
+const DEFAULT_SPLASH_BG_COLOR = '#000000';
 
 /**
  * 渲染软件动画设置页面
@@ -40,6 +46,10 @@ export function AnimationSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [maxExpandTabAnim, setMaxExpandTabAnim] = useState(true);
   const [expandTabAnim, setExpandTabAnim] = useState(true);
+  const [startupAnimationEnabled, setStartupAnimationEnabled] = useState<boolean>(true);
+  const [splashBgColor, setSplashBgColor] = useState(DEFAULT_SPLASH_BG_COLOR);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +64,27 @@ export function AnimationSettingsPage(): ReactElement {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(STARTUP_ANIMATION_ENABLED_STORE_KEY).then((data) => {
+      if (cancelled) return;
+      setStartupAnimationEnabled(typeof data === 'boolean' ? data : true);
+    }).catch(() => {
+      if (cancelled) return;
+      setStartupAnimationEnabled(true);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(SPLASH_BG_COLOR_STORE_KEY).then((v) => {
+      if (cancelled) return;
+      if (typeof v === 'string') setSplashBgColor(v);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   const handleMaxExpandTabAnimChange = (enabled: boolean): void => {
     setMaxExpandTabAnim(enabled);
     window.api.storeWrite(MAXEXPAND_TAB_ANIMATION_KEY, enabled).catch(() => {});
@@ -64,6 +95,37 @@ export function AnimationSettingsPage(): ReactElement {
     setExpandTabAnim(enabled);
     window.api.storeWrite(EXPAND_TAB_ANIMATION_KEY, enabled).catch(() => {});
     window.api.settingsPreview('settings:expand-tab-animation', enabled).catch(() => {});
+  };
+
+  const handleStartupAnimationEnabledChange = (enabled: boolean): void => {
+    setStartupAnimationEnabled(enabled);
+    window.api.storeWrite(STARTUP_ANIMATION_ENABLED_STORE_KEY, enabled).catch(() => {});
+  };
+
+  const handleSplashBgColorChange = (color: string): void => {
+    setSplashBgColor(color);
+    window.api.storeWrite(SPLASH_BG_COLOR_STORE_KEY, color).catch(() => {});
+  };
+
+  const handleSplashBgColorReset = (): void => {
+    setSplashBgColor(DEFAULT_SPLASH_BG_COLOR);
+    window.api.storeWrite(SPLASH_BG_COLOR_STORE_KEY, null).catch(() => {});
+  };
+
+  const handlePreviewPlay = (): void => {
+    const video = previewVideoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+    setPreviewPlaying(true);
+  };
+
+  const handlePreviewStop = (): void => {
+    const video = previewVideoRef.current;
+    if (!video) return;
+    video.pause();
+    video.currentTime = 0;
+    setPreviewPlaying(false);
   };
 
   return (
@@ -144,6 +206,86 @@ export function AnimationSettingsPage(): ReactElement {
               />
               {t('settings.app.animation.maxExpandTabSwitchToggle', { defaultValue: '启用切换动画' })}
             </label>
+          </div>
+        </div>
+        <div className="settings-splash-preview-row">
+          <div className="settings-splash-preview-cards">
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title">{t('settings.app.animation.startupAnimationTitle', { defaultValue: '是否显示启动动画' })}</div>
+                <div className="settings-card-subtitle">{t('settings.app.animation.startupAnimationHint', { defaultValue: '开启后每次启动显示启动动画，关闭后不显示' })}</div>
+              </div>
+              <div className="settings-card-inline-row">
+                <label className="settings-card-check">
+                  <input
+                    type="checkbox"
+                    checked={startupAnimationEnabled}
+                    onChange={(e) => {
+                      handleStartupAnimationEnabledChange(e.target.checked);
+                    }}
+                  />
+                  {t('settings.app.animation.startupAnimationToggle', { defaultValue: '显示启动动画' })}
+                </label>
+              </div>
+            </div>
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title-row">
+                  <div className="settings-card-title">{t('settings.app.animation.splashBgColorTitle', { defaultValue: '启动画面背景颜色' })}</div>
+                  <button
+                    className="maxexpand-layout-reset-btn"
+                    type="button"
+                    onClick={handleSplashBgColorReset}
+                    title={t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+                  >
+                    <img src={SvgIcon.REVERT} alt="" className="maxexpand-layout-reset-btn-icon" />
+                    {t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+                  </button>
+                </div>
+                <div className="settings-card-subtitle">{t('settings.app.animation.splashBgColorHint', { defaultValue: '自定义启动画面的背景颜色' })}</div>
+              </div>
+              <div className="settings-card-inline-row">
+                <span className="settings-performance-monitor-color-control">
+                  <input
+                    className="settings-performance-monitor-color-input"
+                    type="color"
+                    value={splashBgColor}
+                    onChange={(e) => handleSplashBgColorChange(e.target.value)}
+                  />
+                  <span className="settings-performance-monitor-color-value">{splashBgColor}</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="settings-splash-preview-container">
+            <div className="settings-splash-preview-stage" style={{ background: splashBgColor }}>
+              <SplashWaveEffect playing={previewPlaying} color={splashBgColor} />
+              <video
+                ref={previewVideoRef}
+                className="splash-video"
+                src={SPLASH_VIDEO_SRC}
+                muted
+                onEnded={() => setPreviewPlaying(false)}
+              />
+            </div>
+            <div className="settings-splash-preview-controls">
+              <button
+                className="settings-splash-preview-btn"
+                type="button"
+                onClick={handlePreviewPlay}
+                disabled={previewPlaying}
+              >
+                {t('settings.app.animation.previewPlay', { defaultValue: '预览' })}
+              </button>
+              <button
+                className="settings-splash-preview-btn"
+                type="button"
+                onClick={handlePreviewStop}
+                disabled={!previewPlaying}
+              >
+                {t('settings.app.animation.previewStop', { defaultValue: '停止' })}
+              </button>
+            </div>
           </div>
         </div>
       </div>

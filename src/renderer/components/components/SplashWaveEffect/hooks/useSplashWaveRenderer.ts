@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import {
   SPLASH_WAVE_FRAGMENT_SHADER,
@@ -34,11 +34,33 @@ import { compileSplashWaveShader } from '../utils/compileSplashWaveShader';
 
 /**
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
+ * WebGL 上下文在首次 playing=true 时创建并复用，后续仅控制 RAF 循环。
  * @param canvasRef - 需要承载波浪背景的画布引用。
+ * @param bgColor - 背景颜色 [r, g, b]，各分量范围 0-1。通过 ref 传递，draw 循环每帧读取最新值。
+ * @param playing - 是否播放渲染循环。
  * @returns 无返回值。
  */
-export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>): void {
+export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true): void {
+  const bgColorRef = useRef(bgColor);
+  bgColorRef.current = bgColor;
+
+  /** 跨 effect 生命周期持久化的 WebGL 资源 */
+  const glRef = useRef<{
+    gl: WebGLRenderingContext;
+    program: WebGLProgram;
+    buffer: WebGLBuffer;
+    posLoc: number;
+    resLoc: WebGLUniformLocation | null;
+    timeLoc: WebGLUniformLocation | null;
+    bgColorLoc: WebGLUniformLocation | null;
+    startTime: number;
+  } | null>(null);
+
+  /** 首次 playing=true 时初始化 WebGL 上下文与着色器 */
   useEffect(() => {
+    if (!playing) return;
+    if (glRef.current) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -76,17 +98,33 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
 
-    const posLoc = gl.getAttribLocation(program, 'aPosition');
-    const resLoc = gl.getUniformLocation(program, 'uResolution');
-    const timeLoc = gl.getUniformLocation(program, 'uTime');
-
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
-    const startTime = performance.now();
+    glRef.current = {
+      gl,
+      program,
+      buffer,
+      posLoc: gl.getAttribLocation(program, 'aPosition'),
+      resLoc: gl.getUniformLocation(program, 'uResolution'),
+      timeLoc: gl.getUniformLocation(program, 'uTime'),
+      bgColorLoc: gl.getUniformLocation(program, 'uBgColor'),
+      startTime: performance.now(),
+    };
+  }, [canvasRef, playing]);
+
+  /** RAF 渲染循环，playing=true 时运行，playing=false 时停止 */
+  useEffect(() => {
+    if (!playing) return;
+
+    const ctx = glRef.current;
+    const canvas = canvasRef.current;
+    if (!ctx || !canvas) return;
+
     let rafId = 0;
 
     const draw = (): void => {
+      const { gl, program, buffer, posLoc, resLoc, timeLoc, bgColorLoc, startTime } = ctx;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
       const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
@@ -96,6 +134,7 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
         canvas.height = h;
       }
 
+      const c = bgColorRef.current;
       gl.viewport(0, 0, w, h);
       gl.useProgram(program);
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -103,6 +142,7 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
       gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
       gl.uniform2f(resLoc, w, h);
       gl.uniform1f(timeLoc, (performance.now() - startTime) / 1000);
+      gl.uniform3f(bgColorLoc, c[0], c[1], c[2]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       rafId = requestAnimationFrame(draw);
     };
@@ -112,5 +152,5 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     return () => {
       cancelAnimationFrame(rafId);
     };
-  }, [canvasRef]);
+  }, [canvasRef, playing]);
 }

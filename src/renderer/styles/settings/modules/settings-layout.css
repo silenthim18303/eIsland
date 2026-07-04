@@ -2931,6 +2931,97 @@
   margin-left: auto;
 }
 
+/* ── 启动动画预览 ── */
+
+.settings-splash-preview-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.settings-splash-preview-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-splash-preview-container {
+  flex: 0 0 280px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--color-text-rgb), 0.08);
+}
+
+.settings-splash-preview-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  aspect-ratio: 16 / 9;
+}
+
+.settings-splash-preview-stage .splash-wave-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+}
+
+.settings-splash-preview-stage .splash-video {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  display: block;
+  z-index: 1;
+}
+
+.settings-splash-preview-stage .splash-video {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  display: block;
+}
+
+.settings-splash-preview-controls {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(var(--color-text-rgb), 0.04);
+}
+
+.settings-splash-preview-btn {
+  flex: 1;
+  padding: 5px 0;
+  font-size: 12px;
+  border: 1px solid rgba(var(--color-text-rgb), 0.12);
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(var(--color-text-rgb), 0.7);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.settings-splash-preview-btn:hover:not(:disabled) {
+  background: rgba(var(--color-text-rgb), 0.08);
+  color: var(--color-text);
+}
+
+.settings-splash-preview-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
 .download-task-card {
   padding: 10px;
   border: 1px solid rgba(var(--color-text-rgb), 0.12);
