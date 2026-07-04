@@ -28,6 +28,7 @@ import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../../../../../store/slices';
+import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
@@ -100,6 +101,11 @@ export function AnimationSettingsPage(): ReactElement {
   const handleSplashBgColorChange = (color: string): void => {
     setSplashBgColor(color);
     window.api.storeWrite(SPLASH_BG_COLOR_STORE_KEY, color).catch(() => {});
+  };
+
+  const handleSplashBgColorReset = (): void => {
+    setSplashBgColor(DEFAULT_SPLASH_BG_COLOR);
+    window.api.storeWrite(SPLASH_BG_COLOR_STORE_KEY, null).catch(() => {});
   };
 
   return (
@@ -202,7 +208,18 @@ export function AnimationSettingsPage(): ReactElement {
         </div>
         <div className="settings-card">
           <div className="settings-card-header">
-            <div className="settings-card-title">{t('settings.app.animation.splashBgColorTitle', { defaultValue: '启动画面背景颜色' })}</div>
+            <div className="settings-card-title-row">
+              <div className="settings-card-title">{t('settings.app.animation.splashBgColorTitle', { defaultValue: '启动画面背景颜色' })}</div>
+              <button
+                className="maxexpand-layout-reset-btn"
+                type="button"
+                onClick={handleSplashBgColorReset}
+                title={t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+              >
+                <img src={SvgIcon.REVERT} alt="" className="maxexpand-layout-reset-btn-icon" />
+                {t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+              </button>
+            </div>
             <div className="settings-card-subtitle">{t('settings.app.animation.splashBgColorHint', { defaultValue: '自定义启动画面的背景颜色' })}</div>
           </div>
           <div className="settings-card-inline-row">

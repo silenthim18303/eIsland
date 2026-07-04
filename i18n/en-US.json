@@ -2214,7 +2214,8 @@
         "startupAnimationHint": "When enabled, the startup animation is shown every time the app starts. When disabled, it is skipped.",
         "startupAnimationToggle": "Show startup animation",
         "splashBgColorTitle": "Splash background color",
-        "splashBgColorHint": "Customize the background color of the splash screen"
+        "splashBgColorHint": "Customize the background color of the splash screen",
+        "resetDefault": "Restore Defaults"
       },
       "album": {
         "carouselTitle": "Album Carousel Mode",
