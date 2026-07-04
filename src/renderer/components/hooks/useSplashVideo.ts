@@ -19,18 +19,29 @@
  */
 
 /**
- * @file useSplash.ts
- * @description 启动画面交互逻辑聚合 Hook
+ * @file useSplashVideo.ts
+ * @description 启动画面视频播放控制 Hook，监听主进程播放指令并通知播放完成
  * @author 鸡哥
  */
 
-import { useSplashFadeOut } from './useSplashFadeOut';
-import { useSplashVideo } from './useSplashVideo';
+import { useCallback, useEffect, useRef } from 'react';
 
-/** 启动画面交互逻辑聚合 Hook */
-export function useSplash() {
-  const { fadeOut } = useSplashFadeOut();
-  const { videoRef, handleVideoEnded } = useSplashVideo();
+/** 启动画面视频播放控制 Hook */
+export function useSplashVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
 
-  return { fadeOut, videoRef, handleVideoEnded };
+  /** 视频播放完成，通知主进程 */
+  const handleVideoEnded = useCallback(() => {
+    window.electron.ipcRenderer.send('splash:video-ended');
+  }, []);
+
+  /** 监听主进程指令：开始播放视频 */
+  useEffect(() => {
+    const removeListener = window.electron.ipcRenderer.on('splash:play-video', () => {
+      videoRef.current?.play().catch(() => {});
+    });
+    return removeListener;
+  }, []);
+
+  return { videoRef, handleVideoEnded };
 }

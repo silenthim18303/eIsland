@@ -19,18 +19,23 @@
  */
 
 /**
- * @file useSplash.ts
- * @description 启动画面交互逻辑聚合 Hook
+ * @file useSplashFadeOut.ts
+ * @description 启动画面淡出状态 Hook，监听主进程淡出指令
  * @author 鸡哥
  */
 
-import { useSplashFadeOut } from './useSplashFadeOut';
-import { useSplashVideo } from './useSplashVideo';
+import { useEffect, useState } from 'react';
 
-/** 启动画面交互逻辑聚合 Hook */
-export function useSplash() {
-  const { fadeOut } = useSplashFadeOut();
-  const { videoRef, handleVideoEnded } = useSplashVideo();
+/** 启动画面淡出状态 Hook */
+export function useSplashFadeOut() {
+  const [fadeOut, setFadeOut] = useState(false);
 
-  return { fadeOut, videoRef, handleVideoEnded };
+  useEffect(() => {
+    const removeListener = window.electron.ipcRenderer.on('splash:fade-out', () => {
+      setFadeOut(true);
+    });
+    return removeListener;
+  }, []);
+
+  return { fadeOut };
 }
