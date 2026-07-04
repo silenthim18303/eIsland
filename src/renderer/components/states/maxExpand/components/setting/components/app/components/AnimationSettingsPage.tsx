@@ -32,6 +32,8 @@ import useIslandStore from '../../../../../../../../store/slices';
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
 const STARTUP_ANIMATION_ENABLED_STORE_KEY = 'startup-animation-enabled';
+const SPLASH_BG_COLOR_STORE_KEY = 'splash-bg-color';
+const DEFAULT_SPLASH_BG_COLOR = '#000000';
 
 /**
  * 渲染软件动画设置页面
@@ -42,6 +44,7 @@ export function AnimationSettingsPage(): ReactElement {
   const [maxExpandTabAnim, setMaxExpandTabAnim] = useState(true);
   const [expandTabAnim, setExpandTabAnim] = useState(true);
   const [startupAnimationEnabled, setStartupAnimationEnabled] = useState<boolean>(true);
+  const [splashBgColor, setSplashBgColor] = useState(DEFAULT_SPLASH_BG_COLOR);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,6 +71,15 @@ export function AnimationSettingsPage(): ReactElement {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(SPLASH_BG_COLOR_STORE_KEY).then((v) => {
+      if (cancelled) return;
+      if (typeof v === 'string') setSplashBgColor(v);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
   const handleMaxExpandTabAnimChange = (enabled: boolean): void => {
     setMaxExpandTabAnim(enabled);
     window.api.storeWrite(MAXEXPAND_TAB_ANIMATION_KEY, enabled).catch(() => {});
@@ -83,6 +95,11 @@ export function AnimationSettingsPage(): ReactElement {
   const handleStartupAnimationEnabledChange = (enabled: boolean): void => {
     setStartupAnimationEnabled(enabled);
     window.api.storeWrite(STARTUP_ANIMATION_ENABLED_STORE_KEY, enabled).catch(() => {});
+  };
+
+  const handleSplashBgColorChange = (color: string): void => {
+    setSplashBgColor(color);
+    window.api.storeWrite(SPLASH_BG_COLOR_STORE_KEY, color).catch(() => {});
   };
 
   return (
@@ -181,6 +198,21 @@ export function AnimationSettingsPage(): ReactElement {
               />
               {t('settings.app.animation.startupAnimationToggle', { defaultValue: '显示启动动画' })}
             </label>
+          </div>
+        </div>
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-card-title">{t('settings.app.animation.splashBgColorTitle', { defaultValue: '启动画面背景颜色' })}</div>
+            <div className="settings-card-subtitle">{t('settings.app.animation.splashBgColorHint', { defaultValue: '自定义启动画面的背景颜色' })}</div>
+          </div>
+          <div className="settings-card-inline-row">
+            <input
+              type="color"
+              value={splashBgColor}
+              onChange={(e) => handleSplashBgColorChange(e.target.value)}
+              style={{ width: 40, height: 32, border: 'none', padding: 0, cursor: 'pointer', background: 'transparent' }}
+            />
+            <span style={{ marginLeft: 8, fontSize: 13, opacity: 0.7 }}>{splashBgColor}</span>
           </div>
         </div>
       </div>

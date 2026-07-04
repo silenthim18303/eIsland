@@ -24,17 +24,31 @@
  * @author 鸡哥
  */
 
+import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useSplash } from './hooks/useSplash';
 import { SPLASH_VIDEO_SRC } from './config/splashConfig';
 import { SplashWaveEffect } from './components/SplashWaveEffect';
 
+/** 启动画面默认背景颜色 */
+const DEFAULT_BG_COLOR = '#000000';
+
 /** 启动画面组件 */
 export function SplashScreen(): ReactElement {
   const { fadeOut, videoRef, handleVideoEnded } = useSplash();
+  const [bgColor, setBgColor] = useState(DEFAULT_BG_COLOR);
+
+  useEffect(() => {
+    window.api.storeRead('splash-bg-color').then((v) => {
+      if (typeof v === 'string') setBgColor(v);
+    }).catch(() => {});
+  }, []);
 
   return (
-    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
+    <div
+      className={`splash-container${fadeOut ? ' fade-out' : ''}`}
+      style={{ background: bgColor }}
+    >
       <SplashWaveEffect />
       <video
         ref={videoRef}

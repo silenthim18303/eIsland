@@ -195,6 +195,12 @@ export const IDLE_CLICK_EXPAND_STORE_KEY = 'idle-click-expand';
 /** 启动动画显示开关存储键名 */
 export const STARTUP_ANIMATION_ENABLED_STORE_KEY = 'startup-animation-enabled';
 
+/** 启动画面背景颜色存储键名 */
+export const SPLASH_BG_COLOR_STORE_KEY = 'splash-bg-color';
+
+/** 启动画面默认背景颜色 */
+export const DEFAULT_SPLASH_BG_COLOR = '#000000';
+
 /** 灵动岛弹性动画开关存储键名 */
 export const SPRING_ANIMATION_STORE_KEY = 'spring-animation';
 
@@ -568,4 +574,13 @@ export function readUpdateAutoPromptConfig(): boolean {
 export function readStartupAnimationEnabledConfig(): boolean {
   const data = readJsonFile(STARTUP_ANIMATION_ENABLED_STORE_KEY);
   return typeof data === 'boolean' ? data : true;
+}
+
+/**
+ * 读取启动画面背景颜色配置
+ * @returns 背景颜色十六进制值
+ */
+export function readSplashBgColorConfig(): string {
+  const data = readJsonFile(SPLASH_BG_COLOR_STORE_KEY);
+  return typeof data === 'string' ? data : DEFAULT_SPLASH_BG_COLOR;
 }

@@ -462,6 +462,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   { label: '灵动岛动画速度', desc: '控制灵动岛状态切换时的过渡动画快慢', labelKey: 'settings.app.animation.animSpeedTitle', descKey: 'settings.app.animation.animSpeedHint', tab: 'app', appPage: 'animation' },
   { label: 'Expand 切换动画', desc: '启用后，展开态切换页面时将播放左右滑动过渡动画', labelKey: 'settings.app.animation.expandTabSwitchTitle', descKey: 'settings.app.animation.expandTabSwitchHint', tab: 'app', appPage: 'animation' },
   { label: 'MaxExpand 切换动画', desc: '启用后，最大展开态切换页面时将播放左右滑动过渡动画', labelKey: 'settings.app.animation.maxExpandTabSwitchTitle', descKey: 'settings.app.animation.maxExpandTabSwitchHint', tab: 'app', appPage: 'animation' },
+  { label: '启动画面背景颜色', desc: '自定义启动画面的背景颜色', labelKey: 'settings.app.animation.splashBgColorTitle', descKey: 'settings.app.animation.splashBgColorHint', tab: 'app', appPage: 'animation' },
   // ── 软件设置 > URL 解析 ──
   { label: '剪贴板 URL 监听', desc: '启用后，检测到剪贴板含链接时会弹出询问通知', labelKey: 'settings.app.urlParser.title', descKey: 'settings.app.urlParser.hint', tab: 'app', appPage: 'url-parser' },
   { label: '识别项目', desc: '选择剪贴板中被识别为 URL 的匹配范围，并可在收藏界面临时静音通知。', labelKey: 'settings.app.urlParser.detectModes', descKey: 'settings.app.urlParser.detectModesHint', tab: 'app', appPage: 'url-parser' },
