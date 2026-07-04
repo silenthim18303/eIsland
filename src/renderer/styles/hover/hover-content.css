@@ -28,41 +28,32 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 500px;
+  width: 100%;
   height: 100%;
   padding: 0 16px;
-  animation: hoverContentEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes hoverContentEnter {
-  0% {
-    opacity: 0;
-    filter: blur(4px);
-  }
-  50% {
-    opacity: 0.85;
-    filter: blur(0);
-  }
-  100% {
-    opacity: 1;
-    filter: blur(0);
-  }
+.island-shell.hover.morphing.from-idle .hover-nav-dots,
+.island-shell.hover.morphing.from-idle .hover-tab-content > * {
+  animation: hoverControlsFadeSlideIn 0.24s cubic-bezier(0.25, 1, 0.5, 1) both;
+  will-change: opacity, transform;
 }
 
-/** Hover 导航点入场：依次弹入 */
-.hover-content .hover-nav-dots {
-  animation: hoverNavEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s both;
+.island-shell.hover.morphing.from-idle .weather-tab,
+.island-shell.hover.morphing.from-lyrics .hover-nav-dots,
+.island-shell.hover.morphing.from-lyrics .hover-tab-content > * {
+  animation: hoverControlsFadeIn 0.22s ease-out both;
+  will-change: opacity;
 }
 
-@keyframes hoverNavEnter {
-  0% {
-    opacity: 0;
-    transform: translateX(-6px) scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) scale(1);
-  }
+@keyframes hoverControlsFadeSlideIn {
+  from { opacity: 0; transform: translate3d(24px, 0, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes hoverControlsFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /** Hover 内容区的标签页内容 */
@@ -74,16 +65,4 @@
   justify-content: flex-end;
   white-space: nowrap;
   overflow: hidden;
-  animation: hoverTabEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
-}
-
-@keyframes hoverTabEnter {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
