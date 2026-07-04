@@ -2948,7 +2948,7 @@
 }
 
 .settings-splash-preview-container {
-  flex: 0 0 200px;
+  flex: 0 0 280px;
   display: flex;
   flex-direction: column;
   border-radius: 12px;
@@ -2957,10 +2957,10 @@
 }
 
 .settings-splash-preview-stage {
-  flex: 1;
   position: relative;
   overflow: hidden;
   border-radius: 12px 12px 0 0;
+  aspect-ratio: 16 / 9;
 }
 
 .settings-splash-preview-stage .splash-wave-canvas {
