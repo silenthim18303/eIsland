@@ -192,6 +192,9 @@ export const MAXEXPAND_MOUSELEAVE_IDLE_STORE_KEY = 'maxexpand-mouseleave-idle';
 /** idle 状态点击展开开关存储键名 */
 export const IDLE_CLICK_EXPAND_STORE_KEY = 'idle-click-expand';
 
+/** 启动动画显示开关存储键名 */
+export const STARTUP_ANIMATION_ENABLED_STORE_KEY = 'startup-animation-enabled';
+
 /** 灵动岛弹性动画开关存储键名 */
 export const SPRING_ANIMATION_STORE_KEY = 'spring-animation';
 
@@ -555,5 +558,14 @@ export function readClipboardUrlBlacklistConfig(): string[] {
  */
 export function readUpdateAutoPromptConfig(): boolean {
   const data = readJsonFile(UPDATE_AUTO_PROMPT_STORE_KEY);
+  return typeof data === 'boolean' ? data : true;
+}
+
+/**
+ * 读取启动动画显示开关配置
+ * @returns 是否显示启动动画
+ */
+export function readStartupAnimationEnabledConfig(): boolean {
+  const data = readJsonFile(STARTUP_ANIMATION_ENABLED_STORE_KEY);
   return typeof data === 'boolean' ? data : true;
 }

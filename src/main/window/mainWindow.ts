@@ -42,6 +42,9 @@ interface CreateMainWindowServiceOptions {
   setIslandPositionOffset: (offset: { x: number; y: number }) => void;
   sanitizeIslandPositionOffset: (offset: { x?: number; y?: number }) => { x: number; y: number };
   sizes: WindowSizeOptions;
+  onBeforeShow?: () => void;
+  /** 主窗口 ready-to-show 后、显示前的异步回调（等待 splash 消失等） */
+  onReadyToShow?: () => Promise<void>;
 }
 
 interface MainWindowService {
@@ -149,10 +152,19 @@ export function createMainWindowService(options: CreateMainWindowServiceOptions)
     mainWindow.setAlwaysOnTop(true, 'screen-saver');
     mainWindow.setBounds(initialBounds, false);
 
-    mainWindow.on('ready-to-show', () => {
+    mainWindow.on('ready-to-show', async () => {
       mainWindow.setBounds(initialBounds, false);
-      mainWindow.show();
-      mainWindow.setAlwaysOnTop(true, 'screen-saver');
+      if (options.onBeforeShow) {
+        options.onBeforeShow();
+      }
+      if (options.onReadyToShow) {
+        await options.onReadyToShow();
+      }
+      if (!mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('island:show');
+        mainWindow.show();
+        mainWindow.setAlwaysOnTop(true, 'screen-saver');
+      }
     });
 
     mainWindow.on('blur', () => {

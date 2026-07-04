@@ -73,3 +73,8 @@ declare module '*.gif' {
   const content: Record<string, string>;
   export default content;
 }
+
+declare module '*.webm' {
+  const src: string;
+  export default src;
+}

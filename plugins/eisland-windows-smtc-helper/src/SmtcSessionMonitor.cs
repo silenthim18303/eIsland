@@ -308,7 +308,7 @@ public static class SmtcSessionMonitor
         {
             try
             {
-                var info = BuildSessionInfo(session);
+                var info = BuildSessionInfo(session, refreshThumbnail: false);
                 _sessions[id] = info;
                 SignalChange();
             }
@@ -324,7 +324,7 @@ public static class SmtcSessionMonitor
                 if (now - last < TimelineThrottleMs) return;
                 _lastTimelineSignal[id] = now;
 
-                var info = BuildSessionInfo(session);
+                var info = BuildSessionInfo(session, refreshThumbnail: false);
                 _sessions[id] = info;
                 SignalChange();
             }
@@ -336,10 +336,15 @@ public static class SmtcSessionMonitor
 
     #region 数据构建
 
-    private static SessionInfo BuildSessionInfo(GlobalSystemMediaTransportControlsSession session)
+    private static SessionInfo BuildSessionInfo(
+        GlobalSystemMediaTransportControlsSession session,
+        bool refreshThumbnail = true)
     {
         var id = session.SourceAppUserModelId;
-        var media = BuildMediaMetadata(session);
+        var cachedThumbnail = _sessions.TryGetValue(id, out var cached)
+            ? cached.Media?.Thumbnail
+            : null;
+        var media = BuildMediaMetadata(session, refreshThumbnail, cachedThumbnail);
         var playback = BuildPlaybackInfo(session);
         var timeline = BuildTimelineInfo(session);
 
@@ -352,7 +357,10 @@ public static class SmtcSessionMonitor
         };
     }
 
-    private static MediaMetadata? BuildMediaMetadata(GlobalSystemMediaTransportControlsSession session)
+    private static MediaMetadata? BuildMediaMetadata(
+        GlobalSystemMediaTransportControlsSession session,
+        bool refreshThumbnail,
+        string? cachedThumbnail)
     {
         try
         {
@@ -367,12 +375,15 @@ public static class SmtcSessionMonitor
             }
             catch { /* 部分应用不支持 */ }
 
-            string? thumbnail = null;
-            try
+            string? thumbnail = cachedThumbnail;
+            if (refreshThumbnail)
             {
-                thumbnail = ReadThumbnailAsBase64(props.Thumbnail);
+                try
+                {
+                    thumbnail = ReadThumbnailAsBase64(props.Thumbnail);
+                }
+                catch { /* 忽略 */ }
             }
-            catch { /* 忽略 */ }
 
             return new MediaMetadata
             {

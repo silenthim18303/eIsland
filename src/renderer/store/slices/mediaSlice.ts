@@ -72,7 +72,7 @@ export const createMediaSlice: StateCreator<
     };
   }),
 
-  onMediaChanged: (data) => set({
+  onMediaChanged: (data) => set((state) => ({
     isMusicPlaying: true,
     mediaInfo: {
       title: data.title,
@@ -84,8 +84,10 @@ export const createMediaSlice: StateCreator<
     nearbyLyrics: [],
     currentDurationMs: data.duration_ms ?? 0,
     currentPositionMs: 0,
-    coverImage: data.thumbnail ?? null,
-  }),
+    coverImage: Object.prototype.hasOwnProperty.call(data, 'thumbnail')
+      ? data.thumbnail ?? null
+      : state.coverImage,
+  })),
 
   setPlaybackState: (isPlaying) => set({ isPlaying }),
 
@@ -113,7 +115,7 @@ export const createMediaSlice: StateCreator<
       return;
     }
 
-    set({
+    set((state) => ({
       isMusicPlaying: true,
       isPlaying: info.isPlaying,
       mediaInfo: {
@@ -124,9 +126,11 @@ export const createMediaSlice: StateCreator<
       },
       currentDurationMs: info.duration_ms,
       currentPositionMs: info.position_ms,
-      coverImage: info.thumbnail,
+      coverImage: Object.prototype.hasOwnProperty.call(info, 'thumbnail')
+        ? info.thumbnail ?? null
+        : state.coverImage,
       currentLyricText: null,
       nearbyLyrics: [],
-    });
+    }));
   },
 });

@@ -65,6 +65,7 @@ import { initUpdaterService } from './services/updaterService';
 import { createCaptureWindowService } from './window/captureWindow';
 import { createMainWindowService } from './window/mainWindow';
 import { openStandaloneWindow } from './window/standaloneWindow';
+import { showSplashWindow, closeSplashWindow } from './window/splashWindow';
 import { createSmtcService } from './music/smtcService';
 import { setSmtcAccessor } from './music/smtcAccessor';
 import { createAutoHideWatcher } from './system/autoHideWatcher';
@@ -118,7 +119,7 @@ import {
   readHideProcessListConfig, readAutoHideFullscreenWindowsConfig, readIslandPositionOffsetConfig, readIslandDisplaySelectionConfig,
   writeIslandPositionOffsetConfig, writeIslandDisplaySelectionConfig,
   readClipboardUrlMonitorEnabledConfig, readClipboardUrlDetectModeConfig, readClipboardUrlBlacklistConfig,
-  readUpdateAutoPromptConfig,
+  readUpdateAutoPromptConfig, readStartupAnimationEnabledConfig,
 } from './config/storeConfig';
 import type { IslandPositionOffset } from './config/storeConfig';
 
@@ -348,6 +349,9 @@ const mainWindowService = createMainWindowService({
   sizes: {
     islandWidth: ISLAND_WIDTH,
     islandHeight: ISLAND_HEIGHT,
+  },
+  onReadyToShow: async () => {
+    await closeSplashWindow();
   },
 });
 
@@ -829,6 +833,9 @@ app.whenReady().then(() => {
   clipboardUrlState.setDetectMode(readClipboardUrlDetectModeConfig());
   clipboardUrlState.setBlacklist(readClipboardUrlBlacklistConfig());
 
+  if (readStartupAnimationEnabledConfig()) {
+    showSplashWindow();
+  }
   mainWindowService.createWindow();
   createTray(mainWindow);
 
