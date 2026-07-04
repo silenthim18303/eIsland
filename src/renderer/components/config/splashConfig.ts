@@ -19,28 +19,10 @@
  */
 
 /**
- * @file SplashScreen.tsx
- * @description 启动画面组件（开场视频 + 纯黑背景）
+ * @file splashConfig.ts
+ * @description 启动画面配置常量
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
-import { useSplash } from './hooks/useSplash';
-import { SPLASH_VIDEO_SRC } from './config/splashConfig';
-
-/** 启动画面组件 */
-export function SplashScreen(): ReactElement {
-  const { fadeOut, videoRef, handleVideoEnded } = useSplash();
-
-  return (
-    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
-      <video
-        ref={videoRef}
-        className="splash-video"
-        src={SPLASH_VIDEO_SRC}
-        muted
-        onEnded={handleVideoEnded}
-      />
-    </div>
-  );
-}
+/** 开场视频路径（public 目录） */
+export const SPLASH_VIDEO_SRC = '/video/sign.mp4';
