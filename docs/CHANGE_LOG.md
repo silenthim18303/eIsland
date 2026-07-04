@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-04T14:17:53.292Z
+> 生成时间：2026-07-04T15:07:20.206Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,10 @@
 
 ## Unreleased
 
+- 2026-07-04 | 6da37593 | 鸡哥 | Merge pull request #118 from JNTMTMTM/dev
+- 2026-07-04 | 08deb75c | 鸡哥 | feat: enhance lyric synchronization with improved calibration timer management
+- 2026-07-04 | af30cadd | 鸡哥 | feat: enhance hover effects and transitions for improved UI responsiveness
+- 2026-07-04 | 2b1d7edb | github-actions[bot] | docs: auto update CHANGE_LOG.md for #117 by @JNTMTMTM [skip ci]
 - 2026-07-04 | 8f50d7bc | 鸡哥 | Merge pull request #117 from JNTMTMTM/dev
 - 2026-07-04 | 13ceb37b | 鸡哥 | feat: restructure SplashWaveEffect component and related shaders for improved organization and maintainability
 - 2026-07-04 | f542a0ef | 鸡哥 | feat: add startup animation settings and functionality
