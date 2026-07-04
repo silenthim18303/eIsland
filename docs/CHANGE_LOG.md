@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-04T15:07:20.206Z
+> 生成时间：2026-07-04T16:11:14.958Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,18 @@
 
 ## Unreleased
 
+- 2026-07-05 | 4e797011 | 鸡哥 | Merge pull request #119 from JNTMTMTM/dev
+- 2026-07-05 | de84d038 | 鸡哥 | feat: add color prop to SplashWaveEffect for dynamic background color and update styling for splash video
+- 2026-07-04 | 306dfc58 | 鸡哥 | feat: add playing prop to SplashWaveEffect for controlled rendering
+- 2026-07-04 | 3e8a1bcc | 鸡哥 | feat: adjust splash preview container size and maintain aspect ratio
+- 2026-07-04 | 9ec01985 | 鸡哥 | feat: update splash screen preview controls and styling
+- 2026-07-04 | 57a86e1e | 鸡哥 | feat: add preview controls for splash animation in settings
+- 2026-07-04 | d1f016b3 | 鸡哥 | feat: enhance splash background color input styling in animation settings
+- 2026-07-04 | 32f05d72 | 鸡哥 | feat: add reset default option for splash background color in animation settings
+- 2026-07-04 | 74af80e9 | 鸡哥 | feat: implement dynamic background color for splash wave effect
+- 2026-07-04 | 969579fa | 鸡哥 | feat: add splash screen background color customization to animation settings
+- 2026-07-04 | 8ec73dc2 | 鸡哥 | feat: add startup animation settings to animation configuration
+- 2026-07-04 | 8ab05f86 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #118 by @JNTMTMTM [skip ci]
 - 2026-07-04 | 6da37593 | 鸡哥 | Merge pull request #118 from JNTMTMTM/dev
 - 2026-07-04 | 08deb75c | 鸡哥 | feat: enhance lyric synchronization with improved calibration timer management
 - 2026-07-04 | af30cadd | 鸡哥 | feat: enhance hover effects and transitions for improved UI responsiveness
