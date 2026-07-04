@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-03T18:23:00.932Z
+> 生成时间：2026-07-04T04:21:05.705Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,9 @@
 
 ## Unreleased
 
+- 2026-07-04 | f54accbb | 鸡哥 | Merge pull request #115 from JNTMTMTM/dev
+- 2026-07-04 | d562ba79 | 鸡哥 | ci: update workflows to use pull_request_target for i18n and test checks
+- 2026-07-03 | 2126a40a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #113 by @JNTMTMTM [skip ci]
 - 2026-07-04 | b5b7c85b | 鸡哥 | Merge pull request #113 from JNTMTMTM/dev
 - 2026-07-04 | f831c3ca | 鸡哥 | ci: upgrade upload and download artifact actions to v5
 - 2026-07-04 | db97005d | 鸡哥 | docs: update i18n-check workflow permissions and upgrade download-artifact action to v5
