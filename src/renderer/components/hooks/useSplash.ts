@@ -30,10 +30,6 @@ import { SPLASH_MIN_DISPLAY_MS } from '../config/splashConfig';
 /** 启动画面交互逻辑 Hook */
 export function useSplash() {
   const [fadeOut, setFadeOut] = useState(false);
-  const [version] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('version') || '';
-  });
   const startTimeRef = useRef(Date.now());
 
   /** 监听主进程发送的淡出指令，确保至少停留 SPLASH_MIN_DISPLAY_MS */
@@ -50,5 +46,5 @@ export function useSplash() {
     return removeListener;
   }, []);
 
-  return { fadeOut, version };
+  return { fadeOut };
 }

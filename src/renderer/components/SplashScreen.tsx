@@ -20,33 +20,18 @@
 
 /**
  * @file SplashScreen.tsx
- * @description 启动画面组件，显示图标、应用名和加载动画
+ * @description 启动画面组件（空白占位窗口）
  * @author 鸡哥
  */
 
 import type { ReactElement } from 'react';
-import eislandSvg from '../../../resources/icon/eisland.svg';
 import { useSplash } from './hooks/useSplash';
 
 /** 启动画面组件 */
 export function SplashScreen(): ReactElement {
-  const { fadeOut, version } = useSplash();
+  const { fadeOut } = useSplash();
 
   return (
-    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
-      <div className="splash-icon-wrapper">
-        <img src={eislandSvg} alt="eIsland" draggable={false} />
-      </div>
-      <div className="splash-app-name">eIsland</div>
-      <div className="splash-app-subtitle">灵动岛 · 正在启动</div>
-      <div className="splash-loading-pill">
-        <div className="splash-loading-pill-dot">
-          <span />
-          <span />
-          <span />
-        </div>
-      </div>
-      {version && <div className="splash-version">v{version}</div>}
-    </div>
+    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`} />
   );
 }

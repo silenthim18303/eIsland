@@ -26,6 +26,3 @@
 
 /** 启动画面最小停留时间（毫秒） */
 export const SPLASH_MIN_DISPLAY_MS = 3000;
-
-/** 启动画面淡出动画时长（毫秒），需与 CSS transition 保持一致 */
-export const SPLASH_FADE_DURATION_MS = 300;
