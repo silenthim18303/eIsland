@@ -20,13 +20,14 @@
 
 /**
  * @file SplashScreen.tsx
- * @description 启动画面组件（开场视频 + 纯黑背景）
+ * @description 启动画面组件（开场视频 + 电子音浪背景）
  * @author 鸡哥
  */
 
 import type { ReactElement } from 'react';
 import { useSplash } from './hooks/useSplash';
 import { SPLASH_VIDEO_SRC } from './config/splashConfig';
+import { SplashWaveEffect } from './SplashWaveEffect';
 
 /** 启动画面组件 */
 export function SplashScreen(): ReactElement {
@@ -34,6 +35,7 @@ export function SplashScreen(): ReactElement {
 
   return (
     <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
+      <SplashWaveEffect />
       <video
         ref={videoRef}
         className="splash-video"

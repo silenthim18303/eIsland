@@ -28,4 +28,4 @@
 export const SPLASH_VIDEO_SRC = '/video/sign.webm';
 
 /** 视频播完后额外停留时间（毫秒） */
-export const SPLASH_POST_VIDEO_DELAY_MS = 0;
+export const SPLASH_POST_VIDEO_DELAY_MS = 1000;
