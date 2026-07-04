@@ -29,6 +29,10 @@
   gap: 12px;
   color: var(--color-island-text);
   white-space: nowrap;
+  flex: 0 0 auto;
+  contain: layout paint;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .weather-tab-icon {
