@@ -2969,6 +2969,18 @@
   width: 100%;
   height: 100%;
   display: block;
+  z-index: 0;
+}
+
+.settings-splash-preview-stage .splash-video {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  display: block;
+  z-index: 1;
 }
 
 .settings-splash-preview-stage .splash-video {
