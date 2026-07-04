@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-04T04:21:05.705Z
+> 生成时间：2026-07-04T14:17:53.292Z
 
 ## 26.6.3
 
@@ -2276,8 +2276,32 @@
 
 ## Unreleased
 
+- 2026-07-04 | 8f50d7bc | 鸡哥 | Merge pull request #117 from JNTMTMTM/dev
+- 2026-07-04 | 13ceb37b | 鸡哥 | feat: restructure SplashWaveEffect component and related shaders for improved organization and maintainability
+- 2026-07-04 | f542a0ef | 鸡哥 | feat: add startup animation settings and functionality
+- 2026-07-04 | dcc7073a | 鸡哥 | feat: add SplashWaveEffect component and update splash screen styles
+- 2026-07-04 | c9f33d33 | 鸡哥 | feat: increase splash window dimensions for improved visibility
+- 2026-07-04 | a7bd8a63 | 鸡哥 | Refactor code structure for improved readability and maintainability
+- 2026-07-04 | 3073f2d6 | 鸡哥 | feat: update splash screen post-video delay to align with renderer configuration
+- 2026-07-04 | 1cf0f436 | 鸡哥 | feat: refactor useSplash hook by extracting video and fade-out logic into separate hooks
+- 2026-07-04 | a4c395a6 | 鸡哥 | feat: refactor SplashScreen component and extract video logic into useSplash hook
+- 2026-07-04 | d054fcd6 | 鸡哥 | feat: enhance splash screen with video playback and improve layout styles
+- 2026-07-04 | 7ef83e4e | 鸡哥 | feat: add TypeScript declaration for .mp4 file imports
+- 2026-07-04 | 30c7131f | 鸡哥 | feat: update splash window behavior to show inactive state for improved user experience
+- 2026-07-04 | 7ebd6902 | 鸡哥 | feat: update splash container styles for improved visual consistency
+- 2026-07-04 | 66ffa37e | 鸡哥 | feat: simplify SplashScreen component and remove unused elements
+- 2026-07-04 | 27ea8822 | 鸡哥 | feat: add sign.mp4 video file for enhanced visual content
+- 2026-07-04 | d79dad23 | 鸡哥 | feat: add splash screen configuration constants and improve fade-out logic
+- 2026-07-04 | 205507bd | 鸡哥 | feat: refactor SplashScreen to use custom useSplash hook for improved state management
+- 2026-07-04 | e08954bd | 鸡哥 | feat: implement splash screen component and styles
+- 2026-07-04 | 05e72c4a | 鸡哥 | Merge pull request #116 from silenthim18303/dev
+- 2026-07-04 | 28bfb08f | 鸡哥 | refactor: update thumbnail handling in SMTC service and related interfaces
+- 2026-07-04 | f19cbb43 | 鸡哥 | refactor: optimize BuildSessionInfo and BuildMediaMetadata to control thumbnail refresh
+- 2026-07-04 | 9cd9f049 | silenthim | Merge branch 'JNTMTMTM:dev' into dev
+- 2026-07-04 | ef89f093 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #115 by @JNTMTMTM [skip ci]
 - 2026-07-04 | f54accbb | 鸡哥 | Merge pull request #115 from JNTMTMTM/dev
 - 2026-07-04 | d562ba79 | 鸡哥 | ci: update workflows to use pull_request_target for i18n and test checks
+- 2026-07-04 | 8aecedec | silenthim18303 | feat(ui): 添加Electron splash启动窗口
 - 2026-07-03 | 2126a40a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #113 by @JNTMTMTM [skip ci]
 - 2026-07-04 | b5b7c85b | 鸡哥 | Merge pull request #113 from JNTMTMTM/dev
 - 2026-07-04 | f831c3ca | 鸡哥 | ci: upgrade upload and download artifact actions to v5
