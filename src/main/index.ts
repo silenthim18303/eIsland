@@ -119,7 +119,7 @@ import {
   readHideProcessListConfig, readAutoHideFullscreenWindowsConfig, readIslandPositionOffsetConfig, readIslandDisplaySelectionConfig,
   writeIslandPositionOffsetConfig, writeIslandDisplaySelectionConfig,
   readClipboardUrlMonitorEnabledConfig, readClipboardUrlDetectModeConfig, readClipboardUrlBlacklistConfig,
-  readUpdateAutoPromptConfig,
+  readUpdateAutoPromptConfig, readStartupAnimationEnabledConfig,
 } from './config/storeConfig';
 import type { IslandPositionOffset } from './config/storeConfig';
 
@@ -833,7 +833,9 @@ app.whenReady().then(() => {
   clipboardUrlState.setDetectMode(readClipboardUrlDetectModeConfig());
   clipboardUrlState.setBlacklist(readClipboardUrlBlacklistConfig());
 
-  showSplashWindow();
+  if (readStartupAnimationEnabledConfig()) {
+    showSplashWindow();
+  }
   mainWindowService.createWindow();
   createTray(mainWindow);
 
