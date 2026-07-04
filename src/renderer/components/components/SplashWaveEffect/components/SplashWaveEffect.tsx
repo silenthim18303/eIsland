@@ -42,11 +42,17 @@ function hexToRgbNorm(hex: string): [number, number, number] {
   return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
 }
 
+interface SplashWaveEffectProps {
+  /** 是否播放渲染循环，默认 true。实际启动画面始终为 true，预览区按需控制。 */
+  playing?: boolean;
+}
+
 /**
  * 渲染启动画面波浪背景画布。
+ * @param playing - 是否播放渲染循环。
  * @returns 启动画面波浪背景节点。
  */
-export function SplashWaveEffect(): ReactElement {
+export function SplashWaveEffect({ playing = true }: SplashWaveEffectProps): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [bgColor, setBgColor] = useState<[number, number, number]>(SHADER_DEFAULT_BG_RGB);
 
@@ -56,7 +62,7 @@ export function SplashWaveEffect(): ReactElement {
     }).catch(() => {});
   }, []);
 
-  useSplashWaveRenderer(canvasRef, bgColor);
+  useSplashWaveRenderer(canvasRef, bgColor, playing);
 
   return <canvas ref={canvasRef} className="splash-wave-canvas" />;
 }

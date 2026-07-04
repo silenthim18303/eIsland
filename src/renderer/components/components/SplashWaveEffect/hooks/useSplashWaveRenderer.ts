@@ -36,12 +36,21 @@ import { compileSplashWaveShader } from '../utils/compileSplashWaveShader';
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
  * @param canvasRef - 需要承载波浪背景的画布引用。
  * @param bgColor - 背景颜色 [r, g, b]，各分量范围 0-1。
+ * @param playing - 是否播放渲染循环，为 false 时停止 RAF 并清除画布。
  * @returns 无返回值。
  */
-export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number]): void {
+export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true): void {
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !playing) {
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      return;
+    }
 
     const gl = canvas.getContext('webgl', {
       alpha: true,
@@ -115,5 +124,5 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     return () => {
       cancelAnimationFrame(rafId);
     };
-  }, [canvasRef, bgColor]);
+  }, [canvasRef, bgColor, playing]);
 }

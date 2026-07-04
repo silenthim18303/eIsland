@@ -259,7 +259,7 @@ export function AnimationSettingsPage(): ReactElement {
           </div>
           <div className="settings-splash-preview-container">
             <div className="settings-splash-preview-stage" style={{ background: splashBgColor }}>
-              <SplashWaveEffect />
+              <SplashWaveEffect playing={previewPlaying} />
               <video
                 ref={previewVideoRef}
                 className="splash-video"
