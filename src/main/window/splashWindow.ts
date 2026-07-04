@@ -37,8 +37,8 @@ let videoEndedResolve: (() => void) | null = null;
 /** 启动画面淡出动画时长（毫秒），需与 CSS transition 保持一致 */
 const SPLASH_FADE_DURATION_MS = 300;
 
-/** 视频播完后额外停留时间（毫秒） */
-const SPLASH_POST_VIDEO_DELAY_MS = 3000;
+/** 视频播完后额外停留时间（毫秒），需与 renderer 侧 SPLASH_POST_VIDEO_DELAY_MS 保持一致 */
+const SPLASH_POST_VIDEO_DELAY_MS = 0;
 
 /**
  * 创建并显示启动画面窗口

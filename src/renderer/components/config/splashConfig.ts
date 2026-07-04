@@ -26,3 +26,6 @@
 
 /** 开场视频路径（public 目录） */
 export const SPLASH_VIDEO_SRC = '/video/sign.mp4';
+
+/** 视频播完后额外停留时间（毫秒） */
+export const SPLASH_POST_VIDEO_DELAY_MS = 0;
