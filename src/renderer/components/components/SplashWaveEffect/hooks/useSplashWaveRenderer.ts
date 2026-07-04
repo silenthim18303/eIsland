@@ -35,9 +35,10 @@ import { compileSplashWaveShader } from '../utils/compileSplashWaveShader';
 /**
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
  * @param canvasRef - 需要承载波浪背景的画布引用。
+ * @param bgColor - 背景颜色 [r, g, b]，各分量范围 0-1。
  * @returns 无返回值。
  */
-export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>): void {
+export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number]): void {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -79,6 +80,7 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     const posLoc = gl.getAttribLocation(program, 'aPosition');
     const resLoc = gl.getUniformLocation(program, 'uResolution');
     const timeLoc = gl.getUniformLocation(program, 'uTime');
+    const bgColorLoc = gl.getUniformLocation(program, 'uBgColor');
 
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
@@ -103,6 +105,7 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
       gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
       gl.uniform2f(resLoc, w, h);
       gl.uniform1f(timeLoc, (performance.now() - startTime) / 1000);
+      gl.uniform3f(bgColorLoc, bgColor[0], bgColor[1], bgColor[2]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       rafId = requestAnimationFrame(draw);
     };
@@ -112,5 +115,5 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     return () => {
       cancelAnimationFrame(rafId);
     };
-  }, [canvasRef]);
+  }, [canvasRef, bgColor]);
 }

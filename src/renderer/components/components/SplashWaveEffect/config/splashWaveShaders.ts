@@ -40,6 +40,7 @@ precision highp float;
 varying vec2 vUv;
 uniform vec2 uResolution;
 uniform float uTime;
+uniform vec3 uBgColor;
 
 float saturate(float v){ return clamp(v, 0.0, 1.0); }
 float ease(float v){ v = saturate(v); return v * v * (3.0 - 2.0 * v); }
@@ -119,7 +120,7 @@ void main(){
   float bladeMask = smoothstep(-1.55, -0.08, p.x) * (1.0 - smoothstep(0.08, 1.55, p.x));
   vec3 blade = mix(ch1, ch2, vUv.x) * centerBeam * bladeMask * (0.40 + 0.28 * climax);
   float flare = exp(-dot(p, p) * 3.6) * exp(-pow((t - 0.88) / 0.40, 2.0));
-  vec3 col = vec3(0.002, 0.004, 0.005);
+  vec3 col = uBgColor;
   col += loopCol * (0.56 + 0.46 * bloomIn) * calm * settle;
   col += climaxCol * 0.22;
   float diagonalGlint = exp(-pow(lane * 1.2 + crossLane * 0.10, 2.0) / 0.030) * climax;

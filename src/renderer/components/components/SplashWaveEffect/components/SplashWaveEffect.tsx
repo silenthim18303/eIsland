@@ -24,9 +24,23 @@
  * @author 鸡哥
  */
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useSplashWaveRenderer } from '../hooks/useSplashWaveRenderer';
+
+/** 默认背景颜色（黑色） */
+const DEFAULT_BG_RGB: [number, number, number] = [0.002, 0.004, 0.005];
+
+/**
+ * 将十六进制颜色转换为归一化 RGB 分量。
+ * @param hex - 十六进制颜色字符串（如 #000000）。
+ * @returns 归一化 RGB 三元组，各分量范围 0-1。
+ */
+function hexToRgbNorm(hex: string): [number, number, number] {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return DEFAULT_BG_RGB;
+  return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
+}
 
 /**
  * 渲染启动画面波浪背景画布。
@@ -34,8 +48,15 @@ import { useSplashWaveRenderer } from '../hooks/useSplashWaveRenderer';
  */
 export function SplashWaveEffect(): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [bgColor, setBgColor] = useState<[number, number, number]>(DEFAULT_BG_RGB);
 
-  useSplashWaveRenderer(canvasRef);
+  useEffect(() => {
+    window.api.storeRead('splash-bg-color').then((v) => {
+      if (typeof v === 'string') setBgColor(hexToRgbNorm(v));
+    }).catch(() => {});
+  }, []);
+
+  useSplashWaveRenderer(canvasRef, bgColor);
 
   return <canvas ref={canvasRef} className="splash-wave-canvas" />;
 }
