@@ -34,6 +34,12 @@ import { is } from '@electron-toolkit/utils';
 
 let splashWindow: BrowserWindow | null = null;
 
+/** 启动画面最小停留时间（毫秒），需与 renderer 侧 SPLASH_MIN_DISPLAY_MS 保持一致 */
+const SPLASH_MIN_DISPLAY_MS = 3000;
+
+/** 启动画面淡出动画时长（毫秒），需与 CSS transition 保持一致 */
+const SPLASH_FADE_DURATION_MS = 300;
+
 /**
  * 创建并显示启动画面窗口
  * @description 创建一个无边框、居中的启动画面窗口，显示应用图标和加载动画
@@ -90,7 +96,7 @@ function showSplashWindow(): void {
 
 /**
  * 关闭启动画面窗口
- * @description 带有淡出动画效果地关闭启动画面窗口
+ * @description 带有淡出动画效果地关闭启动画面窗口，确保至少停留 3 秒
  */
 function closeSplashWindow(): void {
   if (splashWindow && !splashWindow.isDestroyed()) {
@@ -100,7 +106,7 @@ function closeSplashWindow(): void {
       if (win && !win.isDestroyed()) {
         win.close();
       }
-    }, 300);
+    }, SPLASH_MIN_DISPLAY_MS + SPLASH_FADE_DURATION_MS);
     splashWindow = null;
   }
 }

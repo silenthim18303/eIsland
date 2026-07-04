@@ -24,7 +24,8 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { SPLASH_MIN_DISPLAY_MS } from '../config/splashConfig';
 
 /** 启动画面交互逻辑 Hook */
 export function useSplash() {
@@ -33,11 +34,18 @@ export function useSplash() {
     const params = new URLSearchParams(window.location.search);
     return params.get('version') || '';
   });
+  const startTimeRef = useRef(Date.now());
 
-  /** 监听主进程发送的淡出指令 */
+  /** 监听主进程发送的淡出指令，确保至少停留 SPLASH_MIN_DISPLAY_MS */
   useEffect(() => {
     const removeListener = window.electron.ipcRenderer.on('splash:fade-out', () => {
-      setFadeOut(true);
+      const elapsed = Date.now() - startTimeRef.current;
+      const remaining = SPLASH_MIN_DISPLAY_MS - elapsed;
+      if (remaining > 0) {
+        setTimeout(() => setFadeOut(true), remaining);
+      } else {
+        setFadeOut(true);
+      }
     });
     return removeListener;
   }, []);
