@@ -60,6 +60,7 @@ function showSplashWindow(): void {
       ? join(__dirname, '../../resources/icon/eisland_256x256.ico')
       : join(process.resourcesPath, 'icon/eisland_256x256.ico'),
     webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -94,7 +95,7 @@ function showSplashWindow(): void {
 function closeSplashWindow(): void {
   if (splashWindow && !splashWindow.isDestroyed()) {
     const win = splashWindow;
-    win.webContents.executeJavaScript('startFadeOut()').catch(() => {});
+    win.webContents.send('splash:fade-out');
     setTimeout(() => {
       if (win && !win.isDestroyed()) {
         win.close();
