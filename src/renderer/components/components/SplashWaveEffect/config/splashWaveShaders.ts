@@ -19,16 +19,13 @@
  */
 
 /**
- * @file SplashWaveEffect.tsx
- * @description 启动画面波浪背景效果（WebGL 着色器，eisland 主题色）
+ * @file splashWaveShaders.ts
+ * @description 启动画面波浪背景 WebGL 着色器配置。
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
-import { useEffect, useRef } from 'react';
-
 /** 顶点着色器 */
-const VERT_SRC = `
+export const SPLASH_WAVE_VERTEX_SHADER = `
 attribute vec2 aPosition;
 varying vec2 vUv;
 void main(){
@@ -38,7 +35,7 @@ void main(){
 `;
 
 /** 片段着色器 — 电子音浪效果（eisland 主题色） */
-const FRAG_SRC = `
+export const SPLASH_WAVE_FRAGMENT_SHADER = `
 precision highp float;
 varying vec2 vUv;
 uniform vec2 uResolution;
@@ -103,7 +100,6 @@ void main(){
   uv += flowAxis * syncWave * 0.055 * climax;
   uv += crossAxis * sin(lane * 7.2 + t * 1.25) * 0.034 * climax;
   uv *= 1.0 + 0.045 * preClimax - 0.020 * climax;
-  // eisland 主题色: 深蓝 / 亮蓝 / 浅蓝
   vec3 ch1 = vec3(0.043, 0.173, 0.380);
   vec3 ch2 = vec3(0.439, 0.627, 1.000);
   vec3 ch3 = vec3(0.439, 0.502, 0.824);
@@ -141,97 +137,3 @@ void main(){
   gl_FragColor = vec4(col, 1.0);
 }
 `;
-
-/** 编译着色器，失败返回 null */
-function compileShader(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.warn('[SplashWave] shader compile failed:', gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
-  }
-  return shader;
-}
-
-/** 启动画面波浪背景组件 */
-export function SplashWaveEffect(): ReactElement {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const gl = canvas.getContext('webgl', {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
-      powerPreference: 'high-performance',
-    });
-    if (!gl) return;
-
-    const vert = compileShader(gl, gl.VERTEX_SHADER, VERT_SRC);
-    const frag = compileShader(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
-    if (!vert || !frag) return;
-
-    const program = gl.createProgram();
-    if (!program) return;
-    gl.attachShader(program, vert);
-    gl.attachShader(program, frag);
-    gl.linkProgram(program);
-    gl.deleteShader(vert);
-    gl.deleteShader(frag);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.warn('[SplashWave] shader link failed:', gl.getProgramInfoLog(program));
-      gl.deleteProgram(program);
-      return;
-    }
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-
-    const posLoc = gl.getAttribLocation(program, 'aPosition');
-    const resLoc = gl.getUniformLocation(program, 'uResolution');
-    const timeLoc = gl.getUniformLocation(program, 'uTime');
-
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.CULL_FACE);
-
-    const startTime = performance.now();
-    let rafId = 0;
-
-    const draw = (): void => {
-      if (!canvas || !gl) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
-      const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-      }
-      gl.viewport(0, 0, w, h);
-      gl.useProgram(program);
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-      gl.uniform2f(resLoc, w, h);
-      gl.uniform1f(timeLoc, (performance.now() - startTime) / 1000);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      rafId = requestAnimationFrame(draw);
-    };
-
-    rafId = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="splash-wave-canvas" />;
-}

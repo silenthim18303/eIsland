@@ -19,30 +19,9 @@
  */
 
 /**
- * @file SplashScreen.tsx
- * @description 启动画面组件（开场视频 + 电子音浪背景）
+ * @file index.ts
+ * @description 启动画面波浪背景公共组件模块导出。
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
-import { useSplash } from './hooks/useSplash';
-import { SPLASH_VIDEO_SRC } from './config/splashConfig';
-import { SplashWaveEffect } from './components/SplashWaveEffect';
-
-/** 启动画面组件 */
-export function SplashScreen(): ReactElement {
-  const { fadeOut, videoRef, handleVideoEnded } = useSplash();
-
-  return (
-    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
-      <SplashWaveEffect />
-      <video
-        ref={videoRef}
-        className="splash-video"
-        src={SPLASH_VIDEO_SRC}
-        muted
-        onEnded={handleVideoEnded}
-      />
-    </div>
-  );
-}
+export { SplashWaveEffect } from './components/SplashWaveEffect';

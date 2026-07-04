@@ -19,30 +19,33 @@
  */
 
 /**
- * @file SplashScreen.tsx
- * @description 启动画面组件（开场视频 + 电子音浪背景）
+ * @file compileSplashWaveShader.ts
+ * @description 启动画面波浪背景 WebGL 着色器编译工具。
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
-import { useSplash } from './hooks/useSplash';
-import { SPLASH_VIDEO_SRC } from './config/splashConfig';
-import { SplashWaveEffect } from './components/SplashWaveEffect';
+/**
+ * 编译启动波浪背景着色器。
+ * @param gl - WebGL 渲染上下文。
+ * @param type - 着色器类型。
+ * @param source - 着色器源码。
+ * @returns 编译成功的着色器，失败时返回 null。
+ */
+export function compileSplashWaveShader(
+  gl: WebGLRenderingContext,
+  type: number,
+  source: string,
+): WebGLShader | null {
+  const shader = gl.createShader(type);
+  if (!shader) return null;
 
-/** 启动画面组件 */
-export function SplashScreen(): ReactElement {
-  const { fadeOut, videoRef, handleVideoEnded } = useSplash();
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.warn('[SplashWave] shader compile failed:', gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
 
-  return (
-    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
-      <SplashWaveEffect />
-      <video
-        ref={videoRef}
-        className="splash-video"
-        src={SPLASH_VIDEO_SRC}
-        muted
-        onEnded={handleVideoEnded}
-      />
-    </div>
-  );
+  return shader;
 }
