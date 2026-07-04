@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../../../../../store/slices';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
 import { SPLASH_VIDEO_SRC } from '../../../../../../../config/splashConfig';
+import { SplashWaveEffect } from '../../../../../../../components/SplashWaveEffect';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
@@ -119,10 +120,11 @@ export function AnimationSettingsPage(): ReactElement {
     setPreviewPlaying(true);
   };
 
-  const handlePreviewPause = (): void => {
+  const handlePreviewStop = (): void => {
     const video = previewVideoRef.current;
     if (!video) return;
     video.pause();
+    video.currentTime = 0;
     setPreviewPlaying(false);
   };
 
@@ -256,10 +258,11 @@ export function AnimationSettingsPage(): ReactElement {
             </div>
           </div>
           <div className="settings-splash-preview-container">
-            <div className="settings-splash-preview-video-wrapper" style={{ background: splashBgColor }}>
+            <div className="settings-splash-preview-stage" style={{ background: splashBgColor }}>
+              <SplashWaveEffect />
               <video
                 ref={previewVideoRef}
-                className="settings-splash-preview-video"
+                className="splash-video"
                 src={SPLASH_VIDEO_SRC}
                 muted
                 onEnded={() => setPreviewPlaying(false)}
@@ -277,10 +280,10 @@ export function AnimationSettingsPage(): ReactElement {
               <button
                 className="settings-splash-preview-btn"
                 type="button"
-                onClick={handlePreviewPause}
+                onClick={handlePreviewStop}
                 disabled={!previewPlaying}
               >
-                {t('settings.app.animation.previewPause', { defaultValue: '暂停' })}
+                {t('settings.app.animation.previewStop', { defaultValue: '停止' })}
               </button>
             </div>
           </div>

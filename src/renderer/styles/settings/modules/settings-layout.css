@@ -2956,16 +2956,25 @@
   border: 1px solid rgba(var(--color-text-rgb), 0.08);
 }
 
-.settings-splash-preview-video-wrapper {
+.settings-splash-preview-stage {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
   overflow: hidden;
   border-radius: 12px 12px 0 0;
 }
 
-.settings-splash-preview-video {
+.settings-splash-preview-stage .splash-wave-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.settings-splash-preview-stage .splash-video {
+  position: absolute;
+  inset: 0;
+  margin: auto;
   width: 60%;
   height: 60%;
   object-fit: contain;

@@ -2217,7 +2217,7 @@
         "splashBgColorHint": "Customize the background color of the splash screen",
         "resetDefault": "Restore Defaults",
         "previewPlay": "Preview",
-        "previewPause": "Pause"
+        "previewStop": "Stop"
       },
       "album": {
         "carouselTitle": "Album Carousel Mode",
