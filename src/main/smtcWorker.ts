@@ -43,21 +43,23 @@ const sessionCache = new Map<string, CacheEntry>();
  * 序列化当前缓存中的会话并通过 parentPort 推送给主进程
  * @param sourceAppId - 应用会话 ID
  */
-function postSessionUpdate(sourceAppId: string): void {
+function postSessionUpdate(sourceAppId: string, includeThumbnail = true): void {
   const entry = sessionCache.get(sourceAppId);
   if (!entry) return;
 
   const { media, playback, timeline } = entry;
+  const mediaPayload = media ? {
+    title: media.title,
+    artist: media.artist,
+    albumTitle: media.albumTitle,
+    ...(includeThumbnail ? { thumbnail: media.thumbnail } : {}),
+  } : null;
+
   parentPort!.postMessage({
     type: 'session-update',
     sourceAppId,
     session: {
-      media: media ? {
-        title: media.title,
-        artist: media.artist,
-        albumTitle: media.albumTitle,
-        thumbnail: media.thumbnail,
-      } : null,
+      media: mediaPayload,
       playback,
       timeline,
     },
@@ -113,13 +115,13 @@ smtc.on('session-media-changed', (sourceAppId: string, mediaProps: MediaProps) =
 smtc.on('session-playback-changed', (sourceAppId: string, playbackInfo: PlaybackInfo) => {
   const existing = sessionCache.get(sourceAppId) ?? { media: null, playback: null, timeline: null };
   sessionCache.set(sourceAppId, { ...existing, playback: playbackInfo });
-  postSessionUpdate(sourceAppId);
+  postSessionUpdate(sourceAppId, false);
 });
 
 smtc.on('session-timeline-changed', (sourceAppId: string, timelineProps: TimelineProps) => {
   const existing = sessionCache.get(sourceAppId) ?? { media: null, playback: null, timeline: null };
   sessionCache.set(sourceAppId, { ...existing, timeline: timelineProps });
-  postSessionUpdate(sourceAppId);
+  postSessionUpdate(sourceAppId, false);
 });
 
 /** 接收主进程请求：主动查询当前所有 SMTC 会话（用于播放源检测按钮） */

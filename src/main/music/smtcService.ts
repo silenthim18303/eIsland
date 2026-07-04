@@ -156,12 +156,28 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
       const sessionRuntime = new Map<string, SmtcSessionRuntimeEntry>();
       smtcSessionRuntime = sessionRuntime;
 
-      const emitCurrentSession = (): void => {
+      const emitCurrentSession = (includeThumbnail = false): void => {
         const currentEntry = currentDeviceId ? sessionRuntime.get(currentDeviceId) : undefined;
         const payload = currentEntry?.hasTitle ? currentEntry.payload : null;
+        const outboundPayload = payload && !includeThumbnail
+          ? {
+              title: payload.title,
+              artist: payload.artist,
+              album: payload.album,
+              duration_ms: payload.duration_ms,
+              position_ms: payload.position_ms,
+              isPlaying: payload.isPlaying,
+              canFastForward: payload.canFastForward,
+              canSkip: payload.canSkip,
+              canLike: payload.canLike,
+              canChangeVolume: payload.canChangeVolume,
+              canSetOutput: payload.canSetOutput,
+              deviceId: payload.deviceId,
+            }
+          : payload;
         BrowserWindow.getAllWindows().forEach((win) => {
           if (!win.isDestroyed()) {
-            win.webContents.send('nowplaying:info', payload);
+            win.webContents.send('nowplaying:info', outboundPayload);
           }
         });
       };
@@ -179,7 +195,7 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
         type: string;
         sourceAppId?: string;
         session?: {
-          media: { title: string; artist: string; albumTitle: string; thumbnail: string | null } | null;
+          media: { title: string; artist: string; albumTitle: string; thumbnail?: string | null } | null;
           playback: { playbackStatus: number; playbackType: number } | null;
           timeline: { position: number; duration: number } | null;
         };
@@ -239,11 +255,16 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
 
         const prevEntry = sessionRuntime.get(sourceAppId);
         const prevPayload = prevEntry?.payload;
+        const hasThumbnailUpdate = Boolean(media && Object.prototype.hasOwnProperty.call(media, 'thumbnail'));
+        const nextThumbnail = hasThumbnailUpdate
+          ? media?.thumbnail ?? null
+          : prevPayload?.thumbnail ?? null;
         const sameTrack = Boolean(
           prevPayload
           && prevPayload.title === (media?.title ?? '')
           && prevPayload.artist === (media?.artist ?? ''),
         );
+        const shouldEmitThumbnail = hasThumbnailUpdate && (!sameTrack || nextThumbnail !== (prevPayload?.thumbnail ?? null));
         const durationMs = timeline
           ? Math.round((timeline.duration ?? 0) * 1000)
           : sameTrack ? prevPayload!.duration_ms : 0;
@@ -258,7 +279,7 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
           duration_ms: durationMs,
           position_ms: positionMs,
           isPlaying,
-          thumbnail: media?.thumbnail ?? null,
+          thumbnail: nextThumbnail,
           canFastForward: false,
           canSkip: false,
           canLike: false,
@@ -287,13 +308,13 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
         if (!currentDeviceId) {
           if (isPlaying && hasTitle) {
             currentDeviceId = sourceAppId;
-            emitCurrentSession();
+            emitCurrentSession(true);
           }
           return;
         }
 
         if (sourceAppId === currentDeviceId) {
-          emitCurrentSession();
+          emitCurrentSession(shouldEmitThumbnail);
           if (!isPlaying && !hasTitle) {
             currentDeviceId = '';
           }
@@ -312,7 +333,7 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
             emitSourceSwitchRequest(sourceAppId, payload.title, payload.artist);
           } else {
             currentDeviceId = sourceAppId;
-            emitCurrentSession();
+            emitCurrentSession(true);
           }
         }
       });

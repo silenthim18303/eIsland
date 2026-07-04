@@ -1682,7 +1682,7 @@ interface NowPlayingInfo {
   duration_ms: number;
   position_ms: number;
   isPlaying: boolean;
-  thumbnail: string | null;
+  thumbnail?: string | null;
   canFastForward: boolean;
   canSkip: boolean;
   canLike: boolean;
