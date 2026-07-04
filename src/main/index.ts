@@ -350,8 +350,8 @@ const mainWindowService = createMainWindowService({
     islandWidth: ISLAND_WIDTH,
     islandHeight: ISLAND_HEIGHT,
   },
-  onBeforeShow: () => {
-    closeSplashWindow();
+  onReadyToShow: async () => {
+    await closeSplashWindow();
   },
 });
 

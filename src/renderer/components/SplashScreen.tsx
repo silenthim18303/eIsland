@@ -20,18 +20,48 @@
 
 /**
  * @file SplashScreen.tsx
- * @description 启动画面组件（空白占位窗口）
+ * @description 启动画面组件（开场视频 + 纯黑背景）
  * @author 鸡哥
  */
 
 import type { ReactElement } from 'react';
-import { useSplash } from './hooks/useSplash';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /** 启动画面组件 */
 export function SplashScreen(): ReactElement {
-  const { fadeOut } = useSplash();
+  const [fadeOut, setFadeOut] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  /** 视频播放完成，通知主进程 */
+  const handleVideoEnded = useCallback(() => {
+    window.electron.ipcRenderer.send('splash:video-ended');
+  }, []);
+
+  /** 监听主进程指令：开始播放视频 */
+  useEffect(() => {
+    const removeListener = window.electron.ipcRenderer.on('splash:play-video', () => {
+      videoRef.current?.play().catch(() => {});
+    });
+    return removeListener;
+  }, []);
+
+  /** 监听主进程指令：淡出 */
+  useEffect(() => {
+    const removeListener = window.electron.ipcRenderer.on('splash:fade-out', () => {
+      setFadeOut(true);
+    });
+    return removeListener;
+  }, []);
 
   return (
-    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`} />
+    <div className={`splash-container${fadeOut ? ' fade-out' : ''}`}>
+      <video
+        ref={videoRef}
+        className="splash-video"
+        src="/video/sign.mp4"
+        muted
+        onEnded={handleVideoEnded}
+      />
+    </div>
   );
 }

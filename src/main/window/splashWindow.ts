@@ -16,9 +16,6 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 /**
@@ -28,21 +25,24 @@
  * @author 鸡哥
  */
 
-import { BrowserWindow } from 'electron';
+import { BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
 import { is } from '@electron-toolkit/utils';
 
 let splashWindow: BrowserWindow | null = null;
 
-/** 启动画面最小停留时间（毫秒），需与 renderer 侧 SPLASH_MIN_DISPLAY_MS 保持一致 */
-const SPLASH_MIN_DISPLAY_MS = 3000;
+/** 视频播放完成回调（跨 closeSplashWindow 调用生命周期存储） */
+let videoEndedResolve: (() => void) | null = null;
 
 /** 启动画面淡出动画时长（毫秒），需与 CSS transition 保持一致 */
 const SPLASH_FADE_DURATION_MS = 300;
 
+/** 视频播完后额外停留时间（毫秒） */
+const SPLASH_POST_VIDEO_DELAY_MS = 3000;
+
 /**
  * 创建并显示启动画面窗口
- * @description 创建一个无边框、居中的启动画面窗口，显示应用图标和加载动画
+ * @description 创建一个无边框、居中的启动画面窗口，播放开场视频
  */
 function showSplashWindow(): void {
   if (splashWindow && !splashWindow.isDestroyed()) {
@@ -85,6 +85,14 @@ function showSplashWindow(): void {
     splashWindow.loadFile(join(__dirname, '../renderer/splash.html'));
   }
 
+  /** 注册一次性 IPC：renderer 视频播完后通知 */
+  ipcMain.once('splash:video-ended', () => {
+    if (videoEndedResolve) {
+      videoEndedResolve();
+      videoEndedResolve = null;
+    }
+  });
+
   splashWindow.once('ready-to-show', () => {
     if (splashWindow && !splashWindow.isDestroyed()) {
       splashWindow.showInactive();
@@ -93,24 +101,48 @@ function showSplashWindow(): void {
 
   splashWindow.on('closed', () => {
     splashWindow = null;
+    videoEndedResolve = null;
   });
 }
 
 /**
  * 关闭启动画面窗口
- * @description 带有淡出动画效果地关闭启动画面窗口，确保至少停留 3 秒
+ * @description 触发开场视频播放，等待视频播完 + 3 秒停留，然后淡出并关闭窗口。
+ *   返回 Promise，在窗口完全关闭后 resolve，供主窗口等待后再显示。
  */
-function closeSplashWindow(): void {
-  if (splashWindow && !splashWindow.isDestroyed()) {
+function closeSplashWindow(): Promise<void> {
+  return new Promise<void>((resolve) => {
+    if (!splashWindow || splashWindow.isDestroyed()) {
+      resolve();
+      return;
+    }
+
     const win = splashWindow;
-    win.webContents.send('splash:fade-out');
-    setTimeout(() => {
-      if (win && !win.isDestroyed()) {
-        win.close();
-      }
-    }, SPLASH_MIN_DISPLAY_MS + SPLASH_FADE_DURATION_MS);
     splashWindow = null;
-  }
+
+    /**
+     * 视频播完后的收尾流程：等待 3s → 淡出 → 关窗口
+     * 可由 IPC 回调触发，也可在 IPC 已错过时立即执行
+     */
+    const finishAndClose = (): void => {
+      setTimeout(() => {
+        if (!win.isDestroyed()) {
+          win.webContents.send('splash:fade-out');
+        }
+        setTimeout(() => {
+          if (!win.isDestroyed()) {
+            win.close();
+          }
+          resolve();
+        }, SPLASH_FADE_DURATION_MS);
+      }, SPLASH_POST_VIDEO_DELAY_MS);
+    };
+
+    videoEndedResolve = finishAndClose;
+
+    /** 通知 renderer 开始播放视频 */
+    win.webContents.send('splash:play-video');
+  });
 }
 
 /**
