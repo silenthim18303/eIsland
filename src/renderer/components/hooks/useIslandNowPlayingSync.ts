@@ -83,12 +83,14 @@ async function calibrateLyrics(lyrics: SyncedLyricLine[]): Promise<SyncedLyricLi
 }
 
 /**
- * 延迟校准：先设置歌词，延迟后再读取 SMTC 时间戳校准
+ * 延迟校准：先设置歌词，延迟后再读取 SMTC 时间戳校准。
+ * 通过 calTimerRef 跟踪计时器状态，支持暂停时冻结计时、恢复时继续。
  * @param lyrics - 原始歌词数据
  * @param capturedKey - 当前歌曲标识，用于检测切歌
  * @param delayMs - 延迟毫秒数
  * @param songKeyRef - 歌曲标识 ref
  * @param setSyncedLyricsRef - 设置歌词的 ref
+ * @param calTimerRef - 校准计时器状态 ref
  */
 function scheduleCalibration(
   lyrics: SyncedLyricLine[],
@@ -96,13 +98,27 @@ function scheduleCalibration(
   delayMs: number,
   songKeyRef: React.MutableRefObject<string>,
   setSyncedLyricsRef: React.MutableRefObject<(lyrics: SyncedLyricLine[] | null) => void>,
+  calTimerRef: React.MutableRefObject<{
+    timerId: ReturnType<typeof setTimeout> | null;
+    remainingMs: number;
+    pauseTimestamp: number;
+    lyrics: SyncedLyricLine[];
+  }>,
 ): void {
-  setTimeout(async () => {
+  // 清除已有计时器
+  if (calTimerRef.current.timerId !== null) {
+    clearTimeout(calTimerRef.current.timerId);
+  }
+
+  const timerId = setTimeout(async () => {
+    calTimerRef.current = { timerId: null, remainingMs: 0, pauseTimestamp: 0, lyrics: [] };
     if (songKeyRef.current !== capturedKey) return;
     const calibrated = await calibrateLyrics(lyrics);
     if (songKeyRef.current !== capturedKey) return;
     setSyncedLyricsRef.current(calibrated);
   }, delayMs);
+
+  calTimerRef.current = { timerId, remainingMs: delayMs, pauseTimestamp: 0, lyrics };
 }
 
 interface UseIslandNowPlayingSyncOptions {
@@ -132,6 +148,14 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
   const progressBaseRef = useRef({ positionMs: 0, durationMs: 0, timestamp: 0 });
   const progressRafRef = useRef<number | null>(null);
 
+  /** 校准计时器状态，用于暂停/恢复时正确处理剩余时间 */
+  const calTimerRef = useRef<{
+    timerId: ReturnType<typeof setTimeout> | null;
+    remainingMs: number;
+    pauseTimestamp: number;
+    lyrics: SyncedLyricLine[];
+  }>({ timerId: null, remainingMs: 0, pauseTimestamp: 0, lyrics: [] });
+
   useLayoutEffect(() => {
     handleNowPlayingUpdateRef.current = handleNowPlayingUpdate;
   });
@@ -159,6 +183,11 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
       const newKey = info ? `${info.title}||${info.artist}` : '';
       if (newKey && newKey !== songKeyRef.current) {
         songKeyRef.current = newKey;
+        // 切歌时清除校准计时器
+        if (calTimerRef.current.timerId !== null) {
+          clearTimeout(calTimerRef.current.timerId);
+        }
+        calTimerRef.current = { timerId: null, remainingMs: 0, pauseTimestamp: 0, lyrics: [] };
         setSyncedLyricsRef.current(null);
         setLyricsLoadingRef.current(true);
         const capturedKey = newKey;
@@ -196,7 +225,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
                 }));
                 setSyncedLyricsRef.current(mapped);
                 if (calibrateEnabled) {
-                  scheduleCalibration(mapped, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef);
+                  scheduleCalibration(mapped, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef, calTimerRef);
                 }
                 return;
               }
@@ -211,7 +240,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             if (songKeyRef.current !== capturedKey) return;
             setSyncedLyricsRef.current(result);
             if (result && result.length > 0 && calibrateEnabled) {
-              scheduleCalibration(result, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef);
+              scheduleCalibration(result, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef, calTimerRef);
             }
           } catch {
             if (songKeyRef.current === capturedKey) setSyncedLyricsRef.current(null);
@@ -226,6 +255,21 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
 
       if (info && info.position_ms !== undefined) {
         if (info.isPlaying) {
+          // 恢复校准计时器（从暂停恢复时，用剩余时间重新启动）
+          const cal = calTimerRef.current;
+          if (cal.timerId === null && cal.remainingMs > 0 && cal.pauseTimestamp > 0) {
+            const elapsed = Date.now() - cal.pauseTimestamp;
+            const newRemaining = Math.max(0, cal.remainingMs - elapsed);
+            if (newRemaining > 0) {
+              cal.pauseTimestamp = 0;
+              scheduleCalibration(
+                cal.lyrics, songKeyRef.current, newRemaining, songKeyRef, setSyncedLyricsRef, calTimerRef,
+              );
+            } else {
+              calTimerRef.current = { timerId: null, remainingMs: 0, pauseTimestamp: 0, lyrics: [] };
+            }
+          }
+
           progressBaseRef.current = {
             positionMs: info.position_ms,
             durationMs: info.duration_ms,
@@ -247,6 +291,18 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             progressRafRef.current = requestAnimationFrame(tick);
           }
         } else {
+          // 暂停时冻结校准计时器
+          const cal = calTimerRef.current;
+          if (cal.timerId !== null) {
+            clearTimeout(cal.timerId);
+            calTimerRef.current = {
+              timerId: null,
+              remainingMs: cal.remainingMs,
+              pauseTimestamp: Date.now(),
+              lyrics: cal.lyrics,
+            };
+          }
+
           stopProgressRAF();
           updateProgressRef.current(info.position_ms);
         }
@@ -256,6 +312,9 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
     return () => {
       unsubscribe?.();
       stopProgressRAF();
+      if (calTimerRef.current.timerId !== null) {
+        clearTimeout(calTimerRef.current.timerId);
+      }
     };
   }, []);
 }
