@@ -454,7 +454,7 @@ export const SEARCHABLE_SETTINGS: SearchableSettingItem[] = [
   // ── 软件设置 > 交互行为 ──
   { label: '鼠标移开自动收回', desc: '启用后，鼠标离开灵动岛时将自动回到空闲状态（若正在播放音乐则切到歌词态）', labelKey: 'settings.app.behavior.mouseLeaveTitle', descKey: 'settings.app.behavior.mouseLeaveHint', tab: 'app', appPage: 'behavior' },
   { label: '空闲态点击展开', desc: '启用后，鼠标悬停在灵动岛上不会自动展开，需要点击才能展开，后续交互不受影响', labelKey: 'settings.app.behavior.idleClickExpandTitle', descKey: 'settings.app.behavior.idleClickExpandHint', tab: 'app', appPage: 'behavior' },
-  { label: '是否显示启动动画', desc: '开启后每次启动显示启动动画，关闭后不显示', labelKey: 'settings.app.behavior.startupAnimationTitle', descKey: 'settings.app.behavior.startupAnimationHint', tab: 'app', appPage: 'behavior' },
+  { label: '是否显示启动动画', desc: '开启后每次启动显示启动动画，关闭后不显示', labelKey: 'settings.app.animation.startupAnimationTitle', descKey: 'settings.app.animation.startupAnimationHint', tab: 'app', appPage: 'animation' },
   { label: '待办事项 / 倒数日 / 设置 打开方式', desc: '选择点击导航时，在灵动岛内显示还是打开独立窗口', labelKey: 'settings.app.behavior.windowModeTitle', descKey: 'settings.app.behavior.windowModeHint', tab: 'app', appPage: 'behavior' },
   { label: '悬停界面截图按钮模式', desc: '配置 hover 界面的截图按钮触发选区截图或显示器截图', labelKey: 'settings.app.behavior.hoverScreenshotModeTitle', descKey: 'settings.app.behavior.hoverScreenshotModeHint', tab: 'app', appPage: 'behavior' },
   // ── 软件设置 > 动画 ──

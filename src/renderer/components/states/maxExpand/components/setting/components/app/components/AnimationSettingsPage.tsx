@@ -31,6 +31,7 @@ import useIslandStore from '../../../../../../../../store/slices';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
+const STARTUP_ANIMATION_ENABLED_STORE_KEY = 'startup-animation-enabled';
 
 /**
  * 渲染软件动画设置页面
@@ -40,6 +41,7 @@ export function AnimationSettingsPage(): ReactElement {
   const { t } = useTranslation();
   const [maxExpandTabAnim, setMaxExpandTabAnim] = useState(true);
   const [expandTabAnim, setExpandTabAnim] = useState(true);
+  const [startupAnimationEnabled, setStartupAnimationEnabled] = useState<boolean>(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +56,18 @@ export function AnimationSettingsPage(): ReactElement {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    window.api.storeRead(STARTUP_ANIMATION_ENABLED_STORE_KEY).then((data) => {
+      if (cancelled) return;
+      setStartupAnimationEnabled(typeof data === 'boolean' ? data : true);
+    }).catch(() => {
+      if (cancelled) return;
+      setStartupAnimationEnabled(true);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
   const handleMaxExpandTabAnimChange = (enabled: boolean): void => {
     setMaxExpandTabAnim(enabled);
     window.api.storeWrite(MAXEXPAND_TAB_ANIMATION_KEY, enabled).catch(() => {});
@@ -64,6 +78,11 @@ export function AnimationSettingsPage(): ReactElement {
     setExpandTabAnim(enabled);
     window.api.storeWrite(EXPAND_TAB_ANIMATION_KEY, enabled).catch(() => {});
     window.api.settingsPreview('settings:expand-tab-animation', enabled).catch(() => {});
+  };
+
+  const handleStartupAnimationEnabledChange = (enabled: boolean): void => {
+    setStartupAnimationEnabled(enabled);
+    window.api.storeWrite(STARTUP_ANIMATION_ENABLED_STORE_KEY, enabled).catch(() => {});
   };
 
   return (
@@ -143,6 +162,24 @@ export function AnimationSettingsPage(): ReactElement {
                 onChange={(e) => handleMaxExpandTabAnimChange(e.target.checked)}
               />
               {t('settings.app.animation.maxExpandTabSwitchToggle', { defaultValue: '启用切换动画' })}
+            </label>
+          </div>
+        </div>
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-card-title">{t('settings.app.animation.startupAnimationTitle', { defaultValue: '是否显示启动动画' })}</div>
+            <div className="settings-card-subtitle">{t('settings.app.animation.startupAnimationHint', { defaultValue: '开启后每次启动显示启动动画，关闭后不显示' })}</div>
+          </div>
+          <div className="settings-card-inline-row">
+            <label className="settings-card-check">
+              <input
+                type="checkbox"
+                checked={startupAnimationEnabled}
+                onChange={(e) => {
+                  handleStartupAnimationEnabledChange(e.target.checked);
+                }}
+              />
+              {t('settings.app.animation.startupAnimationToggle', { defaultValue: '显示启动动画' })}
             </label>
           </div>
         </div>
