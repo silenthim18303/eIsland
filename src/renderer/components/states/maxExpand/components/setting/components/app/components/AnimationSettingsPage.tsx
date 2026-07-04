@@ -24,11 +24,12 @@
  * @author 鸡哥
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../../../../../store/slices';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
+import { SPLASH_VIDEO_SRC } from '../../../../../../../config/splashConfig';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
@@ -46,6 +47,8 @@ export function AnimationSettingsPage(): ReactElement {
   const [expandTabAnim, setExpandTabAnim] = useState(true);
   const [startupAnimationEnabled, setStartupAnimationEnabled] = useState<boolean>(true);
   const [splashBgColor, setSplashBgColor] = useState(DEFAULT_SPLASH_BG_COLOR);
+  const [previewPlaying, setPreviewPlaying] = useState(false);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -106,6 +109,21 @@ export function AnimationSettingsPage(): ReactElement {
   const handleSplashBgColorReset = (): void => {
     setSplashBgColor(DEFAULT_SPLASH_BG_COLOR);
     window.api.storeWrite(SPLASH_BG_COLOR_STORE_KEY, null).catch(() => {});
+  };
+
+  const handlePreviewPlay = (): void => {
+    const video = previewVideoRef.current;
+    if (!video) return;
+    video.currentTime = 0;
+    video.play().catch(() => {});
+    setPreviewPlaying(true);
+  };
+
+  const handlePreviewPause = (): void => {
+    const video = previewVideoRef.current;
+    if (!video) return;
+    video.pause();
+    setPreviewPlaying(false);
   };
 
   return (
@@ -188,50 +206,83 @@ export function AnimationSettingsPage(): ReactElement {
             </label>
           </div>
         </div>
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <div className="settings-card-title">{t('settings.app.animation.startupAnimationTitle', { defaultValue: '是否显示启动动画' })}</div>
-            <div className="settings-card-subtitle">{t('settings.app.animation.startupAnimationHint', { defaultValue: '开启后每次启动显示启动动画，关闭后不显示' })}</div>
+        <div className="settings-splash-preview-row">
+          <div className="settings-splash-preview-cards">
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title">{t('settings.app.animation.startupAnimationTitle', { defaultValue: '是否显示启动动画' })}</div>
+                <div className="settings-card-subtitle">{t('settings.app.animation.startupAnimationHint', { defaultValue: '开启后每次启动显示启动动画，关闭后不显示' })}</div>
+              </div>
+              <div className="settings-card-inline-row">
+                <label className="settings-card-check">
+                  <input
+                    type="checkbox"
+                    checked={startupAnimationEnabled}
+                    onChange={(e) => {
+                      handleStartupAnimationEnabledChange(e.target.checked);
+                    }}
+                  />
+                  {t('settings.app.animation.startupAnimationToggle', { defaultValue: '显示启动动画' })}
+                </label>
+              </div>
+            </div>
+            <div className="settings-card">
+              <div className="settings-card-header">
+                <div className="settings-card-title-row">
+                  <div className="settings-card-title">{t('settings.app.animation.splashBgColorTitle', { defaultValue: '启动画面背景颜色' })}</div>
+                  <button
+                    className="maxexpand-layout-reset-btn"
+                    type="button"
+                    onClick={handleSplashBgColorReset}
+                    title={t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+                  >
+                    <img src={SvgIcon.REVERT} alt="" className="maxexpand-layout-reset-btn-icon" />
+                    {t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+                  </button>
+                </div>
+                <div className="settings-card-subtitle">{t('settings.app.animation.splashBgColorHint', { defaultValue: '自定义启动画面的背景颜色' })}</div>
+              </div>
+              <div className="settings-card-inline-row">
+                <span className="settings-performance-monitor-color-control">
+                  <input
+                    className="settings-performance-monitor-color-input"
+                    type="color"
+                    value={splashBgColor}
+                    onChange={(e) => handleSplashBgColorChange(e.target.value)}
+                  />
+                  <span className="settings-performance-monitor-color-value">{splashBgColor}</span>
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="settings-card-inline-row">
-            <label className="settings-card-check">
-              <input
-                type="checkbox"
-                checked={startupAnimationEnabled}
-                onChange={(e) => {
-                  handleStartupAnimationEnabledChange(e.target.checked);
-                }}
+          <div className="settings-splash-preview-container">
+            <div className="settings-splash-preview-video-wrapper" style={{ background: splashBgColor }}>
+              <video
+                ref={previewVideoRef}
+                className="settings-splash-preview-video"
+                src={SPLASH_VIDEO_SRC}
+                muted
+                onEnded={() => setPreviewPlaying(false)}
               />
-              {t('settings.app.animation.startupAnimationToggle', { defaultValue: '显示启动动画' })}
-            </label>
-          </div>
-        </div>
-        <div className="settings-card">
-          <div className="settings-card-header">
-            <div className="settings-card-title-row">
-              <div className="settings-card-title">{t('settings.app.animation.splashBgColorTitle', { defaultValue: '启动画面背景颜色' })}</div>
+            </div>
+            <div className="settings-splash-preview-controls">
               <button
-                className="maxexpand-layout-reset-btn"
+                className="settings-splash-preview-btn"
                 type="button"
-                onClick={handleSplashBgColorReset}
-                title={t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+                onClick={handlePreviewPlay}
+                disabled={previewPlaying}
               >
-                <img src={SvgIcon.REVERT} alt="" className="maxexpand-layout-reset-btn-icon" />
-                {t('settings.app.animation.resetDefault', { defaultValue: '恢复默认' })}
+                {t('settings.app.animation.previewPlay', { defaultValue: '预览' })}
+              </button>
+              <button
+                className="settings-splash-preview-btn"
+                type="button"
+                onClick={handlePreviewPause}
+                disabled={!previewPlaying}
+              >
+                {t('settings.app.animation.previewPause', { defaultValue: '暂停' })}
               </button>
             </div>
-            <div className="settings-card-subtitle">{t('settings.app.animation.splashBgColorHint', { defaultValue: '自定义启动画面的背景颜色' })}</div>
-          </div>
-          <div className="settings-card-inline-row">
-            <span className="settings-performance-monitor-color-control">
-              <input
-                className="settings-performance-monitor-color-input"
-                type="color"
-                value={splashBgColor}
-                onChange={(e) => handleSplashBgColorChange(e.target.value)}
-              />
-              <span className="settings-performance-monitor-color-value">{splashBgColor}</span>
-            </span>
           </div>
         </div>
       </div>

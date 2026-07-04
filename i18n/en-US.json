@@ -2215,7 +2215,9 @@
         "startupAnimationToggle": "Show startup animation",
         "splashBgColorTitle": "Splash background color",
         "splashBgColorHint": "Customize the background color of the splash screen",
-        "resetDefault": "Restore Defaults"
+        "resetDefault": "Restore Defaults",
+        "previewPlay": "Preview",
+        "previewPause": "Pause"
       },
       "album": {
         "carouselTitle": "Album Carousel Mode",

@@ -2215,7 +2215,9 @@
         "startupAnimationToggle": "显示启动动画",
         "splashBgColorTitle": "启动画面背景颜色",
         "splashBgColorHint": "自定义启动画面的背景颜色",
-        "resetDefault": "恢复默认"
+        "resetDefault": "恢复默认",
+        "previewPlay": "预览",
+        "previewPause": "暂停"
       },
       "album": {
         "carouselTitle": "相册轮播方式",
