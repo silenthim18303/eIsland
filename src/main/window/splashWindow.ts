@@ -46,7 +46,7 @@ const SPLASH_FADE_DURATION_MS = 300;
  */
 function showSplashWindow(): void {
   if (splashWindow && !splashWindow.isDestroyed()) {
-    splashWindow.show();
+    splashWindow.showInactive();
     return;
   }
 
@@ -61,6 +61,8 @@ function showSplashWindow(): void {
     movable: true,
     alwaysOnTop: true,
     skipTaskbar: true,
+    focusable: false,
+    title: '',
     hasShadow: true,
     icon: is.dev
       ? join(__dirname, '../../resources/icon/eisland_256x256.ico')
@@ -85,7 +87,7 @@ function showSplashWindow(): void {
 
   splashWindow.once('ready-to-show', () => {
     if (splashWindow && !splashWindow.isDestroyed()) {
-      splashWindow.show();
+      splashWindow.showInactive();
     }
   });
 
