@@ -223,13 +223,15 @@ export function AnimationSettingsPage(): ReactElement {
             <div className="settings-card-subtitle">{t('settings.app.animation.splashBgColorHint', { defaultValue: '自定义启动画面的背景颜色' })}</div>
           </div>
           <div className="settings-card-inline-row">
-            <input
-              type="color"
-              value={splashBgColor}
-              onChange={(e) => handleSplashBgColorChange(e.target.value)}
-              style={{ width: 40, height: 32, border: 'none', padding: 0, cursor: 'pointer', background: 'transparent' }}
-            />
-            <span style={{ marginLeft: 8, fontSize: 13, opacity: 0.7 }}>{splashBgColor}</span>
+            <span className="settings-performance-monitor-color-control">
+              <input
+                className="settings-performance-monitor-color-input"
+                type="color"
+                value={splashBgColor}
+                onChange={(e) => handleSplashBgColorChange(e.target.value)}
+              />
+              <span className="settings-performance-monitor-color-value">{splashBgColor}</span>
+            </span>
           </div>
         </div>
       </div>
