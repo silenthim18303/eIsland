@@ -19,32 +19,35 @@
  */
 
 /**
- * @file userAccountApi.types.ts
- * @description 用户账号 API 相关类型定义（向后兼容重新导出）。
+ * @file index.ts
+ * @description 用户模块类型统一导出
  * @author 鸡哥
  */
 
+export type { UserAccountResult } from './UserAccountResult';
+export type { UserAccountLoginData } from './UserAccountLoginData';
+export type { UserEmailCodeScene } from './UserEmailCodeScene';
+export type { UserCaptchaConfig, UserCaptchaChallenge, UserCaptchaPayload } from './UserCaptcha';
 export type {
-  UserAccountResult,
-  UserAccountLoginData,
-  UserEmailCodeScene,
-  UserCaptchaConfig,
-  UserCaptchaChallenge,
-  UserCaptchaPayload,
   WallpaperMarketItem,
   WallpaperMarketListData,
   UploadWallpaperPayload,
   UploadWallpaperOptions,
   WallpaperTagItem,
+} from './Wallpaper';
+export type {
   UserIssueFeedbackItem,
   UserIssueFeedbackListData,
   SubmitUserIssueFeedbackPayload,
   UserFeedbackUploadOptions,
-  UpdateUserProfilePayload,
-  UpdateUserPasswordPayload,
+} from './UserFeedback';
+export type { UpdateUserProfilePayload, UpdateUserPasswordPayload } from './UserProfile';
+export type {
+  UserPaymentCreateChannel,
   UserPaymentPricingData,
   UserPaymentChannelsData,
   UserPaymentOrderData,
-  UserAccountGender,
-  UserAccountProfile,
-} from './types';
+  AgentBalanceData,
+} from './UserPayment';
+export type { InternalRequestInit } from './InternalRequestInit';
+export type { UserAccountGender, UserAccountProfile } from '../../../utils/userAccount';

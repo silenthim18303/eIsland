@@ -31,8 +31,10 @@ import type {
   UserPaymentOrderData,
   UserPaymentPricingData,
 } from './userAccountApi.types';
+import type { UserPaymentCreateChannel } from './types/UserPayment';
+import type { AgentBalanceData } from './types/UserPayment';
 
-export type UserPaymentCreateChannel = 'WECHAT' | 'ALIPAY';
+export type { UserPaymentCreateChannel, AgentBalanceData };
 
 /**
  * 获取 Pro 月付价格信息。
@@ -124,10 +126,6 @@ export function closeUserPaymentOrder(
     method: 'POST',
     auth: token,
   });
-}
-
-export interface AgentBalanceData {
-  balanceYuan: string;
 }
 
 /**

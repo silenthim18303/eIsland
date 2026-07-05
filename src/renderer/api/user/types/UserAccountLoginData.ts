@@ -19,32 +19,19 @@
  */
 
 /**
- * @file userAccountApi.types.ts
- * @description 用户账号 API 相关类型定义（向后兼容重新导出）。
+ * @file UserAccountLoginData.ts
+ * @description 用户登录数据结构定义
  * @author 鸡哥
  */
 
-export type {
-  UserAccountResult,
-  UserAccountLoginData,
-  UserEmailCodeScene,
-  UserCaptchaConfig,
-  UserCaptchaChallenge,
-  UserCaptchaPayload,
-  WallpaperMarketItem,
-  WallpaperMarketListData,
-  UploadWallpaperPayload,
-  UploadWallpaperOptions,
-  WallpaperTagItem,
-  UserIssueFeedbackItem,
-  UserIssueFeedbackListData,
-  SubmitUserIssueFeedbackPayload,
-  UserFeedbackUploadOptions,
-  UpdateUserProfilePayload,
-  UpdateUserPasswordPayload,
-  UserPaymentPricingData,
-  UserPaymentChannelsData,
-  UserPaymentOrderData,
-  UserAccountGender,
-  UserAccountProfile,
-} from './types';
+/** 用户登录数据 */
+export interface UserAccountLoginData {
+  /** 认证token */
+  token: string;
+  /** 用户名 */
+  username: string;
+  /** 邮箱 */
+  email: string;
+  /** 角色 */
+  role: string;
+}

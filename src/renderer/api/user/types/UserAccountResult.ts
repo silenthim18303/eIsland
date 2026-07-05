@@ -19,32 +19,19 @@
  */
 
 /**
- * @file userAccountApi.types.ts
- * @description 用户账号 API 相关类型定义（向后兼容重新导出）。
+ * @file UserAccountResult.ts
+ * @description 用户账号API通用响应结构定义
  * @author 鸡哥
  */
 
-export type {
-  UserAccountResult,
-  UserAccountLoginData,
-  UserEmailCodeScene,
-  UserCaptchaConfig,
-  UserCaptchaChallenge,
-  UserCaptchaPayload,
-  WallpaperMarketItem,
-  WallpaperMarketListData,
-  UploadWallpaperPayload,
-  UploadWallpaperOptions,
-  WallpaperTagItem,
-  UserIssueFeedbackItem,
-  UserIssueFeedbackListData,
-  SubmitUserIssueFeedbackPayload,
-  UserFeedbackUploadOptions,
-  UpdateUserProfilePayload,
-  UpdateUserPasswordPayload,
-  UserPaymentPricingData,
-  UserPaymentChannelsData,
-  UserPaymentOrderData,
-  UserAccountGender,
-  UserAccountProfile,
-} from './types';
+/** 用户账号API通用响应 */
+export interface UserAccountResult<T = unknown> {
+  /** 是否成功 */
+  ok: boolean;
+  /** 状态码 */
+  code: number;
+  /** 响应消息 */
+  message: string;
+  /** 响应数据 */
+  data?: T;
+}

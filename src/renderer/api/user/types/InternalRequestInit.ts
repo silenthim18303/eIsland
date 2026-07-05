@@ -19,32 +19,19 @@
  */
 
 /**
- * @file userAccountApi.types.ts
- * @description 用户账号 API 相关类型定义（向后兼容重新导出）。
+ * @file InternalRequestInit.ts
+ * @description 内部请求配置数据结构定义
  * @author 鸡哥
  */
 
-export type {
-  UserAccountResult,
-  UserAccountLoginData,
-  UserEmailCodeScene,
-  UserCaptchaConfig,
-  UserCaptchaChallenge,
-  UserCaptchaPayload,
-  WallpaperMarketItem,
-  WallpaperMarketListData,
-  UploadWallpaperPayload,
-  UploadWallpaperOptions,
-  WallpaperTagItem,
-  UserIssueFeedbackItem,
-  UserIssueFeedbackListData,
-  SubmitUserIssueFeedbackPayload,
-  UserFeedbackUploadOptions,
-  UpdateUserProfilePayload,
-  UpdateUserPasswordPayload,
-  UserPaymentPricingData,
-  UserPaymentChannelsData,
-  UserPaymentOrderData,
-  UserAccountGender,
-  UserAccountProfile,
-} from './types';
+/** 内部请求配置 */
+export interface InternalRequestInit {
+  /** HTTP方法 */
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  /** 认证token */
+  auth?: string | null;
+  /** 请求体 */
+  body?: Record<string, unknown> | null;
+  /** 超时时间（毫秒） */
+  timeoutMs?: number;
+}

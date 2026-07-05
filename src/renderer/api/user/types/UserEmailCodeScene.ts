@@ -19,32 +19,10 @@
  */
 
 /**
- * @file userAccountApi.types.ts
- * @description 用户账号 API 相关类型定义（向后兼容重新导出）。
+ * @file UserEmailCodeScene.ts
+ * @description 邮箱验证码场景类型定义
  * @author 鸡哥
  */
 
-export type {
-  UserAccountResult,
-  UserAccountLoginData,
-  UserEmailCodeScene,
-  UserCaptchaConfig,
-  UserCaptchaChallenge,
-  UserCaptchaPayload,
-  WallpaperMarketItem,
-  WallpaperMarketListData,
-  UploadWallpaperPayload,
-  UploadWallpaperOptions,
-  WallpaperTagItem,
-  UserIssueFeedbackItem,
-  UserIssueFeedbackListData,
-  SubmitUserIssueFeedbackPayload,
-  UserFeedbackUploadOptions,
-  UpdateUserProfilePayload,
-  UpdateUserPasswordPayload,
-  UserPaymentPricingData,
-  UserPaymentChannelsData,
-  UserPaymentOrderData,
-  UserAccountGender,
-  UserAccountProfile,
-} from './types';
+/** 邮箱验证码场景 */
+export type UserEmailCodeScene = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'CHANGE_EMAIL' | 'UNREGISTER';

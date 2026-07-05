@@ -19,32 +19,29 @@
  */
 
 /**
- * @file userAccountApi.types.ts
- * @description 用户账号 API 相关类型定义（向后兼容重新导出）。
+ * @file UserProfile.ts
+ * @description 用户资料相关数据结构定义
  * @author 鸡哥
  */
 
-export type {
-  UserAccountResult,
-  UserAccountLoginData,
-  UserEmailCodeScene,
-  UserCaptchaConfig,
-  UserCaptchaChallenge,
-  UserCaptchaPayload,
-  WallpaperMarketItem,
-  WallpaperMarketListData,
-  UploadWallpaperPayload,
-  UploadWallpaperOptions,
-  WallpaperTagItem,
-  UserIssueFeedbackItem,
-  UserIssueFeedbackListData,
-  SubmitUserIssueFeedbackPayload,
-  UserFeedbackUploadOptions,
-  UpdateUserProfilePayload,
-  UpdateUserPasswordPayload,
-  UserPaymentPricingData,
-  UserPaymentChannelsData,
-  UserPaymentOrderData,
-  UserAccountGender,
-  UserAccountProfile,
-} from './types';
+import type { UserAccountGender } from '../../../utils/userAccount';
+
+/** 更新用户资料载荷 */
+export interface UpdateUserProfilePayload {
+  /** 头像URL */
+  avatar?: string | null;
+  /** 性别 */
+  gender?: UserAccountGender;
+  /** 自定义性别 */
+  genderCustom?: string | null;
+  /** 生日 */
+  birthday?: string | null;
+}
+
+/** 更新用户密码载荷 */
+export interface UpdateUserPasswordPayload {
+  /** 新密码 */
+  password: string;
+  /** 邮箱验证码 */
+  emailCode: string;
+}
