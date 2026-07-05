@@ -33,15 +33,13 @@ import {
   sanitizeClipboardUrlBlacklist,
 } from '../utils/clipboardUrl';
 import { sanitizeProcessNameList } from '../system/runningProcesses';
+import type { IslandPositionOffset } from '../types/config/IslandPositionOffset';
 
 // ===== Types =====
 
 export type ClipboardUrlDetectMode = 'https-only' | 'http-https' | 'domain-only';
 
-export interface IslandPositionOffset {
-  x: number;
-  y: number;
-}
+export type { IslandPositionOffset };
 
 /**
  * 规范化灵动岛显示器选择配置

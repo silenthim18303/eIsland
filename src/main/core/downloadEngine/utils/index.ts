@@ -29,13 +29,9 @@ import { rm } from 'fs/promises';
 import { basename, join } from 'path';
 import { pipeline } from 'stream/promises';
 import { DEFAULT_THREADS, MAX_THREADS, MIN_CHUNK_BYTES, MIN_THREADS } from '../config';
+import type { ChunkInfo } from '../../../types/core/ChunkInfo';
 
-export interface ChunkInfo {
-  index: number;
-  start: number;
-  end: number;
-  partPath: string;
-}
+export type { ChunkInfo };
 
 /**
  * 标准化并限制下载线程数。

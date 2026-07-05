@@ -26,57 +26,24 @@
 
 import http from 'http';
 import https from 'https';
+import type { OpenAIChatMessage } from '../../types/agent/OpenAIChatMessage';
+import type { OpenAIChatRequest } from '../../types/agent/OpenAIChatRequest';
+import type { OpenAIStreamDelta } from '../../types/agent/OpenAIStreamDelta';
+import type { OpenAIStreamChoice } from '../../types/agent/OpenAIStreamChoice';
+import type { OpenAIStreamChunk } from '../../types/agent/OpenAIStreamChunk';
+import type { OpenAIStreamCallbacks } from '../../types/agent/OpenAIStreamCallbacks';
+
+export type {
+  OpenAIChatMessage,
+  OpenAIChatRequest,
+  OpenAIStreamDelta,
+  OpenAIStreamChoice,
+  OpenAIStreamChunk,
+  OpenAIStreamCallbacks,
+};
 
 const CHAT_COMPLETIONS_PATH = '/v1/chat/completions';
 const REQUEST_TIMEOUT_MS = 120_000;
-
-export interface OpenAIChatMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
-
-export interface OpenAIChatRequest {
-  model: string;
-  messages: OpenAIChatMessage[];
-  stream?: boolean;
-  temperature?: number;
-  top_p?: number;
-  max_tokens?: number;
-  baseUrl: string;
-  apiKey: string;
-  signal?: AbortSignal;
-}
-
-export interface OpenAIStreamDelta {
-  content?: string;
-  reasoning_content?: string;
-  role?: string;
-}
-
-export interface OpenAIStreamChoice {
-  index: number;
-  delta: OpenAIStreamDelta;
-  finish_reason: string | null;
-}
-
-export interface OpenAIStreamChunk {
-  id?: string;
-  object?: string;
-  model?: string;
-  choices: OpenAIStreamChoice[];
-  usage?: {
-    prompt_tokens?: number;
-    completion_tokens?: number;
-    total_tokens?: number;
-  };
-}
-
-export interface OpenAIStreamCallbacks {
-  onChunk?: (text: string) => void;
-  onThinkChunk?: (text: string) => void;
-  onDone?: (fullText: string, usage?: OpenAIStreamChunk['usage']) => void;
-  onError?: (error: Error) => void;
-}
 
 /**
  * 解析 baseUrl，确定正确的 completions 路径。

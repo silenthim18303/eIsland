@@ -26,42 +26,20 @@
 
 import { streamOpenAIChat } from './openaiCompatClient';
 import type { OpenAIChatMessage, OpenAIStreamChunk } from './openaiCompatClient';
-import type { AgentLocalToolRequest, AgentLocalToolResult } from './localToolIpc';
+import type { AgentLocalToolResult } from './localToolIpc';
+import type { CustomDirectOrchestratorRequest } from '../../types/agent/CustomDirectOrchestratorRequest';
+import type { CustomDirectEvent, CustomDirectEventType } from '../../types/agent/CustomDirectEvent';
+import type { CustomDirectOrchestratorCallbacks } from '../../types/agent/CustomDirectOrchestratorCallbacks';
+
+export type {
+  CustomDirectOrchestratorRequest,
+  CustomDirectEvent,
+  CustomDirectEventType,
+  CustomDirectOrchestratorCallbacks,
+};
 
 const MAX_REACT_TURNS = 15;
 const MAX_OBSERVATION_CHARS = 8000;
-
-export interface CustomDirectOrchestratorRequest {
-  model: string;
-  systemPrompt: string;
-  userMessage: string;
-  context?: string;
-  baseUrl: string;
-  apiKey: string;
-  temperature?: number;
-  signal?: AbortSignal;
-}
-
-export type CustomDirectEventType =
-  | 'meta'
-  | 'status'
-  | 'think'
-  | 'chunk'
-  | 'tool_call_request'
-  | 'tool_call_result'
-  | 'stream_rollback'
-  | 'final'
-  | 'error';
-
-export interface CustomDirectEvent {
-  type: CustomDirectEventType;
-  payload: Record<string, unknown>;
-}
-
-export interface CustomDirectOrchestratorCallbacks {
-  onEvent: (event: CustomDirectEvent) => void;
-  executeLocalTool: (request: AgentLocalToolRequest) => Promise<AgentLocalToolResult>;
-}
 
 interface ParsedToolCall {
   tool: string;

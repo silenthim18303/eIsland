@@ -26,41 +26,20 @@
 
 import { streamOllamaChat } from './ollamaClient';
 import type { OllamaChatMessage, OllamaStreamChunk } from './ollamaClient';
-import type { AgentLocalToolRequest, AgentLocalToolResult } from './localToolIpc';
+import type { AgentLocalToolResult } from './localToolIpc';
+import type { OllamaOrchestratorRequest } from '../../types/agent/OllamaOrchestratorRequest';
+import type { OllamaEvent, OllamaEventType } from '../../types/agent/OllamaEvent';
+import type { OllamaOrchestratorCallbacks } from '../../types/agent/OllamaOrchestratorCallbacks';
+
+export type {
+  OllamaOrchestratorRequest,
+  OllamaEvent,
+  OllamaEventType,
+  OllamaOrchestratorCallbacks,
+};
 
 const MAX_REACT_TURNS = 15;
 const MAX_OBSERVATION_CHARS = 8000;
-
-export interface OllamaOrchestratorRequest {
-  model: string;
-  systemPrompt: string;
-  userMessage: string;
-  context?: string;
-  baseUrl?: string;
-  temperature?: number;
-  signal?: AbortSignal;
-}
-
-export type OllamaEventType =
-  | 'meta'
-  | 'status'
-  | 'think'
-  | 'chunk'
-  | 'tool_call_request'
-  | 'tool_call_result'
-  | 'stream_rollback'
-  | 'final'
-  | 'error';
-
-export interface OllamaEvent {
-  type: OllamaEventType;
-  payload: Record<string, unknown>;
-}
-
-export interface OllamaOrchestratorCallbacks {
-  onEvent: (event: OllamaEvent) => void;
-  executeLocalTool: (request: AgentLocalToolRequest) => Promise<AgentLocalToolResult>;
-}
 
 interface ParsedToolCall {
   tool: string;
