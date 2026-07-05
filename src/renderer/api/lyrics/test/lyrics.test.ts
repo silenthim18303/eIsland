@@ -27,19 +27,37 @@
 import { describe, expect, it, vi, beforeEach, type Mock } from 'vitest';
 
 const fetchLyricsFromNetease = vi.hoisted(() => vi.fn());
+const fetchLyricsWithTranslationFromNetease = vi.hoisted(() => vi.fn(async (...args: unknown[]) => {
+  const lyrics = await fetchLyricsFromNetease(...args);
+  return lyrics ? { lyrics, translation: { status: 'not-provided', lines: null } } : null;
+}));
 const fetchLyricsFromQQMusic = vi.hoisted(() => vi.fn());
+const fetchLyricsWithTranslationFromQQMusic = vi.hoisted(() => vi.fn(async (...args: unknown[]) => {
+  const lyrics = await fetchLyricsFromQQMusic(...args);
+  return lyrics ? { lyrics, translation: { status: 'not-provided', lines: null } } : null;
+}));
 const fetchLyricsFromKugou = vi.hoisted(() => vi.fn());
 const fetchLyricsFromSodaMusic = vi.hoisted(() => vi.fn());
+const fetchLyricsWithTranslationFromSodaMusic = vi.hoisted(() => vi.fn(async (...args: unknown[]) => {
+  const lyrics = await fetchLyricsFromSodaMusic(...args);
+  return lyrics ? { lyrics, translation: { status: 'not-provided', lines: null } } : null;
+}));
 const fetchLyricsFromLrclib = vi.hoisted(() => vi.fn());
+const fetchLyricsFromAppleMusic = vi.hoisted(() => vi.fn());
+const fetchLyricsFromSpotify = vi.hoisted(() => vi.fn());
+const fetchLyricsFromMoeKoe = vi.hoisted(() => vi.fn());
 
-vi.mock('../lrcs/normal/providers/netease', () => ({ fetchLyricsFromNetease }));
-vi.mock('../lrcs/normal/providers/qqmusic', () => ({ fetchLyricsFromQQMusic }));
+vi.mock('../lrcs/normal/providers/netease', () => ({ fetchLyricsFromNetease, fetchLyricsWithTranslationFromNetease }));
+vi.mock('../lrcs/normal/providers/qqmusic', () => ({ fetchLyricsFromQQMusic, fetchLyricsWithTranslationFromQQMusic }));
 vi.mock('../lrcs/normal/providers/kugou', () => ({ fetchLyricsFromKugou }));
-vi.mock('../lrcs/normal/providers/sodaMusic', () => ({ fetchLyricsFromSodaMusic }));
+vi.mock('../lrcs/normal/providers/sodaMusic', () => ({ fetchLyricsFromSodaMusic, fetchLyricsWithTranslationFromSodaMusic }));
 vi.mock('../lrcs/normal/providers/lrclib', () => ({ fetchLyricsFromLrclib }));
+vi.mock('../lrcs/normal/providers/appleMusic', () => ({ fetchLyricsFromAppleMusic }));
+vi.mock('../lrcs/normal/providers/spotify', () => ({ fetchLyricsFromSpotify }));
+vi.mock('../lrcs/normal/providers/moeKoe', () => ({ fetchLyricsFromMoeKoe }));
 
 import type { LyricLine } from '../lrcs/index';
-import { getCurrentLyric, getNearbyLyrics, fetchLyrics } from '../lrcs/index';
+import { getCurrentLyric, getNearbyLyrics, fetchLyrics, fetchLyricsWithTranslation } from '../lrcs/index';
 
 function makeLyric(time_ms: number, text: string): LyricLine {
   return { time_ms, text };
@@ -225,6 +243,18 @@ describe('fetchLyrics', () => {
     expect(fetchLyricsFromKugou).not.toHaveBeenCalled();
     expect(fetchLyricsFromLrclib).not.toHaveBeenCalled();
     expect(result).toEqual(expected);
+  });
+
+  it('keeps translation payload in the data-layer result', async () => {
+    musicLyricsSourceGet.mockResolvedValue('netease-only');
+    const lyrics: LyricLine[] = [makeLyric(0, 'ne-line')];
+    const translation = { status: 'available' as const, lines: [makeLyric(0, 'translated-line')] };
+    fetchLyricsWithTranslationFromNetease.mockResolvedValueOnce({ lyrics, translation });
+
+    const result = await fetchLyricsWithTranslation('song', 'artist');
+
+    expect(fetchLyricsWithTranslationFromNetease).toHaveBeenCalledWith('song', 'artist');
+    expect(result).toEqual({ lyrics, translation });
   });
 
   it('returns null when all providers including lrclib fail', async () => {

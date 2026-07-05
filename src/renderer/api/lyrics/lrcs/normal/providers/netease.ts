@@ -24,8 +24,9 @@
  * @author 鸡哥
  */
 
-import type { LyricLine } from '../types';
+import type { LyricsFetchResult, LyricLine } from '../types';
 import { cleanArtist, cleanTitle, parseSyncedLrc, parseYrc } from '../helpers';
+import { parseTranslationLyrics } from '../translation';
 import { requestJsonWithLog } from '../request';
 
 const NETEASE_HEADERS = {
@@ -34,7 +35,7 @@ const NETEASE_HEADERS = {
   'Content-Type': 'application/x-www-form-urlencoded',
 };
 
-async function searchNetease(queryTitle: string, queryArtist: string): Promise<LyricLine[] | null> {
+async function searchNetease(queryTitle: string, queryArtist: string): Promise<LyricsFetchResult | null> {
   const query = `${queryTitle} ${queryArtist}`;
   try {
     const searchJson = await requestJsonWithLog<Record<string, unknown>>(
@@ -65,18 +66,23 @@ async function searchNetease(queryTitle: string, queryArtist: string): Promise<L
     );
     if (!lrcJson) return null;
 
+    const translationObj = lrcJson.tlyric as Record<string, unknown> | undefined;
+    const translation = parseTranslationLyrics(
+      typeof translationObj?.lyric === 'string' ? translationObj.lyric : null,
+    );
+
     const yrcObj = lrcJson.yrc as Record<string, unknown> | undefined;
     const yrcText = typeof yrcObj?.lyric === 'string' ? yrcObj.lyric : null;
     if (yrcText && yrcText.length > 0) {
       const yrcLines = parseYrc(yrcText);
-      if (yrcLines.length > 0) return yrcLines;
+      if (yrcLines.length > 0) return { lyrics: yrcLines, translation };
     }
 
     const lrcObj = lrcJson.lrc as Record<string, unknown> | undefined;
     const lrcText = typeof lrcObj?.lyric === 'string' ? lrcObj.lyric : null;
     if (lrcText && lrcText.length > 0) {
       const lines = parseSyncedLrc(lrcText);
-      if (lines.length > 0) return lines;
+      if (lines.length > 0) return { lyrics: lines, translation };
     }
 
     return null;
@@ -85,7 +91,10 @@ async function searchNetease(queryTitle: string, queryArtist: string): Promise<L
   }
 }
 
-export async function fetchLyricsFromNetease(title: string, artist: string): Promise<LyricLine[] | null> {
+export async function fetchLyricsWithTranslationFromNetease(
+  title: string,
+  artist: string,
+): Promise<LyricsFetchResult | null> {
   const raw = await searchNetease(title, artist);
   if (raw) return raw;
 
@@ -95,4 +104,9 @@ export async function fetchLyricsFromNetease(title: string, artist: string): Pro
     return searchNetease(cleanedTitle, cleanedArtist);
   }
   return null;
+}
+
+export async function fetchLyricsFromNetease(title: string, artist: string): Promise<LyricLine[] | null> {
+  const result = await fetchLyricsWithTranslationFromNetease(title, artist);
+  return result?.lyrics ?? null;
 }

@@ -26,6 +26,7 @@
 
 import type { LocationInfo } from '../../api/weather/locationApi';
 import type { WeatherApiConfig } from '../../api/weather/weatherApi';
+import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 
 export type { WeatherApiConfig };
 
@@ -376,6 +377,7 @@ export interface MediaSlice {
   coverImage: string | null;
   dominantColor: [number, number, number];
   syncedLyrics: SyncedLyricLine[] | null;
+  translationLyrics: TranslationLyricsResult | null;
   lyricsLoading: boolean;
   updateLrcData: (data: LrcUpdateData | null) => void;
   onMediaChanged: (data: MediaChangedData) => void;
@@ -386,6 +388,7 @@ export interface MediaSlice {
   setDominantColor: (color: [number, number, number]) => void;
   handleNowPlayingUpdate: (info: NowPlayingInfo | null) => void;
   setSyncedLyrics: (lyrics: SyncedLyricLine[] | null) => void;
+  setTranslationLyrics: (translation: TranslationLyricsResult | null) => void;
   setLyricsLoading: (loading: boolean) => void;
 }
 

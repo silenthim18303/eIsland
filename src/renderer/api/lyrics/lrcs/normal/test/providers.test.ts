@@ -72,9 +72,9 @@ vi.mock('../../../../../utils/logger', () => ({
 
 import { fetchLyricsFromKugou } from '../providers/kugou';
 import { fetchLyricsFromLrclib } from '../providers/lrclib';
-import { fetchLyricsFromNetease } from '../providers/netease';
-import { fetchLyricsFromQQMusic } from '../providers/qqmusic';
-import { fetchLyricsFromSodaMusic } from '../providers/sodaMusic';
+import { fetchLyricsFromNetease, fetchLyricsWithTranslationFromNetease } from '../providers/netease';
+import { fetchLyricsFromQQMusic, fetchLyricsWithTranslationFromQQMusic } from '../providers/qqmusic';
+import { fetchLyricsFromSodaMusic, fetchLyricsWithTranslationFromSodaMusic } from '../providers/sodaMusic';
 
 /* ---------- helpers ---------- */
 
@@ -290,10 +290,11 @@ describe('fetchLyricsFromNetease', () => {
     return { result: { songs } };
   }
 
-  function lyricsResponse(yrcLyric?: string, lrcLyric?: string) {
+  function lyricsResponse(yrcLyric?: string, lrcLyric?: string, translationLyric?: string) {
     const resp: Record<string, unknown> = {};
     if (yrcLyric !== undefined) resp.yrc = { lyric: yrcLyric };
     if (lrcLyric !== undefined) resp.lrc = { lyric: lrcLyric };
+    if (translationLyric !== undefined) resp.tlyric = { lyric: translationLyric };
     return resp;
   }
 
@@ -348,6 +349,38 @@ describe('fetchLyricsFromNetease', () => {
       .mockResolvedValueOnce(searchResponse([{ id: 789 }]))
       .mockResolvedValueOnce({});
     expect(await fetchLyricsFromNetease('t', 'a')).toBeNull();
+  });
+
+  it('returns translation lyrics when tlyric exists', async () => {
+    const yrcLines = okLines('yrc-line');
+    const translationLines = okLines('translated-line');
+    mockRequestJsonWithLog
+      .mockResolvedValueOnce(searchResponse([{ id: 321 }]))
+      .mockResolvedValueOnce(lyricsResponse('[00:01.00]yrc-line', undefined, '[00:01.00]translated-line'));
+    mockParseSyncedLrc.mockReturnValueOnce(translationLines);
+    mockParseYrc.mockReturnValueOnce(yrcLines);
+
+    const result = await fetchLyricsWithTranslationFromNetease('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: yrcLines,
+      translation: { status: 'available', lines: translationLines },
+    });
+  });
+
+  it('returns not-provided when Netease response has no translation lyrics', async () => {
+    const lrcLines = okLines('lrc-line');
+    mockRequestJsonWithLog
+      .mockResolvedValueOnce(searchResponse([{ id: 654 }]))
+      .mockResolvedValueOnce(lyricsResponse(undefined, '[00:01.00]lrc-line'));
+    mockParseSyncedLrc.mockReturnValueOnce(lrcLines);
+
+    const result = await fetchLyricsWithTranslationFromNetease('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: lrcLines,
+      translation: { status: 'not-provided', lines: null },
+    });
   });
 
   it('calls the v1 lyrics endpoint with song ID', async () => {
@@ -424,6 +457,32 @@ describe('fetchLyricsFromQQMusic', () => {
     expect(mockParseSyncedLrc).toHaveBeenCalledWith(lrcText);
   });
 
+  it('decodes trans field as translation lyrics', async () => {
+    const lrcText = '[00:05.00]qq-line';
+    const transText = '[00:05.00]qq-translated';
+    const lyricB64 = btoa(unescape(encodeURIComponent(lrcText)));
+    const transB64 = btoa(unescape(encodeURIComponent(transText)));
+    const callback = 'MusicJsonCallback_lrc';
+    const jsonpBody = `${callback}(${JSON.stringify({ lyric: lyricB64, trans: transB64 })})`;
+    const lyricLines = okLines('qq-line');
+    const translationLines = okLines('qq-translated');
+
+    mockSearchWithScoring.mockResolvedValue({ id: '1', mid: 'xyz', title: 't', artists: ['a'] });
+    mockRequestTextWithLog.mockResolvedValueOnce(jsonpBody);
+    mockParseSyncedLrc
+      .mockReturnValueOnce(lyricLines)
+      .mockReturnValueOnce(translationLines);
+
+    const result = await fetchLyricsWithTranslationFromQQMusic('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: lyricLines,
+      translation: { status: 'available', lines: translationLines },
+    });
+    expect(mockParseSyncedLrc).toHaveBeenNthCalledWith(1, lrcText);
+    expect(mockParseSyncedLrc).toHaveBeenNthCalledWith(2, transText);
+  });
+
   it('returns null when decoded LRC parses to empty', async () => {
     const callback = 'MusicJsonCallback_lrc';
     const b64 = btoa(unescape(encodeURIComponent('[99:99.99]')));
@@ -482,6 +541,24 @@ describe('fetchLyricsFromSodaMusic', () => {
     expect(detailUrl).toContain('api.qishui.com/luna/pc/track_v2');
     expect(detailUrl).toContain('track_id=42');
     expect(mockParseKrc).toHaveBeenCalledWith('krc-data');
+  });
+
+  it('returns translation lyrics from translations field', async () => {
+    const krcLines = okLines('soda-line');
+    const translationLines = okLines('soda-translated');
+    mockSearchWithScoring.mockResolvedValue({ id: '42', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({
+      lyric: { content: 'krc-data', translations: '[00:01.00]soda-translated' },
+    });
+    mockParseKrc.mockReturnValueOnce(krcLines);
+    mockParseSyncedLrc.mockReturnValueOnce(translationLines);
+
+    const result = await fetchLyricsWithTranslationFromSodaMusic('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: krcLines,
+      translation: { status: 'available', lines: translationLines },
+    });
   });
 
   it('returns null when parseKrc returns empty', async () => {

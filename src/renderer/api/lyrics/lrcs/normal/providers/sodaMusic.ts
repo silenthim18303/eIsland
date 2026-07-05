@@ -26,8 +26,9 @@
  * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { LyricLine } from '../types';
+import type { LyricsFetchResult, LyricLine } from '../types';
 import { parseKrc } from '../helpers';
+import { parseTranslationLyrics } from '../translation';
 import { requestJsonWithLog } from '../request';
 import { logger } from '../../../../../utils/logger';
 import { searchWithScoring } from '../matcher';
@@ -83,7 +84,7 @@ async function searchSodaMusicApi(query: string): Promise<SearchCandidate[]> {
 
 /* ── 详情 + 歌词获取 ───────────────────────────────────────────────── */
 
-async function fetchLyricsByTrackId(trackId: string): Promise<LyricLine[] | null> {
+async function fetchLyricsByTrackId(trackId: string): Promise<LyricsFetchResult | null> {
   const detailUrl =
     `https://api.qishui.com/luna/pc/track_v2?track_id=${encodeURIComponent(trackId)}&media_type=track&queue_type=&aid=386088&iid=114514`;
 
@@ -105,13 +106,19 @@ async function fetchLyricsByTrackId(trackId: string): Promise<LyricLine[] | null
     logger.warn(`${LOG_TAG} KRC 解析后 0 行, trackId=${trackId}`);
     return null;
   }
+  const translationText = typeof lyricInfo?.translations === 'string' ? lyricInfo.translations : null;
+  const translation = parseTranslationLyrics(translationText);
+
   logger.info(`${LOG_TAG} 获取成功, trackId=${trackId}, 行数=${lines.length}`);
-  return lines;
+  return { lyrics: lines, translation };
 }
 
 /* ── 对外入口 ──────────────────────────────────────────────────────── */
 
-export async function fetchLyricsFromSodaMusic(title: string, artist: string): Promise<LyricLine[] | null> {
+export async function fetchLyricsWithTranslationFromSodaMusic(
+  title: string,
+  artist: string,
+): Promise<LyricsFetchResult | null> {
   logger.info(`${LOG_TAG} 开始获取, title="${title}", artist="${artist}"`);
 
   const matched = await searchWithScoring(
@@ -128,4 +135,9 @@ export async function fetchLyricsFromSodaMusic(title: string, artist: string): P
 
   logger.info(`${LOG_TAG} 匹配到: "${matched.title}" - "${matched.artists.join(', ')}" (id=${matched.id})`);
   return fetchLyricsByTrackId(matched.id);
+}
+
+export async function fetchLyricsFromSodaMusic(title: string, artist: string): Promise<LyricLine[] | null> {
+  const result = await fetchLyricsWithTranslationFromSodaMusic(title, artist);
+  return result?.lyrics ?? null;
 }

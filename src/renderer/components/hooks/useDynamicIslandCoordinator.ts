@@ -95,6 +95,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     dominantColor,
     setDominantColor,
     setSyncedLyrics,
+    setTranslationLyrics,
     setLyricsLoading,
     syncedLyrics,
     lyricsLoading,
@@ -167,6 +168,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     handleNowPlayingUpdate,
     updateProgress,
     setSyncedLyrics,
+    setTranslationLyrics,
     setLyricsLoading,
   });
 

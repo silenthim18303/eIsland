@@ -25,7 +25,12 @@
  * @author 鸡哥
  */
 
-export type { LyricLine } from './lrcs';
+export type {
+  LyricLine,
+  LyricsFetchResult,
+  TranslationLyricsResult,
+  TranslationLyricsStatus,
+} from './lrcs';
 export {
   fetchLyricsFromLrclib,
   fetchLyricsFromNetease,
@@ -33,6 +38,7 @@ export {
   fetchLyricsFromKugou,
   fetchLyricsFromSodaMusic,
   fetchLyrics,
+  fetchLyricsWithTranslation,
   getCurrentLyric,
   getNearbyLyrics,
 } from './lrcs';

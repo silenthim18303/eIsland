@@ -24,38 +24,55 @@
  * @author 鸡哥
  */
 
-import type { LyricLine } from './normal/types';
+import type { LyricLine, LyricsFetchResult } from './normal/types';
 import { fetchLyricsFromLrclib } from './normal/providers/lrclib';
-import { fetchLyricsFromNetease } from './normal/providers/netease';
-import { fetchLyricsFromQQMusic } from './normal/providers/qqmusic';
+import { fetchLyricsWithTranslationFromNetease } from './normal/providers/netease';
+import { fetchLyricsWithTranslationFromQQMusic } from './normal/providers/qqmusic';
 import { fetchLyricsFromKugou } from './normal/providers/kugou';
-import { fetchLyricsFromSodaMusic } from './normal/providers/sodaMusic';
+import { fetchLyricsWithTranslationFromSodaMusic } from './normal/providers/sodaMusic';
 import { fetchLyricsFromAppleMusic } from './normal/providers/appleMusic';
 import { fetchLyricsFromSpotify } from './normal/providers/spotify';
 import { fetchLyricsFromMoeKoe } from './normal/providers/moeKoe';
+import { unsupportedTranslationLyrics } from './normal/translation';
 
-export type { LyricLine } from './normal/types';
+export type {
+  LyricLine,
+  LyricsFetchResult,
+  TranslationLyricsResult,
+  TranslationLyricsStatus,
+} from './normal/types';
 export { fetchLyricsFromLrclib } from './normal/providers/lrclib';
-export { fetchLyricsFromNetease } from './normal/providers/netease';
-export { fetchLyricsFromQQMusic } from './normal/providers/qqmusic';
+export { fetchLyricsFromNetease, fetchLyricsWithTranslationFromNetease } from './normal/providers/netease';
+export { fetchLyricsFromQQMusic, fetchLyricsWithTranslationFromQQMusic } from './normal/providers/qqmusic';
 export { fetchLyricsFromKugou } from './normal/providers/kugou';
-export { fetchLyricsFromSodaMusic } from './normal/providers/sodaMusic';
+export { fetchLyricsFromSodaMusic, fetchLyricsWithTranslationFromSodaMusic } from './normal/providers/sodaMusic';
 export { fetchLyricsFromAppleMusic } from './normal/providers/appleMusic';
 export { fetchLyricsFromSpotify } from './normal/providers/spotify';
 export { fetchLyricsFromMoeKoe } from './normal/providers/moeKoe';
 
 type Provider = 'netease' | 'qqmusic' | 'kugou' | 'sodamusic' | 'applemusic' | 'spotify' | 'moekoe';
 
-type FetchFn = (title: string, artist: string) => Promise<LyricLine[] | null>;
+type FetchFn = (title: string, artist: string) => Promise<LyricsFetchResult | null>;
+
+async function fetchWithUnsupportedTranslation(
+  fetchLyricsOnly: (title: string, artist: string) => Promise<LyricLine[] | null>,
+  title: string,
+  artist: string,
+): Promise<LyricsFetchResult | null> {
+  const lyrics = await fetchLyricsOnly(title, artist);
+  return lyrics && lyrics.length > 0
+    ? { lyrics, translation: unsupportedTranslationLyrics() }
+    : null;
+}
 
 const PROVIDER_MAP: Record<Provider, FetchFn> = {
-  netease: fetchLyricsFromNetease,
-  qqmusic: fetchLyricsFromQQMusic,
-  kugou: fetchLyricsFromKugou,
-  sodamusic: fetchLyricsFromSodaMusic,
-  applemusic: fetchLyricsFromAppleMusic,
-  spotify: fetchLyricsFromSpotify,
-  moekoe: fetchLyricsFromMoeKoe,
+  netease: fetchLyricsWithTranslationFromNetease,
+  qqmusic: fetchLyricsWithTranslationFromQQMusic,
+  kugou: (title, artist) => fetchWithUnsupportedTranslation(fetchLyricsFromKugou, title, artist),
+  sodamusic: fetchLyricsWithTranslationFromSodaMusic,
+  applemusic: (title, artist) => fetchWithUnsupportedTranslation(fetchLyricsFromAppleMusic, title, artist),
+  spotify: (title, artist) => fetchWithUnsupportedTranslation(fetchLyricsFromSpotify, title, artist),
+  moekoe: (title, artist) => fetchWithUnsupportedTranslation(fetchLyricsFromMoeKoe, title, artist),
 };
 
 const ALL_PROVIDERS: Provider[] = ['netease', 'qqmusic', 'kugou', 'sodamusic', 'applemusic', 'spotify', 'moekoe'];
@@ -83,13 +100,13 @@ async function tryProviders(
   providers: Provider[],
   title: string,
   artist: string,
-): Promise<LyricLine[] | null> {
-  return providers.reduce<Promise<LyricLine[] | null>>(async (prevPromise, provider) => {
+): Promise<LyricsFetchResult | null> {
+  return providers.reduce<Promise<LyricsFetchResult | null>>(async (prevPromise, provider) => {
     const prev = await prevPromise;
     if (prev) return prev;
     try {
       const result = await PROVIDER_MAP[provider](title, artist);
-      return result && result.length > 0 ? result : null;
+      return result && result.lyrics.length > 0 ? result : null;
     } catch {
       return null;
     }
@@ -114,22 +131,22 @@ async function readLyricsSourceSetting(): Promise<string> {
   }
 }
 
-export async function fetchLyrics(
+export async function fetchLyricsWithTranslation(
   title: string,
   artist: string,
   sourceAppId?: string,
-): Promise<LyricLine[] | null> {
+): Promise<LyricsFetchResult | null> {
   const setting = await readLyricsSourceSetting();
 
   if (setting === 'lrclib-only') {
-    return fetchLyricsFromLrclib(title, artist);
+    return fetchWithUnsupportedTranslation(fetchLyricsFromLrclib, title, artist);
   }
 
   const forced = SOURCE_SETTING_TO_PROVIDER[setting];
   if (forced) {
     const result = await tryProviders([forced], title, artist);
     if (result) return result;
-    return fetchLyricsFromLrclib(title, artist);
+    return fetchWithUnsupportedTranslation(fetchLyricsFromLrclib, title, artist);
   }
 
   const appId = sourceAppId ?? await resolveSourceAppId();
@@ -144,7 +161,16 @@ export async function fetchLyrics(
     if (result) return result;
   }
 
-  return fetchLyricsFromLrclib(title, artist);
+  return fetchWithUnsupportedTranslation(fetchLyricsFromLrclib, title, artist);
+}
+
+export async function fetchLyrics(
+  title: string,
+  artist: string,
+  sourceAppId?: string,
+): Promise<LyricLine[] | null> {
+  const result = await fetchLyricsWithTranslation(title, artist, sourceAppId);
+  return result?.lyrics ?? null;
 }
 
 async function resolveSourceAppId(): Promise<string> {

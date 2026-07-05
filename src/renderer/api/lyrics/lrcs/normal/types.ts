@@ -28,3 +28,15 @@ export interface LyricLine {
   time_ms: number;
   text: string;
 }
+
+export type TranslationLyricsStatus = 'available' | 'not-provided' | 'not-fetched' | 'unsupported';
+
+export interface TranslationLyricsResult {
+  status: TranslationLyricsStatus;
+  lines: LyricLine[] | null;
+}
+
+export interface LyricsFetchResult {
+  lyrics: LyricLine[];
+  translation: TranslationLyricsResult;
+}
