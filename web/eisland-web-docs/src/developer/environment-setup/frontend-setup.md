@@ -235,7 +235,7 @@ The project uses **electron-vite** to manage three separate build targets:
 |--------|-------|--------|-------------|
 | **main** | `src/main/index.ts`, `src/main/smtcWorker.ts` | `out/main` | Node.js main process |
 | **preload** | `src/preload/index.ts` | `out/preload` | Context bridge |
-| **renderer** | `index.html`, `standalone.html`, `AIbackground.html` | `out/renderer` | React UI (3 HTML entries) |
+| **renderer** | `index.html`, `standalone.html`, `splash.html`, `AIbackground.html` | `out/renderer` | React UI (4 HTML entries) |
 
 ### Key Build Dependencies
 
