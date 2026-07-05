@@ -121,6 +121,7 @@ import {
   writeIslandPositionOffsetConfig, writeIslandDisplaySelectionConfig,
   readClipboardUrlMonitorEnabledConfig, readClipboardUrlDetectModeConfig, readClipboardUrlBlacklistConfig,
   readUpdateAutoPromptConfig, readStartupAnimationEnabledConfig,
+  readFirstLaunchConfig, writeFirstLaunchConfig,
 } from './config/storeConfig';
 import type { IslandPositionOffset } from './config/storeConfig';
 
@@ -836,6 +837,12 @@ app.whenReady().then(() => {
   clipboardUrlState.setMonitorEnabled(readClipboardUrlMonitorEnabledConfig());
   clipboardUrlState.setDetectMode(readClipboardUrlDetectModeConfig());
   clipboardUrlState.setBlacklist(readClipboardUrlBlacklistConfig());
+
+  /** 是否为首次启动 */
+  const isFirstLaunch = readFirstLaunchConfig();
+  if (isFirstLaunch) {
+    writeFirstLaunchConfig();
+  }
 
   if (readStartupAnimationEnabledConfig()) {
     showSplashWindow();
