@@ -239,3 +239,18 @@
   color: rgba(var(--color-text-rgb), 0.6);
   font-size: 14px;
 }
+
+.announcement-content-row {
+  flex: 1;
+  display: flex;
+  gap: 14px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.announcement-video-wrapper {
+  flex: 0 0 50%;
+  min-width: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}

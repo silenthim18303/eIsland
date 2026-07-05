@@ -43,6 +43,7 @@ export interface AnnouncementData {
   startAt?: string;
   endAt?: string;
   updatedAt?: string;
+  bvid?: string;
 }
 
 export async function readAnnouncementShowMode(): Promise<AnnouncementShowMode> {
@@ -98,6 +99,7 @@ export async function fetchCurrentAnnouncement(): Promise<AnnouncementData | nul
     const startAt = typeof payload.data.startAt === 'string' ? payload.data.startAt : undefined;
     const endAt = typeof payload.data.endAt === 'string' ? payload.data.endAt : undefined;
     const updatedAt = typeof payload.data.updatedAt === 'string' ? payload.data.updatedAt : undefined;
+    const bvid = typeof payload.data.bvid === 'string' ? payload.data.bvid : undefined;
 
     if (!title && !content && !contentHtml) return null;
 
@@ -109,6 +111,7 @@ export async function fetchCurrentAnnouncement(): Promise<AnnouncementData | nul
       startAt,
       endAt,
       updatedAt,
+      bvid,
     };
   } catch {
     return null;
