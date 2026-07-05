@@ -25,7 +25,7 @@
  */
 
 import { fetchAgentPrompt } from './mihtnelisAgentStream';
-import type { MihtnelisAgentStreamEvent, MihtnelisAgentStreamEventType } from './types/MihtnelisAgentStreamEvent';
+import type { MihtnelisAgentStreamEventType } from './types/MihtnelisAgentStreamEvent';
 import type { OllamaLocalAgentRequest } from './types/OllamaLocalAgentRequest';
 
 export type { OllamaLocalAgentRequest };
