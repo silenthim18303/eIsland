@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-05T14:47:25.358Z
+> 生成时间：2026-07-05T16:18:07.926Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,26 @@
 
 ## Unreleased
 
+- 2026-07-06 | 01803adc | 鸡哥 | Merge pull request #124 from JNTMTMTM/dev
+- 2026-07-06 | 4d205e9b | 鸡哥 | fix: update MiMo API endpoint to token-plan-cn.xiaomimimo.com
+- 2026-07-06 | fdd67d43 | 鸡哥 | refactor(renderer/api/ai/ollamaLocalAgent): remove unused import from MihtnelisAgentStreamEvent
+- 2026-07-06 | 41ee161d | 鸡哥 | refactor(renderer/api/site): move interfaces to co-located types/ folder
+- 2026-07-06 | b091044c | 鸡哥 | refactor(renderer/api/weather): move interfaces to co-located types/ folder
+- 2026-07-06 | 6d85a74e | 鸡哥 | refactor(renderer/api/user): move interfaces to co-located types/ folder
+- 2026-07-05 | 7a0058df | 鸡哥 | refactor(renderer/api/update): move interfaces to co-located types/ folder
+- 2026-07-05 | ab5a1c0c | 鸡哥 | refactor(renderer/api/tools): move interfaces to co-located types/ folder
+- 2026-07-05 | ea0e3fbf | 鸡哥 | refactor(renderer/api/miniGame): move interfaces to co-located types/ folder
+- 2026-07-05 | 83d12d91 | 鸡哥 | refactor(renderer/api/announcement): move interfaces to co-located types/ folder
+- 2026-07-05 | b57c7e98 | 鸡哥 | fix: remove unused MihtnelisAgentStreamEvent import
+- 2026-07-05 | e8d8d57a | 鸡哥 | fix: update type imports and ensure correct buffer type in Tencent STT
+- 2026-07-05 | 37223965 | 鸡哥 | refactor(renderer/api/ai): move interfaces to co-located types/ folder
+- 2026-07-05 | e6ad4c60 | 鸡哥 | revert: undo renderer centralized types migration
+- 2026-07-05 | d3950bcb | 鸡哥 | fix: remove duplicate FetchAgentPrompt interface definitions in mihtnelisAgentStream.ts
+- 2026-07-05 | 5e739018 | 鸡哥 | refactor(renderer/api): move exported interfaces to types/api/ folder
+- 2026-07-05 | c6d3f9e5 | 鸡哥 | refactor(main): move interfaces to types/ folder for architectural compliance
+- 2026-07-05 | 31ff4325 | 鸡哥 | refactor(agent): move interfaces to types/ folder for architectural compliance
+- 2026-07-05 | 832559a1 | 鸡哥 | feat: add first launch configuration handling
+- 2026-07-05 | e7957d6b | github-actions[bot] | docs: auto update CHANGE_LOG.md for #123 by @JNTMTMTM [skip ci]
 - 2026-07-05 | 1e1ee963 | 鸡哥 | Merge pull request #123 from JNTMTMTM/dev
 - 2026-07-05 | 0592f562 | 鸡哥 | docs: update documentation to reflect addition of splash screen and its lifecycle
 - 2026-07-05 | ffef3150 | 鸡哥 | feat: enhance splash screen video handling with IPC readiness notification
