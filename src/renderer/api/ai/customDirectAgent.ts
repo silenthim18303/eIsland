@@ -26,9 +26,6 @@
 
 import { fetchAgentPrompt } from './mihtnelisAgentStream';
 import type { MihtnelisAgentStreamEvent, MihtnelisAgentStreamEventType } from './mihtnelisAgentStream';
-import type { CustomDirectAgentRequest } from '../../types/api/ai/CustomDirectAgentRequest';
-
-export type { CustomDirectAgentRequest };
 
 let cachedSystemPrompt: string | null = null;
 let cachedPromptKey = '';
@@ -74,6 +71,22 @@ async function resolveSystemPrompt(request: CustomDirectAgentRequest): Promise<s
 export function clearCustomDirectPromptCache(): void {
   cachedSystemPrompt = null;
   cachedPromptKey = '';
+}
+
+export interface CustomDirectAgentRequest {
+  token: string;
+  message: string;
+  model: string;
+  agentMode?: string;
+  context?: string;
+  workspaces?: string[];
+  skills?: Array<{ name: string; content: string }>;
+  snapshotMode?: boolean;
+  baseUrl: string;
+  apiKey: string;
+  temperature?: number;
+  signal?: AbortSignal;
+  onEvent?: (event: MihtnelisAgentStreamEvent) => void;
 }
 
 /**

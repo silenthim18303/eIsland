@@ -24,16 +24,24 @@
  * @author 鸡哥
  */
 
-import type { TranslateResponse } from '../../types/api/tools/TranslateResponse';
-import type { TranslateApiResult } from '../../types/api/tools/TranslateApiResult';
-
-export type { TranslateResponse, TranslateApiResult };
-
 const IS_DEV_RENDERER = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const TOOLBOX_API_BASE = IS_DEV_RENDERER
   ? 'https://test.server.pyisland.com/api'
   : 'https://server.pyisland.com/api';
+
+export interface TranslateResponse {
+  targetText: string;
+  source: string;
+  target: string;
+  requestId: string;
+}
+
+export interface TranslateApiResult {
+  success: boolean;
+  data?: TranslateResponse;
+  message?: string;
+}
 
 export async function fetchTranslate(
   token: string,

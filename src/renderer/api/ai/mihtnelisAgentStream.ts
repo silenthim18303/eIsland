@@ -20,27 +20,71 @@
  */
 
 import { buildReplayHeaders, resolveClientVersion, USER_ACCOUNT_API_BASE } from '../user/userAccountApi.client';
-import type { MihtnelisAgentStreamEvent, MihtnelisAgentStreamEventType } from '../../types/api/ai/MihtnelisAgentStreamEvent';
-import type { ResolveMihtnelisWebAccessRequest } from '../../types/api/ai/ResolveMihtnelisWebAccessRequest';
-import type { ResolveMihtnelisLocalToolAccessRequest } from '../../types/api/ai/ResolveMihtnelisLocalToolAccessRequest';
-import type { ResolveMihtnelisLocalToolRequest } from '../../types/api/ai/ResolveMihtnelisLocalToolRequest';
-import type { MihtnelisAgentStreamRequest } from '../../types/api/ai/MihtnelisAgentStreamRequest';
-import type { FetchAgentPromptRequest } from '../../types/api/ai/FetchAgentPromptRequest';
-import type { FetchAgentPromptResponse } from '../../types/api/ai/FetchAgentPromptResponse';
-
-export type {
-  MihtnelisAgentStreamEvent,
-  MihtnelisAgentStreamEventType,
-  ResolveMihtnelisWebAccessRequest,
-  ResolveMihtnelisLocalToolAccessRequest,
-  ResolveMihtnelisLocalToolRequest,
-  MihtnelisAgentStreamRequest,
-  FetchAgentPromptRequest,
-  FetchAgentPromptResponse,
-};
 
 const APP_NAME_HEADER = 'X-App-Name';
 const APP_NAME_VALUE = 'eisland';
+
+export type MihtnelisAgentStreamEventType =
+  | 'meta'
+  | 'tool'
+  | 'tool_call_request'
+  | 'tool_call_result'
+  | 'think'
+  | 'chunk'
+  | 'chunk_reset'
+  | 'billing'
+  | 'web_access_request'
+  | 'web_access_resolved'
+  | 'todo'
+  | 'final'
+  | 'error';
+
+export interface MihtnelisAgentStreamEvent {
+  type: MihtnelisAgentStreamEventType;
+  payload: unknown;
+}
+
+export interface ResolveMihtnelisWebAccessRequest {
+  token: string;
+  requestId: string;
+  allow: boolean;
+}
+
+export interface ResolveMihtnelisLocalToolAccessRequest {
+  token: string;
+  requestId: string;
+  allow: boolean;
+}
+
+export interface ResolveMihtnelisLocalToolRequest {
+  token: string;
+  requestId: string;
+  success: boolean;
+  result?: unknown;
+  error?: string;
+  durationMs?: number;
+}
+
+export interface MihtnelisAgentStreamRequest {
+  token: string;
+  message: string;
+  sessionId?: string;
+  provider?: string;
+  model?: string;
+  agentMode?: string;
+  context?: string;
+  workspaces?: string[];
+  skills?: Array<{ name: string; content: string }>;
+  thinking?: boolean;
+  reasoningEffort?: 'low' | 'medium' | 'high';
+  timestamp?: string;
+  location?: string;
+  snapshotMode?: boolean;
+  customApiKey?: string;
+  customEndpoint?: string;
+  signal?: AbortSignal;
+  onEvent?: (event: MihtnelisAgentStreamEvent) => void;
+}
 
 /**
  * 发起 mihtnelis agent 流式请求。
@@ -274,6 +318,21 @@ export async function resolveMihtnelisLocalToolAccess(request: ResolveMihtnelisL
     const body = await response.text().catch(() => '');
     throw new Error(`本地工具授权提交失败 (${response.status}): ${body || response.statusText}`);
   }
+}
+
+export interface FetchAgentPromptRequest {
+  token: string;
+  agentMode?: string;
+  snapshotMode?: boolean;
+  localMode?: boolean;
+  workspaces?: string[];
+  skills?: Array<{ name: string; content: string }>;
+}
+
+export interface FetchAgentPromptResponse {
+  success: boolean;
+  systemPrompt: string;
+  error?: string;
 }
 
 /**

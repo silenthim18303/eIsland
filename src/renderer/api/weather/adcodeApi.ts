@@ -27,11 +27,43 @@
 import { loadNetworkConfig } from '../../store/utils/storage';
 import { logger } from '../../utils/logger';
 import i18n from '../../i18n';
-import type { DistrictQueryParams } from '../../types/api/weather/DistrictQueryParams';
-import type { DistrictItem } from '../../types/api/weather/DistrictItem';
-import type { DistrictResolvedLocation } from '../../types/api/weather/DistrictResolvedLocation';
 
-export type { DistrictQueryParams, DistrictItem, DistrictResolvedLocation };
+/** 行政区查询参数 */
+export interface DistrictQueryParams {
+  /** 行政区编码（可选，与 keyword 二选一或同时提供） */
+  adcode?: string;
+  /** 区域关键字（支持中文/英文） */
+  keyword?: string;
+  /** 区域关键字（兼容 SDK 字段） */
+  keywords?: string;
+  /** 子级深度：0-3 */
+  subdistrict?: 0 | 1 | 2 | 3;
+  /** 分页页码（从 1 开始） */
+  page?: number;
+  /** 每页数量 */
+  pageSize?: number;
+}
+
+/** 行政区条目（保留可扩展字段） */
+export interface DistrictItem {
+  name?: string;
+  adcode?: string;
+  level?: string;
+  country?: string;
+  province?: string;
+  city?: string;
+  district?: string;
+  lat?: number;
+  lng?: number;
+  [key: string]: unknown;
+}
+
+export interface DistrictResolvedLocation {
+  latitude: number;
+  longitude: number;
+  city: string;
+  adcode?: string;
+}
 
 function toFiniteNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) return value;

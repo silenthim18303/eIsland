@@ -24,9 +24,15 @@
  * @author 鸡哥
  */
 
-import type { VersionInfo } from '../../types/api/update/VersionInfo';
-
-export type { VersionInfo };
+/** 版本信息接口 */
+export interface VersionInfo {
+  appName: string;
+  version: string;
+  description: string;
+  downloadUrl: string;
+  id: number;
+  updatedAt: string;
+}
 
 const IS_DEV_RENDERER = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const VERSION_API_BASE = IS_DEV_RENDERER

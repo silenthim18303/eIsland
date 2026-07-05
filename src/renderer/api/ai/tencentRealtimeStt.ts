@@ -25,19 +25,29 @@
  */
 
 import { buildReplayHeaders, resolveClientVersion, USER_ACCOUNT_API_BASE } from '../user/userAccountApi.client';
-import type { RealtimeSttEvent, RealtimeSttEventType } from '../../types/api/ai/RealtimeSttEvent';
-import type { RealtimeSttSession } from '../../types/api/ai/RealtimeSttSession';
-import type { StartRealtimeSttRequest } from '../../types/api/ai/StartRealtimeSttRequest';
-
-export type {
-  RealtimeSttEvent,
-  RealtimeSttEventType,
-  RealtimeSttSession,
-  StartRealtimeSttRequest,
-};
 
 const APP_NAME_HEADER = 'X-App-Name';
 const APP_NAME_VALUE = 'eisland';
+
+export type RealtimeSttEventType = 'partial' | 'final' | 'error' | 'ready';
+
+export interface RealtimeSttEvent {
+  type: RealtimeSttEventType;
+  text: string;
+}
+
+export interface RealtimeSttSession {
+  pushAudioFrame: (pcm16: Int16Array) => void;
+  stop: () => void;
+}
+
+export interface StartRealtimeSttRequest {
+  token: string;
+  language?: 'zh-CN' | 'en-US';
+  onEvent: (event: RealtimeSttEvent) => void;
+  onOpen?: () => void;
+  onClose?: () => void;
+}
 
 function toWebSocketBase(httpBase: string): string {
   return httpBase.replace(/^https:/i, 'wss:').replace(/^http:/i, 'ws:');

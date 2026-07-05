@@ -36,12 +36,12 @@ import { request as requestUserAccountApi } from '../user/userAccountApi.client'
 import { readLocalToken } from '../../utils/userAccount';
 import { logger } from '../../utils/logger';
 import { fetchLocation } from './locationApi';
-import type { WeatherApiConfig } from '../../types/api/weather/WeatherApiConfig';
-import type { WeatherAlertSummary } from '../../types/api/weather/WeatherAlertSummary';
-import type { StartupWeatherAlertPayload } from '../../types/api/weather/StartupWeatherAlertPayload';
-import type { WeatherAlertLocation } from '../../types/api/weather/WeatherAlertLocation';
 
-export type { WeatherApiConfig, WeatherAlertSummary, StartupWeatherAlertPayload, WeatherAlertLocation };
+/** 天气接口配置（经纬度） */
+export interface WeatherApiConfig {
+  longitude: number;
+  latitude: number;
+}
 
 /** Open-Meteo JSON 响应结构 */
 interface OpenMeteoResponse {
@@ -118,6 +118,29 @@ interface QWeatherAlertItem {
 interface QWeatherAlertResponse {
   code?: string;
   warning?: QWeatherAlertItem[];
+}
+
+interface WeatherAlertLocation {
+  latitude: number;
+  longitude: number;
+  city: string;
+}
+
+export interface WeatherAlertSummary {
+  id: string;
+  title: string;
+  text: string;
+  level: string;
+  severity: string;
+  severityColor: string;
+  typeName: string;
+  sender: string;
+  pubTime: string;
+}
+
+export interface StartupWeatherAlertPayload {
+  location: WeatherAlertLocation;
+  alerts: WeatherAlertSummary[];
 }
 
 function normalizeWeatherAlertLocationCandidate(candidate: unknown): WeatherAlertLocation | null {

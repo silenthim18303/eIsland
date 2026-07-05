@@ -25,7 +25,26 @@
  * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
+/** 搜索候选歌曲（从搜索 API 提取的元数据） */
+export interface SearchCandidate {
+  /** 歌曲 ID（QQ Music 数字 id / Soda Music track id / Netease id / Kugou hash） */
+  id: string;
+  /** QQ Music songmid（可选） */
+  mid?: string;
+  /** 歌曲标题 */
+  title: string;
+  /** 艺术家列表 */
+  artists: string[];
+  /** 专辑名 */
+  album: string;
+  /** 时长（毫秒） */
+  durationMs?: number;
+}
 
-export type { SearchCandidate, ScoreInput };
+/** 评分输入（当前播放歌曲的元数据） */
+export interface ScoreInput {
+  title: string;
+  artist: string;
+  album?: string;
+  durationMs?: number;
+}
