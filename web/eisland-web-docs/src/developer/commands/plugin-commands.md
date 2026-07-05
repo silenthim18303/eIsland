@@ -42,6 +42,13 @@ All plugins share these three build commands:
 After modifying `binding.gyp` (e.g., adding a new source file or library), always run `npm run rebuild` — a regular `npm run build` may use cached artifacts.
 :::
 
+:::info NativeAOT Build Requirement
+Building NativeAOT DLLs (`npm run build:ctypes` for SMTC, Bluetooth, Power, WiFi helpers) requires `vswhere.exe` in PATH. If the build fails with `'vswhere.exe' is not recognized`, add it:
+```bash
+export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
+```
+:::
+
 ---
 
 ## Windows Fullscreen Detector
