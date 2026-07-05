@@ -31,8 +31,6 @@ import type { AnnouncementData } from '../../../../api/announcement/announcement
 import { ANNOUNCEMENT_KEYS, ANNOUNCEMENT_DEFAULTS } from '../config/announcementDefaults';
 import { AnnouncementVideo } from './AnnouncementVideo';
 
-const DEFAULT_BVID = 'BV1QEE36eEWJ';
-
 interface AnnouncementBodyProps {
   loading: boolean;
   announcement: AnnouncementData | null;
@@ -58,12 +56,14 @@ export function AnnouncementBody({ loading, announcement }: AnnouncementBodyProp
     ? <div className="announcement-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(announcement.contentHtml) }} />
     : <div className="announcement-body"><pre>{announcement.content || ''}</pre></div>;
 
-  const bvid = announcement.bvid || DEFAULT_BVID;
+  if (announcement.bvid) {
+    return (
+      <div className="announcement-content-row">
+        <AnnouncementVideo bvid={announcement.bvid} autoplay={false} showDanmaku={false} aspectRatio={9 / 16} />
+        {contentNode}
+      </div>
+    );
+  }
 
-  return (
-    <div className="announcement-content-row">
-      <AnnouncementVideo bvid={bvid} autoplay={false} showDanmaku={false} aspectRatio={9 / 16} />
-      {contentNode}
-    </div>
-  );
+  return contentNode;
 }
