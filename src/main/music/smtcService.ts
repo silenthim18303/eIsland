@@ -314,7 +314,8 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
         }
 
         if (sourceAppId === currentDeviceId) {
-          emitCurrentSession(shouldEmitThumbnail);
+          const resumingFromPause = isPlaying && !prevEntry?.isPlaying;
+          emitCurrentSession(shouldEmitThumbnail || resumingFromPause);
           if (!isPlaying && !hasTitle) {
             currentDeviceId = '';
           }
