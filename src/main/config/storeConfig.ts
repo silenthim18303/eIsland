@@ -65,6 +65,7 @@ export const NOTIFICATION_WIDTH = 500;
 export const NOTIFICATION_HEIGHT = 88;
 export const LYRICS_WIDTH = 500;
 export const LYRICS_HEIGHT = 42;
+export const LYRICS_TRANSLATION_HEIGHT = 60;
 /** 单击展开后的完整面板尺寸 */
 export const EXPANDED_FULL_WIDTH = 860;
 export const EXPANDED_FULL_HEIGHT = 150;

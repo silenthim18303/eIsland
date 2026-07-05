@@ -174,6 +174,7 @@ declare global {
       expandWindow: () => void;
       expandWindowNotification: () => void;
       expandWindowLyrics: () => void;
+      expandWindowLyricsTranslation: () => void;
       expandWindowFull: () => void;
       expandWindowSettings: () => void;
       collapseWindow: () => void;

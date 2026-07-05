@@ -294,6 +294,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     springAnimation,
     animationSpeed,
     dominantColor,
+    translationLyrics: store.translationLyrics,
   });
 
   return {

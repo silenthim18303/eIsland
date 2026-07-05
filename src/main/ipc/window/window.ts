@@ -35,6 +35,7 @@ interface WindowIpcSizeOptions {
   notificationHeight: number;
   lyricsWidth: number;
   lyricsHeight: number;
+  lyricsTranslationHeight: number;
   expandedFullWidth: number;
   expandedFullHeight: number;
   settingsWidth: number;
@@ -144,6 +145,17 @@ export function registerWindowIpcHandlers(options: RegisterWindowIpcHandlersOpti
         y: win.getBounds().y,
         width: options.sizes.lyricsWidth,
         height: options.sizes.lyricsHeight,
+      });
+    });
+  });
+
+  ipcMain.on('window:expand-lyrics-translation', () => {
+    withWindow((win) => {
+      win.setBounds({
+        x: Math.round(options.getInitialCenterX() - options.sizes.lyricsWidth / 2),
+        y: win.getBounds().y,
+        width: options.sizes.lyricsWidth,
+        height: options.sizes.lyricsTranslationHeight,
       });
     });
   });
