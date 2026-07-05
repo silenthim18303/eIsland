@@ -82,7 +82,6 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setExpanded,
     setCli,
     setLyrics,
-    setGuide,
     setAnnouncement,
     setAgentVoiceInput,
     timerData,
@@ -203,7 +202,6 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
   useIslandSettingsSync({
     language,
     initRef,
-    setGuide,
     setNotificationRef,
     applyBgMedia,
     expandLeaveIdleRef,
