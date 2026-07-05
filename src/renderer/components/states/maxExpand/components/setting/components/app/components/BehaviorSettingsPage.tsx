@@ -114,7 +114,7 @@ export function BehaviorSettingsPage({
 
     const restartRequiredNotification = {
       title: t('settings.app.notifications.configChanged.title', { defaultValue: '配置变更' }),
-      body: t('settings.app.notifications.configChanged.body', { defaultValue: '待办事项/倒数日/设置打开方式已变更。' }),
+      body: t('settings.app.notifications.configChanged.body', { defaultValue: '独立窗口模式设置已变更。' }),
       icon: SvgIcon.SETTING,
       type: 'restart-required',
     } as const;
@@ -184,8 +184,8 @@ export function BehaviorSettingsPage({
 
         <div className="settings-card">
           <div className="settings-card-header">
-            <div className="settings-card-title">{t('settings.app.behavior.windowModeTitle', { defaultValue: '待办事项 / 倒数日 / 设置 打开方式' })}</div>
-            <div className="settings-card-subtitle">{t('settings.app.behavior.windowModeHint', { defaultValue: '选择点击导航时，在灵动岛内显示还是打开独立窗口' })}</div>
+            <div className="settings-card-title">{t('settings.app.behavior.windowModeTitle', { defaultValue: '独立窗口模式' })}</div>
+            <div className="settings-card-subtitle">{t('settings.app.behavior.windowModeHint', { defaultValue: '启用后，待办事项、倒数日、设置将在独立窗口中打开，而非灵动岛内' })}</div>
           </div>
           <div className="settings-card-inline-row">
             <label className="settings-card-check">
