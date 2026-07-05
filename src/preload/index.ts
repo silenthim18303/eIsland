@@ -1035,6 +1035,21 @@ const api = {
     return ipcRenderer.invoke('music:lyrics-enabled:set', enabled);
   },
   /**
+   * 获取翻译歌词显示开关
+   * @returns 是否显示翻译歌词
+   */
+  musicLyricsTranslationEnabledGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-translation-enabled:get');
+  },
+  /**
+   * 设置翻译歌词显示开关
+   * @param enabled - 是否显示
+   * @returns 是否保存成功
+   */
+  musicLyricsTranslationEnabledSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-translation-enabled:set', enabled);
+  },
+  /**
    * 获取逐字扫光开关
    * @returns 是否启用逐字扫光
    */

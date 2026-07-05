@@ -60,8 +60,10 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
   } = options;
 
   const lyricsEnabledRef = useRef<boolean>(true);
+  const lyricsTranslationEnabledRef = useRef<boolean>(true);
   useEffect(() => {
     window.api.musicLyricsEnabledGet().then((v) => { lyricsEnabledRef.current = v; }).catch(() => {});
+    window.api.musicLyricsTranslationEnabledGet().then((v) => { lyricsTranslationEnabledRef.current = v; }).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -86,7 +88,7 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
     if (isPlaying && ((syncedLyrics?.length ?? 0) > 0 || lyricsLoading)) {
       const hasTranslation = translationLyrics?.status === 'available'
         && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
-      if (hasTranslation) {
+      if (hasTranslation && lyricsTranslationEnabledRef.current) {
         setLyricsTranslation();
       } else {
         setLyrics();
@@ -97,6 +99,7 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
   /** 歌词状态下翻译歌词加载完成 → 升级到 lyricsTranslation */
   useEffect(() => {
     if (state !== 'lyrics') return;
+    if (!lyricsTranslationEnabledRef.current) return;
     const hasTranslation = translationLyrics?.status === 'available'
       && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
     if (hasTranslation) {

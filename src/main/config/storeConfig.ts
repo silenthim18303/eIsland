@@ -172,6 +172,9 @@ export const LYRICS_CALIBRATE_DELAY_STORE_KEY = 'lyrics-calibrate-delay';
 /** 歌词功能开关存储键名 */
 export const LYRICS_ENABLED_STORE_KEY = 'lyrics-enabled';
 
+/** 翻译歌词显示开关存储键名 */
+export const LYRICS_TRANSLATION_ENABLED_STORE_KEY = 'lyrics-translation-enabled';
+
 /** SMTC 取消订阅时间存储键名 */
 export const SMTC_UNSUBSCRIBE_MS_STORE_KEY = 'music-smtc-unsubscribe-ms';
 

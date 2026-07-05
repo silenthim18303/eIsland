@@ -58,6 +58,8 @@ interface MusicSettingsSectionProps {
   setLyricsKaraoke: (value: boolean) => void;
   lyricsEnabled: boolean;
   setLyricsEnabled: (value: boolean) => void;
+  lyricsTranslationEnabled: boolean;
+  setLyricsTranslationEnabled: (value: boolean) => void;
   lyricsClock: boolean;
   setLyricsClock: (value: boolean) => void;
   lyricsCalibrateEnabled: boolean;
@@ -114,6 +116,8 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
     setLyricsKaraoke,
     lyricsEnabled,
     setLyricsEnabled,
+    lyricsTranslationEnabled,
+    setLyricsTranslationEnabled,
     lyricsClock,
     setLyricsClock,
     lyricsCalibrateEnabled,
@@ -270,6 +274,26 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
                       }}
                     />
                     {t('settings.music.lyrics.enabledToggle', { defaultValue: '启用歌词功能' })}
+                  </label>
+                </div>
+              </div>
+
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <div className="settings-card-title">{t('settings.music.lyrics.translationTitle', { defaultValue: '翻译歌词' })}</div>
+                  <div className="settings-card-subtitle">{t('settings.music.lyrics.translationHint', { defaultValue: '关闭后不显示翻译歌词，不切换到翻译歌词状态' })}</div>
+                </div>
+                <div className="settings-card-inline-row">
+                  <label className="settings-card-check">
+                    <input
+                      type="checkbox"
+                      checked={lyricsTranslationEnabled}
+                      onChange={(e) => {
+                        setLyricsTranslationEnabled(e.target.checked);
+                        window.api.musicLyricsTranslationEnabledSet(e.target.checked).catch(() => {});
+                      }}
+                    />
+                    {t('settings.music.lyrics.translationToggle', { defaultValue: '显示翻译歌词' })}
                   </label>
                 </div>
               </div>
