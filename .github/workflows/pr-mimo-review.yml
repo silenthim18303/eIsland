@@ -1,0 +1,115 @@
+name: PR MiMo Review
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Review PR with MiMo
+        uses: actions/github-script@v7
+        env:
+          MIMO_API_KEY: ${{ secrets.MIMO_API_KEY }}
+          PROMPT_PREFIX: |
+            You are a senior code reviewer for the eIsland project (an Apple Dynamic Island inspired floating widget for Windows built with Electron, using React + TypeScript + Electron + native C/C++/C# plugins).
+
+            Review the following pull request. Provide your review in the same language as the PR title/description (Chinese if Chinese, English otherwise).
+
+            Structure your review as:
+
+            ## Review Summary
+            One-sentence overall assessment.
+
+            ## Findings
+            For each issue found, use this format:
+            - **[severity]** `file:line` — description of the issue
+
+            Severity levels: [critical], [warning], [suggestion]
+
+            Focus on:
+            - Logic errors or bugs
+            - Security concerns
+            - Performance issues
+            - Missing error handling
+            - API misuse or type safety issues
+            - Potential runtime crashes
+
+            If the PR looks good, say so — do not fabricate issues.
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const prNumber = pr.number;
+            const prTitle = pr.title;
+            const prBody = pr.body || '(no description)';
+
+            // Fetch PR diff
+            const diffResponse = await github.rest.pulls.get({
+              owner,
+              repo,
+              pull_number: prNumber,
+              mediaType: { format: 'diff' },
+            });
+            const diff = diffResponse.data;
+
+            // Truncate diff if too large (API token limit)
+            const maxDiffLength = 30000;
+            const truncatedDiff = typeof diff === 'string' && diff.length > maxDiffLength
+              ? diff.substring(0, maxDiffLength) + '\n\n... (diff truncated — too large)'
+              : diff;
+
+            const bk = String.fromCharCode(96);
+            const prompt = process.env.PROMPT_PREFIX
+              + '\n---\nPR #' + prNumber + ': ' + prTitle
+              + '\nDescription:\n' + prBody
+              + '\n\nDiff:\n' + bk + bk + bk + 'diff\n'
+              + truncatedDiff + '\n'
+              + bk + bk + bk + '\n---';
+
+            const response = await fetch('https://api.xiaomi.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + process.env.MIMO_API_KEY,
+              },
+              body: JSON.stringify({
+                model: 'MiMo',
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.3,
+              }),
+            });
+
+            if (!response.ok) {
+              const errText = await response.text();
+              core.setFailed('MiMo API error: ' + response.status + ' ' + errText);
+              return;
+            }
+
+            const data = await response.json();
+            const review = data.choices?.[0]?.message?.content?.trim();
+
+            if (!review) {
+              core.setFailed('MiMo returned empty response');
+              return;
+            }
+
+            const marker = '<!-- mimo-pr-review -->';
+            const body = marker + '\n## MiMo Code Review\n\n' + review;
+
+            await github.rest.pulls.createReview({
+              owner,
+              repo,
+              pull_number: prNumber,
+              event: 'COMMENT',
+              body,
+            });
+
+            console.log('Posted MiMo review on PR #' + prNumber);
