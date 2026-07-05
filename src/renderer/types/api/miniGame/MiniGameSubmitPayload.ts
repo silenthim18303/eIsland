@@ -19,13 +19,23 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file MiniGameSubmitPayload.ts
+ * @description 小游戏提交负载类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 小游戏提交负载 */
+export interface MiniGameSubmitPayload {
+  /** 分数 */
+  score: number;
+  /** 用时（毫秒） */
+  durationMs: number;
+  /** 步数 */
+  moves: number;
+  /** 达成时间戳（毫秒） */
+  achievedAt: number;
+  /** 会话 ID */
+  sessionId?: string;
+  /** 移动轨迹 */
+  moveTrace?: string;
+}

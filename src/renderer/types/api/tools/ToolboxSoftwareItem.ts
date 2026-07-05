@@ -19,13 +19,21 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file ToolboxSoftwareItem.ts
+ * @description 工具箱软件项类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 工具箱软件项 */
+export interface ToolboxSoftwareItem {
+  /** 软件 ID */
+  id: number;
+  /** 软件名称 */
+  name: string;
+  /** 软件描述 */
+  description: string;
+  /** 软件链接 */
+  url: string;
+  /** 软件图标 URL */
+  iconUrl: string;
+}

@@ -19,13 +19,39 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UserIssueFeedbackItem.ts
+ * @description 用户问题反馈项类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 用户问题反馈项 */
+export interface UserIssueFeedbackItem {
+  /** 反馈 ID */
+  id: number;
+  /** 用户名 */
+  username: string;
+  /** 反馈类型 */
+  feedbackType: string;
+  /** 标题 */
+  title: string;
+  /** 内容 */
+  content: string;
+  /** 联系方式 */
+  contact?: string;
+  /** 反馈日志 URL */
+  feedbackLogUrl?: string;
+  /** 反馈截图 URL */
+  feedbackScreenshotUrl?: string;
+  /** 客户端版本 */
+  clientVersion?: string;
+  /** 状态 */
+  status: string;
+  /** 管理员回复 */
+  adminReply?: string;
+  /** 创建时间 */
+  createdAt?: string;
+  /** 更新时间 */
+  updatedAt?: string;
+  /** 解决时间 */
+  resolvedAt?: string;
+}

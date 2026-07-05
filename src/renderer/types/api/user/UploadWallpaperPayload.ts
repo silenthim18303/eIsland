@@ -19,13 +19,39 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UploadWallpaperPayload.ts
+ * @description 上传壁纸负载类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 上传壁纸负载 */
+export interface UploadWallpaperPayload {
+  /** 标题 */
+  title: string;
+  /** 描述 */
+  description?: string;
+  /** 标签 */
+  tags?: string;
+  /** 类型 */
+  type?: 'image' | 'video';
+  /** 版权声明 */
+  copyrightDeclared: boolean;
+  /** 版权信息 */
+  copyrightInfo?: string;
+  /** 宽度 */
+  width?: number;
+  /** 高度 */
+  height?: number;
+  /** 时长（毫秒） */
+  durationMs?: number;
+  /** 帧率 */
+  frameRate?: number;
+  /** 原始文件 */
+  original: File;
+  /** 320px 缩略图 */
+  thumb320: File;
+  /** 720px 缩略图 */
+  thumb720: File;
+  /** 1280px 缩略图 */
+  thumb1280: File;
+}

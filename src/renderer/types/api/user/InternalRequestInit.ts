@@ -19,13 +19,19 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file InternalRequestInit.ts
+ * @description 内部请求初始化类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 内部请求初始化 */
+export interface InternalRequestInit {
+  /** 请求方法 */
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  /** 认证 token */
+  auth?: string | null;
+  /** 请求体 */
+  body?: Record<string, unknown> | null;
+  /** 超时时间（毫秒） */
+  timeoutMs?: number;
+}

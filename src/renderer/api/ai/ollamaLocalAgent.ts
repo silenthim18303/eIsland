@@ -26,6 +26,9 @@
 
 import { fetchAgentPrompt } from './mihtnelisAgentStream';
 import type { MihtnelisAgentStreamEvent, MihtnelisAgentStreamEventType } from './mihtnelisAgentStream';
+import type { OllamaLocalAgentRequest } from '../../types/api/ai/OllamaLocalAgentRequest';
+
+export type { OllamaLocalAgentRequest };
 
 let cachedSystemPrompt: string | null = null;
 let cachedPromptKey = '';
@@ -48,21 +51,6 @@ function getRoleFromToken(token: string | null | undefined): string | null {
 function isProToken(token: string | null | undefined): boolean {
   const role = getRoleFromToken(token);
   return role === 'pro';
-}
-
-export interface OllamaLocalAgentRequest {
-  token: string;
-  message: string;
-  model: string;
-  agentMode?: string;
-  context?: string;
-  workspaces?: string[];
-  skills?: Array<{ name: string; content: string }>;
-  snapshotMode?: boolean;
-  baseUrl?: string;
-  temperature?: number;
-  signal?: AbortSignal;
-  onEvent?: (event: MihtnelisAgentStreamEvent) => void;
 }
 
 function buildPromptCacheKey(

@@ -19,13 +19,21 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UpdateUserProfilePayload.ts
+ * @description 更新用户资料负载类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
+import type { UserAccountGender } from '../../../utils/userAccount';
 
-export type { SearchCandidate, ScoreInput };
+/** 更新用户资料负载 */
+export interface UpdateUserProfilePayload {
+  /** 头像 */
+  avatar?: string | null;
+  /** 性别 */
+  gender?: UserAccountGender;
+  /** 自定义性别 */
+  genderCustom?: string | null;
+  /** 生日 */
+  birthday?: string | null;
+}

@@ -19,13 +19,23 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file DistrictQueryParams.ts
+ * @description 行政区查询参数类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 行政区查询参数 */
+export interface DistrictQueryParams {
+  /** 行政区编码（可选，与 keyword 二选一或同时提供） */
+  adcode?: string;
+  /** 区域关键字（支持中文/英文） */
+  keyword?: string;
+  /** 区域关键字（兼容 SDK 字段） */
+  keywords?: string;
+  /** 子级深度：0-3 */
+  subdistrict?: 0 | 1 | 2 | 3;
+  /** 分页页码（从 1 开始） */
+  page?: number;
+  /** 每页数量 */
+  pageSize?: number;
+}

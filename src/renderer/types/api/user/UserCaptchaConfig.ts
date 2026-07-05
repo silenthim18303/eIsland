@@ -19,13 +19,23 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UserCaptchaConfig.ts
+ * @description 用户验证码配置类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 用户验证码配置 */
+export interface UserCaptchaConfig {
+  /** 是否启用 */
+  enabled: boolean;
+  /** 提供商 */
+  provider?: string;
+  /** 最小值 */
+  minValue?: number;
+  /** 最大值 */
+  maxValue?: number;
+  /** 容差 */
+  tolerance?: number;
+  /** 挑战有效期（秒） */
+  challengeTtlSeconds?: number;
+}

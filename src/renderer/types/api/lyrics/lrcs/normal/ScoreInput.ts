@@ -19,13 +19,19 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file ScoreInput.ts
+ * @description 评分输入类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 评分输入（当前播放歌曲的元数据） */
+export interface ScoreInput {
+  /** 歌曲标题 */
+  title: string;
+  /** 艺术家 */
+  artist: string;
+  /** 专辑名 */
+  album?: string;
+  /** 时长（毫秒） */
+  durationMs?: number;
+}

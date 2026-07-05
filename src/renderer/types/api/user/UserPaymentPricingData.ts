@@ -19,13 +19,31 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UserPaymentPricingData.ts
+ * @description 用户支付定价数据类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 用户支付定价数据 */
+export interface UserPaymentPricingData {
+  /** 产品代码 */
+  productCode: string;
+  /** 金额（分） */
+  amountFen: number;
+  /** 金额（元） */
+  amountYuan: string;
+  /** 货币 */
+  currency: string;
+  /** 计费周期 */
+  billingCycle: string;
+  /** 主题 */
+  subject: string;
+  /** 免费描述 */
+  freeDesc?: string;
+  /** 免费功能列表 */
+  freeFeatures?: string[];
+  /** Pro 描述 */
+  proDesc?: string;
+  /** Pro 功能列表 */
+  proFeatures?: string[];
+}

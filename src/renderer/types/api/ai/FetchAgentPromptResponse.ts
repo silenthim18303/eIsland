@@ -19,13 +19,17 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file FetchAgentPromptResponse.ts
+ * @description 获取 Agent 提示词响应类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 获取 Agent 提示词响应 */
+export interface FetchAgentPromptResponse {
+  /** 请求是否成功 */
+  success: boolean;
+  /** 系统提示词 */
+  systemPrompt: string;
+  /** 错误信息 */
+  error?: string;
+}

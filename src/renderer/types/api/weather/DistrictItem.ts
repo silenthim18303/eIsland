@@ -19,13 +19,31 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file DistrictItem.ts
+ * @description 行政区条目类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 行政区条目（保留可扩展字段） */
+export interface DistrictItem {
+  /** 名称 */
+  name?: string;
+  /** 行政区编码 */
+  adcode?: string;
+  /** 级别 */
+  level?: string;
+  /** 国家 */
+  country?: string;
+  /** 省份 */
+  province?: string;
+  /** 城市 */
+  city?: string;
+  /** 区县 */
+  district?: string;
+  /** 纬度 */
+  lat?: number;
+  /** 经度 */
+  lng?: number;
+  /** 扩展字段 */
+  [key: string]: unknown;
+}

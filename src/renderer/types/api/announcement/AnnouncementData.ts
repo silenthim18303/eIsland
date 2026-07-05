@@ -19,13 +19,27 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file AnnouncementData.ts
+ * @description 公告数据类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 公告数据 */
+export interface AnnouncementData {
+  /** 公告标题 */
+  title: string;
+  /** 公告内容（纯文本） */
+  content: string;
+  /** 公告内容（HTML 格式） */
+  contentHtml?: string;
+  /** 内容格式 */
+  contentFormat?: string;
+  /** 开始时间 */
+  startAt?: string;
+  /** 结束时间 */
+  endAt?: string;
+  /** 更新时间 */
+  updatedAt?: string;
+  /** B 站视频 BV 号 */
+  bvid?: string;
+}

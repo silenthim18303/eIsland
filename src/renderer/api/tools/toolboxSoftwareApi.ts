@@ -24,19 +24,15 @@
  * @author 鸡哥
  */
 
+import type { ToolboxSoftwareItem } from '../../types/api/tools/ToolboxSoftwareItem';
+
+export type { ToolboxSoftwareItem };
+
 const IS_DEV_RENDERER = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const TOOLBOX_API_BASE = IS_DEV_RENDERER
   ? 'https://test.server.pyisland.com/api'
   : 'https://server.pyisland.com/api';
-
-export interface ToolboxSoftwareItem {
-  id: number;
-  name: string;
-  description: string;
-  url: string;
-  iconUrl: string;
-}
 
 export async function fetchToolboxSoftwareList(): Promise<ToolboxSoftwareItem[]> {
   try {

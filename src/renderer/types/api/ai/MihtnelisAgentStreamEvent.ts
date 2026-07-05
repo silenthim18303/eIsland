@@ -19,13 +19,31 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file MihtnelisAgentStreamEvent.ts
+ * @description mihtnelis agent 流式事件类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
+/** mihtnelis agent 流式事件类型 */
+export type MihtnelisAgentStreamEventType =
+  | 'meta'
+  | 'tool'
+  | 'tool_call_request'
+  | 'tool_call_result'
+  | 'think'
+  | 'chunk'
+  | 'chunk_reset'
+  | 'billing'
+  | 'web_access_request'
+  | 'web_access_resolved'
+  | 'todo'
+  | 'final'
+  | 'error';
 
-export type { SearchCandidate, ScoreInput };
+/** mihtnelis agent 流式事件 */
+export interface MihtnelisAgentStreamEvent {
+  /** 事件类型 */
+  type: MihtnelisAgentStreamEventType;
+  /** 事件负载 */
+  payload: unknown;
+}

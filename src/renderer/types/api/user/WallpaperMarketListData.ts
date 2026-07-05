@@ -19,13 +19,17 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file WallpaperMarketListData.ts
+ * @description 壁纸市场列表数据类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
+import type { WallpaperMarketItem } from './WallpaperMarketItem';
 
-export type { SearchCandidate, ScoreInput };
+/** 壁纸市场列表数据 */
+export interface WallpaperMarketListData {
+  /** 壁纸列表 */
+  items: WallpaperMarketItem[];
+  /** 总数 */
+  total?: number;
+}

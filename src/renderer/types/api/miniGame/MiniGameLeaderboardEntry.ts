@@ -19,13 +19,27 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file MiniGameLeaderboardEntry.ts
+ * @description 小游戏排行榜条目类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 小游戏排行榜条目 */
+export interface MiniGameLeaderboardEntry {
+  /** 排名 */
+  rank: number;
+  /** 用户 ID */
+  userId: number;
+  /** 用户名 */
+  username?: string;
+  /** 头像 */
+  avatar?: string | null;
+  /** 是否为 Pro 用户 */
+  isPro?: boolean;
+  /** 最高分 */
+  highScore: number;
+  /** 最佳用时（毫秒） */
+  bestDurationMs?: number;
+  /** 最佳步数 */
+  bestMoves?: number;
+}

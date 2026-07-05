@@ -27,46 +27,19 @@
 import { request, resolveClientVersion } from '../user/userAccountApi.client';
 import { readLocalToken } from '../../utils/userAccount';
 import type { UserAccountResult } from '../user/userAccountApi.types';
+import type { MiniGameScoreData } from '../../types/api/miniGame/MiniGameScoreData';
+import type { MiniGameLeaderboardEntry } from '../../types/api/miniGame/MiniGameLeaderboardEntry';
+import type { MiniGameSubmitPayload } from '../../types/api/miniGame/MiniGameSubmitPayload';
+import type { MiniGameSessionData } from '../../types/api/miniGame/MiniGameSessionData';
+import type { LeaderboardRefreshCheckData } from '../../types/api/miniGame/LeaderboardRefreshCheckData';
 
-export interface MiniGameScoreData {
-  gameId: string;
-  userId: number;
-  highScore: number;
-  bestDurationMs?: number;
-  bestMoves?: number;
-  playsCount?: number;
-  achievedAt?: string;
-}
-
-export interface MiniGameLeaderboardEntry {
-  rank: number;
-  userId: number;
-  username?: string;
-  avatar?: string | null;
-  isPro?: boolean;
-  highScore: number;
-  bestDurationMs?: number;
-  bestMoves?: number;
-}
-
-export interface MiniGameSubmitPayload {
-  score: number;
-  durationMs: number;
-  moves: number;
-  achievedAt: number;
-  sessionId?: string;
-  moveTrace?: string;
-}
-
-export interface MiniGameSessionData {
-  sessionId: string;
-  seed: number;
-  startedAt: number;
-}
-
-export interface LeaderboardRefreshCheckData {
-  requireCaptcha: boolean;
-}
+export type {
+  MiniGameScoreData,
+  MiniGameLeaderboardEntry,
+  MiniGameSubmitPayload,
+  MiniGameSessionData,
+  LeaderboardRefreshCheckData,
+};
 
 interface PendingSubmission {
   submitId: string;

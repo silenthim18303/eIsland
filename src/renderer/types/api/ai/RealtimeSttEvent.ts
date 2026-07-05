@@ -19,13 +19,18 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file RealtimeSttEvent.ts
+ * @description 实时语音识别事件类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
+/** 实时语音识别事件类型 */
+export type RealtimeSttEventType = 'partial' | 'final' | 'error' | 'ready';
 
-export type { SearchCandidate, ScoreInput };
+/** 实时语音识别事件 */
+export interface RealtimeSttEvent {
+  /** 事件类型 */
+  type: RealtimeSttEventType;
+  /** 识别文本 */
+  text: string;
+}

@@ -19,13 +19,15 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UserPaymentChannelsData.ts
+ * @description 用户支付通道数据类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 用户支付通道数据 */
+export interface UserPaymentChannelsData {
+  /** 微信支付是否启用 */
+  wechatEnabled: boolean;
+  /** 支付宝是否启用 */
+  alipayEnabled: boolean;
+}

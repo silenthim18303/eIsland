@@ -19,13 +19,35 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UserPaymentOrderData.ts
+ * @description 用户支付订单数据类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 用户支付订单数据 */
+export interface UserPaymentOrderData {
+  /** 外部交易号 */
+  outTradeNo: string;
+  /** 产品代码 */
+  productCode: string;
+  /** 金额（分） */
+  amountFen: number;
+  /** 货币 */
+  currency: string;
+  /** 状态 */
+  status: string;
+  /** 支付通道 */
+  channel: 'WECHAT' | 'ALIPAY';
+  /** 二维码 URL */
+  qrCodeUrl?: string;
+  /** 支付 URL */
+  payUrl?: string;
+  /** 过期时间 */
+  expireAt?: string;
+  /** 支付时间 */
+  paidAt?: string;
+  /** 创建时间 */
+  createdAt?: string;
+  /** Pro 过期时间 */
+  proExpireAt?: string;
+}

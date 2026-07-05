@@ -19,13 +19,19 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file TranslateApiResult.ts
+ * @description 翻译 API 结果类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
+import type { TranslateResponse } from './TranslateResponse';
 
-export type { SearchCandidate, ScoreInput };
+/** 翻译 API 结果 */
+export interface TranslateApiResult {
+  /** 请求是否成功 */
+  success: boolean;
+  /** 翻译响应数据 */
+  data?: TranslateResponse;
+  /** 错误信息 */
+  message?: string;
+}

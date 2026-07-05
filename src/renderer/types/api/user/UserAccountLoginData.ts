@@ -19,13 +19,19 @@
  */
 
 /**
- * @file searchTypes.ts
- * @description 歌词搜索共享类型 — 搜索候选、评分输入
+ * @file UserAccountLoginData.ts
+ * @description 用户账号登录数据类型定义
  * @author 鸡哥
- * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { SearchCandidate } from '../../../../types/api/lyrics/lrcs/normal/SearchCandidate';
-import type { ScoreInput } from '../../../../types/api/lyrics/lrcs/normal/ScoreInput';
-
-export type { SearchCandidate, ScoreInput };
+/** 用户账号登录数据 */
+export interface UserAccountLoginData {
+  /** 用户 token */
+  token: string;
+  /** 用户名 */
+  username: string;
+  /** 邮箱 */
+  email: string;
+  /** 角色 */
+  role: string;
+}
