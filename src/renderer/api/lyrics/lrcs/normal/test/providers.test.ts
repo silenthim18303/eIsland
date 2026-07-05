@@ -543,7 +543,7 @@ describe('fetchLyricsFromSodaMusic', () => {
     expect(mockParseKrc).toHaveBeenCalledWith('krc-data');
   });
 
-  it('returns translation lyrics from translations field', async () => {
+  it('returns translation lyrics from translations field (string format)', async () => {
     const krcLines = okLines('soda-line');
     const translationLines = okLines('soda-translated');
     mockSearchWithScoring.mockResolvedValue({ id: '42', title: 't', artists: ['a'] });
@@ -558,6 +558,58 @@ describe('fetchLyricsFromSodaMusic', () => {
     expect(result).toEqual({
       lyrics: krcLines,
       translation: { status: 'available', lines: translationLines },
+    });
+  });
+
+  it('returns translation lyrics from array format translations', async () => {
+    const krcLines = okLines('soda-line');
+    const translationLines = okLines('soda-translated');
+    mockSearchWithScoring.mockResolvedValue({ id: '42', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({
+      lyric: { content: 'krc-data', translations: [{ lang: 'zh', content: '[00:01.00]soda-translated' }] },
+    });
+    mockParseKrc.mockReturnValueOnce(krcLines);
+    mockParseSyncedLrc.mockReturnValueOnce(translationLines);
+
+    const result = await fetchLyricsWithTranslationFromSodaMusic('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: krcLines,
+      translation: { status: 'available', lines: translationLines },
+    });
+  });
+
+  it('returns translation lyrics from object format translations (lang key)', async () => {
+    const krcLines = okLines('soda-line');
+    const translationLines = okLines('soda-translated');
+    mockSearchWithScoring.mockResolvedValue({ id: '42', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({
+      lyric: { content: 'krc-data', translations: { cn: '[00:01.00]soda-translated' } },
+    });
+    mockParseKrc.mockReturnValueOnce(krcLines);
+    mockParseSyncedLrc.mockReturnValueOnce(translationLines);
+
+    const result = await fetchLyricsWithTranslationFromSodaMusic('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: krcLines,
+      translation: { status: 'available', lines: translationLines },
+    });
+  });
+
+  it('returns not-provided when translations is null', async () => {
+    const krcLines = okLines('soda-line');
+    mockSearchWithScoring.mockResolvedValue({ id: '42', title: 't', artists: ['a'] });
+    mockRequestJsonWithLog.mockResolvedValueOnce({
+      lyric: { content: 'krc-data', translations: null },
+    });
+    mockParseKrc.mockReturnValueOnce(krcLines);
+
+    const result = await fetchLyricsWithTranslationFromSodaMusic('t', 'a');
+
+    expect(result).toEqual({
+      lyrics: krcLines,
+      translation: { status: 'not-provided', lines: null },
     });
   });
 

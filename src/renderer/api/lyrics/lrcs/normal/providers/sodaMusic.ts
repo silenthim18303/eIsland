@@ -106,10 +106,32 @@ async function fetchLyricsByTrackId(trackId: string): Promise<LyricsFetchResult 
     logger.warn(`${LOG_TAG} KRC 解析后 0 行, trackId=${trackId}`);
     return null;
   }
-  const translationText = typeof lyricInfo?.translations === 'string' ? lyricInfo.translations : null;
+  const rawTranslations = lyricInfo?.translations;
+  logger.info(`${LOG_TAG} translations 字段类型=${typeof rawTranslations}, 值=${JSON.stringify(rawTranslations)?.slice(0, 200)}`);
+
+  let translationText: string | null = null;
+  if (typeof rawTranslations === 'string') {
+    translationText = rawTranslations;
+  } else if (Array.isArray(rawTranslations) && rawTranslations.length > 0) {
+    // API 可能返回 [{lang: "zh", content: "[00:01.00]..."}] 格式
+    const first = rawTranslations[0] as Record<string, unknown> | undefined;
+    if (first && typeof first.content === 'string') {
+      translationText = first.content;
+    }
+  } else if (rawTranslations && typeof rawTranslations === 'object' && !Array.isArray(rawTranslations)) {
+    // API 返回 {cn: "[00:01.00]...", en: "..."} 格式（语言代码为 key）
+    const obj = rawTranslations as Record<string, unknown>;
+    for (const value of Object.values(obj)) {
+      if (typeof value === 'string' && value.trim().length > 0) {
+        translationText = value;
+        break;
+      }
+    }
+  }
+
   const translation = parseTranslationLyrics(translationText);
 
-  logger.info(`${LOG_TAG} 获取成功, trackId=${trackId}, 行数=${lines.length}`);
+  logger.info(`${LOG_TAG} 获取成功, trackId=${trackId}, 行数=${lines.length}, 翻译歌词状态=${translation.status}`);
   return { lyrics: lines, translation };
 }
 
