@@ -25,16 +25,14 @@
  */
 
 import type { ReactElement } from 'react';
-import { useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
-import { SvgIcon } from '../../../utils/SvgIcon';
 import { useLyricsSettings } from '../lyrics/hooks/useLyricsSettings';
 import { useBeijingClock } from '../lyrics/hooks/useBeijingClock';
 import { useAutoIdle } from '../lyrics/hooks/useAutoIdle';
 import { useCurrentLyric } from '../lyrics/hooks/useCurrentLyric';
-import { findCurrentIndex } from '../lyrics/utils/findCurrentIndex';
-import { KaraokeSyllableLine } from '../lyrics/components/KaraokeSyllableLine';
+import { useTranslationLyric } from './hooks/useTranslationLyric';
+import { useTranslationFallback } from './hooks/useTranslationFallback';
+import { LyricsTranslationContentView } from './components/LyricsTranslationContentView';
 import '../../../styles/lyrics/lyrics.css';
 
 /**
@@ -42,7 +40,6 @@ import '../../../styles/lyrics/lyrics.css';
  * @description 当翻译歌词可用时显示，左侧专辑封面+光晕，右侧原文+翻译双行歌词
  */
 export function LyricsTranslationContent(): ReactElement {
-  const { t } = useTranslation();
   const isMusicPlaying = useIslandStore((s) => s.isMusicPlaying);
   const isPlaying = useIslandStore((s) => s.isPlaying);
   const coverImage = useIslandStore((s) => s.coverImage);
@@ -59,91 +56,30 @@ export function LyricsTranslationContent(): ReactElement {
   const { karaokeEnabled, clockEnabled, musicOuterGlowEffectEnabled } = useLyricsSettings();
   const clockText = useBeijingClock(clockEnabled);
   useAutoIdle(isMusicPlaying, lyricsLoading, syncedLyrics, setIdle);
-  const { currentIdx, hasLyrics, isIntro, currentLine, currentText, hasSyllables } = useCurrentLyric(syncedLyrics, lyricsLoading, currentPositionMs);
+  const { currentIdx, isIntro, currentLine, currentText, hasSyllables } = useCurrentLyric(syncedLyrics, lyricsLoading, currentPositionMs);
 
-  /** 当前翻译歌词行文本 */
-  const translationText = useMemo(() => {
-    if (!translationLines || translationLines.length === 0 || currentIdx < 0) return '';
-    const tIdx = findCurrentIndex(translationLines, currentPositionMs);
-    return tIdx >= 0 ? translationLines[tIdx].text : '';
-  }, [translationLines, currentIdx, currentPositionMs]);
-
-  /** 翻译歌词不可用时回退到普通歌词状态 */
-  useEffect(() => {
-    if (!translationLines || translationLines.length === 0) {
-      window.api?.expandWindowLyrics();
-      useIslandStore.getState().setLyrics();
-    }
-  }, [translationLines]);
-
-  const [r, g, b] = dominantColor;
+  const translationText = useTranslationLyric(translationLines, currentIdx, currentPositionMs);
+  useTranslationFallback(translationLines);
 
   return (
-    <div className="lyrics-content">
-      {/* 背景光晕 */}
-      <div
-        className={`idle-glow${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' active' : ''}${isMusicPlaying && coverImage && !isPlaying && musicOuterGlowEffectEnabled ? ' paused' : ''}`}
-        style={isMusicPlaying && coverImage && musicOuterGlowEffectEnabled
-          ? { background: `radial-gradient(ellipse at 10% 50%, rgba(${r}, ${g}, ${b}, 0.35) 0%, transparent 60%)` }
-          : undefined}
-      />
-
-      {/* 左侧：专辑封面 */}
-      <div className="lyrics-left">
-        <div
-          className={`idle-album-cover${!isPlaying ? ' paused' : ''}${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' glowing' : ''}`}
-          style={{
-            backgroundImage: coverImage ? `url(${coverImage})` : undefined,
-            ...(isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? { boxShadow: `0 0 12px 4px rgba(${r}, ${g}, ${b}, 0.5)` } : {}),
-          }}
-        />
-      </div>
-
-      {/* 中间：当前北京时间 */}
-      {clockEnabled && clockText && (
-        <span className="lyrics-time">{clockText}</span>
-      )}
-
-      {/* 右侧：原文歌词 + 翻译歌词 */}
-      <div className="lyrics-right">
-        {lyricsLoading ? (
-          <div className="lyrics-loading">
-            <span className="lyrics-loading-dot" />
-            <span className="lyrics-loading-dot" />
-            <span className="lyrics-loading-dot" />
-            <span className="lyrics-loading-label">{t('songTab.lyrics.loading')}</span>
-          </div>
-        ) : isIntro ? (
-          <>
-            <span className="lyrics-intro-title-center">{mediaInfo.title}</span>
-            <img src={SvgIcon.MUSIC} alt="" className="lyrics-intro-icon" />
-          </>
-        ) : currentText ? (
-          <div className="lyrics-lines-wrapper">
-            <span
-              key={currentIdx}
-              className={`lyrics-current-line${karaokeEnabled && hasSyllables ? ' lyrics-karaoke' : ''}`}
-            >
-              {karaokeEnabled && hasSyllables && currentLine ? (
-                <KaraokeSyllableLine
-                  syllables={currentLine.syllables!}
-                  lineStartMs={currentLine.time_ms}
-                  posMs={currentPositionMs}
-                />
-              ) : (
-                currentText
-              )}
-            </span>
-            {translationText && (
-              <span key={`t-${currentIdx}`} className="lyrics-translation-line">
-                {translationText}
-              </span>
-            )}
-          </div>
-        ) : (
-          <span className="lyrics-empty">{t('songTab.lyrics.empty')} {t('songTab.lyrics.enjoyMusic', { defaultValue: '享受音乐' })}</span>
-        )}
-      </div>
-    </div>
+    <LyricsTranslationContentView
+      currentPositionMs={currentPositionMs}
+      lyricsLoading={lyricsLoading}
+      isMusicPlaying={isMusicPlaying}
+      isPlaying={isPlaying}
+      coverImage={coverImage}
+      dominantColor={dominantColor}
+      glowEnabled={musicOuterGlowEffectEnabled}
+      clockText={clockText}
+      clockEnabled={clockEnabled}
+      isIntro={isIntro}
+      mediaTitle={mediaInfo.title}
+      currentIdx={currentIdx}
+      currentText={currentText}
+      currentLine={currentLine}
+      hasSyllables={hasSyllables}
+      karaokeEnabled={karaokeEnabled}
+      translationText={translationText}
+    />
   );
 }
