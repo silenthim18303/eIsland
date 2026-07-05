@@ -24,6 +24,7 @@
  */
 
 const path = require('node:path');
+const fs = require('node:fs');
 const koffi = require('koffi');
 
 const TFM = 'net10.0-windows10.0.19041.0';
@@ -34,11 +35,16 @@ const dllCandidates = [
   path.join(__dirname, 'src', 'bin', 'Release', TFM, 'win-x64', 'eIslandWifiHelper.dll'),
 ];
 
+function toUnpackedDllPath(candidate) {
+  return candidate.replace(`${path.sep}app.asar${path.sep}`, `${path.sep}app.asar.unpacked${path.sep}`);
+}
+
 let dllPath;
 for (const candidate of dllCandidates) {
+  const loadableCandidate = toUnpackedDllPath(candidate);
   try {
-    require('node:fs').accessSync(candidate);
-    dllPath = candidate;
+    fs.accessSync(loadableCandidate);
+    dllPath = loadableCandidate;
     break;
   } catch { /* try next */ }
 }
