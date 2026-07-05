@@ -27,18 +27,26 @@
 import type { LyricLine, TranslationLyricsResult } from './types';
 import { parseSyncedLrc } from './helpers';
 
+/** @returns 不支持翻译歌词的结果 */
 export function unsupportedTranslationLyrics(): TranslationLyricsResult {
   return { status: 'unsupported', lines: null };
 }
 
+/** @returns 播放器未提供翻译歌词的结果 */
 export function missingTranslationLyrics(): TranslationLyricsResult {
   return { status: 'not-provided', lines: null };
 }
 
+/** @returns 未获取到翻译歌词的结果 */
 export function unresolvedTranslationLyrics(): TranslationLyricsResult {
   return { status: 'not-fetched', lines: null };
 }
 
+/**
+ * 解析翻译歌词原始文本
+ * @param raw - LRC 格式的翻译歌词文本
+ * @returns 解析后的翻译歌词结果
+ */
 export function parseTranslationLyrics(raw: string | null | undefined): TranslationLyricsResult {
   if (typeof raw !== 'string' || raw.trim().length === 0) {
     return missingTranslationLyrics();
