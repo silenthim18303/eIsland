@@ -26,15 +26,9 @@
 
 import { loadNetworkConfig } from '../../store/utils/storage';
 import { logger } from '../../utils/logger';
+import type { LocationInfo } from './types/LocationInfo';
 
-/** 位置信息接口 */
-export interface LocationInfo {
-  latitude: number;
-  longitude: number;
-  city: string;
-  regionName: string;
-  country: string;
-}
+export type { LocationInfo };
 
 /**
  * 获取当前设备位置（精确坐标）
