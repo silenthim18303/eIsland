@@ -40,6 +40,7 @@ export function useSplashVideo() {
     const removeListener = window.electron.ipcRenderer.on('splash:play-video', () => {
       videoRef.current?.play().catch(() => {});
     });
+    window.electron.ipcRenderer.send('splash:renderer-ready');
     return removeListener;
   }, []);
 
