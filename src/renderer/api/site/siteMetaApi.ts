@@ -24,9 +24,11 @@
  * @author 鸡哥
  */
 
-const SITE_AUTH_POLICY_KEY = 'eIsland_siteAuthorizationPolicies';
+import type { SiteAuthorizationPolicy } from './types/SiteAuthorizationPolicy';
 
-export type SiteAuthorizationPolicy = 'ask' | 'allow' | 'deny';
+export type { SiteAuthorizationPolicy };
+
+const SITE_AUTH_POLICY_KEY = 'eIsland_siteAuthorizationPolicies';
 
 interface SiteAuthorizationPolicyMap {
   [hostname: string]: SiteAuthorizationPolicy;
