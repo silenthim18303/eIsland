@@ -37,7 +37,7 @@ export function useHover(props: HoverContentProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   const getDotLabel = (tab: HoverTab): string => t(`hover.nav.${tab}`, {
-    defaultValue: tab === 'time' ? '工具' : tab === 'o3ics' ? '歌曲' : tab === 'weather' ? '天气' : '展开',
+    defaultValue: tab === 'time' ? '工具' : tab === 'lyrics' ? '歌曲' : tab === 'weather' ? '天气' : '展开',
   });
 
   useEffect(() => {

@@ -34,6 +34,7 @@ interface UseIslandHoverInteractionOptions {
   setHover: () => void;
   setIdle: (force?: boolean) => void;
   setLyrics: () => void;
+  setLyricsTranslation: () => void;
   isHoveringRef: React.MutableRefObject<boolean>;
   idleClickExpandRef: React.MutableRefObject<boolean>;
   expandLeaveIdleRef: React.MutableRefObject<boolean>;
@@ -52,6 +53,7 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
     setHover,
     setIdle,
     setLyrics,
+    setLyricsTranslation,
     isHoveringRef,
     idleClickExpandRef,
     expandLeaveIdleRef,
@@ -176,7 +178,13 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
               isHoveringRef.current = false;
               const store = useIslandStore.getState();
               if (store.isPlaying && store.timerData.state === 'idle' && ((store.syncedLyrics?.length ?? 0) > 0 || store.lyricsLoading)) {
-                setLyrics();
+                const hasTranslation = store.translationLyrics?.status === 'available'
+                  && Boolean(store.translationLyrics.lines && store.translationLyrics.lines.length > 0);
+                if (hasTranslation) {
+                  setLyricsTranslation();
+                } else {
+                  setLyrics();
+                }
               } else {
                 setIdle(true);
               }
@@ -202,6 +210,7 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
     setHover,
     setIdle,
     setLyrics,
+    setLyricsTranslation,
     clearAllTimers,
     isHoveringRef,
     idleClickExpandRef,

@@ -24,8 +24,9 @@
  * @author 鸡哥
  */
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import type { SyncedLyricLine, TimerState } from '../../store/types';
+import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 import type { IslandState } from './useDynamicIslandShell';
 
 interface UseIslandStateBridgesOptions {
@@ -34,7 +35,9 @@ interface UseIslandStateBridgesOptions {
   isPlaying: boolean;
   syncedLyrics: SyncedLyricLine[] | null;
   lyricsLoading: boolean;
+  translationLyrics: TranslationLyricsResult | null;
   setLyrics: () => void;
+  setLyricsTranslation: () => void;
   setAgentVoiceInput: () => void;
   setIdle: (force?: boolean) => void;
 }
@@ -50,10 +53,30 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
     isPlaying,
     syncedLyrics,
     lyricsLoading,
+    translationLyrics,
     setLyrics,
+    setLyricsTranslation,
     setAgentVoiceInput,
     setIdle,
   } = options;
+
+  const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
+  const [lyricsTranslationEnabled, setLyricsTranslationEnabled] = useState<boolean>(true);
+  useEffect(() => {
+    window.api.musicLyricsEnabledGet().then(setLyricsEnabled).catch(() => {});
+    window.api.musicLyricsTranslationEnabledGet().then(setLyricsTranslationEnabled).catch(() => {});
+    const unsub = window.api.onSettingsChanged((channel, value) => {
+      if (channel === 'music:lyrics-enabled') setLyricsEnabled(value as boolean);
+      if (channel === 'music:lyrics-translation-enabled') setLyricsTranslationEnabled(value as boolean);
+    });
+    const onLocal = (e: Event) => {
+      const { channel, value } = (e as CustomEvent).detail;
+      if (channel === 'music:lyrics-enabled') setLyricsEnabled(value);
+      if (channel === 'music:lyrics-translation-enabled') setLyricsTranslationEnabled(value);
+    };
+    window.addEventListener('island:setting-changed', onLocal);
+    return () => { unsub(); window.removeEventListener('island:setting-changed', onLocal); };
+  }, []);
 
   useEffect(() => {
     const unsub = window.api?.onAgentVoiceInputState?.((active: boolean) => {
@@ -71,10 +94,35 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
   }, [state, setAgentVoiceInput, setIdle]);
 
   useEffect(() => {
+    if (!lyricsEnabled) return;
     if (state !== 'idle') return;
     if (timerState !== 'idle') return;
     if (isPlaying && ((syncedLyrics?.length ?? 0) > 0 || lyricsLoading)) {
+      const hasTranslation = translationLyrics?.status === 'available'
+        && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
+      if (hasTranslation && lyricsTranslationEnabled) {
+        setLyricsTranslation();
+      } else {
+        setLyrics();
+      }
+    }
+  }, [state, timerState, isPlaying, syncedLyrics, lyricsLoading, translationLyrics, lyricsEnabled, lyricsTranslationEnabled, setLyrics, setLyricsTranslation]);
+
+  /** 歌词状态下翻译歌词加载完成 → 升级到 lyricsTranslation */
+  useEffect(() => {
+    if (state !== 'lyrics') return;
+    if (!lyricsTranslationEnabled) return;
+    const hasTranslation = translationLyrics?.status === 'available'
+      && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
+    if (hasTranslation) {
+      setLyricsTranslation();
+    }
+  }, [state, translationLyrics, lyricsTranslationEnabled, setLyricsTranslation]);
+
+  /** 翻译歌词关闭时，从 lyricsTranslation 回退到 lyrics */
+  useEffect(() => {
+    if (state === 'lyricsTranslation' && !lyricsTranslationEnabled) {
       setLyrics();
     }
-  }, [state, timerState, isPlaying, syncedLyrics, lyricsLoading, setLyrics]);
+  }, [state, lyricsTranslationEnabled, setLyrics]);
 }

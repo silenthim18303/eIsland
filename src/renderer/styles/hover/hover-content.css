@@ -41,7 +41,9 @@
 
 .island-shell.hover.morphing.from-idle .weather-tab,
 .island-shell.hover.morphing.from-lyrics .hover-nav-dots,
-.island-shell.hover.morphing.from-lyrics .hover-tab-content > * {
+.island-shell.hover.morphing.from-lyrics .hover-tab-content > *,
+.island-shell.hover.morphing.from-lyricsTranslation .hover-nav-dots,
+.island-shell.hover.morphing.from-lyricsTranslation .hover-tab-content > * {
   animation: hoverControlsFadeIn 0.22s ease-out both;
   will-change: opacity;
 }

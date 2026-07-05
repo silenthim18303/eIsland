@@ -27,7 +27,8 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { NowPlayingInfo } from '../../store/isLandStore';
 import type { SyncedLyricLine } from '../../store/types';
-import { fetchLyrics } from '../../api/lyrics/lrcApi';
+import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
+import { fetchLyricsWithTranslation } from '../../api/lyrics/lrcApi';
 import { fetchKaraokeLyrics } from '../../api/lyrics/lrcs/karaoke';
 import type { KaraokeLine } from '../../api/lyrics/lrcs/karaoke';
 
@@ -125,7 +126,25 @@ interface UseIslandNowPlayingSyncOptions {
   handleNowPlayingUpdate: (info: NowPlayingInfo | null) => void;
   updateProgress: (positionMs: number) => void;
   setSyncedLyrics: (lyrics: SyncedLyricLine[] | null) => void;
+  setTranslationLyrics: (translation: TranslationLyricsResult | null) => void;
   setLyricsLoading: (loading: boolean) => void;
+}
+
+function notFetchedTranslationLyrics(): TranslationLyricsResult {
+  return { status: 'not-fetched', lines: null };
+}
+
+const TRANSLATION_STATUS_LABELS: Record<TranslationLyricsResult['status'], string> = {
+  available: '已获取翻译歌词',
+  'not-provided': '播放器未提供翻译歌词',
+  'not-fetched': '未获取到翻译歌词',
+  unsupported: '当前歌词源不支持翻译歌词',
+};
+
+function logTranslationLyricsStatus(translation: TranslationLyricsResult): void {
+  console.log(
+    `[LyricsTranslation] status=${translation.status} ${TRANSLATION_STATUS_LABELS[translation.status]}, lines=${translation.lines?.length ?? 0}`,
+  );
 }
 
 /**
@@ -137,12 +156,14 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
     handleNowPlayingUpdate,
     updateProgress,
     setSyncedLyrics,
+    setTranslationLyrics,
     setLyricsLoading,
   } = options;
 
   const handleNowPlayingUpdateRef = useRef(handleNowPlayingUpdate);
   const updateProgressRef = useRef(updateProgress);
   const setSyncedLyricsRef = useRef(setSyncedLyrics);
+  const setTranslationLyricsRef = useRef(setTranslationLyrics);
   const setLyricsLoadingRef = useRef(setLyricsLoading);
   const songKeyRef = useRef('');
   const progressBaseRef = useRef({ positionMs: 0, durationMs: 0, timestamp: 0 });
@@ -166,6 +187,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
 
   useLayoutEffect(() => {
     setSyncedLyricsRef.current = setSyncedLyrics;
+    setTranslationLyricsRef.current = setTranslationLyrics;
     setLyricsLoadingRef.current = setLyricsLoading;
   });
 
@@ -189,6 +211,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
         }
         calTimerRef.current = { timerId: null, remainingMs: 0, pauseTimestamp: 0, lyrics: [] };
         setSyncedLyricsRef.current(null);
+        setTranslationLyricsRef.current(null);
         setLyricsLoadingRef.current(true);
         const capturedKey = newKey;
         const title = info!.title;
@@ -196,6 +219,24 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
         const deviceId = info!.deviceId;
 
         const loadLyrics = async (): Promise<void> => {
+          let lyricsEnabled = true;
+          try {
+            lyricsEnabled = await window.api.musicLyricsEnabledGet();
+          } catch {
+            lyricsEnabled = true;
+          }
+          if (!lyricsEnabled) {
+            setLyricsLoadingRef.current(false);
+            return;
+          }
+
+          let translationEnabled = true;
+          try {
+            translationEnabled = await window.api.musicLyricsTranslationEnabledGet();
+          } catch {
+            translationEnabled = true;
+          }
+
           let karaokeEnabled = false;
           try {
             karaokeEnabled = await window.api.musicLyricsKaraokeGet();
@@ -212,6 +253,9 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             // use defaults
           }
 
+          const normalLyricsPromise = fetchLyricsWithTranslation(title, artist, deviceId)
+            .catch(() => null);
+
           if (karaokeEnabled) {
             try {
               const karaoke = await fetchKaraokeLyrics(title, artist, deviceId);
@@ -227,6 +271,12 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
                 if (calibrateEnabled) {
                   scheduleCalibration(mapped, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef, calTimerRef);
                 }
+
+                const normalResult = await normalLyricsPromise;
+                if (songKeyRef.current !== capturedKey) return;
+                const translation = normalResult?.translation ?? notFetchedTranslationLyrics();
+                logTranslationLyricsStatus(translation);
+                if (translationEnabled) setTranslationLyricsRef.current(translation);
                 return;
               }
             } catch {
@@ -235,15 +285,15 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             if (songKeyRef.current !== capturedKey) return;
           }
 
-          try {
-            const result = await fetchLyrics(title, artist, deviceId);
-            if (songKeyRef.current !== capturedKey) return;
-            setSyncedLyricsRef.current(result);
-            if (result && result.length > 0 && calibrateEnabled) {
-              scheduleCalibration(result, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef, calTimerRef);
-            }
-          } catch {
-            if (songKeyRef.current === capturedKey) setSyncedLyricsRef.current(null);
+          const result = await normalLyricsPromise;
+          if (songKeyRef.current !== capturedKey) return;
+          const translation = result?.translation ?? notFetchedTranslationLyrics();
+          logTranslationLyricsStatus(translation);
+          if (translationEnabled) setTranslationLyricsRef.current(translation);
+          const lyrics = result?.lyrics ?? null;
+          setSyncedLyricsRef.current(lyrics);
+          if (lyrics && lyrics.length > 0 && calibrateEnabled) {
+            scheduleCalibration(lyrics, capturedKey, calibrateDelaySec * 1000, songKeyRef, setSyncedLyricsRef, calTimerRef);
           }
         };
 
@@ -251,6 +301,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
       } else if (!newKey) {
         songKeyRef.current = '';
         setSyncedLyricsRef.current(null);
+        setTranslationLyricsRef.current(null);
       }
 
       if (info && info.position_ms !== undefined) {

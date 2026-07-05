@@ -19,16 +19,24 @@
  */
 
 /**
- * @file hoverConfig.ts
- * @description Hover 状态配置与类型定义
+ * @file useTranslationFallback.ts
+ * @description 翻译歌词不可用时回退到普通歌词状态 Hook
  * @author 鸡哥
  */
 
-import type { HoverTab } from '../../../../store/types';
+import { useEffect } from 'react';
+import type { LyricLine } from '../../../../api/lyrics/lrcApi';
+import useIslandStore from '../../../../store/slices';
 
-export interface HoverContentProps {
-  fullTimeStr: string;
-  lunarStr: string;
+/**
+ * 当翻译歌词行数组变为空时，自动回退到普通歌词状态。
+ * @param translationLines - 翻译歌词行数组（null 表示不可用）。
+ */
+export function useTranslationFallback(translationLines: LyricLine[] | null): void {
+  useEffect(() => {
+    if (!translationLines || translationLines.length === 0) {
+      window.api?.expandWindowLyrics();
+      useIslandStore.getState().setLyrics();
+    }
+  }, [translationLines]);
 }
-
-export const NAV_DOTS: HoverTab[] = ['time', 'lyrics', 'weather', 'expand'];

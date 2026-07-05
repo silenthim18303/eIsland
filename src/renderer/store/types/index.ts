@@ -26,17 +26,18 @@
 
 import type { LocationInfo } from '../../api/weather/locationApi';
 import type { WeatherApiConfig } from '../../api/weather/weatherApi';
+import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 
 export type { WeatherApiConfig };
 
 /** 灵动岛 UI 状态枚举 */
-export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'lyrics' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
+export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'lyrics' | 'lyricsTranslation' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
 
 /** 灵动岛动画速度档位 */
 export type AnimationSpeed = 'slow' | 'medium' | 'fast';
 
 /** Hover 状态下的子标签页类型 */
-export type HoverTab = 'time' | 'o3ics' | 'weather' | 'expand';
+export type HoverTab = 'time' | 'lyrics' | 'weather' | 'expand';
 
 /** Expanded 状态下的子标签页类型 */
 export type ExpandTab = 'hover' | 'overview' | 'song' | 'tools' | 'translation' | 'performanceMonitor';
@@ -105,7 +106,7 @@ export interface LrcUpdateData {
   artist: string;
   position_ms?: number;
   duration_ms?: number;
-  nearby_o3ics?: LyricLine[];
+  nearby_lyrics?: LyricLine[];
 }
 
 /** 媒体变化数据 */
@@ -326,6 +327,7 @@ export interface IslandSlice {
   setPayment: (context?: PaymentContext) => void;
   returnFromAuth: () => void;
   setLyrics: () => void;
+  setLyricsTranslation: () => void;
   setNotification: (data: NotificationData) => void;
 
   setGuide: () => void;
@@ -376,6 +378,7 @@ export interface MediaSlice {
   coverImage: string | null;
   dominantColor: [number, number, number];
   syncedLyrics: SyncedLyricLine[] | null;
+  translationLyrics: TranslationLyricsResult | null;
   lyricsLoading: boolean;
   updateLrcData: (data: LrcUpdateData | null) => void;
   onMediaChanged: (data: MediaChangedData) => void;
@@ -386,6 +389,7 @@ export interface MediaSlice {
   setDominantColor: (color: [number, number, number]) => void;
   handleNowPlayingUpdate: (info: NowPlayingInfo | null) => void;
   setSyncedLyrics: (lyrics: SyncedLyricLine[] | null) => void;
+  setTranslationLyrics: (translation: TranslationLyricsResult | null) => void;
   setLyricsLoading: (loading: boolean) => void;
 }
 

@@ -64,6 +64,24 @@
   z-index: 1;
 }
 
+.lyrics-lines-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lyrics-translation-line {
+  font-size: 11px;
+  font-weight: 400;
+  color: rgba(var(--color-text-rgb), 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: lyricFadeSwap 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .lyrics-current-line {
   font-size: 13px;
   font-weight: 500;

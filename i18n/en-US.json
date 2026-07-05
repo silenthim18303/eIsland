@@ -276,7 +276,7 @@
   "hover": {
     "nav": {
       "time": "Tools",
-      "o3ics": "Music",
+      "lyrics": "Music",
       "weather": "Weather",
       "expand": "Expand",
       "switchToPage": "Switch to {{label}} page"
@@ -2509,6 +2509,12 @@
         "alreadyExists": "Already in whitelist"
       },
       "lyrics": {
+        "enabledTitle": "Lyrics Feature",
+        "enabledHint": "When disabled, no lyrics network requests are sent, lyrics are not displayed, and the island does not switch to lyrics state",
+        "enabledToggle": "Enable lyrics feature",
+        "translationTitle": "Translation Lyrics",
+        "translationHint": "When disabled, translation lyrics are not displayed and the island does not switch to translation lyrics state",
+        "translationToggle": "Show translation lyrics",
         "title": "Lyrics Source",
         "hint": "Auto mode selects source by detected SMTC player and falls back to LRCLIB",
         "displayTitle": "Lyrics Display",

@@ -45,6 +45,7 @@ export const createMediaSlice: StateCreator<
   coverImage: null,
   dominantColor: [0, 0, 0] as [number, number, number],
   syncedLyrics: null,
+  translationLyrics: null,
   lyricsLoading: false,
 
   updateLrcData: (data) => set((state) => {
@@ -54,9 +55,9 @@ export const createMediaSlice: StateCreator<
         isPlaying: false,
         currentLyricText: null,
         nearbyLyrics: [],
+        translationLyrics: null,
       };
     }
-
     return {
       isMusicPlaying: true,
       currentLyricText: data.text,
@@ -68,7 +69,7 @@ export const createMediaSlice: StateCreator<
         album: state.mediaInfo.album,
         duration_ms: data.duration_ms ?? state.mediaInfo.duration_ms,
       },
-      nearbyLyrics: data.nearby_o3ics ?? [],
+      nearbyLyrics: data.nearby_lyrics ?? [],
     };
   }),
 
@@ -82,6 +83,7 @@ export const createMediaSlice: StateCreator<
     },
     currentLyricText: null,
     nearbyLyrics: [],
+    translationLyrics: null,
     currentDurationMs: data.duration_ms ?? 0,
     currentPositionMs: 0,
     coverImage: Object.prototype.hasOwnProperty.call(data, 'thumbnail')
@@ -98,6 +100,7 @@ export const createMediaSlice: StateCreator<
   setCoverImage: (cover) => set({ coverImage: cover }),
   setDominantColor: (color) => set({ dominantColor: color }),
   setSyncedLyrics: (lyrics) => set({ syncedLyrics: lyrics, lyricsLoading: false }),
+  setTranslationLyrics: (translation) => set({ translationLyrics: translation }),
   setLyricsLoading: (loading) => set({ lyricsLoading: loading }),
 
   handleNowPlayingUpdate: (info) => {
@@ -111,6 +114,7 @@ export const createMediaSlice: StateCreator<
         currentDurationMs: 0,
         currentPositionMs: 0,
         coverImage: null,
+        translationLyrics: null,
       });
       return;
     }

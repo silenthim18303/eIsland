@@ -65,6 +65,13 @@ const api = {
     ipcRenderer.send('window:expand-lyrics');
   },
   /**
+   * 展开窗口到歌词+翻译歌词状态尺寸
+   * @description 宽度 500，高度 60（与 hover 一致）
+   */
+  expandWindowLyricsTranslation: (): void => {
+    ipcRenderer.send('window:expand-lyrics-translation');
+  },
+  /**
    * 完整展开窗口到 expanded 状态尺寸
    * @description 单击灵动岛后展开为完整操作面板（560x200）
    */
@@ -1011,6 +1018,36 @@ const api = {
    */
   musicLyricsSourceSet: (source: string): Promise<boolean> => {
     return ipcRenderer.invoke('music:lyrics-source:set', source);
+  },
+  /**
+   * 获取歌词功能开关
+   * @returns 是否启用歌词功能
+   */
+  musicLyricsEnabledGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-enabled:get');
+  },
+  /**
+   * 设置歌词功能开关
+   * @param enabled - 是否启用
+   * @returns 是否保存成功
+   */
+  musicLyricsEnabledSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-enabled:set', enabled);
+  },
+  /**
+   * 获取翻译歌词显示开关
+   * @returns 是否显示翻译歌词
+   */
+  musicLyricsTranslationEnabledGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-translation-enabled:get');
+  },
+  /**
+   * 设置翻译歌词显示开关
+   * @param enabled - 是否显示
+   * @returns 是否保存成功
+   */
+  musicLyricsTranslationEnabledSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-translation-enabled:set', enabled);
   },
   /**
    * 获取逐字扫光开关

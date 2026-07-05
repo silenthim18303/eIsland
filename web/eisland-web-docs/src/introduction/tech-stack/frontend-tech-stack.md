@@ -355,6 +355,7 @@ function DynamicIsland() {
       {state === 'expanded' && <ExpandedState />}
       {state === 'maxExpand' && <MaxExpandState />}
       {state === 'lyrics' && <LyricsState />}
+      {state === 'lyricsTranslation' && <LyricsTranslationState />}
       {state === 'login' && <LoginState />}
       {state === 'register' && <RegisterState />}
       {state === 'agent' && <AgentState />}
@@ -527,6 +528,7 @@ export const STATE_AREA: Record<string, number> = {
   expanded: 860 * 150,      // 129,000 px²
   maxExpand: 860 * 400,     // 344,000 px²
   lyrics: 500 * 42,         // 21,000 px²
+  lyricsTranslation: 500 * 60, // 30,000 px²
   minimal: 260 * 42,        // 10,920 px²
   agent: 500 * 88,          // 44,000 px²
   agentVoiceInput: 500 * 88,// 44,000 px²
@@ -548,6 +550,7 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   idle:         { mousePassthrough: true,  expanded: false, enterDelay: 0,   leaveDelay: 0   },
   hover:        { mousePassthrough: false, expanded: true,  enterDelay: 60,  leaveDelay: 80  },
   lyrics:       { mousePassthrough: true,  expanded: true,  enterDelay: 50,  leaveDelay: 0   },
+  lyricsTranslation:{ mousePassthrough: true,  expanded: true,  enterDelay: 50,  leaveDelay: 0   },
   notification: { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   expanded:     { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   maxExpand:    { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },

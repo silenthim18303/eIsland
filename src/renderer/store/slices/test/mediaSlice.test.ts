@@ -50,7 +50,7 @@ describe('createMediaSlice', () => {
       text: 'lyric',
       position_ms: 10,
       duration_ms: 20,
-      nearby_o3ics: [{ text: 'line', is_current: false }],
+      nearby_lyrics: [{ text: 'line', is_current: false }],
     });
 
     store.getState().updateLrcData(null);
@@ -60,6 +60,21 @@ describe('createMediaSlice', () => {
     expect(after.isPlaying).toBe(false);
     expect(after.currentLyricText).toBeNull();
     expect(after.nearbyLyrics).toEqual([]);
+    expect(after.translationLyrics).toBeNull();
+  });
+
+  it('stores translation lyrics independently from display lyrics', () => {
+    const store = createSliceState(createMediaSlice);
+    const translation = {
+      status: 'available' as const,
+      lines: [{ time_ms: 0, text: 'translated' }],
+    };
+
+    expect(store.getState().translationLyrics).toBeNull();
+    store.getState().setTranslationLyrics(translation);
+
+    expect(store.getState().translationLyrics).toEqual(translation);
+    expect(store.getState().syncedLyrics).toBeNull();
   });
 
   it('updates core fields on media changed', () => {
@@ -103,5 +118,6 @@ describe('createMediaSlice', () => {
     expect(after.currentDurationMs).toBe(0);
     expect(after.currentPositionMs).toBe(0);
     expect(after.coverImage).toBeNull();
+    expect(after.translationLyrics).toBeNull();
   });
 });

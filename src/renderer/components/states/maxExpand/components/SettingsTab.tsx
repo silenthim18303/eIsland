@@ -326,6 +326,8 @@ export function SettingsTab(): ReactElement {
   const [whitelistDraft, setWhitelistDraft] = useState<string>('');
   const [whitelistInputError, setWhitelistInputError] = useState<string>('');
   const [lyricsSource, setLyricsSource] = useState<string>('auto');
+  const [lyricsEnabled, setLyricsEnabled] = useState<boolean>(true);
+  const [lyricsTranslationEnabled, setLyricsTranslationEnabled] = useState<boolean>(true);
   const [lyricsKaraoke, setLyricsKaraoke] = useState<boolean>(false);
   const [lyricsClock, setLyricsClock] = useState<boolean>(true);
   const [lyricsCalibrateEnabled, setLyricsCalibrateEnabled] = useState<boolean>(true);
@@ -1015,6 +1017,14 @@ export function SettingsTab(): ReactElement {
     window.api.musicLyricsSourceGet().then((src) => {
       if (cancelled) return;
       setLyricsSource(src);
+    }).catch(() => {});
+    window.api.musicLyricsEnabledGet().then((enabled) => {
+      if (cancelled) return;
+      setLyricsEnabled(enabled);
+    }).catch(() => {});
+    window.api.musicLyricsTranslationEnabledGet().then((enabled) => {
+      if (cancelled) return;
+      setLyricsTranslationEnabled(enabled);
     }).catch(() => {});
     window.api.musicLyricsKaraokeGet().then((enabled) => {
       if (cancelled) return;
@@ -2659,6 +2669,10 @@ export function SettingsTab(): ReactElement {
               lyricsSourceOptions={LYRICS_SOURCE_OPTIONS}
               lyricsSource={lyricsSource}
               setLyricsSource={setLyricsSource}
+              lyricsEnabled={lyricsEnabled}
+              setLyricsEnabled={setLyricsEnabled}
+              lyricsTranslationEnabled={lyricsTranslationEnabled}
+              setLyricsTranslationEnabled={setLyricsTranslationEnabled}
               lyricsKaraoke={lyricsKaraoke}
               setLyricsKaraoke={setLyricsKaraoke}
               lyricsClock={lyricsClock}

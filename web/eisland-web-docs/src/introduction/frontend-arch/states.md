@@ -6,7 +6,7 @@ icon: diagram-project
 # eIsland State Machine
 
 :::info
-The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **16 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
+The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **17 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
 :::
 
 ## State Categories
@@ -26,6 +26,7 @@ The eIsland state machine is the core architecture that controls the island's ap
 | State | Description | Mouse Passthrough | Dimensions (W×H) |
 |-------|-------------|-------------------|------------------|
 | `lyrics` | Music lyrics display | Yes | 500×42 px |
+| `lyricsTranslation` | Lyrics with translation | Yes | 500×60 px |
 | `notification` | Alert and message display | No | 500×88 px |
 | `announcement` | System announcements | No | 860×400 px |
 
@@ -68,6 +69,7 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   idle:           { mousePassthrough: true,  expanded: false, enterDelay: 0,   leaveDelay: 0   },
   hover:          { mousePassthrough: false, expanded: true,  enterDelay: 60,  leaveDelay: 80  },
   lyrics:         { mousePassthrough: true,  expanded: true,  enterDelay: 50,  leaveDelay: 0   },
+  lyricsTranslation:{ mousePassthrough: true,  expanded: true,  enterDelay: 50,  leaveDelay: 0   },
   notification:   { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   expanded:       { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   maxExpand:      { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
@@ -99,6 +101,7 @@ export const STATE_AREA: Record<string, number> = {
   expanded: 860 * 150,      // 129,000 px²
   maxExpand: 860 * 400,     // 344,000 px²
   lyrics: 500 * 42,         // 21,000 px²
+  lyricsTranslation: 500 * 60, // 30,000 px²
   minimal: 260 * 42,        // 10,920 px²
   agent: 500 * 88,          // 44,000 px²
   agentVoiceInput: 500 * 88,// 44,000 px²
@@ -143,6 +146,10 @@ function handleIslandClick() {
     case 'payment':
       // Auth states handle their own navigation
       break;
+    case 'lyrics':
+    case 'lyricsTranslation':
+      // Lyrics states use mouse pass-through, no click handling
+      break;
     default:
       setIdle();
   }
@@ -175,7 +182,10 @@ The state machine includes automatic transitions triggered by system events:
 | Trigger | From | To | Description |
 |---------|------|----|-------------|
 | Music plays | `idle` | `lyrics` | Auto-show lyrics when music starts |
-| Music stops | `lyrics` | `idle` | Return to idle when music stops |
+| Music plays (with translation) | `idle` | `lyricsTranslation` | Auto-show lyrics with translation |
+| Translation loaded | `lyrics` | `lyricsTranslation` | Upgrade when translation becomes available |
+| Translation lost | `lyricsTranslation` | `lyrics` | Downgrade when translation unavailable |
+| Music stops | `lyrics` / `lyricsTranslation` | `idle` | Return to idle when music stops |
 | Notification arrives | Any | `notification` | Show notification overlay |
 | Mouse hover | `idle` | `hover` | Expand on mouse enter |
 | Mouse leave | `hover` | `idle` | Collapse on mouse leave (with delay) |
@@ -456,6 +466,48 @@ The `lyrics` state displays synchronized music lyrics, automatically activated d
 - Music-reactive glow effect (`music-glow` CSS class)
 - Paused state indicator (`music-paused` CSS class)
 - SMTC worker integration for system-level media control
+
+---
+
+### lyricsTranslation
+
+:::info
+The `lyricsTranslation` state displays synchronized lyrics with translation text below each line, automatically activated when translation lyrics are available during music playback.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 500×60 px |
+| **Mouse** | Pass-through |
+| **Expanded** | Yes |
+| **Enter Delay** | 50ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- Music playback starts with translation lyrics available (auto-trigger from `idle`)
+- Translation lyrics loaded while in `lyrics` state (auto-upgrade)
+- Hover leave with translation available
+
+**Exit Conditions:**
+- Translation lyrics become unavailable → `lyrics` (auto-downgrade)
+- Music playback stops → `idle`
+- Manual dismiss
+
+**UI Components Rendered:**
+- Synchronized lyrics display (original text)
+- Translation text below each lyric line
+- Album art thumbnail
+- Song title and artist
+- Playback progress indicator
+- Music glow effect (reactive to playback)
+
+**Behavior Details:**
+- Real-time lyrics and translation synchronization with playback
+- Taller window (60px vs 42px) to accommodate translation line
+- Automatic upgrade from `lyrics` when translation becomes available
+- Automatic downgrade to `lyrics` when translation becomes unavailable
+- Same mouse pass-through behavior as `lyrics` state
+- Supports Soda Music, NetEase, QQ Music translation sources
 
 ---
 

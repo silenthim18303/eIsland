@@ -67,7 +67,7 @@ export function HoverForm(props: HoverFormProps): ReactElement {
             lunarStr={lunarStr}
           />
         )}
-        {hoverTab === 'o3ics' && <LyricsTab />}
+        {hoverTab === 'lyrics' && <LyricsTab />}
         {hoverTab === 'weather' && <WeatherTab />}
       </div>
     </div>

@@ -19,16 +19,27 @@
  */
 
 /**
- * @file hoverConfig.ts
- * @description Hover 状态配置与类型定义
+ * @file BeijingClock.tsx
+ * @description 北京时间显示组件
  * @author 鸡哥
  */
 
-import type { HoverTab } from '../../../../store/types';
+import type { ReactElement } from 'react';
 
-export interface HoverContentProps {
-  fullTimeStr: string;
-  lunarStr: string;
+interface BeijingClockProps {
+  clockEnabled: boolean;
+  clockText: string | null;
 }
 
-export const NAV_DOTS: HoverTab[] = ['time', 'lyrics', 'weather', 'expand'];
+/**
+ * @description 渲染当前北京时间。
+ * @param props - 时钟参数。
+ * @returns 时钟节点；未启用或无文本时返回 null。
+ */
+export function BeijingClock(props: BeijingClockProps): ReactElement | null {
+  const { clockEnabled, clockText } = props;
+
+  if (!clockEnabled || !clockText) return null;
+
+  return <span className="lyrics-time">{clockText}</span>;
+}

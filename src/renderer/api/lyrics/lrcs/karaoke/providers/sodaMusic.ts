@@ -77,7 +77,7 @@ async function searchSodaMusicApi(query: string): Promise<SearchCandidate[]> {
           durationMs: track.duration,
         };
       })
-      .filter((c): c is SearchCandidate => c !== null);
+      .filter((c) => c !== null);
   });
 }
 

@@ -26,8 +26,9 @@
  * @docs https://github.com/cXp1r/lyricify-lyrics-provider-rs
  */
 
-import type { LyricLine } from '../types';
+import type { LyricsFetchResult, LyricLine, TranslationLyricsResult } from '../types';
 import { parseSyncedLrc } from '../helpers';
+import { parseTranslationLyrics } from '../translation';
 import { requestJsonWithLog, requestTextWithLog } from '../request';
 import { logger } from '../../../../../utils/logger';
 import { searchWithScoring } from '../matcher';
@@ -160,7 +161,7 @@ async function searchQQMusicAll(query: string): Promise<SearchCandidate[]> {
 
 /* ── LRC 歌词获取（POST form，与 Lyrix 对齐）───────────────────────── */
 
-async function fetchLrc(songMid: string): Promise<LyricLine[] | null> {
+async function fetchLrc(songMid: string): Promise<LyricsFetchResult | null> {
   const callback = 'MusicJsonCallback_lrc';
   const pcachetime = Date.now().toString();
   const params = new URLSearchParams({
@@ -227,13 +228,21 @@ async function fetchLrc(songMid: string): Promise<LyricLine[] | null> {
     logger.warn(`${LOG_TAG} LRC 解析后 0 行, mid=${songMid}`);
     return null;
   }
+  const transB64 = typeof parsed.trans === 'string' ? parsed.trans : null;
+  const translation: TranslationLyricsResult = parseTranslationLyrics(
+    transB64 ? base64DecodeUtf8(transB64) : null,
+  );
+
   logger.info(`${LOG_TAG} LRC 获取成功, mid=${songMid}, 行数=${lines.length}`);
-  return lines;
+  return { lyrics: lines, translation };
 }
 
 /* ── 对外入口 ──────────────────────────────────────────────────────── */
 
-export async function fetchLyricsFromQQMusic(title: string, artist: string): Promise<LyricLine[] | null> {
+export async function fetchLyricsWithTranslationFromQQMusic(
+  title: string,
+  artist: string,
+): Promise<LyricsFetchResult | null> {
   logger.info(`${LOG_TAG} 开始获取 LRC, title="${title}", artist="${artist}"`);
 
   const matched = await searchWithScoring(
@@ -253,10 +262,15 @@ export async function fetchLyricsFromQQMusic(title: string, artist: string): Pro
 
   // 优先用 mid 获取 LRC
   if (matched.mid) {
-    const lines = await fetchLrc(matched.mid);
-    if (lines) return lines;
+    const result = await fetchLrc(matched.mid);
+    if (result) return result;
   }
 
   logger.warn(`${LOG_TAG} LRC 获取失败, mid=${matched.mid}`);
   return null;
+}
+
+export async function fetchLyricsFromQQMusic(title: string, artist: string): Promise<LyricLine[] | null> {
+  const result = await fetchLyricsWithTranslationFromQQMusic(title, artist);
+  return result?.lyrics ?? null;
 }
