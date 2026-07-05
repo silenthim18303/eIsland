@@ -27,7 +27,8 @@
 import type React from 'react';
 import { resolveMihtnelisLocalToolResult } from '../../../../api/ai/mihtnelisAgentStream';
 import type { MihtnelisAgentStreamEvent } from '../../../../api/ai/mihtnelisAgentStream';
-import type { AuthPending, AgentPhase } from '../config/agentContentConfig';
+import type { AgentPhase } from '../config/agentContentConfig';
+import type { AuthPending } from '../types/AuthPending';
 import { isClientLocalToolName, isHighRiskLocalToolName } from './agentToolPolicy';
 
 interface CreateAgentStreamEventHandlerOptions {

@@ -26,7 +26,8 @@
 
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
-import type { AgentPhase, AuthPending } from '../config/agentContentConfig';
+import type { AgentPhase } from '../config/agentContentConfig';
+import type { AuthPending } from '../types/AuthPending';
 import { renderInlineMarkdown } from '../utils/renderInlineMarkdown';
 import { PHASE_LABEL } from '../config/agentContentConfig';
 

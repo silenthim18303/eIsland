@@ -33,7 +33,8 @@ import { streamOllamaLocalAgent } from '../../../../api/ai/ollamaLocalAgent';
 import { streamCustomDirectAgent } from '../../../../api/ai/customDirectAgent';
 import { readLocalToken } from '../../../../utils/userAccount';
 import type { AiChatMessage } from '../../../../store/types';
-import type { AuthPending, AgentPhase } from '../config/agentContentConfig';
+import type { AgentPhase } from '../config/agentContentConfig';
+import type { AuthPending } from '../types/AuthPending';
 import { INLINE_PROMPT_HINT } from '../config/agentContentConfig';
 import {
   resolveAgentRouting,
