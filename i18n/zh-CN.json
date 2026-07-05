@@ -276,7 +276,7 @@
   "hover": {
     "nav": {
       "time": "工具",
-      "o3ics": "歌曲",
+      "lyrics": "歌曲",
       "weather": "天气",
       "expand": "展开",
       "switchToPage": "切换到{{label}}页面"

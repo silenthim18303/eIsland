@@ -31,4 +31,4 @@ export interface HoverContentProps {
   lunarStr: string;
 }
 
-export const NAV_DOTS: HoverTab[] = ['time', 'o3ics', 'weather', 'expand'];
+export const NAV_DOTS: HoverTab[] = ['time', 'lyrics', 'weather', 'expand'];

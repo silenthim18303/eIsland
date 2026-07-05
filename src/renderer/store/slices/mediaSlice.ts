@@ -69,7 +69,7 @@ export const createMediaSlice: StateCreator<
         album: state.mediaInfo.album,
         duration_ms: data.duration_ms ?? state.mediaInfo.duration_ms,
       },
-      nearbyLyrics: data.nearby_o3ics ?? [],
+      nearbyLyrics: data.nearby_lyrics ?? [],
     };
   }),
 

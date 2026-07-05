@@ -276,7 +276,7 @@
   "hover": {
     "nav": {
       "time": "Tools",
-      "o3ics": "Music",
+      "lyrics": "Music",
       "weather": "Weather",
       "expand": "Expand",
       "switchToPage": "Switch to {{label}} page"

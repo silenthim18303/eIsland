@@ -37,7 +37,7 @@ export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxE
 export type AnimationSpeed = 'slow' | 'medium' | 'fast';
 
 /** Hover 状态下的子标签页类型 */
-export type HoverTab = 'time' | 'o3ics' | 'weather' | 'expand';
+export type HoverTab = 'time' | 'lyrics' | 'weather' | 'expand';
 
 /** Expanded 状态下的子标签页类型 */
 export type ExpandTab = 'hover' | 'overview' | 'song' | 'tools' | 'translation' | 'performanceMonitor';
@@ -106,7 +106,7 @@ export interface LrcUpdateData {
   artist: string;
   position_ms?: number;
   duration_ms?: number;
-  nearby_o3ics?: LyricLine[];
+  nearby_lyrics?: LyricLine[];
 }
 
 /** 媒体变化数据 */

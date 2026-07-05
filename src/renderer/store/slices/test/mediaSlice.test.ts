@@ -50,7 +50,7 @@ describe('createMediaSlice', () => {
       text: 'lyric',
       position_ms: 10,
       duration_ms: 20,
-      nearby_o3ics: [{ text: 'line', is_current: false }],
+      nearby_lyrics: [{ text: 'line', is_current: false }],
     });
 
     store.getState().updateLrcData(null);
