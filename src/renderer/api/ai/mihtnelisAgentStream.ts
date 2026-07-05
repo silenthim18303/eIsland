@@ -276,21 +276,6 @@ export async function resolveMihtnelisLocalToolAccess(request: ResolveMihtnelisL
   }
 }
 
-export interface FetchAgentPromptRequest {
-  token: string;
-  agentMode?: string;
-  snapshotMode?: boolean;
-  localMode?: boolean;
-  workspaces?: string[];
-  skills?: Array<{ name: string; content: string }>;
-}
-
-export interface FetchAgentPromptResponse {
-  success: boolean;
-  systemPrompt: string;
-  error?: string;
-}
-
 /**
  * 从服务端动态获取 Agent 系统提示词（供客户端本地直连模式使用）。
  * @param request - 请求参数。
