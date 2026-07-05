@@ -271,6 +271,7 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
                       onChange={(e) => {
                         setLyricsEnabled(e.target.checked);
                         window.api.musicLyricsEnabledSet(e.target.checked).catch(() => {});
+                        window.dispatchEvent(new CustomEvent('island:setting-changed', { detail: { channel: 'music:lyrics-enabled', value: e.target.checked } }));
                       }}
                     />
                     {t('settings.music.lyrics.enabledToggle', { defaultValue: '启用歌词功能' })}
@@ -291,6 +292,7 @@ export function MusicSettingsSection(props: MusicSettingsSectionProps): ReactEle
                       onChange={(e) => {
                         setLyricsTranslationEnabled(e.target.checked);
                         window.api.musicLyricsTranslationEnabledSet(e.target.checked).catch(() => {});
+                        window.dispatchEvent(new CustomEvent('island:setting-changed', { detail: { channel: 'music:lyrics-translation-enabled', value: e.target.checked } }));
                       }}
                     />
                     {t('settings.music.lyrics.translationToggle', { defaultValue: '显示翻译歌词' })}

@@ -230,6 +230,13 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
             return;
           }
 
+          let translationEnabled = true;
+          try {
+            translationEnabled = await window.api.musicLyricsTranslationEnabledGet();
+          } catch {
+            translationEnabled = true;
+          }
+
           let karaokeEnabled = false;
           try {
             karaokeEnabled = await window.api.musicLyricsKaraokeGet();
@@ -269,7 +276,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
                 if (songKeyRef.current !== capturedKey) return;
                 const translation = normalResult?.translation ?? notFetchedTranslationLyrics();
                 logTranslationLyricsStatus(translation);
-                setTranslationLyricsRef.current(translation);
+                if (translationEnabled) setTranslationLyricsRef.current(translation);
                 return;
               }
             } catch {
@@ -282,7 +289,7 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
           if (songKeyRef.current !== capturedKey) return;
           const translation = result?.translation ?? notFetchedTranslationLyrics();
           logTranslationLyricsStatus(translation);
-          setTranslationLyricsRef.current(translation);
+          if (translationEnabled) setTranslationLyricsRef.current(translation);
           const lyrics = result?.lyrics ?? null;
           setSyncedLyricsRef.current(lyrics);
           if (lyrics && lyrics.length > 0 && calibrateEnabled) {
