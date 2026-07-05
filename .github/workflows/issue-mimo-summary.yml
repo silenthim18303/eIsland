@@ -40,7 +40,7 @@ jobs:
               + '\nBody:\n' + issueBody
               + '\n---';
 
-            const response = await fetch('https://api.xiaomi.com/v1/chat/completions', {
+            const response = await fetch('https://token-plan-cn.xiaomimimo.com/v1/chat/completions', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
