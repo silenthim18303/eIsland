@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-05T10:48:51.375Z
+> 生成时间：2026-07-05T14:47:25.358Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,19 @@
 
 ## Unreleased
 
+- 2026-07-05 | 1e1ee963 | 鸡哥 | Merge pull request #123 from JNTMTMTM/dev
+- 2026-07-05 | 0592f562 | 鸡哥 | docs: update documentation to reflect addition of splash screen and its lifecycle
+- 2026-07-05 | ffef3150 | 鸡哥 | feat: enhance splash screen video handling with IPC readiness notification
+- 2026-07-05 | c2bb9ef1 | 鸡哥 | fix: correct splash video source path for proper loading
+- 2026-07-05 | 69c6c225 | 鸡哥 | feat: update ffi-loader to use unpacked DLL paths for better compatibility
+- 2026-07-05 | 10f0c377 | 鸡哥 | ci: add workflows for deploying frpc config and summarizing issues with MiMo
+- 2026-07-05 | 2762276d | 鸡哥 | refactor: remove push trigger from test workflow for cleaner PR handling
+- 2026-07-05 | 464c8a55 | 鸡哥 | feat: update release workflow to include .NET SDK setup and build plugins step
+- 2026-07-05 | 1e76b086 | 鸡哥 | feat: add bulk operations for building and cleaning all plugins
+- 2026-07-05 | 45ce047e | 鸡哥 | feat: add plugin build and clean scripts for various components
+- 2026-07-05 | 8bea6ae4 | 鸡哥 | docs: update plugin commands and setup documentation for NativeAOT build requirements
+- 2026-07-05 | 5ea5a9f9 | 鸡哥 | feat: enable self-contained and static ICU for Bluetooth, Power, SMTC, and WiFi helpers
+- 2026-07-05 | 4f397708 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #122 by @JNTMTMTM [skip ci]
 - 2026-07-05 | cf70b90e | 鸡哥 | Merge pull request #122 from JNTMTMTM/dev
 - 2026-07-05 | e89faf97 | 鸡哥 | feat: add hover animation for lyrics translation state in CSS
 - 2026-07-05 | 1b78833e | 鸡哥 | fix: update import path for TranslationLyricsResult in useIslandStateBridges hook
