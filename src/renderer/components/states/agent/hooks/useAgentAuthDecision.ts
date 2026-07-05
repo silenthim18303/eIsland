@@ -30,7 +30,7 @@ import {
   resolveMihtnelisLocalToolAccess,
   resolveMihtnelisLocalToolResult,
 } from '../../../../api/ai/mihtnelisAgentStream';
-import type { AuthPending } from '../config/agentContentConfig';
+import type { AuthPending } from '../types/AuthPending';
 
 interface UseAgentAuthDecisionOptions {
   authPending: AuthPending | null;

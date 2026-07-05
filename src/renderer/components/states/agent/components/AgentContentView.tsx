@@ -24,23 +24,10 @@
  * @author 鸡哥
  */
 
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AgentPhase, AuthPending } from '../config/agentContentConfig';
+import type { AgentContentViewProps } from '../types/AgentContentView';
 import { PHASE_IMAGE, PHASE_LABEL } from '../config/agentContentConfig';
-
-interface AgentContentViewProps {
-  phase: AgentPhase;
-  overlayLabel: string | null;
-  renderedDisplay: ReactNode;
-  textRef: React.RefObject<HTMLDivElement | null>;
-  overlayText: string | null;
-  isThinkOnly: boolean;
-  authPending: AuthPending | null;
-  onClose: () => void;
-  onAllow: () => void;
-  onDeny: () => void;
-}
 
 /**
  * @description 渲染 Agent 文本区与授权操作区。

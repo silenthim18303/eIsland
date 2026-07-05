@@ -24,6 +24,11 @@
  * @author 鸡哥
  */
 
+import type { AnnouncementShowMode } from './types/AnnouncementShowMode';
+import type { AnnouncementData } from './types/AnnouncementData';
+
+export type { AnnouncementShowMode, AnnouncementData };
+
 const IS_DEV_RENDERER = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 const ANNOUNCEMENT_API_BASE = IS_DEV_RENDERER
@@ -32,19 +37,6 @@ const ANNOUNCEMENT_API_BASE = IS_DEV_RENDERER
 
 export const ANNOUNCEMENT_SHOW_MODE_STORE_KEY = 'announcement-show-mode';
 export const ANNOUNCEMENT_LAST_SHOWN_APP_VERSION_STORE_KEY = 'announcement-last-shown-app-version';
-
-export type AnnouncementShowMode = 'always' | 'version-update-only';
-
-export interface AnnouncementData {
-  title: string;
-  content: string;
-  contentHtml?: string;
-  contentFormat?: string;
-  startAt?: string;
-  endAt?: string;
-  updatedAt?: string;
-  bvid?: string;
-}
 
 export async function readAnnouncementShowMode(): Promise<AnnouncementShowMode> {
   try {

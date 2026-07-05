@@ -28,25 +28,15 @@
 import { app, nativeImage } from 'electron';
 import { exec } from 'child_process';
 import { activeWindow, openWindows } from 'get-windows';
+import type { RunningProcessInfo } from '../types/system/RunningProcessInfo';
+import type { RunningWindowInfo } from '../types/system/RunningWindowInfo';
+
+export type { RunningProcessInfo, RunningWindowInfo };
 
 const PROCESS_QUERY_TIMEOUT_MS = 4000;
 const PROCESS_ICON_CACHE_MAX = 240;
 
 const processIconCache = new Map<string, string | null>();
-
-export interface RunningProcessInfo {
-  name: string;
-  iconDataUrl: string | null;
-}
-
-export interface RunningWindowInfo {
-  id: string;
-  title: string;
-  processName: string;
-  processPath: string | null;
-  processId: number | null;
-  iconDataUrl: string | null;
-}
 
 interface RawWindowInfo {
   id?: unknown;

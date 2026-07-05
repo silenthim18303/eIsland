@@ -25,29 +25,14 @@
  */
 
 import { buildReplayHeaders, resolveClientVersion, USER_ACCOUNT_API_BASE } from '../user/userAccountApi.client';
+import type { RealtimeSttEvent, RealtimeSttEventType } from './types/RealtimeSttEvent';
+import type { RealtimeSttSession } from './types/RealtimeSttSession';
+import type { StartRealtimeSttRequest } from './types/StartRealtimeSttRequest';
+
+export type { RealtimeSttEvent, RealtimeSttEventType, RealtimeSttSession, StartRealtimeSttRequest };
 
 const APP_NAME_HEADER = 'X-App-Name';
 const APP_NAME_VALUE = 'eisland';
-
-export type RealtimeSttEventType = 'partial' | 'final' | 'error' | 'ready';
-
-export interface RealtimeSttEvent {
-  type: RealtimeSttEventType;
-  text: string;
-}
-
-export interface RealtimeSttSession {
-  pushAudioFrame: (pcm16: Int16Array) => void;
-  stop: () => void;
-}
-
-export interface StartRealtimeSttRequest {
-  token: string;
-  language?: 'zh-CN' | 'en-US';
-  onEvent: (event: RealtimeSttEvent) => void;
-  onOpen?: () => void;
-  onClose?: () => void;
-}
 
 function toWebSocketBase(httpBase: string): string {
   return httpBase.replace(/^https:/i, 'wss:').replace(/^http:/i, 'ws:');
@@ -134,7 +119,7 @@ export async function startTencentRealtimeStt(request: StartRealtimeSttRequest):
   return {
     pushAudioFrame: (pcm16: Int16Array): void => {
       if (closed || socket.readyState !== WebSocket.OPEN || pcm16.length === 0) return;
-      socket.send(pcm16.buffer.slice(pcm16.byteOffset, pcm16.byteOffset + pcm16.byteLength));
+      socket.send(pcm16.buffer.slice(pcm16.byteOffset, pcm16.byteOffset + pcm16.byteLength) as ArrayBuffer);
     },
     stop: (): void => {
       if (closed) return;

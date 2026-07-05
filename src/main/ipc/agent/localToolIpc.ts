@@ -25,19 +25,10 @@
  */
 
 import { ipcMain } from 'electron';
+import type { AgentLocalToolRequest } from '../../types/agent/AgentLocalToolRequest';
+import type { AgentLocalToolResult } from '../../types/agent/AgentLocalToolResult';
 
-export interface AgentLocalToolRequest {
-  tool?: unknown;
-  arguments?: unknown;
-  workspaces?: unknown;
-}
-
-export interface AgentLocalToolResult {
-  success: boolean;
-  result: unknown;
-  error: string;
-  durationMs: number;
-}
+export type { AgentLocalToolRequest, AgentLocalToolResult };
 
 interface RegisterAgentLocalToolIpcHandlersOptions {
   executeAgentLocalTool: (request: AgentLocalToolRequest) => Promise<AgentLocalToolResult>;

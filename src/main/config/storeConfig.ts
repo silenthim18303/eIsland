@@ -33,15 +33,13 @@ import {
   sanitizeClipboardUrlBlacklist,
 } from '../utils/clipboardUrl';
 import { sanitizeProcessNameList } from '../system/runningProcesses';
+import type { IslandPositionOffset } from '../types/config/IslandPositionOffset';
 
 // ===== Types =====
 
 export type ClipboardUrlDetectMode = 'https-only' | 'http-https' | 'domain-only';
 
-export interface IslandPositionOffset {
-  x: number;
-  y: number;
-}
+export type { IslandPositionOffset };
 
 /**
  * 规范化灵动岛显示器选择配置
@@ -279,6 +277,9 @@ export const AGENT_NOTIFICATION_ENABLED_STORE_KEY = 'agent-notification-enabled'
 
 /** 解除帧率限制开关存储键名 */
 export const DISABLE_FRAME_RATE_LIMIT_STORE_KEY = 'disable-frame-rate-limit';
+
+/** 首次启动标记存储键名 */
+export const FIRST_LAUNCH_STORE_KEY = 'first-launch';
 
 // ===== Helper =====
 
@@ -602,4 +603,30 @@ export function readSplashBgColorConfig(): string {
 export function readDisableFrameRateLimitConfig(): boolean {
   const data = readJsonFile(DISABLE_FRAME_RATE_LIMIT_STORE_KEY);
   return typeof data === 'boolean' ? data : false;
+}
+
+/**
+ * 读取首次启动标记配置
+ * @returns 是否为首次启动（文件不存在时返回 true）
+ */
+export function readFirstLaunchConfig(): boolean {
+  const data = readJsonFile(FIRST_LAUNCH_STORE_KEY);
+  return data === undefined;
+}
+
+/**
+ * 写入首次启动标记配置（标记为已启动过）
+ * @returns 是否写入成功
+ */
+export function writeFirstLaunchConfig(): boolean {
+  try {
+    const storeDir = getStoreDir();
+    if (!existsSync(storeDir)) mkdirSync(storeDir, { recursive: true });
+    const filePath = join(storeDir, `${FIRST_LAUNCH_STORE_KEY}.json`);
+    writeFileSync(filePath, JSON.stringify(false, null, 2), 'utf-8');
+    return true;
+  } catch (err) {
+    console.error('[FirstLaunch] persist error:', err);
+    return false;
+  }
 }

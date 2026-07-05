@@ -27,7 +27,8 @@
 import { useRef, useState } from 'react';
 import type { ReactElement } from 'react';
 import useIslandStore from '../../../store/isLandStore';
-import type { AgentPhase, AuthPending } from './config/agentContentConfig';
+import type { AgentPhase } from './config/agentContentConfig';
+import type { AuthPending } from './types/AuthPending';
 import { useAgentAutoScroll } from './hooks/useAgentAutoScroll';
 import { useAgentDisplayState } from './hooks/useAgentDisplayState';
 import { useAgentRunner } from './hooks/useAgentRunner';

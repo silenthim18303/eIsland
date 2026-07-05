@@ -28,89 +28,31 @@ import { BrowserWindow, app } from 'electron';
 import http from 'http';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
+import type { ClaudeCodeHookEventDetailItem } from '../types/system/ClaudeCodeHookEventDetailItem';
+import type { ClaudeCodeHookEvent, ClaudeCodeHookEventKind } from '../types/system/ClaudeCodeHookEvent';
+import type { ClaudeCodeSessionSnapshot, ClaudeCodeSessionPhase } from '../types/system/ClaudeCodeSessionSnapshot';
+import type { ClaudeCodeHeatmapDailyCount, ClaudeCodeHeatmapDaily } from '../types/system/ClaudeCodeHeatmapDailyCount';
+import type { ClaudeCodeStatusSnapshot } from '../types/system/ClaudeCodeStatusSnapshot';
+import type { ClaudeCodeStatusService, ClaudeSettingsMutationResult, PermissionDecision } from '../types/system/ClaudeCodeStatusService';
 
-export type ClaudeCodeHookEventKind = 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
-export type ClaudeCodeSessionPhase = 'idle' | 'running' | 'waiting_permission' | 'completed';
-
-export interface ClaudeCodeHookEventDetailItem {
-  label: string;
-  value: string;
-}
-
-export interface ClaudeCodeHookEvent {
-  id: string;
-  eventName: string;
-  kind: ClaudeCodeHookEventKind;
-  sessionId: string;
-  cwd: string | null;
-  transcriptPath: string | null;
-  summary: string;
-  detail: string | null;
-  detailItems: ClaudeCodeHookEventDetailItem[];
-  toolName: string | null;
-  toolInputPreview: string | null;
-  createdAt: number;
-  raw: Record<string, unknown>;
-}
-
-export interface ClaudeCodeSessionSnapshot {
-  id: string;
-  title: string;
-  phase: ClaudeCodeSessionPhase;
-  cwd: string | null;
-  transcriptPath: string | null;
-  lastSummary: string;
-  lastEventAt: number;
-  pendingPermission: ClaudeCodeHookEvent | null;
-  events: ClaudeCodeHookEvent[];
-}
-
-/** 单日热力图计数：按指标分别统计 */
-export interface ClaudeCodeHeatmapDailyCount {
-  session: number;
-  tool: number;
-  prompt: number;
-}
-
-/** 热力图按天累计计数，键为 `年-月-日`（月、日均不补零，与渲染层一致） */
-export type ClaudeCodeHeatmapDaily = Record<string, ClaudeCodeHeatmapDailyCount>;
-
-export interface ClaudeCodeStatusSnapshot {
-  enabled: boolean;
-  receiverRunning: boolean;
-  receiverUrl: string | null;
-  settingsPath: string;
-  hookScriptPath: string;
-  sessions: ClaudeCodeSessionSnapshot[];
-  events: ClaudeCodeHookEvent[];
-  heatmap: ClaudeCodeHeatmapDaily;
-  updatedAt: number;
-}
+export type {
+  ClaudeCodeHookEventDetailItem,
+  ClaudeCodeHookEvent,
+  ClaudeCodeHookEventKind,
+  ClaudeCodeSessionSnapshot,
+  ClaudeCodeSessionPhase,
+  ClaudeCodeHeatmapDailyCount,
+  ClaudeCodeHeatmapDaily,
+  ClaudeCodeStatusSnapshot,
+  ClaudeCodeStatusService,
+  ClaudeSettingsMutationResult,
+  PermissionDecision,
+};
 
 interface CreateClaudeCodeStatusServiceOptions {
   getMainWindow: () => BrowserWindow | null;
   port?: number;
 }
-
-interface ClaudeSettingsMutationResult {
-  ok: boolean;
-  message: string;
-  snapshot: ClaudeCodeStatusSnapshot;
-}
-
-export interface ClaudeCodeStatusService {
-  start: () => Promise<void>;
-  stop: () => void;
-  getSnapshot: () => ClaudeCodeStatusSnapshot;
-  installHook: () => Promise<ClaudeSettingsMutationResult>;
-  uninstallHook: () => Promise<ClaudeSettingsMutationResult>;
-  clearEvents: () => ClaudeCodeStatusSnapshot;
-  deleteSessions: (sessionIds: string[]) => ClaudeCodeStatusSnapshot;
-  resolvePermission: (sessionId: string, decision: PermissionDecision) => ClaudeCodeStatusSnapshot;
-}
-
-/** 授权决策：批准 / 永久批准 / 拒绝 */
-export type PermissionDecision = 'allow' | 'always' | 'deny';
 
 const MAX_EVENTS = 120;
 const MAX_SESSION_EVENTS = 40;

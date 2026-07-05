@@ -48,11 +48,3 @@ export const AGENT_MODE_STORAGE_KEY = 'eIsland_agentMode';
 export const VALID_AGENT_MODES = new Set(['mihtnelis', 'r1pxc', 'edoc']);
 
 export const INLINE_PROMPT_HINT = '[快问快答模式] 请用简洁精炼的语言回答，输出不超过3句话，避免冗长解释和列表。直接给出核心结论。思考过程(thinking)也请尽量精简，不要输出冗长的推理链，控制在几句话以内。';
-
-export interface AuthPending {
-  type: 'web' | 'tool';
-  requestId: string;
-  description: string;
-  tool?: string;
-  argumentsPayload?: Record<string, unknown>;
-}

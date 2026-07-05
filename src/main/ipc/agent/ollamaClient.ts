@@ -25,55 +25,25 @@
  */
 
 import http from 'http';
+import type { OllamaChatMessage } from '../../types/agent/OllamaChatMessage';
+import type { OllamaChatRequest } from '../../types/agent/OllamaChatRequest';
+import type { OllamaStreamDelta } from '../../types/agent/OllamaStreamDelta';
+import type { OllamaStreamChoice } from '../../types/agent/OllamaStreamChoice';
+import type { OllamaStreamChunk } from '../../types/agent/OllamaStreamChunk';
+import type { OllamaStreamCallbacks } from '../../types/agent/OllamaStreamCallbacks';
+
+export type {
+  OllamaChatMessage,
+  OllamaChatRequest,
+  OllamaStreamDelta,
+  OllamaStreamChoice,
+  OllamaStreamChunk,
+  OllamaStreamCallbacks,
+};
 
 const DEFAULT_OLLAMA_BASE = 'http://localhost:11434';
 const CHAT_COMPLETIONS_PATH = '/v1/chat/completions';
 const REQUEST_TIMEOUT_MS = 120_000;
-
-export interface OllamaChatMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
-
-export interface OllamaChatRequest {
-  model: string;
-  messages: OllamaChatMessage[];
-  stream?: boolean;
-  temperature?: number;
-  top_p?: number;
-  max_tokens?: number;
-  baseUrl?: string;
-  signal?: AbortSignal;
-}
-
-export interface OllamaStreamDelta {
-  content?: string;
-  role?: string;
-}
-
-export interface OllamaStreamChoice {
-  index: number;
-  delta: OllamaStreamDelta;
-  finish_reason: string | null;
-}
-
-export interface OllamaStreamChunk {
-  id?: string;
-  object?: string;
-  model?: string;
-  choices: OllamaStreamChoice[];
-  usage?: {
-    prompt_tokens?: number;
-    completion_tokens?: number;
-    total_tokens?: number;
-  };
-}
-
-export interface OllamaStreamCallbacks {
-  onChunk?: (text: string) => void;
-  onDone?: (fullText: string, usage?: OllamaStreamChunk['usage']) => void;
-  onError?: (error: Error) => void;
-}
 
 /**
  * 检测本地 Ollama 服务是否可用。

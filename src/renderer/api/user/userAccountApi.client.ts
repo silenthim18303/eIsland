@@ -26,6 +26,9 @@
 
 import { buildReplayHeaders as buildSecurityReplayHeaders } from '../../utils/security';
 import type { UserAccountResult } from './userAccountApi.types';
+import type { InternalRequestInit } from './types/InternalRequestInit';
+
+export type { InternalRequestInit };
 
 const IS_DEV_RENDERER = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -50,13 +53,6 @@ const LOGIN_REPLAY_PATHS = new Set([
 let cachedClientVersion: string | null = null;
 
 type StaticAssetNode = 'r2' | 'cos' | 'oss';
-
-export interface InternalRequestInit {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
-  auth?: string | null;
-  body?: Record<string, unknown> | null;
-  timeoutMs?: number;
-}
 
 /**
  * 构建防重放请求头。

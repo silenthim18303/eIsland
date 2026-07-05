@@ -39,32 +39,11 @@ import {
   safeFileName,
   type ChunkInfo,
 } from './downloadEngine/utils';
+import type { DownloadTaskSnapshot } from '../types/core/DownloadTaskSnapshot';
+import type { StartDownloadOptions } from '../types/core/StartDownloadOptions';
 
-export type DownloadTaskStatus = 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-
-export interface DownloadTaskSnapshot {
-  id: string;
-  url: string;
-  savePath: string;
-  fileName: string;
-  totalBytes: number;
-  downloadedBytes: number;
-  progress: number;
-  speedBytesPerSecond: number;
-  estimatedFinishAt: number | null;
-  threads: number;
-  status: DownloadTaskStatus;
-  errorMessage?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-
-export interface StartDownloadOptions {
-  url: string;
-  savePath?: string;
-  threads?: number;
-  defaultDir: string;
-}
+export type { DownloadTaskStatus, DownloadTaskSnapshot } from '../types/core/DownloadTaskSnapshot';
+export type { StartDownloadOptions } from '../types/core/StartDownloadOptions';
 
 interface DownloadEngineOptions {
   onTaskUpdated?: (task: DownloadTaskSnapshot) => void;
