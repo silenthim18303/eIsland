@@ -25,7 +25,7 @@
  */
 
 import { fetchAgentPrompt } from './mihtnelisAgentStream';
-import type { MihtnelisAgentStreamEvent } from './types/MihtnelisAgentStreamEvent';
+import type { MihtnelisAgentStreamEvent, MihtnelisAgentStreamEventType } from './types/MihtnelisAgentStreamEvent';
 import type { CustomDirectAgentRequest } from './types/CustomDirectAgentRequest';
 
 export type { CustomDirectAgentRequest };

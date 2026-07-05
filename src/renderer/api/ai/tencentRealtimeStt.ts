@@ -119,7 +119,7 @@ export async function startTencentRealtimeStt(request: StartRealtimeSttRequest):
   return {
     pushAudioFrame: (pcm16: Int16Array): void => {
       if (closed || socket.readyState !== WebSocket.OPEN || pcm16.length === 0) return;
-      socket.send(pcm16.buffer.slice(pcm16.byteOffset, pcm16.byteOffset + pcm16.byteLength));
+      socket.send(pcm16.buffer.slice(pcm16.byteOffset, pcm16.byteOffset + pcm16.byteLength) as ArrayBuffer);
     },
     stop: (): void => {
       if (closed) return;
