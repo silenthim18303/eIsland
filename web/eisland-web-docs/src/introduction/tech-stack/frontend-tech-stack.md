@@ -57,7 +57,7 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     build: {
       rollupOptions: {
-        input: { index: 'index.html', standalone: 'standalone.html', AIbackground: 'AIbackground.html' },
+        input: { index: 'index.html', standalone: 'standalone.html', splash: 'splash.html', AIbackground: 'AIbackground.html' },
       },
     },
   },
@@ -70,13 +70,13 @@ export default defineConfig({
 |--------|-------|--------|-------------|
 | **main** | `src/main/index.ts`, `src/main/smtcWorker.ts` | `out/main` | Node.js main process with SMTC worker |
 | **preload** | `src/preload/index.ts` | `out/preload` | Context bridge between main and renderer |
-| **renderer** | `index.html`, `standalone.html`, `AIbackground.html` | `out/renderer` | Chromium renderer with 3 HTML entry points |
+| **renderer** | `index.html`, `standalone.html`, `splash.html`, `AIbackground.html` | `out/renderer` | Chromium renderer with 4 HTML entry points |
 
 **Key Features:**
 - **externalizeDepsPlugin**: Excludes Node.js dependencies from main/preload bundles
 - **@vitejs/plugin-react**: React Fast Refresh for development
 - **@tailwindcss/vite**: Tailwind CSS v4 integration (no separate config file)
-- **Multiple HTML entries**: Supports main island window, standalone widget, and AI background
+- **Multiple HTML entries**: Supports main island window, standalone widget, splash screen, and AI background
 
 ## Electron Architecture
 

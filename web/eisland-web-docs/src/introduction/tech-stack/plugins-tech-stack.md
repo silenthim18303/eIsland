@@ -859,7 +859,7 @@ const temperatureReaderCandidates = [
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **.NET** | 10.0 | Runtime |
+| **.NET** | 10.0 | Runtime (required on client — this is NOT a NativeAOT build) |
 | **LibreHardwareMonitorLib** | 0.9.6 | Hardware sensor access via WMI/COM |
 
 #### Build
@@ -1037,9 +1037,13 @@ npm run build:all      # Both
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **.NET** | 10.0 | Runtime |
+| **.NET** | 10.0 | Build-time only (self-contained DLL — no runtime needed on client) |
 | **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.Devices.Bluetooth` |
 | **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
+
+:::tip Self-Contained Deployment
+All .NET Native AOT DLLs (Bluetooth, Power, WiFi, SMTC) are built with `<SelfContained>true</SelfContained>` and `<StaticICU>true</StaticICU>`. Client machines do **not** need the .NET runtime installed.
+:::
 
 ### Performance
 
@@ -1212,7 +1216,7 @@ npm run build:all      # Both
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **.NET** | 10.0 | Runtime |
+| **.NET** | 10.0 | Build-time only (self-contained DLL — no runtime needed on client) |
 | **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.System.Power` |
 | **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
 
@@ -1379,7 +1383,7 @@ npm run build:all      # Both
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **.NET** | 10.0 | Runtime |
+| **.NET** | 10.0 | Build-time only (self-contained DLL — no runtime needed on client) |
 | **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.Networking.Connectivity` |
 | **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
 
@@ -1589,7 +1593,7 @@ Output: `src/bin/Release/net10.0/eIslandBrightnessReader.exe`
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **.NET** | 10.0 | Runtime |
+| **.NET** | 10.0 | Runtime (required on client — this is NOT a self-contained build; WMI is incompatible with NativeAOT) |
 | **System.Management** | 10.0.0-preview.3 | WMI access (`ManagementObjectSearcher`, `ManagementEventWatcher`) |
 
 ### Performance
@@ -2051,8 +2055,12 @@ The SMTC helper targets `net10.0-windows10.0.19041.0` to access WinRT APIs. This
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| **.NET** | 10.0 | Runtime |
+| **.NET** | 10.0 | Build-time only (self-contained DLL — no runtime needed on client) |
 | **Windows 10 SDK** | 10.0.19041.0+ | WinRT API projections for `Windows.Media.Control` |
+
+:::tip Self-Contained Deployment
+The SMTC Helper DLL is built with `<SelfContained>true</SelfContained>` and `<StaticICU>true</StaticICU>`, so all .NET and ICU dependencies are statically linked. Client machines do **not** need the .NET runtime installed.
+:::
 
 ### Example Output
 

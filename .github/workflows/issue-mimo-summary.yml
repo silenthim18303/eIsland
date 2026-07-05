@@ -1,0 +1,80 @@
+name: Issue MiMo Summary
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Summarize issue with MiMo
+        uses: actions/github-script@v7
+        env:
+          MIMO_API_KEY: ${{ secrets.MIMO_API_KEY }}
+          PROMPT_PREFIX: |
+            You are a helpful assistant for the eIsland open-source project (an Apple Dynamic Island inspired floating widget for Windows built with Electron).
+
+            The following GitHub issue was just opened. Please provide a concise summary in the same language as the issue (Chinese if the issue is in Chinese, English otherwise). Structure your response as:
+
+            1. **Summary** — One-sentence overview of what the issue is about.
+            2. **Key Points** — Bullet list of the main details, requests, or problems described.
+            3. **Suggested Labels** — Based on the content, suggest appropriate labels from: bug, feature, enhancement, documentation, question, help wanted, good first issue.
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const issue = context.payload.issue;
+            const issueNumber = issue.number;
+            const issueTitle = issue.title;
+            const issueBody = issue.body || '(no description)';
+            const labels = (issue.labels || []).map(l => l.name).join(', ') || 'none';
+
+            const prompt = process.env.PROMPT_PREFIX
+              + '\n---\nIssue #' + issueNumber + ': ' + issueTitle
+              + '\nLabels: ' + labels
+              + '\nBody:\n' + issueBody
+              + '\n---';
+
+            const response = await fetch('https://api.xiaomi.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + process.env.MIMO_API_KEY,
+              },
+              body: JSON.stringify({
+                model: 'MiMo',
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.3,
+              }),
+            });
+
+            if (!response.ok) {
+              const errText = await response.text();
+              core.setFailed('MiMo API error: ' + response.status + ' ' + errText);
+              return;
+            }
+
+            const data = await response.json();
+            const summary = data.choices?.[0]?.message?.content?.trim();
+
+            if (!summary) {
+              core.setFailed('MiMo returned empty response');
+              return;
+            }
+
+            const marker = '<!-- mimo-issue-summary -->';
+            const body = marker + '\n## MiMo Issue Summary\n\n' + summary;
+
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number: issueNumber,
+              body,
+            });
+
+            console.log('Posted MiMo summary on issue #' + issueNumber);

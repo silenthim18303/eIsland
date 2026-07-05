@@ -158,6 +158,44 @@ const mainWindow = new BrowserWindow({
 | **Agent Voice Input** | `fullscreen`, `transparent`, `setIgnoreMouseEvents(true)` | Voice input overlay |
 | **CLI Glow Overlay** | `transparent`, `alwaysOnTop` | Terminal glow effect |
 | **Standalone Widget** | Separate HTML entry | Independent widget window |
+| **Splash Screen** | `frameless`, `transparent`, `alwaysOnTop`, `show: false` | Startup video playback with IPC synchronization |
+
+#### Splash Window Lifecycle
+
+:::important
+The splash window uses an **IPC-based ready synchronization** pattern to ensure the renderer has mounted and subscribed to playback commands before the main process sends them.
+:::
+
+The splash window lifecycle follows a two-phase approach:
+
+**Phase 1 — Creation & Ready Sync:**
+
+1. Main process creates the splash window with `show: false`
+2. A `splashReadyPromise` is created with a 1500ms fallback timer
+3. Renderer mounts, subscribes to `splash:play-video`, then sends `splash:renderer-ready`
+4. On receiving `splash:renderer-ready` (or fallback timeout), the window is revealed
+
+**Phase 2 — Playback & Close:**
+
+1. Main process waits for `splashReadyPromise` to resolve
+2. Sends `splash:play-video` to renderer
+3. Sets a 5000ms playback fallback timer
+4. On video end (IPC) or playback timeout → wait 1s → fade out → close
+
+```ts
+// Renderer side — signal readiness after mounting
+useEffect(() => {
+  const remove = ipcRenderer.on('splash:play-video', () => {
+    videoRef.current?.play().catch(() => {});
+  });
+  ipcRenderer.send('splash:renderer-ready'); // Signal main process
+  return remove;
+}, []);
+```
+
+:::tip
+The dual-fallback design (ready timeout + playback timeout) ensures the main window is never permanently blocked, even if the renderer fails to load or the video resource is unavailable.
+:::
 
 ### Custom Protocol
 
@@ -507,6 +545,7 @@ The renderer supports multiple HTML entry points for different visual contexts:
 |-------|------|---------|
 | **Main Island** | `index.html` | Primary dynamic island window |
 | **Standalone Widget** | `standalone.html` | Independent widget window |
+| **Splash Screen** | `splash.html` | Startup video playback window |
 | **AI Background** | `AIbackground.html` | AI assistant background effects |
 
 ## Data Flow
@@ -579,7 +618,7 @@ export default defineConfig({
     plugins: [react(), tailwindcss()],
     build: {
       rollupOptions: {
-        input: { index: 'index.html', standalone: 'standalone.html', AIbackground: 'AIbackground.html' },
+        input: { index: 'index.html', standalone: 'standalone.html', splash: 'splash.html', AIbackground: 'AIbackground.html' },
       },
     },
   },
@@ -592,13 +631,13 @@ export default defineConfig({
 |--------|-------|--------|-------------|
 | **main** | `src/main/index.ts`, `src/main/smtcWorker.ts` | `out/main` | Node.js main process with SMTC worker |
 | **preload** | `src/preload/index.ts` | `out/preload` | Context bridge between main and renderer |
-| **renderer** | `index.html`, `standalone.html`, `AIbackground.html` | `out/renderer` | Chromium renderer with 3 HTML entry points |
+| **renderer** | `index.html`, `standalone.html`, `splash.html`, `AIbackground.html` | `out/renderer` | Chromium renderer with 4 HTML entry points |
 
 **Key Features:**
 - **externalizeDepsPlugin**: Excludes Node.js dependencies from main/preload bundles
 - **@vitejs/plugin-react**: React Fast Refresh for development
 - **@tailwindcss/vite**: Tailwind CSS v4 integration (no separate config file)
-- **Multiple HTML entries**: Supports main island window, standalone widget, and AI background
+- **Multiple HTML entries**: Supports main island window, standalone widget, splash screen, and AI background
 
 ## SMTC Worker
 

@@ -42,6 +42,42 @@ All plugins share these three build commands:
 After modifying `binding.gyp` (e.g., adding a new source file or library), always run `npm run rebuild` — a regular `npm run build` may use cached artifacts.
 :::
 
+## Bulk Operations
+
+Run from the **project root** to build or clean all plugins at once.
+
+| Command | Description |
+|---------|-------------|
+| `npm run plugins:build` | Build all 9 plugins sequentially (uses `build:all` where available) |
+| `npm run plugins:clean` | Clean all 9 plugins in parallel |
+
+:::tip
+`plugins:build` automatically uses `build:all` for Bluetooth, Power, SMTC, and WiFi Helpers (which include NativeAOT DLL targets). All other plugins use `build`.
+:::
+
+### Individual Plugin Commands
+
+Each plugin also has a dedicated root-level command for targeted builds and cleans:
+
+| Plugin | Build | Clean |
+|--------|-------|-------|
+| Bluetooth Helper | `npm run plugin:build:bluetooth` | `npm run plugin:clean:bluetooth` |
+| Brightness Helper | `npm run plugin:build:brightness` | `npm run plugin:clean:brightness` |
+| Power Helper | `npm run plugin:build:power` | `npm run plugin:clean:power` |
+| Processes Attacker | `npm run plugin:build:processes` | `npm run plugin:clean:processes` |
+| SMTC Helper | `npm run plugin:build:smtc` | `npm run plugin:clean:smtc` |
+| Toast Listener | `npm run plugin:build:toast` | `npm run plugin:clean:toast` |
+| WiFi Helper | `npm run plugin:build:wifi` | `npm run plugin:clean:wifi` |
+| Fullscreen Detector | `npm run plugin:build:fullscreen` | `npm run plugin:clean:fullscreen` |
+| Performance Monitor | `npm run plugin:build:perfmon` | `npm run plugin:clean:perfmon` |
+
+:::info NativeAOT Build Requirement
+Building NativeAOT DLLs (`npm run build:ctypes` for SMTC, Bluetooth, Power, WiFi helpers) requires `vswhere.exe` in PATH. If the build fails with `'vswhere.exe' is not recognized`, add it:
+```bash
+export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
+```
+:::
+
 ---
 
 ## Windows Fullscreen Detector
@@ -364,7 +400,7 @@ This is a pure .NET plugin that spawns a console EXE for WMI brightness operatio
 | WiFi Helper (DLL) | `cd plugins/eisland-windows-wifi-helper && npm run build:ctypes` |
 | WiFi Helper (all) | `cd plugins/eisland-windows-wifi-helper && npm run build:all` |
 | Brightness Helper | `cd plugins/eisland-windows-brightness-helper && npm run build` |
-| **All plugins** | `npm install` (from root — triggers `electron-builder install-app-deps`) |
+| **All plugins** | `npm run plugins:build` (from root — builds all 9 plugins) |
 
 ### All Test Commands
 

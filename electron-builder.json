@@ -9,6 +9,11 @@
     "out/**/*",
     "!out/renderer/.vite/**"
   ],
+  "asarUnpack": [
+    "node_modules/@eisland/**/src/bin/Release/**/*",
+    "node_modules/@eisland/**/*.node",
+    "node_modules/koffi/**/*"
+  ],
   "extraResources": [
     {
       "from": "resources/icon",

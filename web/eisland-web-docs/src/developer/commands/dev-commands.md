@@ -59,7 +59,7 @@ npm run build
 out/
 ├── main/          # Compiled main process (Node.js)
 ├── preload/       # Compiled preload scripts
-└── renderer/      # Compiled React UI (3 HTML entries)
+└── renderer/      # Compiled React UI (4 HTML entries)
 ```
 
 :::info

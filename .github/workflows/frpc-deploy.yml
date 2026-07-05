@@ -1,0 +1,55 @@
+name: Deploy frpc Config
+
+on:
+  workflow_dispatch:
+    inputs:
+      config_content:
+        description: 'frpc.toml content (paste the full config)'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, windows]
+    steps:
+      - name: Ensure C:\frp directory exists
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'C:\frp')) {
+            New-Item -ItemType Directory -Path 'C:\frp' -Force
+            Write-Host 'Created C:\frp directory'
+          } else {
+            Write-Host 'C:\frp directory already exists'
+          }
+
+      - name: Write frpc config file
+        shell: pwsh
+        run: |
+          $configPath = 'C:\frp\frpc.toml'
+          $content = @'
+          ${{ inputs.config_content }}
+          '@
+          Set-Content -Path $configPath -Value $content -Encoding UTF8
+          Write-Host "Written config to $configPath"
+          Get-Content $configPath
+
+      - name: Restart frpc service
+        shell: pwsh
+        run: |
+          $serviceName = 'frpc'
+
+          # Try to restart as a Windows service
+          $svc = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+          if ($svc) {
+            Write-Host "Restarting service '$serviceName'..."
+            Restart-Service -Name $serviceName -Force
+            Write-Host 'Service restarted successfully'
+            Get-Service -Name $serviceName | Format-Table Name, Status
+          } else {
+            # If not a service, try to restart the process
+            Write-Host "Service '$serviceName' not found, attempting process restart..."
+            Get-Process -Name 'frpc' -ErrorAction SilentlyContinue | Stop-Process -Force
+            Start-Sleep -Seconds 2
+            Start-Process -FilePath 'C:\frp\frpc.exe' -ArgumentList '-c C:\frp\frpc.toml' -WindowStyle Hidden
+            Write-Host 'frpc process restarted'
+          }

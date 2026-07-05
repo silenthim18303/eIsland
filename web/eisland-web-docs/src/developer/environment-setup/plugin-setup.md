@@ -36,7 +36,7 @@ All plugins are compiled using **node-gyp**, which requires Visual Studio Build 
 | **Node.js** | >= 22.x | JavaScript runtime for node-gyp |
 | **npm** | >= 10.x | Package manager |
 | **Visual Studio Build Tools 2022** | Latest | C/C++ compiler toolchain |
-| **.NET 10 SDK** | >= 10.0 | Build temperature-helper (.NET component) |
+| **.NET 10 SDK** | >= 10.0 | Build .NET Native AOT plugins and temperature-helper |
 | **Python** | >= 3.10 | SMTC ctypes DLL testing |
 | **Git** | Latest | Version control |
 
@@ -197,10 +197,12 @@ eisland-windows-smtc-helper/
     └── eIslandSmtcCtypes.csproj   # NativeAOT DLL (for Python ctypes / FFI)
         └── TargetFramework: net10.0-windows10.0.19041.0
         └── PublishAot: true
+        └── SelfContained: true
+        └── StaticICU: true
 ```
 
 1. **dotnet build** compiles the .NET console application using .NET 10 SDK + Windows SDK
-2. **dotnet publish** compiles the NativeAOT DLL (requires `vswhere.exe` in PATH)
+2. **dotnet publish** compiles the self-contained NativeAOT DLL (requires `vswhere.exe` in PATH)
 3. At runtime, `index.js` spawns the .NET executable via `spawnSync` with CLI arguments
 4. The .NET app outputs JSON to stdout and exits
 
@@ -221,11 +223,19 @@ eisland-windows-bluetooth-helper/
     └── eIslandBluetoothCtypes.csproj  # NativeAOT DLL (for koffi FFI)
         └── TargetFramework: net10.0-windows10.0.19041.0
         └── PublishAot: true
+        └── SelfContained: true
+        └── StaticICU: true
 ```
 
 1. **dotnet build** compiles the .NET class library
-2. **dotnet publish** compiles the NativeAOT DLL (requires `vswhere.exe` in PATH)
+2. **dotnet publish** compiles the self-contained NativeAOT DLL (requires `vswhere.exe` in PATH)
 3. At runtime, `index.js` loads the DLL via koffi FFI and calls C-style exported functions
+
+:::important Self-Contained Native AOT
+All .NET Native AOT DLLs are built with `<SelfContained>true</SelfContained>` and `<StaticICU>true</StaticICU>`. This means **client machines do not need the .NET runtime installed** — all dependencies are statically linked into the DLL. The trade-off is a larger DLL size (~5MB per plugin).
+:::
+
+The Power and WiFi helpers follow the same architecture. The Brightness helper is different — it uses a .NET console EXE (not NativeAOT) because `System.Management` (WMI) is incompatible with NativeAOT.
 :::
 
 ### Installation Summary
@@ -701,6 +711,19 @@ dotnet build
 cd plugins/eisland-windows-smtc-helper
 npm run build
 ```
+
+### NativeAOT Build Fails — 'vswhere.exe' is not recognized
+
+Building NativeAOT DLLs requires `vswhere.exe` in PATH. Add it before building:
+
+```bash
+export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
+npm run build:ctypes
+```
+
+:::note
+This is only needed for `dotnet publish` with `PublishAot=true`. Regular `dotnet build` does not require `vswhere.exe`.
+:::
 
 ### Plugin Loads but Returns undefined
 
