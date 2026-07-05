@@ -46,7 +46,6 @@ import type { IslandBgMediaConfig, UpdateSourceKey } from '../config/dynamicIsla
 interface UseIslandSettingsSyncOptions {
   language: string | undefined;
   initRef: React.MutableRefObject<boolean>;
-  setGuide: () => void;
   setNotificationRef: React.MutableRefObject<(data: NotificationData) => void>;
   applyBgMedia: (media: IslandBgMediaConfig | null, previewUrl: string | null) => void;
   expandLeaveIdleRef: React.MutableRefObject<boolean>;
@@ -72,7 +71,6 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
   const {
     language,
     initRef,
-    setGuide,
     setNotificationRef,
     applyBgMedia,
     expandLeaveIdleRef,
@@ -157,15 +155,6 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
         }
       }).catch(() => {});
 
-      Promise.all([
-        window.api?.storeRead?.('guide-shown-version') as Promise<string | null>,
-        window.api?.updaterVersion?.(),
-      ]).then(([shownVersion, currentVersion]) => {
-        if (currentVersion && shownVersion !== currentVersion) {
-          setTimeout(() => setGuide(), 800);
-        }
-      }).catch(() => {});
-
       window.api?.onSettingsChanged?.((channel: string, value: unknown) => {
         if (channel === 'shortcut:open-clipboard-history') {
           const store = useIslandStore.getState();
@@ -183,9 +172,6 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
               startupUpdateResolvedUrl?: string;
             });
           }
-        }
-        if (channel === 'guide:show') {
-          setGuide();
         }
         if (channel === 'island:opacity') {
           const v = typeof value === 'number' ? Math.max(10, Math.min(100, Math.round(value))) : 100;
@@ -322,7 +308,6 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
   }, [
     language,
     initRef,
-    setGuide,
     setNotificationRef,
     applyBgMedia,
     expandLeaveIdleRef,

@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import DOMPurify from 'dompurify';
 import type { AnnouncementData } from '../../../../api/announcement/announcementApi';
 import { ANNOUNCEMENT_KEYS, ANNOUNCEMENT_DEFAULTS } from '../config/announcementDefaults';
+import { AnnouncementVideo } from './AnnouncementVideo';
 
 interface AnnouncementBodyProps {
   loading: boolean;
@@ -51,13 +52,18 @@ export function AnnouncementBody({ loading, announcement }: AnnouncementBodyProp
     return <div className="announcement-empty">{t(ANNOUNCEMENT_KEYS.EMPTY, { defaultValue: ANNOUNCEMENT_DEFAULTS.EMPTY })}</div>;
   }
 
-  if (announcement.contentHtml) {
-    return <div className="announcement-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(announcement.contentHtml) }} />;
+  const contentNode = announcement.contentHtml
+    ? <div className="announcement-body" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(announcement.contentHtml) }} />
+    : <div className="announcement-body"><pre>{announcement.content || ''}</pre></div>;
+
+  if (announcement.bvid) {
+    return (
+      <div className="announcement-content-row">
+        <AnnouncementVideo bvid={announcement.bvid} autoplay={false} showDanmaku={false} aspectRatio={9 / 16} />
+        {contentNode}
+      </div>
+    );
   }
 
-  return (
-    <div className="announcement-body">
-      <pre>{announcement.content || ''}</pre>
-    </div>
-  );
+  return contentNode;
 }

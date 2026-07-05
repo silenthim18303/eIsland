@@ -396,7 +396,6 @@ export const NAV_CARDS: NavCardDef[] = [
   { id: 'shortcut', label: SETTINGS_TAB_LABELS.shortcut, desc: SETTINGS_TAB_DESCRIPTIONS.shortcut, icon: SETTINGS_TAB_ICONS.shortcut, tab: 'shortcut' },
   { id: 'update', label: SETTINGS_TAB_LABELS.update, desc: SETTINGS_TAB_DESCRIPTIONS.update, icon: SETTINGS_TAB_ICONS.update, tab: 'update' },
   { id: 'pluginMarket', label: SETTINGS_TAB_LABELS.pluginMarket, desc: SETTINGS_TAB_DESCRIPTIONS.pluginMarket, icon: SETTINGS_TAB_ICONS.pluginMarket, tab: 'pluginMarket' },
-  { id: 'guide', label: '使用教程', desc: '查看灵动岛功能引导与操作说明。', icon: SvgIcon.GUIDE, tab: 'index', actionId: 'guide' },
   { id: 'about', label: SETTINGS_TAB_LABELS.about, desc: SETTINGS_TAB_DESCRIPTIONS.about, icon: SETTINGS_TAB_ICONS.about, tab: 'about' },
   { id: 'music-whitelist', label: SETTINGS_TAB_LABELS['music-whitelist'], desc: SETTINGS_TAB_DESCRIPTIONS['music-whitelist'], icon: SETTINGS_TAB_ICONS['music-whitelist'], tab: 'music', musicPage: 'whitelist' },
   { id: 'music-lyrics', label: SETTINGS_TAB_LABELS['music-lyrics'], desc: SETTINGS_TAB_DESCRIPTIONS['music-lyrics'], icon: SETTINGS_TAB_ICONS['music-lyrics'], tab: 'music', musicPage: 'lyrics' },

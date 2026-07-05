@@ -224,7 +224,7 @@ export function SettingsTab(): ReactElement {
   const [aboutInitialPage, setAboutInitialPage] = useState<'development' | 'feedback'>('development');
   const [pluginMarketPage, setPluginMarketPage] = useState<PluginMarketPageKey>('wallpaper');
   const [wallpaperMarketRefreshKey, setWallpaperMarketRefreshKey] = useState(0);
-  const { aiConfig, setAiConfig, fetchWeatherData, setGuide, setLogin, setRegister, setNotification } = useIslandStore();
+  const { aiConfig, setAiConfig, fetchWeatherData, setLogin, setRegister, setNotification } = useIslandStore();
   const settingsRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef(activeTab);
   activeTabRef.current = activeTab;
@@ -2354,11 +2354,6 @@ export function SettingsTab(): ReactElement {
               setAiSettingsPage={setAiSettingsPage}
               setActiveTab={setActiveTab}
               onAction={(actionId) => {
-                if (actionId === 'guide') {
-                  setGuide();
-                  window.api.settingsPreview('guide:show', true).catch(() => {});
-                  return;
-                }
                 if (actionId === 'user-pro') {
                   setUserInitialProfilePage('pro');
                   setActiveTab('user');
