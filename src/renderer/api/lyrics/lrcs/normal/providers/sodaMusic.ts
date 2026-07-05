@@ -78,7 +78,7 @@ async function searchSodaMusicApi(query: string): Promise<SearchCandidate[]> {
           durationMs: track.duration,
         };
       })
-      .filter((c): c is SearchCandidate => c !== null);
+      .filter((c) => c !== null);
   });
 }
 
@@ -121,12 +121,8 @@ async function fetchLyricsByTrackId(trackId: string): Promise<LyricsFetchResult 
   } else if (rawTranslations && typeof rawTranslations === 'object' && !Array.isArray(rawTranslations)) {
     // API 返回 {cn: "[00:01.00]...", en: "..."} 格式（语言代码为 key）
     const obj = rawTranslations as Record<string, unknown>;
-    for (const value of Object.values(obj)) {
-      if (typeof value === 'string' && value.trim().length > 0) {
-        translationText = value;
-        break;
-      }
-    }
+    const found = Object.values(obj).find((v): v is string => typeof v === 'string' && v.trim().length > 0);
+    if (found) translationText = found;
   }
 
   const translation = parseTranslationLyrics(translationText);
