@@ -1020,6 +1020,21 @@ const api = {
     return ipcRenderer.invoke('music:lyrics-source:set', source);
   },
   /**
+   * 获取歌词功能开关
+   * @returns 是否启用歌词功能
+   */
+  musicLyricsEnabledGet: (): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-enabled:get');
+  },
+  /**
+   * 设置歌词功能开关
+   * @param enabled - 是否启用
+   * @returns 是否保存成功
+   */
+  musicLyricsEnabledSet: (enabled: boolean): Promise<boolean> => {
+    return ipcRenderer.invoke('music:lyrics-enabled:set', enabled);
+  },
+  /**
    * 获取逐字扫光开关
    * @returns 是否启用逐字扫光
    */

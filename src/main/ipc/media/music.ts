@@ -37,6 +37,7 @@ interface RegisterMusicIpcHandlersOptions {
   lyricsClockStoreKey: string;
   lyricsCalibrateEnabledStoreKey: string;
   lyricsCalibrateDelayStoreKey: string;
+  lyricsEnabledStoreKey: string;
   smtcUnsubscribeStoreKey: string;
   defaultLyricsKaraoke: boolean;
   defaultLyricsClock: boolean;
@@ -153,6 +154,29 @@ export function registerMusicIpcHandlers(options: RegisterMusicIpcHandlersOption
       return true;
     } catch (err) {
       console.error('[LyricsCalibrateEnabled] persist error:', err);
+      return false;
+    }
+  });
+
+  ipcMain.handle('music:lyrics-enabled:get', () => {
+    try {
+      const filePath = join(options.storeDir, `${options.lyricsEnabledStoreKey}.json`);
+      if (!existsSync(filePath)) return true;
+      const raw = readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+      return typeof data === 'boolean' ? data : true;
+    } catch {
+      return true;
+    }
+  });
+
+  ipcMain.handle('music:lyrics-enabled:set', (_event, enabled: boolean) => {
+    try {
+      const filePath = join(options.storeDir, `${options.lyricsEnabledStoreKey}.json`);
+      writeFileSync(filePath, JSON.stringify(enabled, null, 2), 'utf-8');
+      return true;
+    } catch (err) {
+      console.error('[LyricsEnabled] persist error:', err);
       return false;
     }
   });

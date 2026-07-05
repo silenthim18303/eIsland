@@ -2509,6 +2509,9 @@
         "alreadyExists": "已在白名单中"
       },
       "lyrics": {
+        "enabledTitle": "歌词功能",
+        "enabledHint": "关闭后不再发送歌词相关网络请求，不显示歌词，不切换到歌词状态",
+        "enabledToggle": "启用歌词功能",
         "title": "歌词源",
         "hint": "自动模式根据 SMTC 检测到的播放器进程选择对应源，失败后依次尝试其他源，最后使用 LRCLIB 兜底",
         "displayTitle": "歌词显示",

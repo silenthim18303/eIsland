@@ -409,6 +409,8 @@ declare global {
       musicWhitelistSet: (list: string[]) => Promise<boolean>;
       musicLyricsSourceGet: () => Promise<string>;
       musicLyricsSourceSet: (source: string) => Promise<boolean>;
+      musicLyricsEnabledGet: () => Promise<boolean>;
+      musicLyricsEnabledSet: (enabled: boolean) => Promise<boolean>;
       musicLyricsKaraokeGet: () => Promise<boolean>;
       musicLyricsKaraokeSet: (enabled: boolean) => Promise<boolean>;
       musicLyricsClockGet: () => Promise<boolean>;

@@ -219,6 +219,17 @@ export function useIslandNowPlayingSync(options: UseIslandNowPlayingSyncOptions)
         const deviceId = info!.deviceId;
 
         const loadLyrics = async (): Promise<void> => {
+          let lyricsEnabled = true;
+          try {
+            lyricsEnabled = await window.api.musicLyricsEnabledGet();
+          } catch {
+            lyricsEnabled = true;
+          }
+          if (!lyricsEnabled) {
+            setLyricsLoadingRef.current(false);
+            return;
+          }
+
           let karaokeEnabled = false;
           try {
             karaokeEnabled = await window.api.musicLyricsKaraokeGet();

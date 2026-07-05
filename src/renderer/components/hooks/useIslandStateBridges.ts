@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { SyncedLyricLine, TimerState, TranslationLyricsResult } from '../../store/types';
 import type { IslandState } from './useDynamicIslandShell';
 
@@ -59,6 +59,11 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
     setIdle,
   } = options;
 
+  const lyricsEnabledRef = useRef<boolean>(true);
+  useEffect(() => {
+    window.api.musicLyricsEnabledGet().then((v) => { lyricsEnabledRef.current = v; }).catch(() => {});
+  }, []);
+
   useEffect(() => {
     const unsub = window.api?.onAgentVoiceInputState?.((active: boolean) => {
       const currentState = state;
@@ -75,6 +80,7 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
   }, [state, setAgentVoiceInput, setIdle]);
 
   useEffect(() => {
+    if (!lyricsEnabledRef.current) return;
     if (state !== 'idle') return;
     if (timerState !== 'idle') return;
     if (isPlaying && ((syncedLyrics?.length ?? 0) > 0 || lyricsLoading)) {
