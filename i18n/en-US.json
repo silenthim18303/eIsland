@@ -1940,7 +1940,11 @@
         "hint": "Performance-related configuration.",
         "modeTitle": "Enable Performance Mode",
         "modeHint": "When enabled, MaxExpand lazily loads pages on first entry to reduce initial switching lag. When disabled, it uses the previous eager loading behavior.",
-        "modeToggle": "Enable performance mode"
+        "modeToggle": "Enable performance mode",
+        "frameRateLimitTitle": "Disable Frame Rate Limit",
+        "frameRateLimitHint": "When enabled, removes the Chromium frame rate cap. Suitable for high refresh rate displays. Requires app restart to take effect.",
+        "frameRateLimitToggle": "Disable frame rate limit",
+        "frameRateLimitRestartHint": "Frame rate limit setting has changed. Restart to apply."
       },
       "performanceMonitor": {
         "title": "Performance Monitor",

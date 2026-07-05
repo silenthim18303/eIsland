@@ -270,6 +270,9 @@ export const AGENT_VOICE_INPUT_HOTKEY_STORE_KEY = 'agent-voice-input-hotkey';
 /** Agent 启动通知开关存储键名 */
 export const AGENT_NOTIFICATION_ENABLED_STORE_KEY = 'agent-notification-enabled';
 
+/** 解除帧率限制开关存储键名 */
+export const DISABLE_FRAME_RATE_LIMIT_STORE_KEY = 'disable-frame-rate-limit';
+
 // ===== Helper =====
 
 function getStoreDir(): string {
@@ -583,4 +586,13 @@ export function readStartupAnimationEnabledConfig(): boolean {
 export function readSplashBgColorConfig(): string {
   const data = readJsonFile(SPLASH_BG_COLOR_STORE_KEY);
   return typeof data === 'string' ? data : DEFAULT_SPLASH_BG_COLOR;
+}
+
+/**
+ * 读取解除帧率限制开关配置
+ * @returns 是否解除帧率限制
+ */
+export function readDisableFrameRateLimitConfig(): boolean {
+  const data = readJsonFile(DISABLE_FRAME_RATE_LIMIT_STORE_KEY);
+  return typeof data === 'boolean' ? data : false;
 }

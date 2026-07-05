@@ -1940,7 +1940,11 @@
         "hint": "性能相关配置。",
         "modeTitle": "启用性能模式",
         "modeHint": "启用后 MaxExpand 首次进入将延迟加载各页面，降低首次切换卡顿；关闭后使用旧版一次性加载方式。",
-        "modeToggle": "启用性能模式"
+        "modeToggle": "启用性能模式",
+        "frameRateLimitTitle": "解除帧率限制",
+        "frameRateLimitHint": "启用后将解除 Chromium 帧率上限，适用于高刷新率显示器。更改后需重启应用生效。",
+        "frameRateLimitToggle": "解除帧率限制",
+        "frameRateLimitRestartHint": "帧率限制设置已变更，重启后生效。"
       },
       "performanceMonitor": {
         "title": "性能监控",

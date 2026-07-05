@@ -25,6 +25,11 @@
  */
 
 import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../../config/storeConfig', () => ({
+  readDisableFrameRateLimitConfig: () => false,
+}));
+
 import { applyChromiumPerformanceFlags } from '../chromiumFlags';
 
 describe('applyChromiumPerformanceFlags', () => {
