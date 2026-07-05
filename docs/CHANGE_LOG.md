@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-05T06:35:25.884Z
+> 生成时间：2026-07-05T08:10:17.403Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,15 @@
 
 ## Unreleased
 
+- 2026-07-05 | 87569abf | 鸡哥 | Merge pull request #121 from JNTMTMTM/dev
+- 2026-07-05 | 5d420707 | 鸡哥 | feat: set default bvid in fetchCurrentAnnouncement function
+- 2026-07-05 | b8cfc7ea | 鸡哥 | refactor: remove default bvid and simplify AnnouncementVideo rendering logic
+- 2026-07-05 | 056ac3ba | 鸡哥 | feat: enhance AnnouncementVideo styling with border radius and alignment adjustments
+- 2026-07-05 | 4a8e8561 | 鸡哥 | feat: add AnnouncementVideo component and integrate bvid support in announcements
+- 2026-07-05 | ce3b5ed9 | 鸡哥 | chore: revert version to 26.6.3 in package.json
+- 2026-07-05 | a0df81be | 鸡哥 | feat: update startupUpdateSource to include 'esa-cdn' in NotificationData interface
+- 2026-07-05 | 19c4cc64 | 鸡哥 | chore: update version to 26.6.4 and remove guide references from settings
+- 2026-07-05 | c2156b90 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #120 by @JNTMTMTM [skip ci]
 - 2026-07-05 | f778efd9 | 鸡哥 | Merge pull request #120 from JNTMTMTM/dev
 - 2026-07-05 | 2c44be66 | 鸡哥 | feat: update window mode settings and notifications for standalone mode in English and Chinese translations
 - 2026-07-05 | 76d50f11 | 鸡哥 | feat: add frame rate limit toggle in performance settings and update related configurations
