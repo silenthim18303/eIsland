@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-04T16:11:14.958Z
+> 生成时间：2026-07-05T06:35:25.884Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,10 @@
 
 ## Unreleased
 
+- 2026-07-05 | f778efd9 | 鸡哥 | Merge pull request #120 from JNTMTMTM/dev
+- 2026-07-05 | 2c44be66 | 鸡哥 | feat: update window mode settings and notifications for standalone mode in English and Chinese translations
+- 2026-07-05 | 76d50f11 | 鸡哥 | feat: add frame rate limit toggle in performance settings and update related configurations
+- 2026-07-04 | 113ded9a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #119 by @JNTMTMTM [skip ci]
 - 2026-07-05 | 4e797011 | 鸡哥 | Merge pull request #119 from JNTMTMTM/dev
 - 2026-07-05 | de84d038 | 鸡哥 | feat: add color prop to SplashWaveEffect for dynamic background color and update styling for splash video
 - 2026-07-04 | 306dfc58 | 鸡哥 | feat: add playing prop to SplashWaveEffect for controlled rendering
