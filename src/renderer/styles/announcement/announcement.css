@@ -243,6 +243,7 @@
 .announcement-content-row {
   flex: 1;
   display: flex;
+  align-items: stretch;
   gap: 14px;
   overflow: hidden;
   min-height: 0;
@@ -250,6 +251,7 @@
 
 .announcement-video-wrapper {
   flex: 0 0 50%;
+  align-self: center;
   min-width: 0;
   border-radius: 10px;
   overflow: hidden;

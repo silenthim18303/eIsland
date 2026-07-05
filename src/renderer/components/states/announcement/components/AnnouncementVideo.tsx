@@ -78,6 +78,7 @@ export function AnnouncementVideo({
           position: 'relative',
           paddingTop: `${aspectRatio * 100}%`,
           overflow: 'hidden',
+          borderRadius: 10,
           backgroundColor: '#000',
         }}
       >
