@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-05T08:10:17.403Z
+> 生成时间：2026-07-05T10:48:51.375Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,23 @@
 
 ## Unreleased
 
+- 2026-07-05 | cf70b90e | 鸡哥 | Merge pull request #122 from JNTMTMTM/dev
+- 2026-07-05 | e89faf97 | 鸡哥 | feat: add hover animation for lyrics translation state in CSS
+- 2026-07-05 | 1b78833e | 鸡哥 | fix: update import path for TranslationLyricsResult in useIslandStateBridges hook
+- 2026-07-05 | eb8f12b6 | 鸡哥 | feat: add lyrics and translation settings with event dispatch for state updates
+- 2026-07-05 | a78611d1 | 鸡哥 | feat: add translation lyrics feature with settings and IPC handlers
+- 2026-07-05 | 6b92c365 | 鸡哥 | feat: implement lyrics feature toggle with settings and IPC handlers
+- 2026-07-05 | adcca088 | 鸡哥 | refactor: enhance translation result functions with additional status descriptions
+- 2026-07-05 | 315d9941 | 鸡哥 | refactor: simplify filter and improve translation extraction logic in SodaMusic provider
+- 2026-07-05 | 5cd90337 | 鸡哥 | feat: enhance session emission logic to handle resuming from pause state
+- 2026-07-05 | 5ae68787 | 鸡哥 | feat: add lyricsTranslation state for displaying synchronized lyrics with translation
+- 2026-07-05 | 704f63ca | 鸡哥 | refactor: implement lyrics translation feature with new components and hooks
+- 2026-07-05 | 7bc5e233 | 鸡哥 | feat: add lyrics translation support with new component and state handling
+- 2026-07-05 | 17e06a6e | 鸡哥 | feat: add support for lyrics translation with dynamic window resizing and styling
+- 2026-07-05 | 0ab90670 | 鸡哥 | feat: update hover tab and related translations from 'o3ics' to 'lyrics'
+- 2026-07-05 | 07a11256 | 鸡哥 | feat: enhance translation lyrics handling in fetchLyricsWithTranslationFromSodaMusic
+- 2026-07-05 | d05ed856 | 鸡哥 | feat: add translation lyrics support and refactor related functions
+- 2026-07-05 | 89c2296d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #121 by @JNTMTMTM [skip ci]
 - 2026-07-05 | 87569abf | 鸡哥 | Merge pull request #121 from JNTMTMTM/dev
 - 2026-07-05 | 5d420707 | 鸡哥 | feat: set default bvid in fetchCurrentAnnouncement function
 - 2026-07-05 | b8cfc7ea | 鸡哥 | refactor: remove default bvid and simplify AnnouncementVideo rendering logic
