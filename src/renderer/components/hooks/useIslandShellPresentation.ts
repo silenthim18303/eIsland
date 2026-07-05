@@ -26,7 +26,6 @@
 
 import { useMemo } from 'react';
 import { STATE_AREA, getStateClassName } from '../config/dynamicIslandConfig';
-import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 
 interface UseIslandShellPresentationOptions {
   state: string;
@@ -36,7 +35,6 @@ interface UseIslandShellPresentationOptions {
   springAnimation: boolean;
   animationSpeed: string;
   dominantColor: [number, number, number];
-  translationLyrics: TranslationLyricsResult | null;
 }
 
 interface IslandShellPresentationState {
@@ -58,12 +56,7 @@ export function useIslandShellPresentation(options: UseIslandShellPresentationOp
     springAnimation,
     animationSpeed,
     dominantColor,
-    translationLyrics,
   } = options;
-
-  const hasTranslation = state === 'lyrics'
-    && translationLyrics?.status === 'available'
-    && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
 
   const shellClassName = useMemo(() => {
     const stateAreaMap = STATE_AREA as Record<string, number>;
@@ -71,8 +64,8 @@ export function useIslandShellPresentation(options: UseIslandShellPresentationOp
       && fromState
       && (stateAreaMap[fromState] ?? 0) > (stateAreaMap[state] ?? 0);
 
-    return `island-shell ${getStateClassName(state as Parameters<typeof getStateClassName>[0])}${morphing ? ' morphing' : ''}${fromState ? ` from-${fromState}` : ''}${instantResize ? ' instant-resize' : ''}${showGlow ? ' music-glow' : ''}${showGlow === 'paused' ? ' music-paused' : ''}${springAnimation ? ' spring-animation' : ''}${hasTranslation ? ' has-translation' : ''} speed-${animationSpeed}`;
-  }, [state, morphing, fromState, showGlow, springAnimation, animationSpeed, hasTranslation]);
+    return `island-shell ${getStateClassName(state as Parameters<typeof getStateClassName>[0])}${morphing ? ' morphing' : ''}${fromState ? ` from-${fromState}` : ''}${instantResize ? ' instant-resize' : ''}${showGlow ? ' music-glow' : ''}${showGlow === 'paused' ? ' music-paused' : ''}${springAnimation ? ' spring-animation' : ''} speed-${animationSpeed}`;
+  }, [state, morphing, fromState, showGlow, springAnimation, animationSpeed]);
 
   const shellStyle = useMemo<React.CSSProperties | undefined>(() => {
     if (!showGlow) return undefined;

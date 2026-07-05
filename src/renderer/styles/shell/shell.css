@@ -388,8 +388,11 @@
   border-radius: 0 0 22px 22px;
 }
 
-.island-shell.lyrics.has-translation {
+.island-shell.lyricsTranslation {
+  width: 500px;
   height: 60px;
+  background: var(--color-island-bg);
+  border-radius: 0 0 22px 22px;
 }
 
 .island-shell.agentVoiceInput {

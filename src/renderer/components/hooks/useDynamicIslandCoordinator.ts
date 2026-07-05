@@ -82,6 +82,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setExpanded,
     setCli,
     setLyrics,
+    setLyricsTranslation,
     setAnnouncement,
     setAgentVoiceInput,
     timerData,
@@ -99,6 +100,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setLyricsLoading,
     syncedLyrics,
     lyricsLoading,
+    translationLyrics,
     springAnimation,
     animationSpeed,
   } = store;
@@ -232,7 +234,9 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     isPlaying,
     syncedLyrics,
     lyricsLoading,
+    translationLyrics,
     setLyrics,
+    setLyricsTranslation,
     setAgentVoiceInput,
     setIdle,
   });
@@ -275,6 +279,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     setHover,
     setIdle,
     setLyrics,
+    setLyricsTranslation,
     isHoveringRef,
     idleClickExpandRef,
     expandLeaveIdleRef,
@@ -294,7 +299,6 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     springAnimation,
     animationSpeed,
     dominantColor,
-    translationLyrics: store.translationLyrics,
   });
 
   return {

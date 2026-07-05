@@ -19,27 +19,29 @@
  */
 
 /**
- * @file LyricsContent.tsx
- * @description 歌词状态内容组件 — 左侧专辑封面 + 光晕，右侧实时歌词
+ * @file LyricsTranslationContent.tsx
+ * @description 带翻译歌词的状态内容组件 — 左侧专辑封面 + 光晕，右侧原文歌词 + 翻译歌词
  * @author 鸡哥
  */
 
 import type { ReactElement } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../store/slices';
 import { SvgIcon } from '../../../utils/SvgIcon';
-import { useLyricsSettings } from './hooks/useLyricsSettings';
-import { useBeijingClock } from './hooks/useBeijingClock';
-import { useAutoIdle } from './hooks/useAutoIdle';
-import { useCurrentLyric } from './hooks/useCurrentLyric';
-import { KaraokeSyllableLine } from './components/KaraokeSyllableLine';
+import { useLyricsSettings } from '../lyrics/hooks/useLyricsSettings';
+import { useBeijingClock } from '../lyrics/hooks/useBeijingClock';
+import { useAutoIdle } from '../lyrics/hooks/useAutoIdle';
+import { useCurrentLyric } from '../lyrics/hooks/useCurrentLyric';
+import { findCurrentIndex } from '../lyrics/utils/findCurrentIndex';
+import { KaraokeSyllableLine } from '../lyrics/components/KaraokeSyllableLine';
 import '../../../styles/lyrics/lyrics.css';
 
 /**
- * 歌词状态内容组件
- * @description 鼠标离开 hover 且正在播放音乐时显示，左侧专辑封面+光晕，右侧歌词
+ * 带翻译歌词的状态内容组件
+ * @description 当翻译歌词可用时显示，左侧专辑封面+光晕，右侧原文+翻译双行歌词
  */
-export function LyricsContent(): ReactElement {
+export function LyricsTranslationContent(): ReactElement {
   const { t } = useTranslation();
   const isMusicPlaying = useIslandStore((s) => s.isMusicPlaying);
   const isPlaying = useIslandStore((s) => s.isPlaying);
@@ -50,17 +52,35 @@ export function LyricsContent(): ReactElement {
   const currentPositionMs = useIslandStore((s) => s.currentPositionMs);
   const mediaInfo = useIslandStore((s) => s.mediaInfo);
   const setIdle = useIslandStore((s) => s.setIdle);
+  const translationLyrics = useIslandStore((s) => s.translationLyrics);
+
+  const translationLines = translationLyrics?.status === 'available' ? translationLyrics.lines : null;
 
   const { karaokeEnabled, clockEnabled, musicOuterGlowEffectEnabled } = useLyricsSettings();
   const clockText = useBeijingClock(clockEnabled);
   useAutoIdle(isMusicPlaying, lyricsLoading, syncedLyrics, setIdle);
   const { currentIdx, hasLyrics, isIntro, currentLine, currentText, hasSyllables } = useCurrentLyric(syncedLyrics, lyricsLoading, currentPositionMs);
 
+  /** 当前翻译歌词行文本 */
+  const translationText = useMemo(() => {
+    if (!translationLines || translationLines.length === 0 || currentIdx < 0) return '';
+    const tIdx = findCurrentIndex(translationLines, currentPositionMs);
+    return tIdx >= 0 ? translationLines[tIdx].text : '';
+  }, [translationLines, currentIdx, currentPositionMs]);
+
+  /** 翻译歌词不可用时回退到普通歌词状态 */
+  useEffect(() => {
+    if (!translationLines || translationLines.length === 0) {
+      window.api?.expandWindowLyrics();
+      useIslandStore.getState().setLyrics();
+    }
+  }, [translationLines]);
+
   const [r, g, b] = dominantColor;
 
   return (
     <div className="lyrics-content">
-      {/* 背景光晕 — 与 IdleContent 一致 */}
+      {/* 背景光晕 */}
       <div
         className={`idle-glow${isMusicPlaying && coverImage && musicOuterGlowEffectEnabled ? ' active' : ''}${isMusicPlaying && coverImage && !isPlaying && musicOuterGlowEffectEnabled ? ' paused' : ''}`}
         style={isMusicPlaying && coverImage && musicOuterGlowEffectEnabled
@@ -84,7 +104,7 @@ export function LyricsContent(): ReactElement {
         <span className="lyrics-time">{clockText}</span>
       )}
 
-      {/* 右侧：歌词 / 前奏居中 */}
+      {/* 右侧：原文歌词 + 翻译歌词 */}
       <div className="lyrics-right">
         {lyricsLoading ? (
           <div className="lyrics-loading">
@@ -99,20 +119,27 @@ export function LyricsContent(): ReactElement {
             <img src={SvgIcon.MUSIC} alt="" className="lyrics-intro-icon" />
           </>
         ) : currentText ? (
-          <span
-            key={currentIdx}
-            className={`lyrics-current-line${karaokeEnabled && hasSyllables ? ' lyrics-karaoke' : ''}`}
-          >
-            {karaokeEnabled && hasSyllables && currentLine ? (
-              <KaraokeSyllableLine
-                syllables={currentLine.syllables!}
-                lineStartMs={currentLine.time_ms}
-                posMs={currentPositionMs}
-              />
-            ) : (
-              currentText
+          <div className="lyrics-lines-wrapper">
+            <span
+              key={currentIdx}
+              className={`lyrics-current-line${karaokeEnabled && hasSyllables ? ' lyrics-karaoke' : ''}`}
+            >
+              {karaokeEnabled && hasSyllables && currentLine ? (
+                <KaraokeSyllableLine
+                  syllables={currentLine.syllables!}
+                  lineStartMs={currentLine.time_ms}
+                  posMs={currentPositionMs}
+                />
+              ) : (
+                currentText
+              )}
+            </span>
+            {translationText && (
+              <span key={`t-${currentIdx}`} className="lyrics-translation-line">
+                {translationText}
+              </span>
             )}
-          </span>
+          </div>
         ) : (
           <span className="lyrics-empty">{t('songTab.lyrics.empty')} {t('songTab.lyrics.enjoyMusic', { defaultValue: '享受音乐' })}</span>
         )}

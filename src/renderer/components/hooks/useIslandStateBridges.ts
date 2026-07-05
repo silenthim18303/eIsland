@@ -25,7 +25,7 @@
  */
 
 import { useEffect } from 'react';
-import type { SyncedLyricLine, TimerState } from '../../store/types';
+import type { SyncedLyricLine, TimerState, TranslationLyricsResult } from '../../store/types';
 import type { IslandState } from './useDynamicIslandShell';
 
 interface UseIslandStateBridgesOptions {
@@ -34,7 +34,9 @@ interface UseIslandStateBridgesOptions {
   isPlaying: boolean;
   syncedLyrics: SyncedLyricLine[] | null;
   lyricsLoading: boolean;
+  translationLyrics: TranslationLyricsResult | null;
   setLyrics: () => void;
+  setLyricsTranslation: () => void;
   setAgentVoiceInput: () => void;
   setIdle: (force?: boolean) => void;
 }
@@ -50,7 +52,9 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
     isPlaying,
     syncedLyrics,
     lyricsLoading,
+    translationLyrics,
     setLyrics,
+    setLyricsTranslation,
     setAgentVoiceInput,
     setIdle,
   } = options;
@@ -74,7 +78,23 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
     if (state !== 'idle') return;
     if (timerState !== 'idle') return;
     if (isPlaying && ((syncedLyrics?.length ?? 0) > 0 || lyricsLoading)) {
-      setLyrics();
+      const hasTranslation = translationLyrics?.status === 'available'
+        && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
+      if (hasTranslation) {
+        setLyricsTranslation();
+      } else {
+        setLyrics();
+      }
     }
-  }, [state, timerState, isPlaying, syncedLyrics, lyricsLoading, setLyrics]);
+  }, [state, timerState, isPlaying, syncedLyrics, lyricsLoading, translationLyrics, setLyrics, setLyricsTranslation]);
+
+  /** 歌词状态下翻译歌词加载完成 → 升级到 lyricsTranslation */
+  useEffect(() => {
+    if (state !== 'lyrics') return;
+    const hasTranslation = translationLyrics?.status === 'available'
+      && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
+    if (hasTranslation) {
+      setLyricsTranslation();
+    }
+  }, [state, translationLyrics, setLyricsTranslation]);
 }
