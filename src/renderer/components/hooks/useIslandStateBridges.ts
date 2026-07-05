@@ -25,7 +25,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import type { SyncedLyricLine, TimerState, TranslationLyricsResult } from '../../store/types';
+import type { SyncedLyricLine, TimerState } from '../../store/types';
+import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 import type { IslandState } from './useDynamicIslandShell';
 
 interface UseIslandStateBridgesOptions {
