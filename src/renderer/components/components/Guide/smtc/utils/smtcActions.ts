@@ -103,16 +103,3 @@ export function ensureInitialized(): void {
   window.api.mediaCurrentInfoGet().then(handleNowPlaying).catch(() => {});
   runtime.unsubscribe = window.api.onNowPlayingInfo(handleNowPlaying);
 }
-
-/** 重新检测 */
-export async function retry(): Promise<void> {
-  runtime.status = 'loading';
-  runtime.sourceAppId = '';
-  try {
-    const info = await window.api.mediaCurrentInfoGet();
-    await handleNowPlaying(info);
-  } catch {
-    runtime.status = 'no-media';
-    notify();
-  }
-}

@@ -62,23 +62,6 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-.guide-smtc-retry-btn {
-  padding: 8px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 13px;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
-}
-
-.guide-smtc-retry-btn:hover {
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.85);
-}
-
 /* ===== 结果布局 ===== */
 
 .guide-smtc-result {

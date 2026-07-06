@@ -50,7 +50,6 @@
       "title": "SMTC Media Test",
       "subtitle": "Check if system media transport controls are available",
       "hint": "Play a song with your media player",
-      "retry": "Retry",
       "player": "Player",
       "state": "State",
       "playing": "Playing",

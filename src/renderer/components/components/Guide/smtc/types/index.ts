@@ -50,6 +50,4 @@ export interface SmtcMediaMeta {
 export interface UseSmtcTestReturn {
   status: SmtcTestStatus;
   meta: SmtcMediaMeta | null;
-  /** 重新检测 */
-  retry: () => void;
 }

@@ -24,10 +24,10 @@
  * @author 鸡哥
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { UseSmtcTestReturn } from '../types';
 import { runtime } from '../utils/smtcStore';
-import { ensureInitialized, retry as retryAction } from '../utils/smtcActions';
+import { ensureInitialized } from '../utils/smtcActions';
 
 /**
  * SMTC 媒体测试 Hook
@@ -43,7 +43,5 @@ export function useSmtcTest(): UseSmtcTestReturn {
     return () => { runtime.listeners.delete(listener); };
   }, []);
 
-  const retry = useCallback(() => { retryAction(); }, []);
-
-  return { status: runtime.status, meta: runtime.meta, retry };
+  return { status: runtime.status, meta: runtime.meta };
 }

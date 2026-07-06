@@ -35,7 +35,7 @@ import type { SmtcStepProps } from '../types';
  */
 export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
   const { t } = useTranslation();
-  const { status, meta, retry } = useSmtcTest();
+  const { status, meta } = useSmtcTest();
   const [r, g, b] = meta?.dominantColor ?? [0, 0, 0];
 
   return (
@@ -46,20 +46,12 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
       </div>
 
       <div className="guide-smtc-content">
-        {status === 'loading' && (
-          <div className="guide-smtc-loading">
-            <div className="guide-smtc-spinner" />
-          </div>
-        )}
-
-        {status === 'no-media' && (
+        {(status === 'loading' || status === 'no-media') && (
           <div className="guide-smtc-empty">
+            <div className="guide-smtc-spinner" />
             <p className="guide-smtc-hint">
               {t('guide.smtc.hint', { defaultValue: '请使用播放器播放一首歌' })}
             </p>
-            <button className="guide-smtc-retry-btn" onClick={retry}>
-              {t('guide.smtc.retry', { defaultValue: '重新检测' })}
-            </button>
           </div>
         )}
 
