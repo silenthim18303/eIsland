@@ -357,7 +357,7 @@ const mainWindowService = createMainWindowService({
     await closeSplashWindow();
     const isFirst = readFirstLaunchConfig();
     if (isFirst || !app.isPackaged) {
-      await showGuideWindow();
+      showGuideWindow();
     }
   },
 });
