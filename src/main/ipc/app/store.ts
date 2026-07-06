@@ -29,10 +29,7 @@ import { ipcMain } from 'electron';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { broadcastSettingChange } from '../../utils/broadcast';
-
-interface RegisterStoreIpcHandlersOptions {
-  storeDir: string;
-}
+import type { RegisterStoreIpcHandlersOptions } from './types';
 
 /** 合法的 store key：不含路径分隔符和 traversal 片段 */
 function isValidStoreKey(key: unknown): key is string {

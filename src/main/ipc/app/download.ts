@@ -28,20 +28,10 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { MultiThreadDownloadEngine, type DownloadTaskSnapshot } from '../../core/downloadEngine';
-
-interface RegisterDownloadIpcHandlersOptions {
-  getDownloadsPath: () => string;
-}
-
-interface DownloadStartPayload {
-  url?: unknown;
-  savePath?: unknown;
-  threads?: unknown;
-}
+import type { RegisterDownloadIpcHandlersOptions, DownloadStartPayload } from './types';
+import { MAX_PERSISTED_TASKS, PERSIST_DEBOUNCE_MS } from './config/download';
 
 let registered = false;
-const MAX_PERSISTED_TASKS = 200;
-const PERSIST_DEBOUNCE_MS = 600;
 
 function isDownloadTaskStatus(value: unknown): value is DownloadTaskSnapshot['status'] {
   return value === 'downloading' || value === 'paused' || value === 'completed' || value === 'failed' || value === 'canceled';

@@ -43,10 +43,16 @@
     "plugins:clean": "run-p plugin:clean:bluetooth plugin:clean:brightness plugin:clean:power plugin:clean:processes plugin:clean:smtc plugin:clean:toast plugin:clean:wifi plugin:clean:fullscreen plugin:clean:perfmon"
   },
   "dependencies": {
+    "@eisland/windows-application-icon-helper": "file:plugins/eisland-windows-application-icon-helper",
+    "@eisland/windows-bluetooth-helper": "file:plugins/eisland-windows-bluetooth-helper",
+    "@eisland/windows-brightness-helper": "file:plugins/eisland-windows-brightness-helper",
     "@eisland/windows-fullscreen-detector": "file:plugins/windows-fullscreen-detector",
     "@eisland/windows-performance-monitor": "file:plugins/windows-performance-monitor",
+    "@eisland/windows-power-helper": "file:plugins/eisland-windows-power-helper",
+    "@eisland/windows-processes-attacker": "file:plugins/eisland-windows-processes-attacker",
     "@eisland/windows-smtc-helper": "file:plugins/eisland-windows-smtc-helper",
     "@eisland/windows-toast-listener": "file:plugins/eisland-windows-toast-listener",
+    "@eisland/windows-wifi-helper": "file:plugins/eisland-windows-wifi-helper",
     "@gsap/react": "^2.1.2",
     "@tailwindcss/vite": "^4.2.2",
     "colorthief": "^3.3.1",

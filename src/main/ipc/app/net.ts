@@ -26,31 +26,8 @@
  */
 
 import { ipcMain, net } from 'electron';
-
-type MainLogWriter = (level: 'info' | 'warn' | 'error', message: string) => void;
-
-interface RegisterNetIpcHandlersOptions {
-  writeMainLog: MainLogWriter;
-}
-
-const SENSITIVE_HEADER_NAMES = new Set([
-  'authorization',
-  'cookie',
-  'set-cookie',
-  'proxy-authorization',
-  'x-api-key',
-]);
-
-const SENSITIVE_BODY_KEYS = new Set([
-  'password',
-  'token',
-  'accessToken',
-  'refreshToken',
-  'authorization',
-  'oldPassword',
-  'newPassword',
-  'confirmPassword',
-]);
+import type { RegisterNetIpcHandlersOptions } from './types';
+import { SENSITIVE_HEADER_NAMES, SENSITIVE_BODY_KEYS } from './config/net';
 
 function isTrustedSenderUrl(url: string): boolean {
   if (!url) return false;

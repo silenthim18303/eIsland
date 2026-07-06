@@ -25,145 +25,56 @@
  */
 
 import { ElectronAPI } from '@electron-toolkit/preload';
-
-/** 歌曲信息类型（来自 SMTC Worker 主进程推送） */
-export interface NowPlayingInfo {
-  title: string;
-  artist: string;
-  album: string;
-  duration_ms: number;
-  position_ms: number;
-  isPlaying: boolean;
-  thumbnail?: string | null;
-  canFastForward: boolean;
-  canSkip: boolean;
-  canLike: boolean;
-  canChangeVolume: boolean;
-  canSetOutput: boolean;
-}
-
-export interface RunningProcessInfo {
-  name: string;
-  iconDataUrl: string | null;
-}
-
-export interface RunningWindowInfo {
-  id: string;
-  title: string;
-  processName: string;
-  processPath: string | null;
-  processId: number | null;
-  iconDataUrl: string | null;
-}
-
-export interface PerformanceHardwareSelection {
-  cpu?: string;
-  gpu?: string;
-  disk?: string;
-}
-
-export interface PerformanceHardwareOption {
-  id: string;
-  label: string;
-}
-
-export interface PerformanceHardwareOptions {
-  cpu: PerformanceHardwareOption[];
-  gpu: PerformanceHardwareOption[];
-  disk: PerformanceHardwareOption[];
-}
-
-export interface PerformanceSnapshot {
-  timestamp: number;
-  host: {
-    hostname: string;
-    platform: string;
-    release: string;
-    arch: string;
-    uptimeSeconds: number;
-  };
-  cpu: {
-    manufacturer: string;
-    brand: string;
-    cores: number;
-    physicalCores: number;
-    speedGhz: number | null;
-    speedMaxGhz: number | null;
-    loadPercent: number;
-    temperatureCelsius: number | null;
-  };
-  memory: {
-    totalBytes: number;
-    usedBytes: number;
-    availableBytes: number;
-    usagePercent: number;
-  };
-  gpu: {
-    vendor: string;
-    model: string;
-    vramTotalMb: number | null;
-    loadPercent: number | null;
-    temperatureCelsius: number | null;
-  } | null;
-  disk: {
-    totalBytes: number;
-    usedBytes: number;
-    usagePercent: number;
-    temperatureCelsius: number | null;
-  };
-  hardwareOptions: PerformanceHardwareOptions;
-}
-
-export interface ClaudeCodeHookEventDetailItem {
-  label: string;
-  value: string;
-}
-
-export interface ClaudeCodeHookEvent {
-  id: string;
-  eventName: string;
-  kind: 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
-  sessionId: string;
-  cwd: string | null;
-  transcriptPath: string | null;
-  summary: string;
-  detail: string | null;
-  detailItems: ClaudeCodeHookEventDetailItem[];
-  toolName: string | null;
-  toolInputPreview: string | null;
-  createdAt: number;
-  raw: Record<string, unknown>;
-}
-
-export interface ClaudeCodeSessionSnapshot {
-  id: string;
-  title: string;
-  phase: 'idle' | 'running' | 'waiting_permission' | 'completed';
-  cwd: string | null;
-  transcriptPath: string | null;
-  lastSummary: string;
-  lastEventAt: number;
-  pendingPermission: ClaudeCodeHookEvent | null;
-  events: ClaudeCodeHookEvent[];
-}
-
-export interface ClaudeCodeStatusSnapshot {
-  enabled: boolean;
-  receiverRunning: boolean;
-  receiverUrl: string | null;
-  settingsPath: string;
-  hookScriptPath: string;
-  sessions: ClaudeCodeSessionSnapshot[];
-  events: ClaudeCodeHookEvent[];
-  heatmap: Record<string, { session: number; tool: number; prompt: number }>;
-  updatedAt: number;
-}
-
-export interface ClaudeCodeHookMutationResult {
-  ok: boolean;
-  message: string;
-  snapshot: ClaudeCodeStatusSnapshot;
-}
+import type {
+  Point,
+  Bounds,
+  IslandDisplayInfo,
+  SearchLocalFilesOptions,
+  SearchLocalFileResult,
+  SaveTextFilePayload,
+  SaveTextFileResult,
+  ComputeFileHashResult,
+  ExecuteAgentLocalToolRequest,
+  ExecuteAgentLocalToolResult,
+  OllamaChatRequest,
+  ChatEvent,
+  ChatStartResult,
+  ChatAbortResult,
+  CustomDirectChatRequest,
+  NowPlayingInfo,
+  SmtcTimestampResult,
+  DetectSourceAppIdResult,
+  ImageCompressionStartPayload,
+  ImageCompressionStartResult,
+  ImageCompressionTask,
+  SaveImageAsResult,
+  ResolveShortcutResult,
+  ExtractVideoTrackOptions,
+  ExtractVideoTrackResult,
+  PickVideoForExtractResult,
+  NetFetchOptions,
+  NetFetchResult,
+  MailInboxResult,
+  NavOrderPayload,
+  SetWallpaperPayload,
+  DownloadStartPayload,
+  DownloadStartResult,
+  DownloadTask,
+  UpdaterCheckResult,
+  UpdaterProgress,
+  UpdaterDownloadedData,
+  UpdaterAvailableData,
+  UpdaterNotAvailableData,
+  UpdaterStartupAutoCheckRequestData,
+  ClipboardUrlsDetectedData,
+  ExternalAgentData,
+  RunningProcessInfo,
+  RunningWindowInfo,
+  PerformanceHardwareSelection,
+  PerformanceSnapshot,
+  ClaudeCodeStatusSnapshot,
+  ClaudeCodeHookMutationResult,
+} from './types';
 
 declare global {
   interface Window {
@@ -179,14 +90,14 @@ declare global {
       expandWindowSettings: () => void;
       collapseWindow: () => void;
       hideWindow: () => void;
-      getMousePosition: () => Promise<{ x: number; y: number }>;
-      getWindowBounds: () => Promise<{ x: number; y: number; width: number; height: number }>;
-      getIslandDisplays: () => Promise<Array<{ id: string; width: number; height: number; isPrimary: boolean }>>;
+      getMousePosition: () => Promise<Point>;
+      getWindowBounds: () => Promise<Bounds>;
+      getIslandDisplays: () => Promise<IslandDisplayInfo[]>;
       getIslandDisplaySelection: () => Promise<string>;
       setIslandDisplaySelection: (selection: string) => Promise<boolean>;
-      getIslandPositionOffset: () => Promise<{ x: number; y: number }>;
-      setIslandPositionOffset: (offset: { x: number; y: number }) => Promise<boolean>;
-      onIslandPositionOffsetChanged: (callback: (offset: { x: number; y: number }) => void) => () => void;
+      getIslandPositionOffset: () => Promise<Point>;
+      setIslandPositionOffset: (offset: Point) => Promise<boolean>;
+      onIslandPositionOffsetChanged: (callback: (offset: Point) => void) => () => void;
       quitApp: () => void;
       restartApp: () => Promise<boolean>;
       openLogsFolder: () => Promise<boolean>;
@@ -195,72 +106,33 @@ declare global {
       pickLocalSearchDirectory: () => Promise<string | null>;
       pickSkillFile: () => Promise<string | null>;
       readTextFile: (filePath: string) => Promise<string | null>;
-      saveTextFile: (payload: {
-        defaultPath: string;
-        content: string;
-        filters?: Array<{ name: string; extensions: string[] }>;
-      }) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
+      saveTextFile: (payload: SaveTextFilePayload) => Promise<SaveTextFileResult>;
       searchLocalFiles: (
         rootDir: string,
         keyword: string,
-        options?: {
-          limit?: number;
-          maxDepth?: number;
-          includeDirectories?: boolean;
-          includeFiles?: boolean;
-          includeHidden?: boolean;
-          caseSensitive?: boolean;
-          matchMode?: 'contains' | 'startsWith' | 'endsWith' | 'exact';
-          matchScope?: 'name' | 'path';
-          extensions?: string[];
-          excludeDirs?: string[];
-        },
-      ) => Promise<Array<{ name: string; path: string; isDirectory: boolean }>>;
-      executeAgentLocalTool: (request: {
-        tool: string;
-        arguments?: Record<string, unknown>;
-        workspaces?: string[];
-      }) => Promise<{
-        success: boolean;
-        result: unknown;
-        error: string;
-        durationMs: number;
-      }>;
+        options?: SearchLocalFilesOptions,
+      ) => Promise<SearchLocalFileResult[]>;
+      executeAgentLocalTool: (request: ExecuteAgentLocalToolRequest) => Promise<ExecuteAgentLocalToolResult>;
       ollamaPing: (baseUrl?: string) => Promise<boolean>;
       ollamaModels: (baseUrl?: string) => Promise<string[]>;
       ollamaDetectBaseUrl: () => Promise<string | null>;
       ollamaChatStart: (
         sessionId: string,
-        request: {
-          model: string;
-          systemPrompt: string;
-          userMessage: string;
-          context?: string;
-          baseUrl?: string;
-          temperature?: number;
-        },
-      ) => Promise<{ started: boolean; sessionId: string }>;
-      ollamaChatAbort: (sessionId: string) => Promise<{ aborted: boolean }>;
+        request: OllamaChatRequest,
+      ) => Promise<ChatStartResult>;
+      ollamaChatAbort: (sessionId: string) => Promise<ChatAbortResult>;
       onOllamaChatEvent: (
         sessionId: string,
-        callback: (event: { type: string; payload: Record<string, unknown> }) => void,
+        callback: (event: ChatEvent) => void,
       ) => () => void;
       customDirectChatStart: (
         sessionId: string,
-        request: {
-          model: string;
-          systemPrompt: string;
-          userMessage: string;
-          context?: string;
-          baseUrl: string;
-          apiKey: string;
-          temperature?: number;
-        },
-      ) => Promise<{ started: boolean; sessionId: string }>;
-      customDirectChatAbort: (sessionId: string) => Promise<{ aborted: boolean }>;
+        request: CustomDirectChatRequest,
+      ) => Promise<ChatStartResult>;
+      customDirectChatAbort: (sessionId: string) => Promise<ChatAbortResult>;
       onCustomDirectChatEvent: (
         sessionId: string,
-        callback: (event: { type: string; payload: Record<string, unknown> }) => void,
+        callback: (event: ChatEvent) => void,
       ) => () => void;
       clearLogsCache: () => Promise<{ success: boolean; freedBytes: number }>;
       windowMinimize: () => void;
@@ -288,90 +160,26 @@ declare global {
       openFile: (filePath: string) => Promise<boolean>;
       openInExplorer: (filePath: string) => Promise<boolean>;
       pickFileForHash: () => Promise<string | null>;
-      computeFileHash: (filePath: string, algorithm: string) => Promise<{
-        hash: string;
-        algorithm: string;
-        fileName: string;
-        fileSize: number;
-      } | null>;
+      computeFileHash: (filePath: string, algorithm: string) => Promise<ComputeFileHashResult | null>;
       imageCompressionPickImages: () => Promise<string[]>;
       imageCompressionPickOutputDir: () => Promise<string | null>;
-      imageCompressionStart: (payload: {
-        inputPaths: string[];
-        outputDir?: string;
-        quality?: number;
-      }) => Promise<{
-        ok: boolean;
-        results?: Array<{
-          id: string;
-          fileName: string;
-          inputPath: string;
-          outputPath: string;
-          quality: number;
-          status: 'completed' | 'failed';
-          success: boolean;
-          originalBytes: number;
-          compressedBytes: number;
-          ratio: number;
-          error?: string;
-          createdAt: number;
-          updatedAt: number;
-        }>;
-        message?: string;
-      }>;
-      imageCompressionList: () => Promise<Array<{
-        id: string;
-        fileName: string;
-        inputPath: string;
-        outputPath: string;
-        quality: number;
-        status: 'completed' | 'failed';
-        success: boolean;
-        originalBytes: number;
-        compressedBytes: number;
-        ratio: number;
-        error?: string;
-        createdAt: number;
-        updatedAt: number;
-      }>>;
+      imageCompressionStart: (payload: ImageCompressionStartPayload) => Promise<ImageCompressionStartResult>;
+      imageCompressionList: () => Promise<ImageCompressionTask[]>;
       imageCompressionRemove: (taskId: string) => Promise<boolean>;
-      onImageCompressionTaskUpdated: (callback: (task: {
-        id: string;
-        fileName: string;
-        inputPath: string;
-        outputPath: string;
-        quality: number;
-        status: 'completed' | 'failed';
-        success: boolean;
-        originalBytes: number;
-        compressedBytes: number;
-        ratio: number;
-        error?: string;
-        createdAt: number;
-        updatedAt: number;
-      }) => void) => () => void;
-      saveImageAs: (sourcePath: string) => Promise<{ ok: boolean; canceled: boolean; filePath: string | null }>;
-      resolveShortcut: (lnkPath: string) => Promise<{ target: string; name: string } | null>;
+      onImageCompressionTaskUpdated: (callback: (task: ImageCompressionTask) => void) => () => void;
+      saveImageAs: (sourcePath: string) => Promise<SaveImageAsResult>;
+      resolveShortcut: (lnkPath: string) => Promise<ResolveShortcutResult | null>;
       openImageDialog: () => Promise<string | null>;
       openVideoDialog: () => Promise<string | null>;
       loadWallpaperFile: (filePath: string) => Promise<string | null>;
       clearWallpaperCache: () => Promise<void>;
-      setSystemDesktopWallpaper: (payload: { sourcePath?: string | null; previewUrl?: string | null; clear?: boolean }) => Promise<boolean>;
+      setSystemDesktopWallpaper: (payload: SetWallpaperPayload) => Promise<boolean>;
       wallpaperVideoCover: (sourcePath: string) => Promise<string | null>;
       readLocalFileAsBuffer: (filePath: string) => Promise<Uint8Array | null>;
-      pickVideoForExtract: () => Promise<{ filePath: string; fileSize: number | null } | null>;
-      extractVideoTrack: (options: {
-        filePath: string;
-        trackType: string;
-        outputFormat: string;
-      }) => Promise<{ success: boolean; outputPath?: string; error?: string; fileSize?: number }>;
-      netFetch: (url: string, options?: {
-        method?: string;
-        headers?: Record<string, string>;
-        body?: string;
-        timeoutMs?: number;
-      }) => Promise<{ ok: boolean; status: number; body: string }>;
-      mailInboxList: (configOrLimit?: Record<string, unknown> | number, limit?: number) => Promise<{ ok: boolean; items: Array<{ uid: string; subject: string; from: string; to: string; date: string; size: number; preview: string; body: string }>; message: string }>;
+      pickVideoForExtract: () => Promise<PickVideoForExtractResult | null>;
+      extractVideoTrack: (options: ExtractVideoTrackOptions) => Promise<ExtractVideoTrackResult>;
+      netFetch: (url: string, options?: NetFetchOptions) => Promise<NetFetchResult>;
+      mailInboxList: (configOrLimit?: Record<string, unknown> | number, limit?: number) => Promise<MailInboxResult>;
       storeRead: (key: string) => Promise<unknown>;
       storeWrite: (key: string, data: unknown) => Promise<boolean>;
       hotkeyGet: () => Promise<string>;
@@ -423,8 +231,8 @@ declare global {
       musicLyricsCalibrateDelaySet: (delaySec: number) => Promise<boolean>;
       musicSmtcUnsubscribeMsGet: () => Promise<number>;
       musicSmtcUnsubscribeMsSet: (valueMs: number) => Promise<boolean>;
-      musicDetectSourceAppId: () => Promise<{ ok: boolean; sources: Array<{ sourceAppId: string; isPlaying: boolean; hasTitle: boolean; thumbnail: string | null }>; message: string }>;
-      smtcGetTimestamp: () => Promise<{ isAvailable: boolean; playbackStatus: string; timeline: { startTime: number; endTime: number; position: number; minSeekTime: number; maxSeekTime: number } | null }>;
+      musicDetectSourceAppId: () => Promise<DetectSourceAppIdResult>;
+      smtcGetTimestamp: () => Promise<SmtcTimestampResult>;
       getRunningNonSystemProcesses: () => Promise<string[]>;
       getRunningNonSystemProcessesWithIcons: () => Promise<RunningProcessInfo[]>;
       getOpenWindowsWithIcons: () => Promise<RunningWindowInfo[]>;
@@ -463,98 +271,30 @@ declare global {
       clipboardUrlBlacklistAddDomain: (domain: string) => Promise<boolean>;
       autostartGet: () => Promise<string>;
       autostartSet: (mode: string) => Promise<boolean>;
-      navOrderGet: () => Promise<{ visibleOrder: string[]; hiddenOrder: string[] }>;
-      navOrderSet: (payload: { visibleOrder: string[]; hiddenOrder: string[] }) => Promise<boolean>;
-      downloadStart: (payload: { url: string; savePath?: string; threads?: number }) => Promise<{
-        ok: boolean;
-        task?: {
-          id: string;
-          url: string;
-          savePath: string;
-          fileName: string;
-          totalBytes: number;
-          downloadedBytes: number;
-          progress: number;
-          speedBytesPerSecond: number;
-          estimatedFinishAt: number | null;
-          threads: number;
-          status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-          errorMessage?: string;
-          createdAt: number;
-          updatedAt: number;
-        };
-        message?: string;
-      }>;
+      navOrderGet: () => Promise<NavOrderPayload>;
+      navOrderSet: (payload: NavOrderPayload) => Promise<boolean>;
+      downloadStart: (payload: DownloadStartPayload) => Promise<DownloadStartResult>;
       downloadCancel: (taskId: string) => Promise<boolean>;
       downloadPause: (taskId: string) => Promise<boolean>;
-      downloadResume: (taskId: string) => Promise<{
-        ok: boolean;
-        task?: {
-          id: string;
-          url: string;
-          savePath: string;
-          fileName: string;
-          totalBytes: number;
-          downloadedBytes: number;
-          progress: number;
-          speedBytesPerSecond: number;
-          estimatedFinishAt: number | null;
-          threads: number;
-          status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-          errorMessage?: string;
-          createdAt: number;
-          updatedAt: number;
-        };
-        message?: string;
-      }>;
+      downloadResume: (taskId: string) => Promise<DownloadStartResult>;
       downloadRemove: (taskId: string) => Promise<boolean>;
-      downloadList: () => Promise<Array<{
-        id: string;
-        url: string;
-        savePath: string;
-        fileName: string;
-        totalBytes: number;
-        downloadedBytes: number;
-        progress: number;
-        speedBytesPerSecond: number;
-        estimatedFinishAt: number | null;
-        threads: number;
-        status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-        errorMessage?: string;
-        createdAt: number;
-        updatedAt: number;
-      }>>;
+      downloadList: () => Promise<DownloadTask[]>;
       downloadPickSavePath: (suggestedName?: string) => Promise<string | null>;
       downloadGetDefaultDir: () => Promise<string>;
-      onDownloadTaskUpdated: (callback: (task: {
-        id: string;
-        url: string;
-        savePath: string;
-        fileName: string;
-        totalBytes: number;
-        downloadedBytes: number;
-        progress: number;
-        speedBytesPerSecond: number;
-        estimatedFinishAt: number | null;
-        threads: number;
-        status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-        errorMessage?: string;
-        createdAt: number;
-        updatedAt: number;
-      }) => void) => () => void;
-      updaterCheck: (source?: string, resolvedUrl?: string) => Promise<{ available: boolean; version?: string; releaseNotes?: string; currentVersion?: string; error?: string }>;
+      onDownloadTaskUpdated: (callback: (task: DownloadTask) => void) => () => void;
+      updaterCheck: (source?: string, resolvedUrl?: string) => Promise<UpdaterCheckResult>;
       updaterDownload: (source?: string, resolvedUrl?: string) => Promise<boolean>;
       updaterInstall: () => Promise<boolean>;
       updaterVersion: () => Promise<string>;
-      onUpdaterProgress: (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void) => () => void;
-      onUpdaterDownloaded: (callback: (data: { version: string }) => void) => () => void;
-      onUpdaterAvailable: (callback: (data: { version: string; releaseNotes: string }) => void) => () => void;
-      onUpdaterNotAvailable: (callback: (data: { version: string }) => void) => () => void;
-      onUpdaterStartupAutoCheckRequest: (callback: (data: { requestedAt: number }) => void) => () => void;
-      onClipboardUrlsDetected: (callback: (data: { urls: string[]; title: string }) => void) => () => void;
+      onUpdaterProgress: (callback: (progress: UpdaterProgress) => void) => () => void;
+      onUpdaterDownloaded: (callback: (data: UpdaterDownloadedData) => void) => () => void;
+      onUpdaterAvailable: (callback: (data: UpdaterAvailableData) => void) => () => void;
+      onUpdaterNotAvailable: (callback: (data: UpdaterNotAvailableData) => void) => () => void;
+      onUpdaterStartupAutoCheckRequest: (callback: (data: UpdaterStartupAutoCheckRequestData) => void) => () => void;
+      onClipboardUrlsDetected: (callback: (data: ClipboardUrlsDetectedData) => void) => () => void;
       clipboardOpenUrl: (url: string) => Promise<boolean>;
-      onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void) => () => void;
-      onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void) => () => void;
+      onExternalAgentStarted: (callback: (data: ExternalAgentData) => void) => () => void;
+      onExternalAgentStopped: (callback: (data: ExternalAgentData) => void) => () => void;
       claudeCodeStatusGet: () => Promise<ClaudeCodeStatusSnapshot>;
       claudeCodeHookInstall: () => Promise<ClaudeCodeHookMutationResult>;
       claudeCodeHookUninstall: () => Promise<ClaudeCodeHookMutationResult>;

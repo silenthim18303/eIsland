@@ -26,12 +26,7 @@
  */
 
 import { ipcMain } from 'electron';
-
-type MainLogWriter = (level: 'info' | 'warn' | 'error', message: string) => void;
-
-interface RegisterLogIpcHandlersOptions {
-  writeMainLog: MainLogWriter;
-}
+import type { RegisterLogIpcHandlersOptions } from './types';
 
 /**
  * 注册日志相关 IPC 处理器

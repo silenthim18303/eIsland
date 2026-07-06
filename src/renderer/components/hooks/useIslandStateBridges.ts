@@ -28,6 +28,7 @@ import { useEffect, useState } from 'react';
 import type { SyncedLyricLine, TimerState } from '../../store/types';
 import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 import type { IslandState } from './useDynamicIslandShell';
+import { findCurrentIndex } from '../states/lyrics/utils/findCurrentIndex';
 
 interface UseIslandStateBridgesOptions {
   state: IslandState;
@@ -36,10 +37,33 @@ interface UseIslandStateBridgesOptions {
   syncedLyrics: SyncedLyricLine[] | null;
   lyricsLoading: boolean;
   translationLyrics: TranslationLyricsResult | null;
+  currentPositionMs: number;
   setLyrics: () => void;
   setLyricsTranslation: () => void;
   setAgentVoiceInput: () => void;
   setIdle: (force?: boolean) => void;
+}
+
+/**
+ * 检查当前歌词行的原文与翻译是否完全一致。
+ * @param syncedLyrics - 同步歌词行数组。
+ * @param translationLyrics - 翻译歌词结果。
+ * @param currentPositionMs - 当前播放位置（毫秒）。
+ * @returns 原文与翻译完全一致时返回 true。
+ */
+function isCurrentLyricIdenticalToTranslation(
+  syncedLyrics: SyncedLyricLine[] | null,
+  translationLyrics: TranslationLyricsResult | null,
+  currentPositionMs: number,
+): boolean {
+  if (!syncedLyrics || !translationLyrics || translationLyrics.status !== 'available') return false;
+  const tLines = translationLyrics.lines;
+  if (!tLines || tLines.length === 0) return false;
+  const origIdx = findCurrentIndex(syncedLyrics, currentPositionMs);
+  if (origIdx < 0) return false;
+  const tIdx = findCurrentIndex(tLines, currentPositionMs);
+  if (tIdx < 0) return false;
+  return syncedLyrics[origIdx].text === tLines[tIdx].text;
 }
 
 /**
@@ -54,6 +78,7 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
     syncedLyrics,
     lyricsLoading,
     translationLyrics,
+    currentPositionMs,
     setLyrics,
     setLyricsTranslation,
     setAgentVoiceInput,
@@ -101,23 +126,29 @@ export function useIslandStateBridges(options: UseIslandStateBridgesOptions): vo
       const hasTranslation = translationLyrics?.status === 'available'
         && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
       if (hasTranslation && lyricsTranslationEnabled) {
-        setLyricsTranslation();
+        /** 原文与翻译完全一致时显示普通歌词 */
+        if (isCurrentLyricIdenticalToTranslation(syncedLyrics, translationLyrics, currentPositionMs)) {
+          setLyrics();
+        } else {
+          setLyricsTranslation();
+        }
       } else {
         setLyrics();
       }
     }
-  }, [state, timerState, isPlaying, syncedLyrics, lyricsLoading, translationLyrics, lyricsEnabled, lyricsTranslationEnabled, setLyrics, setLyricsTranslation]);
+  }, [state, timerState, isPlaying, syncedLyrics, lyricsLoading, translationLyrics, lyricsEnabled, lyricsTranslationEnabled, currentPositionMs, setLyrics, setLyricsTranslation]);
 
-  /** 歌词状态下翻译歌词加载完成 → 升级到 lyricsTranslation */
+  /** 歌词状态下翻译歌词加载完成 → 升级到 lyricsTranslation（原文与翻译一致时保持 lyrics） */
   useEffect(() => {
     if (state !== 'lyrics') return;
     if (!lyricsTranslationEnabled) return;
     const hasTranslation = translationLyrics?.status === 'available'
       && Boolean(translationLyrics.lines && translationLyrics.lines.length > 0);
     if (hasTranslation) {
+      if (isCurrentLyricIdenticalToTranslation(syncedLyrics, translationLyrics, currentPositionMs)) return;
       setLyricsTranslation();
     }
-  }, [state, translationLyrics, lyricsTranslationEnabled, setLyricsTranslation]);
+  }, [state, translationLyrics, lyricsTranslationEnabled, currentPositionMs, syncedLyrics, setLyricsTranslation]);
 
   /** 翻译歌词关闭时，从 lyricsTranslation 回退到 lyrics */
   useEffect(() => {

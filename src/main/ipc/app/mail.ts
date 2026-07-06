@@ -29,39 +29,8 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { ImapFlow } from 'imapflow';
 import { simpleParser } from 'mailparser';
 import { join } from 'path';
-
-interface RegisterMailIpcHandlersOptions {
-  storeDir: string;
-  mailConfigStoreKey: string;
-}
-
-interface MailAccountConfig {
-  emailAddress: string;
-  imapHost: string;
-  imapPort: string;
-  imapSecure: boolean;
-  authUser: string;
-  authSecret: string;
-}
-
-interface MailInboxItem {
-  uid: string;
-  subject: string;
-  from: string;
-  to: string;
-  date: string;
-  size: number;
-  preview: string;
-  body: string;
-}
-
-interface MailInboxCacheStore {
-  accounts: Record<string, Record<string, MailInboxItem>>;
-}
-
-const IMAP_TIMEOUT_MS = 15000;
-const MAIL_INBOX_CACHE_STORE_KEY = 'mail-inbox-cache';
-const MAIL_INBOX_CACHE_MAX_ITEMS = 200;
+import type { RegisterMailIpcHandlersOptions, MailAccountConfig, MailInboxItem, MailInboxCacheStore } from './types';
+import { IMAP_TIMEOUT_MS, MAIL_INBOX_CACHE_STORE_KEY, MAIL_INBOX_CACHE_MAX_ITEMS } from './config/mail';
 
 function parsePort(raw: string, fallback: number): number {
   const value = Number(raw);
