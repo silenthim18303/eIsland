@@ -40,7 +40,10 @@ export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
 
   return (
     <div className="guide-step">
-      <h2>{t('guide.language.title', { defaultValue: '选择语言' })}</h2>
+      <div className="guide-step-header">
+        <h2>{t('guide.language.title', { defaultValue: '选择语言' })}</h2>
+        <p>{t('guide.language.subtitle', { defaultValue: '选择你偏好的语言以继续' })}</p>
+      </div>
       <div className="guide-language-list">
         {LANGUAGE_OPTIONS.map((opt) => (
           <button
@@ -52,9 +55,11 @@ export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
           </button>
         ))}
       </div>
-      <button className="guide-next-btn" onClick={onNext}>
-        {t('guide.actions.next', { defaultValue: '下一步' })}
-      </button>
+      <div className="guide-step-footer">
+        <button className="guide-next-btn" onClick={onNext}>
+          {t('guide.actions.next', { defaultValue: '下一步' })}
+        </button>
+      </div>
     </div>
   );
 }

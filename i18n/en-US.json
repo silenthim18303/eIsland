@@ -36,6 +36,7 @@
     },
     "language": {
       "title": "Select Language",
+      "subtitle": "Choose your preferred language to continue",
       "zhCN": "中文",
       "enUS": "English"
     },

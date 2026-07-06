@@ -80,10 +80,30 @@ html, body {
 /* ===== Step ===== */
 
 .guide-step {
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 24px;
+  justify-content: center;
+}
+
+.guide-step-header {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+}
+
+.guide-step-header p {
+  margin-top: 6px;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+.guide-step-footer {
+  position: absolute;
+  bottom: 32px;
+  right: 40px;
 }
 
 /* ===== Language Step ===== */
@@ -95,27 +115,41 @@ html, body {
 
 .guide-language-option {
   padding: 12px 32px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.55);
   font-size: 16px;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.guide-language-option:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .guide-language-option.selected {
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 .guide-next-btn {
-  margin-top: 12px;
   padding: 10px 48px;
-  border: none;
+  border: 1px solid rgba(100, 180, 255, 0.25);
   border-radius: 8px;
-  background: #ffffff;
-  color: #000000;
+  background: rgba(100, 180, 255, 0.08);
+  color: rgba(100, 180, 255, 0.85);
   font-size: 15px;
   cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.guide-next-btn:hover {
+  border-color: rgba(100, 180, 255, 0.45);
+  background: rgba(100, 180, 255, 0.15);
+  color: rgba(100, 180, 255, 1);
 }
