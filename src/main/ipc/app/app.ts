@@ -38,6 +38,7 @@ import { registerAgentIpcHandlers } from '../agent';
 import { queryOpenWindowsWithIcons, type RunningWindowInfo } from '../../system/runningProcesses';
 import { broadcastSettingChange } from '../../utils/broadcast';
 import { getSmtcNowPlaying } from '../../music/smtcAccessor';
+import { getIconByPath, getIconByShortcutPath } from '@eisland/windows-application-icon-helper';
 
 interface LocalFileSearchItem {
   name: string;
@@ -2407,27 +2408,11 @@ export function registerAppIpcHandlers(): void {
     }
   });
 
-  ipcMain.handle('app:get-file-icon', async (_event, filePath: string) => {
+  ipcMain.handle('app:get-file-icon', (_event, filePath: string) => {
     try {
-      const iconPaths = [filePath];
-      if (process.platform === 'win32' && filePath.toLowerCase().endsWith('.lnk')) {
-        try {
-          const result = shell.readShortcutLink(filePath);
-          iconPaths.unshift(...[result.icon, result.target].filter((path): path is string => !!path));
-        } catch {
-          // ignore
-        }
-      }
-      return iconPaths.reduce<Promise<string | null>>(async (resolvedIconPromise, iconPath) => {
-        const resolvedIcon = await resolvedIconPromise;
-        if (resolvedIcon) return resolvedIcon;
-        try {
-          const icon = await app.getFileIcon(iconPath, { size: 'large' });
-          return icon.isEmpty() ? null : icon.toPNG().toString('base64');
-        } catch {
-          return null;
-        }
-      }, Promise.resolve(null));
+      const isLnk = filePath.toLowerCase().endsWith('.lnk');
+      const result = isLnk ? getIconByShortcutPath(filePath) : getIconByPath(filePath);
+      return result ? result.data.toString('base64') : null;
     } catch (err) {
       console.error('[App] get-file-icon error:', err);
       return null;

@@ -43,6 +43,7 @@
     "plugins:clean": "run-p plugin:clean:bluetooth plugin:clean:brightness plugin:clean:power plugin:clean:processes plugin:clean:smtc plugin:clean:toast plugin:clean:wifi plugin:clean:fullscreen plugin:clean:perfmon"
   },
   "dependencies": {
+    "@eisland/windows-application-icon-helper": "file:plugins/eisland-windows-application-icon-helper",
     "@eisland/windows-fullscreen-detector": "file:plugins/windows-fullscreen-detector",
     "@eisland/windows-performance-monitor": "file:plugins/windows-performance-monitor",
     "@eisland/windows-smtc-helper": "file:plugins/eisland-windows-smtc-helper",
