@@ -46,6 +46,14 @@
       "esES": "Español",
       "ruRU": "Русский"
     },
+    "smtc": {
+      "title": "Media Detection",
+      "subtitle": "Check if system media transport controls are available",
+      "check": "Start Detection",
+      "checking": "Detecting…",
+      "found": "Detection Successful",
+      "notFound": "No media session detected"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "desc": "A Windows desktop floating widget inspired by Apple Dynamic Island,\nmaking your desktop more vivid and productive."

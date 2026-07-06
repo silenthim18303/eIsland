@@ -32,24 +32,41 @@ import { createRoot } from 'react-dom/client';
 import './styles/guide.css';
 import { WaveEffect } from './components/components/WaveEffect';
 import { LanguageStep } from './components/components/Guide/language';
+import { SmtcStep } from './components/components/Guide/smtc';
+
+/** 引导步骤 */
+type GuideStep = 'language' | 'smtc';
 
 /** 引导窗口根组件 */
 function GuideApp(): ReactElement {
+  const [step, setStep] = useState<GuideStep>('language');
+
   /** 通知主进程引导完成，关闭引导窗口并显示主窗口 */
   const handleComplete = useCallback((): void => {
     window.electron.ipcRenderer.send('guide:complete');
   }, []);
 
-  /** 语言选择完成，进入下一步（暂直接完成） */
+  /** 语言选择完成，进入 SMTC 检查 */
   const handleLanguageNext = useCallback((): void => {
+    setStep('smtc');
+  }, []);
+
+  /** SMTC 检查完成，结束引导 */
+  const handleSmtcNext = useCallback((): void => {
     handleComplete();
   }, [handleComplete]);
+
+  /** SMTC 返回语言选择 */
+  const handleSmtcPrev = useCallback((): void => {
+    setStep('language');
+  }, []);
 
   return (
     <div className="guide-container">
       <WaveEffect />
       <div className="guide-content">
-        <LanguageStep onNext={handleLanguageNext} />
+        {step === 'language' && <LanguageStep onNext={handleLanguageNext} />}
+        {step === 'smtc' && <SmtcStep onNext={handleSmtcNext} onPrev={handleSmtcPrev} />}
       </div>
     </div>
   );

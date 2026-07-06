@@ -46,6 +46,14 @@
       "esES": "Español",
       "ruRU": "Русский"
     },
+    "smtc": {
+      "title": "媒体检测",
+      "subtitle": "检测系统媒体会话是否可用",
+      "check": "开始检测",
+      "checking": "检测中…",
+      "found": "检测成功",
+      "notFound": "未检测到媒体会话"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "desc": "一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。"
