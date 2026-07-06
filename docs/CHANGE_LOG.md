@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-05T16:18:07.926Z
+> 生成时间：2026-07-06T07:09:15.929Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,22 @@
 
 ## Unreleased
 
+- 2026-07-06 | df8f6f29 | 鸡哥 | Merge pull request #126 from JNTMTMTM/dev
+- 2026-07-06 | 6e991025 | 鸡哥 | chore(workflows): remove MiMo summary and review workflows
+- 2026-07-06 | 94f9acfb | 鸡哥 | fix(api): improve sidebar badge injection and observation logic
+- 2026-07-06 | cebf9be6 | 鸡哥 | docs(api): update constructor signatures for BluetoothMonitor, WifiMonitor, SmtcMonitor, and PowerMonitor
+- 2026-07-06 | 0ef73d0c | 鸡哥 | docs(api): rewrite toast-listener API docs
+- 2026-07-06 | afbbcef7 | 鸡哥 | docs(api): rewrite smtc-helper API docs
+- 2026-07-06 | aed6ae1d | 鸡哥 | docs(api): rewrite processes-attacker API docs
+- 2026-07-06 | 49f62cfe | 鸡哥 | docs(api): rewrite performance-monitor API docs
+- 2026-07-06 | 69634ae4 | 鸡哥 | docs(api): rewrite power-helper API docs
+- 2026-07-06 | 50f48dec | 鸡哥 | docs(api): rewrite wifi-helper API docs
+- 2026-07-06 | 8615c67e | 鸡哥 | docs(api): rewrite bluetooth-helper API docs
+- 2026-07-06 | 7570ceff | 鸡哥 | docs(api): rewrite fullscreen-detector API docs
+- 2026-07-06 | cfc19c23 | 鸡哥 | docs(api): rewrite brightness-helper API docs
+- 2026-07-06 | d945a7a3 | 鸡哥 | fix: enable codeTabs in markdown configuration
+- 2026-07-06 | 3e175973 | 鸡哥 | fix: enhance sidebar badge injection with MutationObserver and click event handling
+- 2026-07-05 | 43d60987 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #124 by @JNTMTMTM [skip ci]
 - 2026-07-06 | 01803adc | 鸡哥 | Merge pull request #124 from JNTMTMTM/dev
 - 2026-07-06 | 4d205e9b | 鸡哥 | fix: update MiMo API endpoint to token-plan-cn.xiaomimimo.com
 - 2026-07-06 | fdd67d43 | 鸡哥 | refactor(renderer/api/ai/ollamaLocalAgent): remove unused import from MihtnelisAgentStreamEvent
