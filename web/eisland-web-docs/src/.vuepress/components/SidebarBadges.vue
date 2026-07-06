@@ -129,20 +129,33 @@ function injectBadges(): void {
 // ── lifecycle ────────────────────────────────────────────────────
 const route = useRoute()
 let observer: MutationObserver | null = null
+let clickHandler: ((e: Event) => void) | null = null
 
 onMounted(() => {
   nextTick(injectBadges)
-  // watch for sidebar DOM changes (collapsible group expand/collapse)
+
   const sidebar = document.querySelector('.vp-sidebar')
   if (sidebar) {
-    observer = new MutationObserver(() => injectBadges())
+    // MutationObserver as secondary safeguard — use rAF to defer
+    // until after Vue's DOM update cycle completes
+    observer = new MutationObserver(() => requestAnimationFrame(injectBadges))
     observer.observe(sidebar, { childList: true, subtree: true })
+
+    // Primary trigger for collapsible group expand/collapse:
+    // click callbacks are macrotasks that fire after Vue re-renders,
+    // so the new .vp-sidebar-link elements are guaranteed to be in the DOM
+    clickHandler = () => requestAnimationFrame(injectBadges)
+    sidebar.addEventListener('click', clickHandler)
   }
 })
 
 onUnmounted(() => {
   observer?.disconnect()
   observer = null
+  if (clickHandler) {
+    document.querySelector('.vp-sidebar')?.removeEventListener('click', clickHandler)
+    clickHandler = null
+  }
 })
 
 watch(
