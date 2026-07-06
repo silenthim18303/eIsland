@@ -33,6 +33,7 @@ Complete API reference for all eIsland native plugins. Each plugin provides Wind
 | [Windows Power Helper](system-power/power-helper.md) | Battery and power status monitoring |
 | [Windows Performance Monitor](system-power/performance-monitor.md) | CPU, memory, and temperature monitoring |
 | [Windows Processes Attacker](system-power/processes-attacker.md) | Process termination utilities |
+| [Windows Application Icon Helper](system-power/application-icon-helper.md) | Application icon extraction |
 
 ### Media & Notifications
 
