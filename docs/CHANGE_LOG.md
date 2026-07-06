@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-06T10:37:26.355Z
+> 生成时间：2026-07-06T12:42:05.384Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,17 @@
 
 ## Unreleased
 
+- 2026-07-06 | c86228a6 | 鸡哥 | Merge pull request #130 from JNTMTMTM/dev
+- 2026-07-06 | 4d0cff37 | 鸡哥 | feat: add new Windows helper plugins for Bluetooth, brightness, power, processes, and WiFi
+- 2026-07-06 | 1603c324 | 鸡哥 | fix: fallback to GITHUB_TOKEN when BOT_PAT is unavailable in workflow files
+- 2026-07-06 | a0bc7cc7 | 鸡哥 | Refactor preload types into separate modules
+- 2026-07-06 | 76c3cb22 | 鸡哥 | feat(preload): enhance API with type definitions and improve return types
+- 2026-07-06 | 19dcf802 | 鸡哥 | feat: enhance lyrics translation handling by checking for identical original and translated lyrics
+- 2026-07-06 | 7bab1fec | 鸡哥 | fix: update license link to point to the GNU General Public License v3.0
+- 2026-07-06 | 75edcba3 | 鸡哥 | fix: update depsTitle in English and Chinese localizations for clarity
+- 2026-07-06 | 2db77d0a | 鸡哥 | feat: add configuration and type definitions for download, image compression, mail, net, and updater modules
+- 2026-07-06 | b892a02f | 鸡哥 | feat: add windows application icon helper for improved file icon retrieval
+- 2026-07-06 | 20b7e147 | eislandBot | docs: auto update CHANGE_LOG.md for #129 by @JNTMTMTM [skip ci]
 - 2026-07-06 | 4f6b6a08 | 鸡哥 | Merge pull request #129 from JNTMTMTM/dev
 - 2026-07-06 | b8cea4d3 | 鸡哥 | fix: update workflows to fall back to GITHUB_TOKEN when BOT_PAT is unavailable
 - 2026-07-06 | ed41cdd9 | 鸡哥 | fix: update workflows to enhance changelog updates and fallback token handling
