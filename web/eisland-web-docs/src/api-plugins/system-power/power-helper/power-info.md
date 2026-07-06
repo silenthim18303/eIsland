@@ -7,7 +7,7 @@ icon: fa6-solid:table
 # PowerInfo
 
 :::info
-`PowerInfo` is a snapshot interface that describes the complete power state of the system at a given moment. It is the return type of [getPowerInfo()](./power-helper.md) and the payload delivered by every [PowerMonitor](./power-monitor.md) event. Use it to read battery level, charging state, AC power connection, and energy saver mode in a single object.
+`PowerInfo` is a snapshot interface that describes the complete power state of the system at a given moment. It is the return type of [getPowerInfo()](./get-power-info.md) and the payload delivered by every [PowerMonitor](./power-monitor.md) event. Use it to read battery level, charging state, AC power connection, and energy saver mode in a single object.
 :::
 
 ## Interface Introduction

@@ -57,7 +57,7 @@ Multiple media sessions can coexist on the system (e.g., a browser tab playing a
 4. **Call `stop()`** when you no longer need monitoring (e.g., on app shutdown) to release native resources.
 
 :::tip
-If you only need the current playback position for lyric synchronization and do not need full media metadata, consider using the standalone [`getTimestamp()`](smtc-helper.md) function instead — it is lighter weight than maintaining a full monitor.
+If you only need the current playback position for lyric synchronization and do not need full media metadata, consider using the standalone [`getTimestamp()`](./get-timestamp.md) function instead — it is lighter weight than maintaining a full monitor.
 :::
 
 :::warning
@@ -175,7 +175,7 @@ The `SmtcMonitor` class extends Node.js `EventEmitter`. All standard EventEmitte
 :::
 
 :::tip
-For lyric synchronization or any use case that only needs the current playback position without full media metadata, use the standalone [`getTimestamp()`](smtc-helper.md) function. It returns a lightweight `TimestampInfo` object and avoids the overhead of maintaining a full monitor instance.
+For lyric synchronization or any use case that only needs the current playback position without full media metadata, use the standalone [`getTimestamp()`](./get-timestamp.md) function. It returns a lightweight `TimestampInfo` object and avoids the overhead of maintaining a full monitor instance.
 :::
 
 :::note

@@ -7,12 +7,12 @@ icon: fa6-solid:table
 # TemperatureSnapshot
 
 :::info Introduction
-`TemperatureSnapshot` is the data structure returned by the [`getTemperature()`](./temperature-snapshot.md) function. It contains an array of temperature readings collected from all available hardware sensors via LibreHardwareMonitor, along with a convenience field for the highest temperature across all sensors. Use this interface to monitor CPU, GPU, motherboard, and storage temperatures in real time.
+`TemperatureSnapshot` is the data structure returned by the [`getTemperature()`](./get-temperature.md) function. It contains an array of temperature readings collected from all available hardware sensors via Libre Hardware Monitor, along with a convenience field for the highest temperature across all sensors. Use this interface to monitor CPU, GPU, motherboard, and storage temperatures in real time.
 :::
 
 ## Interface Introduction
 
-You receive a `TemperatureSnapshot` object every time you call `getTemperature()`. It tells you whether temperature monitoring is available on the current system, provides the full list of sensor readings, and exposes the maximum temperature observed. If LibreHardwareMonitor is not running or temperature sensors are unavailable, `isAvailable` will be `false` and `readings` will be empty.
+You receive a `TemperatureSnapshot` object every time you call `getTemperature()`. It tells you whether temperature monitoring is available on the current system, provides the full list of sensor readings, and exposes the maximum temperature observed. If Libre Hardware Monitor is not running or temperature sensors are unavailable, `isAvailable` will be `false` and `readings` will be empty.
 
 ## Usage
 
@@ -22,15 +22,15 @@ Call `getTemperature()` to obtain a snapshot of the current system temperatures.
 For a real-time temperature display, call `getTemperature()` on a 1–2 second interval. For a one-time health check, a single call is sufficient. Avoid calling it more frequently than once per second to minimize overhead.
 :::
 
-:::note LibreHardwareMonitor Dependency
-Temperature data is only available when the LibreHardwareMonitor helper process is running. Always check `isAvailable` before accessing `readings` or `maxTemperatureCelsius`. See the [system requirements](../index.md) for setup details.
+:::note Libre Hardware Monitor Dependency
+Temperature data is only available when the Libre Hardware Monitor helper process is running. Always check `isAvailable` before accessing `readings` or `maxTemperatureCelsius`. See the [system requirements](../README.md) for setup details.
 :::
 
 ## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `isAvailable` | `boolean` | Whether temperature data is available on this system. Returns `false` if LibreHardwareMonitor is not running or no sensors are detected. |
+| `isAvailable` | `boolean` | Whether temperature data is available on this system. Returns `false` if Libre Hardware Monitor is not running or no sensors are detected. |
 | `readings` | [`TemperatureReading`](./temperature-reading.md)`[]` | Array of individual sensor readings. Empty when `isAvailable` is `false`. |
 | `maxTemperatureCelsius` | `number \| null` | The highest temperature (in degrees Celsius) across all sensors. Returns `null` when `readings` is empty. |
 
@@ -66,7 +66,7 @@ if (snapshot.isAvailable) {
     console.log(`Max temperature: ${snapshot.maxTemperatureCelsius}°C`);
   }
 } else {
-  // Temperature data is unavailable — LibreHardwareMonitor may not be running
+  // Temperature data is unavailable — Libre Hardware Monitor may not be running
   console.log('Temperature data unavailable — is the helper EXE running?');
 }
 ```
@@ -95,7 +95,7 @@ if (snapshot.isAvailable) {
     console.log(`Max temperature: ${snapshot.maxTemperatureCelsius}°C`);
   }
 } else {
-  // Temperature data is unavailable — LibreHardwareMonitor may not be running
+  // Temperature data is unavailable — Libre Hardware Monitor may not be running
   console.log('Temperature data unavailable — is the helper EXE running?');
 }
 ```

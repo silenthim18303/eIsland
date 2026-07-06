@@ -165,6 +165,18 @@ export default sidebar({
       ],
     },
     {
+      text: "Windows Application Icon Helper",
+      icon: "icons",
+      collapsible: true,
+      children: [
+        "system-power/application-icon-helper/icon-result.md",
+        "system-power/application-icon-helper/get-icon-by-process-name.md",
+        "system-power/application-icon-helper/get-icon-by-pid.md",
+        "system-power/application-icon-helper/get-icon-by-path.md",
+        "system-power/application-icon-helper/get-icon-by-shortcut-path.md",
+      ],
+    },
+    {
       text: "Windows SMTC Helper",
       icon: "music",
       collapsible: true,

@@ -7,7 +7,7 @@ icon: fa6-solid:table
 # PlaybackControls
 
 :::info Introduction
-`PlaybackControls` is an interface that describes which media playback commands are currently available from the active SMTC (System Media Transport Controls) session. It is a sub-object of [MediaStatus](media-status.md), returned by the [`getStatus()`](playback-commands.md) function. Each boolean flag corresponds to a specific transport control button exposed by the Windows media session.
+`PlaybackControls` is an interface that describes which media playback commands are currently available from the active SMTC (System Media Transport Controls) session. It is a sub-object of [MediaStatus](media-status.md), returned by the [`getStatus()`](./get-status.md) function. Each boolean flag corresponds to a specific transport control button exposed by the Windows media session.
 :::
 
 ## Interface Introduction
@@ -52,10 +52,10 @@ These flags reflect the capabilities reported by the media source application at
 
 You typically read `PlaybackControls` when building a media-control UI that should adapt to what the current player supports. The workflow is:
 
-1. Call [`getStatus()`](playback-commands.md) to obtain the full `MediaStatus`.
+1. Call [`getStatus()`](./get-status.md) to obtain the full `MediaStatus`.
 2. Check `status.isAvailable` — if `false`, there is no active media session.
 3. Read `status.controls` to determine which buttons to render.
-4. Call the corresponding command function ([`play()`](playback-commands.md), [`next()`](playback-commands.md), etc.) only if the flag is `true`.
+4. Call the corresponding command function ([`play()`](./play.md), [`next()`](./next.md), etc.) only if the flag is `true`.
 
 :::tip
 If you need real-time updates when control availability changes, use the [`SmtcMonitor`](smtc-monitor.md) class and listen for the `session-playback-changed` event. This avoids polling `getStatus()` repeatedly.
@@ -156,7 +156,7 @@ The `isRecordEnabled`, `isChannelUpEnabled`, and `isChannelDownEnabled` flags ar
 :::
 
 :::note
-A flag being `true` does not guarantee the command will succeed — it only means the media source reported that control as available. The [`CommandResult`](playback-commands.md) object returned by each command function should still be checked for the actual `success` status.
+A flag being `true` does not guarantee the command will succeed — it only means the media source reported that control as available. The [`CommandResult`](./command-result.md) object returned by each command function should still be checked for the actual `success` status.
 :::
 
 :::tip
@@ -166,7 +166,7 @@ When building a UI, consider showing disabled buttons for unavailable controls r
 ## Danger Avoidance
 
 :::danger
-Do not call command functions ([`play()`](playback-commands.md), [`next()`](playback-commands.md), [`seek()`](playback-commands.md), etc.) without first checking the corresponding control flag. While calling an unsupported command will not crash the application (it returns a failed `CommandResult`), repeatedly issuing unsupported commands can cause unexpected behavior in some media players and generates unnecessary IPC overhead to the Windows SMTC subsystem.
+Do not call command functions ([`play()`](./play.md), [`next()`](./next.md), [`seek()`](./seek.md), etc.) without first checking the corresponding control flag. While calling an unsupported command will not crash the application (it returns a failed `CommandResult`), repeatedly issuing unsupported commands can cause unexpected behavior in some media players and generates unnecessary IPC overhead to the Windows SMTC subsystem.
 :::
 
 :::danger

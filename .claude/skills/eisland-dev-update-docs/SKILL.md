@@ -49,6 +49,54 @@ Follow these steps in order:
 2. Add the file path to `src/.vuepress/sidebar.ts` under the correct group
 3. Add a link to the file in the subdirectory's `README.md`
 4. If creating a new subdirectory, create a `README.md` index for it
+5. **For API plugin docs**: Register sidebar badge in `src/.vuepress/components/SidebarBadges.vue` if adding Interface, Enum, or Monitor
+
+## API Plugin Documentation
+
+For documentation under `src/api-plugins/`, follow the guidelines in `src/api-plugins/CLAUDE.md`:
+
+### Icon Convention
+
+Every documentation file MUST use the correct icon in frontmatter:
+
+| Type | Icon | Example |
+|------|------|---------|
+| Function/Method | `fa6-solid:code` | `getIconByPath` |
+| Interface/Type | `fa6-solid:table` | `BluetoothDeviceInfo` |
+| Class/Monitor | `fa6-solid:cubes` | `BluetoothMonitor` |
+| Enum | `fa6-solid:list` | `BatteryStatus` |
+| Plugin index | Category icon | `bluetooth`, `music`, etc. |
+
+### Code Examples
+
+All function/method documentation MUST include both TypeScript and JavaScript code blocks using `::: code-tabs` syntax.
+
+### Required Sections (Function/Method)
+
+Every function/method document MUST include these sections in this exact order:
+
+1. **Info admonition** — Brief description with internal mechanism and return type
+2. **Signature** — TypeScript function signature
+3. **Parameters** — Table with Parameter, Type, Description
+4. **Usage** — When to use, typical workflow, `:::note` and `:::tip`
+5. **Return Value** — Table with Type and Description, `:::warning`
+6. **Example** — `::: code-tabs` with TS + JS
+7. **Notes** — Exactly 3 admonitions: `:::note`, `:::tip`, `:::important`
+8. **Danger Avoidance** — `:::danger` admonition
+
+### Sidebar Badge Registration
+
+When adding new Interface, Enum, or Monitor documentation, register the badge in `src/.vuepress/components/SidebarBadges.vue`:
+
+```typescript
+const BADGE_MAP: Record<string, string> = {
+  YourNewInterface: 'interface',
+  YourNewEnum: 'enum',
+  YourNewMonitor: 'monitor',
+}
+```
+
+Function badges are auto-detected from URL patterns (`get*`, `set*`, `close*`, etc.).
 
 ## File Template
 

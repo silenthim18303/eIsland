@@ -78,6 +78,8 @@ const BADGE_MAP: Record<string, string> = {
   ToastNotificationChangeKind: 'enum',
   ToastNotificationChangedEvent: 'interface',
   ToastNotificationSnapshot: 'interface',
+  // Application Icon Helper
+  IconResult: 'interface',
 }
 
 // ── badge label text ─────────────────────────────────────────────
