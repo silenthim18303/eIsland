@@ -71,7 +71,7 @@ jobs:
         env:
           EXIT_CODE: ${{ needs.i18n-check.outputs.exit_code }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.BOT_PAT }}
           script: |
             const fs = require('node:fs');
             const marker = '<!-- i18n-check-report -->';
