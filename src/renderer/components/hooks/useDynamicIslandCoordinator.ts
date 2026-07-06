@@ -101,6 +101,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     syncedLyrics,
     lyricsLoading,
     translationLyrics,
+    currentPositionMs,
     springAnimation,
     animationSpeed,
   } = store;
@@ -235,6 +236,7 @@ export function useDynamicIslandCoordinator(options: UseDynamicIslandCoordinator
     syncedLyrics,
     lyricsLoading,
     translationLyrics,
+    currentPositionMs,
     setLyrics,
     setLyricsTranslation,
     setAgentVoiceInput,

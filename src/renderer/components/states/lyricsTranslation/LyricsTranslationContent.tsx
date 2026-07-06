@@ -24,6 +24,7 @@
  * @author 鸡哥
  */
 
+import { useEffect, useRef } from 'react';
 import type { ReactElement } from 'react';
 import useIslandStore from '../../../store/slices';
 import { useLyricsSettings } from '../lyrics/hooks/useLyricsSettings';
@@ -60,6 +61,17 @@ export function LyricsTranslationContent(): ReactElement {
 
   const translationText = useTranslationLyric(translationLines, currentIdx, currentPositionMs);
   useTranslationFallback(translationLines);
+
+  /** 歌词行切换时，若原文与翻译完全一致则回退到普通歌词状态 */
+  const lastIdxRef = useRef(currentIdx);
+  useEffect(() => {
+    if (currentIdx === lastIdxRef.current) return;
+    lastIdxRef.current = currentIdx;
+    if (currentText && translationText && currentText === translationText) {
+      window.api?.expandWindowLyrics();
+      useIslandStore.getState().setLyrics();
+    }
+  }, [currentIdx, currentText, translationText]);
 
   return (
     <LyricsTranslationContentView
