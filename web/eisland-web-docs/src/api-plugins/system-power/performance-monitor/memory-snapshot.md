@@ -7,7 +7,7 @@ icon: fa6-solid:table
 # MemorySnapshot
 
 :::info Introduction
-`MemorySnapshot` is the data interface returned by [getMemory()](./getMemory.md). It represents a point-in-time snapshot of system physical memory usage, including total capacity, consumed memory, available memory, and a pre-calculated usage percentage. Use this interface to build memory monitors, display utilization gauges, or trigger alerts when memory pressure is high.
+`MemorySnapshot` is the data interface returned by [getMemory()](./get-memory.md). It represents a point-in-time snapshot of system physical memory usage, including total capacity, consumed memory, available memory, and a pre-calculated usage percentage. Use this interface to build memory monitors, display utilization gauges, or trigger alerts when memory pressure is high.
 :::
 
 ## Interface Introduction

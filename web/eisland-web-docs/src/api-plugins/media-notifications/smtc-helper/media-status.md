@@ -7,7 +7,7 @@ icon: fa6-solid:table
 # MediaStatus
 
 :::info Introduction
-`MediaStatus` is an interface representing a complete snapshot of the current media session state. It includes track metadata (title, artist, album), playback state, timeline information, and available playback controls. You obtain this object by calling [`getStatus()`](./index.md) from `@eisland/windows-smtc-helper`.
+`MediaStatus` is an interface representing a complete snapshot of the current media session state. It includes track metadata (title, artist, album), playback state, timeline information, and available playback controls. You obtain this object by calling [`getStatus()`](./get-status.md) from `@eisland/windows-smtc-helper`.
 :::
 
 ## Interface Introduction

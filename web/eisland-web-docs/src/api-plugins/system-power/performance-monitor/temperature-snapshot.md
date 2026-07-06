@@ -7,7 +7,7 @@ icon: fa6-solid:table
 # TemperatureSnapshot
 
 :::info Introduction
-`TemperatureSnapshot` is the data structure returned by the [`getTemperature()`](./temperature-snapshot.md) function. It contains an array of temperature readings collected from all available hardware sensors via LibreHardwareMonitor, along with a convenience field for the highest temperature across all sensors. Use this interface to monitor CPU, GPU, motherboard, and storage temperatures in real time.
+`TemperatureSnapshot` is the data structure returned by the [`getTemperature()`](./get-temperature.md) function. It contains an array of temperature readings collected from all available hardware sensors via LibreHardwareMonitor, along with a convenience field for the highest temperature across all sensors. Use this interface to monitor CPU, GPU, motherboard, and storage temperatures in real time.
 :::
 
 ## Interface Introduction
@@ -23,7 +23,7 @@ For a real-time temperature display, call `getTemperature()` on a 1–2 second i
 :::
 
 :::note LibreHardwareMonitor Dependency
-Temperature data is only available when the LibreHardwareMonitor helper process is running. Always check `isAvailable` before accessing `readings` or `maxTemperatureCelsius`. See the [system requirements](../index.md) for setup details.
+Temperature data is only available when the LibreHardwareMonitor helper process is running. Always check `isAvailable` before accessing `readings` or `maxTemperatureCelsius`. See the [system requirements](../README.md) for setup details.
 :::
 
 ## Properties

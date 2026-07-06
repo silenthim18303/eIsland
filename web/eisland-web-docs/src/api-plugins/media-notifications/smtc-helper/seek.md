@@ -36,7 +36,7 @@ Returns a [CommandResult](command-result.md) object:
 | `error` | `string \| null` | Error message when the command fails; `null` on success. |
 
 :::warning
-A `success: true` return does **not** guarantee the playback position has already updated. The media app processes the command asynchronously. Call [getStatus](./getStatus.md) or [getTimestamp](./getTimestamp.md) after a short delay to confirm the new position.
+A `success: true` return does **not** guarantee the playback position has already updated. The media app processes the command asynchronously. Call [getStatus](./get-status.md) or [getTimestamp](./get-timestamp.md) after a short delay to confirm the new position.
 :::
 
 ## Usage
@@ -44,7 +44,7 @@ A `success: true` return does **not** guarantee the playback position has alread
 Call `seek` when you need to jump to a specific time in the currently playing media — for example, jumping to a bookmark position, skipping to a chapter, or syncing playback with lyrics.
 
 :::tip
-Before seeking, read the `timeline.minSeekTime` and `timeline.maxSeekTime` fields from [getStatus](./getStatus.md) to know the valid range. Passing a value outside this range is safe (it gets clamped), but checking first lets you present meaningful UI feedback to the user.
+Before seeking, read the `timeline.minSeekTime` and `timeline.maxSeekTime` fields from [getStatus](./get-status.md) to know the valid range. Passing a value outside this range is safe (it gets clamped), but checking first lets you present meaningful UI feedback to the user.
 :::
 
 :::note
@@ -108,7 +108,7 @@ The seekable range is defined by `minSeekTime` and `maxSeekTime` in [TimelinePro
 :::
 
 :::tip
-For real-time position tracking (e.g. syncing lyrics), prefer [getTimestamp](./getTimestamp.md) over [getStatus](./getStatus.md). `getTimestamp` returns a lightweight [TimestampInfo](timestamp-info.md) object without media metadata, making it faster for frequent polling.
+For real-time position tracking (e.g. syncing lyrics), prefer [getTimestamp](./get-timestamp.md) over [getStatus](./get-status.md). `getTimestamp` returns a lightweight [TimestampInfo](timestamp-info.md) object without media metadata, making it faster for frequent polling.
 :::
 
 :::note

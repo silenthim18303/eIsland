@@ -7,7 +7,7 @@ icon: fa6-solid:table
 # HardwareListSnapshot
 
 :::info Introduction
-`HardwareListSnapshot` is a data structure returned by [`getHardwareList()`](./index.md). It provides a snapshot of all detected CPU and GPU hardware devices on the system, powered by the Libre Hardware Monitor backend. Use this interface to enumerate available hardware before querying per-device metrics such as temperature readings.
+`HardwareListSnapshot` is a data structure returned by [`getHardwareList()`](./get-hardware-list.md). It provides a snapshot of all detected CPU and GPU hardware devices on the system, powered by the Libre Hardware Monitor backend. Use this interface to enumerate available hardware before querying per-device metrics such as temperature readings.
 :::
 
 ## Interface Introduction
