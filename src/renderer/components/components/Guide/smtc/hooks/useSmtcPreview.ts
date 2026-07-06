@@ -25,67 +25,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getColor } from 'colorthief';
 import type { NowPlayingInfo } from '../../../../../../preload/types/media';
-
-/** 测试状态 */
-export type SmtcTestStatus = 'loading' | 'success' | 'no-media';
-
-/** 媒体元数据 */
-export interface SmtcMediaMeta {
-  title: string;
-  artist: string;
-  album: string;
-  coverImage: string | null;
-  dominantColor: [number, number, number];
-  isPlaying: boolean;
-  durationMs: number;
-  positionMs: number;
-  sourceAppId: string;
-}
-
-interface UseSmtcTestReturn {
-  status: SmtcTestStatus;
-  meta: SmtcMediaMeta | null;
-  /** 重新检测 */
-  retry: () => void;
-}
-
-/** 提取封面主色 */
-async function extractDominantColor(coverImage: string): Promise<[number, number, number]> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.crossOrigin = 'Anonymous';
-    img.src = coverImage;
-    img.onload = async () => {
-      try {
-        const color = await getColor(img, { colorSpace: 'rgb' });
-        if (color) {
-          const { r, g, b } = color.rgb();
-          resolve([r, g, b]);
-          return;
-        }
-      } catch { /* fallback */ }
-      resolve([0, 0, 0]);
-    };
-    img.onerror = () => resolve([0, 0, 0]);
-  });
-}
-
-/** 格式化毫秒为 mm:ss */
-export function formatTime(ms: number): string {
-  const totalSec = Math.floor(ms / 1000);
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return `${min}:${sec.toString().padStart(2, '0')}`;
-}
-
-/** 从 sourceAppId 提取可读播放器名 */
-export function extractPlayerName(sourceAppId: string): string {
-  if (!sourceAppId) return '未知';
-  const name = sourceAppId.replace(/^.*[/\\]/, '').replace(/\.exe$/i, '');
-  return name || sourceAppId;
-}
+import type { SmtcTestStatus, SmtcMediaMeta, UseSmtcTestReturn } from '../types';
+import { extractDominantColor } from '../utils/smtcUtils';
 
 /**
  * SMTC 媒体测试 Hook
@@ -175,7 +117,6 @@ export function useSmtcTest(): UseSmtcTestReturn {
       const p = progressRef.current;
       if (p.isPlaying && p.timestamp > 0) {
         const now = Date.now();
-        // 每 66ms（~15fps）更新一次，避免过度渲染
         if (now - lastWrite >= 66) {
           lastWrite = now;
           const pos = p.baseMs + (now - p.timestamp);

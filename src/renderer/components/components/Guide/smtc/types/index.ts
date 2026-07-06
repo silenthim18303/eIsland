@@ -20,7 +20,7 @@
 
 /**
  * @file types/index.ts
- * @description 引导 SMTC 检查步骤 — 类型定义
+ * @description 引导 SMTC 模块 — 类型定义
  * @author 鸡哥
  */
 
@@ -30,4 +30,28 @@ export interface SmtcStepProps {
   onNext: () => void;
   /** 返回上一步的回调 */
   onPrev: () => void;
+}
+
+/** SMTC 测试状态 */
+export type SmtcTestStatus = 'loading' | 'success' | 'no-media';
+
+/** 媒体元数据 */
+export interface SmtcMediaMeta {
+  title: string;
+  artist: string;
+  album: string;
+  coverImage: string | null;
+  dominantColor: [number, number, number];
+  isPlaying: boolean;
+  durationMs: number;
+  positionMs: number;
+  sourceAppId: string;
+}
+
+/** useSmtcTest 返回值 */
+export interface UseSmtcTestReturn {
+  status: SmtcTestStatus;
+  meta: SmtcMediaMeta | null;
+  /** 重新检测 */
+  retry: () => void;
 }

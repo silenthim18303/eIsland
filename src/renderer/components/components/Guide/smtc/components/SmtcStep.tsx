@@ -26,7 +26,8 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSmtcTest, formatTime, extractPlayerName } from '../hooks/useSmtcPreview';
+import { useSmtcTest } from '../hooks/useSmtcPreview';
+import { formatTime, extractPlayerName } from '../utils/smtcUtils';
 import type { SmtcStepProps } from '../types';
 
 /**
