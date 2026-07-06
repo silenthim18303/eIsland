@@ -26,3 +26,5 @@ export function getIconByProcessName(processName: string): Buffer | null;
 export function getIconByPid(pid: number): Buffer | null;
 /** 根据可执行文件路径获取应用图标 */
 export function getIconByPath(exePath: string): Buffer | null;
+/** 根据快捷方式路径获取应用图标（解析 .lnk 目标） */
+export function getIconByShortcutPath(lnkPath: string): Buffer | null;

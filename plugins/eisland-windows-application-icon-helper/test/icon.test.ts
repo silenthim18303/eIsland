@@ -24,11 +24,14 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const icon = require('../') as {
   getIconByProcessName(processName: string): Buffer | null;
   getIconByPid(pid: number): Buffer | null;
   getIconByPath(exePath: string): Buffer | null;
+  getIconByShortcutPath(lnkPath: string): Buffer | null;
 };
 
 /** 验证返回的 Buffer 是有效的 PNG */
@@ -47,6 +50,7 @@ describe('@eisland/windows-application-icon-helper', () => {
     expect(typeof icon.getIconByProcessName).toBe('function');
     expect(typeof icon.getIconByPid).toBe('function');
     expect(typeof icon.getIconByPath).toBe('function');
+    expect(typeof icon.getIconByShortcutPath).toBe('function');
   });
 
   describe('getIconByProcessName', () => {
@@ -124,6 +128,58 @@ describe('@eisland/windows-application-icon-helper', () => {
       expect(() => icon.getIconByPath(process.execPath)).not.toThrow();
       expect(() => icon.getIconByPath('C:\\nonexistent')).not.toThrow();
       expect(() => icon.getIconByPath('')).not.toThrow();
+    });
+  });
+
+  describe('getIconByShortcutPath', () => {
+    it('returns Buffer for valid shortcut', () => {
+      // 查找一个可用的快捷方式
+      const startMenuPath = path.join(process.env.APPDATA || '', 'Microsoft', 'Windows', 'Start Menu', 'Programs');
+      let lnkPath: string | null = null;
+
+      try {
+        const walk = (dir: string): string[] => {
+          const results: string[] = [];
+          for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+              results.push(...walk(fullPath));
+            } else if (entry.name.endsWith('.lnk')) {
+              results.push(fullPath);
+            }
+          }
+          return results;
+        };
+        const lnks = walk(startMenuPath);
+        if (lnks.length > 0) lnkPath = lnks[0];
+      } catch { /* ignore */ }
+
+      if (!lnkPath) return; // skip if no shortcuts found
+
+      const result = icon.getIconByShortcutPath(lnkPath);
+      expect(result).not.toBeNull();
+      if (result) expectValidPngBuffer(result);
+    });
+
+    it('returns null for non-existent path', () => {
+      const result = icon.getIconByShortcutPath('C:\\nonexistent\\file.lnk');
+      expect(result).toBeNull();
+    });
+
+    it('returns null for non-lnk file', () => {
+      const result = icon.getIconByShortcutPath('C:\\Windows\\notepad.exe');
+      expect(result).toBeNull();
+    });
+
+    it('returns null for empty string', () => {
+      const result = icon.getIconByShortcutPath('');
+      expect(result).toBeNull();
+    });
+
+    it('never throws', () => {
+      expect(() => icon.getIconByShortcutPath('C:\\nonexistent.lnk')).not.toThrow();
+      expect(() => icon.getIconByShortcutPath('C:\\Windows\\notepad.exe')).not.toThrow();
+      expect(() => icon.getIconByShortcutPath('')).not.toThrow();
     });
   });
 });

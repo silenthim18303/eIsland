@@ -51,8 +51,18 @@ function getIconByPath(exePath) {
   return callIcon('icon_get_by_path', exePath);
 }
 
+/**
+ * 根据快捷方式路径获取应用图标（解析 .lnk 目标）
+ * @param {string} lnkPath - 快捷方式文件完整路径
+ * @returns {Buffer|null} PNG 图标数据，未找到时返回 null
+ */
+function getIconByShortcutPath(lnkPath) {
+  return callIcon('icon_get_by_shortcut', lnkPath);
+}
+
 module.exports = {
   getIconByProcessName,
   getIconByPid,
   getIconByPath,
+  getIconByShortcutPath,
 };

@@ -72,6 +72,7 @@ const icon = {
   icon_get_by_process_name: lib.func('str icon_get_by_process_name(str)'),
   icon_get_by_pid:         lib.func('str icon_get_by_pid(uint)'),
   icon_get_by_path:        lib.func('str icon_get_by_path(str)'),
+  icon_get_by_shortcut:    lib.func('str icon_get_by_shortcut(str)'),
 };
 
 /**

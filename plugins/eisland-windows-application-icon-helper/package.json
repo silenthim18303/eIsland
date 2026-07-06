@@ -23,7 +23,8 @@
     "smoke": "node --experimental-strip-types test/icon.smoke.ts",
     "smoke:process-name": "node --experimental-strip-types test/icon.by-process-name.smoke.ts",
     "smoke:pid": "node --experimental-strip-types test/icon.by-pid.smoke.ts",
-    "smoke:path": "node --experimental-strip-types test/icon.by-path.smoke.ts"
+    "smoke:path": "node --experimental-strip-types test/icon.by-path.smoke.ts",
+    "smoke:shortcut": "node --experimental-strip-types test/icon.by-shortcut.smoke.ts"
   },
   "dependencies": {
     "koffi": "^2.9.1"

@@ -47,6 +47,17 @@ internal static class Exports
         return png != null ? MarshalToBase64(png) : IntPtr.Zero;
     }
 
+    /// <summary>根据快捷方式路径获取图标（返回 base64 PNG）</summary>
+    [UnmanagedCallersOnly(EntryPoint = "icon_get_by_shortcut")]
+    public static IntPtr GetByShortcut(IntPtr lnkPtr)
+    {
+        string? lnkPath = Marshal.PtrToStringUTF8(lnkPtr);
+        if (string.IsNullOrEmpty(lnkPath)) return IntPtr.Zero;
+
+        var png = IconExtractor.GetIconByShortcutPath(lnkPath);
+        return png != null ? MarshalToBase64(png) : IntPtr.Zero;
+    }
+
 
     /// <summary>将字节数组编码为 base64 并通过 CoTaskMem 分配为 UTF-8 字符串</summary>
     private static IntPtr MarshalToBase64(byte[] data)
