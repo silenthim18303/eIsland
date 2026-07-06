@@ -63,6 +63,7 @@ export default hopeTheme({
 
   markdown: {
     spoiler: true,
+    codeTabs: true,
   },
 
   plugins: {
