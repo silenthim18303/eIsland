@@ -119,3 +119,36 @@ Refer to [CommandResult](command-result.md) for return type details.
 ```
 
 Every Notes section MUST include at least one cross-reference to a related function.
+
+## Sidebar Badge Registration
+
+When adding new Interface, Enum, or Monitor documentation, you MUST register the badge in `src/.vuepress/components/SidebarBadges.vue`:
+
+1. Open `src/.vuepress/components/SidebarBadges.vue`
+2. Add the name to `BADGE_MAP` with the correct type:
+
+```typescript
+const BADGE_MAP: Record<string, string> = {
+  // ... existing entries ...
+  YourNewInterface: 'interface',
+  YourNewEnum: 'enum',
+  YourNewMonitor: 'monitor',
+}
+```
+
+3. Badge types match the icon convention:
+
+| Badge Type | Icon | Description |
+|------------|------|-------------|
+| `interface` | `fa6-solid:table` | Data structures, interfaces |
+| `enum` | `fa6-solid:list` | Enumerations |
+| `monitor` | `fa6-solid:cubes` | Monitor classes |
+| `function` | `fa6-solid:code` | Auto-detected by URL pattern |
+
+:::important
+Function badges are auto-detected from URL patterns (`get*`, `set*`, `close*`, `start*`, `stop*`, `is*`, `enable*`, `disable*`, `request*`, `play*`, `pause*`, `next*`, `previous*`, `seek*`). You do NOT need to register functions manually.
+:::
+
+:::warning
+If you forget to register a badge, the sidebar item will not show its type indicator. Always verify badges appear after adding new documentation.
+:::
