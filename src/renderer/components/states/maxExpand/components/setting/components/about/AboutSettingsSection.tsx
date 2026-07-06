@@ -500,8 +500,9 @@ export function AboutSettingsSection({ aboutVersion, initialPage = 'development'
         <div className="settings-about-row"><span className="settings-about-label">{t('settings.about.links.publicSecurityRecord', { defaultValue: '公安备案' })}</span><img className="settings-about-record-icon" src={publicSecurityRecordIcon} alt="" aria-hidden="true" /><a className="settings-about-link" href="https://www.beian.gov.cn/portal/registerSystemInfo?recordcode=32011502013770" target="_blank" rel="noreferrer">苏公网安备32011502013770号</a></div>
       </div>
       <div className="settings-about-deps">
-        <div className="settings-about-deps-title">{t('settings.about.depsTitle', { defaultValue: '开源框架 & 依赖' })}</div>
+        <div className="settings-about-deps-title">{t('settings.about.depsTitle', { defaultValue: '开源框架、依赖 & 项目' })}</div>
         <div className="settings-about-deps-grid">
+          <a className="settings-about-dep" href="https://github.com/XxHuberrr/Mineradio" target="_blank" rel="noreferrer">Mineradio</a>
           <span className="settings-about-dep">Electron</span>
           <span className="settings-about-dep">React</span>
           <span className="settings-about-dep">React DOM</span>
