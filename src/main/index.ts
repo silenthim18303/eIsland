@@ -66,6 +66,7 @@ import { createCaptureWindowService } from './window/captureWindow';
 import { createMainWindowService } from './window/mainWindow';
 import { openStandaloneWindow } from './window/standaloneWindow';
 import { showSplashWindow, closeSplashWindow } from './window/splashWindow';
+import { showGuideWindow } from './window/guideWindow';
 import { createSmtcService } from './music/smtcService';
 import { setSmtcAccessor } from './music/smtcAccessor';
 import { createAutoHideWatcher } from './system/autoHideWatcher';
@@ -354,6 +355,10 @@ const mainWindowService = createMainWindowService({
   },
   onReadyToShow: async () => {
     await closeSplashWindow();
+    const isFirst = readFirstLaunchConfig();
+    if (isFirst || !app.isPackaged) {
+      await showGuideWindow();
+    }
   },
 });
 

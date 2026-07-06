@@ -63,7 +63,8 @@ export default defineConfig({
           index: resolve(__dirname, 'src/renderer/index.html'),
           standalone: resolve(__dirname, 'src/renderer/standalone.html'),
           AIbackground: resolve(__dirname, 'src/renderer/AIbackground.html'),
-          splash: resolve(__dirname, 'src/renderer/splash.html')
+          splash: resolve(__dirname, 'src/renderer/splash.html'),
+          guideMain: resolve(__dirname, 'src/renderer/guideMain.html')
         }
       },
     },
