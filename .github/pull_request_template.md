@@ -1,30 +1,30 @@
-## 变更说明
+## Changes
 
 - 
 
-## 验证说明
+## Verification
 
-- [ ] 本地已完成必要验证（功能/构建/回归）
+- [ ] Verified locally (features / build / regression)
 
-## 前端规范全量核对（必填）
+## Frontend Standards Full Checklist (required)
 
-> 规范文档：`docs/FRONTEND_STANDARDS.md`
+> Standards: `docs/FRONTEND_STANDARDS.md`
 >
-> 注释规范文档：`docs/COMMENT_STANDARDS.md`
+> Comment standards: `docs/COMMENT_STANDARDS.md`
 >
-> 以下 6 项用于 `PR Code Quality Review` 工作流强校验，必须勾选。
+> The following 6 items are enforced by the `PR Code Quality Review` workflow and must be checked.
 
-- [ ] STD-1-HTML 已核对 docs/FRONTEND_STANDARDS.md 第 1 章 HTML 规范全部条款
-- [ ] STD-2-CSS 已核对 docs/FRONTEND_STANDARDS.md 第 2 章 CSS 规范全部条款
-- [ ] STD-3-JSTS 已核对 docs/FRONTEND_STANDARDS.md 第 3 章 JavaScript / TypeScript 规范全部条款
-- [ ] STD-4-REACT 已核对 docs/FRONTEND_STANDARDS.md 第 4 章 React 规范全部条款
-- [ ] STD-5-NEXT 已核对 docs/FRONTEND_STANDARDS.md 第 5 章 Next.js 规范全部条款（如适用）
-- [ ] STD-COMMENT 已核对 docs/COMMENT_STANDARDS.md 注释规范全部条款
+- [ ] STD-1-HTML Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 1 HTML Standards
+- [ ] STD-2-CSS Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 2 CSS Standards
+- [ ] STD-3-JSTS Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 3 JavaScript / TypeScript Standards
+- [ ] STD-4-REACT Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 4 React Standards
+- [ ] STD-5-NEXT Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 5 Next.js Standards (if applicable)
+- [ ] STD-COMMENT Verified all clauses in docs/COMMENT_STANDARDS.md
 
-## 影响范围
+## Impact Scope
 
-- [ ] 渲染层（`src/renderer`）
-- [ ] 主进程（`src/main`）
-- [ ] 预加载（`src/preload`）
-- [ ] 文档/工作流
-- [ ] 其他：
+- [ ] Renderer (`src/renderer`)
+- [ ] Main Process (`src/main`)
+- [ ] Preload (`src/preload`)
+- [ ] Docs / Workflows
+- [ ] Other:

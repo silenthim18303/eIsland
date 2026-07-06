@@ -71,7 +71,8 @@ jobs:
         env:
           EXIT_CODE: ${{ needs.i18n-check.outputs.exit_code }}
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # Fall back to GITHUB_TOKEN when BOT_PAT is unavailable (e.g. fork PRs)
+          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('node:fs');
             const marker = '<!-- i18n-check-report -->';
