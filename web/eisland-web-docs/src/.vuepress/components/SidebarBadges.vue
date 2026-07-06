@@ -100,10 +100,11 @@ function inferTypeFromLink(link: string): string | null {
   return null
 }
 
+const SIDEBAR_SELECTOR = '.vp-sidebar'
+const SIDEBAR_LINK_SELECTOR = `${SIDEBAR_SELECTOR} .vp-sidebar-link`
+
 function injectBadges(): void {
-  const links = document.querySelectorAll<HTMLAnchorElement>(
-    '.vp-sidebar .vp-sidebar-link',
-  )
+  const links = document.querySelectorAll<HTMLAnchorElement>(SIDEBAR_LINK_SELECTOR)
   for (const link of links) {
     // skip if badge already injected
     if (link.querySelector('.sidebar-badge')) continue
@@ -128,26 +129,70 @@ function injectBadges(): void {
 
 // ── lifecycle ────────────────────────────────────────────────────
 const route = useRoute()
-let observer: MutationObserver | null = null
+let sidebarObserver: MutationObserver | null = null
+let sidebarRootObserver: MutationObserver | null = null
+let observedSidebar: Element | null = null
+let clickHandler: ((e: Event) => void) | null = null
+let pendingRefresh = false
+
+function stopObservingSidebar(): void {
+  sidebarObserver?.disconnect()
+  sidebarObserver = null
+
+  if (clickHandler) {
+    observedSidebar?.removeEventListener('click', clickHandler)
+    clickHandler = null
+  }
+
+  observedSidebar = null
+}
+
+function syncSidebarObserver(): void {
+  const nextSidebar = document.querySelector(SIDEBAR_SELECTOR)
+  if (nextSidebar === observedSidebar) return
+
+  stopObservingSidebar()
+  if (!nextSidebar) return
+
+  observedSidebar = nextSidebar
+  clickHandler = () => scheduleRefresh()
+  sidebarObserver = new MutationObserver(scheduleRefresh)
+
+  sidebarObserver.observe(nextSidebar, { childList: true, subtree: true })
+  nextSidebar.addEventListener('click', clickHandler)
+}
+
+function refreshBadges(): void {
+  syncSidebarObserver()
+  injectBadges()
+}
+
+function scheduleRefresh(): void {
+  if (pendingRefresh) return
+
+  pendingRefresh = true
+  requestAnimationFrame(() => {
+    pendingRefresh = false
+    refreshBadges()
+  })
+}
 
 onMounted(() => {
-  nextTick(injectBadges)
-  // watch for sidebar DOM changes (collapsible group expand/collapse)
-  const sidebar = document.querySelector('.vp-sidebar')
-  if (sidebar) {
-    observer = new MutationObserver(() => injectBadges())
-    observer.observe(sidebar, { childList: true, subtree: true })
-  }
+  nextTick(refreshBadges)
+
+  sidebarRootObserver = new MutationObserver(scheduleRefresh)
+  sidebarRootObserver.observe(document.body, { childList: true, subtree: true })
 })
 
 onUnmounted(() => {
-  observer?.disconnect()
-  observer = null
+  sidebarRootObserver?.disconnect()
+  sidebarRootObserver = null
+  stopObservingSidebar()
 })
 
 watch(
   () => route.path,
-  () => nextTick(injectBadges),
+  () => nextTick(scheduleRefresh),
 )
 </script>
 

@@ -6,11 +6,13 @@ icon: fa6-solid:table
 
 # BluetoothDeviceInfo
 
-:::info
-This document describes the `BluetoothDeviceInfo` interface returned by all Bluetooth Helper query functions and monitor events. The `deviceType` field is derived from BLE Appearance or Classic Bluetooth Class of Device (CoD), following the [Bluetooth SIG Assigned Numbers](https://www.bluetooth.com/specifications/assigned-numbers/).
+:::info Introduction
+`BluetoothDeviceInfo` is the core data interface returned by all Bluetooth Helper query functions (`getPairedDevices`, `getConnectedDevices`, `getAllDevices`, `getDevice`) and emitted in every `BluetoothMonitor` event. It represents a snapshot of a single Bluetooth device's state, including identity, connection status, signal strength, and a human-readable device type derived from BLE Appearance or Classic Bluetooth Class of Device (CoD) standards.
 :::
 
-## Interface
+## Interface Introduction
+
+`BluetoothDeviceInfo` is encountered whenever you query or monitor Bluetooth devices through `@eisland/windows-bluetooth-helper`. Every function that returns device information produces objects conforming to this interface, and every `BluetoothMonitor` event (except `device-removed` and `error`) delivers one. The `deviceType` field is resolved by the internal `DeriveDeviceType()` function, which checks BLE Appearance first, then falls back to Classic Bluetooth CoD.
 
 ```typescript
 interface BluetoothDeviceInfo {
@@ -28,30 +30,49 @@ interface BluetoothDeviceInfo {
 }
 ```
 
+## Usage
+
+You encounter `BluetoothDeviceInfo` in two scenarios:
+
+1. **Querying devices** -- Call `getPairedDevices()`, `getConnectedDevices()`, `getAllDevices()`, or `getDevice()` to get a snapshot array or single object.
+2. **Monitoring devices** -- Subscribe to `BluetoothMonitor` events. The `device-added`, `device-connected`, `device-updated` events deliver a full `BluetoothDeviceInfo` object. The `device-removed` and `device-disconnected` events deliver only the `deviceId` string.
+
+:::tip Best Practice
+Use `deviceId` as the unique key when building UI lists or caching device state. It is the Windows `DeviceInformation.ID` and remains stable across reconnections. Do not rely on `name` for identification -- it can be `null` or change.
+:::
+
+:::tip Performance Tip
+If you only need a single device's current state, call `getDevice(deviceId)` instead of iterating over `getAllDevices()`. The single-device lookup is more efficient and returns `null` if the device is no longer visible.
+:::
+
 ## Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `deviceId` | `string` | Windows DeviceInformation ID |
-| `name` | `string \| null` | Device friendly name |
-| `bluetoothAddress` | `string \| null` | Bluetooth MAC address (hex string) |
-| `isConnected` | `boolean` | Whether the device is currently connected |
-| `isPaired` | `boolean` | Whether the device is paired |
-| `signalStrength` | `number \| null` | RSSI in dBm, `null` if unavailable |
-| `deviceClass` | `number \| null` | Raw Class of Device value (Classic Bluetooth) |
-| `appearance` | `number \| null` | Raw BLE Appearance value |
-| `serviceUuids` | `string[]` | GATT service UUIDs (BLE devices only) |
-| `deviceType` | `string \| null` | Human-readable device type (see below) |
-| `batteryLevel` | `number \| null` | Battery percentage 0–100 (BLE only), `null` if unavailable |
+| `deviceId` | `string` | Windows DeviceInformation ID. Stable unique identifier for the device. |
+| `name` | `string \| null` | Device friendly name. `null` if the device does not advertise a name. |
+| `bluetoothAddress` | `string \| null` | Bluetooth MAC address as a hex string. `null` if unavailable. |
+| `isConnected` | `boolean` | Whether the device is currently connected. |
+| `isPaired` | `boolean` | Whether the device is paired with this PC. |
+| `signalStrength` | `number \| null` | RSSI in dBm. `null` if the device does not report signal strength. |
+| `deviceClass` | `number \| null` | Raw Class of Device value (Classic Bluetooth). `null` for BLE-only devices. |
+| `appearance` | `number \| null` | Raw BLE Appearance value. `null` for Classic Bluetooth-only devices. |
+| `serviceUuids` | `string[]` | GATT service UUIDs advertised by the device. Empty array for Classic Bluetooth devices. |
+| `deviceType` | `string \| null` | Human-readable device type string (see [Device Type Derivation](#device-type-derivation)). `null` if neither BLE Appearance nor CoD yields a recognized type. |
+| `batteryLevel` | `number \| null` | Battery percentage (0--100). Only available for BLE devices that expose the Battery Service. `null` otherwise. |
+
+:::note
+`serviceUuids` is only populated for BLE devices that advertise GATT services. Classic Bluetooth devices will have an empty array. Similarly, `batteryLevel` requires the BLE device to expose the standard Battery Service (UUID `0x180F`) -- not all BLE devices do.
+:::
 
 ## Device Type Derivation
 
-The `deviceType` field is resolved by `DeriveDeviceType()` using two standards, checked in priority order:
+The `deviceType` field is resolved using two standards, checked in priority order:
 
-1. **BLE Appearance** — Category field (bits 6–15) of the `BluetoothLEAppearance` raw value
-2. **Classic Bluetooth CoD** — Major Device Class (bits 8–12) + Minor Device Class (bits 2–7) of the `BluetoothClassOfDevice` raw value
+1. **BLE Appearance** -- Category field (bits 6--15) of the `BluetoothLEAppearance` raw value.
+2. **Classic Bluetooth CoD** -- Major Device Class (bits 8--12) + Minor Device Class (bits 2--7) of the `BluetoothClassOfDevice` raw value.
 
-If neither source yields a value, `deviceType` is `null`.
+If neither source yields a recognized value, `deviceType` is `null`.
 
 ---
 
@@ -107,13 +128,13 @@ If neither source yields a value, `deviceType` is `null`.
 
 ### Classic Bluetooth CoD Types
 
-#### Major Class `0x00` — Miscellaneous
+#### Major Class `0x00` -- Miscellaneous
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
 | _(any)_ | `"Miscellaneous"` | Uncategorized device |
 
-#### Major Class `0x01` — Computer
+#### Major Class `0x01` -- Computer
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -126,7 +147,7 @@ If neither source yields a value, `deviceType` is `null`.
 | `0x07` | `"Tablet"` | Tablet |
 | _(other)_ | `"Computer"` | Other computer |
 
-#### Major Class `0x02` — Phone
+#### Major Class `0x02` -- Phone
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -137,13 +158,13 @@ If neither source yields a value, `deviceType` is `null`.
 | `0x05` | `"ISDNAccess"` | Common ISDN access |
 | _(other)_ | `"Phone"` | Other phone |
 
-#### Major Class `0x03` — LAN / Network
+#### Major Class `0x03` -- LAN / Network
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
 | _(any)_ | `"LAN"` | Network access point (minor encodes utilization) |
 
-#### Major Class `0x04` — Audio / Video
+#### Major Class `0x04` -- Audio / Video
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -165,7 +186,7 @@ If neither source yields a value, `deviceType` is `null`.
 | `0x12` | `"GamingToy"` | Gaming / Toy |
 | _(other)_ | `"Audio"` | Other audio/video device |
 
-#### Major Class `0x05` — Peripheral
+#### Major Class `0x05` -- Peripheral
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -180,10 +201,10 @@ If neither source yields a value, `deviceType` is `null`.
 | `0x24` | `"HandheldGesturalInput"` | Handheld gestural input device |
 | _(other)_ | `"Peripheral"` | Other peripheral device |
 
-#### Major Class `0x06` — Imaging
+#### Major Class `0x06` -- Imaging
 
 :::note
-The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera (`0x08`), bit 4 = Scanner (`0x10`), bit 5 = Printer (`0x20`). Multiple flags can be set simultaneously — e.g., `0x24` (Display + Printer) yields `"Display+Printer"`.
+The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera (`0x08`), bit 4 = Scanner (`0x10`), bit 5 = Printer (`0x20`). Multiple flags can be set simultaneously -- e.g., `0x24` (Display + Printer) yields `"Display+Printer"`.
 :::
 
 | Minor Class (hex) | `deviceType` | Description |
@@ -197,7 +218,7 @@ The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera
 | _(combination)_ | `"<flag>+<flag>..."` | Any combination of the above flags |
 | _(other)_ | `"Imaging"` | Other imaging device (no recognized flags) |
 
-#### Major Class `0x07` — Wearable
+#### Major Class `0x07` -- Wearable
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -208,7 +229,7 @@ The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera
 | `0x05` | `"Glasses"` | Glasses |
 | _(other)_ | `"Wearable"` | Other wearable device |
 
-#### Major Class `0x08` — Toy
+#### Major Class `0x08` -- Toy
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -219,7 +240,7 @@ The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera
 | `0x05` | `"ToyGame"` | Game |
 | _(other)_ | `"Toy"` | Other toy |
 
-#### Major Class `0x09` — Health
+#### Major Class `0x09` -- Health
 
 | Minor Class (hex) | `deviceType` | Description |
 |--------------------|--------------|-------------|
@@ -242,7 +263,7 @@ The Imaging minor class uses bit flags: bit 2 = Display (`0x04`), bit 3 = Camera
 | _(other)_ | `"Health"` | Other health device |
 
 :::tip
-BLE devices report types via the Appearance standard (43 categories). Classic Bluetooth devices use CoD Major + Minor Class (9 major classes, 80+ minor types). Both produce consistent type strings where the standards overlap — e.g., `"Phone"`, `"Computer"`, `"Headphones"`.
+BLE devices report types via the Appearance standard (43 categories). Classic Bluetooth devices use CoD Major + Minor Class (9 major classes, 80+ minor types). Both produce consistent type strings where the standards overlap -- e.g., `"Phone"`, `"Computer"`, `"Headphones"`.
 :::
 
 :::warning
@@ -251,15 +272,90 @@ Some BLE headphones or speakers may not advertise a specific Appearance category
 
 ## Example
 
-```typescript
-import { getPairedDevices } from '@eisland/windows-bluetooth-helper';
+::: code-tabs
 
+@tab TypeScript
+
+```ts
+import { getPairedDevices, getDevice } from '@eisland/windows-bluetooth-helper';
+
+// Query all paired devices
 const devices = getPairedDevices();
+
+// Iterate over each paired device
 for (const device of devices) {
+  // Print device name and type, using fallbacks for null values
   console.log(`${device.name ?? 'Unknown'} (${device.deviceType ?? 'N/A'})`);
+  // Print connection and pairing status
   console.log(`  Connected: ${device.isConnected}, Paired: ${device.isPaired}`);
+  // Print battery level if the BLE device exposes it
   if (device.batteryLevel !== null) {
     console.log(`  Battery: ${device.batteryLevel}%`);
   }
 }
+
+// Query a single device by its deviceId
+const singleDevice = getDevice('BT_1234567890');
+if (singleDevice) {
+  // Print the device's GATT service UUIDs
+  console.log('Services:', singleDevice.serviceUuids);
+}
 ```
+
+@tab JavaScript
+
+```js
+const { getPairedDevices, getDevice } = require('@eisland/windows-bluetooth-helper');
+
+// Query all paired devices
+const devices = getPairedDevices();
+
+// Iterate over each paired device
+for (const device of devices) {
+  // Print device name and type, using fallbacks for null values
+  console.log(`${device.name ?? 'Unknown'} (${device.deviceType ?? 'N/A'})`);
+  // Print connection and pairing status
+  console.log(`  Connected: ${device.isConnected}, Paired: ${device.isPaired}`);
+  // Print battery level if the BLE device exposes it
+  if (device.batteryLevel !== null) {
+    console.log(`  Battery: ${device.batteryLevel}%`);
+  }
+}
+
+// Query a single device by its deviceId
+const singleDevice = getDevice('BT_1234567890');
+if (singleDevice) {
+  // Print the device's GATT service UUIDs
+  console.log('Services:', singleDevice.serviceUuids);
+}
+```
+
+:::
+
+## Notes
+
+:::note
+The `deviceId` value is the Windows `DeviceInformation.ID` string. It is unique per device and stable across reconnections, making it the correct key for caching or tracking devices in your application state.
+:::
+
+:::note
+`signalStrength` (RSSI) is measured in dBm. Typical values range from -30 dBm (very strong, very close) to -100 dBm (very weak, far away). A `null` value means the device does not report RSSI, which is common for Classic Bluetooth devices.
+:::
+
+:::tip
+When using `BluetoothMonitor`, the `device-updated` event fires whenever a device's properties change (e.g., connection state flips from disconnected to connected). The event delivers a full `BluetoothDeviceInfo` object, so you can diff it against your cached state to detect what changed.
+:::
+
+:::warning
+The `batteryLevel` field is only available for BLE devices that expose the standard GATT Battery Service (UUID `0x180F`). Many BLE devices -- including most headphones -- do not expose this service, so `batteryLevel` will be `null` even if the device has a battery.
+:::
+
+## Danger Avoidance
+
+:::danger
+Do not assume `name` is always a non-null string. Devices that do not advertise a name will have `name: null`. Always use a fallback (e.g., `device.name ?? 'Unknown'`) before displaying or indexing by name. Using `null` names in UI rendering without a guard will cause runtime errors.
+:::
+
+:::danger
+Do not use `bluetoothAddress` as a persistent unique identifier across sessions. While MAC addresses are typically stable, some BLE devices use rotating addresses for privacy. Use `deviceId` (the Windows DeviceInformation ID) as your stable key instead.
+:::
