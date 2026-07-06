@@ -54,8 +54,7 @@
       "player": "Player",
       "state": "State",
       "playing": "Playing",
-      "paused": "Paused",
-      "time": "Duration"
+      "paused": "Paused"
     },
     "welcome": {
       "title": "Welcome to eIsland",

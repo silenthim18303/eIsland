@@ -26,8 +26,8 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSmtcTest } from '../hooks/useSmtcPreview';
-import { formatTime, extractPlayerName } from '../utils/smtcUtils';
+import { useSmtcTest } from '../hooks/useSmtcTest';
+import { extractPlayerName } from '../utils/smtcUtils';
 import type { SmtcStepProps } from '../types';
 
 /**
@@ -100,14 +100,6 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
                   {meta.isPlaying
                     ? t('guide.smtc.playing', { defaultValue: '播放中' })
                     : t('guide.smtc.paused', { defaultValue: '已暂停' })}
-                </span>
-              </div>
-              <div className="guide-smtc-info">
-                <span className="guide-smtc-info-label">
-                  {t('guide.smtc.time', { defaultValue: '时长' })}
-                </span>
-                <span className="guide-smtc-info-value">
-                  {formatTime(meta.positionMs)} / {formatTime(meta.durationMs)}
                 </span>
               </div>
             </div>

@@ -19,37 +19,29 @@
  */
 
 /**
- * @file types/index.ts
- * @description 引导 SMTC 模块 — 类型定义
+ * @file smtcStore.ts
+ * @description 引导 SMTC — 模块级单例状态
  * @author 鸡哥
  */
 
-/** SmtcStep 组件属性 */
-export interface SmtcStepProps {
-  /** 确认后进入下一步的回调 */
-  onNext: () => void;
-  /** 返回上一步的回调 */
-  onPrev: () => void;
-}
+import type { SmtcTestStatus, SmtcMediaMeta } from '../types';
 
-/** SMTC 测试状态 */
-export type SmtcTestStatus = 'loading' | 'success' | 'no-media';
+/** 封面主色缓存 */
+export const dominantColorCache = new Map<string, [number, number, number]>();
 
-/** 媒体元数据 */
-export interface SmtcMediaMeta {
-  title: string;
-  artist: string;
-  album: string;
-  coverImage: string | null;
-  dominantColor: [number, number, number];
-  isPlaying: boolean;
-  sourceAppId: string;
-}
+/** 运行时状态（跨组件挂载持久化） */
+export const runtime = {
+  status: 'loading' as SmtcTestStatus,
+  meta: null as SmtcMediaMeta | null,
+  coverImage: null as string | null,
+  dominantColor: [0, 0, 0] as [number, number, number],
+  sourceAppId: '',
+  initialized: false,
+  unsubscribe: null as (() => void) | null,
+  listeners: new Set<() => void>(),
+};
 
-/** useSmtcTest 返回值 */
-export interface UseSmtcTestReturn {
-  status: SmtcTestStatus;
-  meta: SmtcMediaMeta | null;
-  /** 重新检测 */
-  retry: () => void;
+/** 通知所有订阅者触发重渲染 */
+export function notify(): void {
+  runtime.listeners.forEach((fn) => fn());
 }

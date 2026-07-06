@@ -52,18 +52,6 @@ export async function extractDominantColor(coverImage: string): Promise<[number,
 }
 
 /**
- * 格式化毫秒为 mm:ss
- * @param ms - 毫秒数
- * @returns 格式化的时间字符串
- */
-export function formatTime(ms: number): string {
-  const totalSec = Math.floor(ms / 1000);
-  const min = Math.floor(totalSec / 60);
-  const sec = totalSec % 60;
-  return `${min}:${sec.toString().padStart(2, '0')}`;
-}
-
-/**
  * 从 sourceAppId 提取可读播放器名
  * @param sourceAppId - 播放源标识
  * @returns 可读播放器名称
