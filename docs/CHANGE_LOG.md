@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-06T09:06:03.740Z
+> 生成时间：2026-07-06T09:45:26.214Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,10 @@
 
 ## Unreleased
 
+- 2026-07-06 | 2e32cea7 | 鸡哥 | Merge pull request #128 from JNTMTMTM/dev
+- 2026-07-06 | 6f4c1c0d | 鸡哥 | fix: update artifact download action in deploy workflow
+- 2026-07-06 | f870d46f | 鸡哥 | feat: add GitHub Actions workflow for deploying documentation
+- 2026-07-06 | a3898881 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #127 by @JNTMTMTM [skip ci]
 - 2026-07-06 | 575a400b | 鸡哥 | Merge pull request #127 from JNTMTMTM/dev
 - 2026-07-06 | 3433d380 | 鸡哥 | fix: update icon retrieval functions to return IconResult structure and improve documentation
 - 2026-07-06 | e06cb76e | 鸡哥 | fix: update return type in README for icon functions to reflect correct data structure
