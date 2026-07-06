@@ -13,7 +13,7 @@ icon: fa6-solid:cubes
 ## Constructor
 
 ```typescript
-constructor()
+new PowerMonitor(): PowerMonitor
 ```
 
 The constructor takes no arguments. It prepares internal FFI bindings but does **not** start listening for events — you must call [`start()`](#methods) to begin monitoring.

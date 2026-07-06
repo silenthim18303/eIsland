@@ -13,7 +13,7 @@ icon: fa6-solid:cubes
 ## Constructor
 
 ```typescript
-constructor()
+new SmtcMonitor(): SmtcMonitor
 ```
 
 :::note

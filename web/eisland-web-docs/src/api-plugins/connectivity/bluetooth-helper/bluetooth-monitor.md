@@ -13,7 +13,7 @@ Real-time Bluetooth device change monitor. Uses a .NET NativeAOT DLL via koffi F
 ## Constructor
 
 ```typescript
-constructor()
+new BluetoothMonitor(): BluetoothMonitor
 ```
 
 Creates a new `BluetoothMonitor` instance. The monitor does not start listening until you call `start()`.

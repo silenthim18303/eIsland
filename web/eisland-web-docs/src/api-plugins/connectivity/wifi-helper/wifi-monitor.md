@@ -13,7 +13,7 @@ icon: fa6-solid:cubes
 ## Constructor
 
 ```typescript
-new WifiMonitor()
+new WifiMonitor(): WifiMonitor
 ```
 
 The constructor takes no arguments. After instantiation, call [`start()`](#methods) to begin listening for WiFi status changes.
