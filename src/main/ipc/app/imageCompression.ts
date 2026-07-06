@@ -29,12 +29,8 @@ import { spawn } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'fs';
 import { basename, dirname, extname, join } from 'path';
 import { getFfmpegBinary } from '../../utils/ffmpegPath';
-
-interface ImageCompressionStartPayload {
-  inputPaths?: unknown;
-  outputDir?: unknown;
-  quality?: unknown;
-}
+import type { ImageCompressionStartPayload, ImageCompressionTaskResult, ImageCompressionStartResult } from './types';
+import { IMAGE_EXTENSIONS, MAX_PERSISTED_TASKS, PERSIST_DEBOUNCE_MS } from './config/imageCompression';
 
 function sortTasks(tasks: ImageCompressionTaskResult[]): ImageCompressionTaskResult[] {
   return tasks.slice().sort((a, b) => b.createdAt - a.createdAt);
@@ -102,31 +98,6 @@ function savePersistedTasks(storePath: string, tasks: ImageCompressionTaskResult
   }
 }
 
-interface ImageCompressionTaskResult {
-  id: string;
-  fileName: string;
-  inputPath: string;
-  outputPath: string;
-  quality: number;
-  status: 'completed' | 'failed';
-  success: boolean;
-  originalBytes: number;
-  compressedBytes: number;
-  ratio: number;
-  error?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-
-interface ImageCompressionStartResult {
-  ok: boolean;
-  results?: ImageCompressionTaskResult[];
-  message?: string;
-}
-
-const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp', 'bmp']);
-const MAX_PERSISTED_TASKS = 200;
-const PERSIST_DEBOUNCE_MS = 500;
 let registered = false;
 
 function buildTaskId(): string {

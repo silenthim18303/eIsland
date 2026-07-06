@@ -19,22 +19,24 @@
  */
 
 /**
- * @file log.ts
- * @description 日志相关 IPC 处理模块
- * @description 处理来自渲染进程的日志写入请求
+ * @file updater.ts
+ * @description 更新模块常量配置
  * @author 鸡哥
  */
 
-import { ipcMain } from 'electron';
-import type { RegisterLogIpcHandlersOptions } from './types';
+import type { UpdateSourceKey } from '../types';
 
-/**
- * 注册日志相关 IPC 处理器
- * @description 注册日志写入的 IPC 事件处理器
- * @param options - 配置选项，包含日志写入函数
- */
-export function registerLogIpcHandlers(options: RegisterLogIpcHandlersOptions): void {
-  ipcMain.on('log:write', (_event, level: string, message: string) => {
-    options.writeMainLog(level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'info', message);
-  });
-}
+/** 默认更新源 */
+export const DEFAULT_UPDATE_SOURCE: UpdateSourceKey = 'cloudflare-r2';
+
+/** Cloudflare R2 更新 URL */
+export const R2_UPDATE_URL = 'https://pub-4c1e73c3c2004901aecd6ca014cb16bd.r2.dev';
+
+/** ESA CDN 更新 URL */
+export const ESA_CDN_URL = 'https://eisland-server-download-cdn.pyisland.com/eisland-update';
+
+/** GitHub 仓库所有者 */
+export const GITHUB_OWNER = 'JNTMTMTM';
+
+/** GitHub 仓库名 */
+export const GITHUB_REPO = 'eIsland';

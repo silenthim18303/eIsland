@@ -19,22 +19,37 @@
  */
 
 /**
- * @file log.ts
- * @description 日志相关 IPC 处理模块
- * @description 处理来自渲染进程的日志写入请求
+ * @file ImageCompressionTaskResult.ts
+ * @description 图片压缩任务结果类型定义
  * @author 鸡哥
  */
 
-import { ipcMain } from 'electron';
-import type { RegisterLogIpcHandlersOptions } from './types';
-
-/**
- * 注册日志相关 IPC 处理器
- * @description 注册日志写入的 IPC 事件处理器
- * @param options - 配置选项，包含日志写入函数
- */
-export function registerLogIpcHandlers(options: RegisterLogIpcHandlersOptions): void {
-  ipcMain.on('log:write', (_event, level: string, message: string) => {
-    options.writeMainLog(level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'info', message);
-  });
+/** 图片压缩任务结果 */
+export interface ImageCompressionTaskResult {
+  /** 任务 ID */
+  id: string;
+  /** 文件名 */
+  fileName: string;
+  /** 输入路径 */
+  inputPath: string;
+  /** 输出路径 */
+  outputPath: string;
+  /** 压缩质量 */
+  quality: number;
+  /** 任务状态 */
+  status: 'completed' | 'failed';
+  /** 是否成功 */
+  success: boolean;
+  /** 原始大小（字节） */
+  originalBytes: number;
+  /** 压缩后大小（字节） */
+  compressedBytes: number;
+  /** 压缩比 */
+  ratio: number;
+  /** 错误信息 */
+  error?: string;
+  /** 创建时间戳 */
+  createdAt: number;
+  /** 更新时间戳 */
+  updatedAt: number;
 }

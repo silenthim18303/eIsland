@@ -19,22 +19,23 @@
  */
 
 /**
- * @file log.ts
- * @description 日志相关 IPC 处理模块
- * @description 处理来自渲染进程的日志写入请求
+ * @file MailAccountConfig.ts
+ * @description 邮件账户配置类型定义
  * @author 鸡哥
  */
 
-import { ipcMain } from 'electron';
-import type { RegisterLogIpcHandlersOptions } from './types';
-
-/**
- * 注册日志相关 IPC 处理器
- * @description 注册日志写入的 IPC 事件处理器
- * @param options - 配置选项，包含日志写入函数
- */
-export function registerLogIpcHandlers(options: RegisterLogIpcHandlersOptions): void {
-  ipcMain.on('log:write', (_event, level: string, message: string) => {
-    options.writeMainLog(level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'info', message);
-  });
+/** 邮件账户配置 */
+export interface MailAccountConfig {
+  /** 邮箱地址 */
+  emailAddress: string;
+  /** IMAP 主机 */
+  imapHost: string;
+  /** IMAP 端口 */
+  imapPort: string;
+  /** 是否使用 SSL */
+  imapSecure: boolean;
+  /** 认证用户名 */
+  authUser: string;
+  /** 认证密码/授权码 */
+  authSecret: string;
 }

@@ -19,22 +19,31 @@
  */
 
 /**
- * @file log.ts
- * @description 日志相关 IPC 处理模块
- * @description 处理来自渲染进程的日志写入请求
+ * @file LocalFileSearchOptions.ts
+ * @description 本地文件搜索选项类型定义
  * @author 鸡哥
  */
 
-import { ipcMain } from 'electron';
-import type { RegisterLogIpcHandlersOptions } from './types';
-
-/**
- * 注册日志相关 IPC 处理器
- * @description 注册日志写入的 IPC 事件处理器
- * @param options - 配置选项，包含日志写入函数
- */
-export function registerLogIpcHandlers(options: RegisterLogIpcHandlersOptions): void {
-  ipcMain.on('log:write', (_event, level: string, message: string) => {
-    options.writeMainLog(level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'info', message);
-  });
+/** 本地文件搜索选项 */
+export interface LocalFileSearchOptions {
+  /** 最大返回数量 */
+  limit?: number;
+  /** 最大搜索深度 */
+  maxDepth?: number;
+  /** 是否包含目录 */
+  includeDirectories?: boolean;
+  /** 是否包含文件 */
+  includeFiles?: boolean;
+  /** 是否包含隐藏文件 */
+  includeHidden?: boolean;
+  /** 是否区分大小写 */
+  caseSensitive?: boolean;
+  /** 匹配模式 */
+  matchMode?: 'contains' | 'startsWith' | 'endsWith' | 'exact';
+  /** 匹配范围 */
+  matchScope?: 'name' | 'path';
+  /** 文件扩展名过滤 */
+  extensions?: string[];
+  /** 排除目录 */
+  excludeDirs?: string[];
 }

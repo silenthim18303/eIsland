@@ -33,19 +33,7 @@ import { spawn } from 'child_process';
 import { existsSync, statSync } from 'fs';
 import { basename, dirname, extname, join } from 'path';
 import { getFfmpegBinary } from '../../utils/ffmpegPath';
-
-interface ExtractVideoTrackOptions {
-  filePath: string;
-  trackType: 'audio' | 'video';
-  outputFormat: string;
-}
-
-interface ExtractVideoTrackResult {
-  success: boolean;
-  outputPath?: string;
-  error?: string;
-  fileSize?: number;
-}
+import type { ExtractVideoTrackOptions, ExtractVideoTrackResult } from './types';
 
 /**
  * 执行 ffmpeg 命令

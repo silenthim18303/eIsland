@@ -19,22 +19,16 @@
  */
 
 /**
- * @file log.ts
- * @description 日志相关 IPC 处理模块
- * @description 处理来自渲染进程的日志写入请求
+ * @file imageCompression.ts
+ * @description 图片压缩模块常量配置
  * @author 鸡哥
  */
 
-import { ipcMain } from 'electron';
-import type { RegisterLogIpcHandlersOptions } from './types';
+/** 支持的图片扩展名 */
+export const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp', 'bmp']);
 
-/**
- * 注册日志相关 IPC 处理器
- * @description 注册日志写入的 IPC 事件处理器
- * @param options - 配置选项，包含日志写入函数
- */
-export function registerLogIpcHandlers(options: RegisterLogIpcHandlersOptions): void {
-  ipcMain.on('log:write', (_event, level: string, message: string) => {
-    options.writeMainLog(level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'info', message);
-  });
-}
+/** 最大持久化任务数 */
+export const MAX_PERSISTED_TASKS = 200;
+
+/** 持久化防抖间隔（毫秒） */
+export const PERSIST_DEBOUNCE_MS = 500;

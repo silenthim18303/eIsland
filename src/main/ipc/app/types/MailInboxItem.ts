@@ -19,22 +19,27 @@
  */
 
 /**
- * @file log.ts
- * @description 日志相关 IPC 处理模块
- * @description 处理来自渲染进程的日志写入请求
+ * @file MailInboxItem.ts
+ * @description 邮件收件箱条目类型定义
  * @author 鸡哥
  */
 
-import { ipcMain } from 'electron';
-import type { RegisterLogIpcHandlersOptions } from './types';
-
-/**
- * 注册日志相关 IPC 处理器
- * @description 注册日志写入的 IPC 事件处理器
- * @param options - 配置选项，包含日志写入函数
- */
-export function registerLogIpcHandlers(options: RegisterLogIpcHandlersOptions): void {
-  ipcMain.on('log:write', (_event, level: string, message: string) => {
-    options.writeMainLog(level === 'warn' ? 'warn' : level === 'error' ? 'error' : 'info', message);
-  });
+/** 邮件收件箱条目 */
+export interface MailInboxItem {
+  /** 邮件 UID */
+  uid: string;
+  /** 主题 */
+  subject: string;
+  /** 发件人 */
+  from: string;
+  /** 收件人 */
+  to: string;
+  /** 日期 */
+  date: string;
+  /** 大小（字节） */
+  size: number;
+  /** 预览文本 */
+  preview: string;
+  /** 正文 */
+  body: string;
 }

@@ -27,20 +27,8 @@
 
 import { ipcMain } from 'electron';
 import type { AppUpdater } from 'electron-updater';
-
-type UpdateSourceKey = 'cloudflare-r2' | 'esa-cdn' | 'tencent-cos' | 'aliyun-oss' | 'github';
-
-interface RegisterUpdaterIpcHandlersOptions {
-  updater: AppUpdater;
-  getVersion: () => string;
-  isPackaged: () => boolean;
-}
-
-const DEFAULT_UPDATE_SOURCE: UpdateSourceKey = 'cloudflare-r2';
-const R2_UPDATE_URL = 'https://pub-4c1e73c3c2004901aecd6ca014cb16bd.r2.dev';
-const ESA_CDN_URL = 'https://eisland-server-download-cdn.pyisland.com/eisland-update';
-const GITHUB_OWNER = 'JNTMTMTM';
-const GITHUB_REPO = 'eIsland';
+import type { UpdateSourceKey, RegisterUpdaterIpcHandlersOptions } from './types';
+import { DEFAULT_UPDATE_SOURCE, R2_UPDATE_URL, ESA_CDN_URL, GITHUB_OWNER, GITHUB_REPO } from './config/updater';
 
 function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   if (value === 'github') return 'github';
