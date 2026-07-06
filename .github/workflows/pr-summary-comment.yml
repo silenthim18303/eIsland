@@ -16,12 +16,13 @@ jobs:
       - name: Generate PR summary and post comment
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.BOT_PAT }}
+          # Fall back to GITHUB_TOKEN when BOT_PAT is unavailable (e.g. fork PRs)
+          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
             const marker = '<!-- pr-auto-summary-comment -->';
-            const sanitizeMentions = (text) => String(text ?? '').replace(/@/g, '@​');
+            const sanitizeMentions = (text) => String(text ?? '').replace(/@/g, '@200b');
 
             // ========== 1. Fetch changed files ==========
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -119,7 +120,7 @@ jobs:
             body.push(`| **PR** | #${pr.number} |`);
             body.push(`| **Title** | ${prTitle} |`);
             body.push(`| **Branch** | \`${headRef}\` → \`${baseRef}\` |`);
-            body.push(`| **Author** | @​${submitter} |`);
+            body.push(`| **Author** | @200b${submitter} |`);
             body.push(`| **Commits** | ${commits.length} |`);
             body.push(`| **Changed Files** | ${files.length} |`);
             body.push(`| **Total Lines** | **+${totalAdded}** / **-${totalDeleted}** |`);
