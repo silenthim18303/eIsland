@@ -41,6 +41,7 @@ varying vec2 vUv;
 uniform vec2 uResolution;
 uniform float uTime;
 uniform vec3 uBgColor;
+uniform vec3 uAccentColor;
 
 float saturate(float v){ return clamp(v, 0.0, 1.0); }
 float ease(float v){ v = saturate(v); return v * v * (3.0 - 2.0 * v); }
@@ -101,9 +102,9 @@ void main(){
   uv += flowAxis * syncWave * 0.055 * climax;
   uv += crossAxis * sin(lane * 7.2 + t * 1.25) * 0.034 * climax;
   uv *= 1.0 + 0.045 * preClimax - 0.020 * climax;
-  vec3 ch1 = vec3(0.043, 0.173, 0.380);
-  vec3 ch2 = vec3(0.439, 0.627, 1.000);
-  vec3 ch3 = vec3(0.439, 0.502, 0.824);
+  vec3 ch1 = mix(vec3(0.043, 0.173, 0.380), uAccentColor * 0.15, 0.6);
+  vec3 ch2 = mix(vec3(0.439, 0.627, 1.000), uAccentColor, 0.5);
+  vec3 ch3 = mix(vec3(0.439, 0.502, 0.824), uAccentColor * 0.8, 0.4);
   float a = animatedLoop(uv, t, 0.0);
   float b = animatedLoop(uv * 1.018 + vec2(0.012, -0.008), t + 0.18, 1.0);
   float c = animatedLoop(uv * 0.986 + vec2(-0.010, 0.010), t + 0.35, 2.0);

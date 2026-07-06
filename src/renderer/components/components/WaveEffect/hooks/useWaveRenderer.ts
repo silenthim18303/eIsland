@@ -40,9 +40,11 @@ import { compileWaveShader } from '../utils/compileWaveShader';
  * @param playing - 是否播放渲染循环。
  * @returns 无返回值。
  */
-export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true): void {
+export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true, accentColor: [number, number, number] = [0.439, 0.627, 1.0]): void {
   const bgColorRef = useRef(bgColor);
   bgColorRef.current = bgColor;
+  const accentColorRef = useRef(accentColor);
+  accentColorRef.current = accentColor;
 
   /** 跨 effect 生命周期持久化的 WebGL 资源 */
   const glRef = useRef<{
@@ -53,6 +55,7 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
     resLoc: WebGLUniformLocation | null;
     timeLoc: WebGLUniformLocation | null;
     bgColorLoc: WebGLUniformLocation | null;
+    accentColorLoc: WebGLUniformLocation | null;
     startTime: number;
   } | null>(null);
 
@@ -109,6 +112,7 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
       resLoc: gl.getUniformLocation(program, 'uResolution'),
       timeLoc: gl.getUniformLocation(program, 'uTime'),
       bgColorLoc: gl.getUniformLocation(program, 'uBgColor'),
+      accentColorLoc: gl.getUniformLocation(program, 'uAccentColor'),
       startTime: performance.now(),
     };
   }, [canvasRef, playing]);
@@ -124,7 +128,7 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
     let rafId = 0;
 
     const draw = (): void => {
-      const { gl, program, buffer, posLoc, resLoc, timeLoc, bgColorLoc, startTime } = ctx;
+      const { gl, program, buffer, posLoc, resLoc, timeLoc, bgColorLoc, accentColorLoc, startTime } = ctx;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
       const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
@@ -143,6 +147,8 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
       gl.uniform2f(resLoc, w, h);
       gl.uniform1f(timeLoc, (performance.now() - startTime) / 1000);
       gl.uniform3f(bgColorLoc, c[0], c[1], c[2]);
+      const ac = accentColorRef.current;
+      gl.uniform3f(accentColorLoc, ac[0], ac[1], ac[2]);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       rafId = requestAnimationFrame(draw);
     };

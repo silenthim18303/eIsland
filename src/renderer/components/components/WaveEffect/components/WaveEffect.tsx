@@ -47,6 +47,8 @@ interface WaveEffectProps {
   playing?: boolean;
   /** 背景颜色十六进制值，传入时优先于 store 读取。预览区用于实时跟随颜色选择器。 */
   color?: string;
+  /** 波纹强调色 [r, g, b]，各分量范围 0-1。默认蓝色。 */
+  accentColor?: [number, number, number];
 }
 
 /**
@@ -55,7 +57,7 @@ interface WaveEffectProps {
  * @param color - 背景颜色十六进制值，优先于 store。
  * @returns 波浪背景节点。
  */
-export function WaveEffect({ playing = true, color }: WaveEffectProps): ReactElement {
+export function WaveEffect({ playing = true, color, accentColor }: WaveEffectProps): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [bgColor, setBgColor] = useState<[number, number, number]>(SHADER_DEFAULT_BG_RGB);
 
@@ -69,7 +71,7 @@ export function WaveEffect({ playing = true, color }: WaveEffectProps): ReactEle
     }).catch(() => {});
   }, [color]);
 
-  useWaveRenderer(canvasRef, bgColor, playing);
+  useWaveRenderer(canvasRef, bgColor, playing, accentColor);
 
   return <canvas ref={canvasRef} className="splash-wave-canvas" />;
 }

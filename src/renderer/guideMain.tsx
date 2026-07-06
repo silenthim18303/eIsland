@@ -33,6 +33,7 @@ import './styles/guide.css';
 import { WaveEffect } from './components/components/WaveEffect';
 import { LanguageStep } from './components/components/Guide/language';
 import { SmtcStep } from './components/components/Guide/smtc';
+import { useSmtcAccentColor } from './components/components/Guide/smtc/hooks/useSmtcAccentColor';
 
 /** 引导步骤 */
 type GuideStep = 'language' | 'smtc';
@@ -40,6 +41,7 @@ type GuideStep = 'language' | 'smtc';
 /** 引导窗口根组件 */
 function GuideApp(): ReactElement {
   const [step, setStep] = useState<GuideStep>('language');
+  const accentColor = useSmtcAccentColor();
 
   /** 通知主进程引导完成，关闭引导窗口并显示主窗口 */
   const handleComplete = useCallback((): void => {
@@ -63,7 +65,7 @@ function GuideApp(): ReactElement {
 
   return (
     <div className="guide-container">
-      <WaveEffect />
+      <WaveEffect accentColor={accentColor} />
       <div className="guide-content">
         {step === 'language' && <LanguageStep onNext={handleLanguageNext} />}
         {step === 'smtc' && <SmtcStep onNext={handleSmtcNext} onPrev={handleSmtcPrev} />}
