@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-06T09:45:26.214Z
+> 生成时间：2026-07-06T10:37:26.355Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,16 @@
 
 ## Unreleased
 
+- 2026-07-06 | 4f6b6a08 | 鸡哥 | Merge pull request #129 from JNTMTMTM/dev
+- 2026-07-06 | b8cea4d3 | 鸡哥 | fix: update workflows to fall back to GITHUB_TOKEN when BOT_PAT is unavailable
+- 2026-07-06 | ed41cdd9 | 鸡哥 | fix: update workflows to enhance changelog updates and fallback token handling
+- 2026-07-06 | 91d3de95 | 鸡哥 | fix: update issue templates to improve clarity and consistency in descriptions and labels
+- 2026-07-06 | b653b1cd | 鸡哥 | fix: update comments and labels in workflow files to improve clarity and consistency
+- 2026-07-06 | dbe6063f | 鸡哥 | fix: update GitHub token to use BOT_PAT in workflow files
+- 2026-07-06 | ff71ace0 | 鸡哥 | fix: update GitHub token to use BOT_PAT for release build and upload
+- 2026-07-06 | 21f6aa09 | 鸡哥 | fix: update bot configuration for CHANGE_LOG.md commits
+- 2026-07-06 | 688a3fef | 鸡哥 | fix: update download action in deploy workflow to use actions/download-artifact@v4
+- 2026-07-06 | 6b54a00d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #128 by @JNTMTMTM [skip ci]
 - 2026-07-06 | 2e32cea7 | 鸡哥 | Merge pull request #128 from JNTMTMTM/dev
 - 2026-07-06 | 6f4c1c0d | 鸡哥 | fix: update artifact download action in deploy workflow
 - 2026-07-06 | f870d46f | 鸡哥 | feat: add GitHub Actions workflow for deploying documentation
