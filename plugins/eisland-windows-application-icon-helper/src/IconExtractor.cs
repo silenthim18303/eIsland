@@ -41,6 +41,9 @@ internal static class IconExtractor
     [DllImport("ole32.dll")]
     private static extern int CoInitializeEx(IntPtr pvReserved, uint dwCoInit);
 
+    [DllImport("ole32.dll")]
+    private static extern void CoUninitialize();
+
     [UnmanagedFunctionPointer(CallingConvention.StdCall)]
     private delegate int PersistFileLoadDelegate(IntPtr thisPtr, [MarshalAs(UnmanagedType.LPWStr)] string pszFileName, uint dwMode);
 
@@ -143,13 +146,15 @@ internal static class IconExtractor
     {
         IntPtr persistPtr = IntPtr.Zero;
         IntPtr shellLinkPtr = IntPtr.Zero;
+        bool comInitialized = false;
         try
         {
-            CoInitializeEx(IntPtr.Zero, 0); // COINIT_APARTMENTTHREADED
+            int hr = CoInitializeEx(IntPtr.Zero, 0); // COINIT_APARTMENTTHREADED
+            comInitialized = hr == 0 || hr == 1; // S_OK or S_FALSE (already initialized)
 
             Guid clsid = CLSID_ShellLink;
             Guid iidPersist = IID_IPersistFile;
-            int hr = CoCreateInstance(ref clsid, IntPtr.Zero, 1, ref iidPersist, out persistPtr);
+            hr = CoCreateInstance(ref clsid, IntPtr.Zero, 1, ref iidPersist, out persistPtr);
             if (hr != 0 || persistPtr == IntPtr.Zero) return null;
 
             // IPersistFile::Load (vtable slot 5)
@@ -184,6 +189,7 @@ internal static class IconExtractor
         {
             if (shellLinkPtr != IntPtr.Zero) Marshal.Release(shellLinkPtr);
             if (persistPtr != IntPtr.Zero) Marshal.Release(persistPtr);
+            if (comInitialized) CoUninitialize();
         }
     }
 
