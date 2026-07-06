@@ -56,7 +56,9 @@ jobs:
           git config user.email "bot@electronisland.com"
 
           git add docs/CHANGE_LOG.md
-          AUTH_HEADER="Authorization: Basic $(printf 'eislandBot:${{ secrets.BOT_PAT }}' | base64)"
+          # Fall back to GITHUB_TOKEN when BOT_PAT is unavailable
+          PAT_TOKEN="${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}"
+          AUTH_HEADER="Authorization: Basic $(printf "eislandBot:${PAT_TOKEN}" | base64)"
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git commit -m "docs: auto update CHANGE_LOG.md for #${{ github.event.pull_request.number }} by @${{ github.event.pull_request.user.login }} [skip ci]"
