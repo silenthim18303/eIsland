@@ -23,7 +23,7 @@ Extract Windows application and process icons by name, PID, path, or shortcut vi
 | Function | [getIconByShortcutPath](get-icon-by-shortcut-path.md) | Get icon by shortcut (.lnk) path |
 
 :::tip
-All functions return `Buffer | null`. The buffer contains raw PNG image data. Returns `null` when the icon cannot be found or the target doesn't exist.
+All functions return `IconResult | null`. The result contains PNG image data, size, and format. Returns `null` when the icon cannot be found or the target doesn't exist.
 :::
 
 :::note
