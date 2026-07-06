@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-06T07:09:15.929Z
+> 生成时间：2026-07-06T09:06:03.740Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,22 @@
 
 ## Unreleased
 
+- 2026-07-06 | 575a400b | 鸡哥 | Merge pull request #127 from JNTMTMTM/dev
+- 2026-07-06 | 3433d380 | 鸡哥 | fix: update icon retrieval functions to return IconResult structure and improve documentation
+- 2026-07-06 | e06cb76e | 鸡哥 | fix: update return type in README for icon functions to reflect correct data structure
+- 2026-07-06 | f52102a7 | 鸡哥 | fix: ensure proper COM initialization and uninitialization in IconExtractor
+- 2026-07-06 | 987870ac | 鸡哥 | fix: update return type annotations in icon retrieval functions for clarity
+- 2026-07-06 | 852e3fd5 | 鸡哥 | feat: add detailed file headers and descriptions to test files and configuration
+- 2026-07-06 | 60458f52 | 鸡哥 | fix: update links in documentation for consistency and accuracy
+- 2026-07-06 | 7bc609d1 | 鸡哥 | feat: enhance API plugin documentation with sidebar badge registration guidelines
+- 2026-07-06 | d5d04111 | 鸡哥 | feat: add IconResult interface to badge mapping in SidebarBadges.vue
+- 2026-07-06 | f750c929 | 鸡哥 | feat: enhance icon retrieval functions to return structured IconResult and add documentation for new interface
+- 2026-07-06 | dbc5b261 | 鸡哥 | feat: update icon retrieval functions to return structured IconResult with size and format
+- 2026-07-06 | a6c55f56 | 鸡哥 | feat: add Windows Application Icon Helper plugin and documentation
+- 2026-07-06 | 5a2dabc2 | 鸡哥 | feat: add support for extracting icons from shortcut files
+- 2026-07-06 | 943f5cd6 | 鸡哥 | feat(tests): add smoke tests for icon extraction by process name, PID, and path
+- 2026-07-06 | f3c5c608 | 鸡哥 | feat: add Windows application icon helper plugin with icon extraction capabilities
+- 2026-07-06 | c0091f6e | github-actions[bot] | docs: auto update CHANGE_LOG.md for #126 by @JNTMTMTM [skip ci]
 - 2026-07-06 | df8f6f29 | 鸡哥 | Merge pull request #126 from JNTMTMTM/dev
 - 2026-07-06 | 6e991025 | 鸡哥 | chore(workflows): remove MiMo summary and review workflows
 - 2026-07-06 | 94f9acfb | 鸡哥 | fix(api): improve sidebar badge injection and observation logic
