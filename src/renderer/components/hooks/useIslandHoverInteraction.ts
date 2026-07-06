@@ -28,7 +28,7 @@ import { useCallback, useEffect } from 'react';
 import useIslandStore from '../../store/isLandStore';
 import type { IslandState } from './useDynamicIslandShell';
 import { STATE_CONFIGS, isMouseInWindow } from '../config/dynamicIslandConfig';
-import { findCurrentIndex } from '../states/lyrics/utils/findCurrentIndex';
+import { isCurrentLyricIdenticalToTranslation } from '../states/lyrics/utils/isCurrentLyricIdenticalToTranslation';
 
 interface UseIslandHoverInteractionOptions {
   state: IslandState;
@@ -183,13 +183,7 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
                   && Boolean(store.translationLyrics.lines && store.translationLyrics.lines.length > 0);
                 if (hasTranslation) {
                   /** 原文与翻译完全一致时回退到普通歌词 */
-                  const posMs = store.currentPositionMs;
-                  const origIdx = store.syncedLyrics ? findCurrentIndex(store.syncedLyrics, posMs) : -1;
-                  const origText = origIdx >= 0 ? store.syncedLyrics![origIdx].text : '';
-                  const tLines = store.translationLyrics!.lines!;
-                  const tIdx = findCurrentIndex(tLines, posMs);
-                  const transText = tIdx >= 0 ? tLines[tIdx].text : '';
-                  if (origText && transText && origText === transText) {
+                  if (isCurrentLyricIdenticalToTranslation(store.syncedLyrics, store.translationLyrics, store.currentPositionMs)) {
                     setLyrics();
                   } else {
                     setLyricsTranslation();

@@ -28,7 +28,7 @@ import { useEffect, useState } from 'react';
 import type { SyncedLyricLine, TimerState } from '../../store/types';
 import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 import type { IslandState } from './useDynamicIslandShell';
-import { findCurrentIndex } from '../states/lyrics/utils/findCurrentIndex';
+import { isCurrentLyricIdenticalToTranslation } from '../states/lyrics/utils/isCurrentLyricIdenticalToTranslation';
 
 interface UseIslandStateBridgesOptions {
   state: IslandState;
@@ -42,28 +42,6 @@ interface UseIslandStateBridgesOptions {
   setLyricsTranslation: () => void;
   setAgentVoiceInput: () => void;
   setIdle: (force?: boolean) => void;
-}
-
-/**
- * 检查当前歌词行的原文与翻译是否完全一致。
- * @param syncedLyrics - 同步歌词行数组。
- * @param translationLyrics - 翻译歌词结果。
- * @param currentPositionMs - 当前播放位置（毫秒）。
- * @returns 原文与翻译完全一致时返回 true。
- */
-function isCurrentLyricIdenticalToTranslation(
-  syncedLyrics: SyncedLyricLine[] | null,
-  translationLyrics: TranslationLyricsResult | null,
-  currentPositionMs: number,
-): boolean {
-  if (!syncedLyrics || !translationLyrics || translationLyrics.status !== 'available') return false;
-  const tLines = translationLyrics.lines;
-  if (!tLines || tLines.length === 0) return false;
-  const origIdx = findCurrentIndex(syncedLyrics, currentPositionMs);
-  if (origIdx < 0) return false;
-  const tIdx = findCurrentIndex(tLines, currentPositionMs);
-  if (tIdx < 0) return false;
-  return syncedLyrics[origIdx].text === tLines[tIdx].text;
 }
 
 /**

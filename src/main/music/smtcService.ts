@@ -28,6 +28,7 @@
 import { BrowserWindow } from 'electron';
 import { Worker } from 'worker_threads';
 import { join } from 'path';
+import type { SourceSwitchRequestData } from '../../preload/types/media';
 
 interface DetectedSourceEntry {
   isPlaying: boolean;
@@ -185,7 +186,8 @@ export function createSmtcService(options: CreateSmtcServiceOptions): SmtcServic
       const emitSourceSwitchRequest = (sourceAppId: string, title: string, artist: string): void => {
         const mainWindow = options.getMainWindow();
         if (!mainWindow || mainWindow.isDestroyed()) return;
-        mainWindow.webContents.send('media:source-switch-request', { sourceAppId, title, artist });
+        const payload: SourceSwitchRequestData = { sourceAppId, title, artist };
+        mainWindow.webContents.send('media:source-switch-request', payload);
       };
 
       const workerPath = join(__dirname, 'smtcWorker.js');
