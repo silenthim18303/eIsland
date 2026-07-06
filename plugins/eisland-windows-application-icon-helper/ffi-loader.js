@@ -76,15 +76,16 @@ const icon = {
 };
 
 /**
- * 调用 DLL 函数获取图标，解码 base64 为 Buffer
+ * 调用 DLL 函数获取图标，解码 base64 为 IconResult
  * @param {string} fnName - icon 函数名
  * @param {any[]} args - 参数
- * @returns {Buffer|null}
+ * @returns {{ data: Buffer, size: number, format: 'png' }|null}
  */
 function callIcon(fnName, ...args) {
   const b64 = icon[fnName](...args);
   if (!b64) return null;
-  return Buffer.from(b64, 'base64');
+  const data = Buffer.from(b64, 'base64');
+  return { data, size: data.length, format: 'png' };
 }
 
 module.exports = { icon, callIcon, dllPath };

@@ -27,22 +27,32 @@ import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface IconResult {
+  data: Buffer;
+  size: number;
+  format: 'png';
+}
+
 const icon = require('../') as {
-  getIconByProcessName(processName: string): Buffer | null;
-  getIconByPid(pid: number): Buffer | null;
-  getIconByPath(exePath: string): Buffer | null;
-  getIconByShortcutPath(lnkPath: string): Buffer | null;
+  getIconByProcessName(processName: string): IconResult | null;
+  getIconByPid(pid: number): IconResult | null;
+  getIconByPath(exePath: string): IconResult | null;
+  getIconByShortcutPath(lnkPath: string): IconResult | null;
 };
 
-/** 验证返回的 Buffer 是有效的 PNG */
-function expectValidPngBuffer(buf: Buffer) {
-  expect(Buffer.isBuffer(buf)).toBe(true);
-  expect(buf.length).toBeGreaterThan(0);
+/** 验证返回的 IconResult 是有效的 */
+function expectValidIconResult(result: IconResult) {
+  expect(result).not.toBeNull();
+  expect(result.data).toBeDefined();
+  expect(Buffer.isBuffer(result.data)).toBe(true);
+  expect(result.data.length).toBeGreaterThan(0);
   // PNG magic bytes: 89 50 4E 47 (‰PNG)
-  expect(buf[0]).toBe(0x89);
-  expect(buf[1]).toBe(0x50);
-  expect(buf[2]).toBe(0x4e);
-  expect(buf[3]).toBe(0x47);
+  expect(result.data[0]).toBe(0x89);
+  expect(result.data[1]).toBe(0x50);
+  expect(result.data[2]).toBe(0x4e);
+  expect(result.data[3]).toBe(0x47);
+  expect(result.size).toBe(result.data.length);
+  expect(result.format).toBe('png');
 }
 
 describe('@eisland/windows-application-icon-helper', () => {
@@ -57,7 +67,7 @@ describe('@eisland/windows-application-icon-helper', () => {
     it('returns Buffer for running process', () => {
       const result = icon.getIconByProcessName('explorer');
       expect(result).not.toBeNull();
-      if (result) expectValidPngBuffer(result);
+      if (result) expectValidIconResult(result);
     });
 
     it('returns null for non-existent process', () => {
@@ -81,7 +91,7 @@ describe('@eisland/windows-application-icon-helper', () => {
     it('returns Buffer for current process', () => {
       const result = icon.getIconByPid(process.pid);
       expect(result).not.toBeNull();
-      if (result) expectValidPngBuffer(result);
+      if (result) expectValidIconResult(result);
     });
 
     it('returns null for PID 0', () => {
@@ -105,13 +115,13 @@ describe('@eisland/windows-application-icon-helper', () => {
     it('returns Buffer for valid exe path', () => {
       const result = icon.getIconByPath(process.execPath);
       expect(result).not.toBeNull();
-      if (result) expectValidPngBuffer(result);
+      if (result) expectValidIconResult(result);
     });
 
     it('returns Buffer for non-exe file (file type icon)', () => {
       const result = icon.getIconByPath('C:\\Windows\\System32\\drivers\\etc\\hosts');
       expect(result).not.toBeNull();
-      if (result) expectValidPngBuffer(result);
+      if (result) expectValidIconResult(result);
     });
 
     it('returns null for non-existent path', () => {
@@ -158,7 +168,7 @@ describe('@eisland/windows-application-icon-helper', () => {
 
       const result = icon.getIconByShortcutPath(lnkPath);
       expect(result).not.toBeNull();
-      if (result) expectValidPngBuffer(result);
+      if (result) expectValidIconResult(result);
     });
 
     it('returns null for non-existent path', () => {

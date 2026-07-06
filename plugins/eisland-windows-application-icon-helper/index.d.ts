@@ -18,13 +18,25 @@
  * GNU General Public License for more details.
  */
 
+// ── 数据类型 ──────────────────────────────────────────────────
+
+/** 图标数据结构 */
+export interface IconResult {
+  /** PNG 图标数据 */
+  data: Buffer;
+  /** 图标数据大小（字节） */
+  size: number;
+  /** 图像格式 */
+  format: 'png';
+}
+
 // ── 图标获取函数 ──────────────────────────────────────────────
 
 /** 根据进程名获取应用图标 */
-export function getIconByProcessName(processName: string): Buffer | null;
+export function getIconByProcessName(processName: string): IconResult | null;
 /** 根据进程 PID 获取应用图标 */
-export function getIconByPid(pid: number): Buffer | null;
+export function getIconByPid(pid: number): IconResult | null;
 /** 根据可执行文件路径获取应用图标 */
-export function getIconByPath(exePath: string): Buffer | null;
+export function getIconByPath(exePath: string): IconResult | null;
 /** 根据快捷方式路径获取应用图标（解析 .lnk 目标） */
-export function getIconByShortcutPath(lnkPath: string): Buffer | null;
+export function getIconByShortcutPath(lnkPath: string): IconResult | null;
