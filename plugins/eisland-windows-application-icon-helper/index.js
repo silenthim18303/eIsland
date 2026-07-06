@@ -27,7 +27,7 @@ const { callIcon } = require('./ffi-loader');
 /**
  * 根据进程名获取应用图标
  * @param {string} processName - 进程名（如 "notepad"、"chrome"）
- * @returns {Buffer|null} PNG 图标数据，未找到时返回 null
+ * @returns {{ data: Buffer, size: number, format: 'png' }|null} 图标结果对象，未找到时返回 null
  */
 function getIconByProcessName(processName) {
   return callIcon('icon_get_by_process_name', processName);
@@ -36,7 +36,7 @@ function getIconByProcessName(processName) {
 /**
  * 根据进程 PID 获取应用图标
  * @param {number} pid - 进程 ID
- * @returns {Buffer|null} PNG 图标数据，未找到时返回 null
+ * @returns {{ data: Buffer, size: number, format: 'png' }|null} 图标结果对象，未找到时返回 null
  */
 function getIconByPid(pid) {
   return callIcon('icon_get_by_pid', pid);
@@ -45,7 +45,7 @@ function getIconByPid(pid) {
 /**
  * 根据可执行文件路径获取应用图标
  * @param {string} exePath - 可执行文件完整路径
- * @returns {Buffer|null} PNG 图标数据，未找到时返回 null
+ * @returns {{ data: Buffer, size: number, format: 'png' }|null} 图标结果对象，未找到时返回 null
  */
 function getIconByPath(exePath) {
   return callIcon('icon_get_by_path', exePath);
@@ -54,7 +54,7 @@ function getIconByPath(exePath) {
 /**
  * 根据快捷方式路径获取应用图标（解析 .lnk 目标）
  * @param {string} lnkPath - 快捷方式文件完整路径
- * @returns {Buffer|null} PNG 图标数据，未找到时返回 null
+ * @returns {{ data: Buffer, size: number, format: 'png' }|null} 图标结果对象，未找到时返回 null
  */
 function getIconByShortcutPath(lnkPath) {
   return callIcon('icon_get_by_shortcut', lnkPath);
