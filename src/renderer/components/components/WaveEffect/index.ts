@@ -19,33 +19,9 @@
  */
 
 /**
- * @file compileSplashWaveShader.ts
- * @description 启动画面波浪背景 WebGL 着色器编译工具。
+ * @file index.ts
+ * @description 波浪背景公共组件模块导出。
  * @author 鸡哥
  */
 
-/**
- * 编译启动波浪背景着色器。
- * @param gl - WebGL 渲染上下文。
- * @param type - 着色器类型。
- * @param source - 着色器源码。
- * @returns 编译成功的着色器，失败时返回 null。
- */
-export function compileSplashWaveShader(
-  gl: WebGLRenderingContext,
-  type: number,
-  source: string,
-): WebGLShader | null {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
-
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.warn('[SplashWave] shader compile failed:', gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
-  }
-
-  return shader;
-}
+export { WaveEffect } from './components/WaveEffect';

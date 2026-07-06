@@ -19,14 +19,14 @@
  */
 
 /**
- * @file SplashWaveEffect.tsx
- * @description 启动画面波浪背景 React 组件。
+ * @file WaveEffect.tsx
+ * @description 波浪背景 React 组件。
  * @author 鸡哥
  */
 
 import { useEffect, useRef, useState } from 'react';
 import type { ReactElement } from 'react';
-import { useSplashWaveRenderer } from '../hooks/useSplashWaveRenderer';
+import { useWaveRenderer } from '../hooks/useWaveRenderer';
 
 /** 着色器原始背景颜色 vec3(0.002, 0.004, 0.005) */
 const SHADER_DEFAULT_BG_RGB: [number, number, number] = [0.002, 0.004, 0.005];
@@ -42,7 +42,7 @@ function hexToRgbNorm(hex: string): [number, number, number] {
   return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
 }
 
-interface SplashWaveEffectProps {
+interface WaveEffectProps {
   /** 是否播放渲染循环，默认 true。实际启动画面始终为 true，预览区按需控制。 */
   playing?: boolean;
   /** 背景颜色十六进制值，传入时优先于 store 读取。预览区用于实时跟随颜色选择器。 */
@@ -50,12 +50,12 @@ interface SplashWaveEffectProps {
 }
 
 /**
- * 渲染启动画面波浪背景画布。
+ * 渲染波浪背景画布。
  * @param playing - 是否播放渲染循环。
  * @param color - 背景颜色十六进制值，优先于 store。
- * @returns 启动画面波浪背景节点。
+ * @returns 波浪背景节点。
  */
-export function SplashWaveEffect({ playing = true, color }: SplashWaveEffectProps): ReactElement {
+export function WaveEffect({ playing = true, color }: WaveEffectProps): ReactElement {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [bgColor, setBgColor] = useState<[number, number, number]>(SHADER_DEFAULT_BG_RGB);
 
@@ -69,7 +69,7 @@ export function SplashWaveEffect({ playing = true, color }: SplashWaveEffectProp
     }).catch(() => {});
   }, [color]);
 
-  useSplashWaveRenderer(canvasRef, bgColor, playing);
+  useWaveRenderer(canvasRef, bgColor, playing);
 
   return <canvas ref={canvasRef} className="splash-wave-canvas" />;
 }

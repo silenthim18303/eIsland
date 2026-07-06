@@ -19,18 +19,18 @@
  */
 
 /**
- * @file useSplashWaveRenderer.ts
- * @description 启动画面波浪背景 WebGL 渲染生命周期 Hook。
+ * @file useWaveRenderer.ts
+ * @description 波浪背景 WebGL 渲染生命周期 Hook。
  * @author 鸡哥
  */
 
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import {
-  SPLASH_WAVE_FRAGMENT_SHADER,
-  SPLASH_WAVE_VERTEX_SHADER,
-} from '../config/splashWaveShaders';
-import { compileSplashWaveShader } from '../utils/compileSplashWaveShader';
+  WAVE_FRAGMENT_SHADER,
+  WAVE_VERTEX_SHADER,
+} from '../config/waveShaders';
+import { compileWaveShader } from '../utils/compileWaveShader';
 
 /**
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
@@ -40,7 +40,7 @@ import { compileSplashWaveShader } from '../utils/compileSplashWaveShader';
  * @param playing - 是否播放渲染循环。
  * @returns 无返回值。
  */
-export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true): void {
+export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true): void {
   const bgColorRef = useRef(bgColor);
   bgColorRef.current = bgColor;
 
@@ -75,8 +75,8 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     });
     if (!gl) return;
 
-    const vert = compileSplashWaveShader(gl, gl.VERTEX_SHADER, SPLASH_WAVE_VERTEX_SHADER);
-    const frag = compileSplashWaveShader(gl, gl.FRAGMENT_SHADER, SPLASH_WAVE_FRAGMENT_SHADER);
+    const vert = compileWaveShader(gl, gl.VERTEX_SHADER, WAVE_VERTEX_SHADER);
+    const frag = compileWaveShader(gl, gl.FRAGMENT_SHADER, WAVE_FRAGMENT_SHADER);
     if (!vert || !frag) return;
 
     const program = gl.createProgram();
@@ -89,7 +89,7 @@ export function useSplashWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | n
     gl.deleteShader(frag);
 
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.warn('[SplashWave] shader link failed:', gl.getProgramInfoLog(program));
+      console.warn('[WaveEffect] shader link failed:', gl.getProgramInfoLog(program));
       gl.deleteProgram(program);
       return;
     }

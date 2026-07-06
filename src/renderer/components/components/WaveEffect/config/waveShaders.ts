@@ -19,13 +19,13 @@
  */
 
 /**
- * @file splashWaveShaders.ts
- * @description 启动画面波浪背景 WebGL 着色器配置。
+ * @file waveShaders.ts
+ * @description 波浪背景 WebGL 着色器配置。
  * @author 鸡哥
  */
 
 /** 顶点着色器 */
-export const SPLASH_WAVE_VERTEX_SHADER = `
+export const WAVE_VERTEX_SHADER = `
 attribute vec2 aPosition;
 varying vec2 vUv;
 void main(){
@@ -35,7 +35,7 @@ void main(){
 `;
 
 /** 片段着色器 — 电子音浪效果（eisland 主题色） */
-export const SPLASH_WAVE_FRAGMENT_SHADER = `
+export const WAVE_FRAGMENT_SHADER = `
 precision highp float;
 varying vec2 vUv;
 uniform vec2 uResolution;
