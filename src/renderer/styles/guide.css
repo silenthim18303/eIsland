@@ -157,7 +157,12 @@ html, body {
 }
 
 .guide-next-btn {
-  padding: 10px 48px;
+  min-width: 140px;
+  height: 40px;
+  padding: 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.06);
