@@ -24,6 +24,8 @@
  * @author 鸡哥
  */
 
+import type { ReactNode } from 'react';
+
 /** SmtcStep 组件属性 */
 export interface SmtcStepProps {
   /** 确认后进入下一步的回调 */
@@ -50,4 +52,10 @@ export interface SmtcMediaMeta {
 export interface UseSmtcTestReturn {
   status: SmtcTestStatus;
   meta: SmtcMediaMeta | null;
+}
+
+/** MarqueeText 组件属性 */
+export interface MarqueeTextProps {
+  children: ReactNode;
+  className?: string;
 }

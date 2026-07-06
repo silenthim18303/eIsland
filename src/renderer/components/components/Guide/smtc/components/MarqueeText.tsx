@@ -24,40 +24,16 @@
  * @author 鸡哥
  */
 
-import { useRef, useState, useEffect, useCallback } from 'react';
-import type { CSSProperties, ReactElement, ReactNode } from 'react';
-
-interface MarqueeTextProps {
-  children: ReactNode;
-  className?: string;
-}
+import type { CSSProperties, ReactElement } from 'react';
+import type { MarqueeTextProps } from '../types';
+import { useMarqueeOverflow } from '../hooks/useMarqueeOverflow';
 
 /**
  * 溢出滚动文本
  * @description 文本超出容器宽度时自动播放滚动动画
  */
 export function MarqueeText({ children, className }: MarqueeTextProps): ReactElement {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLSpanElement>(null);
-  const [distance, setDistance] = useState(0);
-
-  const checkOverflow = useCallback((): void => {
-    const container = containerRef.current;
-    const text = textRef.current;
-    if (!container || !text) {
-      setDistance(0);
-      return;
-    }
-    const diff = text.scrollWidth - container.clientWidth;
-    setDistance(diff > 0 ? diff : 0);
-  }, []);
-
-  useEffect(() => {
-    checkOverflow();
-    const observer = new ResizeObserver(checkOverflow);
-    if (containerRef.current) observer.observe(containerRef.current);
-    return () => { observer.disconnect(); };
-  }, [checkOverflow, children]);
+  const { containerRef, textRef, distance } = useMarqueeOverflow(children);
 
   const marqueeStyle: CSSProperties | undefined = distance > 0
     ? { '--marquee-distance': `${-distance}px` } as CSSProperties
