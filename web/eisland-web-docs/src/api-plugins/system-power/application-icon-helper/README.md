@@ -16,6 +16,7 @@ Extract Windows application and process icons by name, PID, path, or shortcut vi
 
 | Type | Name | Description |
 |------|------|-------------|
+| Interface | [IconResult](icon-result.md) | Icon data structure |
 | Function | [getIconByProcessName](get-icon-by-process-name.md) | Get icon by running process name |
 | Function | [getIconByPid](get-icon-by-pid.md) | Get icon by process ID |
 | Function | [getIconByPath](get-icon-by-path.md) | Get icon by executable file path |

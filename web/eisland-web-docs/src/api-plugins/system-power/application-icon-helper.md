@@ -12,6 +12,12 @@ icon: icons
 Extract Windows application and process icons by name, PID, path, or shortcut via .NET NativeAOT DLL (koffi FFI). This plugin provides a unified interface for retrieving application icons as PNG buffers using Windows Shell32 APIs.
 :::
 
+## Interfaces
+
+| Interface | Description |
+|-----------|-------------|
+| [IconResult](application-icon-helper/icon-result.md) | Icon data structure |
+
 ## Functions
 
 | Function | Description |
@@ -22,7 +28,7 @@ Extract Windows application and process icons by name, PID, path, or shortcut vi
 | [getIconByShortcutPath](application-icon-helper/get-icon-by-shortcut-path.md) | Get icon by shortcut (.lnk) path |
 
 :::tip
-All icon functions return `Buffer | null`. The buffer contains raw PNG image data. Returns `null` when the icon cannot be found or the target doesn't exist.
+All icon functions return `IconResult | null`. The result contains PNG image data, size, and format. Returns `null` when the icon cannot be found or the target doesn't exist.
 :::
 
 ## Build

@@ -13,7 +13,7 @@ Retrieves the application icon by resolving a Windows shortcut (.lnk) file. This
 ## Signature
 
 ```typescript
-function getIconByShortcutPath(lnkPath: string): Buffer | null;
+function getIconByShortcutPath(lnkPath: string): IconResult | null;
 ```
 
 ## Parameters
@@ -45,9 +45,9 @@ This function uses COM interop internally. It initializes COM with apartment thr
 
 | Type | Description |
 |------|-------------|
-| `Buffer \| null` | PNG icon data, or `null` if shortcut not found |
+| `IconResult \| null` | Icon result object, or `null` if shortcut not found |
 
-The buffer contains raw PNG image data from the shortcut's target executable.
+Returns an [IconResult](icon-result.md) object containing PNG icon data, size, and format from the shortcut's target executable. Returns `null` if the shortcut cannot be resolved.
 
 :::warning
 If the target executable has been moved or deleted since the shortcut was created, this function returns `null`. The shortcut file itself must exist on disk.
@@ -71,18 +71,18 @@ const lnkFiles = fs.readdirSync(desktopPath)
   .map((f: string) => path.join(desktopPath, f));
 
 if (lnkFiles.length > 0) {
-  const icon = getIconByShortcutPath(lnkFiles[0]);
-  if (icon) {
-    console.log(`Shortcut icon: ${icon.length} bytes`);
+  const result = getIconByShortcutPath(lnkFiles[0]);
+  if (result) {
+    console.log(`Shortcut icon: ${result.size} bytes`);
     // Convert to data URL for display in HTML
-    const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+    const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
   } else {
     console.log('Could not retrieve icon from shortcut');
   }
 }
 
 // Returns null for non-.lnk files
-const icon2 = getIconByShortcutPath('C:\\Windows\\notepad.exe');
+const result2 = getIconByShortcutPath('C:\\Windows\\notepad.exe');
 ```
 
 @tab JavaScript
@@ -99,18 +99,18 @@ const lnkFiles = fs.readdirSync(desktopPath)
   .map((f) => path.join(desktopPath, f));
 
 if (lnkFiles.length > 0) {
-  const icon = getIconByShortcutPath(lnkFiles[0]);
-  if (icon) {
-    console.log(`Shortcut icon: ${icon.length} bytes`);
+  const result = getIconByShortcutPath(lnkFiles[0]);
+  if (result) {
+    console.log(`Shortcut icon: ${result.size} bytes`);
     // Convert to data URL for display in HTML
-    const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+    const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
   } else {
     console.log('Could not retrieve icon from shortcut');
   }
 }
 
 // Returns null for non-.lnk files
-const icon2 = getIconByShortcutPath('C:\\Windows\\notepad.exe');
+const result2 = getIconByShortcutPath('C:\\Windows\\notepad.exe');
 ```
 
 :::

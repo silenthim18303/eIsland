@@ -13,7 +13,7 @@ Retrieves the application icon for a process by its Process ID (PID). This funct
 ## Signature
 
 ```typescript
-function getIconByPid(pid: number): Buffer | null;
+function getIconByPid(pid: number): IconResult | null;
 ```
 
 ## Parameters
@@ -45,9 +45,9 @@ This function tries the .NET Process API first, then falls back to the Win32 `Qu
 
 | Type | Description |
 |------|-------------|
-| `Buffer \| null` | PNG icon data, or `null` if process not found |
+| `IconResult \| null` | Icon result object, or `null` if process not found |
 
-The buffer contains raw PNG image data. You can save it directly to a file or convert it to a data URL for display.
+Returns an [IconResult](icon-result.md) object containing PNG icon data, size, and format. Returns `null` if the process is not found or inaccessible.
 
 :::warning
 Access to process information may be restricted. If you don't have permission to query the process, this function returns `null`.
@@ -63,22 +63,22 @@ Access to process information may be restricted. If you don't have permission to
 import { getIconByPid } from '@eisland/windows-application-icon-helper';
 
 // Get icon for current Node.js process
-const icon = getIconByPid(process.pid);
+const result = getIconByPid(process.pid);
 
-if (icon) {
-  console.log(`Current process icon: ${icon.length} bytes`);
+if (result) {
+  console.log(`Current process icon: ${result.size} bytes`);
   // Convert to data URL for display in HTML
-  const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+  const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
 } else {
   console.log('Could not retrieve icon');
 }
 
 // Get icon for a specific PID
-const icon2 = getIconByPid(1234);
+const result2 = getIconByPid(1234);
 
 // Returns null for invalid PIDs
-const icon3 = getIconByPid(0);        // System Idle Process
-const icon4 = getIconByPid(99999999); // Non-existent
+const result3 = getIconByPid(0);        // System Idle Process
+const result4 = getIconByPid(99999999); // Non-existent
 ```
 
 @tab JavaScript
@@ -87,22 +87,22 @@ const icon4 = getIconByPid(99999999); // Non-existent
 const { getIconByPid } = require('@eisland/windows-application-icon-helper');
 
 // Get icon for current Node.js process
-const icon = getIconByPid(process.pid);
+const result = getIconByPid(process.pid);
 
-if (icon) {
-  console.log(`Current process icon: ${icon.length} bytes`);
+if (result) {
+  console.log(`Current process icon: ${result.size} bytes`);
   // Convert to data URL for display in HTML
-  const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+  const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
 } else {
   console.log('Could not retrieve icon');
 }
 
 // Get icon for a specific PID
-const icon2 = getIconByPid(1234);
+const result2 = getIconByPid(1234);
 
 // Returns null for invalid PIDs
-const icon3 = getIconByPid(0);        // System Idle Process
-const icon4 = getIconByPid(99999999); // Non-existent
+const result3 = getIconByPid(0);        // System Idle Process
+const result4 = getIconByPid(99999999); // Non-existent
 ```
 
 :::

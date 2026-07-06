@@ -13,7 +13,7 @@ Retrieves the application icon by its executable file path. This function uses `
 ## Signature
 
 ```typescript
-function getIconByPath(exePath: string): Buffer | null;
+function getIconByPath(exePath: string): IconResult | null;
 ```
 
 ## Parameters
@@ -45,9 +45,9 @@ This function works for any file type, not just executables. For non-exe files, 
 
 | Type | Description |
 |------|-------------|
-| `Buffer \| null` | PNG icon data, or `null` if file not found |
+| `IconResult \| null` | Icon result object, or `null` if file not found |
 
-The buffer contains raw PNG image data. You can save it directly to a file or convert it to a data URL for display.
+Returns an [IconResult](icon-result.md) object containing PNG icon data, size, and format. Returns `null` if the file is not found.
 
 :::warning
 The path must be a valid file path. Directory paths may return a folder icon or `null` depending on the system configuration.
@@ -64,22 +64,22 @@ import { getIconByPath } from '@eisland/windows-application-icon-helper';
 import * as path from 'path';
 
 // Get icon for the current Node.js executable
-const icon = getIconByPath(process.execPath);
+const result = getIconByPath(process.execPath);
 
-if (icon) {
-  console.log(`Node.js icon: ${icon.length} bytes`);
+if (result) {
+  console.log(`Node.js icon: ${result.size} bytes`);
   // Convert to data URL for display in HTML
-  const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+  const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
 } else {
   console.log('Could not retrieve icon');
 }
 
 // Get icon for Windows Notepad
 const notepadPath = path.join(process.env.SYSTEMROOT!, 'notepad.exe');
-const icon2 = getIconByPath(notepadPath);
+const result2 = getIconByPath(notepadPath);
 
 // Returns null for non-existent paths
-const icon3 = getIconByPath('C:\\nonexistent\\file.exe');
+const result3 = getIconByPath('C:\\nonexistent\\file.exe');
 ```
 
 @tab JavaScript
@@ -89,22 +89,22 @@ const { getIconByPath } = require('@eisland/windows-application-icon-helper');
 const path = require('path');
 
 // Get icon for the current Node.js executable
-const icon = getIconByPath(process.execPath);
+const result = getIconByPath(process.execPath);
 
-if (icon) {
-  console.log(`Node.js icon: ${icon.length} bytes`);
+if (result) {
+  console.log(`Node.js icon: ${result.size} bytes`);
   // Convert to data URL for display in HTML
-  const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+  const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
 } else {
   console.log('Could not retrieve icon');
 }
 
 // Get icon for Windows Notepad
 const notepadPath = path.join(process.env.SYSTEMROOT, 'notepad.exe');
-const icon2 = getIconByPath(notepadPath);
+const result2 = getIconByPath(notepadPath);
 
 // Returns null for non-existent paths
-const icon3 = getIconByPath('C:\\nonexistent\\file.exe');
+const result3 = getIconByPath('C:\\nonexistent\\file.exe');
 ```
 
 :::

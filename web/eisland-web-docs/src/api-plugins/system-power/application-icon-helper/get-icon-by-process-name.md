@@ -13,7 +13,7 @@ Retrieves the application icon for a running process by its name. This function 
 ## Signature
 
 ```typescript
-function getIconByProcessName(processName: string): Buffer | null;
+function getIconByProcessName(processName: string): IconResult | null;
 ```
 
 ## Parameters
@@ -44,9 +44,9 @@ The process name is case-insensitive. You can pass either `'explorer'` or `'Expl
 
 | Type | Description |
 |------|-------------|
-| `Buffer \| null` | PNG icon data, or `null` if process not found |
+| `IconResult \| null` | Icon result object, or `null` if process not found |
 
-The buffer contains raw PNG image data. You can save it directly to a file or convert it to a data URL for display.
+Returns an [IconResult](icon-result.md) object containing PNG icon data, size, and format. Returns `null` if the process is not found or inaccessible.
 
 :::warning
 This function only works for processes you have permission to access. System processes (e.g., `csrss`, `lsass`) may return `null` due to access restrictions.
@@ -62,21 +62,21 @@ This function only works for processes you have permission to access. System pro
 import { getIconByProcessName } from '@eisland/windows-application-icon-helper';
 
 // Get icon for Windows Explorer
-const icon = getIconByProcessName('explorer');
+const result = getIconByProcessName('explorer');
 
-if (icon) {
-  console.log(`Explorer icon: ${icon.length} bytes`);
+if (result) {
+  console.log(`Explorer icon: ${result.size} bytes`);
   // Convert to data URL for display in HTML
-  const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+  const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
 } else {
   console.log('Process not found or inaccessible');
 }
 
 // Also works with .exe extension
-const icon2 = getIconByProcessName('chrome.exe');
+const result2 = getIconByProcessName('chrome.exe');
 
 // Returns null for non-running processes
-const icon3 = getIconByProcessName('nonexistent');
+const result3 = getIconByProcessName('nonexistent');
 ```
 
 @tab JavaScript
@@ -85,21 +85,21 @@ const icon3 = getIconByProcessName('nonexistent');
 const { getIconByProcessName } = require('@eisland/windows-application-icon-helper');
 
 // Get icon for Windows Explorer
-const icon = getIconByProcessName('explorer');
+const result = getIconByProcessName('explorer');
 
-if (icon) {
-  console.log(`Explorer icon: ${icon.length} bytes`);
+if (result) {
+  console.log(`Explorer icon: ${result.size} bytes`);
   // Convert to data URL for display in HTML
-  const dataUrl = `data:image/png;base64,${icon.toString('base64')}`;
+  const dataUrl = `data:image/png;base64,${result.data.toString('base64')}`;
 } else {
   console.log('Process not found or inaccessible');
 }
 
 // Also works with .exe extension
-const icon2 = getIconByProcessName('chrome.exe');
+const result2 = getIconByProcessName('chrome.exe');
 
 // Returns null for non-running processes
-const icon3 = getIconByProcessName('nonexistent');
+const result3 = getIconByProcessName('nonexistent');
 ```
 
 :::
