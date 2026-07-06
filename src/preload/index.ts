@@ -26,6 +26,55 @@
 
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
+import type {
+  Point,
+  Bounds,
+  IslandDisplayInfo,
+  SearchLocalFilesOptions,
+  SearchLocalFileResult,
+  SaveTextFilePayload,
+  SaveTextFileResult,
+  ComputeFileHashResult,
+  ExecuteAgentLocalToolRequest,
+  ExecuteAgentLocalToolResult,
+  OllamaChatRequest,
+  ChatEvent,
+  ChatStartResult,
+  ChatAbortResult,
+  CustomDirectChatRequest,
+  NowPlayingInfo,
+  SmtcTimestampResult,
+  DetectSourceAppIdResult,
+  ImageCompressionStartPayload,
+  ImageCompressionStartResult,
+  ImageCompressionTask,
+  SaveImageAsResult,
+  ResolveShortcutResult,
+  ExtractVideoTrackOptions,
+  ExtractVideoTrackResult,
+  PickVideoForExtractResult,
+  NetFetchOptions,
+  NetFetchResult,
+  MailInboxResult,
+  NavOrderPayload,
+  SetWallpaperPayload,
+  DownloadStartPayload,
+  DownloadStartResult,
+  DownloadTask,
+  UpdaterCheckResult,
+  UpdaterProgress,
+  UpdaterDownloadedData,
+  UpdaterAvailableData,
+  UpdaterNotAvailableData,
+  UpdaterStartupAutoCheckRequestData,
+  ClipboardUrlsDetectedData,
+  ExternalAgentData,
+  SourceSwitchRequestData,
+  RunningProcessInfo,
+  RunningWindowInfo,
+  ClaudeCodeStatusSnapshot,
+  ClaudeCodeHookMutationResult,
+} from './types';
 
 /** 自定义 API，供渲染进程调用 */
 const api = {
@@ -102,20 +151,20 @@ const api = {
    * 获取当前鼠标位置（屏幕坐标）
    * @returns 包含 x、y 坐标的对象
    */
-  getMousePosition: (): Promise<{ x: number; y: number }> => {
+  getMousePosition: (): Promise<Point> => {
     return ipcRenderer.invoke('window:get-mouse-position');
   },
   /**
    * 获取窗口边界信息
    * @returns 包含 x、y、width、height 的边界对象
    */
-  getWindowBounds: (): Promise<{ x: number; y: number; width: number; height: number }> => {
+  getWindowBounds: (): Promise<Bounds> => {
     return ipcRenderer.invoke('window:get-bounds');
   },
   /**
    * 获取可用于灵动岛显示的显示器列表
    */
-  getIslandDisplays: (): Promise<Array<{ id: string; width: number; height: number; isPrimary: boolean }>> => {
+  getIslandDisplays: (): Promise<IslandDisplayInfo[]> => {
     return ipcRenderer.invoke('window:island-displays:list');
   },
   /**
@@ -134,14 +183,14 @@ const api = {
    * 获取灵动岛位置偏移
    * @returns 相对主屏工作区顶部居中的偏移
    */
-  getIslandPositionOffset: (): Promise<{ x: number; y: number }> => {
+  getIslandPositionOffset: (): Promise<Point> => {
     return ipcRenderer.invoke('window:island-position:get');
   },
   /**
    * 设置并保存灵动岛位置偏移
    * @param offset - 相对主屏工作区顶部居中的偏移
    */
-  setIslandPositionOffset: (offset: { x: number; y: number }): Promise<boolean> => {
+  setIslandPositionOffset: (offset: Point): Promise<boolean> => {
     return ipcRenderer.invoke('window:island-position:set', offset);
   },
   /**
@@ -149,8 +198,8 @@ const api = {
    * @param callback - 回调函数
    * @returns 取消订阅函数
    */
-  onIslandPositionOffsetChanged: (callback: (offset: { x: number; y: number }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, offset: { x: number; y: number }) => {
+  onIslandPositionOffsetChanged: (callback: (offset: Point) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, offset: Point) => {
       callback(offset);
     };
     ipcRenderer.on('window:island-position:changed', handler);
@@ -209,11 +258,7 @@ const api = {
   /**
    * 保存文本文件内容
    */
-  saveTextFile: (payload: {
-    defaultPath: string;
-    content: string;
-    filters?: Array<{ name: string; extensions: string[] }>;
-  }): Promise<{ ok: boolean; canceled: boolean; filePath: string | null }> => {
+  saveTextFile: (payload: SaveTextFilePayload): Promise<SaveTextFileResult> => {
     return ipcRenderer.invoke('app:save-text-file', payload);
   },
   /**
@@ -222,34 +267,14 @@ const api = {
   searchLocalFiles: (
     rootDir: string,
     keyword: string,
-    options?: {
-      limit?: number;
-      maxDepth?: number;
-      includeDirectories?: boolean;
-      includeFiles?: boolean;
-      includeHidden?: boolean;
-      caseSensitive?: boolean;
-      matchMode?: 'contains' | 'startsWith' | 'endsWith' | 'exact';
-      matchScope?: 'name' | 'path';
-      extensions?: string[];
-      excludeDirs?: string[];
-    },
-  ): Promise<Array<{ name: string; path: string; isDirectory: boolean }>> => {
+    options?: SearchLocalFilesOptions,
+  ): Promise<SearchLocalFileResult[]> => {
     return ipcRenderer.invoke('app:search-local-files', rootDir, keyword, options);
   },
   /**
    * 执行本地 Agent 工具（主进程执行）
    */
-  executeAgentLocalTool: (request: {
-    tool: string;
-    arguments?: Record<string, unknown>;
-    workspaces?: string[];
-  }): Promise<{
-    success: boolean;
-    result: unknown;
-    error: string;
-    durationMs: number;
-  }> => {
+  executeAgentLocalTool: (request: ExecuteAgentLocalToolRequest): Promise<ExecuteAgentLocalToolResult> => {
     return ipcRenderer.invoke('agent:local-tool:execute', request);
   },
   /**
@@ -275,21 +300,14 @@ const api = {
    */
   ollamaChatStart: (
     sessionId: string,
-    request: {
-      model: string;
-      systemPrompt: string;
-      userMessage: string;
-      context?: string;
-      baseUrl?: string;
-      temperature?: number;
-    },
-  ): Promise<{ started: boolean; sessionId: string }> => {
+    request: OllamaChatRequest,
+  ): Promise<ChatStartResult> => {
     return ipcRenderer.invoke('ollama:chat:start', sessionId, request);
   },
   /**
    * 中止 Ollama 本地编排会话
    */
-  ollamaChatAbort: (sessionId: string): Promise<{ aborted: boolean }> => {
+  ollamaChatAbort: (sessionId: string): Promise<ChatAbortResult> => {
     return ipcRenderer.invoke('ollama:chat:abort', sessionId);
   },
   /**
@@ -300,12 +318,12 @@ const api = {
    */
   onOllamaChatEvent: (
     sessionId: string,
-    callback: (event: { type: string; payload: Record<string, unknown> }) => void,
+    callback: (event: ChatEvent) => void,
   ): (() => void) => {
     const channel = `ollama:chat:event:${sessionId}`;
     const handler = (
       _event: Electron.IpcRendererEvent,
-      data: { type: string; payload: Record<string, unknown> },
+      data: ChatEvent,
     ): void => {
       callback(data);
     };
@@ -319,22 +337,14 @@ const api = {
    */
   customDirectChatStart: (
     sessionId: string,
-    request: {
-      model: string;
-      systemPrompt: string;
-      userMessage: string;
-      context?: string;
-      baseUrl: string;
-      apiKey: string;
-      temperature?: number;
-    },
-  ): Promise<{ started: boolean; sessionId: string }> => {
+    request: CustomDirectChatRequest,
+  ): Promise<ChatStartResult> => {
     return ipcRenderer.invoke('customDirect:chat:start', sessionId, request);
   },
   /**
    * 中止自定义 API 直连编排会话
    */
-  customDirectChatAbort: (sessionId: string): Promise<{ aborted: boolean }> => {
+  customDirectChatAbort: (sessionId: string): Promise<ChatAbortResult> => {
     return ipcRenderer.invoke('customDirect:chat:abort', sessionId);
   },
   /**
@@ -342,12 +352,12 @@ const api = {
    */
   onCustomDirectChatEvent: (
     sessionId: string,
-    callback: (event: { type: string; payload: Record<string, unknown> }) => void,
+    callback: (event: ChatEvent) => void,
   ): (() => void) => {
     const channel = `customDirect:chat:event:${sessionId}`;
     const handler = (
       _event: Electron.IpcRendererEvent,
-      data: { type: string; payload: Record<string, unknown> },
+      data: ChatEvent,
     ): void => {
       callback(data);
     };
@@ -525,12 +535,7 @@ const api = {
    * @param filePath - 文件绝对路径
    * @param algorithm - 哈希算法 (md5 | sha1 | sha256 | sha512)
    */
-  computeFileHash: (filePath: string, algorithm: string): Promise<{
-    hash: string;
-    algorithm: string;
-    fileName: string;
-    fileSize: number;
-  } | null> => {
+  computeFileHash: (filePath: string, algorithm: string): Promise<ComputeFileHashResult | null> => {
     return ipcRenderer.invoke('app:compute-file-hash', filePath, algorithm);
   },
   /**
@@ -548,81 +553,17 @@ const api = {
   /**
    * 启动图片压缩任务（输出格式与原格式一致）
    */
-  imageCompressionStart: (payload: {
-    inputPaths: string[];
-    outputDir?: string;
-    quality?: number;
-  }): Promise<{
-    ok: boolean;
-    results?: Array<{
-      id: string;
-      fileName: string;
-      inputPath: string;
-      outputPath: string;
-      quality: number;
-      status: 'completed' | 'failed';
-      success: boolean;
-      originalBytes: number;
-      compressedBytes: number;
-      ratio: number;
-      error?: string;
-      createdAt: number;
-      updatedAt: number;
-    }>;
-    message?: string;
-  }> => {
+  imageCompressionStart: (payload: ImageCompressionStartPayload): Promise<ImageCompressionStartResult> => {
     return ipcRenderer.invoke('image-compression:start', payload);
   },
-  imageCompressionList: (): Promise<Array<{
-    id: string;
-    fileName: string;
-    inputPath: string;
-    outputPath: string;
-    quality: number;
-    status: 'completed' | 'failed';
-    success: boolean;
-    originalBytes: number;
-    compressedBytes: number;
-    ratio: number;
-    error?: string;
-    createdAt: number;
-    updatedAt: number;
-  }>> => {
+  imageCompressionList: (): Promise<ImageCompressionTask[]> => {
     return ipcRenderer.invoke('image-compression:list');
   },
   imageCompressionRemove: (taskId: string): Promise<boolean> => {
     return ipcRenderer.invoke('image-compression:remove', taskId);
   },
-  onImageCompressionTaskUpdated: (callback: (task: {
-    id: string;
-    fileName: string;
-    inputPath: string;
-    outputPath: string;
-    quality: number;
-    status: 'completed' | 'failed';
-    success: boolean;
-    originalBytes: number;
-    compressedBytes: number;
-    ratio: number;
-    error?: string;
-    createdAt: number;
-    updatedAt: number;
-  }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, task: {
-      id: string;
-      fileName: string;
-      inputPath: string;
-      outputPath: string;
-      quality: number;
-      status: 'completed' | 'failed';
-      success: boolean;
-      originalBytes: number;
-      compressedBytes: number;
-      ratio: number;
-      error?: string;
-      createdAt: number;
-      updatedAt: number;
-    }): void => {
+  onImageCompressionTaskUpdated: (callback: (task: ImageCompressionTask) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, task: ImageCompressionTask): void => {
       callback(task);
     };
     ipcRenderer.on('image-compression:task-updated', handler);
@@ -635,7 +576,7 @@ const api = {
    * @param sourcePath - 源图片绝对路径
    * @returns 保存结果（ok/canceled/filePath）
    */
-  saveImageAs: (sourcePath: string): Promise<{ ok: boolean; canceled: boolean; filePath: string | null }> => {
+  saveImageAs: (sourcePath: string): Promise<SaveImageAsResult> => {
     return ipcRenderer.invoke('app:save-image-as', sourcePath);
   },
   /**
@@ -643,7 +584,7 @@ const api = {
    * @param lnkPath - .lnk 文件路径
    * @returns 目标路径和名称，或 null
    */
-  resolveShortcut: (lnkPath: string): Promise<{ target: string; name: string } | null> => {
+  resolveShortcut: (lnkPath: string): Promise<ResolveShortcutResult | null> => {
     return ipcRenderer.invoke('app:resolve-shortcut', lnkPath);
   },
   /** ===== 文件选择对话框 API ===== */
@@ -679,7 +620,7 @@ const api = {
    * 将当前背景同步设置为 Windows 系统桌面壁纸
    * @param payload - 背景源路径和预览地址
    */
-  setSystemDesktopWallpaper: (payload: { sourcePath?: string | null; previewUrl?: string | null; clear?: boolean }): Promise<boolean> => {
+  setSystemDesktopWallpaper: (payload: SetWallpaperPayload): Promise<boolean> => {
     return ipcRenderer.invoke('wallpaper:system:set', payload);
   },
   /**
@@ -701,7 +642,7 @@ const api = {
    * 选择视频文件对话框
    * @returns 文件路径和大小，取消返回 null
    */
-  pickVideoForExtract: (): Promise<{ filePath: string; fileSize: number | null } | null> => {
+  pickVideoForExtract: (): Promise<PickVideoForExtractResult | null> => {
     return ipcRenderer.invoke('format-factory:pick-video');
   },
   /**
@@ -709,11 +650,7 @@ const api = {
    * @param options - 提取选项
    * @returns 提取结果
    */
-  extractVideoTrack: (options: {
-    filePath: string;
-    trackType: string;
-    outputFormat: string;
-  }): Promise<{ success: boolean; outputPath?: string; error?: string; fileSize?: number }> => {
+  extractVideoTrack: (options: ExtractVideoTrackOptions): Promise<ExtractVideoTrackResult> => {
     return ipcRenderer.invoke('format-factory:extract-track', options);
   },
   /** ===== HTTP 代理 API（绕过 CORS） ===== */
@@ -723,19 +660,14 @@ const api = {
    * @param options - 请求选项
    * @returns 响应结果
    */
-  netFetch: (url: string, options?: {
-    method?: string;
-    headers?: Record<string, string>;
-    body?: string;
-    timeoutMs?: number;
-  }): Promise<{ ok: boolean; status: number; body: string }> => {
+  netFetch: (url: string, options?: NetFetchOptions): Promise<NetFetchResult> => {
     return ipcRenderer.invoke('net:fetch', url, options);
   },
   /** ===== 邮件 API ===== */
   /**
    * 读取收件箱邮件列表
    */
-  mailInboxList: (configOrLimit?: Record<string, unknown> | number, limit?: number): Promise<{ ok: boolean; items: Array<{ uid: string; subject: string; from: string; to: string; date: string; size: number; preview: string; body: string }>; message: string }> => {
+  mailInboxList: (configOrLimit?: Record<string, unknown> | number, limit?: number): Promise<MailInboxResult> => {
     return ipcRenderer.invoke('mail:inbox:list', configOrLimit, limit);
   },
   /** ===== 文件存储 API ===== */
@@ -1125,7 +1057,7 @@ const api = {
    * 查询当前所有 SMTC 媒体会话播放源
    * @returns 检测到的播放源列表
    */
-  musicDetectSourceAppId: (): Promise<{ ok: boolean; sources: Array<{ sourceAppId: string; isPlaying: boolean; hasTitle: boolean; thumbnail: string | null }>; message: string }> => {
+  musicDetectSourceAppId: (): Promise<DetectSourceAppIdResult> => {
     return ipcRenderer.invoke('music:detect-source-app-id');
   },
   /**
@@ -1133,7 +1065,7 @@ const api = {
    * 用于歌词校准等仅需播放位置的场景
    * @returns 时间戳信息
    */
-  smtcGetTimestamp: (): Promise<{ isAvailable: boolean; playbackStatus: string; timeline: { startTime: number; endTime: number; position: number; minSeekTime: number; maxSeekTime: number } | null }> => {
+  smtcGetTimestamp: (): Promise<SmtcTimestampResult> => {
     return ipcRenderer.invoke('smtc:get-timestamp');
   },
   /** 获取当前运行中的非系统进程列表 */
@@ -1141,15 +1073,15 @@ const api = {
     return ipcRenderer.invoke('system:running-processes:get');
   },
   /** 获取当前运行中的非系统进程列表（包含图标） */
-  getRunningNonSystemProcessesWithIcons: (): Promise<Array<{ name: string; iconDataUrl: string | null }>> => {
+  getRunningNonSystemProcessesWithIcons: (): Promise<RunningProcessInfo[]> => {
     return ipcRenderer.invoke('system:running-processes:with-icons:get');
   },
   /** 获取当前打开窗口列表（包含图标） */
-  getOpenWindowsWithIcons: (): Promise<Array<{ id: string; title: string; processName: string; processPath: string | null; processId: number | null; iconDataUrl: string | null }>> => {
+  getOpenWindowsWithIcons: (): Promise<RunningWindowInfo[]> => {
     return ipcRenderer.invoke('system:open-windows:with-icons:get');
   },
   /** 获取当前焦点窗口 */
-  getFocusedWindow: (): Promise<{ id: string; title: string; processName: string; processPath: string | null; processId: number | null; iconDataUrl: string | null } | null> => {
+  getFocusedWindow: (): Promise<RunningWindowInfo | null> => {
     return ipcRenderer.invoke('system:focused-window:get');
   },
   /** 获取隐藏进程名单 */
@@ -1169,8 +1101,8 @@ const api = {
     return ipcRenderer.invoke('hide-process-list:auto-hide-fullscreen:set', enabled);
   },
   /** 订阅播放源切换请求（主进程推送） */
-  onSourceSwitchRequest: (callback: (data: { sourceAppId: string; title: string; artist: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { sourceAppId: string; title: string; artist: string }) => {
+  onSourceSwitchRequest: (callback: (data: SourceSwitchRequestData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: SourceSwitchRequestData) => {
       callback(data);
     };
     ipcRenderer.on('media:source-switch-request', handler);
@@ -1362,33 +1294,18 @@ const api = {
   /**
    * 获取快速导航卡片配置
    */
-  navOrderGet: (): Promise<{ visibleOrder: string[]; hiddenOrder: string[] }> => {
+  navOrderGet: (): Promise<NavOrderPayload> => {
     return ipcRenderer.invoke('island:nav-order:get');
   },
   /**
    * 设置快速导航卡片配置
    */
-  navOrderSet: (payload: { visibleOrder: string[]; hiddenOrder: string[] }): Promise<boolean> => {
+  navOrderSet: (payload: NavOrderPayload): Promise<boolean> => {
     return ipcRenderer.invoke('island:nav-order:set', payload);
   },
 
   // ===== 下载工具 =====
-  downloadStart: (payload: { url: string; savePath?: string; threads?: number }): Promise<{ ok: boolean; task?: {
-    id: string;
-    url: string;
-    savePath: string;
-    fileName: string;
-    totalBytes: number;
-    downloadedBytes: number;
-    progress: number;
-    speedBytesPerSecond: number;
-    estimatedFinishAt: number | null;
-    threads: number;
-    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-    errorMessage?: string;
-    createdAt: number;
-    updatedAt: number;
-  }; message?: string }> => {
+  downloadStart: (payload: DownloadStartPayload): Promise<DownloadStartResult> => {
     return ipcRenderer.invoke('download:start', payload);
   },
   downloadCancel: (taskId: string): Promise<boolean> => {
@@ -1397,43 +1314,13 @@ const api = {
   downloadPause: (taskId: string): Promise<boolean> => {
     return ipcRenderer.invoke('download:pause', taskId);
   },
-  downloadResume: (taskId: string): Promise<{ ok: boolean; task?: {
-    id: string;
-    url: string;
-    savePath: string;
-    fileName: string;
-    totalBytes: number;
-    downloadedBytes: number;
-    progress: number;
-    speedBytesPerSecond: number;
-    estimatedFinishAt: number | null;
-    threads: number;
-    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-    errorMessage?: string;
-    createdAt: number;
-    updatedAt: number;
-  }; message?: string }> => {
+  downloadResume: (taskId: string): Promise<DownloadStartResult> => {
     return ipcRenderer.invoke('download:resume', taskId);
   },
   downloadRemove: (taskId: string): Promise<boolean> => {
     return ipcRenderer.invoke('download:remove', taskId);
   },
-  downloadList: (): Promise<Array<{
-    id: string;
-    url: string;
-    savePath: string;
-    fileName: string;
-    totalBytes: number;
-    downloadedBytes: number;
-    progress: number;
-    speedBytesPerSecond: number;
-    estimatedFinishAt: number | null;
-    threads: number;
-    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-    errorMessage?: string;
-    createdAt: number;
-    updatedAt: number;
-  }>> => {
+  downloadList: (): Promise<DownloadTask[]> => {
     return ipcRenderer.invoke('download:list');
   },
   downloadPickSavePath: (suggestedName?: string): Promise<string | null> => {
@@ -1442,38 +1329,8 @@ const api = {
   downloadGetDefaultDir: (): Promise<string> => {
     return ipcRenderer.invoke('download:get-default-dir');
   },
-  onDownloadTaskUpdated: (callback: (task: {
-    id: string;
-    url: string;
-    savePath: string;
-    fileName: string;
-    totalBytes: number;
-    downloadedBytes: number;
-    progress: number;
-    speedBytesPerSecond: number;
-    estimatedFinishAt: number | null;
-    threads: number;
-    status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-    errorMessage?: string;
-    createdAt: number;
-    updatedAt: number;
-  }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, task: {
-      id: string;
-      url: string;
-      savePath: string;
-      fileName: string;
-      totalBytes: number;
-      downloadedBytes: number;
-      progress: number;
-      speedBytesPerSecond: number;
-      estimatedFinishAt: number | null;
-      threads: number;
-      status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
-      errorMessage?: string;
-      createdAt: number;
-      updatedAt: number;
-    }): void => {
+  onDownloadTaskUpdated: (callback: (task: DownloadTask) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, task: DownloadTask): void => {
       callback(task);
     };
     ipcRenderer.on('download:task-updated', handler);
@@ -1488,7 +1345,7 @@ const api = {
    * 检查更新
    * @returns 更新信息（是否有新版、版本号等）
    */
-  updaterCheck: (source?: string, resolvedUrl?: string): Promise<{ available: boolean; version?: string; releaseNotes?: string; currentVersion?: string; error?: string }> => {
+  updaterCheck: (source?: string, resolvedUrl?: string): Promise<UpdaterCheckResult> => {
     return ipcRenderer.invoke('updater:check', source, resolvedUrl);
   },
   /**
@@ -1515,8 +1372,8 @@ const api = {
    * @param callback - 下载进度回调
    * @returns 取消监听函数
    */
-  onUpdaterProgress: (callback: (progress: { percent: number; transferred: number; total: number; bytesPerSecond: number }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { percent: number; transferred: number; total: number; bytesPerSecond: number }): void => {
+  onUpdaterProgress: (callback: (progress: UpdaterProgress) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: UpdaterProgress): void => {
       callback(data);
     };
     ipcRenderer.on('updater:download-progress', handler);
@@ -1529,8 +1386,8 @@ const api = {
    * @param callback - 回调函数，接收版本号
    * @returns 取消监听函数
    */
-  onUpdaterDownloaded: (callback: (data: { version: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { version: string }): void => {
+  onUpdaterDownloaded: (callback: (data: UpdaterDownloadedData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: UpdaterDownloadedData): void => {
       callback(data);
     };
     ipcRenderer.on('updater:update-downloaded', handler);
@@ -1543,8 +1400,8 @@ const api = {
    * @param callback - 回调函数，接收版本号和更新说明
    * @returns 取消监听函数
    */
-  onUpdaterAvailable: (callback: (data: { version: string; releaseNotes: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { version: string; releaseNotes: string }): void => {
+  onUpdaterAvailable: (callback: (data: UpdaterAvailableData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: UpdaterAvailableData): void => {
       callback(data);
     };
     ipcRenderer.on('updater:update-available', handler);
@@ -1557,8 +1414,8 @@ const api = {
    * @param callback - 回调函数，接收当前版本号
    * @returns 取消监听函数
    */
-  onUpdaterNotAvailable: (callback: (data: { version: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { version: string }): void => {
+  onUpdaterNotAvailable: (callback: (data: UpdaterNotAvailableData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: UpdaterNotAvailableData): void => {
       callback(data);
     };
     ipcRenderer.on('updater:update-not-available', handler);
@@ -1571,8 +1428,8 @@ const api = {
    * @param callback - 回调函数，接收请求时间戳
    * @returns 取消监听函数
    */
-  onUpdaterStartupAutoCheckRequest: (callback: (data: { requestedAt: number }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { requestedAt: number }): void => {
+  onUpdaterStartupAutoCheckRequest: (callback: (data: UpdaterStartupAutoCheckRequestData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: UpdaterStartupAutoCheckRequestData): void => {
       callback(data);
     };
     ipcRenderer.on('updater:startup-auto-check-request', handler);
@@ -1586,8 +1443,8 @@ const api = {
    * @param callback - 回调函数，接收 URL 数组
    * @returns 取消监听函数
    */
-  onClipboardUrlsDetected: (callback: (data: { urls: string[]; title: string }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { urls: string[]; title: string }): void => {
+  onClipboardUrlsDetected: (callback: (data: ClipboardUrlsDetectedData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: ClipboardUrlsDetectedData): void => {
       callback(data);
     };
     ipcRenderer.on('clipboard:urls-detected', handler);
@@ -1608,8 +1465,8 @@ const api = {
    * @param callback - 收到事件时的回调，包含 agentNames 数组
    * @returns 取消订阅函数
    */
-  onExternalAgentStarted: (callback: (data: { agentNames: string[] }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { agentNames: string[] }): void => {
+  onExternalAgentStarted: (callback: (data: ExternalAgentData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: ExternalAgentData): void => {
       callback(data);
     };
     ipcRenderer.on('external-agent:started', handler);
@@ -1622,8 +1479,8 @@ const api = {
    * @param callback - 收到事件时的回调，包含 agentNames 数组
    * @returns 取消订阅函数
    */
-  onExternalAgentStopped: (callback: (data: { agentNames: string[] }) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, data: { agentNames: string[] }): void => {
+  onExternalAgentStopped: (callback: (data: ExternalAgentData) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: ExternalAgentData): void => {
       callback(data);
     };
     ipcRenderer.on('external-agent:stopped', handler);
@@ -1659,73 +1516,6 @@ const api = {
     };
   }
 };
-
-interface ClaudeCodeHookEventDetailItem {
-  label: string;
-  value: string;
-}
-
-interface ClaudeCodeHookEvent {
-  id: string;
-  eventName: string;
-  kind: 'session' | 'message' | 'tool' | 'permission' | 'notification' | 'completed' | 'unknown';
-  sessionId: string;
-  cwd: string | null;
-  transcriptPath: string | null;
-  summary: string;
-  detail: string | null;
-  detailItems: ClaudeCodeHookEventDetailItem[];
-  toolName: string | null;
-  toolInputPreview: string | null;
-  createdAt: number;
-  raw: Record<string, unknown>;
-}
-
-interface ClaudeCodeSessionSnapshot {
-  id: string;
-  title: string;
-  phase: 'idle' | 'running' | 'waiting_permission' | 'completed';
-  cwd: string | null;
-  transcriptPath: string | null;
-  lastSummary: string;
-  lastEventAt: number;
-  pendingPermission: ClaudeCodeHookEvent | null;
-  events: ClaudeCodeHookEvent[];
-}
-
-interface ClaudeCodeStatusSnapshot {
-  enabled: boolean;
-  receiverRunning: boolean;
-  receiverUrl: string | null;
-  settingsPath: string;
-  hookScriptPath: string;
-  sessions: ClaudeCodeSessionSnapshot[];
-  events: ClaudeCodeHookEvent[];
-  heatmap: Record<string, { session: number; tool: number; prompt: number }>;
-  updatedAt: number;
-}
-
-interface ClaudeCodeHookMutationResult {
-  ok: boolean;
-  message: string;
-  snapshot: ClaudeCodeStatusSnapshot;
-}
-
-/** 歌曲信息类型（与主进程发送的数据格式一致） */
-interface NowPlayingInfo {
-  title: string;
-  artist: string;
-  album: string;
-  duration_ms: number;
-  position_ms: number;
-  isPlaying: boolean;
-  thumbnail?: string | null;
-  canFastForward: boolean;
-  canSkip: boolean;
-  canLike: boolean;
-  canChangeVolume: boolean;
-  canSetOutput: boolean;
-}
 
 /** 注入到 window 对象，供渲染进程访问 */
 if (process.contextIsolated) {
