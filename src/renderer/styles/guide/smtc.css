@@ -66,11 +66,20 @@
 
 .guide-smtc-result {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 32px;
+  gap: 24px;
   width: 100%;
   max-width: 560px;
   padding: 0 20px;
+  transform: translateY(20px);
+}
+
+.guide-smtc-media-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
   perspective: 600px;
 }
 
@@ -175,4 +184,54 @@
 
 .guide-smtc-cover.paused {
   opacity: 0.7;
+}
+
+/* ===== 媒体控制按钮 ===== */
+
+.guide-smtc-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guide-smtc-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.guide-smtc-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.guide-smtc-ctrl-btn:active {
+  transform: scale(0.9);
+}
+
+.guide-smtc-ctrl-btn--play {
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.guide-smtc-ctrl-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+
+.guide-smtc-ctrl-icon--sm {
+  width: 14px;
+  height: 14px;
 }

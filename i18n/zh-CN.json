@@ -53,7 +53,11 @@
       "player": "播放器",
       "state": "状态",
       "playing": "播放中",
-      "paused": "已暂停"
+      "paused": "已暂停",
+      "prev": "上一曲",
+      "next": "下一曲",
+      "pause": "暂停",
+      "play": "播放"
     },
     "welcome": {
       "title": "欢迎使用 eIsland",

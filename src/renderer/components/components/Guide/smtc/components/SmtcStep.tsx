@@ -28,6 +28,7 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSmtcTest } from '../hooks/useSmtcTest';
 import { extractPlayerName } from '../utils/smtcUtils';
+import { SvgIcon } from '../../../../../utils/SvgIcon';
 import { MarqueeText } from './MarqueeText';
 import type { SmtcStepProps } from '../types';
 
@@ -58,43 +59,65 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
 
         {status === 'success' && meta && (
           <div className="guide-smtc-result">
-            <div className="guide-smtc-left">
-              <div
-                className="guide-smtc-glow"
-                style={{
-                  background: `radial-gradient(ellipse at center, rgba(${r}, ${g}, ${b}, 0.4) 0%, transparent 70%)`,
-                }}
-              />
-              <div
-                className={`guide-smtc-cover${!meta.isPlaying ? ' paused' : ''}`}
-                style={{
-                  backgroundImage: meta.coverImage ? `url(${meta.coverImage})` : undefined,
-                  boxShadow: `0 0 20px 6px rgba(${r}, ${g}, ${b}, 0.35)`,
-                }}
-              />
+            <div className="guide-smtc-media-row">
+              <div className="guide-smtc-left">
+                <div
+                  className="guide-smtc-glow"
+                  style={{
+                    background: `radial-gradient(ellipse at center, rgba(${r}, ${g}, ${b}, 0.4) 0%, transparent 70%)`,
+                  }}
+                />
+                <div
+                  className={`guide-smtc-cover${!meta.isPlaying ? ' paused' : ''}`}
+                  style={{
+                    backgroundImage: meta.coverImage ? `url(${meta.coverImage})` : undefined,
+                    boxShadow: `0 0 20px 6px rgba(${r}, ${g}, ${b}, 0.35)`,
+                  }}
+                />
+              </div>
+              <div className="guide-smtc-right">
+                <MarqueeText className="guide-smtc-title">{meta.title}</MarqueeText>
+                <MarqueeText className="guide-smtc-artist">{meta.artist}</MarqueeText>
+                {meta.album && <MarqueeText className="guide-smtc-album">{meta.album}</MarqueeText>}
+                <div className="guide-smtc-info">
+                  <span className="guide-smtc-info-label">
+                    {t('guide.smtc.player', { defaultValue: '播放器' })}
+                  </span>
+                  <span className="guide-smtc-info-value">
+                    {extractPlayerName(meta.sourceAppId)}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="guide-smtc-right">
-              <MarqueeText className="guide-smtc-title">{meta.title}</MarqueeText>
-              <MarqueeText className="guide-smtc-artist">{meta.artist}</MarqueeText>
-              {meta.album && <MarqueeText className="guide-smtc-album">{meta.album}</MarqueeText>}
-              <div className="guide-smtc-info">
-                <span className="guide-smtc-info-label">
-                  {t('guide.smtc.player', { defaultValue: '播放器' })}
-                </span>
-                <span className="guide-smtc-info-value">
-                  {extractPlayerName(meta.sourceAppId)}
-                </span>
-              </div>
-              <div className="guide-smtc-info">
-                <span className="guide-smtc-info-label">
-                  {t('guide.smtc.state', { defaultValue: '状态' })}
-                </span>
-                <span className="guide-smtc-info-value">
-                  {meta.isPlaying
-                    ? t('guide.smtc.playing', { defaultValue: '播放中' })
-                    : t('guide.smtc.paused', { defaultValue: '已暂停' })}
-                </span>
-              </div>
+
+            <div className="guide-smtc-controls">
+              <button
+                className="guide-smtc-ctrl-btn"
+                onClick={(): void => { window.api?.mediaPrev(); }}
+                title={t('guide.smtc.prev', { defaultValue: '上一曲' })}
+              >
+                <img src={SvgIcon.PREVIOUS_SONG} alt="" className="guide-smtc-ctrl-icon guide-smtc-ctrl-icon--sm" />
+              </button>
+              <button
+                className="guide-smtc-ctrl-btn guide-smtc-ctrl-btn--play"
+                onClick={(): void => { window.api?.mediaPlayPause(); }}
+                title={meta.isPlaying
+                  ? t('guide.smtc.pause', { defaultValue: '暂停' })
+                  : t('guide.smtc.play', { defaultValue: '播放' })}
+              >
+                {meta.isPlaying ? (
+                  <img src={SvgIcon.PAUSE} alt="" className="guide-smtc-ctrl-icon" />
+                ) : (
+                  <img src={SvgIcon.CONTINUE} alt="" className="guide-smtc-ctrl-icon" />
+                )}
+              </button>
+              <button
+                className="guide-smtc-ctrl-btn"
+                onClick={(): void => { window.api?.mediaNext(); }}
+                title={t('guide.smtc.next', { defaultValue: '下一曲' })}
+              >
+                <img src={SvgIcon.NEXT_SONG} alt="" className="guide-smtc-ctrl-icon guide-smtc-ctrl-icon--sm" />
+              </button>
             </div>
           </div>
         )}
