@@ -18,7 +18,8 @@ jobs:
         id: quality_check
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.BOT_PAT }}
+          # Fall back to GITHUB_TOKEN when BOT_PAT is unavailable (e.g. fork PRs)
+          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('node:fs');
             const { owner, repo } = context.repo;
@@ -270,7 +271,8 @@ jobs:
       - name: Create or update quality comment
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.BOT_PAT }}
+          # Fall back to GITHUB_TOKEN when BOT_PAT is unavailable (e.g. fork PRs)
+          github-token: ${{ secrets.BOT_PAT || secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('node:fs');
             const marker = '<!-- pr-auto-code-quality-review -->';

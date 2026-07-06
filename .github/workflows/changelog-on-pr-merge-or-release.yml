@@ -54,13 +54,14 @@ jobs:
 
           git config user.name "eislandBot"
           git config user.email "bot@electronisland.com"
-          git remote set-url origin https://eislandBot:${{ secrets.BOT_PAT }}@github.com/${{ github.repository }}.git
 
           git add docs/CHANGE_LOG.md
+          AUTH_HEADER="Authorization: Basic $(printf 'eislandBot:${{ secrets.BOT_PAT }}' | base64)"
+
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git commit -m "docs: auto update CHANGE_LOG.md for #${{ github.event.pull_request.number }} by @${{ github.event.pull_request.user.login }} [skip ci]"
-            git push origin HEAD:${{ github.event.pull_request.base.ref }}
+            git -c "http.extraheader=${AUTH_HEADER}" push origin HEAD:${{ github.event.pull_request.base.ref }}
           else
             git commit -m "docs: auto update CHANGE_LOG.md for release ${{ github.event.release.tag_name }} by @${{ github.actor }} [skip ci]"
-            git push origin HEAD:${{ github.event.release.target_commitish }}
+            git -c "http.extraheader=${AUTH_HEADER}" push origin HEAD:${{ github.event.release.target_commitish }}
           fi
