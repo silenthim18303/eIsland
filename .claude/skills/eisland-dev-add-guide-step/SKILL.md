@@ -1,5 +1,5 @@
 ---
-name: guide-step
+name: eisland-dev-add-guide-step
 description: |
   创建 eIsland 引导配置窗口的新步骤页面。当用户要求在引导界面（Guide）中新增配置步骤、引导页面、引导分页时使用此 skill。
   触发关键词：guide 步骤、引导页面、引导分页、Guide step、新建引导页、添加引导配置。
