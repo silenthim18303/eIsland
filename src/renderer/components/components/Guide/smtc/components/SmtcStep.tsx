@@ -28,6 +28,7 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSmtcTest } from '../hooks/useSmtcTest';
 import { extractPlayerName } from '../utils/smtcUtils';
+import { MarqueeText } from './MarqueeText';
 import type { SmtcStepProps } from '../types';
 
 /**
@@ -73,9 +74,9 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
               />
             </div>
             <div className="guide-smtc-right">
-              <p className="guide-smtc-title">{meta.title}</p>
-              <p className="guide-smtc-artist">{meta.artist}</p>
-              {meta.album && <p className="guide-smtc-album">{meta.album}</p>}
+              <MarqueeText className="guide-smtc-title">{meta.title}</MarqueeText>
+              <MarqueeText className="guide-smtc-artist">{meta.artist}</MarqueeText>
+              {meta.album && <MarqueeText className="guide-smtc-album">{meta.album}</MarqueeText>}
               <div className="guide-smtc-info">
                 <span className="guide-smtc-info-label">
                   {t('guide.smtc.player', { defaultValue: '播放器' })}

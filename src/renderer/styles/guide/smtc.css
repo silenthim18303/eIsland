@@ -117,21 +117,44 @@
   font-size: 20px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.9);
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .guide-smtc-artist {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.55);
   margin-top: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .guide-smtc-album {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.35);
   margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* ===== 滚动文本 ===== */
+
+.guide-smtc-marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.guide-smtc-marquee-inner.scrolling {
+  animation: guideSmtcMarquee 10s ease-in-out 1.5s infinite;
+}
+
+@keyframes guideSmtcMarquee {
+  0%, 15% { transform: translateX(0); }
+  40%, 60% { transform: translateX(var(--marquee-distance, 0)); }
+  85%, 100% { transform: translateX(0); }
 }
 
 .guide-smtc-info {
