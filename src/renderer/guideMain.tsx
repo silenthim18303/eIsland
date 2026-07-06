@@ -29,6 +29,8 @@
 import { StrictMode } from 'react';
 import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
+import './styles/guide.css';
+import { SplashWaveEffect } from './components/components/SplashWaveEffect';
 
 /** 引导窗口根组件（基础架构占位，后续扩展配置步骤） */
 function GuideApp(): ReactElement {
@@ -38,9 +40,12 @@ function GuideApp(): ReactElement {
   };
 
   return (
-    <div>
-      <h1>eIsland 引导配置</h1>
-      <button onClick={handleComplete}>完成配置</button>
+    <div className="guide-container">
+      <SplashWaveEffect />
+      <div className="guide-content">
+        <h1>eIsland 引导配置</h1>
+        <button onClick={handleComplete}>完成配置</button>
+      </div>
     </div>
   );
 }

@@ -59,7 +59,12 @@ function showGuideWindow(): Promise<void> {
       height: GUIDE_HEIGHT,
       show: false,
       frame: false,
+      transparent: true,
+      backgroundColor: '#00000000',
       resizable: false,
+      movable: true,
+      thickFrame: false,
+      hasShadow: false,
       center: true,
       title: '',
       icon: is.dev
