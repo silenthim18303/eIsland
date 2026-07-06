@@ -34,6 +34,11 @@
       "loginNow": "Log In Now",
       "registerNow": "Register Now"
     },
+    "language": {
+      "title": "Select Language",
+      "zhCN": "中文",
+      "enUS": "English"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "desc": "A Windows desktop floating widget inspired by Apple Dynamic Island,\nmaking your desktop more vivid and productive."

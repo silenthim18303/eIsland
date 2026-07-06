@@ -34,6 +34,11 @@
       "loginNow": "立即登录",
       "registerNow": "立即注册"
     },
+    "language": {
+      "title": "选择语言",
+      "zhCN": "中文",
+      "enUS": "English"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "desc": "一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。"

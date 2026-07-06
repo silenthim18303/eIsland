@@ -1,0 +1,60 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file LanguageStep.tsx
+ * @description 引导配置 — 语言选择步骤组件
+ * @author 鸡哥
+ */
+
+import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import { LANGUAGE_OPTIONS } from '../config/languageOptions';
+import { useLanguageSelect } from '../hooks/useLanguageSelect';
+import type { LanguageStepProps } from '../types';
+
+/**
+ * 语言选择步骤组件
+ * @description 展示可选语言列表，用户选择后切换语言并进入下一步
+ */
+export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
+  const { t } = useTranslation();
+  const { selected, handleSelect } = useLanguageSelect();
+
+  return (
+    <div className="guide-step">
+      <h2>{t('guide.language.title', { defaultValue: '选择语言' })}</h2>
+      <div className="guide-language-list">
+        {LANGUAGE_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            className={`guide-language-option${selected === opt.value ? ' selected' : ''}`}
+            onClick={(): void => handleSelect(opt.value)}
+          >
+            {t(opt.labelKey)}
+          </button>
+        ))}
+      </div>
+      <button className="guide-next-btn" onClick={onNext}>
+        {t('guide.actions.next', { defaultValue: '下一步' })}
+      </button>
+    </div>
+  );
+}

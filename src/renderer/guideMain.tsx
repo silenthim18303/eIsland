@@ -26,25 +26,30 @@
  * @author 鸡哥
  */
 
-import { StrictMode } from 'react';
+import { StrictMode, useState, useCallback } from 'react';
 import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/guide.css';
 import { WaveEffect } from './components/components/WaveEffect';
+import { LanguageStep } from './components/components/Guide/language';
 
-/** 引导窗口根组件（基础架构占位，后续扩展配置步骤） */
+/** 引导窗口根组件 */
 function GuideApp(): ReactElement {
   /** 通知主进程引导完成，关闭引导窗口并显示主窗口 */
-  const handleComplete = (): void => {
+  const handleComplete = useCallback((): void => {
     window.electron.ipcRenderer.send('guide:complete');
-  };
+  }, []);
+
+  /** 语言选择完成，进入下一步（暂直接完成） */
+  const handleLanguageNext = useCallback((): void => {
+    handleComplete();
+  }, [handleComplete]);
 
   return (
     <div className="guide-container">
       <WaveEffect />
       <div className="guide-content">
-        <h1>eIsland 引导配置</h1>
-        <button onClick={handleComplete}>完成配置</button>
+        <LanguageStep onNext={handleLanguageNext} />
       </div>
     </div>
   );
