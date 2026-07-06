@@ -56,7 +56,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # ── 自有服务器（rsync over SSH）──────────────────────────────────
+  # ── Self-hosted Server (rsync over SSH) ──────────────────────────
   deploy-server:
     needs: build
     runs-on: ubuntu-latest

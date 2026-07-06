@@ -21,31 +21,31 @@ jobs:
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
             const marker = '<!-- pr-auto-summary-comment -->';
-            const sanitizeMentions = (text) => String(text ?? '').replace(/@/g, '@\u200b');
+            const sanitizeMentions = (text) => String(text ?? '').replace(/@/g, '@​');
 
-            // ========== 1. 获取变更文件列表 ==========
+            // ========== 1. Fetch changed files ==========
             const files = await github.paginate(github.rest.pulls.listFiles, {
               owner, repo,
               pull_number: pr.number,
               per_page: 100
             });
 
-            // ========== 2. 获取提交列表 ==========
+            // ========== 2. Fetch commits ==========
             const commits = await github.paginate(github.rest.pulls.listCommits, {
               owner, repo,
               pull_number: pr.number,
               per_page: 100
             });
 
-            // ========== 3. 按模块分组 ==========
+            // ========== 3. Group by module ==========
             const moduleRules = [
-              { label: '渲染层 (renderer)',   re: /^src\/renderer\//  },
-              { label: '主进程 (main)',        re: /^src\/main\//     },
-              { label: '预加载 (preload)',      re: /^src\/preload\//  },
-              { label: 'CI / 工作流',          re: /^\.github\//      },
-              { label: '构建 / 配置',          re: /^(electron\..*|package\.json|tsconfig.*|\.eslintrc.*)$/ },
-              { label: '文档',                 re: /\.(md|txt)$/i     },
-              { label: '资源文件',             re: /\.(png|jpg|jpeg|gif|svg|webp|ico|css)$/i },
+              { label: 'Renderer',       re: /^src\/renderer\//  },
+              { label: 'Main Process',   re: /^src\/main\//     },
+              { label: 'Preload',        re: /^src\/preload\//  },
+              { label: 'CI / Workflow',  re: /^\.github\//      },
+              { label: 'Build / Config', re: /^(electron\..*|package\.json|tsconfig.*|\.eslintrc.*)$/ },
+              { label: 'Docs',           re: /\.(md|txt)$/i     },
+              { label: 'Assets',         re: /\.(png|jpg|jpeg|gif|svg|webp|ico|css)$/i },
             ];
 
             const groups = {};
@@ -64,9 +64,9 @@ jobs:
               }
               if (!matched) otherFiles.push(f);
             }
-            if (otherFiles.length > 0) groups['其他'] = otherFiles;
+            if (otherFiles.length > 0) groups['Other'] = otherFiles;
 
-            // ========== 4. 统计数据 ==========
+            // ========== 4. Statistics ==========
             let totalAdded = 0, totalDeleted = 0;
             const statusCount = { added: 0, modified: 0, removed: 0, renamed: 0 };
             for (const f of files) {
@@ -77,7 +77,7 @@ jobs:
               else statusCount.modified++;
             }
 
-            // ========== 5. 提交摘要（最近 15 条） ==========
+            // ========== 5. Commit summary (latest 15) ==========
             const recentCommits = commits.slice(-15);
             const commitSummary = recentCommits.map(c => {
               const sha = (c.sha || '').slice(0, 7);
@@ -86,7 +86,7 @@ jobs:
               return `| \`${sha}\` | ${date} | ${msg} |`;
             });
 
-            // ========== 6. 文件变更详情 ==========
+            // ========== 6. File change details ==========
             const statusLabel = { added: 'ADD', modified: 'MOD', removed: 'DEL', renamed: 'REN' };
             const buildGroupTable = (groupFiles) => {
               const lines = [];
@@ -105,57 +105,57 @@ jobs:
             const baseRef = sanitizeMentions(pr.base?.ref || '');
             const submitter = sanitizeMentions(pr.user?.login || 'unknown');
 
-            // ========== 7. 组装评论正文 ==========
+            // ========== 7. Assemble comment body ==========
             const body = [];
             body.push(marker);
-            body.push('## PR 内容自动总结');
+            body.push('## PR Auto Summary');
             body.push('');
 
-            // 基本信息
-            body.push('### 基本信息');
+            // Basic info
+            body.push('### Basic Info');
             body.push('');
-            body.push(`| 项目 | 内容 |`);
+            body.push(`| Item | Value |`);
             body.push(`| --- | --- |`);
             body.push(`| **PR** | #${pr.number} |`);
-            body.push(`| **标题** | ${prTitle} |`);
-            body.push(`| **分支** | \`${headRef}\` → \`${baseRef}\` |`);
-            body.push(`| **提交者** | @\u200b${submitter} |`);
-            body.push(`| **提交数** | ${commits.length} |`);
-            body.push(`| **变更文件数** | ${files.length} |`);
-            body.push(`| **总行数变更** | **+${totalAdded}** / **-${totalDeleted}** |`);
+            body.push(`| **Title** | ${prTitle} |`);
+            body.push(`| **Branch** | \`${headRef}\` → \`${baseRef}\` |`);
+            body.push(`| **Author** | @​${submitter} |`);
+            body.push(`| **Commits** | ${commits.length} |`);
+            body.push(`| **Changed Files** | ${files.length} |`);
+            body.push(`| **Total Lines** | **+${totalAdded}** / **-${totalDeleted}** |`);
             body.push('');
 
-            // 文件操作统计
-            body.push('### 变更统计');
+            // Change statistics
+            body.push('### Change Statistics');
             body.push('');
-            body.push(`| 操作 | 数量 |`);
+            body.push(`| Operation | Count |`);
             body.push(`| --- | --- |`);
-            if (statusCount.added > 0)    body.push(`| 新增 | ${statusCount.added} |`);
-            if (statusCount.modified > 0) body.push(`| 修改 | ${statusCount.modified} |`);
-            if (statusCount.removed > 0)  body.push(`| 删除 | ${statusCount.removed} |`);
-            if (statusCount.renamed > 0)  body.push(`| 重命名 | ${statusCount.renamed} |`);
+            if (statusCount.added > 0)    body.push(`| Added | ${statusCount.added} |`);
+            if (statusCount.modified > 0) body.push(`| Modified | ${statusCount.modified} |`);
+            if (statusCount.removed > 0)  body.push(`| Removed | ${statusCount.removed} |`);
+            if (statusCount.renamed > 0)  body.push(`| Renamed | ${statusCount.renamed} |`);
             body.push('');
 
-            // 影响模块概览
+            // Affected modules
             const affectedModules = Object.keys(groups);
-            body.push('### 影响模块');
+            body.push('### Affected Modules');
             body.push('');
             for (const mod of affectedModules) {
               const gf = groups[mod];
               const ga = gf.reduce((s, f) => s + (f.additions || 0), 0);
               const gd = gf.reduce((s, f) => s + (f.deletions || 0), 0);
-              body.push(`- **${mod}** — ${gf.length} 个文件（+${ga} / -${gd}）`);
+              body.push(`- **${mod}** — ${gf.length} file(s) (+${ga} / -${gd})`);
             }
             body.push('');
 
-            // 分组文件详情
+            // File change details
             body.push('<details>');
-            body.push('<summary><strong>文件变更详情（点击展开）</strong></summary>');
+            body.push('<summary><strong>File Change Details (click to expand)</strong></summary>');
             body.push('');
             for (const mod of affectedModules) {
               body.push(`#### ${mod}`);
               body.push('');
-              body.push('| 状态 | 文件 | 行数变更 |');
+              body.push('| Status | File | Lines Changed |');
               body.push('| --- | --- | --- |');
               body.push(...buildGroupTable(groups[mod]));
               body.push('');
@@ -163,35 +163,35 @@ jobs:
             body.push('</details>');
             body.push('');
 
-            // 提交记录
+            // Commit log
             body.push('<details>');
-            body.push(`<summary><strong>提交记录${commits.length > 15 ? `（最近 15 / 共 ${commits.length}）` : `（共 ${commits.length}）`}</strong></summary>`);
+            body.push(`<summary><strong>Commit Log${commits.length > 15 ? ` (latest 15 / ${commits.length} total)` : ` (${commits.length} total)`}</strong></summary>`);
             body.push('');
-            body.push('| SHA | 日期 | 说明 |');
+            body.push('| SHA | Date | Description |');
             body.push('| --- | --- | --- |');
             body.push(...commitSummary);
             body.push('');
             body.push('</details>');
             body.push('');
 
-            // PR 描述摘录
+            // PR body excerpt
             const prBody = sanitizeMentions((pr.body || '').trim());
             if (prBody) {
               body.push('<details>');
-              body.push('<summary><strong>PR 描述原文</strong></summary>');
+              body.push('<summary><strong>PR Description (original)</strong></summary>');
               body.push('');
-              body.push(prBody.length > 3000 ? prBody.slice(0, 3000) + '\n\n> [WARNING] 描述过长，已截断至 3000 字符' : prBody);
+              body.push(prBody.length > 3000 ? prBody.slice(0, 3000) + '\n\n> [WARNING] Description truncated to 3000 characters' : prBody);
               body.push('');
               body.push('</details>');
               body.push('');
             }
 
             body.push('---');
-            body.push('> 此评论由 **PR Summary** 工作流自动生成');
+            body.push('> This comment was auto-generated by the **PR Summary** workflow');
 
             const commentBody = body.join('\n');
 
-            // ========== 8. 创建或更新评论 ==========
+            // ========== 8. Create or update comment ==========
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner, repo,
               issue_number: pr.number,

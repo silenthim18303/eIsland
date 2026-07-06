@@ -25,12 +25,12 @@ jobs:
             const pr = context.payload.pull_request;
 
             const selfCheckChecklist = [
-              { id: 'STD-1-HTML', label: '已核对 docs/FRONTEND_STANDARDS.md 第 1 章 HTML 规范全部条款' },
-              { id: 'STD-2-CSS', label: '已核对 docs/FRONTEND_STANDARDS.md 第 2 章 CSS 规范全部条款' },
-              { id: 'STD-3-JSTS', label: '已核对 docs/FRONTEND_STANDARDS.md 第 3 章 JavaScript / TypeScript 规范全部条款' },
-              { id: 'STD-4-REACT', label: '已核对 docs/FRONTEND_STANDARDS.md 第 4 章 React 规范全部条款' },
-              { id: 'STD-5-NEXT', label: '已核对 docs/FRONTEND_STANDARDS.md 第 5 章 Next.js 规范全部条款（如适用）' },
-              { id: 'STD-COMMENT', label: '已核对 docs/COMMENT_STANDARDS.md 注释规范全部条款' }
+              { id: 'STD-1-HTML', label: 'Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 1 HTML Standards' },
+              { id: 'STD-2-CSS', label: 'Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 2 CSS Standards' },
+              { id: 'STD-3-JSTS', label: 'Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 3 JavaScript / TypeScript Standards' },
+              { id: 'STD-4-REACT', label: 'Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 4 React Standards' },
+              { id: 'STD-5-NEXT', label: 'Verified all clauses in docs/FRONTEND_STANDARDS.md Chapter 5 Next.js Standards (if applicable)' },
+              { id: 'STD-COMMENT', label: 'Verified all clauses in docs/COMMENT_STANDARDS.md' }
             ];
 
             const prBody = pr.body || '';
@@ -48,7 +48,7 @@ jobs:
                 try {
                   if (testFn(lines[i])) matched.push(i + 1);
                 } catch {
-                  // 单行检测失败时继续尝试下一行
+                  // Skip to next line if single-line detection fails
                 }
               }
               return matched;
@@ -57,55 +57,55 @@ jobs:
             const rules = [
               {
                 id: 'no-var',
-                desc: 'JS/TS 禁止使用 var',
+                desc: 'JS/TS: var is forbidden',
                 applies: /\.(js|jsx|ts|tsx)$/,
                 test: (text) => /(^|\s)var\s+/.test(text)
               },
               {
                 id: 'no-any',
-                desc: 'TypeScript 避免 any',
+                desc: 'TypeScript: avoid any',
                 applies: /\.(ts|tsx)$/,
                 test: (text) => /(:\s*any\b|<\s*any\s*>|\bas\s+any\b)/.test(text)
               },
               {
                 id: 'eqeqeq',
-                desc: '必须使用 === / !==',
+                desc: 'Must use === / !==',
                 applies: /\.(js|jsx|ts|tsx)$/,
                 test: (text) => /(^|[^=!])==([^=]|$)|(^|[^!])!=([^=]|$)/m.test(text)
               },
               {
                 id: 'no-for-in-of',
-                desc: '避免 for...in / for...of，优先高阶函数',
+                desc: 'Avoid for...in / for...of, prefer higher-order functions',
                 applies: /\.(js|jsx|ts|tsx)$/,
                 test: (text) => /for\s*\([^)]*\b(?:in|of)\b[^)]*\)/.test(text)
               },
               {
                 id: 'no-eval-function-constructor',
-                desc: '安全要求：禁止 eval / new Function',
+                desc: 'Security: eval / new Function is forbidden',
                 applies: /\.(js|jsx|ts|tsx)$/,
                 test: (text) => /\beval\s*\(|new\s+Function\s*\(/.test(text)
               },
               {
                 id: 'no-react-import-in-jsx-runtime',
-                desc: 'React 17+ JSX 文件避免未使用 React 默认导入',
+                desc: 'React 17+: avoid unused default React import in JSX files',
                 applies: /\.(jsx|tsx)$/,
                 test: (text) => /import\s+React\s+from\s+['"]react['"]\s*;/.test(text)
               },
               {
                 id: 'no-props-spread',
-                desc: 'React 禁止 Props 扩散传递',
+                desc: 'React: props spreading is forbidden',
                 applies: /\.(jsx|tsx)$/,
                 test: (text) => /<\w[^>]*\{\s*\.\.\.[^}]+\}[^>]*>/.test(text)
               },
               {
                 id: 'no-index-key',
-                desc: 'React 列表 key 禁止使用 index',
+                desc: 'React: using index as list key is forbidden',
                 applies: /\.(jsx|tsx)$/,
                 test: (text) => /key\s*=\s*\{\s*index\s*\}/.test(text)
               },
               {
                 id: 'jsx-brace-spacing',
-                desc: 'JSX 花括号内不应有多余空格',
+                desc: 'JSX: no extra spaces inside curly braces',
                 applies: /\.(jsx|tsx)$/,
                 test: (text) => text.split('\n').some(line => {
                   const t = line.trim();
@@ -115,13 +115,13 @@ jobs:
               },
               {
                 id: 'no-important',
-                desc: 'CSS 禁止使用 !important',
+                desc: 'CSS: !important is forbidden',
                 applies: /\.(css|scss|sass)$/,
                 test: (text) => /!important/.test(text)
               },
               {
                 id: 'html-no-inline-handler',
-                desc: 'HTML 禁止内联事件处理器',
+                desc: 'HTML: inline event handlers are forbidden',
                 applies: /\.html$/,
                 test: (text) => /\son[a-z]+\s*=\s*['"][^'"]*['"]/i.test(text)
               }
@@ -157,7 +157,7 @@ jobs:
                 }
                 text = Buffer.from(resp.data.content, 'base64').toString('utf8');
               } catch (error) {
-                violations.push(`${filename}:1 | fetch-error | 无法读取文件内容`);
+                violations.push(`${filename}:1 | fetch-error | Unable to read file content`);
                 continue;
               }
 
@@ -248,19 +248,19 @@ jobs:
 
           {
             echo "<!-- pr-auto-code-quality-review -->"
-            echo "## PR 代码质量审查"
+            echo "## PR Code Quality Review"
             echo ""
             echo "- PR: #${{ github.event.pull_request.number }}"
-            echo "- 分支: \`${{ github.event.pull_request.head.ref }}\` -> \`${{ github.event.pull_request.base.ref }}\`"
-            echo "- 触发提交: \`${{ github.event.pull_request.head.sha }}\`"
-            echo "- 审查结果: ${{ steps.quality_check.outputs.passed == 'true' && 'PASS' || 'FAIL' }}"
-            echo "- 违规数量: \`${{ steps.quality_check.outputs.violations }}\`"
-            echo "- Checklist 未勾选项（仅自检提示，不影响结果）: \`${{ steps.quality_check.outputs.checklist_missing }}\`"
+            echo "- Branch: \`${{ github.event.pull_request.head.ref }}\` -> \`${{ github.event.pull_request.base.ref }}\`"
+            echo "- Trigger commit: \`${{ github.event.pull_request.head.sha }}\`"
+            echo "- Review result: ${{ steps.quality_check.outputs.passed == 'true' && 'PASS' || 'FAIL' }}"
+            echo "- Violations: \`${{ steps.quality_check.outputs.violations }}\`"
+            echo "- Checklist unchecked (self-check only, non-blocking): \`${{ steps.quality_check.outputs.checklist_missing }}\`"
             echo ""
-            echo "### 已检查文件"
+            echo "### Checked Files"
             cat quality-checked-files.md
             echo ""
-            echo "### 审查输出（前 180 行）"
+            echo "### Review Output (first 180 lines)"
             echo '```text'
             cat quality-check-preview.log
             echo '```'
