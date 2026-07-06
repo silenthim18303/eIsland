@@ -110,16 +110,22 @@ html, body {
 
 .guide-language-list {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  max-width: 560px;
 }
 
 .guide-language-option {
-  padding: 12px 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.55);
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
@@ -137,19 +143,32 @@ html, body {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+.guide-language-option.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.guide-language-icon {
+  width: 22px;
+  height: 16px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
 .guide-next-btn {
   padding: 10px 48px;
-  border: 1px solid rgba(100, 180, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  background: rgba(100, 180, 255, 0.08);
-  color: rgba(100, 180, 255, 0.85);
-  font-size: 15px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
 
 .guide-next-btn:hover {
-  border-color: rgba(100, 180, 255, 0.45);
-  background: rgba(100, 180, 255, 0.15);
-  color: rgba(100, 180, 255, 1);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
 }

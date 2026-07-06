@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGE_OPTIONS } from '../config/languageOptions';
 import { useLanguageSelect } from '../hooks/useLanguageSelect';
 import type { LanguageStepProps } from '../types';
+import type { AppLanguage } from '../../../../../i18n';
 
 /**
  * 语言选择步骤组件
@@ -48,10 +49,12 @@ export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
         {LANGUAGE_OPTIONS.map((opt) => (
           <button
             key={opt.value}
-            className={`guide-language-option${selected === opt.value ? ' selected' : ''}`}
-            onClick={(): void => handleSelect(opt.value)}
+            className={`guide-language-option${selected === opt.value ? ' selected' : ''}${!opt.available ? ' disabled' : ''}`}
+            disabled={!opt.available}
+            onClick={(): void => { if (opt.available) handleSelect(opt.value as AppLanguage); }}
           >
-            {t(opt.labelKey)}
+            <img className="guide-language-icon" src={opt.icon} alt="" />
+            <span>{t(opt.labelKey)}</span>
           </button>
         ))}
       </div>
