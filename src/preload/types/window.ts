@@ -19,25 +19,15 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file window.ts
+ * @description 窗口与显示器相关类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 灵动岛可用显示器信息 */
+export interface IslandDisplayInfo {
+  id: string;
+  width: number;
+  height: number;
+  isPrimary: boolean;
+}

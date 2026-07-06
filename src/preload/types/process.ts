@@ -19,25 +19,23 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file process.ts
+ * @description 进程与窗口信息相关类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 运行中进程信息 */
+export interface RunningProcessInfo {
+  name: string;
+  iconDataUrl: string | null;
+}
+
+/** 运行中窗口信息 */
+export interface RunningWindowInfo {
+  id: string;
+  title: string;
+  processName: string;
+  processPath: string | null;
+  processId: number | null;
+  iconDataUrl: string | null;
+}

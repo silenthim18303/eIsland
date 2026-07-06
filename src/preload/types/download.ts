@@ -19,25 +19,39 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file download.ts
+ * @description 下载任务相关类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 下载任务 */
+export interface DownloadTask {
+  id: string;
+  url: string;
+  savePath: string;
+  fileName: string;
+  totalBytes: number;
+  downloadedBytes: number;
+  progress: number;
+  speedBytesPerSecond: number;
+  estimatedFinishAt: number | null;
+  threads: number;
+  status: 'downloading' | 'paused' | 'completed' | 'failed' | 'canceled';
+  errorMessage?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/** 下载启动载荷 */
+export interface DownloadStartPayload {
+  url: string;
+  savePath?: string;
+  threads?: number;
+}
+
+/** 下载启动结果 */
+export interface DownloadStartResult {
+  ok: boolean;
+  task?: DownloadTask;
+  message?: string;
+}

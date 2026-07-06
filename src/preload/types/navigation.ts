@@ -19,25 +19,13 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file navigation.ts
+ * @description 快速导航卡片配置相关类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 导航卡片顺序配置 */
+export interface NavOrderPayload {
+  visibleOrder: string[];
+  hiddenOrder: string[];
+}

@@ -19,25 +19,38 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file imageCompression.ts
+ * @description 图片压缩功能相关类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 图片压缩任务 */
+export interface ImageCompressionTask {
+  id: string;
+  fileName: string;
+  inputPath: string;
+  outputPath: string;
+  quality: number;
+  status: 'completed' | 'failed';
+  success: boolean;
+  originalBytes: number;
+  compressedBytes: number;
+  ratio: number;
+  error?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+/** 图片压缩启动载荷 */
+export interface ImageCompressionStartPayload {
+  inputPaths: string[];
+  outputDir?: string;
+  quality?: number;
+}
+
+/** 图片压缩启动结果 */
+export interface ImageCompressionStartResult {
+  ok: boolean;
+  results?: ImageCompressionTask[];
+  message?: string;
+}

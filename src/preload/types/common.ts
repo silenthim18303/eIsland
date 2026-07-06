@@ -19,25 +19,21 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file common.ts
+ * @description 预加载脚本通用基础类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 二维坐标 */
+export interface Point {
+  x: number;
+  y: number;
+}
+
+/** 窗口边界 */
+export interface Bounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}

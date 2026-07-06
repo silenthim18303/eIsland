@@ -19,25 +19,18 @@
  */
 
 /**
- * @file index.ts
- * @description 预加载脚本共享类型定义桶文件，聚合所有子模块导出
+ * @file clipboard.ts
+ * @description 剪贴板与外部 Agent 事件相关类型定义
  * @author 鸡哥
  */
 
-export * from './common';
-export * from './window';
-export * from './file';
-export * from './performance';
-export * from './process';
-export * from './media';
-export * from './agent';
-export * from './claudeCode';
-export * from './imageCompression';
-export * from './download';
-export * from './formatFactory';
-export * from './net';
-export * from './mail';
-export * from './updater';
-export * from './clipboard';
-export * from './navigation';
-export * from './settings';
+/** 剪贴板 URL 检测结果 */
+export interface ClipboardUrlsDetectedData {
+  urls: string[];
+  title: string;
+}
+
+/** 外部 Agent 事件数据 */
+export interface ExternalAgentData {
+  agentNames: string[];
+}
