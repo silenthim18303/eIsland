@@ -47,12 +47,15 @@
       "ruRU": "Русский"
     },
     "smtc": {
-      "title": "Media Detection",
+      "title": "SMTC Media Test",
       "subtitle": "Check if system media transport controls are available",
-      "check": "Start Detection",
-      "checking": "Detecting…",
-      "found": "Detection Successful",
-      "notFound": "No media session detected"
+      "hint": "Play a song with your media player",
+      "retry": "Retry",
+      "player": "Player",
+      "state": "State",
+      "playing": "Playing",
+      "paused": "Paused",
+      "time": "Duration"
     },
     "welcome": {
       "title": "Welcome to eIsland",

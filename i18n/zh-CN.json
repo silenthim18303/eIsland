@@ -47,12 +47,15 @@
       "ruRU": "Русский"
     },
     "smtc": {
-      "title": "媒体检测",
+      "title": "SMTC 媒体测试",
       "subtitle": "检测系统媒体会话是否可用",
-      "check": "开始检测",
-      "checking": "检测中…",
-      "found": "检测成功",
-      "notFound": "未检测到媒体会话"
+      "hint": "请使用播放器播放一首歌",
+      "retry": "重新检测",
+      "player": "播放器",
+      "state": "状态",
+      "playing": "播放中",
+      "paused": "已暂停",
+      "time": "时长"
     },
     "welcome": {
       "title": "欢迎使用 eIsland",

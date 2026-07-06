@@ -20,43 +20,153 @@
 
 /**
  * @file guide/smtc.css
- * @description 引导配置窗口 — SMTC 检查步骤样式
+ * @description 引导配置窗口 — SMTC 媒体测试步骤样式
  * @author 鸡哥
  */
 
+/* ===== 容器 ===== */
+
 .guide-smtc-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== 加载 / 空状态 ===== */
+
+.guide-smtc-loading,
+.guide-smtc-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
-.guide-smtc-check-btn {
-  padding: 10px 32px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.guide-smtc-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: guideSmtcSpin 0.8s linear infinite;
+}
+
+@keyframes guideSmtcSpin {
+  to { transform: rotate(360deg); }
+}
+
+.guide-smtc-hint {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.guide-smtc-retry-btn {
+  padding: 8px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
 
-.guide-smtc-check-btn:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+.guide-smtc-retry-btn:hover {
+  border-color: rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.guide-smtc-status {
+/* ===== 结果布局 ===== */
+
+.guide-smtc-result {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 560px;
+  padding: 0 20px;
+  perspective: 600px;
+}
+
+/* ===== 左侧：专辑封面（3D 向内倾斜 + 光晕） ===== */
+
+.guide-smtc-left {
+  flex-shrink: 0;
+  position: relative;
+  transform: rotateY(12deg) rotateX(-4deg);
+  transform-style: preserve-3d;
+}
+
+.guide-smtc-glow {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(20px);
+  opacity: 0.8;
+}
+
+.guide-smtc-cover {
+  position: relative;
+  z-index: 1;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.06);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ===== 右侧：元数据（右对齐 + 3D 向内倾斜） ===== */
+
+.guide-smtc-right {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+
+.guide-smtc-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.guide-smtc-artist {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.55);
+  margin-top: 4px;
 }
 
-.guide-smtc-found {
-  color: rgba(100, 220, 120, 0.9);
+.guide-smtc-album {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 2px;
 }
 
-.guide-smtc-not-found {
-  color: rgba(255, 140, 100, 0.8);
+.guide-smtc-info {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.guide-smtc-info-label {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.guide-smtc-info-value {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.guide-smtc-cover.paused {
+  opacity: 0.7;
 }

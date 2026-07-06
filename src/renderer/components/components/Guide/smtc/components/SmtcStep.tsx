@@ -20,45 +20,100 @@
 
 /**
  * @file SmtcStep.tsx
- * @description 引导配置 — SMTC 检查步骤组件
+ * @description 引导配置 — SMTC 媒体测试步骤组件
  * @author 鸡哥
  */
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSmtcCheck } from '../hooks/useSmtcCheck';
+import { useSmtcTest, formatTime, extractPlayerName } from '../hooks/useSmtcPreview';
 import type { SmtcStepProps } from '../types';
 
 /**
- * SMTC 检查步骤组件
- * @description 检测系统媒体会话（SMTC）是否可用，引导用户确认
+ * SMTC 媒体测试步骤组件
  */
 export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
   const { t } = useTranslation();
-  const { status, check } = useSmtcCheck();
+  const { status, meta, retry } = useSmtcTest();
+  const [r, g, b] = meta?.dominantColor ?? [0, 0, 0];
 
   return (
     <div className="guide-step">
       <div className="guide-step-header">
-        <h2>{t('guide.smtc.title', { defaultValue: '媒体检测' })}</h2>
+        <h2>{t('guide.smtc.title', { defaultValue: 'SMTC 媒体测试' })}</h2>
         <p>{t('guide.smtc.subtitle', { defaultValue: '检测系统媒体会话是否可用' })}</p>
       </div>
+
       <div className="guide-smtc-content">
-        {status === 'idle' && (
-          <button className="guide-smtc-check-btn" onClick={check}>
-            {t('guide.smtc.check', { defaultValue: '开始检测' })}
-          </button>
+        {status === 'loading' && (
+          <div className="guide-smtc-loading">
+            <div className="guide-smtc-spinner" />
+          </div>
         )}
-        {status === 'checking' && (
-          <p className="guide-smtc-status">{t('guide.smtc.checking', { defaultValue: '检测中…' })}</p>
+
+        {status === 'no-media' && (
+          <div className="guide-smtc-empty">
+            <p className="guide-smtc-hint">
+              {t('guide.smtc.hint', { defaultValue: '请使用播放器播放一首歌' })}
+            </p>
+            <button className="guide-smtc-retry-btn" onClick={retry}>
+              {t('guide.smtc.retry', { defaultValue: '重新检测' })}
+            </button>
+          </div>
         )}
-        {status === 'found' && (
-          <p className="guide-smtc-status guide-smtc-found">{t('guide.smtc.found', { defaultValue: '检测成功' })}</p>
-        )}
-        {status === 'not-found' && (
-          <p className="guide-smtc-status guide-smtc-not-found">{t('guide.smtc.notFound', { defaultValue: '未检测到媒体会话' })}</p>
+
+        {status === 'success' && meta && (
+          <div className="guide-smtc-result">
+            <div className="guide-smtc-left">
+              <div
+                className="guide-smtc-glow"
+                style={{
+                  background: `radial-gradient(ellipse at center, rgba(${r}, ${g}, ${b}, 0.4) 0%, transparent 70%)`,
+                }}
+              />
+              <div
+                className={`guide-smtc-cover${!meta.isPlaying ? ' paused' : ''}`}
+                style={{
+                  backgroundImage: meta.coverImage ? `url(${meta.coverImage})` : undefined,
+                  boxShadow: `0 0 20px 6px rgba(${r}, ${g}, ${b}, 0.35)`,
+                }}
+              />
+            </div>
+            <div className="guide-smtc-right">
+              <p className="guide-smtc-title">{meta.title}</p>
+              <p className="guide-smtc-artist">{meta.artist}</p>
+              {meta.album && <p className="guide-smtc-album">{meta.album}</p>}
+              <div className="guide-smtc-info">
+                <span className="guide-smtc-info-label">
+                  {t('guide.smtc.player', { defaultValue: '播放器' })}
+                </span>
+                <span className="guide-smtc-info-value">
+                  {extractPlayerName(meta.sourceAppId)}
+                </span>
+              </div>
+              <div className="guide-smtc-info">
+                <span className="guide-smtc-info-label">
+                  {t('guide.smtc.state', { defaultValue: '状态' })}
+                </span>
+                <span className="guide-smtc-info-value">
+                  {meta.isPlaying
+                    ? t('guide.smtc.playing', { defaultValue: '播放中' })
+                    : t('guide.smtc.paused', { defaultValue: '已暂停' })}
+                </span>
+              </div>
+              <div className="guide-smtc-info">
+                <span className="guide-smtc-info-label">
+                  {t('guide.smtc.time', { defaultValue: '时长' })}
+                </span>
+                <span className="guide-smtc-info-value">
+                  {formatTime(meta.positionMs)} / {formatTime(meta.durationMs)}
+                </span>
+              </div>
+            </div>
+          </div>
         )}
       </div>
+
       <div className="guide-step-footer">
         <button className="guide-prev-btn" onClick={onPrev}>
           {t('guide.actions.prev', { defaultValue: '上一步' })}
