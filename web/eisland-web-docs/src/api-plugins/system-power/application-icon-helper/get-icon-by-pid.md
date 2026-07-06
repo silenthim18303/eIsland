@@ -7,7 +7,7 @@ icon: fa6-solid:code
 # getIconByPid
 
 :::info
-Retrieves the application icon for a process by its Process ID (PID). This function resolves the executable path from the PID using both .NET Process API and Win32 `QueryFullProcessImageNameW` as fallback, then extracts the icon. Returns the icon as a PNG `Buffer`, or `null` if the process is not found.
+Retrieves the application icon for a process by its Process ID (PID). This function resolves the executable path from the PID using both .NET Process API and Win32 `QueryFullProcessImageNameW` as fallback, then extracts the icon. Returns an `IconResult` containing PNG data, or `null` if the process is not found.
 :::
 
 ## Signature
@@ -31,7 +31,7 @@ Typical workflow:
 1. Obtain the PID from process enumeration or monitoring.
 2. Call `getIconByPid(pid)` with the numeric process ID.
 3. Check if the result is `null` (process not found or no permission).
-4. Use the returned `Buffer` as PNG image data.
+4. Use the returned `IconResult` (`.data` contains the PNG buffer).
 
 :::note
 PID 0 is the System Idle Process and does not have an extractable icon. This function returns `null` for PID 0.

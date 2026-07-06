@@ -28,18 +28,24 @@ import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// 跳过非 Windows 平台（模块在导入时即抛出）
+const isWindows = process.platform === 'win32';
+
 interface IconResult {
   data: Buffer;
   size: number;
   format: 'png';
 }
 
-const icon = require('../') as {
-  getIconByProcessName(processName: string): IconResult | null;
-  getIconByPid(pid: number): IconResult | null;
-  getIconByPath(exePath: string): IconResult | null;
-  getIconByShortcutPath(lnkPath: string): IconResult | null;
-};
+// 仅在 Windows 上加载模块，避免非 Windows CI 导入时抛出
+const icon = isWindows
+  ? (require('../') as {
+      getIconByProcessName(processName: string): IconResult | null;
+      getIconByPid(pid: number): IconResult | null;
+      getIconByPath(exePath: string): IconResult | null;
+      getIconByShortcutPath(lnkPath: string): IconResult | null;
+    })
+  : null;
 
 /** 验证返回的 IconResult 是有效的 */
 function expectValidIconResult(result: IconResult) {
@@ -56,89 +62,92 @@ function expectValidIconResult(result: IconResult) {
   expect(result.format).toBe('png');
 }
 
-describe('@eisland/windows-application-icon-helper', () => {
+describe.skipIf(!isWindows)('@eisland/windows-application-icon-helper', () => {
+  // 在 Windows 平台上 icon 保证非空
+  const mod = icon!;
+
   it('exports all expected functions', () => {
-    expect(typeof icon.getIconByProcessName).toBe('function');
-    expect(typeof icon.getIconByPid).toBe('function');
-    expect(typeof icon.getIconByPath).toBe('function');
-    expect(typeof icon.getIconByShortcutPath).toBe('function');
+    expect(typeof mod.getIconByProcessName).toBe('function');
+    expect(typeof mod.getIconByPid).toBe('function');
+    expect(typeof mod.getIconByPath).toBe('function');
+    expect(typeof mod.getIconByShortcutPath).toBe('function');
   });
 
   describe('getIconByProcessName', () => {
     it('returns Buffer for running process', () => {
-      const result = icon.getIconByProcessName('explorer');
+      const result = mod.getIconByProcessName('explorer');
       expect(result).not.toBeNull();
       if (result) expectValidIconResult(result);
     });
 
     it('returns null for non-existent process', () => {
-      const result = icon.getIconByProcessName('nonexistent_process_12345');
+      const result = mod.getIconByProcessName('nonexistent_process_12345');
       expect(result).toBeNull();
     });
 
     it('returns null for empty string', () => {
-      const result = icon.getIconByProcessName('');
+      const result = mod.getIconByProcessName('');
       expect(result).toBeNull();
     });
 
     it('never throws', () => {
-      expect(() => icon.getIconByProcessName('explorer')).not.toThrow();
-      expect(() => icon.getIconByProcessName('nonexistent')).not.toThrow();
-      expect(() => icon.getIconByProcessName('')).not.toThrow();
+      expect(() => mod.getIconByProcessName('explorer')).not.toThrow();
+      expect(() => mod.getIconByProcessName('nonexistent')).not.toThrow();
+      expect(() => mod.getIconByProcessName('')).not.toThrow();
     });
   });
 
   describe('getIconByPid', () => {
     it('returns Buffer for current process', () => {
-      const result = icon.getIconByPid(process.pid);
+      const result = mod.getIconByPid(process.pid);
       expect(result).not.toBeNull();
       if (result) expectValidIconResult(result);
     });
 
     it('returns null for PID 0', () => {
-      const result = icon.getIconByPid(0);
+      const result = mod.getIconByPid(0);
       expect(result).toBeNull();
     });
 
     it('returns null for non-existent PID', () => {
-      const result = icon.getIconByPid(99999999);
+      const result = mod.getIconByPid(99999999);
       expect(result).toBeNull();
     });
 
     it('never throws', () => {
-      expect(() => icon.getIconByPid(process.pid)).not.toThrow();
-      expect(() => icon.getIconByPid(0)).not.toThrow();
-      expect(() => icon.getIconByPid(99999999)).not.toThrow();
+      expect(() => mod.getIconByPid(process.pid)).not.toThrow();
+      expect(() => mod.getIconByPid(0)).not.toThrow();
+      expect(() => mod.getIconByPid(99999999)).not.toThrow();
     });
   });
 
   describe('getIconByPath', () => {
     it('returns Buffer for valid exe path', () => {
-      const result = icon.getIconByPath(process.execPath);
+      const result = mod.getIconByPath(process.execPath);
       expect(result).not.toBeNull();
       if (result) expectValidIconResult(result);
     });
 
     it('returns Buffer for non-exe file (file type icon)', () => {
-      const result = icon.getIconByPath('C:\\Windows\\System32\\drivers\\etc\\hosts');
+      const result = mod.getIconByPath('C:\\Windows\\System32\\drivers\\etc\\hosts');
       expect(result).not.toBeNull();
       if (result) expectValidIconResult(result);
     });
 
     it('returns null for non-existent path', () => {
-      const result = icon.getIconByPath('C:\\nonexistent\\file.exe');
+      const result = mod.getIconByPath('C:\\nonexistent\\file.exe');
       expect(result).toBeNull();
     });
 
     it('returns null for empty string', () => {
-      const result = icon.getIconByPath('');
+      const result = mod.getIconByPath('');
       expect(result).toBeNull();
     });
 
     it('never throws', () => {
-      expect(() => icon.getIconByPath(process.execPath)).not.toThrow();
-      expect(() => icon.getIconByPath('C:\\nonexistent')).not.toThrow();
-      expect(() => icon.getIconByPath('')).not.toThrow();
+      expect(() => mod.getIconByPath(process.execPath)).not.toThrow();
+      expect(() => mod.getIconByPath('C:\\nonexistent')).not.toThrow();
+      expect(() => mod.getIconByPath('')).not.toThrow();
     });
   });
 
@@ -167,30 +176,30 @@ describe('@eisland/windows-application-icon-helper', () => {
 
       if (!lnkPath) return; // skip if no shortcuts found
 
-      const result = icon.getIconByShortcutPath(lnkPath);
+      const result = mod.getIconByShortcutPath(lnkPath);
       expect(result).not.toBeNull();
       if (result) expectValidIconResult(result);
     });
 
     it('returns null for non-existent path', () => {
-      const result = icon.getIconByShortcutPath('C:\\nonexistent\\file.lnk');
+      const result = mod.getIconByShortcutPath('C:\\nonexistent\\file.lnk');
       expect(result).toBeNull();
     });
 
     it('returns null for non-lnk file', () => {
-      const result = icon.getIconByShortcutPath('C:\\Windows\\notepad.exe');
+      const result = mod.getIconByShortcutPath('C:\\Windows\\notepad.exe');
       expect(result).toBeNull();
     });
 
     it('returns null for empty string', () => {
-      const result = icon.getIconByShortcutPath('');
+      const result = mod.getIconByShortcutPath('');
       expect(result).toBeNull();
     });
 
     it('never throws', () => {
-      expect(() => icon.getIconByShortcutPath('C:\\nonexistent.lnk')).not.toThrow();
-      expect(() => icon.getIconByShortcutPath('C:\\Windows\\notepad.exe')).not.toThrow();
-      expect(() => icon.getIconByShortcutPath('')).not.toThrow();
+      expect(() => mod.getIconByShortcutPath('C:\\nonexistent.lnk')).not.toThrow();
+      expect(() => mod.getIconByShortcutPath('C:\\Windows\\notepad.exe')).not.toThrow();
+      expect(() => mod.getIconByShortcutPath('')).not.toThrow();
     });
   });
 });

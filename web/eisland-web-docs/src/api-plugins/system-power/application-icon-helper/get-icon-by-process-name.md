@@ -7,7 +7,7 @@ icon: fa6-solid:code
 # getIconByProcessName
 
 :::info
-Retrieves the application icon for a running process by its name. This function searches for a process with the given name in the system process list and extracts the icon from its executable file. Returns the icon as a PNG `Buffer`, or `null` if the process is not found.
+Retrieves the application icon for a running process by its name. This function searches for a process with the given name in the system process list and extracts the icon from its executable file. Returns an `IconResult` containing PNG data, or `null` if the process is not found.
 :::
 
 ## Signature
@@ -30,7 +30,7 @@ Typical workflow:
 
 1. Call `getIconByProcessName('processName')` with the target process name.
 2. Check if the result is `null` (process not found or no permission).
-3. Use the returned `Buffer` as PNG image data.
+3. Use the returned `IconResult` (`.data` contains the PNG buffer).
 
 :::note
 The `.exe` extension is optional. Both `'chrome'` and `'chrome.exe'` produce the same result.

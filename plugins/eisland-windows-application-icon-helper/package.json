@@ -10,9 +10,7 @@
     "win32"
   ],
   "cpu": [
-    "x64",
-    "arm64",
-    "ia32"
+    "x64"
   ],
   "scripts": {
     "build": "dotnet publish src/eIslandAppIconHelper.csproj -c Release -r win-x64",

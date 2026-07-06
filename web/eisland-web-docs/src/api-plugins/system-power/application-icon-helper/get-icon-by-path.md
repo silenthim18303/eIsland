@@ -7,7 +7,7 @@ icon: fa6-solid:code
 # getIconByPath
 
 :::info
-Retrieves the application icon by its executable file path. This function uses `ExtractAssociatedIconW` from the Windows Shell32 API to extract the icon associated with any file or executable. Returns the icon as a PNG `Buffer`, or `null` if the file is not found.
+Retrieves the application icon by its executable file path. This function uses `ExtractAssociatedIconW` from the Windows Shell32 API to extract the icon associated with any file or executable. Returns an `IconResult` containing PNG data, or `null` if the file is not found.
 :::
 
 ## Signature
@@ -31,7 +31,7 @@ Typical workflow:
 1. Obtain the full file path (e.g., from process enumeration or user input).
 2. Call `getIconByPath(path)` with the absolute path.
 3. Check if the result is `null` (file not found).
-4. Use the returned `Buffer` as PNG image data.
+4. Use the returned `IconResult` (`.data` contains the PNG buffer).
 
 :::note
 The file must exist on disk. This function returns `null` for non-existent paths or empty strings.

@@ -47,13 +47,13 @@ if (lnkFiles.length > 0) {
   const lnkPath = lnkFiles[0];
   console.log(`1. getIconByShortcutPath("${lnkPath}")`);
   const icon1 = getIconByShortcutPath(lnkPath);
-  console.log(icon1 ? `   OK: ${icon1.length} bytes (PNG)` : '   FAIL: 未找到图标');
+  console.log(icon1 ? `   OK: ${icon1.size} bytes (${icon1.format})` : '   FAIL: 未找到图标');
 
   // 测试更多快捷方式
   for (let i = 1; i < Math.min(lnkFiles.length, 3); i++) {
     console.log(`\n${i + 1}. getIconByShortcutPath("${lnkFiles[i]}")`);
     const icon = getIconByShortcutPath(lnkFiles[i]);
-    console.log(icon ? `   OK: ${icon.length} bytes (PNG)` : '   FAIL: 未找到图标');
+    console.log(icon ? `   OK: ${icon.size} bytes (${icon.format})` : '   FAIL: 未找到图标');
   }
 } else {
   console.log('1. SKIP: 桌面无快捷方式文件');
@@ -77,17 +77,17 @@ if (startMenuLnks.length > 0) {
   const idx = lnkFiles.length > 0 ? 4 : 1;
   console.log(`\n${idx}. getIconByShortcutPath("${startMenuLnks[0]}") — Start Menu`);
   const icon = getIconByShortcutPath(startMenuLnks[0]);
-  console.log(icon ? `   OK: ${icon.length} bytes (PNG)` : '   FAIL: 未找到图标');
+  console.log(icon ? `   OK: ${icon.size} bytes (${icon.format})` : '   FAIL: 未找到图标');
 }
 
 // 测试无效路径
 const idx = lnkFiles.length > 0 ? 5 : 2;
 console.log(`\n${idx}. getIconByShortcutPath("C:\\nonexistent\\file.lnk")`);
 const iconNull = getIconByShortcutPath('C:\\nonexistent\\file.lnk');
-console.log(iconNull === null ? '   OK: 正确返回 null' : `   FAIL: 期望 null，实际: ${iconNull.length} bytes`);
+console.log(iconNull === null ? '   OK: 正确返回 null' : `   FAIL: 期望 null，实际: ${iconNull.size} bytes`);
 
 console.log(`\n${idx + 1}. getIconByShortcutPath("C:\\Windows\\notepad.exe") — 非 .lnk 文件`);
 const iconNotLnk = getIconByShortcutPath('C:\\Windows\\notepad.exe');
-console.log(iconNotLnk === null ? '   OK: 正确返回 null' : `   FAIL: 期望 null，实际: ${iconNotLnk.length} bytes`);
+console.log(iconNotLnk === null ? '   OK: 正确返回 null' : `   FAIL: 期望 null，实际: ${iconNotLnk.size} bytes`);
 
 console.log('\n=== Done ===');

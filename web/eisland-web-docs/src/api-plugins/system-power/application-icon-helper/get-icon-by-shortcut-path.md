@@ -7,7 +7,7 @@ icon: fa6-solid:code
 # getIconByShortcutPath
 
 :::info
-Retrieves the application icon by resolving a Windows shortcut (.lnk) file. This function reads the shortcut to find its target executable path using COM `IShellLink` interface, then extracts the icon from the target. Returns the icon as a PNG `Buffer`, or `null` if the shortcut cannot be resolved.
+Retrieves the application icon by resolving a Windows shortcut (.lnk) file. This function reads the shortcut to find its target executable path using COM `IShellLink` interface, then extracts the icon from the target. Returns an `IconResult` containing PNG data, or `null` if the shortcut cannot be resolved.
 :::
 
 ## Signature
@@ -31,7 +31,7 @@ Typical workflow:
 1. Obtain the full path to a `.lnk` file (e.g., from desktop or Start Menu).
 2. Call `getIconByShortcutPath(lnkPath)` with the absolute path.
 3. Check if the result is `null` (shortcut not found or target missing).
-4. Use the returned `Buffer` as PNG image data.
+4. Use the returned `IconResult` (`.data` contains the PNG buffer).
 
 :::note
 The file must have a `.lnk` extension. Passing a non-`.lnk` file returns `null` even if the file exists.
