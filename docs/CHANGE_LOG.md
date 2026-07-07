@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-06T12:42:05.384Z
+> 生成时间：2026-07-07T12:08:18.902Z
 
 ## 26.6.3
 
@@ -2276,7 +2276,41 @@
 
 ## Unreleased
 
+- 2026-07-07 | d9491a89 | 鸡哥 | Merge pull request #131 from JNTMTMTM/dev
+- 2026-07-07 | 06c2ab60 | 鸡哥 | feat: add Dynamic Island wave effect components and utilities
+- 2026-07-07 | 169590e4 | 鸡哥 | feat: refactor WaveEffect component and hooks; improve color handling and WebGL initialization
+- 2026-07-07 | 56baa0d1 | 鸡哥 | feat: implement wave rendering functions and refactor useWaveRenderer hook
+- 2026-07-07 | e0820e5a | 鸡哥 | feat: refactor SMTC module types and improve WebGL context initialization
+- 2026-07-07 | 751189cb | 鸡哥 | feat: add unknown player label and improve player name extraction; update accent color handling
+- 2026-07-07 | 8f403fa6 | 鸡哥 | feat: mock windows application icon helper in appHelpers tests
+- 2026-07-07 | 2abdf350 | 鸡哥 | feat: refactor player icon handling and add PlayerIcon utility
+- 2026-07-07 | 01a36355 | 鸡哥 | feat: add player icons and update SmtcStep component to display them
+- 2026-07-07 | 48bfb479 | 鸡哥 | Add SVG icons for various music players
+- 2026-07-07 | 75741764 | 鸡哥 | fix: remove unnecessary await from showGuideWindow call
+- 2026-07-07 | 4db33ea5 | 鸡哥 | feat: add media control buttons and update layout for SmtcStep component
+- 2026-07-07 | c1c4418b | 鸡哥 | feat: implement useMarqueeOverflow hook for overflow detection and refactor MarqueeText component
+- 2026-07-07 | 92495d87 | 鸡哥 | feat: add MarqueeText component for scrolling text and update styles for title, artist, and album
+- 2026-07-07 | c50fbe71 | 鸡哥 | feat: add accent color support to WaveEffect and related hooks
+- 2026-07-07 | 8d8db9b9 | 鸡哥 | feat: remove retry functionality from SMTC media test and update related styles and hooks
+- 2026-07-07 | 11f715c0 | 鸡哥 | feat: refactor SMTC media test by removing unused time formatting and updating related hooks and types
+- 2026-07-07 | e17f51c1 | 鸡哥 | feat: refactor SMTC media test by moving utility functions to a new module and updating imports
+- 2026-07-07 | 1287c2d3 | 鸡哥 | feat: refactor SMTC check to SMTC media test with enhanced UI and functionality
+- 2026-07-06 | 943fb2a4 | 鸡哥 | feat: update skill name for guide step creation to reflect new functionality
+- 2026-07-06 | c82a7c4c | 鸡哥 | feat: add guide step creation documentation and structure
+- 2026-07-06 | f5df2a67 | 鸡哥 | feat: add guide step creation documentation and structure
+- 2026-07-06 | cbe11874 | 鸡哥 | feat: add base, step, language, and smtc styles for guide configuration window
+- 2026-07-06 | 8223c84f | 鸡哥 | feat: add SMTC check step to guide with localization support and enhance styles
+- 2026-07-06 | 3922e5f9 | 鸡哥 | feat: enhance guide next button styles for improved usability
+- 2026-07-06 | 1bb4ccf2 | 鸡哥 | feat: add multiple language options to language selection step and enhance styles
+- 2026-07-06 | 0c4afc95 | 鸡哥 | feat: add subtitle to language selection step and enhance layout styles
+- 2026-07-06 | 04d3e306 | 鸡哥 | feat: add language selection step to guide with localization support
+- 2026-07-06 | fdd21e73 | 鸡哥 | refactor: replace SplashWaveEffect with WaveEffect and restructure related files
+- 2026-07-06 | ef8325cf | 鸡哥 | feat: enhance guide window with new styles and splash wave effect
+- 2026-07-06 | 4b764b16 | 鸡哥 | feat: add guide window for initial configuration and related components
+- 2026-07-06 | eea743e0 | 鸡哥 | Merge commit '3586e7c9c52c10b57ccaf6fb7414dccdd1e01a7d' into dev
+- 2026-07-06 | 3586e7c9 | eislandBot | docs: auto update CHANGE_LOG.md for #130 by @JNTMTMTM [skip ci]
 - 2026-07-06 | c86228a6 | 鸡哥 | Merge pull request #130 from JNTMTMTM/dev
+- 2026-07-06 | bd56f396 | 鸡哥 | feat: implement isCurrentLyricIdenticalToTranslation utility and refactor related components
 - 2026-07-06 | 4d0cff37 | 鸡哥 | feat: add new Windows helper plugins for Bluetooth, brightness, power, processes, and WiFi
 - 2026-07-06 | 1603c324 | 鸡哥 | fix: fallback to GITHUB_TOKEN when BOT_PAT is unavailable in workflow files
 - 2026-07-06 | a0bc7cc7 | 鸡哥 | Refactor preload types into separate modules
