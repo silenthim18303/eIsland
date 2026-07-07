@@ -180,6 +180,17 @@
 
 .guide-smtc-info-value {
   color: rgba(255, 255, 255, 0.6);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guide-smtc-player-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  object-fit: contain;
+  margin-top: 2px;
 }
 
 .guide-smtc-cover.paused {

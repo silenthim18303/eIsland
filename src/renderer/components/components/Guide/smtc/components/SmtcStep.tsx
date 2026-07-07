@@ -27,7 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSmtcTest } from '../hooks/useSmtcTest';
-import { extractPlayerName } from '../utils/smtcUtils';
+import { extractPlayerName, getPlayerIcon } from '../utils/smtcUtils';
 import { SvgIcon } from '../../../../../utils/SvgIcon';
 import { MarqueeText } from './MarqueeText';
 import type { SmtcStepProps } from '../types';
@@ -84,6 +84,13 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
                     {t('guide.smtc.player', { defaultValue: '播放器' })}
                   </span>
                   <span className="guide-smtc-info-value">
+                    {getPlayerIcon(meta.sourceAppId) && (
+                      <img
+                        src={SvgIcon[getPlayerIcon(meta.sourceAppId)!]}
+                        alt=""
+                        className="guide-smtc-player-icon"
+                      />
+                    )}
                     {extractPlayerName(meta.sourceAppId)}
                   </span>
                 </div>
