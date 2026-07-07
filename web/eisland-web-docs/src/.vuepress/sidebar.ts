@@ -440,7 +440,7 @@ export default sidebar({
     },
     {
       text: "eisland App Services Server",
-      icon: "settings",
+      icon: "server",
       collapsible: true,
       children: [
         {
@@ -455,7 +455,7 @@ export default sidebar({
     },
     {
       text: "eisland Common Services Server",
-      icon: "package",
+      icon: "toolbox",
       collapsible: true,
       children: [
         {
