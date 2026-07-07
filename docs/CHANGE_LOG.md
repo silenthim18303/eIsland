@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-07T12:08:18.902Z
+> 生成时间：2026-07-07T17:15:23.875Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,31 @@
 
 ## Unreleased
 
+- 2026-07-08 | 82b61618 | 鸡哥 | Merge pull request #132 from JNTMTMTM/dev
+- 2026-07-08 | a49d4e97 | 鸡哥 | fix: Correct title casing in Electron Windows documentation
+- 2026-07-08 | 8debe7f1 | 鸡哥 | feat: Add documentation for new configurations and APIs
+- 2026-07-08 | b115c221 | 鸡哥 | feat: Add services and configurations for identity verification, static asset URL rewriting, toolbox software management, TOTP security, user banning, and wallpaper marketplace
+- 2026-07-08 | bd53beba | 鸡哥 | docs: update API endpoint paths in README files for consistency
+- 2026-07-08 | 654e4002 | 鸡哥 | docs: update sidebar icons and remove obsolete configuration link
+- 2026-07-07 | 011aa581 | 鸡哥 | docs: fix sidebar abbreviations to module-specific names
+- 2026-07-07 | b2e3f576 | 鸡哥 | docs: restructure sidebar with eASS naming convention
+- 2026-07-07 | 7159412b | 鸡哥 | Revert "docs: add sidebar configuration for all API backend modules"
+- 2026-07-07 | 4c329639 | 鸡哥 | docs: add sidebar configuration for all API backend modules
+- 2026-07-07 | 2a9d4daa | 鸡哥 | docs: update API backend README with all modules
+- 2026-07-07 | 7a5c9536 | 鸡哥 | docs: add server-app and server-common documentation
+- 2026-07-07 | cd6a9a93 | 鸡哥 | docs: add server-version and server-weather documentation
+- 2026-07-07 | 3a4c4967 | 鸡哥 | docs: add server-mini-game, server-service-status, server-upload documentation
+- 2026-07-07 | 422db866 | 鸡哥 | docs: add server-user module documentation
+- 2026-07-07 | fac06a40 | 鸡哥 | docs: add server-payment module documentation
+- 2026-07-07 | 4973c89e | 鸡哥 | docs: add server-auth module documentation
+- 2026-07-07 | 35465531 | 鸡哥 | fix: update main window URL and script source for Dynamic Island integration
+- 2026-07-07 | c9805de9 | 鸡哥 | Remove deprecated configuration and data type documentation for various agent components, including STT WebSocket, Redis usage, prompt builders, and translation services. This cleanup enhances the clarity and maintainability of the documentation by eliminating obsolete references and files.
+- 2026-07-07 | cb95a2cf | 鸡哥 | feat: update sidebar structure and enhance eisland Agent Services documentation
+- 2026-07-07 | eecf4d77 | 鸡哥 | Add documentation for Mihtnelis agent properties, prompt builders, and data types
+- 2026-07-07 | 4561a632 | 鸡哥 | feat: add API Backend and Frontend documentation with navigation updates
+- 2026-07-07 | 4f05e96b | 鸡哥 | feat: add Electron Windows documentation and update state machine details
+- 2026-07-07 | fed7b509 | 鸡哥 | refactor: restructure renderer components and HTML files
+- 2026-07-07 | 6a6d79ae | eislandBot | docs: auto update CHANGE_LOG.md for #131 by @JNTMTMTM [skip ci]
 - 2026-07-07 | d9491a89 | 鸡哥 | Merge pull request #131 from JNTMTMTM/dev
 - 2026-07-07 | 06c2ab60 | 鸡哥 | feat: add Dynamic Island wave effect components and utilities
 - 2026-07-07 | 169590e4 | 鸡哥 | feat: refactor WaveEffect component and hooks; improve color handling and WebGL initialization
