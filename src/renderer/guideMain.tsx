@@ -30,10 +30,10 @@ import { StrictMode, useState, useCallback } from 'react';
 import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/guide.css';
-import { WaveEffect } from './components/components/WaveEffect';
-import { LanguageStep } from './components/components/Guide/language';
-import { SmtcStep } from './components/components/Guide/smtc';
-import { useSmtcAccentColor } from './components/components/Guide/smtc/hooks/useSmtcAccentColor';
+import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffect';
+import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
+import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc';
+import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc/hooks/useSmtcAccentColor';
 
 /** 引导步骤 */
 type GuideStep = 'language' | 'smtc';
