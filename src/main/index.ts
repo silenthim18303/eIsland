@@ -160,7 +160,7 @@ function isIslandInExpandedOrMaxExpandState(): boolean {
 
 /**
  * 创建全屏透明 Agent 语音输入窗口
- * @description 加载 AIbackground.html，显示 Agent 语音输入背景光效
+ * @description 加载 DynamicIslandAibackground.html，显示 Agent 语音输入背景光效
  */
 function showAgentVoiceInputWindow(): void {
   if (isIslandInExpandedOrMaxExpandState()) {
@@ -205,9 +205,9 @@ function showAgentVoiceInputWindow(): void {
   agentVoiceInputWindow.removeMenu();
 
   if (app.isPackaged) {
-    agentVoiceInputWindow.loadFile(join(__dirname, '../renderer/AIbackground.html'));
+    agentVoiceInputWindow.loadFile(join(__dirname, '../renderer/DynamicIslandAibackground.html'));
   } else {
-    agentVoiceInputWindow.loadFile(join(__dirname, '../../src/renderer/AIbackground.html'));
+    agentVoiceInputWindow.loadFile(join(__dirname, '../../src/renderer/DynamicIslandAibackground.html'));
   }
 
   agentVoiceInputWindow.once('ready-to-show', () => {
@@ -248,7 +248,7 @@ function hideAgentVoiceInputWindow(): void {
 
 /**
  * 显示 CLI 检测全屏边缘光效窗口
- * @description 独立于 Agent 语音输入窗口，加载 AIbackground.html，常驻直到用户响应弹窗后关闭
+ * @description 独立于 Agent 语音输入窗口，加载 DynamicIslandAibackground.html，常驻直到用户响应弹窗后关闭
  */
 function showCliGlowWindow(): void {
   if (cliGlowWindow && !cliGlowWindow.isDestroyed()) {
@@ -289,9 +289,9 @@ function showCliGlowWindow(): void {
   cliGlowWindow.removeMenu();
 
   if (app.isPackaged) {
-    cliGlowWindow.loadFile(join(__dirname, '../renderer/AIbackground.html'));
+    cliGlowWindow.loadFile(join(__dirname, '../renderer/DynamicIslandAibackground.html'));
   } else {
-    cliGlowWindow.loadFile(join(__dirname, '../../src/renderer/AIbackground.html'));
+    cliGlowWindow.loadFile(join(__dirname, '../../src/renderer/DynamicIslandAibackground.html'));
   }
 
   cliGlowWindow.once('ready-to-show', () => {

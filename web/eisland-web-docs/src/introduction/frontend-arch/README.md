@@ -11,11 +11,12 @@ This section documents the eIsland desktop application's frontend architecture, 
 
 ## Overview
 
-The eIsland frontend is built on Electron's multi-process architecture with a strict separation between the **Main Process** (Node.js), the **Preload Bridge** (Context Bridge), and the **Renderer Process** (Chromium). The core of the application is a state machine that manages **15 distinct states** controlling the island's appearance, expansion, and interaction behavior.
+The eIsland frontend is built on Electron's multi-process architecture with a strict separation between the **Main Process** (Node.js), the **Preload Bridge** (Context Bridge), and the **Renderer Process** (Chromium). The core of the application is a state machine that manages **17 distinct states** controlling the island's appearance, expansion, and interaction behavior.
 
 ## Documents
 
 | Document | Description |
 |----------|-------------|
 | [Process Model](process-model.md) | Electron's multi-process architecture: Main, Preload, and Renderer processes with IPC communication |
-| [State Machine](states.md) | The 15-state state machine that controls the island's visual modes, transitions, and interaction behavior |
+| [State Machine](states.md) | The 17-state state machine that controls the island's visual modes, transitions, and interaction behavior |
+| [Electron Windows](electron-windows.md) | All BrowserWindow instances: main island, splash, guide, standalone, capture, and glow overlays |

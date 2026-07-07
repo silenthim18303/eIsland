@@ -75,9 +75,9 @@ function openStandaloneWindow(): void {
   });
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    standaloneWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/standalone.html');
+    standaloneWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '/DynamicIslandStandalone.html');
   } else {
-    standaloneWindow.loadFile(join(__dirname, '../renderer/standalone.html'));
+    standaloneWindow.loadFile(join(__dirname, '../renderer/DynamicIslandStandalone.html'));
   }
 }
 

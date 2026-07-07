@@ -60,11 +60,11 @@ export default defineConfig({
       outDir: 'out/renderer',
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'src/renderer/index.html'),
-          standalone: resolve(__dirname, 'src/renderer/standalone.html'),
-          AIbackground: resolve(__dirname, 'src/renderer/AIbackground.html'),
-          splash: resolve(__dirname, 'src/renderer/splash.html'),
-          guideMain: resolve(__dirname, 'src/renderer/guideMain.html')
+          DynamicIslandIndex: resolve(__dirname, 'src/renderer/DynamicIslandIndex.html'),
+          DynamicIslandStandalone: resolve(__dirname, 'src/renderer/DynamicIslandStandalone.html'),
+          DynamicIslandAibackground: resolve(__dirname, 'src/renderer/DynamicIslandAibackground.html'),
+          DynamicIslandSplash: resolve(__dirname, 'src/renderer/DynamicIslandSplash.html'),
+          DynamicIslandGuide: resolve(__dirname, 'src/renderer/DynamicIslandGuide.html')
         }
       },
     },
