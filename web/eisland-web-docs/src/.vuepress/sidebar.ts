@@ -308,6 +308,16 @@ export default sidebar({
       collapsible: true,
       children: [
         {
+          text: "eAuSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-auth/configuration/verification-redis.md",
+            "server-auth/configuration/security-config.md",
+            "server-auth/configuration/email-verification-mq.md",
+          ],
+        },
+        {
           text: "eAuSS Controller",
           icon: "plug",
           collapsible: true,
@@ -318,6 +328,62 @@ export default sidebar({
             "server-auth/admin-email-dlq-api/README.md",
           ],
         },
+        {
+          text: "eAuSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-auth/service/email-verification-service.md",
+            "server-auth/service/issue-feedback-service.md",
+            "server-auth/service/resend-email-service.md",
+            "server-auth/service/slider-captcha-service.md",
+          ],
+        },
+        {
+          text: "eAuSS Entity",
+          icon: "table",
+          collapsible: true,
+          children: [
+            "server-auth/entity/email-dispatch-dlq-log.md",
+          ],
+        },
+        {
+          text: "eAuSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-auth/mapper/email-dispatch-dlq-log-mapper.md",
+            "server-auth/mapper/issue-feedback-mapper.md",
+          ],
+        },
+        {
+          text: "eAuSS Message Queue",
+          icon: "envelope",
+          collapsible: true,
+          children: [
+            "server-auth/mq/email-code-dispatch-consumer.md",
+          ],
+        },
+        {
+          text: "eAuSS Security",
+          icon: "shield-halved",
+          collapsible: true,
+          children: [
+            "server-auth/security/jwt-authentication-filter.md",
+            "server-auth/security/client-version-gate-filter.md",
+            "server-auth/security/replay-protection-filter.md",
+            "server-auth/security/json-access-denied-handler.md",
+            "server-auth/security/json-authentication-entry-point.md",
+          ],
+        },
+        {
+          text: "eAuSS Utils",
+          icon: "wrench",
+          collapsible: true,
+          children: [
+            "server-auth/util/jwt-util.md",
+          ],
+        },
       ],
     },
     {
@@ -325,6 +391,17 @@ export default sidebar({
       icon: "credit-card",
       collapsible: true,
       children: [
+        {
+          text: "ePSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-payment/configuration/alipay-properties.md",
+            "server-payment/configuration/wechat-pay-properties.md",
+            "server-payment/configuration/payment-redis.md",
+            "server-payment/configuration/payment-mq.md",
+          ],
+        },
         {
           text: "ePSS Controller",
           icon: "plug",
@@ -336,6 +413,61 @@ export default sidebar({
             "server-payment/wechat-pay-notify-api/README.md",
           ],
         },
+        {
+          text: "ePSS Job",
+          icon: "clock",
+          collapsible: true,
+          children: [
+            "server-payment/job/payment-job.md",
+          ],
+        },
+        {
+          text: "ePSS Message Queue",
+          icon: "envelope",
+          collapsible: true,
+          children: [
+            "server-payment/mq/payment-notify-consumer.md",
+            "server-payment/mq/payment-receipt-dispatch-consumer.md",
+          ],
+        },
+        {
+          text: "ePSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-payment/service/payment-service.md",
+            "server-payment/service/alipay-notify-service.md",
+            "server-payment/service/alipay-sdk-client.md",
+            "server-payment/service/wechat-pay-client.md",
+            "server-payment/service/wechat-pay-notify-service.md",
+            "server-payment/service/payment-receipt-email-service.md",
+            "server-payment/service/payment-channel.md",
+          ],
+        },
+        {
+          text: "ePSS Entity",
+          icon: "table",
+          collapsible: true,
+          children: [
+            "server-payment/entity/payment-order.md",
+            "server-payment/entity/payment-transaction.md",
+            "server-payment/entity/payment-pricing-config.md",
+            "server-payment/entity/payment-notify-log.md",
+            "server-payment/entity/payment-dlq-log.md",
+          ],
+        },
+        {
+          text: "ePSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-payment/mapper/payment-order-mapper.md",
+            "server-payment/mapper/payment-transaction-mapper.md",
+            "server-payment/mapper/payment-pricing-config-mapper.md",
+            "server-payment/mapper/payment-notify-log-mapper.md",
+            "server-payment/mapper/payment-dlq-log-mapper.md",
+          ],
+        },
       ],
     },
     {
@@ -343,6 +475,23 @@ export default sidebar({
       icon: "users",
       collapsible: true,
       children: [
+        {
+          text: "eUSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-user/configuration/admin-bootstrap-runner.md",
+            "server-user/configuration/announcement-redis.md",
+            "server-user/configuration/identity-redis.md",
+            "server-user/configuration/identity-material-mq.md",
+            "server-user/configuration/alipay-identity-properties.md",
+            "server-user/configuration/totp-security-redis.md",
+            "server-user/configuration/upload-rate-redis.md",
+            "server-user/configuration/user-ban-redis.md",
+            "server-user/configuration/toolbox-software-redis.md",
+            "server-user/configuration/wallpaper-detail-bloom-redis.md",
+          ],
+        },
         {
           text: "eUSS Controller",
           icon: "plug",
@@ -360,6 +509,86 @@ export default sidebar({
             "server-user/wallpaper-tag-api/README.md",
           ],
         },
+        {
+          text: "eUSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-user/service/user-service.md",
+            "server-user/service/announcement-config-service.md",
+            "server-user/service/identity-verification-service.md",
+            "server-user/service/alipay-identity-client.md",
+            "server-user/service/totp-security-service.md",
+            "server-user/service/user-ban-bloom-service.md",
+            "server-user/service/toolbox-software-service.md",
+            "server-user/service/static-asset-url-service.md",
+            "server-user/service/wallpaper-market-service.md",
+            "server-user/service/wallpaper-detail-bloom-service.md",
+            "server-user/service/wallpaper-tag-service.md",
+          ],
+        },
+        {
+          text: "eUSS Policy",
+          icon: "scale-balanced",
+          collapsible: true,
+          children: [
+            "server-user/policy/username-policy.md",
+            "server-user/policy/password-policy.md",
+            "server-user/policy/password-hash-service.md",
+            "server-user/policy/gender-policy.md",
+          ],
+        },
+        {
+          text: "eUSS Entity",
+          icon: "table",
+          collapsible: true,
+          children: [
+            "server-user/entity/user.md",
+            "server-user/entity/announcement-config.md",
+            "server-user/entity/identity-verification.md",
+            "server-user/entity/toolbox-software.md",
+            "server-user/entity/toolbox-translate-pricing.md",
+            "server-user/entity/wallpaper-asset.md",
+            "server-user/entity/wallpaper-tag.md",
+            "server-user/entity/agent-model-pricing.md",
+            "server-user/entity/agent-usage-stats.md",
+            "server-user/entity/agent-billing-dlq-log.md",
+            "server-user/entity/user-daily-active-stat.md",
+          ],
+        },
+        {
+          text: "eUSS Event",
+          icon: "bolt",
+          collapsible: true,
+          children: [
+            "server-user/event/pro-balance-grant-event.md",
+          ],
+        },
+        {
+          text: "eUSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-user/mapper/user-mapper.md",
+            "server-user/mapper/announcement-config-mapper.md",
+            "server-user/mapper/identity-verification-mapper.md",
+            "server-user/mapper/toolbox-software-mapper.md",
+            "server-user/mapper/toolbox-translate-pricing-mapper.md",
+            "server-user/mapper/wallpaper-market-mapper.md",
+            "server-user/mapper/wallpaper-tag-mapper.md",
+            "server-user/mapper/agent-model-pricing-mapper.md",
+            "server-user/mapper/agent-usage-stats-mapper.md",
+            "server-user/mapper/agent-billing-dlq-log-mapper.md",
+          ],
+        },
+        {
+          text: "eUSS Message Queue",
+          icon: "envelope",
+          collapsible: true,
+          children: [
+            "server-user/mq/identity-material-upload-consumer.md",
+          ],
+        },
       ],
     },
     {
@@ -368,11 +597,55 @@ export default sidebar({
       collapsible: true,
       children: [
         {
+          text: "eMGSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-mini-game/configuration/mini-game-redis.md",
+            "server-mini-game/configuration/mini-game-score-mq.md",
+          ],
+        },
+        {
           text: "eMGSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
             "server-mini-game/mini-game-score-api/README.md",
+          ],
+        },
+        {
+          text: "eMGSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-mini-game/service/mini-game-score-service.md",
+          ],
+        },
+        {
+          text: "eMGSS Entity",
+          icon: "table",
+          collapsible: true,
+          children: [
+            "server-mini-game/entity/mini-game-score.md",
+            "server-mini-game/entity/mini-game-score-dlq-log.md",
+          ],
+        },
+        {
+          text: "eMGSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-mini-game/mapper/mini-game-score-mapper.md",
+            "server-mini-game/mapper/mini-game-score-dlq-log-mapper.md",
+          ],
+        },
+        {
+          text: "eMGSS Message Queue",
+          icon: "envelope",
+          collapsible: true,
+          children: [
+            "server-mini-game/mq/score-upsert-consumer.md",
+            "server-mini-game/mq/score-upsert-producer.md",
           ],
         },
       ],
@@ -390,6 +663,30 @@ export default sidebar({
             "server-service-status/service-status-api/README.md",
           ],
         },
+        {
+          text: "eSSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-service-status/service/service-status-service.md",
+          ],
+        },
+        {
+          text: "eSSS Entity",
+          icon: "table",
+          collapsible: true,
+          children: [
+            "server-service-status/entity/service-status.md",
+          ],
+        },
+        {
+          text: "eSSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-service-status/mapper/service-status-mapper.md",
+          ],
+        },
       ],
     },
     {
@@ -398,11 +695,57 @@ export default sidebar({
       collapsible: true,
       children: [
         {
+          text: "eUpSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-upload/configuration/upload-security-redis.md",
+            "server-upload/configuration/object-replication-mq.md",
+          ],
+        },
+        {
           text: "eUpSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
             "server-upload/upload-api/README.md",
+          ],
+        },
+        {
+          text: "eUpSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-upload/service/object-storage-client.md",
+            "server-upload/service/object-storage-router.md",
+            "server-upload/service/cos-storage-service.md",
+            "server-upload/service/r2-storage-service.md",
+            "server-upload/service/oss-service.md",
+            "server-upload/service/feedback-r2-storage-service.md",
+            "server-upload/service/wallpaper-r2-storage-service.md",
+            "server-upload/service/object-outbox-relay-service.md",
+            "server-upload/service/object-replication-task-service.md",
+            "server-upload/service/object-replication-backfill-service.md",
+            "server-upload/service/upload-rate-limiter.md",
+          ],
+        },
+        {
+          text: "eUpSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-upload/mapper/object-outbox-mapper.md",
+            "server-upload/mapper/object-replication-task-mapper.md",
+            "server-upload/mapper/object-replication-checkpoint-mapper.md",
+            "server-upload/mapper/object-replication-backfill-mapper.md",
+          ],
+        },
+        {
+          text: "eUpSS Message Queue",
+          icon: "envelope",
+          collapsible: true,
+          children: [
+            "server-upload/mq/object-replication-consumer.md",
           ],
         },
       ],
@@ -413,11 +756,44 @@ export default sidebar({
       collapsible: true,
       children: [
         {
+          text: "eVSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-version/configuration/version-bloom-redis.md",
+          ],
+        },
+        {
           text: "eVSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
             "server-version/version-api/README.md",
+          ],
+        },
+        {
+          text: "eVSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-version/service/app-version-service.md",
+            "server-version/service/version-app-bloom-service.md",
+          ],
+        },
+        {
+          text: "eVSS Entity",
+          icon: "table",
+          collapsible: true,
+          children: [
+            "server-version/entity/app-version.md",
+          ],
+        },
+        {
+          text: "eVSS Mapper",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-version/mapper/app-version-mapper.md",
           ],
         },
       ],
@@ -428,12 +804,28 @@ export default sidebar({
       collapsible: true,
       children: [
         {
+          text: "eWSS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-weather/configuration/qweather-redis.md",
+          ],
+        },
+        {
           text: "eWSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
             "server-weather/user-weather-api/README.md",
             "server-weather/admin-weather-api/README.md",
+          ],
+        },
+        {
+          text: "eWSS Service",
+          icon: "server",
+          collapsible: true,
+          children: [
+            "server-weather/service/qweather-service.md",
           ],
         },
       ],
