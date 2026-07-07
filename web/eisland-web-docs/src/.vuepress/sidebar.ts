@@ -237,7 +237,6 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-agent/configuration/README.md",
             "server-agent/configuration/agent-billing-redis.md",
             "server-agent/configuration/agent-pricing-redis.md",
             "server-agent/configuration/agent-usage-redis.md",
@@ -309,7 +308,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eAuSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -327,7 +326,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "ePSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -345,7 +344,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eUSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -369,7 +368,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eMGSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -380,11 +379,11 @@ export default sidebar({
     },
     {
       text: "eisland Service Status Server",
-      icon: "activity",
+      icon: "server",
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eSSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -399,7 +398,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eUpSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -414,7 +413,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eVSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -429,7 +428,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Controller",
+          text: "eWSS Controller",
           icon: "plug",
           collapsible: true,
           children: [
@@ -445,7 +444,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Config",
+          text: "eApSS Config",
           icon: "gear",
           collapsible: true,
           children: [
@@ -460,7 +459,7 @@ export default sidebar({
       collapsible: true,
       children: [
         {
-          text: "eASS Utils",
+          text: "eCSS Utils",
           icon: "wrench",
           collapsible: true,
           children: [
