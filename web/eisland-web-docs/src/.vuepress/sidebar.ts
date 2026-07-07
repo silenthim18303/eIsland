@@ -226,6 +226,22 @@ export default sidebar({
       ],
     },
   ],
+  "/api-backend/": [
+    {
+      text: "API Backend",
+      icon: "server",
+      collapsible: false,
+      children: [],
+    },
+  ],
+  "/api-frontend/": [
+    {
+      text: "API Frontend",
+      icon: "display",
+      collapsible: false,
+      children: [],
+    },
+  ],
   "/developer/": [
     {
       text: "Environment Setup",
