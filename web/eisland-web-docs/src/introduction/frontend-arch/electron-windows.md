@@ -1,5 +1,5 @@
 ---
-title: eisland Electron Windows
+title: eIsland Electron Windows
 icon: window-restore
 ---
 
