@@ -19,25 +19,12 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file guide.css
+ * @description 引导配置窗口样式入口（聚合子模块）
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
-
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+@import './guide/base.css';
+@import './guide/step.css';
+@import './guide/language.css';
+@import './guide/smtc.css';

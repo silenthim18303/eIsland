@@ -1,4 +1,4 @@
-/*
+<!--
  * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
  * https://github.com/JNTMTMTM/eIsland
  *
@@ -16,28 +16,22 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- */
+-->
 
-/**
- * @file index.ts
- * @description SvgIcon 统一入口
- * @author 鸡哥
- */
-
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
-
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+<!--
+  @file guideMain.html
+  @description 引导配置窗口 React 渲染入口
+  @author 鸡哥
+-->
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>eIsland Guide</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./guideMain.tsx"></script>
+  </body>
+</html>

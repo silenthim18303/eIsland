@@ -34,6 +34,32 @@
       "loginNow": "立即登录",
       "registerNow": "立即注册"
     },
+    "language": {
+      "title": "选择语言",
+      "subtitle": "选择你偏好的语言以继续",
+      "zhCN": "中文",
+      "enUS": "English",
+      "jaJP": "日本語",
+      "koKR": "한국어",
+      "frFR": "Français",
+      "deDE": "Deutsch",
+      "esES": "Español",
+      "ruRU": "Русский"
+    },
+    "smtc": {
+      "title": "SMTC 媒体测试",
+      "subtitle": "检测系统媒体会话是否可用",
+      "hint": "请使用播放器播放一首歌",
+      "player": "播放器",
+      "unknownPlayer": "未知",
+      "state": "状态",
+      "playing": "播放中",
+      "paused": "已暂停",
+      "prev": "上一曲",
+      "next": "下一曲",
+      "pause": "暂停",
+      "play": "播放"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "desc": "一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。"

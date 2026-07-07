@@ -1,0 +1,102 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file guide/step.css
+ * @description 引导配置窗口 — 通用步骤布局与按钮样式
+ * @author 鸡哥
+ */
+
+.guide-step {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-step-header {
+  position: absolute;
+  top: 32px;
+  left: 40px;
+}
+
+.guide-step-header p {
+  margin-top: 6px;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+.guide-step-footer {
+  position: absolute;
+  bottom: 32px;
+  right: 40px;
+  display: flex;
+  gap: 12px;
+}
+
+/* ===== Next Button ===== */
+
+.guide-next-btn {
+  min-width: 100px;
+  height: 40px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.guide-next-btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ===== Prev Button ===== */
+
+.guide-prev-btn {
+  min-width: 100px;
+  height: 40px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+
+.guide-prev-btn:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+}

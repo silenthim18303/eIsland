@@ -19,25 +19,10 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file types/index.ts
+ * @description 引导 SMTC 模块 — 类型定义桶导出
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
-
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+export type { SmtcTestStatus, SmtcMediaMeta, UseSmtcTestReturn } from './media';
+export type { SmtcStepProps, MarqueeTextProps } from './props';

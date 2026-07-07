@@ -1,0 +1,248 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file guide/smtc.css
+ * @description 引导配置窗口 — SMTC 媒体测试步骤样式
+ * @author 鸡哥
+ */
+
+/* ===== 容器 ===== */
+
+.guide-smtc-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== 加载 / 空状态 ===== */
+
+.guide-smtc-loading,
+.guide-smtc-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.guide-smtc-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: guideSmtcSpin 0.8s linear infinite;
+}
+
+@keyframes guideSmtcSpin {
+  to { transform: rotate(360deg); }
+}
+
+.guide-smtc-hint {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ===== 结果布局 ===== */
+
+.guide-smtc-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 560px;
+  padding: 0 20px;
+  transform: translateY(20px);
+}
+
+.guide-smtc-media-row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  perspective: 600px;
+}
+
+/* ===== 左侧：专辑封面（3D 向内倾斜 + 光晕） ===== */
+
+.guide-smtc-left {
+  flex-shrink: 0;
+  position: relative;
+  transform: rotateY(12deg) rotateX(-4deg);
+  transform-style: preserve-3d;
+}
+
+.guide-smtc-glow {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(20px);
+  opacity: 0.8;
+}
+
+.guide-smtc-cover {
+  position: relative;
+  z-index: 1;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.06);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ===== 右侧：元数据（右对齐 + 3D 向内倾斜） ===== */
+
+.guide-smtc-right {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+
+.guide-smtc-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.guide-smtc-artist {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.guide-smtc-album {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* ===== 滚动文本 ===== */
+
+.guide-smtc-marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.guide-smtc-marquee-inner.scrolling {
+  animation: guideSmtcMarquee 10s ease-in-out 1.5s infinite;
+}
+
+@keyframes guideSmtcMarquee {
+  0%, 15% { transform: translateX(0); }
+  40%, 60% { transform: translateX(var(--marquee-distance, 0)); }
+  85%, 100% { transform: translateX(0); }
+}
+
+.guide-smtc-info {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.guide-smtc-info-label {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.guide-smtc-info-value {
+  color: rgba(255, 255, 255, 0.6);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.guide-smtc-player-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  object-fit: contain;
+  margin-top: 2px;
+}
+
+.guide-smtc-cover.paused {
+  opacity: 0.7;
+}
+
+/* ===== 媒体控制按钮 ===== */
+
+.guide-smtc-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.guide-smtc-ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.guide-smtc-ctrl-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.guide-smtc-ctrl-btn:active {
+  transform: scale(0.9);
+}
+
+.guide-smtc-ctrl-btn--play {
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.guide-smtc-ctrl-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+
+.guide-smtc-ctrl-icon--sm {
+  width: 14px;
+  height: 14px;
+}

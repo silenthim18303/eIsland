@@ -19,25 +19,29 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file useSmtcTest.ts
+ * @description 引导 SMTC 媒体测试 Hook — 订阅单例状态
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+import { useState, useEffect } from 'react';
+import type { UseSmtcTestReturn } from '../types';
+import { runtime } from '../utils/smtcStore';
+import { ensureInitialized } from '../utils/smtcActions';
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+/**
+ * SMTC 媒体测试 Hook
+ * @description 订阅模块级单例状态，跨挂载持久化
+ */
+export function useSmtcTest(): UseSmtcTestReturn {
+  const [, forceUpdate] = useState(0);
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
+  useEffect(() => {
+    const listener = (): void => forceUpdate((n) => n + 1);
+    runtime.listeners.add(listener);
+    ensureInitialized();
+    return () => { runtime.listeners.delete(listener); };
+  }, []);
 
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+  return { status: runtime.status, meta: runtime.meta };
+}

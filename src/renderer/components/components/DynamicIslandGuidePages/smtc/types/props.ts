@@ -19,25 +19,23 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file types/props.ts
+ * @description 引导 SMTC 模块 — 组件 Props 类型
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+import type { ReactNode } from 'react';
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+/** SmtcStep 组件属性 */
+export interface SmtcStepProps {
+  /** 确认后进入下一步的回调 */
+  onNext: () => void;
+  /** 返回上一步的回调 */
+  onPrev: () => void;
+}
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+/** MarqueeText 组件属性 */
+export interface MarqueeTextProps {
+  children: ReactNode;
+  className?: string;
+}

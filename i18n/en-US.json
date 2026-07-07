@@ -34,6 +34,32 @@
       "loginNow": "Log In Now",
       "registerNow": "Register Now"
     },
+    "language": {
+      "title": "Select Language",
+      "subtitle": "Choose your preferred language to continue",
+      "zhCN": "中文",
+      "enUS": "English",
+      "jaJP": "日本語",
+      "koKR": "한국어",
+      "frFR": "Français",
+      "deDE": "Deutsch",
+      "esES": "Español",
+      "ruRU": "Русский"
+    },
+    "smtc": {
+      "title": "SMTC Media Test",
+      "subtitle": "Check if system media transport controls are available",
+      "hint": "Play a song with your media player",
+      "player": "Player",
+      "unknownPlayer": "Unknown",
+      "state": "State",
+      "playing": "Playing",
+      "paused": "Paused",
+      "prev": "Previous",
+      "next": "Next",
+      "pause": "Pause",
+      "play": "Play"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "desc": "A Windows desktop floating widget inspired by Apple Dynamic Island,\nmaking your desktop more vivid and productive."

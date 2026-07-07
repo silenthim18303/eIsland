@@ -28,7 +28,7 @@ import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useSplash } from './hooks/useSplash';
 import { SPLASH_VIDEO_SRC } from './config/splashConfig';
-import { SplashWaveEffect } from './components/SplashWaveEffect';
+import { WaveEffect } from './components/DynamicIslandSharedWaveEffect';
 
 /** 启动画面默认背景颜色 */
 const DEFAULT_BG_COLOR = '#000000';
@@ -49,7 +49,7 @@ export function SplashScreen(): ReactElement {
       className={`splash-container${fadeOut ? ' fade-out' : ''}`}
       style={{ background: bgColor }}
     >
-      <SplashWaveEffect />
+      <WaveEffect />
       <video
         ref={videoRef}
         className="splash-video"

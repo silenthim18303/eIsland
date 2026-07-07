@@ -19,9 +19,13 @@
  */
 
 /**
- * @file index.ts
- * @description 启动画面波浪背景公共组件模块导出。
+ * @file types/index.ts
+ * @description 引导语言选择步骤 — 类型定义
  * @author 鸡哥
  */
 
-export { SplashWaveEffect } from './components/SplashWaveEffect';
+/** LanguageStep 组件属性 */
+export interface LanguageStepProps {
+  /** 语言确认后进入下一步的回调 */
+  onNext: () => void;
+}

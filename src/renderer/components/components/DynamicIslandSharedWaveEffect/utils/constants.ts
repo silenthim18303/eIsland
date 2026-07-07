@@ -19,25 +19,10 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file constants.ts
+ * @description 波浪背景组件共享常量
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
-
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+/** 默认强调色（蓝色），与 SMTC 封面主色回退色保持一致 */
+export const DEFAULT_ACCENT_COLOR: [number, number, number] = [0.439, 0.627, 1.0];

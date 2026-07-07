@@ -19,25 +19,23 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file color.ts
+ * @description 波浪背景颜色转换工具
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+import type { RgbTuple } from '../types';
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+/** 着色器原始背景颜色 vec3(0.002, 0.004, 0.005) */
+export const SHADER_DEFAULT_BG_RGB: RgbTuple = [0.002, 0.004, 0.005];
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+/**
+ * 将十六进制颜色转换为归一化 RGB 分量。
+ * @param hex - 十六进制颜色字符串（如 #000000）。
+ * @returns 归一化 RGB 三元组，各分量范围 0-1。
+ */
+export function hexToRgbNorm(hex: string): RgbTuple {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return SHADER_DEFAULT_BG_RGB;
+  return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
+}

@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../../../../../store/slices';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
 import { SPLASH_VIDEO_SRC } from '../../../../../../../config/splashConfig';
-import { SplashWaveEffect } from '../../../../../../../components/SplashWaveEffect';
+import { WaveEffect } from '../../../../../../../components/DynamicIslandSharedWaveEffect';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
 const EXPAND_TAB_ANIMATION_KEY = 'expand-tab-animation';
@@ -259,7 +259,7 @@ export function AnimationSettingsPage(): ReactElement {
           </div>
           <div className="settings-splash-preview-container">
             <div className="settings-splash-preview-stage" style={{ background: splashBgColor }}>
-              <SplashWaveEffect playing={previewPlaying} color={splashBgColor} />
+              <WaveEffect playing={previewPlaying} color={splashBgColor} />
               <video
                 ref={previewVideoRef}
                 className="splash-video"

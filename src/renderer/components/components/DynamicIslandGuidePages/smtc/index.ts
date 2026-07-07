@@ -19,25 +19,9 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file Guide/smtc/index.ts
+ * @description 引导 SMTC 检查步骤公共导出
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
-
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+export { SmtcStep } from './components/SmtcStep';

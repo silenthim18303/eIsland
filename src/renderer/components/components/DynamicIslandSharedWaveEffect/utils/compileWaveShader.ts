@@ -19,25 +19,33 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file compileWaveShader.ts
+ * @description 波浪背景 WebGL 着色器编译工具。
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+/**
+ * 编译波浪背景着色器。
+ * @param gl - WebGL 渲染上下文。
+ * @param type - 着色器类型。
+ * @param source - 着色器源码。
+ * @returns 编译成功的着色器，失败时返回 null。
+ */
+export function compileWaveShader(
+  gl: WebGLRenderingContext,
+  type: number,
+  source: string,
+): WebGLShader | null {
+  const shader = gl.createShader(type);
+  if (!shader) return null;
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.warn('[WaveEffect] shader compile failed:', gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+  return shader;
+}

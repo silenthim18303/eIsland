@@ -19,25 +19,29 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file smtcStore.ts
+ * @description 引导 SMTC — 模块级单例状态
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+import type { SmtcTestStatus, SmtcMediaMeta } from '../types';
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+/** 封面主色缓存 */
+export const dominantColorCache = new Map<string, [number, number, number]>();
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
+/** 运行时状态（跨组件挂载持久化） */
+export const runtime = {
+  status: 'loading' as SmtcTestStatus,
+  meta: null as SmtcMediaMeta | null,
+  coverImage: null as string | null,
+  dominantColor: [0, 0, 0] as [number, number, number],
+  sourceAppId: '',
+  initialized: false,
+  unsubscribe: null as (() => void) | null,
+  listeners: new Set<() => void>(),
+};
 
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+/** 通知所有订阅者触发重渲染 */
+export function notify(): void {
+  runtime.listeners.forEach((fn) => fn());
+}

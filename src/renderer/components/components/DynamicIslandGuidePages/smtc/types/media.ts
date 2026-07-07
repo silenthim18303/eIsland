@@ -19,33 +19,27 @@
  */
 
 /**
- * @file compileSplashWaveShader.ts
- * @description 启动画面波浪背景 WebGL 着色器编译工具。
+ * @file types/media.ts
+ * @description 引导 SMTC 模块 — 媒体数据类型
  * @author 鸡哥
  */
 
-/**
- * 编译启动波浪背景着色器。
- * @param gl - WebGL 渲染上下文。
- * @param type - 着色器类型。
- * @param source - 着色器源码。
- * @returns 编译成功的着色器，失败时返回 null。
- */
-export function compileSplashWaveShader(
-  gl: WebGLRenderingContext,
-  type: number,
-  source: string,
-): WebGLShader | null {
-  const shader = gl.createShader(type);
-  if (!shader) return null;
+/** SMTC 测试状态 */
+export type SmtcTestStatus = 'loading' | 'success' | 'no-media';
 
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    console.warn('[SplashWave] shader compile failed:', gl.getShaderInfoLog(shader));
-    gl.deleteShader(shader);
-    return null;
-  }
+/** 媒体元数据 */
+export interface SmtcMediaMeta {
+  title: string;
+  artist: string;
+  album: string;
+  coverImage: string | null;
+  dominantColor: [number, number, number];
+  isPlaying: boolean;
+  sourceAppId: string;
+}
 
-  return shader;
+/** useSmtcTest 返回值 */
+export interface UseSmtcTestReturn {
+  status: SmtcTestStatus;
+  meta: SmtcMediaMeta | null;
 }
