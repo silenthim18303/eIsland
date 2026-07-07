@@ -19,10 +19,27 @@
  */
 
 /**
- * @file types/index.ts
- * @description 引导 SMTC 模块 — 类型定义桶导出
+ * @file types/media.ts
+ * @description 引导 SMTC 模块 — 媒体数据类型
  * @author 鸡哥
  */
 
-export type { SmtcTestStatus, SmtcMediaMeta, UseSmtcTestReturn } from './media';
-export type { SmtcStepProps, MarqueeTextProps } from './props';
+/** SMTC 测试状态 */
+export type SmtcTestStatus = 'loading' | 'success' | 'no-media';
+
+/** 媒体元数据 */
+export interface SmtcMediaMeta {
+  title: string;
+  artist: string;
+  album: string;
+  coverImage: string | null;
+  dominantColor: [number, number, number];
+  isPlaying: boolean;
+  sourceAppId: string;
+}
+
+/** useSmtcTest 返回值 */
+export interface UseSmtcTestReturn {
+  status: SmtcTestStatus;
+  meta: SmtcMediaMeta | null;
+}

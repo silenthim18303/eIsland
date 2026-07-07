@@ -27,7 +27,7 @@
 import { useState, useEffect } from 'react';
 import { runtime } from '../utils/smtcStore';
 import { ensureInitialized } from '../utils/smtcActions';
-import { DEFAULT_ACCENT_COLOR } from '../../../WaveEffect/hooks/useWaveRenderer';
+import { DEFAULT_ACCENT_COLOR } from '../../../WaveEffect/utils/constants';
 
 /**
  * SMTC 强调色 Hook

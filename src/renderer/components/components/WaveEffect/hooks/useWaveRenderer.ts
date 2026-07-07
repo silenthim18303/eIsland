@@ -26,14 +26,9 @@
 
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
-import {
-  WAVE_FRAGMENT_SHADER,
-  WAVE_VERTEX_SHADER,
-} from '../config/waveShaders';
-import { compileWaveShader } from '../utils/compileWaveShader';
-
-/** 默认强调色（蓝色），与 SMTC 封面主色回退色保持一致 */
-export const DEFAULT_ACCENT_COLOR: [number, number, number] = [0.439, 0.627, 1.0];
+import { DEFAULT_ACCENT_COLOR } from '../utils/constants';
+import { initWaveGl } from '../utils/initWaveGl';
+import type { WaveGlContext } from '../types';
 
 /**
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
@@ -51,17 +46,7 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
   accentColorRef.current = accentColor;
 
   /** 跨 effect 生命周期持久化的 WebGL 资源 */
-  const glRef = useRef<{
-    gl: WebGLRenderingContext;
-    program: WebGLProgram;
-    buffer: WebGLBuffer;
-    posLoc: number;
-    resLoc: WebGLUniformLocation | null;
-    timeLoc: WebGLUniformLocation | null;
-    bgColorLoc: WebGLUniformLocation | null;
-    accentColorLoc: WebGLUniformLocation | null;
-    startTime: number;
-  } | null>(null);
+  const glRef = useRef<WaveGlContext | null>(null);
 
   /** 首次 playing=true 时初始化 WebGL 上下文与着色器 */
   useEffect(() => {
@@ -71,54 +56,7 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const gl = canvas.getContext('webgl', {
-      alpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false,
-      premultipliedAlpha: false,
-      preserveDrawingBuffer: false,
-      powerPreference: 'high-performance',
-    });
-    if (!gl) return;
-
-    const vert = compileWaveShader(gl, gl.VERTEX_SHADER, WAVE_VERTEX_SHADER);
-    const frag = compileWaveShader(gl, gl.FRAGMENT_SHADER, WAVE_FRAGMENT_SHADER);
-    if (!vert || !frag) return;
-
-    const program = gl.createProgram();
-    if (!program) return;
-
-    gl.attachShader(program, vert);
-    gl.attachShader(program, frag);
-    gl.linkProgram(program);
-    gl.deleteShader(vert);
-    gl.deleteShader(frag);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      console.warn('[WaveEffect] shader link failed:', gl.getProgramInfoLog(program));
-      gl.deleteProgram(program);
-      return;
-    }
-
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.CULL_FACE);
-
-    glRef.current = {
-      gl,
-      program,
-      buffer,
-      posLoc: gl.getAttribLocation(program, 'aPosition'),
-      resLoc: gl.getUniformLocation(program, 'uResolution'),
-      timeLoc: gl.getUniformLocation(program, 'uTime'),
-      bgColorLoc: gl.getUniformLocation(program, 'uBgColor'),
-      accentColorLoc: gl.getUniformLocation(program, 'uAccentColor'),
-      startTime: performance.now(),
-    };
+    glRef.current = initWaveGl(canvas);
   }, [canvasRef, playing]);
 
   /** RAF 渲染循环，playing=true 时运行，playing=false 时停止 */

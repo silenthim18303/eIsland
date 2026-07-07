@@ -19,10 +19,10 @@
  */
 
 /**
- * @file types/index.ts
- * @description 引导 SMTC 模块 — 类型定义桶导出
+ * @file constants.ts
+ * @description 波浪背景组件共享常量
  * @author 鸡哥
  */
 
-export type { SmtcTestStatus, SmtcMediaMeta, UseSmtcTestReturn } from './media';
-export type { SmtcStepProps, MarqueeTextProps } from './props';
+/** 默认强调色（蓝色），与 SMTC 封面主色回退色保持一致 */
+export const DEFAULT_ACCENT_COLOR: [number, number, number] = [0.439, 0.627, 1.0];

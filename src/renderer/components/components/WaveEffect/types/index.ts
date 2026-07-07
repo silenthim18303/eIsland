@@ -20,9 +20,19 @@
 
 /**
  * @file types/index.ts
- * @description 引导 SMTC 模块 — 类型定义桶导出
+ * @description 波浪背景组件类型定义
  * @author 鸡哥
  */
 
-export type { SmtcTestStatus, SmtcMediaMeta, UseSmtcTestReturn } from './media';
-export type { SmtcStepProps, MarqueeTextProps } from './props';
+/** WebGL 渲染上下文，包含着色器程序与所有 uniform/attribute 位置 */
+export interface WaveGlContext {
+  gl: WebGLRenderingContext;
+  program: WebGLProgram;
+  buffer: WebGLBuffer;
+  posLoc: number;
+  resLoc: WebGLUniformLocation | null;
+  timeLoc: WebGLUniformLocation | null;
+  bgColorLoc: WebGLUniformLocation | null;
+  accentColorLoc: WebGLUniformLocation | null;
+  startTime: number;
+}

@@ -19,10 +19,23 @@
  */
 
 /**
- * @file types/index.ts
- * @description 引导 SMTC 模块 — 类型定义桶导出
+ * @file types/props.ts
+ * @description 引导 SMTC 模块 — 组件 Props 类型
  * @author 鸡哥
  */
 
-export type { SmtcTestStatus, SmtcMediaMeta, UseSmtcTestReturn } from './media';
-export type { SmtcStepProps, MarqueeTextProps } from './props';
+import type { ReactNode } from 'react';
+
+/** SmtcStep 组件属性 */
+export interface SmtcStepProps {
+  /** 确认后进入下一步的回调 */
+  onNext: () => void;
+  /** 返回上一步的回调 */
+  onPrev: () => void;
+}
+
+/** MarqueeText 组件属性 */
+export interface MarqueeTextProps {
+  children: ReactNode;
+  className?: string;
+}
