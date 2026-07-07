@@ -237,15 +237,15 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-agent/configuration/agent-billing-redis.md",
-            "server-agent/configuration/agent-pricing-redis.md",
-            "server-agent/configuration/agent-usage-redis.md",
-            "server-agent/configuration/agent-billing-mq.md",
-            "server-agent/configuration/agent-stt-websocket.md",
-            "server-agent/configuration/mihtnelis-agent-properties.md",
-            "server-agent/configuration/mihtnelis-prompt-builder.md",
-            "server-agent/configuration/edoc-prompt-builder.md",
-            "server-agent/configuration/r1pxc-prompt-builder.md",
+            "server-agent/config/agent-billing-redis.md",
+            "server-agent/config/agent-pricing-redis.md",
+            "server-agent/config/agent-usage-redis.md",
+            "server-agent/config/agent-billing-mq.md",
+            "server-agent/config/agent-stt-websocket.md",
+            "server-agent/config/mihtnelis-agent-properties.md",
+            "server-agent/config/mihtnelis-prompt-builder.md",
+            "server-agent/config/edoc-prompt-builder.md",
+            "server-agent/config/r1pxc-prompt-builder.md",
           ],
         },
         {
@@ -253,11 +253,11 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-agent/agent-chat-api/README.md",
-            "server-agent/admin-agent-api/README.md",
-            "server-agent/admin-tmt-api/README.md",
-            "server-agent/toolbox-api/README.md",
-            "server-agent/stt-websocket/README.md",
+            "server-agent/controller/mihtnelis-agent-controller.md",
+            "server-agent/controller/admin-agent-controller.md",
+            "server-agent/controller/admin-tmt-controller.md",
+            "server-agent/controller/toolbox-translate-controller.md",
+            "server-agent/controller/agent-realtime-stt-controller.md",
           ],
         },
         {
@@ -312,9 +312,9 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-auth/configuration/verification-redis.md",
-            "server-auth/configuration/security-config.md",
-            "server-auth/configuration/email-verification-mq.md",
+            "server-auth/config/verification-redis.md",
+            "server-auth/config/security-config.md",
+            "server-auth/config/email-verification-mq.md",
           ],
         },
         {
@@ -322,10 +322,10 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-auth/auth-api/README.md",
-            "server-auth/email-verification-api/README.md",
-            "server-auth/feedback-api/README.md",
-            "server-auth/admin-email-dlq-api/README.md",
+            "server-auth/controller/auth-controller.md",
+            "server-auth/controller/email-verification-controller.md",
+            "server-auth/controller/issue-feedback-controller.md",
+            "server-auth/controller/admin-email-dlq-controller.md",
           ],
         },
         {
@@ -377,6 +377,14 @@ export default sidebar({
           ],
         },
         {
+          text: "eAuSS Rate Limit",
+          icon: "gauge",
+          collapsible: true,
+          children: [
+            "server-auth/ratelimit/auth-rate-limiter.md",
+          ],
+        },
+        {
           text: "eAuSS Utils",
           icon: "wrench",
           collapsible: true,
@@ -396,10 +404,10 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-payment/configuration/alipay-properties.md",
-            "server-payment/configuration/wechat-pay-properties.md",
-            "server-payment/configuration/payment-redis.md",
-            "server-payment/configuration/payment-mq.md",
+            "server-payment/config/alipay-properties.md",
+            "server-payment/config/wechat-pay-properties.md",
+            "server-payment/config/payment-redis.md",
+            "server-payment/config/payment-mq.md",
           ],
         },
         {
@@ -407,10 +415,10 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-payment/user-payment-api/README.md",
-            "server-payment/admin-payment-api/README.md",
-            "server-payment/alipay-notify-api/README.md",
-            "server-payment/wechat-pay-notify-api/README.md",
+            "server-payment/controller/user-payment-controller.md",
+            "server-payment/controller/admin-payment-controller.md",
+            "server-payment/controller/alipay-notify-controller.md",
+            "server-payment/controller/wechat-pay-notify-controller.md",
           ],
         },
         {
@@ -480,16 +488,16 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-user/configuration/admin-bootstrap-runner.md",
-            "server-user/configuration/announcement-redis.md",
-            "server-user/configuration/identity-redis.md",
-            "server-user/configuration/identity-material-mq.md",
-            "server-user/configuration/alipay-identity-properties.md",
-            "server-user/configuration/totp-security-redis.md",
-            "server-user/configuration/upload-rate-redis.md",
-            "server-user/configuration/user-ban-redis.md",
-            "server-user/configuration/toolbox-software-redis.md",
-            "server-user/configuration/wallpaper-detail-bloom-redis.md",
+            "server-user/config/admin-bootstrap-runner.md",
+            "server-user/config/announcement-redis.md",
+            "server-user/config/identity-redis.md",
+            "server-user/config/identity-material-mq.md",
+            "server-user/config/alipay-identity-properties.md",
+            "server-user/config/totp-security-redis.md",
+            "server-user/config/upload-rate-redis.md",
+            "server-user/config/user-ban-redis.md",
+            "server-user/config/toolbox-software-redis.md",
+            "server-user/config/wallpaper-detail-bloom-redis.md",
           ],
         },
         {
@@ -497,16 +505,16 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-user/user-api/README.md",
-            "server-user/user-admin-api/README.md",
-            "server-user/app-user-api/README.md",
-            "server-user/announcement-api/README.md",
-            "server-user/identity-verification-api/README.md",
-            "server-user/identity-admin-api/README.md",
-            "server-user/toolbox-software-api/README.md",
-            "server-user/wallpaper-user-api/README.md",
-            "server-user/wallpaper-admin-api/README.md",
-            "server-user/wallpaper-tag-api/README.md",
+            "server-user/controller/user-controller.md",
+            "server-user/controller/user-admin-controller.md",
+            "server-user/controller/app-user-controller.md",
+            "server-user/controller/announcement-controller.md",
+            "server-user/controller/identity-verification-controller.md",
+            "server-user/controller/identity-admin-controller.md",
+            "server-user/controller/toolbox-software-controller.md",
+            "server-user/controller/wallpaper-user-controller.md",
+            "server-user/controller/wallpaper-admin-controller.md",
+            "server-user/controller/wallpaper-tag-controller.md",
           ],
         },
         {
@@ -601,8 +609,8 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-mini-game/configuration/mini-game-redis.md",
-            "server-mini-game/configuration/mini-game-score-mq.md",
+            "server-mini-game/config/mini-game-redis.md",
+            "server-mini-game/config/mini-game-score-mq.md",
           ],
         },
         {
@@ -610,7 +618,7 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-mini-game/mini-game-score-api/README.md",
+            "server-mini-game/controller/mini-game-score-controller.md",
           ],
         },
         {
@@ -660,7 +668,7 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-service-status/service-status-api/README.md",
+            "server-service-status/controller/service-status-controller.md",
           ],
         },
         {
@@ -699,8 +707,8 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-upload/configuration/upload-security-redis.md",
-            "server-upload/configuration/object-replication-mq.md",
+            "server-upload/config/upload-security-redis.md",
+            "server-upload/config/object-replication-mq.md",
           ],
         },
         {
@@ -708,7 +716,7 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-upload/upload-api/README.md",
+            "server-upload/controller/upload-controller.md",
           ],
         },
         {
@@ -760,7 +768,7 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-version/configuration/version-bloom-redis.md",
+            "server-version/config/version-bloom-redis.md",
           ],
         },
         {
@@ -768,7 +776,7 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-version/version-api/README.md",
+            "server-version/controller/version-controller.md",
           ],
         },
         {
@@ -808,7 +816,7 @@ export default sidebar({
           icon: "gear",
           collapsible: true,
           children: [
-            "server-weather/configuration/qweather-redis.md",
+            "server-weather/config/qweather-redis.md",
           ],
         },
         {
@@ -816,8 +824,8 @@ export default sidebar({
           icon: "plug",
           collapsible: true,
           children: [
-            "server-weather/user-weather-api/README.md",
-            "server-weather/admin-weather-api/README.md",
+            "server-weather/controller/user-weather-controller.md",
+            "server-weather/controller/admin-weather-controller.md",
           ],
         },
         {
