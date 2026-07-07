@@ -24,12 +24,12 @@
  * @author 鸡哥
  */
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import type { RefObject } from 'react';
 import { DEFAULT_ACCENT_COLOR } from '../utils/constants';
-import { initWaveGl } from '../utils/initWaveGl';
-import { startWaveLoop } from '../utils/drawWave';
-import type { WaveGlContext } from '../types';
+import { useWaveInit } from './useWaveInit';
+import { useWaveLoop } from './useWaveLoop';
+import type { RgbTuple } from '../types';
 
 /**
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
@@ -40,34 +40,12 @@ import type { WaveGlContext } from '../types';
  * @param accentColor - 强调色 [r, g, b]，默认 DEFAULT_ACCENT_COLOR。
  * @returns 无返回值。
  */
-export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true, accentColor: [number, number, number] = DEFAULT_ACCENT_COLOR): void {
+export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: RgbTuple, playing = true, accentColor: RgbTuple = DEFAULT_ACCENT_COLOR): void {
   const bgColorRef = useRef(bgColor);
   bgColorRef.current = bgColor;
   const accentColorRef = useRef(accentColor);
   accentColorRef.current = accentColor;
 
-  /** 跨 effect 生命周期持久化的 WebGL 资源 */
-  const glRef = useRef<WaveGlContext | null>(null);
-
-  /** 首次 playing=true 时初始化 WebGL 上下文与着色器 */
-  useEffect(() => {
-    if (!playing) return;
-    if (glRef.current) return;
-
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    glRef.current = initWaveGl(canvas);
-  }, [canvasRef, playing]);
-
-  /** RAF 渲染循环，playing=true 时运行，playing=false 时停止 */
-  useEffect(() => {
-    if (!playing) return;
-
-    const ctx = glRef.current;
-    const canvas = canvasRef.current;
-    if (!ctx || !canvas) return;
-
-    return startWaveLoop(ctx, canvas, bgColorRef, accentColorRef);
-  }, [canvasRef, playing]);
+  const glRef = useWaveInit(canvasRef, playing);
+  useWaveLoop(canvasRef, playing, glRef, bgColorRef, accentColorRef);
 }

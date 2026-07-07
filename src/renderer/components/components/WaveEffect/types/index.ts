@@ -27,6 +27,16 @@
 /** RGB 颜色三元组，各分量范围 0-1 */
 export type RgbTuple = [number, number, number];
 
+/** WaveEffect 组件属性 */
+export interface WaveEffectProps {
+  /** 是否播放渲染循环，默认 true。实际启动画面始终为 true，预览区按需控制。 */
+  playing?: boolean;
+  /** 背景颜色十六进制值，传入时优先于 store 读取。预览区用于实时跟随颜色选择器。 */
+  color?: string;
+  /** 波纹强调色 [r, g, b]，各分量范围 0-1。默认蓝色。 */
+  accentColor?: RgbTuple;
+}
+
 /** WebGL 渲染上下文，包含着色器程序与所有 uniform/attribute 位置 */
 export interface WaveGlContext {
   gl: WebGLRenderingContext;

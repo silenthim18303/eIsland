@@ -56,29 +56,3 @@ export function drawWave(ctx: WaveGlContext, canvas: HTMLCanvasElement, bgColor:
   gl.uniform3f(accentColorLoc, accentColor[0], accentColor[1], accentColor[2]);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
-
-/**
- * 启动波浪背景 RAF 渲染循环。
- * @param ctx - 已初始化的 WebGL 上下文
- * @param canvas - 渲染目标画布
- * @param bgColorRef - 背景色 ref，每帧读取最新值
- * @param accentColorRef - 强调色 ref，每帧读取最新值
- * @returns 取消函数
- */
-export function startWaveLoop(
-  ctx: WaveGlContext,
-  canvas: HTMLCanvasElement,
-  bgColorRef: { current: RgbTuple },
-  accentColorRef: { current: RgbTuple },
-): () => void {
-  let rafId = 0;
-
-  const frame = (): void => {
-    drawWave(ctx, canvas, bgColorRef.current, accentColorRef.current);
-    rafId = requestAnimationFrame(frame);
-  };
-
-  rafId = requestAnimationFrame(frame);
-
-  return () => { cancelAnimationFrame(rafId); };
-}
