@@ -16,7 +16,7 @@ The STT WebSocket handler provides real-time speech-to-text relay via Tencent Cl
 
 | Article | Description |
 |---|---|
-| [Realtime STT WebSocket](./realtime-stt.md) | Full WebSocket protocol documentation |
+| Realtime STT WebSocket | Full WebSocket protocol documentation |
 
 :::warning
 This endpoint authenticates via a `token` query parameter (JWT). The token is validated by `AgentRealtimeSttAuthService`.

@@ -12,7 +12,7 @@ Translation service management endpoints under `/v1/admin/tmt/`. All require `RO
 
 | Method | Path | Description |
 |---|---|---|
-| GET | [/v1/admin/tmt/quota](./get-tmt-quota.md) | Get monthly translation quota |
-| GET | [/v1/admin/tmt/pricing](./get-tmt-pricing.md) | List all translation pricing |
-| PUT | [/v1/admin/tmt/pricing](./upsert-tmt-pricing.md) | Create or update translation pricing |
-| DELETE | [/v1/admin/tmt/pricing](./delete-tmt-pricing.md) | Delete translation pricing |
+| GET | `/v1/admin/tmt/quota` | Get monthly translation quota |
+| GET | `/v1/admin/tmt/pricing` | List all translation pricing |
+| PUT | `/v1/admin/tmt/pricing` | Create or update translation pricing |
+| DELETE | `/v1/admin/tmt/pricing` | Delete translation pricing |

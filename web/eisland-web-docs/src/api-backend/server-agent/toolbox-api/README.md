@@ -12,4 +12,4 @@ User-facing toolbox endpoints under `/v1/toolbox/`. Requires JWT authentication.
 
 | Method | Path | Description |
 |---|---|---|
-| POST | [/v1/toolbox/translate](./translate.md) | Translate text via Tencent TMT |
+| POST | `/v1/toolbox/translate` | Translate text via Tencent TMT |
