@@ -236,37 +236,236 @@ export default sidebar({
           text: "eASS Config",
           icon: "gear",
           collapsible: true,
-          children: [],
+          children: [
+            "server-agent/configuration/README.md",
+            "server-agent/configuration/agent-billing-redis.md",
+            "server-agent/configuration/agent-pricing-redis.md",
+            "server-agent/configuration/agent-usage-redis.md",
+            "server-agent/configuration/agent-billing-mq.md",
+            "server-agent/configuration/agent-stt-websocket.md",
+            "server-agent/configuration/mihtnelis-agent-properties.md",
+            "server-agent/configuration/mihtnelis-prompt-builder.md",
+            "server-agent/configuration/edoc-prompt-builder.md",
+            "server-agent/configuration/r1pxc-prompt-builder.md",
+          ],
         },
         {
           text: "eASS Controller",
           icon: "plug",
           collapsible: true,
-          children: [],
+          children: [
+            "server-agent/agent-chat-api/README.md",
+            "server-agent/admin-agent-api/README.md",
+            "server-agent/admin-tmt-api/README.md",
+            "server-agent/toolbox-api/README.md",
+            "server-agent/stt-websocket/README.md",
+          ],
         },
         {
           text: "eASS Job",
           icon: "clock",
           collapsible: true,
-          children: [],
+          children: [
+            "server-agent/job/README.md",
+          ],
         },
         {
           text: "eASS Message Queue",
           icon: "envelope",
           collapsible: true,
-          children: [],
+          children: [
+            "server-agent/mq/README.md",
+          ],
         },
         {
           text: "eASS Service",
           icon: "server",
           collapsible: true,
-          children: [],
+          children: [
+            "server-agent/service/README.md",
+          ],
         },
         {
           text: "eASS Utils",
           icon: "wrench",
           collapsible: true,
-          children: [],
+          children: [
+            "server-agent/utils/README.md",
+          ],
+        },
+        {
+          text: "eASS Data Types",
+          icon: "database",
+          collapsible: true,
+          children: [
+            "server-agent/data-types/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Auth Services Server",
+      icon: "key",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-auth/auth-api/README.md",
+            "server-auth/email-verification-api/README.md",
+            "server-auth/feedback-api/README.md",
+            "server-auth/admin-email-dlq-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Payment Services Server",
+      icon: "credit-card",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-payment/user-payment-api/README.md",
+            "server-payment/admin-payment-api/README.md",
+            "server-payment/alipay-notify-api/README.md",
+            "server-payment/wechat-pay-notify-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland User Services Server",
+      icon: "users",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-user/user-api/README.md",
+            "server-user/user-admin-api/README.md",
+            "server-user/app-user-api/README.md",
+            "server-user/announcement-api/README.md",
+            "server-user/identity-verification-api/README.md",
+            "server-user/identity-admin-api/README.md",
+            "server-user/toolbox-software-api/README.md",
+            "server-user/wallpaper-user-api/README.md",
+            "server-user/wallpaper-admin-api/README.md",
+            "server-user/wallpaper-tag-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Mini Game Services Server",
+      icon: "gamepad",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-mini-game/mini-game-score-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Service Status Server",
+      icon: "activity",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-service-status/service-status-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Upload Services Server",
+      icon: "upload",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-upload/upload-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Version Services Server",
+      icon: "tag",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-version/version-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Weather Services Server",
+      icon: "cloud",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Controller",
+          icon: "plug",
+          collapsible: true,
+          children: [
+            "server-weather/user-weather-api/README.md",
+            "server-weather/admin-weather-api/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland App Services Server",
+      icon: "settings",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Config",
+          icon: "gear",
+          collapsible: true,
+          children: [
+            "server-app/README.md",
+          ],
+        },
+      ],
+    },
+    {
+      text: "eisland Common Services Server",
+      icon: "package",
+      collapsible: true,
+      children: [
+        {
+          text: "eASS Utils",
+          icon: "wrench",
+          collapsible: true,
+          children: [
+            "server-common/README.md",
+          ],
         },
       ],
     },
