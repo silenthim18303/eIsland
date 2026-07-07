@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-07T17:15:23.875Z
+> 生成时间：2026-07-07T17:36:14.570Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,9 @@
 
 ## Unreleased
 
+- 2026-07-08 | 015f9fe2 | 鸡哥 | Merge pull request #133 from JNTMTMTM/dev
+- 2026-07-08 | 35210db2 | 鸡哥 | fix: Enhance rsync deployment configuration with additional options
+- 2026-07-07 | 29f2bc70 | eislandBot | docs: auto update CHANGE_LOG.md for #132 by @JNTMTMTM [skip ci]
 - 2026-07-08 | 82b61618 | 鸡哥 | Merge pull request #132 from JNTMTMTM/dev
 - 2026-07-08 | a49d4e97 | 鸡哥 | fix: Correct title casing in Electron Windows documentation
 - 2026-07-08 | 8debe7f1 | 鸡哥 | feat: Add documentation for new configurations and APIs
