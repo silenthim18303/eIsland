@@ -62,16 +62,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download build artifact
-        # Artifact name must match upload-pages-artifact@v3 default ("github-pages")
         uses: actions/download-artifact@v4
         with:
           name: github-pages
           path: dist
 
       - name: Deploy via rsync
-        uses: burnett01/rsync-deployments@796cf0d5e4b535745ce49d7429f77cf39e25ef39 # 7.0.1
+        uses: burnett01/rsync-deployments@796cf0d5e4b535745ce49d7429f77cf39e25ef39
         with:
-          switches: -avzr --delete
+          switches: -avzr --delete --no-owner --no-group --no-perms --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r
           path: dist/
           remote_path: ${{ secrets.DEPLOY_PATH }}
           remote_host: ${{ secrets.DEPLOY_HOST }}
