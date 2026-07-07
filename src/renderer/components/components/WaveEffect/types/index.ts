@@ -24,6 +24,9 @@
  * @author 鸡哥
  */
 
+/** RGB 颜色三元组，各分量范围 0-1 */
+export type RgbTuple = [number, number, number];
+
 /** WebGL 渲染上下文，包含着色器程序与所有 uniform/attribute 位置 */
 export interface WaveGlContext {
   gl: WebGLRenderingContext;

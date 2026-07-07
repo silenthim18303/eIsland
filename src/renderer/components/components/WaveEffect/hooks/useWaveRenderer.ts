@@ -28,6 +28,7 @@ import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import { DEFAULT_ACCENT_COLOR } from '../utils/constants';
 import { initWaveGl } from '../utils/initWaveGl';
+import { startWaveLoop } from '../utils/drawWave';
 import type { WaveGlContext } from '../types';
 
 /**
@@ -67,38 +68,6 @@ export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, 
     const canvas = canvasRef.current;
     if (!ctx || !canvas) return;
 
-    let rafId = 0;
-
-    const draw = (): void => {
-      const { gl, program, buffer, posLoc, resLoc, timeLoc, bgColorLoc, accentColorLoc, startTime } = ctx;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
-      const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
-
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-      }
-
-      const c = bgColorRef.current;
-      gl.viewport(0, 0, w, h);
-      gl.useProgram(program);
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-      gl.uniform2f(resLoc, w, h);
-      gl.uniform1f(timeLoc, (performance.now() - startTime) / 1000);
-      gl.uniform3f(bgColorLoc, c[0], c[1], c[2]);
-      const ac = accentColorRef.current;
-      gl.uniform3f(accentColorLoc, ac[0], ac[1], ac[2]);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      rafId = requestAnimationFrame(draw);
-    };
-
-    rafId = requestAnimationFrame(draw);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-    };
+    return startWaveLoop(ctx, canvas, bgColorRef, accentColorRef);
   }, [canvasRef, playing]);
 }
