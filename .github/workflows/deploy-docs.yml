@@ -67,6 +67,12 @@ jobs:
           name: github-pages
           path: dist
 
+      - name: Extract artifact
+        run: |
+          cd dist
+          tar -xf artifact.tar
+          rm artifact.tar
+
       - name: Deploy via rsync
         uses: burnett01/rsync-deployments@796cf0d5e4b535745ce49d7429f77cf39e25ef39
         with:
@@ -77,3 +83,51 @@ jobs:
           remote_port: ${{ secrets.DEPLOY_PORT }}
           remote_user: ${{ secrets.DEPLOY_USER }}
           remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Purge ESA cache
+        env:
+          ESA_AK: ${{ secrets.ESA_ACCESS_KEY_ID }}
+          ESA_SK: ${{ secrets.ESA_ACCESS_KEY_SECRET }}
+          ESA_ZONE: ${{ secrets.ESA_ZONE_ID }}
+        run: |
+          urlencode() {
+            local s="$1" out="" c
+            for (( i=0; i<${#s}; i++ )); do
+              c="${s:$i:1}"
+              case "$c" in
+                [a-zA-Z0-9._~-]) out+="$c" ;;
+                ' ') out+="%20" ;;
+                *) out+=$(printf '%%%02X' "'$c") ;;
+              esac
+            done
+            printf '%s' "$out"
+          }
+          percent_encode() { urlencode "$1" | sed 's/+/%20/g; s/\*/%2A/g'; }
+
+          now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          nonce=$(openssl rand -hex 16)
+          content=$(percent_encode "eisland-dev.pyisland.com")
+          type_enc=$(percent_encode "flush")
+          zone_enc=$(percent_encode "$ESA_ZONE")
+
+          params="Action=PurgeCaches"
+          params+="&Content=${content}"
+          params+="&Format=JSON"
+          params+="&AccessKeyId=${ESA_AK}"
+          params+="&Nonce=${nonce}"
+          params+="&RegionId=cn-hangzhou"
+          params+="&SignatureMethod=HMAC-SHA1"
+          params+="&SignatureNonce=${nonce}"
+          params+="&SignatureVersion=1.0"
+          params+="&Timestamp=$(percent_encode "$now")"
+          params+="&Type=${type_enc}"
+          params+="&Version=2024-09-10"
+          params+="&ZoneId=${zone_enc}"
+
+          sorted=$(echo "$params" | tr '&' '\n' | sort | tr '\n' '&' | sed 's/&$//')
+          to_sign="POST&$(percent_encode "/")&$(percent_encode "$sorted")"
+          sign=$(printf '%s' "$to_sign" | openssl dgst -sha1 -hmac "${ESA_SK}&" -binary | base64)
+
+          curl -sS -X POST "https://esa.cn-hangzhou.aliyuncs.com" \
+            -d "${sorted}&Signature=$(percent_encode "$sign")"
+          echo
