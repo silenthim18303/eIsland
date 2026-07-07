@@ -32,7 +32,7 @@ import { playNotificationSoundOnce } from '../../utils/audio/notificationSound';
 function isStandaloneRenderer(): boolean {
   try {
     const pathname = window.location?.pathname ?? '';
-    return pathname.includes('standalone.html');
+    return pathname.includes('DynamicIslandStandalone.html');
   } catch {
     return false;
   }

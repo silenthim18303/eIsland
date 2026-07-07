@@ -19,7 +19,7 @@
  */
 
 /**
- * @file standaloneMain.tsx
+ * @file DynamicIslandStandaloneMain.tsx
  * @description 独立窗口渲染入口
  * @author 鸡哥
  */

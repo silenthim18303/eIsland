@@ -42,7 +42,7 @@ export function useLogin() {
       const prevState = prev.state as string;
       const standalone = (() => {
         try {
-          return (window.location?.pathname ?? '').includes('standalone.html');
+          return (window.location?.pathname ?? '').includes('DynamicIslandStandalone.html');
         } catch {
           return false;
         }

@@ -20,7 +20,7 @@
 
 /**
  * @file assets.d.ts
- * @description 渲染进程资源模块类型声明，支持 .jpg/.jpeg/.png/.svg/.gif/.webp/.wav 资源导入
+ * @description 渲染进程资源模块类型声明
  * @author 鸡哥
  */
 

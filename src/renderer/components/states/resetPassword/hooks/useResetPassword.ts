@@ -39,7 +39,7 @@ export function useResetPassword() {
     useIslandStore.setState((prev) => {
       const standalone = (() => {
         try {
-          return (window.location?.pathname ?? '').includes('standalone.html');
+          return (window.location?.pathname ?? '').includes('DynamicIslandStandalone.html');
         } catch {
           return false;
         }
@@ -55,7 +55,7 @@ export function useResetPassword() {
     useIslandStore.setState((prev) => {
       const standalone = (() => {
         try {
-          return (window.location?.pathname ?? '').includes('standalone.html');
+          return (window.location?.pathname ?? '').includes('DynamicIslandStandalone.html');
         } catch {
           return false;
         }

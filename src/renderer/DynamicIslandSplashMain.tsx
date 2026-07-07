@@ -1,4 +1,4 @@
-<!--
+/*
  * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
  * https://github.com/JNTMTMTM/eIsland
  *
@@ -16,22 +16,27 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
--->
+ */
 
-<!--
-  @file guideMain.html
-  @description 引导配置窗口 React 渲染入口
-  @author 鸡哥
--->
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>eIsland Guide</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="./guideMain.tsx"></script>
-  </body>
-</html>
+/**
+ * @file DynamicIslandSplashMain.tsx
+ * @description 启动画面 React 渲染入口
+ * @author 鸡哥
+ */
+
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './styles/splash.css';
+import { SplashScreen } from './components/SplashScreen';
+import i18n from './i18n';
+
+const root = document.getElementById('root');
+if (!root) {
+  throw new Error(`[SplashRenderer] ${i18n.t('common.errors.rootMountNotFound', { defaultValue: '未找到 #root 挂载节点' })}`);
+}
+
+createRoot(root).render(
+  <StrictMode>
+    <SplashScreen />
+  </StrictMode>
+);

@@ -19,7 +19,7 @@
  */
 
 /**
- * @file guideMain.tsx
+ * @file DynamicIslandGuide.tsx
  * @description 引导配置窗口 React 渲染入口
  * @description 首次启动时引导用户完成基础配置，splash 动画结束后通过
  *   FIRST_LAUNCH_STORE_KEY 判断是否进入配置界面（dev 模式下默认进入）
