@@ -27,23 +27,21 @@
 import { useState, useEffect } from 'react';
 import { runtime } from '../utils/smtcStore';
 import { ensureInitialized } from '../utils/smtcActions';
-
-/** 默认强调色（蓝色） */
-const DEFAULT_ACCENT: [number, number, number] = [0.439, 0.627, 1.0];
+import { DEFAULT_ACCENT_COLOR } from '../../../WaveEffect/hooks/useWaveRenderer';
 
 /**
  * SMTC 强调色 Hook
  * @description 订阅封面主色变化，返回归一化 RGB 值
  */
 export function useSmtcAccentColor(): [number, number, number] {
-  const [accent, setAccent] = useState<[number, number, number]>(DEFAULT_ACCENT);
+  const [accent, setAccent] = useState<[number, number, number]>(DEFAULT_ACCENT_COLOR);
 
   useEffect(() => {
     const listener = (): void => {
       const [r, g, b] = runtime.dominantColor;
       // 0-255 → 0-1，全黑时回退默认色
       if (r === 0 && g === 0 && b === 0) {
-        setAccent(DEFAULT_ACCENT);
+        setAccent(DEFAULT_ACCENT_COLOR);
       } else {
         setAccent([r / 255, g / 255, b / 255]);
       }

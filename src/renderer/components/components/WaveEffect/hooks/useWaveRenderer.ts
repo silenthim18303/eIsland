@@ -32,15 +32,19 @@ import {
 } from '../config/waveShaders';
 import { compileWaveShader } from '../utils/compileWaveShader';
 
+/** 默认强调色（蓝色），与 SMTC 封面主色回退色保持一致 */
+export const DEFAULT_ACCENT_COLOR: [number, number, number] = [0.439, 0.627, 1.0];
+
 /**
  * 将 WebGL 电子音浪渲染绑定到画布生命周期。
  * WebGL 上下文在首次 playing=true 时创建并复用，后续仅控制 RAF 循环。
  * @param canvasRef - 需要承载波浪背景的画布引用。
  * @param bgColor - 背景颜色 [r, g, b]，各分量范围 0-1。通过 ref 传递，draw 循环每帧读取最新值。
  * @param playing - 是否播放渲染循环。
+ * @param accentColor - 强调色 [r, g, b]，默认 DEFAULT_ACCENT_COLOR。
  * @returns 无返回值。
  */
-export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true, accentColor: [number, number, number] = [0.439, 0.627, 1.0]): void {
+export function useWaveRenderer(canvasRef: RefObject<HTMLCanvasElement | null>, bgColor: [number, number, number], playing = true, accentColor: [number, number, number] = DEFAULT_ACCENT_COLOR): void {
   const bgColorRef = useRef(bgColor);
   bgColorRef.current = bgColor;
   const accentColorRef = useRef(accentColor);

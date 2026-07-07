@@ -91,7 +91,7 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
                         className="guide-smtc-player-icon"
                       />
                     )}
-                    {extractPlayerName(meta.sourceAppId)}
+                    {extractPlayerName(meta.sourceAppId) || t('guide.smtc.unknownPlayer', { defaultValue: '未知' })}
                   </span>
                 </div>
               </div>

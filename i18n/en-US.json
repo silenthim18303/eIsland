@@ -51,6 +51,7 @@
       "subtitle": "Check if system media transport controls are available",
       "hint": "Play a song with your media player",
       "player": "Player",
+      "unknownPlayer": "Unknown",
       "state": "State",
       "playing": "Playing",
       "paused": "Paused",

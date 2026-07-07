@@ -26,6 +26,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { PlayerIcon } from '../player-icon';
+import { PLAYER_ICON_MAP } from '../../../components/components/Guide/smtc/utils/smtcUtils';
 
 describe('PlayerIcon', () => {
   it('should contain expected keys', () => {
@@ -46,5 +47,12 @@ describe('PlayerIcon', () => {
 
   it('should contain exactly 6 keys', () => {
     expect(Object.keys(PlayerIcon)).toHaveLength(6);
+  });
+
+  it('PLAYER_ICON_MAP should only reference valid PlayerIcon keys', () => {
+    const playerIconKeys = new Set(Object.keys(PlayerIcon));
+    Object.values(PLAYER_ICON_MAP).forEach((iconKey) => {
+      expect(playerIconKeys.has(iconKey)).toBe(true);
+    });
   });
 });

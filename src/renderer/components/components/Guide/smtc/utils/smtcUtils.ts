@@ -58,13 +58,13 @@ export async function extractDominantColor(coverImage: string): Promise<[number,
  * @returns 可读播放器名称
  */
 export function extractPlayerName(sourceAppId: string): string {
-  if (!sourceAppId) return '未知';
+  if (!sourceAppId) return '';
   const name = sourceAppId.replace(/^.*[/\\]/, '').replace(/\.exe$/i, '');
   return name || sourceAppId;
 }
 
 /** 播放器 exe 名 → PlayerIcon 键映射表 */
-const PLAYER_ICON_MAP: Record<string, PlayerIconKey> = {
+export const PLAYER_ICON_MAP: Record<string, PlayerIconKey> = {
   Spotify: 'SPOTIFY',
   cloudmusic: 'NETEASE',
   QQMusic: 'QQMUSIC',

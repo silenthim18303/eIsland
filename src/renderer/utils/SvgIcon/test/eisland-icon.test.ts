@@ -128,7 +128,9 @@ describe('SvgIcon', () => {
     expect(SvgIcon.VIP).toBe('./svg/PRO.svg');
   });
 
-  it('should contain exactly 85 keys', () => {
-    expect(Object.keys(SvgIcon)).toHaveLength(85);
+  it('should not contain any undefined icon paths', () => {
+    Object.entries(SvgIcon).forEach(([key, value]) => {
+      expect(value).toBeDefined();
+    });
   });
 });

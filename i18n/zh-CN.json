@@ -51,6 +51,7 @@
       "subtitle": "检测系统媒体会话是否可用",
       "hint": "请使用播放器播放一首歌",
       "player": "播放器",
+      "unknownPlayer": "未知",
       "state": "状态",
       "playing": "播放中",
       "paused": "已暂停",

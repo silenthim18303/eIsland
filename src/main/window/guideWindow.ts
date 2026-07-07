@@ -41,7 +41,8 @@ const GUIDE_HEIGHT = 500;
 
 /**
  * 显示引导配置窗口
- * @description 创建引导窗口并返回 Promise，当用户完成配置（renderer 发送 guide:complete）后 resolve
+ * @description 创建引导窗口，窗口独立运行，不阻塞调用方。
+ *              当用户完成配置（renderer 发送 guide:complete）后 Promise resolve。
  * @returns Promise<void> 引导完成后 resolve
  */
 function showGuideWindow(): Promise<void> {
