@@ -28,7 +28,7 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSmtcTest } from '../hooks/useSmtcTest';
 import { extractPlayerName, getPlayerIcon } from '../utils/smtcUtils';
-import { SvgIcon } from '../../../../../utils/SvgIcon';
+import { SvgIcon, PlayerIcon } from '../../../../../utils/SvgIcon';
 import { MarqueeText } from './MarqueeText';
 import type { SmtcStepProps } from '../types';
 
@@ -86,7 +86,7 @@ export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
                   <span className="guide-smtc-info-value">
                     {getPlayerIcon(meta.sourceAppId) && (
                       <img
-                        src={SvgIcon[getPlayerIcon(meta.sourceAppId)!]}
+                        src={PlayerIcon[getPlayerIcon(meta.sourceAppId)!]}
                         alt=""
                         className="guide-smtc-player-icon"
                       />

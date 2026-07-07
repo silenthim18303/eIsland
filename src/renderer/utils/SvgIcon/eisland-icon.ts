@@ -109,13 +109,7 @@ export const SvgIcon = {
   FILTER: './svg/FILTER.svg',
   FIRE: './svg/FIRE.svg',
   STOCK_CHOOSE: './svg/STOCK_CHOOSE.svg',
-  SEARCH: './svg/SEARCH.svg',
-  PLAYER_SODAMUSIC: './svg/player/sodamusic.svg',
-  PLAYER_QQMUSIC: './svg/player/qqmusic.svg',
-  PLAYER_NETEASE: './svg/player/netease.svg',
-  PLAYER_KUGOU: './svg/player/kugou.svg',
-  PLAYER_APPLE_MUSIC: './svg/player/applemusic.svg',
-  PLAYER_SPOTIFY: './svg/player/spotify.svg'
+  SEARCH: './svg/SEARCH.svg'
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;

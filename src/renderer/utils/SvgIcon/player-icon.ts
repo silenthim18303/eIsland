@@ -19,25 +19,18 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file player-icon.ts
+ * @description 播放器图标路径枚举
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+export const PlayerIcon = {
+  SODAMUSIC: './svg/player/sodamusic.svg',
+  QQMUSIC: './svg/player/qqmusic.svg',
+  NETEASE: './svg/player/netease.svg',
+  KUGOU: './svg/player/kugou.svg',
+  APPLE_MUSIC: './svg/player/applemusic.svg',
+  SPOTIFY: './svg/player/spotify.svg',
+} as const;
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
+export type PlayerIconKey = keyof typeof PlayerIcon;

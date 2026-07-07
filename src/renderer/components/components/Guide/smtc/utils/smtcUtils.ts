@@ -25,7 +25,7 @@
  */
 
 import { getColor } from 'colorthief';
-import type { SvgIconKey } from '../../../../../utils/SvgIcon';
+import type { PlayerIconKey } from '../../../../../utils/SvgIcon';
 
 /**
  * 提取封面主色
@@ -63,22 +63,22 @@ export function extractPlayerName(sourceAppId: string): string {
   return name || sourceAppId;
 }
 
-/** 播放器 exe 名 → SvgIcon 键映射表 */
-const PLAYER_ICON_MAP: Record<string, SvgIconKey> = {
-  Spotify: 'PLAYER_SPOTIFY',
-  cloudmusic: 'PLAYER_NETEASE',
-  QQMusic: 'PLAYER_QQMUSIC',
-  KuGoo: 'PLAYER_KUGOU',
-  汽水音乐: 'PLAYER_SODAMUSIC',
-  iTunes: 'PLAYER_APPLE_MUSIC',
+/** 播放器 exe 名 → PlayerIcon 键映射表 */
+const PLAYER_ICON_MAP: Record<string, PlayerIconKey> = {
+  Spotify: 'SPOTIFY',
+  cloudmusic: 'NETEASE',
+  QQMusic: 'QQMUSIC',
+  KuGoo: 'KUGOU',
+  汽水音乐: 'SODAMUSIC',
+  iTunes: 'APPLE_MUSIC',
 };
 
 /**
  * 根据播放源标识获取对应播放器图标键
  * @param sourceAppId - 播放源标识
- * @returns SvgIcon 键名，未匹配时返回 undefined
+ * @returns PlayerIcon 键名，未匹配时返回 undefined
  */
-export function getPlayerIcon(sourceAppId: string): SvgIconKey | undefined {
+export function getPlayerIcon(sourceAppId: string): PlayerIconKey | undefined {
   if (!sourceAppId) return undefined;
   const name = sourceAppId.replace(/^.*[/\\]/, '').replace(/\.exe$/i, '');
   return PLAYER_ICON_MAP[name];

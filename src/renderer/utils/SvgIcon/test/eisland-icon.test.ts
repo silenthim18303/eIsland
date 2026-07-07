@@ -114,12 +114,6 @@ describe('SvgIcon', () => {
     expect(SvgIcon).toHaveProperty('FIRE');
     expect(SvgIcon).toHaveProperty('STOCK_CHOOSE');
     expect(SvgIcon).toHaveProperty('SEARCH');
-    expect(SvgIcon).toHaveProperty('PLAYER_SODAMUSIC');
-    expect(SvgIcon).toHaveProperty('PLAYER_QQMUSIC');
-    expect(SvgIcon).toHaveProperty('PLAYER_NETEASE');
-    expect(SvgIcon).toHaveProperty('PLAYER_KUGOU');
-    expect(SvgIcon).toHaveProperty('PLAYER_APPLE_MUSIC');
-    expect(SvgIcon).toHaveProperty('PLAYER_SPOTIFY');
   });
 
   it('all values should be strings starting with ./svg/ and ending with .svg', () => {
@@ -134,7 +128,7 @@ describe('SvgIcon', () => {
     expect(SvgIcon.VIP).toBe('./svg/PRO.svg');
   });
 
-  it('should contain exactly 91 keys', () => {
-    expect(Object.keys(SvgIcon)).toHaveLength(91);
+  it('should contain exactly 85 keys', () => {
+    expect(Object.keys(SvgIcon)).toHaveLength(85);
   });
 });
