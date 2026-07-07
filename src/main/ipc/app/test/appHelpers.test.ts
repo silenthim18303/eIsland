@@ -172,6 +172,11 @@ vi.mock('../../../music/smtcAccessor', () => ({
   getSmtcNowPlaying: getSmtcNowPlayingMock,
 }));
 
+vi.mock('@eisland/windows-application-icon-helper', () => ({
+  getIconByPath: vi.fn().mockResolvedValue(null),
+  getIconByShortcutPath: vi.fn().mockResolvedValue(null),
+}));
+
 // ── imports under test ──
 
 import { registerAppIpcHandlers } from '../app';
