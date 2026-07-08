@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-07T17:36:14.570Z
+> 生成时间：2026-07-08T05:53:09.483Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,15 @@
 
 ## Unreleased
 
+- 2026-07-08 | 9f29037b | 鸡哥 | Merge pull request #135 from JNTMTMTM/dev
+- 2026-07-08 | 411b19d3 | 鸡哥 | fix: update native module names in package commands documentation
+- 2026-07-08 | 7f5e0134 | 鸡哥 | feat: update publish workflow to include GitHub Packages and additional plugins
+- 2026-07-08 | 5d4e82f4 | 鸡哥 | feat: add postinstall scripts and GitHub workflow for publishing plugins to npm
+- 2026-07-08 | 5876970c | 鸡哥 | fix: update plugin paths and documentation for fullscreen detector and performance monitor
+- 2026-07-08 | cca10505 | 鸡哥 | fix: update plugin paths for fullscreen and performance monitor in package.json
+- 2026-07-08 | 0fd31960 | 鸡哥 | feat: add Windows performance monitor plugin with CPU, memory, and temperature snapshots
+- 2026-07-08 | 5291f65c | 鸡哥 | feat: Add artifact extraction and ESA cache purge steps to deployment workflow
+- 2026-07-07 | 24a40915 | eislandBot | docs: auto update CHANGE_LOG.md for #133 by @JNTMTMTM [skip ci]
 - 2026-07-08 | 015f9fe2 | 鸡哥 | Merge pull request #133 from JNTMTMTM/dev
 - 2026-07-08 | 35210db2 | 鸡哥 | fix: Enhance rsync deployment configuration with additional options
 - 2026-07-07 | 29f2bc70 | eislandBot | docs: auto update CHANGE_LOG.md for #132 by @JNTMTMTM [skip ci]
