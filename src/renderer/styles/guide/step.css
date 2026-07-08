@@ -41,7 +41,7 @@
 
 .guide-process-indicator {
   position: absolute;
-  top: 96px;
+  top: 105px;
   left: 40px;
   z-index: 2;
   pointer-events: none;
