@@ -32,10 +32,6 @@ export interface SmtcStepProps {
   onNext: () => void;
   /** 返回上一步的回调 */
   onPrev: () => void;
-  /** 当前步骤索引 */
-  currentStep: number;
-  /** 步骤总数 */
-  totalSteps: number;
 }
 
 /** MarqueeText 组件属性 */

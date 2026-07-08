@@ -31,12 +31,11 @@ import { extractPlayerName, getPlayerIcon } from '../utils/smtcUtils';
 import { SvgIcon, PlayerIcon } from '../../../../../utils/SvgIcon';
 import { MarqueeText } from './MarqueeText';
 import type { SmtcStepProps } from '../types';
-import { ProcessIndicator } from '../../../DynamicIslandProcessIndicator';
 
 /**
  * SMTC 媒体测试步骤组件
  */
-export function SmtcStep({ onNext, onPrev, currentStep, totalSteps }: SmtcStepProps): ReactElement {
+export function SmtcStep({ onNext, onPrev }: SmtcStepProps): ReactElement {
   const { t } = useTranslation();
   const { status, meta } = useSmtcTest();
   const [r, g, b] = meta?.dominantColor ?? [0, 0, 0];
@@ -46,7 +45,6 @@ export function SmtcStep({ onNext, onPrev, currentStep, totalSteps }: SmtcStepPr
       <div className="guide-step-header">
         <h2>{t('guide.smtc.title', { defaultValue: 'SMTC 媒体测试' })}</h2>
         <p>{t('guide.smtc.subtitle', { defaultValue: '检测系统媒体会话是否可用' })}</p>
-        <ProcessIndicator total={totalSteps} current={currentStep} />
       </div>
 
       <div className="guide-smtc-content">

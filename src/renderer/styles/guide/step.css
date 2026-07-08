@@ -39,6 +39,18 @@
   left: 40px;
 }
 
+.guide-process-indicator {
+  position: absolute;
+  top: 96px;
+  left: 40px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.guide-process-indicator .process-indicator {
+  margin-top: 0;
+}
+
 .guide-step-header p {
   margin-top: 6px;
   opacity: 0.6;

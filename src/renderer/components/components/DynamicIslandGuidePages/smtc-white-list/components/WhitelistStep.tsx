@@ -29,13 +29,12 @@ import { useTranslation } from 'react-i18next';
 import { WHITELIST_OPTIONS } from '../config/whitelistOptions';
 import { useWhitelistSelect } from '../hooks/useWhitelistSelect';
 import type { WhitelistStepProps } from '../types';
-import { ProcessIndicator } from '../../../DynamicIslandProcessIndicator';
 
 /**
  * SMTC 白名单选择步骤组件
  * @description 展示可选播放器列表，用户多选后实时同步到配置
  */
-export function WhitelistStep({ onNext, onPrev, currentStep, totalSteps }: WhitelistStepProps): ReactElement {
+export function WhitelistStep({ onNext, onPrev }: WhitelistStepProps): ReactElement {
   const { t } = useTranslation();
   const { selected, toggle } = useWhitelistSelect();
 
@@ -44,7 +43,6 @@ export function WhitelistStep({ onNext, onPrev, currentStep, totalSteps }: White
       <div className="guide-step-header">
         <h2>{t('guide.whitelist.title', { defaultValue: '选择播放器' })}</h2>
         <p>{t('guide.whitelist.subtitle', { defaultValue: '选择需要监听的播放器' })}</p>
-        <ProcessIndicator total={totalSteps} current={currentStep} />
       </div>
       <div className="guide-whitelist-list">
         {WHITELIST_OPTIONS.map((opt) => (

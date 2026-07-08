@@ -34,6 +34,7 @@ import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffec
 import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
 import { WhitelistStep } from './components/components/DynamicIslandGuidePages/smtc-white-list';
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
+import { ProcessIndicator } from './components/components/DynamicIslandProcessIndicator';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
 import type { GuideStep } from './types/DynamicIslandGuideTypes';
 import { GUIDE_STEP_INDEX, GUIDE_STEP_TOTAL } from './types/DynamicIslandGuideTypes';
@@ -77,27 +78,24 @@ function GuideApp(): ReactElement {
     <div className="guide-container">
       <WaveEffect accentColor={accentColor} />
       <div className="guide-content">
+        <div className="guide-process-indicator">
+          <ProcessIndicator total={GUIDE_STEP_TOTAL} current={GUIDE_STEP_INDEX[step]} />
+        </div>
         {step === 'language' && (
           <LanguageStep
             onNext={handleLanguageNext}
-            currentStep={GUIDE_STEP_INDEX[step]}
-            totalSteps={GUIDE_STEP_TOTAL}
           />
         )}
         {step === 'whitelist' && (
           <WhitelistStep
             onNext={handleWhitelistNext}
             onPrev={handleWhitelistPrev}
-            currentStep={GUIDE_STEP_INDEX[step]}
-            totalSteps={GUIDE_STEP_TOTAL}
           />
         )}
         {step === 'smtc' && (
           <SmtcStep
             onNext={handleSmtcNext}
             onPrev={handleSmtcPrev}
-            currentStep={GUIDE_STEP_INDEX[step]}
-            totalSteps={GUIDE_STEP_TOTAL}
           />
         )}
       </div>

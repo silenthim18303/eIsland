@@ -24,9 +24,8 @@
  * @author 鸡哥
  */
 
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import type { ProcessSegment, RenderedProgress } from '../types';
-import { PROGRESS_ANIMATION_MS } from '../config';
 import { createProcessSegments } from '../utils/processIndicatorSegments';
 
 let lastSettledProgress: RenderedProgress | null = null;
@@ -39,23 +38,12 @@ export function useProcessIndicator(total: number, current: number): ProcessSegm
   const previousRef = useRef<RenderedProgress | null>(lastSettledProgress);
   const previousProgress = previousRef.current?.total === total ? previousRef.current : null;
   const segments = createProcessSegments(total, current, previousProgress);
-  const hasMotion = segments.some((segment) => segment.motion !== 'none');
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const nextProgress = { current, total };
     previousRef.current = nextProgress;
-
-    if (!hasMotion) {
-      lastSettledProgress = nextProgress;
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      lastSettledProgress = nextProgress;
-    }, PROGRESS_ANIMATION_MS);
-
-    return () => { clearTimeout(timer); };
-  }, [current, hasMotion, total]);
+    lastSettledProgress = nextProgress;
+  }, [current, total]);
 
   return segments;
 }
