@@ -15,6 +15,7 @@
     "ia32"
   ],
   "scripts": {
+    "postinstall": "dotnet build src/eIslandBrightnessReader.csproj -c Release",
     "build": "dotnet build src/eIslandBrightnessReader.csproj -c Release",
     "clean": "dotnet clean src/eIslandBrightnessReader.csproj",
     "rebuild": "npm run clean && npm run build",

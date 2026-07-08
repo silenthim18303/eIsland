@@ -1,0 +1,126 @@
+name: Publish Plugins
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (skip actual publish)'
+        type: boolean
+        default: false
+
+env:
+  NODE_VERSION: '25'
+  DOTNET_VERSION: '10.0.x'
+
+jobs:
+  publish-npm:
+    name: Publish to npm
+    permissions:
+      contents: read
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin:
+          - eisland-windows-application-icon-helper
+          - eisland-windows-bluetooth-helper
+          - eisland-windows-brightness-helper
+          - eisland-windows-fullscreen-detector
+          - eisland-windows-performance-monitor
+          - eisland-windows-power-helper
+          - eisland-windows-processes-attacker
+          - eisland-windows-smtc-helper
+          - eisland-windows-toast-listener
+          - eisland-windows-wifi-helper
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install Visual Studio Build Tools
+        shell: pwsh
+        run: |
+          $installerPath = "${{ runner.temp }}\vs_buildtools.exe"
+          Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile $installerPath
+          Start-Process -FilePath $installerPath -ArgumentList '--quiet', '--norestart', '--nocache', '--add', 'Microsoft.VisualStudio.Workload.VCTools', '--includeRecommended' -Wait
+          Remove-Item $installerPath
+
+      - name: Publish to npm
+        working-directory: plugins/${{ matrix.plugin }}
+        run: npm publish --access public ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-gpr:
+    name: Publish to GitHub Packages
+    permissions:
+      contents: read
+      packages: write
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin:
+          - eisland-windows-application-icon-helper
+          - eisland-windows-bluetooth-helper
+          - eisland-windows-brightness-helper
+          - eisland-windows-fullscreen-detector
+          - eisland-windows-performance-monitor
+          - eisland-windows-power-helper
+          - eisland-windows-processes-attacker
+          - eisland-windows-smtc-helper
+          - eisland-windows-toast-listener
+          - eisland-windows-wifi-helper
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@jntmtmtm'
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Install Visual Studio Build Tools
+        shell: pwsh
+        run: |
+          $installerPath = "${{ runner.temp }}\vs_buildtools.exe"
+          Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile $installerPath
+          Start-Process -FilePath $installerPath -ArgumentList '--quiet', '--norestart', '--nocache', '--add', 'Microsoft.VisualStudio.Workload.VCTools', '--includeRecommended' -Wait
+          Remove-Item $installerPath
+
+      - name: Rewrite scope for GitHub Packages
+        shell: pwsh
+        working-directory: plugins/${{ matrix.plugin }}
+        run: |
+          $pkg = Get-Content package.json -Raw | ConvertFrom-Json
+          $pkg.name = $pkg.name -replace '@eisland/', '@jntmtmtm/'
+          $pkg | ConvertTo-Json -Depth 10 | Set-Content package.json -NoNewline
+
+      - name: Publish to GitHub Packages
+        working-directory: plugins/${{ matrix.plugin }}
+        run: npm publish --access public ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -20,8 +20,8 @@ npm run <script>
 
 | Plugin | Directory | Language | Build Tool | Tests | Smoke |
 |--------|-----------|----------|------------|-------|-------|
-| **Fullscreen Detector** | `windows-fullscreen-detector` | C | node-gyp | ✅ | ✅ |
-| **Performance Monitor** | `windows-performance-monitor` | C + C# | node-gyp + dotnet | ✅ | ✅ |
+| **Fullscreen Detector** | `eisland-windows-fullscreen-detector` | C | node-gyp | ✅ | ✅ |
+| **Performance Monitor** | `eisland-windows-performance-monitor` | C + C# | node-gyp + dotnet | ✅ | ✅ |
 | **Processes Attacker** | `eisland-windows-processes-attacker` | C | node-gyp | ❌ | ❌ |
 | **Toast Listener** | `eisland-windows-toast-listener` | C++ | node-gyp | ✅ | ✅ |
 | **SMTC Helper** | `eisland-windows-smtc-helper` | C# | dotnet | ✅ | ✅ |
@@ -82,7 +82,7 @@ export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
 
 ## Windows Fullscreen Detector
 
-**Directory:** `plugins/windows-fullscreen-detector` &nbsp;|&nbsp; **Language:** C &nbsp;|&nbsp; **Build:** `node-gyp rebuild`
+**Directory:** `plugins/eisland-windows-fullscreen-detector` &nbsp;|&nbsp; **Language:** C &nbsp;|&nbsp; **Build:** `node-gyp rebuild`
 
 ### Build
 
@@ -110,7 +110,7 @@ export PATH="/c/Program Files (x86)/Microsoft Visual Studio/Installer:$PATH"
 
 ## Windows Performance Monitor
 
-**Directory:** `plugins/windows-performance-monitor` &nbsp;|&nbsp; **Language:** C + C# &nbsp;|&nbsp; **Build:** `node-gyp rebuild && dotnet build`
+**Directory:** `plugins/eisland-windows-performance-monitor` &nbsp;|&nbsp; **Language:** C + C# &nbsp;|&nbsp; **Build:** `node-gyp rebuild && dotnet build`
 
 :::note
 This plugin has a dual build: the C addon is compiled by node-gyp, and the .NET temperature helper is compiled by `dotnet build`.
@@ -383,8 +383,8 @@ This is a pure .NET plugin that spawns a console EXE for WMI brightness operatio
 
 | Plugin | Command |
 |--------|---------|
-| Fullscreen Detector | `cd plugins/windows-fullscreen-detector && npm run build` |
-| Performance Monitor | `cd plugins/windows-performance-monitor && npm run build` |
+| Fullscreen Detector | `cd plugins/eisland-windows-fullscreen-detector && npm run build` |
+| Performance Monitor | `cd plugins/eisland-windows-performance-monitor && npm run build` |
 | Processes Attacker | `cd plugins/eisland-windows-processes-attacker && npm run build` |
 | Toast Listener | `cd plugins/eisland-windows-toast-listener && npm run build` |
 | SMTC Helper (exe) | `cd plugins/eisland-windows-smtc-helper && npm run build` |

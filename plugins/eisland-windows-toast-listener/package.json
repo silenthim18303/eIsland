@@ -26,9 +26,11 @@
     "smoke:suppression": "node --experimental-strip-types test/windows-toast-listener.suppression.smoke.ts",
     "cli:suppression": "node --experimental-strip-types test/windows-toast-listener.suppression.cli.ts"
   },
-  "devDependencies": {
-    "@types/node": "^25.9.3",
+  "dependencies": {
     "node-gyp": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3"
   },
   "gypfile": true,
   "files": [

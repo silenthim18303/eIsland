@@ -19,9 +19,11 @@
     "clean": "node-gyp clean",
     "rebuild": "node-gyp clean && node-gyp rebuild"
   },
-  "devDependencies": {
-    "@types/node": "^25.9.3",
+  "dependencies": {
     "node-gyp": "^11.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3"
   },
   "gypfile": true,
   "files": [
