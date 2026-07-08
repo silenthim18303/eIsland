@@ -18,6 +18,5 @@
  * GNU General Public License for more details.
  */
 
-export { ProcessIndicator } from './components/ProcessIndicator';
-export { useProcessIndicator } from './hooks/useProcessIndicator';
-export type { ProcessIndicatorProps, SegmentStatus } from './types';
+/** 进度动画时长（ms） */
+export const PROGRESS_ANIMATION_MS = 620;

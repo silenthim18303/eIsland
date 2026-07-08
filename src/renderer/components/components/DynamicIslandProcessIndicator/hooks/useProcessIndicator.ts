@@ -25,12 +25,8 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-
-/** 进度动画时长（ms） */
-const PROGRESS_ANIMATION_MS = 620;
-
-/** 单个分段状态 */
-export type SegmentStatus = 'completed' | 'active' | 'progressing' | 'inactive';
+import type { SegmentStatus } from '../types';
+import { PROGRESS_ANIMATION_MS } from '../config';
 
 /**
  * 分段进度条状态管理

@@ -25,3 +25,6 @@ export interface ProcessIndicatorProps {
   /** 当前步索引（从0开始） */
   current: number;
 }
+
+/** 单个分段状态 */
+export type SegmentStatus = 'completed' | 'active' | 'progressing' | 'inactive';
