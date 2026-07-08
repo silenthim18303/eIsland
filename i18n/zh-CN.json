@@ -70,6 +70,15 @@
       "applemusic": "Apple Music",
       "spotify": "Spotify"
     },
+    "theme": {
+      "title": "外观设置",
+      "subtitle": "选择主题模式并调整透明度",
+      "modeLabel": "主题模式",
+      "opacityLabel": "透明度",
+      "dark": "深色",
+      "light": "浅色",
+      "system": "跟随系统"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "subtitle": "配置完成，开始体验灵动岛吧",

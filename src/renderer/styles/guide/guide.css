@@ -402,11 +402,6 @@
   --icon-invert: 0;
 }
 
-[data-theme="light"] .mini-island {
-  --color-shadow-rgb: 255, 255, 255;
-  --icon-invert: 1;
-}
-
 /* 跑马灯光带 — 外层 frame 包裹岛体，用旋转圆 + overflow 裁剪实现 */
 .mini-marquee-frame {
   position: relative;

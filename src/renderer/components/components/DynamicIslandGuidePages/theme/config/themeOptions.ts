@@ -18,17 +18,28 @@
  * GNU General Public License for more details.
  */
 
-/** 引导步骤 */
-export type GuideStep = 'language' | 'whitelist' | 'theme' | 'smtc' | 'welcome';
+import type { ThemeMode } from '../../../../../../utils/theme';
 
-/** 引导步骤索引映射 */
-export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
-  language: 0,
-  whitelist: 1,
-  smtc: 2,
-  theme: 3,
-  welcome: 4,
-};
+/** 主题模式选项条目 */
+export interface ThemeModeOption {
+  /** 模式值 */
+  value: ThemeMode;
+  /** 显示名称 i18n key */
+  labelKey: string;
+}
 
-/** 引导步骤总数 */
-export const GUIDE_STEP_TOTAL = 5;
+/** 主题模式选项列表 */
+export const THEME_MODE_OPTIONS: ThemeModeOption[] = [
+  { value: 'dark', labelKey: 'guide.theme.dark' },
+  { value: 'light', labelKey: 'guide.theme.light' },
+  { value: 'system', labelKey: 'guide.theme.system' },
+];
+
+/** 透明度最小值 */
+export const OPACITY_MIN = 10;
+
+/** 透明度最大值 */
+export const OPACITY_MAX = 100;
+
+/** 透明度默认值 */
+export const OPACITY_DEFAULT = 100;

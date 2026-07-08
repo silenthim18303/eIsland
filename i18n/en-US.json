@@ -70,6 +70,15 @@
       "applemusic": "Apple Music",
       "spotify": "Spotify"
     },
+    "theme": {
+      "title": "Appearance",
+      "subtitle": "Choose theme mode and adjust transparency",
+      "modeLabel": "Theme Mode",
+      "opacityLabel": "Opacity",
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "subtitle": "Setup complete, start your Dynamic Island experience",

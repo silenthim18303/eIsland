@@ -18,17 +18,10 @@
  * GNU General Public License for more details.
  */
 
-/** 引导步骤 */
-export type GuideStep = 'language' | 'whitelist' | 'theme' | 'smtc' | 'welcome';
-
-/** 引导步骤索引映射 */
-export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
-  language: 0,
-  whitelist: 1,
-  smtc: 2,
-  theme: 3,
-  welcome: 4,
-};
-
-/** 引导步骤总数 */
-export const GUIDE_STEP_TOTAL = 5;
+/** ThemeStep 组件属性 */
+export interface ThemeStepProps {
+  /** 确认后进入下一步的回调 */
+  onNext: () => void;
+  /** 返回上一步的回调 */
+  onPrev: () => void;
+}
