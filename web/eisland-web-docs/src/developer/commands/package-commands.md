@@ -53,7 +53,7 @@ npm run postinstall
 **Under the hood:** `electron-builder install-app-deps`
 
 **What it does:**
-- Rebuilds native modules (e.g., `windows-smtc-monitor`, `eisland-windows-fullscreen-detector`) for Electron's Node.js version
+- Rebuilds native modules (e.g., `eisland-windows-smtc-helper`, `eisland-windows-fullscreen-detector`) for Electron's Node.js version
 - Ensures native addons are ABI-compatible with the Electron runtime
 
 :::warning
