@@ -72,6 +72,7 @@
     },
     "welcome": {
       "title": "Welcome to eIsland",
+      "subtitle": "Setup complete, start your Dynamic Island experience",
       "desc": "A Windows desktop floating widget inspired by Apple Dynamic Island,\nmaking your desktop more vivid and productive."
     },
     "sections": {

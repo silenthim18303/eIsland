@@ -72,6 +72,7 @@
     },
     "welcome": {
       "title": "欢迎使用 eIsland",
+      "subtitle": "配置完成，开始体验灵动岛吧",
       "desc": "一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。"
     },
     "sections": {

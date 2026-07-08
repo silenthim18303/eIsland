@@ -34,6 +34,7 @@ import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffec
 import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
 import { WhitelistStep } from './components/components/DynamicIslandGuidePages/smtc-white-list';
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
+import { WelcomeStep } from './components/components/DynamicIslandGuidePages/welcome';
 import { ProcessIndicator } from './components/components/DynamicIslandProcessIndicator';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
 import type { GuideStep } from './types/DynamicIslandGuideTypes';
@@ -64,14 +65,19 @@ function GuideApp(): ReactElement {
     setStep('language');
   }, []);
 
-  /** SMTC 检查完成，结束引导 */
+  /** SMTC 检查完成，进入欢迎页 */
   const handleSmtcNext = useCallback((): void => {
-    handleComplete();
-  }, [handleComplete]);
+    setStep('welcome');
+  }, []);
 
   /** SMTC 返回白名单配置 */
   const handleSmtcPrev = useCallback((): void => {
     setStep('whitelist');
+  }, []);
+
+  /** 欢迎页返回 SMTC 检查 */
+  const handleWelcomePrev = useCallback((): void => {
+    setStep('smtc');
   }, []);
 
   return (
@@ -96,6 +102,12 @@ function GuideApp(): ReactElement {
           <SmtcStep
             onNext={handleSmtcNext}
             onPrev={handleSmtcPrev}
+          />
+        )}
+        {step === 'welcome' && (
+          <WelcomeStep
+            onComplete={handleComplete}
+            onPrev={handleWelcomePrev}
           />
         )}
       </div>
