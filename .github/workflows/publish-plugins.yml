@@ -1,0 +1,59 @@
+name: Publish Plugins to npm
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (skip actual publish)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        plugin:
+          - eisland-windows-application-icon-helper
+          - eisland-windows-bluetooth-helper
+          - eisland-windows-brightness-helper
+          - eisland-windows-fullscreen-detector
+          - eisland-windows-performance-monitor
+          - eisland-windows-power-helper
+          - eisland-windows-processes-attacker
+          - eisland-windows-smtc-helper
+          - eisland-windows-toast-listener
+          - eisland-windows-wifi-helper
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 25
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Visual Studio Build Tools
+        shell: pwsh
+        run: |
+          $installerPath = "${{ runner.temp }}\vs_buildtools.exe"
+          Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile $installerPath
+          Start-Process -FilePath $installerPath -ArgumentList '--quiet', '--norestart', '--nocache', '--add', 'Microsoft.VisualStudio.Workload.VCTools', '--includeRecommended' -Wait
+          Remove-Item $installerPath
+
+      - name: Publish plugin
+        working-directory: plugins/${{ matrix.plugin }}
+        run: npm publish --access public ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

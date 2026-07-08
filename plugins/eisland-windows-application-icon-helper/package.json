@@ -13,6 +13,7 @@
     "x64"
   ],
   "scripts": {
+    "postinstall": "dotnet publish src/eIslandAppIconHelper.csproj -c Release -r win-x64",
     "build": "dotnet publish src/eIslandAppIconHelper.csproj -c Release -r win-x64",
     "clean": "dotnet clean src/eIslandAppIconHelper.csproj",
     "rebuild": "npm run clean && npm run build",

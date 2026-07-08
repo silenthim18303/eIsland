@@ -15,6 +15,7 @@
     "ia32"
   ],
   "scripts": {
+    "postinstall": "npm run build:all",
     "build": "dotnet publish src/eIslandPowerHelper.csproj -c Release -r win-x64",
     "build:ctypes": "dotnet publish pw-ctypes/eIslandPowerCtypes.csproj -c Release -r win-x64",
     "build:all": "npm run build && npm run build:ctypes",
