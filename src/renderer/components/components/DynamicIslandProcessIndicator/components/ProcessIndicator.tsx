@@ -24,55 +24,23 @@
  * @author 鸡哥
  */
 
-import { useEffect } from 'react';
 import type { ReactElement } from 'react';
 import type { ProcessIndicatorProps } from '../types';
+import { useProcessIndicator } from '../hooks/useProcessIndicator';
 import '../styles/process-indicator.css';
-
-let previousRenderedCurrent: number | null = null;
-let previousRenderedTotal: number | null = null;
-const PROGRESS_ANIMATION_MS = 620;
 
 /**
  * 分段进度条
- * @description 白色分段进度条，已完成步骤高亮，当前步骤半透明，未完成步骤微弱显示
+ * @description 白色分段进度条，已完成步骤高亮，当前步骤从左至白色填充，未完成步骤微弱显示
  */
 export function ProcessIndicator({ total, current }: ProcessIndicatorProps): ReactElement {
-  const previousCurrent = previousRenderedTotal === total ? previousRenderedCurrent : null;
-  const progressStart = previousCurrent ?? current;
-  const isProgressIncreasing = previousCurrent !== null && current > previousCurrent;
-
-  useEffect(() => {
-    if (!isProgressIncreasing) {
-      previousRenderedCurrent = current;
-      previousRenderedTotal = total;
-      return;
-    }
-
-    const updatePreviousProgress = setTimeout(() => {
-      previousRenderedCurrent = current;
-      previousRenderedTotal = total;
-    }, PROGRESS_ANIMATION_MS);
-
-    return () => {
-      clearTimeout(updatePreviousProgress);
-    };
-  }, [current, isProgressIncreasing, total]);
+  const segments = useProcessIndicator(total, current);
 
   return (
     <div className="process-indicator">
-      {Array.from({ length: total }, (_, i) => {
-        const isCompleted = i < current;
-        const isActive = i === current;
-        const isProgressing = isProgressIncreasing && i > progressStart && i <= current;
-
-        return (
-          <div
-            key={i}
-            className={`process-indicator-segment${isCompleted ? ' completed' : ''}${isActive ? ' active' : ''}${isProgressing ? ' progressing' : ''}`}
-          />
-        );
-      })}
+      {segments.map((status, i) => (
+        <div key={i} className={`process-indicator-segment ${status}`} />
+      ))}
     </div>
   );
 }
