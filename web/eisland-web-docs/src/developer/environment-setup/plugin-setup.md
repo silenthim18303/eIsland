@@ -15,8 +15,8 @@ eIsland uses nine native plugins to access Windows features that web technologie
 
 | Plugin | Language | Windows Libraries | Purpose |
 |--------|----------|-------------------|---------|
-| **windows-fullscreen-detector** | C | user32, dwmapi | Detects fullscreen applications |
-| **windows-performance-monitor** | C + .NET | — | CPU, memory, and temperature monitoring |
+| **eisland-windows-fullscreen-detector** | C | user32, dwmapi | Detects fullscreen applications |
+| **eisland-windows-performance-monitor** | C + .NET | — | CPU, memory, and temperature monitoring |
 | **eisland-windows-processes-attacker** | C | kernel32 | Process management |
 | **eisland-windows-toast-listener** | C++ | runtimeobject | Windows notification listener |
 | **eisland-windows-smtc-helper** | C# (.NET) | — | System Media Transport Controls (play, pause, next, previous, status) |
@@ -155,7 +155,7 @@ vcpkg automatically downloads the source, compiles it with MSVC, and installs he
 
 #### .NET Components
 
-The `windows-performance-monitor` plugin includes a .NET helper application (`eIslandTemperatureReader`) that reads hardware temperature sensors using LibreHardwareMonitorLib. The `eisland-windows-smtc-helper` plugin is a pure .NET console application that controls Windows media playback via SMTC APIs.
+The `eisland-windows-performance-monitor` plugin includes a .NET helper application (`eIslandTemperatureReader`) that reads hardware temperature sensors using LibreHardwareMonitorLib. The `eisland-windows-smtc-helper` plugin is a pure .NET console application that controls Windows media playback via SMTC APIs.
 
 | Component | ID | Description |
 |-----------|-----|-------------|
@@ -167,7 +167,7 @@ The `windows-performance-monitor` plugin includes a .NET helper application (`eI
 The temperature helper has a specific build chain:
 
 ```
-windows-performance-monitor/
+eisland-windows-performance-monitor/
 ├── binding.gyp              # C plugin → compiled by node-gyp (MSVC)
 ├── src/
 │   ├── performance_monitor.c
@@ -325,7 +325,7 @@ Each plugin has a `binding.gyp` file that tells node-gyp how to compile the nati
 | `libraries` | Windows system libraries to link (e.g., `user32.lib`, `kernel32.lib`) |
 | `msvs_settings` | MSVC-specific compiler and linker options |
 
-:::details Example binding.gyp — windows-fullscreen-detector
+:::details Example binding.gyp — eisland-windows-fullscreen-detector
 ```json
 {
   "targets": [
@@ -435,14 +435,14 @@ The `postinstall` script runs `electron-builder install-app-deps`, which trigger
 To build a single plugin independently:
 
 ```bash
-cd plugins/windows-fullscreen-detector
+cd plugins/eisland-windows-fullscreen-detector
 npm run build    # Runs: node-gyp rebuild
 ```
 
 ### Rebuild After Code Changes
 
 ```bash
-cd plugins/windows-fullscreen-detector
+cd plugins/eisland-windows-fullscreen-detector
 npm run rebuild  # Runs: node-gyp clean && node-gyp rebuild
 ```
 
@@ -481,7 +481,7 @@ sdk/
 Each plugin has its own test suite using Vitest:
 
 ```bash
-cd plugins/windows-fullscreen-detector
+cd plugins/eisland-windows-fullscreen-detector
 
 # Run all tests
 npm run test
@@ -615,7 +615,7 @@ If you prefer the full Visual Studio IDE instead of VS Code:
 4. Use the **Developer Command Prompt** for node-gyp commands:
 
 ```bash
-cd plugins\windows-fullscreen-detector
+cd plugins\eisland-windows-fullscreen-detector
 npm run build
 ```
 
@@ -646,7 +646,7 @@ cd sdk
 npm run build
 
 # 6. Build a plugin
-cd ../plugins/windows-fullscreen-detector
+cd ../plugins/eisland-windows-fullscreen-detector
 npm run build
 
 # 7. Run tests
@@ -704,7 +704,7 @@ winget install Microsoft.DotNet.SDK.10
 dotnet --list-sdks  # Should show 10.x.x
 
 # Rebuild the temperature helper
-cd plugins/windows-performance-monitor/temperature-helper
+cd plugins/eisland-windows-performance-monitor/temperature-helper
 dotnet build
 
 # Or rebuild the SMTC helper

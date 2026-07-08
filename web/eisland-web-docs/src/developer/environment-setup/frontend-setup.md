@@ -147,7 +147,7 @@ The `postinstall` script automatically runs `electron-builder install-app-deps` 
 :::
 
 :::warning
-`npm install` will automatically compile four native C/C++ plugins (`windows-fullscreen-detector`, `windows-performance-monitor`, `windows-toast-listener`, `windows-processes-attacker`) and one .NET helper (`temperature-helper`). This requires:
+`npm install` will automatically compile four native C/C++ plugins (`eisland-windows-fullscreen-detector`, `eisland-windows-performance-monitor`, `windows-toast-listener`, `windows-processes-attacker`) and one .NET helper (`temperature-helper`). This requires:
 
 - **Visual Studio Build Tools 2022** — with the **"Desktop development with C++"** workload installed
 - **.NET 10 SDK** — required for building the `eIslandTemperatureReader` helper
