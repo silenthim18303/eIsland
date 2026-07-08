@@ -24,49 +24,44 @@
  * @author 鸡哥
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import type { SegmentStatus } from '../types';
 import { PROGRESS_ANIMATION_MS } from '../config';
+
+type RenderedProgress = { current: number; total: number };
+
+let previousRenderedProgress: RenderedProgress | null = null;
 
 /**
  * 分段进度条状态管理
  * @description 追踪进度变化，生成各分段状态，支持从左至右逐步填充动画
  */
 export function useProcessIndicator(total: number, current: number): SegmentStatus[] {
-  const previousRef = useRef<{ current: number; total: number } | null>(null);
-  const [progressStart, setProgressStart] = useState<number | null>(null);
-  const [isProgressing, setIsProgressing] = useState(false);
+  const previousProgress = previousRenderedProgress;
+  const progressingRange = previousProgress !== null && previousProgress.total === total && current > previousProgress.current
+    ? { from: previousProgress.current, to: current }
+    : null;
 
-  const prev = previousRef.current;
-  const isProgressIncreasing = prev !== null && prev.total === total && current > prev.current;
+  const progressingFrom = progressingRange?.from ?? null;
+  const progressingTo = progressingRange?.to ?? null;
 
   useEffect(() => {
-    if (!isProgressIncreasing) {
-      previousRef.current = { current, total };
+    if (progressingRange === null) {
+      previousRenderedProgress = { current, total };
       return;
     }
 
-    setProgressStart(prev!.current);
-    setIsProgressing(true);
-
     const timer = setTimeout(() => {
-      setIsProgressing(false);
-      setProgressStart(null);
-      previousRef.current = { current, total };
+      previousRenderedProgress = { current, total };
     }, PROGRESS_ANIMATION_MS);
 
     return () => { clearTimeout(timer); };
-  }, [current, isProgressIncreasing, total]);
-
-  // 首次渲染直接记录
-  if (prev === null) {
-    previousRef.current = { current, total };
-  }
+  }, [current, progressingFrom, progressingTo, total]);
 
   return Array.from({ length: total }, (_, i) => {
+    if (progressingRange !== null && i > progressingRange.from && i <= progressingRange.to) return 'progressing';
     if (i < current) return 'completed';
     if (i === current) return 'active';
-    if (isProgressing && progressStart !== null && i > progressStart && i <= current) return 'progressing';
     return 'inactive';
   });
 }

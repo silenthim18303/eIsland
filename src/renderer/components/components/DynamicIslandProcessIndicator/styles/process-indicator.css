@@ -63,8 +63,8 @@
   will-change: transform, opacity;
 }
 
-.process-indicator-segment.completed::before,
-.process-indicator-segment.active::before {
+.process-indicator-segment.completed:not(.progressing)::before,
+.process-indicator-segment.active:not(.progressing)::before {
   opacity: 1;
   transform: scale3d(1, 1, 1);
 }
