@@ -33,7 +33,7 @@ import { ProcessIndicator } from '../../../DynamicIslandProcessIndicator';
 
 /**
  * SMTC 白名单选择步骤组件
- * @description 展示可选播放器列表，用户多选后进入下一步
+ * @description 展示可选播放器列表，用户多选后实时同步到配置
  */
 export function WhitelistStep({ onNext, onPrev, currentStep, totalSteps }: WhitelistStepProps): ReactElement {
   const { t } = useTranslation();

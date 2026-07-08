@@ -18,8 +18,11 @@
  * GNU General Public License for more details.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { WHITELIST_OPTIONS } from '../config/whitelistOptions';
+
+/** 默认选中值 */
+const DEFAULT_SELECTED = WHITELIST_OPTIONS.filter((opt) => opt.defaultSelected).map((opt) => opt.value);
 
 interface UseWhitelistSelectReturn {
   /** 当前选中的白名单列表 */
@@ -30,19 +33,28 @@ interface UseWhitelistSelectReturn {
 
 /**
  * 白名单选择逻辑 Hook
- * @description 管理多选状态，默认全选
+ * @description 从存储加载当前白名单，管理多选状态
  */
 export function useWhitelistSelect(): UseWhitelistSelectReturn {
-  const [selected, setSelected] = useState<string[]>(() =>
-    WHITELIST_OPTIONS.filter((opt) => opt.defaultSelected).map((opt) => opt.value)
-  );
+  const [selected, setSelected] = useState<string[]>(DEFAULT_SELECTED);
+
+  /** 初始化时从存储加载当前白名单 */
+  useEffect(() => {
+    window.api.musicWhitelistGet().then((list) => {
+      if (Array.isArray(list)) {
+        setSelected(list);
+      }
+    }).catch(() => {});
+  }, []);
 
   const toggle = useCallback((value: string): void => {
-    setSelected((prev) =>
-      prev.includes(value)
+    setSelected((prev) => {
+      const next = prev.includes(value)
         ? prev.filter((v) => v !== value)
-        : [...prev, value]
-    );
+        : [...prev, value];
+      window.api.musicWhitelistSet(next).catch(() => {});
+      return next;
+    });
   }, []);
 
   return { selected, toggle };

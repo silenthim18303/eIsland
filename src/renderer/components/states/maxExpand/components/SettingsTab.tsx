@@ -992,6 +992,9 @@ export function SettingsTab(): ReactElement {
       if (channel === `store:${AUTO_HIDE_FULLSCREEN_WINDOWS_STORE_KEY}`) {
         setAutoHideFullscreenWindowsState(value === true);
       }
+      if (channel === 'store:music-whitelist' && Array.isArray(value)) {
+        setWhitelist(value);
+      }
     });
     return () => {
       cancelled = true;
