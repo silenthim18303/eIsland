@@ -24,8 +24,9 @@
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import type { ProcessIndicatorProps } from '../types';
+import { PROGRESS_ANIMATION_MS } from '../config';
 import { useProcessIndicator } from '../hooks/useProcessIndicator';
 import '../styles/process-indicator.css';
 
@@ -35,11 +36,15 @@ import '../styles/process-indicator.css';
  */
 export function ProcessIndicator({ total, current }: ProcessIndicatorProps): ReactElement {
   const segments = useProcessIndicator(total, current);
+  const style = { '--process-indicator-duration': `${PROGRESS_ANIMATION_MS}ms` } as CSSProperties;
 
   return (
-    <div className="process-indicator">
-      {segments.map((status, i) => (
-        <div key={i} className={`process-indicator-segment ${status}`} />
+    <div className="process-indicator" style={style}>
+      {segments.map((segment, i) => (
+        <div
+          key={i}
+          className={`process-indicator-segment ${segment.status}${segment.motion !== 'none' ? ` ${segment.motion}` : ''}`}
+        />
       ))}
     </div>
   );

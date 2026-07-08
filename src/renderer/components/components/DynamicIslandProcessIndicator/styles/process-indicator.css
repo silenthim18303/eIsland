@@ -25,6 +25,8 @@
  */
 
 .process-indicator {
+  --process-indicator-duration: 620ms;
+  --process-indicator-easing: cubic-bezier(0.7, 0, 0.84, 0);
   display: flex;
   gap: 8px;
   margin-top: 14px;
@@ -37,18 +39,14 @@
   background: rgba(255, 255, 255, 0.12);
   position: relative;
   overflow: hidden;
+  transform: translateZ(0);
 }
 
-.process-indicator-segment::before,
-.process-indicator-segment::after {
+.process-indicator-segment::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  pointer-events: none;
-}
-
-.process-indicator-segment::before {
   background: #ffffff;
   opacity: 0;
   transform: scale3d(0, 1, 1);
@@ -56,38 +54,21 @@
   will-change: transform, opacity;
 }
 
-.process-indicator-segment::after {
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.72) 48%, transparent 100%);
-  opacity: 0;
-  transform: translate3d(-120%, 0, 0);
-  will-change: transform, opacity;
-}
-
-.process-indicator-segment.completed:not(.progressing):not(.regressing)::before,
-.process-indicator-segment.active:not(.progressing):not(.regressing)::before {
+.process-indicator-segment.completed::before,
+.process-indicator-segment.active::before {
   opacity: 1;
   transform: scale3d(1, 1, 1);
 }
 
-/* 前进动画：从左至右填充 */
-.process-indicator-segment.progressing::before {
-  animation: process-indicator-fill 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+.process-indicator-segment.enter::before {
+  animation: process-indicator-enter var(--process-indicator-duration) var(--process-indicator-easing) both;
 }
 
-.process-indicator-segment.progressing::after {
-  animation: process-indicator-sweep 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.process-indicator-segment.exit::before {
+  animation: process-indicator-exit var(--process-indicator-duration) var(--process-indicator-easing) both;
 }
 
-/* 后退动画：从右至左清空 */
-.process-indicator-segment.regressing::before {
-  animation: process-indicator-empty 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.process-indicator-segment.regressing::after {
-  animation: process-indicator-sweep-back 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes process-indicator-fill {
+@keyframes process-indicator-enter {
   from {
     opacity: 1;
     transform: scale3d(0, 1, 1);
@@ -99,23 +80,7 @@
   }
 }
 
-@keyframes process-indicator-sweep {
-  0% {
-    opacity: 0;
-    transform: translate3d(-120%, 0, 0);
-  }
-
-  24% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(120%, 0, 0);
-  }
-}
-
-@keyframes process-indicator-empty {
+@keyframes process-indicator-exit {
   from {
     opacity: 1;
     transform: scale3d(1, 1, 1);
@@ -124,40 +89,12 @@
   to {
     opacity: 0;
     transform: scale3d(0, 1, 1);
-  }
-}
-
-@keyframes process-indicator-sweep-back {
-  0% {
-    opacity: 0;
-    transform: translate3d(120%, 0, 0);
-  }
-
-  24% {
-    opacity: 0.5;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(-120%, 0, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .process-indicator-segment.progressing::before,
-  .process-indicator-segment.progressing::after,
-  .process-indicator-segment.regressing::before,
-  .process-indicator-segment.regressing::after {
+  .process-indicator-segment.enter::before,
+  .process-indicator-segment.exit::before {
     animation: none;
-  }
-
-  .process-indicator-segment.progressing::before {
-    opacity: 1;
-    transform: scale3d(1, 1, 1);
-  }
-
-  .process-indicator-segment.regressing::before {
-    opacity: 0;
-    transform: scale3d(0, 1, 1);
   }
 }

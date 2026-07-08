@@ -26,5 +26,16 @@ export interface ProcessIndicatorProps {
   current: number;
 }
 
-/** 单个分段状态 */
-export type SegmentStatus = 'completed' | 'active' | 'progressing' | 'regressing' | 'inactive';
+export type SegmentStatus = 'completed' | 'active' | 'inactive';
+
+export type SegmentMotion = 'none' | 'enter' | 'exit';
+
+export interface ProcessSegment {
+  status: SegmentStatus;
+  motion: SegmentMotion;
+}
+
+export interface RenderedProgress {
+  current: number;
+  total: number;
+}
