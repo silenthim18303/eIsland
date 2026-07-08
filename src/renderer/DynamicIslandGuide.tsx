@@ -32,8 +32,8 @@ import { createRoot } from 'react-dom/client';
 import './styles/guide.css';
 import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffect';
 import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
-import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc';
-import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc/hooks/useSmtcAccentColor';
+import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
+import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
 
 /** 引导步骤 */
 type GuideStep = 'language' | 'smtc';

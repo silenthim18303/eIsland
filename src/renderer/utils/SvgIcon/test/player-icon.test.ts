@@ -26,7 +26,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { PlayerIcon } from '../player-icon';
-import { PLAYER_ICON_MAP } from '../../../components/components/DynamicIslandGuidePages/smtc/utils/smtcUtils';
+import { PLAYER_ICON_MAP } from '../../../components/components/DynamicIslandGuidePages/smtc-test/utils/smtcUtils';
 
 describe('PlayerIcon', () => {
   it('should contain expected keys', () => {
