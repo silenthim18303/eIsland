@@ -30,12 +30,13 @@ import { LANGUAGE_OPTIONS } from '../config/languageOptions';
 import { useLanguageSelect } from '../hooks/useLanguageSelect';
 import type { LanguageStepProps } from '../types';
 import type { AppLanguage } from '../../../../../i18n';
+import { ProcessIndicator } from '../../../DynamicIslandProcessIndicator';
 
 /**
  * 语言选择步骤组件
  * @description 展示可选语言列表，用户选择后切换语言并进入下一步
  */
-export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
+export function LanguageStep({ onNext, currentStep, totalSteps }: LanguageStepProps): ReactElement {
   const { t } = useTranslation();
   const { selected, handleSelect } = useLanguageSelect();
 
@@ -44,6 +45,7 @@ export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
       <div className="guide-step-header">
         <h2>{t('guide.language.title', { defaultValue: '选择语言' })}</h2>
         <p>{t('guide.language.subtitle', { defaultValue: '选择你偏好的语言以继续' })}</p>
+        <ProcessIndicator total={totalSteps} current={currentStep} />
       </div>
       <div className="guide-language-list">
         {LANGUAGE_OPTIONS.map((opt) => (

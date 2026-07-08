@@ -28,4 +28,8 @@
 export interface LanguageStepProps {
   /** 语言确认后进入下一步的回调 */
   onNext: () => void;
+  /** 当前步骤索引 */
+  currentStep: number;
+  /** 步骤总数 */
+  totalSteps: number;
 }

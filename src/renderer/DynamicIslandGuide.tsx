@@ -35,6 +35,7 @@ import { LanguageStep } from './components/components/DynamicIslandGuidePages/la
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
 import type { GuideStep } from './types/DynamicIslandGuideTypes';
+import { GUIDE_STEP_INDEX, GUIDE_STEP_TOTAL } from './types/DynamicIslandGuideTypes';
 
 /** 引导窗口根组件 */
 function GuideApp(): ReactElement {
@@ -65,8 +66,21 @@ function GuideApp(): ReactElement {
     <div className="guide-container">
       <WaveEffect accentColor={accentColor} />
       <div className="guide-content">
-        {step === 'language' && <LanguageStep onNext={handleLanguageNext} />}
-        {step === 'smtc' && <SmtcStep onNext={handleSmtcNext} onPrev={handleSmtcPrev} />}
+        {step === 'language' && (
+          <LanguageStep
+            onNext={handleLanguageNext}
+            currentStep={GUIDE_STEP_INDEX[step]}
+            totalSteps={GUIDE_STEP_TOTAL}
+          />
+        )}
+        {step === 'smtc' && (
+          <SmtcStep
+            onNext={handleSmtcNext}
+            onPrev={handleSmtcPrev}
+            currentStep={GUIDE_STEP_INDEX[step]}
+            totalSteps={GUIDE_STEP_TOTAL}
+          />
+        )}
       </div>
     </div>
   );

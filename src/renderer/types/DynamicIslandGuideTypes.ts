@@ -20,3 +20,12 @@
 
 /** 引导步骤 */
 export type GuideStep = 'language' | 'smtc';
+
+/** 引导步骤索引映射 */
+export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
+  language: 0,
+  smtc: 1,
+};
+
+/** 引导步骤总数 */
+export const GUIDE_STEP_TOTAL = 2;
