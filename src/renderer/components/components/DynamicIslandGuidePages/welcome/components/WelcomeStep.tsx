@@ -41,6 +41,14 @@ export function WelcomeStep({ onComplete, onPrev }: WelcomeStepProps): ReactElem
         <h2>{t('guide.welcome.title', { defaultValue: '欢迎使用 eIsland' })}</h2>
         <p>{t('guide.welcome.subtitle', { defaultValue: '配置完成，开始体验灵动岛吧' })}</p>
       </div>
+      <div className="guide-welcome-video">
+        <video
+          src="./video/sign.webm"
+          autoPlay
+          muted
+          playsInline
+        />
+      </div>
       <div className="guide-step-footer">
         <button className="guide-prev-btn" onClick={onPrev}>
           {t('guide.actions.prev', { defaultValue: '上一步' })}
