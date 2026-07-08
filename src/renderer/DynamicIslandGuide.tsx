@@ -34,9 +34,7 @@ import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffec
 import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
-
-/** 引导步骤 */
-type GuideStep = 'language' | 'smtc';
+import type { GuideStep } from './types/DynamicIslandGuideTypes';
 
 /** 引导窗口根组件 */
 function GuideApp(): ReactElement {
