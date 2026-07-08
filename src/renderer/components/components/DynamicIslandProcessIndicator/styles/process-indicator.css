@@ -26,22 +26,23 @@
 
 .process-indicator {
   display: flex;
-  gap: 6px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .process-indicator-segment {
-  width: 24px;
-  height: 3px;
+  width: 32px;
+  height: 4px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.15);
-  transition: background 0.3s ease;
+  background: rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
 }
 
 .process-indicator-segment.completed {
-  background: rgba(255, 255, 255, 0.85);
+  background: #ffffff;
 }
 
 .process-indicator-segment.active {
-  background: rgba(255, 255, 255, 0.45);
+  background: #ffffff;;
 }
