@@ -32,6 +32,7 @@ import { createRoot } from 'react-dom/client';
 import './styles/guide.css';
 import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffect';
 import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
+import { WhitelistStep } from './components/components/DynamicIslandGuidePages/smtc-white-list';
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
 import type { GuideStep } from './types/DynamicIslandGuideTypes';
@@ -47,9 +48,19 @@ function GuideApp(): ReactElement {
     window.electron.ipcRenderer.send('guide:complete');
   }, []);
 
-  /** 语言选择完成，进入 SMTC 检查 */
+  /** 语言选择完成，进入白名单配置 */
   const handleLanguageNext = useCallback((): void => {
+    setStep('whitelist');
+  }, []);
+
+  /** 白名单配置完成，进入 SMTC 检查 */
+  const handleWhitelistNext = useCallback((): void => {
     setStep('smtc');
+  }, []);
+
+  /** 白名单返回语言选择 */
+  const handleWhitelistPrev = useCallback((): void => {
+    setStep('language');
   }, []);
 
   /** SMTC 检查完成，结束引导 */
@@ -57,9 +68,9 @@ function GuideApp(): ReactElement {
     handleComplete();
   }, [handleComplete]);
 
-  /** SMTC 返回语言选择 */
+  /** SMTC 返回白名单配置 */
   const handleSmtcPrev = useCallback((): void => {
-    setStep('language');
+    setStep('whitelist');
   }, []);
 
   return (
@@ -69,6 +80,14 @@ function GuideApp(): ReactElement {
         {step === 'language' && (
           <LanguageStep
             onNext={handleLanguageNext}
+            currentStep={GUIDE_STEP_INDEX[step]}
+            totalSteps={GUIDE_STEP_TOTAL}
+          />
+        )}
+        {step === 'whitelist' && (
+          <WhitelistStep
+            onNext={handleWhitelistNext}
+            onPrev={handleWhitelistPrev}
             currentStep={GUIDE_STEP_INDEX[step]}
             totalSteps={GUIDE_STEP_TOTAL}
           />

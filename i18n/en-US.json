@@ -60,6 +60,16 @@
       "pause": "Pause",
       "play": "Play"
     },
+    "whitelist": {
+      "title": "Select Players",
+      "subtitle": "Choose players to monitor",
+      "qqmusic": "QQ Music",
+      "netease": "NetEase Cloud Music",
+      "sodamusic": "Soda Music",
+      "kugou": "KuGou",
+      "applemusic": "Apple Music",
+      "spotify": "Spotify"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "desc": "A Windows desktop floating widget inspired by Apple Dynamic Island,\nmaking your desktop more vivid and productive."

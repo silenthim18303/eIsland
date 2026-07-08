@@ -60,6 +60,16 @@
       "pause": "暂停",
       "play": "播放"
     },
+    "whitelist": {
+      "title": "选择播放器",
+      "subtitle": "选择需要监听的播放器",
+      "qqmusic": "QQ 音乐",
+      "netease": "网易云音乐",
+      "sodamusic": "汽水音乐",
+      "kugou": "酷狗音乐",
+      "applemusic": "Apple Music",
+      "spotify": "Spotify"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "desc": "一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。"

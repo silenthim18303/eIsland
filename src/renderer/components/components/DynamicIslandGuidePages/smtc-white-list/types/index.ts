@@ -18,15 +18,14 @@
  * GNU General Public License for more details.
  */
 
-/** 引导步骤 */
-export type GuideStep = 'language' | 'whitelist' | 'smtc';
-
-/** 引导步骤索引映射 */
-export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
-  language: 0,
-  whitelist: 1,
-  smtc: 2,
-};
-
-/** 引导步骤总数 */
-export const GUIDE_STEP_TOTAL = 3;
+/** WhitelistStep 组件属性 */
+export interface WhitelistStepProps {
+  /** 确认后进入下一步的回调 */
+  onNext: () => void;
+  /** 返回上一步的回调 */
+  onPrev: () => void;
+  /** 当前步骤索引 */
+  currentStep: number;
+  /** 步骤总数 */
+  totalSteps: number;
+}
