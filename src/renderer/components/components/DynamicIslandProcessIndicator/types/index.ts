@@ -27,4 +27,4 @@ export interface ProcessIndicatorProps {
 }
 
 /** 单个分段状态 */
-export type SegmentStatus = 'completed' | 'active' | 'progressing' | 'inactive';
+export type SegmentStatus = 'completed' | 'active' | 'progressing' | 'regressing' | 'inactive';

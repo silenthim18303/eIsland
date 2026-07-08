@@ -34,19 +34,25 @@ let previousRenderedProgress: RenderedProgress | null = null;
 
 /**
  * 分段进度条状态管理
- * @description 追踪进度变化，生成各分段状态，支持从左至右逐步填充动画
+ * @description 追踪进度变化，生成各分段状态，支持前进/后退动画
  */
 export function useProcessIndicator(total: number, current: number): SegmentStatus[] {
   const previousProgress = previousRenderedProgress;
-  const progressingRange = previousProgress !== null && previousProgress.total === total && current > previousProgress.current
-    ? { from: previousProgress.current, to: current }
+  const hasChanged = previousProgress !== null && previousProgress.total === total && current !== previousProgress.current;
+
+  const isForward = hasChanged && current > previousProgress!.current;
+  const isBackward = hasChanged && current < previousProgress!.current;
+
+  const progressingRange = isForward
+    ? { from: previousProgress!.current, to: current }
     : null;
 
-  const progressingFrom = progressingRange?.from ?? null;
-  const progressingTo = progressingRange?.to ?? null;
+  const regressingRange = isBackward
+    ? { from: current + 1, to: previousProgress!.current + 1 }
+    : null;
 
   useEffect(() => {
-    if (progressingRange === null) {
+    if (!hasChanged) {
       previousRenderedProgress = { current, total };
       return;
     }
@@ -56,12 +62,15 @@ export function useProcessIndicator(total: number, current: number): SegmentStat
     }, PROGRESS_ANIMATION_MS);
 
     return () => { clearTimeout(timer); };
-  }, [current, progressingFrom, progressingTo, total]);
+  }, [current, hasChanged, total]);
 
-  return Array.from({ length: total }, (_, i) => {
+  const segments: SegmentStatus[] = Array.from({ length: total }, (_, i) => {
     if (progressingRange !== null && i > progressingRange.from && i <= progressingRange.to) return 'progressing';
+    if (regressingRange !== null && i >= regressingRange.from && i < regressingRange.to) return 'regressing';
     if (i < current) return 'completed';
     if (i === current) return 'active';
     return 'inactive';
   });
+
+  return segments;
 }
