@@ -50,7 +50,6 @@
 }
 
 .guide-theme-mode-btn {
-  flex: 1;
   height: 40px;
   padding: 0 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -58,6 +57,7 @@
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.55);
   font-size: 14px;
+  white-space: nowrap;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, color 0.2s;
 }
