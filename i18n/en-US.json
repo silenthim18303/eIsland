@@ -83,6 +83,16 @@
       "title": "Select Update Source",
       "subtitle": "Choose the download source for checking updates"
     },
+    "github": {
+      "title": "Open Source",
+      "subtitle": "eIsland is an open source project",
+      "notice": "This software is free and open source. Open source under GPL-3.0 License.",
+      "links": {
+        "repo": "GitHub",
+        "website": "Website",
+        "docs": "Docs"
+      }
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "subtitle": "Setup complete, start your Dynamic Island experience",

@@ -83,6 +83,16 @@
       "title": "选择更新源",
       "subtitle": "选择检查更新时使用的下载源"
     },
+    "github": {
+      "title": "开源信息",
+      "subtitle": "eIsland 是一个开源项目",
+      "notice": "本软件开源免费，使用 GPL-3.0 许可证授权。",
+      "links": {
+        "repo": "GitHub",
+        "website": "官网",
+        "docs": "文档"
+      }
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "subtitle": "配置完成，开始体验灵动岛吧",

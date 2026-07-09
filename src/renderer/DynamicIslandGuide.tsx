@@ -36,6 +36,7 @@ import { WhitelistStep } from './components/components/DynamicIslandGuidePages/s
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
 import { ThemeStep } from './components/components/DynamicIslandGuidePages/theme';
 import { UpdateStep } from './components/components/DynamicIslandGuidePages/update';
+import { GithubStep } from './components/components/DynamicIslandGuidePages/github';
 import { WelcomeStep } from './components/components/DynamicIslandGuidePages/welcome';
 import { ProcessIndicator } from './components/components/DynamicIslandProcessIndicator';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
@@ -87,9 +88,9 @@ function GuideApp(): ReactElement {
     setStep('smtc');
   }, []);
 
-  /** 更新源配置完成，进入欢迎页 */
+  /** 更新源配置完成，进入开源信息 */
   const handleUpdateNext = useCallback((): void => {
-    setStep('welcome');
+    setStep('github');
   }, []);
 
   /** 更新源配置返回主题设置 */
@@ -97,9 +98,19 @@ function GuideApp(): ReactElement {
     setStep('theme');
   }, []);
 
-  /** 欢迎页返回更新源配置 */
-  const handleWelcomePrev = useCallback((): void => {
+  /** 开源信息完成，进入欢迎页 */
+  const handleGithubNext = useCallback((): void => {
+    setStep('welcome');
+  }, []);
+
+  /** 开源信息返回更新源配置 */
+  const handleGithubPrev = useCallback((): void => {
     setStep('update');
+  }, []);
+
+  /** 欢迎页返回开源信息 */
+  const handleWelcomePrev = useCallback((): void => {
+    setStep('github');
   }, []);
 
   return (
@@ -136,6 +147,12 @@ function GuideApp(): ReactElement {
           <UpdateStep
             onNext={handleUpdateNext}
             onPrev={handleUpdatePrev}
+          />
+        )}
+        {step === 'github' && (
+          <GithubStep
+            onNext={handleGithubNext}
+            onPrev={handleGithubPrev}
           />
         )}
         {step === 'welcome' && (
