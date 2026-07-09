@@ -338,6 +338,9 @@ let islandPositionOffset: IslandPositionOffset = { ...DEFAULT_ISLAND_POSITION_OF
 /** 运行时灵动岛显示器选择 */
 let islandDisplaySelection = DEFAULT_ISLAND_DISPLAY_SELECTION;
 
+/** 本次启动是否需要显示首次引导窗口 */
+let shouldShowGuideOnStartup = false;
+
 const mainWindowService = createMainWindowService({
   getMainWindow: () => mainWindow,
   setMainWindow: (window) => {
@@ -355,9 +358,13 @@ const mainWindowService = createMainWindowService({
   },
   onReadyToShow: async () => {
     await closeSplashWindow();
-    const isFirst = readFirstLaunchConfig();
-    if (isFirst || !app.isPackaged) {
-      showGuideWindow();
+    const shouldShowGuide = shouldShowGuideOnStartup || !app.isPackaged;
+    if (!shouldShowGuide) return;
+
+    await showGuideWindow();
+    if (shouldShowGuideOnStartup) {
+      writeFirstLaunchConfig();
+      shouldShowGuideOnStartup = false;
     }
   },
 });
@@ -843,11 +850,8 @@ app.whenReady().then(() => {
   clipboardUrlState.setDetectMode(readClipboardUrlDetectModeConfig());
   clipboardUrlState.setBlacklist(readClipboardUrlBlacklistConfig());
 
-  /** 是否为首次启动 */
-  const isFirstLaunch = readFirstLaunchConfig();
-  if (isFirstLaunch) {
-    writeFirstLaunchConfig();
-  }
+  /** 是否需要在本次启动显示首次引导 */
+  shouldShowGuideOnStartup = readFirstLaunchConfig();
 
   if (readStartupAnimationEnabledConfig()) {
     showSplashWindow();
