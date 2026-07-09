@@ -52,6 +52,7 @@ export function UpdateStep({ onNext, onPrev }: UpdateStepProps): ReactElement {
             className={`guide-update-option${selected === opt.key ? ' selected' : ''}`}
             onClick={(): void => { handleSelect(opt.key); }}
           >
+            {opt.icon && <img className="guide-update-icon" src={opt.icon} alt="" />}
             <span>{opt.label}</span>
             {opt.proOnly && (
               <img className="guide-update-pro-icon" src={SvgIcon.PRO} alt="PRO" />

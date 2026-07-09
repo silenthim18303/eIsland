@@ -25,6 +25,8 @@
  */
 
 import { UPDATE_SOURCES } from '../../../../states/maxExpand/components/setting/config/settingsTabConfig';
+import { ServiceIcon } from '../../../../../utils/SvgIcon';
+import { SvgIcon } from '../../../../../utils/SvgIcon';
 
 /** 更新源选项条目 */
 export interface UpdateSourceOption {
@@ -34,7 +36,16 @@ export interface UpdateSourceOption {
   label: string;
   /** 是否仅 PRO 可用 */
   proOnly: boolean;
+  /** 图标路径（可选） */
+  icon?: string;
 }
+
+/** 更新源图标映射 */
+const UPDATE_SOURCE_ICON_MAP: Record<string, string> = {
+  'cloudflare-r2': ServiceIcon.CLOUDFLARE,
+  'esa-cdn': ServiceIcon.ALIBABACLOUD,
+  'github': SvgIcon.GITHUB,
+};
 
 /** 更新源选项列表（复用设置页配置，引导页暂不展示 PRO 专用源） */
 export const UPDATE_SOURCE_OPTIONS: UpdateSourceOption[] = UPDATE_SOURCES
@@ -43,6 +54,7 @@ export const UPDATE_SOURCE_OPTIONS: UpdateSourceOption[] = UPDATE_SOURCES
     key: s.key,
     label: s.label,
     proOnly: s.proOnly ?? false,
+    icon: UPDATE_SOURCE_ICON_MAP[s.key],
   }));
 
 /** 更新源持久化存储键 */

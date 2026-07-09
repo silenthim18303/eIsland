@@ -60,6 +60,12 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+.guide-update-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 .guide-update-pro-icon {
   width: 16px;
   height: 16px;
