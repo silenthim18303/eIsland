@@ -11,7 +11,7 @@ This guide covers the environment configuration for eIsland plugin development. 
 
 ## Overview
 
-eIsland uses nine native plugins to access Windows features that web technologies cannot provide:
+eIsland uses ten native plugins to access Windows features that web technologies cannot provide:
 
 | Plugin | Language | Windows Libraries | Purpose |
 |--------|----------|-------------------|---------|
@@ -24,9 +24,10 @@ eIsland uses nine native plugins to access Windows features that web technologie
 | **eisland-windows-power-helper** | C# (.NET) | — | Battery status and power event monitoring |
 | **eisland-windows-wifi-helper** | C# (.NET) | — | WiFi connection status and event monitoring |
 | **eisland-windows-brightness-helper** | C# (.NET) | — | Screen brightness query, control, and WMI event monitoring |
+| **eisland-windows-application-icon-helper** | C# (.NET) | Shell32 | Application icon extraction by process name, PID, path, or shortcut |
 
 :::important
-All plugins are compiled using **node-gyp**, which requires Visual Studio Build Tools 2022 as the native compiler. The `.npm install` process in the root project automatically triggers these builds.
+All plugins are compiled using **node-gyp** or **dotnet publish**, which requires Visual Studio Build Tools 2022 as the native compiler. The `npm run plugins:build` command in the root project automatically triggers these builds.
 :::
 
 ## Prerequisites
