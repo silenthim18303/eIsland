@@ -50,6 +50,9 @@ describe('SvgIcon', () => {
     expect(SvgIcon).toHaveProperty('ABOUT');
     expect(SvgIcon).toHaveProperty('MOVE');
     expect(SvgIcon).toHaveProperty('THEME');
+    expect(SvgIcon).toHaveProperty('THEME_DARK');
+    expect(SvgIcon).toHaveProperty('THEME_FOLLOW_SYSTEM');
+    expect(SvgIcon).toHaveProperty('THEME_LIGHT');
     expect(SvgIcon).toHaveProperty('SMTC');
     expect(SvgIcon).toHaveProperty('INTERACTION');
     expect(SvgIcon).toHaveProperty('UPDATE');
