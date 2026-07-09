@@ -19,28 +19,28 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file service-icon.test.ts
+ * @description unit test
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+import { describe, expect, it } from 'vitest';
+import { ServiceIcon } from '../service-icon';
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
+describe('ServiceIcon', () => {
+  it('should contain expected keys', () => {
+    expect(ServiceIcon).toHaveProperty('CLOUDFLARE');
+    expect(ServiceIcon).toHaveProperty('ALIBABACLOUD');
+  });
 
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
+  it('all values should be strings starting with ./svg/services/ and ending with .svg', () => {
+    Object.entries(ServiceIcon).forEach(([, value]) => {
+      expect(typeof value).toBe('string');
+      expect(value).toMatch(/^\.\/svg\/services\/.+\.svg$/);
+    });
+  });
 
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
-
-export { ServiceIcon } from './service-icon';
-export type { ServiceIconKey } from './service-icon';
+  it('should contain exactly 2 keys', () => {
+    expect(Object.keys(ServiceIcon)).toHaveLength(2);
+  });
+});

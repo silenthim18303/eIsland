@@ -19,28 +19,14 @@
  */
 
 /**
- * @file index.ts
- * @description SvgIcon 统一入口
+ * @file service-icon.ts
+ * @description 服务/平台图标路径枚举
  * @author 鸡哥
  */
 
-export { SvgIcon } from './eisland-icon';
-export type { SvgIconKey } from './eisland-icon';
+export const ServiceIcon = {
+  CLOUDFLARE: './svg/services/CLOUDFLARE.svg',
+  ALIBABACLOUD: './svg/services/ALIBABACLOUD.svg',
+} as const;
 
-export {
-  DevIcon,
-  DEVICON_LANGUAGE_ALIASES,
-  resolveDevIconLanguage,
-  resolveDevIconByLanguage,
-  resolveDevIconByFileName,
-} from './dev-icon';
-export type { DevIconKey } from './dev-icon';
-
-export { AgentIcon } from './agent-icon';
-export type { AgentIconKey } from './agent-icon';
-
-export { PlayerIcon } from './player-icon';
-export type { PlayerIconKey } from './player-icon';
-
-export { ServiceIcon } from './service-icon';
-export type { ServiceIconKey } from './service-icon';
+export type ServiceIconKey = keyof typeof ServiceIcon;
