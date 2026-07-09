@@ -26,13 +26,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { UPDATE_SOURCE_STORE_KEY, DEFAULT_UPDATE_SOURCE } from '../config/updateSourceOptions';
-
-interface UseUpdateSourceSelectReturn {
-  /** 当前选中的更新源 */
-  selected: string;
-  /** 选择更新源（立即持久化） */
-  handleSelect: (key: string) => void;
-}
+import type { UseUpdateSourceSelectReturn } from '../types';
 
 /**
  * 更新源选择逻辑 Hook

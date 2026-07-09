@@ -25,20 +25,8 @@
  */
 
 import { UPDATE_SOURCES } from '../../../../states/maxExpand/components/setting/config/settingsTabConfig';
-import { ServiceIcon } from '../../../../../utils/SvgIcon';
-import { SvgIcon } from '../../../../../utils/SvgIcon';
-
-/** 更新源选项条目 */
-export interface UpdateSourceOption {
-  /** 更新源标识 */
-  key: string;
-  /** 显示名称 */
-  label: string;
-  /** 是否仅 PRO 可用 */
-  proOnly: boolean;
-  /** 图标路径（可选） */
-  icon?: string;
-}
+import { ServiceIcon, SvgIcon } from '../../../../../utils/SvgIcon';
+import type { UpdateSourceOption } from '../types';
 
 /** 更新源图标映射 */
 const UPDATE_SOURCE_ICON_MAP: Record<string, string> = {

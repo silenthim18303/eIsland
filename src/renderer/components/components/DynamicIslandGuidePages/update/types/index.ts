@@ -25,3 +25,23 @@ export interface UpdateStepProps {
   /** 返回上一步的回调 */
   onPrev: () => void;
 }
+
+/** 更新源选项条目 */
+export interface UpdateSourceOption {
+  /** 更新源标识 */
+  key: string;
+  /** 显示名称 */
+  label: string;
+  /** 是否仅 PRO 可用 */
+  proOnly: boolean;
+  /** 图标路径（可选） */
+  icon?: string;
+}
+
+/** useUpdateSourceSelect Hook 返回值 */
+export interface UseUpdateSourceSelectReturn {
+  /** 当前选中的更新源 */
+  selected: string;
+  /** 选择更新源（立即持久化） */
+  handleSelect: (key: string) => void;
+}
