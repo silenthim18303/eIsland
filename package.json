@@ -22,6 +22,8 @@
     "comment:check": "node --experimental-strip-types scripts/check-comment-standards.ts",
     "i18n:check": "node --experimental-strip-types scripts/check-i18n-completeness.ts",
     "esa:purge": "node --experimental-strip-types scripts/purge-esa-cache.ts",
+    "esa:purge-hostname": "node --experimental-strip-types scripts/purge-esa-hostname.ts",
+    "esa:purge-all": "node --experimental-strip-types scripts/purge-esa-hostname.ts --purge-all",
     "plugin:build:bluetooth": "cd plugins/eisland-windows-bluetooth-helper && npm run build:all",
     "plugin:build:brightness": "cd plugins/eisland-windows-brightness-helper && npm run build",
     "plugin:build:power": "cd plugins/eisland-windows-power-helper && npm run build:all",
