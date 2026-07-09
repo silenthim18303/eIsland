@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file whitelistOptions.ts
+ * @description 引导播放器白名单选择步骤配置
+ * @author 鸡哥
+ */
+
 import { PlayerIcon } from '../../../../../utils/SvgIcon/player-icon';
 
 /** 白名单选项条目 */

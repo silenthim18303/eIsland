@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file DynamicIslandGuideTypes.ts
+ * @description 灵动岛引导流程类型定义
+ * @author 鸡哥
+ */
+
 /** 引导步骤 */
 export type GuideStep = 'language' | 'whitelist' | 'smtc' | 'theme' | 'update' | 'github' | 'welcome';
 

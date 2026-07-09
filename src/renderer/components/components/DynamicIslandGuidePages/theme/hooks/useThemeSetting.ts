@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file useThemeSetting.ts
+ * @description 引导外观设置逻辑 Hook
+ * @author 鸡哥
+ */
+
 import { useState, useCallback, useEffect } from 'react';
 import type { ThemeMode } from '../../../../../utils/theme';
 import { setThemeMode } from '../../../../../utils/theme';

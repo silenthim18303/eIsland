@@ -18,5 +18,11 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 进度指示器配置常量
+ * @author 鸡哥
+ */
+
 /** 进度动画时长（ms） */
 export const PROGRESS_ANIMATION_MS = 620;

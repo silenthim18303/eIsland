@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 进度指示器组件模块入口
+ * @author 鸡哥
+ */
+
 export { ProcessIndicator } from './components/ProcessIndicator';
 export { useProcessIndicator } from './hooks/useProcessIndicator';
 export type { ProcessIndicatorProps, SegmentStatus } from './types';

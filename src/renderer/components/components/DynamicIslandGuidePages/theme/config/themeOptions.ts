@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file themeOptions.ts
+ * @description 引导外观设置步骤配置
+ * @author 鸡哥
+ */
+
 import type { ThemeMode } from '../../../../../utils/theme';
 import { SvgIcon } from '../../../../../utils/SvgIcon';
 

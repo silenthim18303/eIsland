@@ -26,12 +26,25 @@
 
 import type { ProcessSegment, RenderedProgress, SegmentMotion, SegmentStatus } from '../types';
 
+/**
+ * 获取指定索引的分段状态
+ * @param index - 分段索引
+ * @param current - 当前激活索引
+ * @returns 分段状态
+ */
 function getSegmentStatus(index: number, current: number): SegmentStatus {
   if (index < current) return 'completed';
   if (index === current) return 'active';
   return 'inactive';
 }
 
+/**
+ * 获取指定索引的分段动画类型
+ * @param index - 分段索引
+ * @param current - 当前激活索引
+ * @param previous - 上一次渲染进度
+ * @returns 动画类型
+ */
 function getSegmentMotion(index: number, current: number, previous: RenderedProgress | null): SegmentMotion {
   if (previous === null) return 'none';
   if (current > previous.current && index > previous.current && index <= current) return 'enter';
@@ -39,6 +52,13 @@ function getSegmentMotion(index: number, current: number, previous: RenderedProg
   return 'none';
 }
 
+/**
+ * 创建进度分段数组
+ * @param total - 总分段数
+ * @param current - 当前激活索引
+ * @param previous - 上一次渲染进度
+ * @returns 分段状态数组
+ */
 export function createProcessSegments(total: number, current: number, previous: RenderedProgress | null): ProcessSegment[] {
   return Array.from({ length: total }, (_, index) => ({
     status: getSegmentStatus(index, current),

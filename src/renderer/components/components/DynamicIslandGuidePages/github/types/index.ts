@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 引导开源信息步骤类型定义
+ * @author 鸡哥
+ */
+
 /** GithubStep 组件属性 */
 export interface GithubStepProps {
   /** 确认后进入下一步的回调 */

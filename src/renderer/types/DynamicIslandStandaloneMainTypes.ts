@@ -17,3 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+
+/**
+ * @file DynamicIslandStandaloneMainTypes.ts
+ * @description 灵动岛独立窗口类型定义
+ * @author 鸡哥
+ */

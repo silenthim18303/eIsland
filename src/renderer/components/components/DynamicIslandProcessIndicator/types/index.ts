@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 进度指示器类型定义
+ * @author 鸡哥
+ */
+
 /** ProcessIndicator 组件属性 */
 export interface ProcessIndicatorProps {
   /** 总步数 */

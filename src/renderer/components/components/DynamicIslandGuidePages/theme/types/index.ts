@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 引导外观设置步骤类型定义
+ * @author 鸡哥
+ */
+
 /** ThemeStep 组件属性 */
 export interface ThemeStepProps {
   /** 确认后进入下一步的回调 */

@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 引导欢迎步骤类型定义
+ * @author 鸡哥
+ */
+
 /** WelcomeStep 组件属性 */
 export interface WelcomeStepProps {
   /** 完成引导的回调 */

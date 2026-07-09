@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 引导播放器白名单选择步骤类型定义
+ * @author 鸡哥
+ */
+
 /** WhitelistStep 组件属性 */
 export interface WhitelistStepProps {
   /** 确认后进入下一步的回调 */
