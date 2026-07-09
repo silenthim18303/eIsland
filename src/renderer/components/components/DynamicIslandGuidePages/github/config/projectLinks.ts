@@ -18,20 +18,20 @@
  * GNU General Public License for more details.
  */
 
-/** GithubStep 组件属性 */
-export interface GithubStepProps {
-  /** 确认后进入下一步的回调 */
-  onNext: () => void;
-  /** 返回上一步的回调 */
-  onPrev: () => void;
-}
+/**
+ * @file projectLinks.ts
+ * @description 引导开源信息步骤 — 项目链接配置
+ * @author 鸡哥
+ */
 
-/** 项目链接条目 */
-export interface ProjectLink {
-  /** 链接标识 */
-  key: string;
-  /** 链接地址 */
-  url: string;
-  /** 图标路径 */
-  icon: string;
-}
+import { SvgIcon } from '../../../../../utils/SvgIcon';
+import type { ProjectLink } from '../types';
+
+/** 项目链接配置 */
+export const PROJECT_LINKS: ProjectLink[] = [
+  { key: 'repo', url: 'https://github.com/JNTMTMTM/eIsland', icon: SvgIcon.GITHUB },
+  { key: 'website', url: 'https://pyisland.com', icon: SvgIcon.WEBSITE },
+  { key: 'docs', url: 'https://docs.pyisland.com', icon: SvgIcon.DOCS },
+  { key: 'devDocs', url: 'https://dev.electronisland.com', icon: SvgIcon.DEVELOPER },
+];
+
