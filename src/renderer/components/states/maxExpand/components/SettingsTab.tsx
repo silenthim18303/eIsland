@@ -995,6 +995,9 @@ export function SettingsTab(): ReactElement {
       if (channel === 'store:music-whitelist' && Array.isArray(value)) {
         setWhitelist(value);
       }
+      if (channel === 'store:update-source' && typeof value === 'string' && value) {
+        setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : value === 'esa-cdn' ? 'esa-cdn' : 'cloudflare-r2');
+      }
     });
     return () => {
       cancelled = true;

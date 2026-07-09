@@ -36,12 +36,14 @@ export interface UpdateSourceOption {
   proOnly: boolean;
 }
 
-/** 更新源选项列表（复用设置页配置） */
-export const UPDATE_SOURCE_OPTIONS: UpdateSourceOption[] = UPDATE_SOURCES.map((s) => ({
-  key: s.key,
-  label: s.label,
-  proOnly: s.proOnly ?? false,
-}));
+/** 更新源选项列表（复用设置页配置，引导页暂不展示 PRO 专用源） */
+export const UPDATE_SOURCE_OPTIONS: UpdateSourceOption[] = UPDATE_SOURCES
+  .filter((s) => !s.proOnly)
+  .map((s) => ({
+    key: s.key,
+    label: s.label,
+    proOnly: s.proOnly ?? false,
+  }));
 
 /** 更新源持久化存储键 */
 export const UPDATE_SOURCE_STORE_KEY = 'update-source';
