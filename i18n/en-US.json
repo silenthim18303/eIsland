@@ -79,6 +79,10 @@
       "light": "Light",
       "system": "System"
     },
+    "update": {
+      "title": "Select Update Source",
+      "subtitle": "Choose the download source for checking updates"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "subtitle": "Setup complete, start your Dynamic Island experience",

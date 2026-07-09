@@ -35,6 +35,7 @@ import { LanguageStep } from './components/components/DynamicIslandGuidePages/la
 import { WhitelistStep } from './components/components/DynamicIslandGuidePages/smtc-white-list';
 import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
 import { ThemeStep } from './components/components/DynamicIslandGuidePages/theme';
+import { UpdateStep } from './components/components/DynamicIslandGuidePages/update';
 import { WelcomeStep } from './components/components/DynamicIslandGuidePages/welcome';
 import { ProcessIndicator } from './components/components/DynamicIslandProcessIndicator';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
@@ -76,9 +77,9 @@ function GuideApp(): ReactElement {
     setStep('whitelist');
   }, []);
 
-  /** 主题设置完成，进入欢迎页 */
+  /** 主题设置完成，进入更新源配置 */
   const handleThemeNext = useCallback((): void => {
-    setStep('welcome');
+    setStep('update');
   }, []);
 
   /** 主题设置返回 SMTC 检查 */
@@ -86,9 +87,19 @@ function GuideApp(): ReactElement {
     setStep('smtc');
   }, []);
 
-  /** 欢迎页返回主题设置 */
-  const handleWelcomePrev = useCallback((): void => {
+  /** 更新源配置完成，进入欢迎页 */
+  const handleUpdateNext = useCallback((): void => {
+    setStep('welcome');
+  }, []);
+
+  /** 更新源配置返回主题设置 */
+  const handleUpdatePrev = useCallback((): void => {
     setStep('theme');
+  }, []);
+
+  /** 欢迎页返回更新源配置 */
+  const handleWelcomePrev = useCallback((): void => {
+    setStep('update');
   }, []);
 
   return (
@@ -119,6 +130,12 @@ function GuideApp(): ReactElement {
           <ThemeStep
             onNext={handleThemeNext}
             onPrev={handleThemePrev}
+          />
+        )}
+        {step === 'update' && (
+          <UpdateStep
+            onNext={handleUpdateNext}
+            onPrev={handleUpdatePrev}
           />
         )}
         {step === 'welcome' && (

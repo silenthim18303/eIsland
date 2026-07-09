@@ -19,16 +19,32 @@
  */
 
 /**
- * @file guide.css
- * @description 引导配置窗口样式入口（聚合子模块）
+ * @file updateSourceOptions.ts
+ * @description 引导更新源选择步骤 — 更新源选项配置
  * @author 鸡哥
  */
 
-@import './guide/base.css';
-@import './guide/step.css';
-@import './guide/language.css';
-@import './guide/whitelist.css';
-@import './guide/smtc.css';
-@import './guide/theme.css';
-@import './guide/update.css';
-@import './guide/welcome.css';
+import { UPDATE_SOURCES } from '../../../../states/maxExpand/components/setting/config/settingsTabConfig';
+
+/** 更新源选项条目 */
+export interface UpdateSourceOption {
+  /** 更新源标识 */
+  key: string;
+  /** 显示名称 */
+  label: string;
+  /** 是否仅 PRO 可用 */
+  proOnly: boolean;
+}
+
+/** 更新源选项列表（复用设置页配置） */
+export const UPDATE_SOURCE_OPTIONS: UpdateSourceOption[] = UPDATE_SOURCES.map((s) => ({
+  key: s.key,
+  label: s.label,
+  proOnly: s.proOnly ?? false,
+}));
+
+/** 更新源持久化存储键 */
+export const UPDATE_SOURCE_STORE_KEY = 'update-source';
+
+/** 默认更新源 */
+export const DEFAULT_UPDATE_SOURCE = 'cloudflare-r2';

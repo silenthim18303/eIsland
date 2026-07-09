@@ -79,6 +79,10 @@
       "light": "浅色",
       "system": "跟随系统"
     },
+    "update": {
+      "title": "选择更新源",
+      "subtitle": "选择检查更新时使用的下载源"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "subtitle": "配置完成，开始体验灵动岛吧",
