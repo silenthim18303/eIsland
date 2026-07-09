@@ -47,6 +47,7 @@ import {
   type AboutSettingsPageKey,
 } from './components/AboutSettingsPageDots';
 import { SvgIcon } from '../../../../../../../utils/SvgIcon';
+import { ALL_DEPENDENCIES } from '../../../../../../../components/config/dependencies';
 
 const WALLPAPER_SOURCES = [
   {
@@ -502,40 +503,13 @@ export function AboutSettingsSection({ aboutVersion, initialPage = 'development'
       <div className="settings-about-deps">
         <div className="settings-about-deps-title">{t('settings.about.depsTitle', { defaultValue: '开源框架、依赖 & 项目' })}</div>
         <div className="settings-about-deps-grid">
-          <a className="settings-about-dep" href="https://github.com/XxHuberrr/Mineradio" target="_blank" rel="noreferrer">Mineradio</a>
-          <span className="settings-about-dep">Electron</span>
-          <span className="settings-about-dep">React</span>
-          <span className="settings-about-dep">React DOM</span>
-          <span className="settings-about-dep">TypeScript</span>
-          <span className="settings-about-dep">Vite</span>
-          <span className="settings-about-dep">electron-vite</span>
-          <span className="settings-about-dep">electron-builder</span>
-          <span className="settings-about-dep">electron-updater</span>
-          <span className="settings-about-dep">Zustand</span>
-          <span className="settings-about-dep">i18next</span>
-          <span className="settings-about-dep">react-i18next</span>
-          <span className="settings-about-dep">Tailwind CSS</span>
-          <span className="settings-about-dep">@tailwindcss/vite</span>
-          <span className="settings-about-dep">react-markdown</span>
-          <span className="settings-about-dep">remark-gfm</span>
-          <span className="settings-about-dep">react-datepicker</span>
-          <span className="settings-about-dep">imapflow</span>
-          <span className="settings-about-dep">mailparser</span>
-          <span className="settings-about-dep">openmeteo</span>
-          <span className="settings-about-dep">lunar-javascript</span>
-          <span className="settings-about-dep">lyric-resolver</span>
-          <span className="settings-about-dep">colorthief</span>
-          <span className="settings-about-dep">fetch-installed-software</span>
-          <span className="settings-about-dep">get-windows</span>
-          <span className="settings-about-dep">uapi-sdk-typescript</span>
-          <span className="settings-about-dep">@eisland/windows-smtc-helper</span>
-          <span className="settings-about-dep">lucide-react</span>
-          <span className="settings-about-dep">@electron-toolkit/preload</span>
-          <span className="settings-about-dep">@electron-toolkit/utils</span>
-          <span className="settings-about-dep">@electron-toolkit/tsconfig</span>
-          <span className="settings-about-dep">@vitejs/plugin-react</span>
-          <span className="settings-about-dep">PostCSS</span>
-          <span className="settings-about-dep">Autoprefixer</span>
+          {ALL_DEPENDENCIES.map((dep) =>
+            dep.url ? (
+              <a className="settings-about-dep" href={dep.url} target="_blank" rel="noreferrer" key={dep.name}>{dep.name}</a>
+            ) : (
+              <span className="settings-about-dep" key={dep.name}>{dep.name}</span>
+            ),
+          )}
         </div>
       </div>
       <div className="settings-about-deps">

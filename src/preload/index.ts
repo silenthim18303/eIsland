@@ -1368,6 +1368,12 @@ const api = {
     return ipcRenderer.invoke('updater:version');
   },
   /**
+   * 重置首次启动标记，下次启动时显示引导界面
+   */
+  guideReset: (): Promise<boolean> => {
+    return ipcRenderer.invoke('guide:reset');
+  },
+  /**
    * 监听下载进度
    * @param callback - 下载进度回调
    * @returns 取消监听函数

@@ -32,11 +32,16 @@ import { createRoot } from 'react-dom/client';
 import './styles/guide.css';
 import { WaveEffect } from './components/components/DynamicIslandSharedWaveEffect';
 import { LanguageStep } from './components/components/DynamicIslandGuidePages/language';
-import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc';
-import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc/hooks/useSmtcAccentColor';
-
-/** 引导步骤 */
-type GuideStep = 'language' | 'smtc';
+import { WhitelistStep } from './components/components/DynamicIslandGuidePages/smtc-white-list';
+import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-test';
+import { ThemeStep } from './components/components/DynamicIslandGuidePages/theme';
+import { UpdateStep } from './components/components/DynamicIslandGuidePages/update';
+import { GithubStep } from './components/components/DynamicIslandGuidePages/github';
+import { WelcomeStep } from './components/components/DynamicIslandGuidePages/welcome';
+import { ProcessIndicator } from './components/components/DynamicIslandProcessIndicator';
+import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
+import type { GuideStep } from './types/DynamicIslandGuideTypes';
+import { GUIDE_STEP_INDEX, GUIDE_STEP_TOTAL } from './types/DynamicIslandGuideTypes';
 
 /** 引导窗口根组件 */
 function GuideApp(): ReactElement {
@@ -48,27 +53,114 @@ function GuideApp(): ReactElement {
     window.electron.ipcRenderer.send('guide:complete');
   }, []);
 
-  /** 语言选择完成，进入 SMTC 检查 */
+  /** 语言选择完成，进入白名单配置 */
   const handleLanguageNext = useCallback((): void => {
+    setStep('whitelist');
+  }, []);
+
+  /** 白名单配置完成，进入 SMTC 检查 */
+  const handleWhitelistNext = useCallback((): void => {
     setStep('smtc');
   }, []);
 
-  /** SMTC 检查完成，结束引导 */
-  const handleSmtcNext = useCallback((): void => {
-    handleComplete();
-  }, [handleComplete]);
-
-  /** SMTC 返回语言选择 */
-  const handleSmtcPrev = useCallback((): void => {
+  /** 白名单返回语言选择 */
+  const handleWhitelistPrev = useCallback((): void => {
     setStep('language');
+  }, []);
+
+  /** SMTC 检查完成，进入主题设置 */
+  const handleSmtcNext = useCallback((): void => {
+    setStep('theme');
+  }, []);
+
+  /** SMTC 返回白名单配置 */
+  const handleSmtcPrev = useCallback((): void => {
+    setStep('whitelist');
+  }, []);
+
+  /** 主题设置完成，进入更新源配置 */
+  const handleThemeNext = useCallback((): void => {
+    setStep('update');
+  }, []);
+
+  /** 主题设置返回 SMTC 检查 */
+  const handleThemePrev = useCallback((): void => {
+    setStep('smtc');
+  }, []);
+
+  /** 更新源配置完成，进入开源信息 */
+  const handleUpdateNext = useCallback((): void => {
+    setStep('github');
+  }, []);
+
+  /** 更新源配置返回主题设置 */
+  const handleUpdatePrev = useCallback((): void => {
+    setStep('theme');
+  }, []);
+
+  /** 开源信息完成，进入欢迎页 */
+  const handleGithubNext = useCallback((): void => {
+    setStep('welcome');
+  }, []);
+
+  /** 开源信息返回更新源配置 */
+  const handleGithubPrev = useCallback((): void => {
+    setStep('update');
+  }, []);
+
+  /** 欢迎页返回开源信息 */
+  const handleWelcomePrev = useCallback((): void => {
+    setStep('github');
   }, []);
 
   return (
     <div className="guide-container">
       <WaveEffect accentColor={accentColor} />
       <div className="guide-content">
-        {step === 'language' && <LanguageStep onNext={handleLanguageNext} />}
-        {step === 'smtc' && <SmtcStep onNext={handleSmtcNext} onPrev={handleSmtcPrev} />}
+        <div className="guide-process-indicator">
+          <ProcessIndicator total={GUIDE_STEP_TOTAL} current={GUIDE_STEP_INDEX[step]} />
+        </div>
+        {step === 'language' && (
+          <LanguageStep
+            onNext={handleLanguageNext}
+          />
+        )}
+        {step === 'whitelist' && (
+          <WhitelistStep
+            onNext={handleWhitelistNext}
+            onPrev={handleWhitelistPrev}
+          />
+        )}
+        {step === 'smtc' && (
+          <SmtcStep
+            onNext={handleSmtcNext}
+            onPrev={handleSmtcPrev}
+          />
+        )}
+        {step === 'theme' && (
+          <ThemeStep
+            onNext={handleThemeNext}
+            onPrev={handleThemePrev}
+          />
+        )}
+        {step === 'update' && (
+          <UpdateStep
+            onNext={handleUpdateNext}
+            onPrev={handleUpdatePrev}
+          />
+        )}
+        {step === 'github' && (
+          <GithubStep
+            onNext={handleGithubNext}
+            onPrev={handleGithubPrev}
+          />
+        )}
+        {step === 'welcome' && (
+          <WelcomeStep
+            onComplete={handleComplete}
+            onPrev={handleWelcomePrev}
+          />
+        )}
       </div>
     </div>
   );

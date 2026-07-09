@@ -60,8 +60,44 @@
       "pause": "Pause",
       "play": "Play"
     },
+    "whitelist": {
+      "title": "Select Players",
+      "subtitle": "Choose players to monitor",
+      "qqmusic": "QQ Music",
+      "netease": "NetEase Cloud Music",
+      "sodamusic": "Soda Music",
+      "kugou": "KuGou",
+      "applemusic": "Apple Music",
+      "spotify": "Spotify"
+    },
+    "theme": {
+      "title": "Appearance",
+      "subtitle": "Choose theme mode and adjust transparency",
+      "modeLabel": "Theme Mode",
+      "opacityLabel": "Opacity",
+      "dark": "Dark",
+      "light": "Light",
+      "system": "System"
+    },
+    "update": {
+      "title": "Select Update Source",
+      "subtitle": "Choose the download source for checking updates"
+    },
+    "github": {
+      "title": "Open Source",
+      "subtitle": "eIsland is an open source project",
+      "links": {
+        "repo": "GitHub",
+        "website": "Website",
+        "docs": "Docs",
+        "devDocs": "Dev Docs"
+      },
+      "license": "GPL-3.0 License",
+      "depsTitle": "Open Source Frameworks & Dependencies & Projects"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
+      "subtitle": "Setup complete, start your Dynamic Island experience",
       "desc": "A Windows desktop floating widget inspired by Apple Dynamic Island,\nmaking your desktop more vivid and productive."
     },
     "sections": {
@@ -2681,8 +2717,13 @@
         "latest": "Already Latest",
         "download": "Download Update",
         "installRestart": "Install & Restart",
-        "retry": "Retry"
-      }
+        "retry": "Retry",
+        "resetGuide": "Show Guide on Next Launch"
+      },
+      "guideCardTitle": "Guide",
+      "guideCardHint": "Show the first-launch guide again",
+      "guideResetSuccess": "Success! Guide will show on next launch",
+      "guideResetError": "Failed. Please try again later"
     },
     "pluginMarket": {
       "search": {

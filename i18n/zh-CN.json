@@ -60,8 +60,44 @@
       "pause": "暂停",
       "play": "播放"
     },
+    "whitelist": {
+      "title": "选择播放器",
+      "subtitle": "选择需要监听的播放器",
+      "qqmusic": "QQ 音乐",
+      "netease": "网易云音乐",
+      "sodamusic": "汽水音乐",
+      "kugou": "酷狗音乐",
+      "applemusic": "Apple Music",
+      "spotify": "Spotify"
+    },
+    "theme": {
+      "title": "外观设置",
+      "subtitle": "选择主题模式并调整透明度",
+      "modeLabel": "主题模式",
+      "opacityLabel": "透明度",
+      "dark": "深色",
+      "light": "浅色",
+      "system": "跟随系统"
+    },
+    "update": {
+      "title": "选择更新源",
+      "subtitle": "选择检查更新时使用的下载源"
+    },
+    "github": {
+      "title": "开源信息",
+      "subtitle": "eIsland 是一个开源项目",
+      "links": {
+        "repo": "GitHub",
+        "website": "官网",
+        "docs": "文档",
+        "devDocs": "开发文档"
+      },
+      "license": "GPL-3.0 许可证",
+      "depsTitle": "开源框架 & 依赖 & 项目"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
+      "subtitle": "配置完成，开始体验灵动岛吧",
       "desc": "一款灵感来自 Apple 灵动岛的 Windows 桌面浮窗小组件，\n让你的桌面更加灵动、高效。"
     },
     "sections": {
@@ -2681,8 +2717,13 @@
         "latest": "已是最新版本",
         "download": "下载更新",
         "installRestart": "安装并重启",
-        "retry": "重试"
-      }
+        "retry": "重试",
+        "resetGuide": "下次启动显示引导"
+      },
+      "guideCardTitle": "引导界面",
+      "guideCardHint": "重新显示首次启动引导界面",
+      "guideResetSuccess": "设置成功，下次启动将显示引导界面",
+      "guideResetError": "设置失败，请稍后重试"
     },
     "pluginMarket": {
       "search": {

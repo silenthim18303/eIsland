@@ -28,6 +28,7 @@
 import { ipcMain } from 'electron';
 import { join } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { broadcastSettingChange } from '../../utils/broadcast';
 
 interface RegisterMusicIpcHandlersOptions {
   storeDir: string;
@@ -63,11 +64,12 @@ export function registerMusicIpcHandlers(options: RegisterMusicIpcHandlersOption
     return options.getWhitelist();
   });
 
-  ipcMain.handle('music:whitelist:set', (_event, list: string[]) => {
+  ipcMain.handle('music:whitelist:set', (event, list: string[]) => {
     try {
       options.setWhitelist(list);
       const filePath = join(options.storeDir, `${options.whitelistStoreKey}.json`);
       writeFileSync(filePath, JSON.stringify(list, null, 2), 'utf-8');
+      broadcastSettingChange(event.sender.id, 'store:music-whitelist', list);
       return true;
     } catch (err) {
       console.error('[Whitelist] persist error:', err);

@@ -35,10 +35,12 @@ const {
   existsSyncMock,
   readFileSyncMock,
   writeFileSyncMock,
+  broadcastSettingChangeMock,
 } = vi.hoisted(() => ({
   existsSyncMock: vi.fn(),
   readFileSyncMock: vi.fn(),
   writeFileSyncMock: vi.fn(),
+  broadcastSettingChangeMock: vi.fn(),
 }));
 
 const {
@@ -70,6 +72,10 @@ vi.mock('fs', () => ({
   writeFileSync: writeFileSyncMock,
 }));
 
+vi.mock('../../../utils/broadcast', () => ({
+  broadcastSettingChange: broadcastSettingChangeMock,
+}));
+
 vi.mock('@eisland/windows-smtc-helper', () => ({
   play: playMock,
   pause: pauseMock,
@@ -91,6 +97,7 @@ describe('media ipc handlers', () => {
     existsSyncMock.mockReset();
     readFileSyncMock.mockReset();
     writeFileSyncMock.mockReset();
+    broadcastSettingChangeMock.mockReset();
 
     handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handlers.set(channel, handler);
@@ -207,10 +214,16 @@ describe('media ipc handlers', () => {
         .mockRejectedValueOnce(new Error('boom')),
     });
 
-    expect(handlers.get('music:whitelist:get')?.({})).toEqual(['A', 'B']);
-    expect(handlers.get('music:whitelist:set')?.({}, ['C'])).toBe(true);
+    const event = { sender: { id: 42 } };
+    expect(handlers.get('music:whitelist:get')?.(event)).toEqual(['A', 'B']);
+    expect(handlers.get('music:whitelist:set')?.(event, ['C'])).toBe(true);
     expect(setWhitelist).toHaveBeenCalledWith(['C']);
     expect(writeFileSyncMock).toHaveBeenCalled();
+    expect(broadcastSettingChangeMock).toHaveBeenCalledWith(
+      event.sender.id,
+      'store:music-whitelist',
+      ['C'],
+    );
 
     writeFileSyncMock.mockImplementationOnce(() => {
       throw new Error('disk full');

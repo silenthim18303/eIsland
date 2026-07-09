@@ -26,7 +26,9 @@ src/renderer/public/svg/
 ├── *.svg                  → SvgIcon (eisland-icon.ts)
 ├── agent/*.svg            → AgentIcon (agent-icon.ts)
 ├── countries/*.svg        → CountryIcon (country-icon.ts)
-└── devicons/*.svg         → DevIcon (dev-icon.ts)
+├── devicons/*.svg         → DevIcon (dev-icon.ts)
+├── player/*.svg           → PlayerIcon (player-icon.ts)
+└── services/*.svg         → ServiceIcon (service-icon.ts)
 
 src/renderer/utils/SvgIcon/
 ├── index.ts               → unified exports
@@ -34,11 +36,15 @@ src/renderer/utils/SvgIcon/
 ├── agent-icon.ts          → AgentIcon enum
 ├── country-icon.ts        → CountryIcon enum + aliases + resolvers
 ├── dev-icon.ts            → DevIcon enum + aliases + resolvers
+├── player-icon.ts         → PlayerIcon enum
+├── service-icon.ts        → ServiceIcon enum
 └── test/
     ├── eisland-icon.test.ts
     ├── agent-icon.test.ts
     ├── country-icon.test.ts
-    └── dev-icon.test.ts
+    ├── dev-icon.test.ts
+    ├── player-icon.test.ts
+    └── service-icon.test.ts
 ```
 
 ## Process
@@ -53,15 +59,19 @@ Determine which enum the SVG belongs to based on its filesystem path:
 | `svg/agent/FOO.svg` | `agent-icon.ts` | `AgentIcon` | `./svg/agent/` |
 | `svg/countries/FOO.svg` | `country-icon.ts` | `CountryIcon` | `./svg/countries/` |
 | `svg/devicons/FOO.svg` | `dev-icon.ts` | `DevIcon` | `/svg/devicons/` |
+| `svg/player/FOO.svg` | `player-icon.ts` | `PlayerIcon` | `./svg/player/` |
+| `svg/services/FOO.svg` | `service-icon.ts` | `ServiceIcon` | `./svg/services/` |
 
-Note the path prefix difference: root/agent/countries use `./svg/...`, devicons use `/svg/...`.
+Note the path prefix difference: root/agent/countries/player/services use `./svg/...`, devicons use `/svg/...`.
 
 ### Step 2: Derive the enum key
 
-Use the SVG filename (without extension), converted to UPPER_SNAKE_CASE for eisland-icon and agent-icon. Examples:
+Use the SVG filename (without extension), converted to UPPER_SNAKE_CASE for eisland-icon, agent-icon, and player-icon. Examples:
 - `FILTER.svg` → `FILTER`
 - `CLAUDE.svg` → `CLAUDE`
 - `PIN_ON_TOP.svg` → `PIN_ON_TOP`
+- `applemusic.svg` → `APPLE_MUSIC`
+- `qqmusic.svg` → `QQMUSIC`
 
 For country-icon and dev-icon, keys follow their existing conventions (e.g., `CHN`, `javascript`).
 
@@ -69,9 +79,11 @@ For country-icon and dev-icon, keys follow their existing conventions (e.g., `CH
 
 Read the enum file, then add the new entry before the closing `} as const;`. Keep entries sorted logically or grouped with related icons — match the existing ordering style.
 
-**eisland-icon.ts / agent-icon.ts pattern:**
+**eisland-icon.ts / agent-icon.ts / player-icon.ts / service-icon.ts pattern:**
 ```ts
   NEW_ICON: './svg/NEW_ICON.svg',
+  // player-icon.ts uses: './svg/player/name.svg'
+  // service-icon.ts uses: './svg/services/name.svg'
 ```
 
 **country-icon.ts / dev-icon.ts:** These have aliases and resolver functions. Only add if the user explicitly asks, and follow the existing alias/resolver patterns.

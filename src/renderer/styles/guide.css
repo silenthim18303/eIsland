@@ -27,4 +27,9 @@
 @import './guide/base.css';
 @import './guide/step.css';
 @import './guide/language.css';
+@import './guide/whitelist.css';
 @import './guide/smtc.css';
+@import './guide/theme.css';
+@import './guide/update.css';
+@import './guide/github.css';
+@import './guide/welcome.css';

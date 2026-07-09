@@ -50,6 +50,9 @@ describe('SvgIcon', () => {
     expect(SvgIcon).toHaveProperty('ABOUT');
     expect(SvgIcon).toHaveProperty('MOVE');
     expect(SvgIcon).toHaveProperty('THEME');
+    expect(SvgIcon).toHaveProperty('THEME_DARK');
+    expect(SvgIcon).toHaveProperty('THEME_FOLLOW_SYSTEM');
+    expect(SvgIcon).toHaveProperty('THEME_LIGHT');
     expect(SvgIcon).toHaveProperty('SMTC');
     expect(SvgIcon).toHaveProperty('INTERACTION');
     expect(SvgIcon).toHaveProperty('UPDATE');
@@ -114,6 +117,9 @@ describe('SvgIcon', () => {
     expect(SvgIcon).toHaveProperty('FIRE');
     expect(SvgIcon).toHaveProperty('STOCK_CHOOSE');
     expect(SvgIcon).toHaveProperty('SEARCH');
+    expect(SvgIcon).toHaveProperty('WEBSITE');
+    expect(SvgIcon).toHaveProperty('DOCS');
+    expect(SvgIcon).toHaveProperty('DEVELOPER');
   });
 
   it('all values should be strings starting with ./svg/ and ending with .svg', () => {

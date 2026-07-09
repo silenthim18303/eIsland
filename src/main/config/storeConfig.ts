@@ -27,7 +27,7 @@
 
 import { app } from 'electron';
 import { join } from 'path';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, unlinkSync } from 'fs';
 import {
   normalizeClipboardUrlDetectMode,
   sanitizeClipboardUrlBlacklist,
@@ -627,6 +627,23 @@ export function writeFirstLaunchConfig(): boolean {
     return true;
   } catch (err) {
     console.error('[FirstLaunch] persist error:', err);
+    return false;
+  }
+}
+
+/**
+ * 删除首次启动标记配置
+ * @returns 是否删除成功
+ */
+export function deleteFirstLaunchConfig(): boolean {
+  try {
+    const filePath = join(getStoreDir(), `${FIRST_LAUNCH_STORE_KEY}.json`);
+    if (existsSync(filePath)) {
+      unlinkSync(filePath);
+    }
+    return true;
+  } catch (err) {
+    console.error('[FirstLaunch] delete error:', err);
     return false;
   }
 }

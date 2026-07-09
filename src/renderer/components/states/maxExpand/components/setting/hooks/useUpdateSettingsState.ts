@@ -64,6 +64,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
   const [updateAutoPromptEnabled, setUpdateAutoPromptEnabled] = useState<boolean>(true);
   const [announcementShowMode, setAnnouncementShowMode] = useState<AnnouncementShowMode>('version-update-only');
   const [updateSource, setUpdateSource] = useState<UpdateSourceKey>('cloudflare-r2');
+  const [guideResetStatus, setGuideResetStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const currentSourceLabel = UPDATE_SOURCES.find((s) => s.key === updateSource)?.label ?? updateSource;
 
@@ -128,7 +129,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     let cancelled = false;
     window.api.storeRead(UPDATE_SOURCE_STORE_KEY).then((value) => {
       if (cancelled) return;
-      setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : value === 'esa-cdn' ? 'esa-cdn' : 'cloudflare-r2');
+      setUpdateSource(UPDATE_SOURCES.some(s => s.key === value) ? value as UpdateSourceKey : 'cloudflare-r2');
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
@@ -216,6 +217,15 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     window.api.updaterInstall().catch(() => {});
   };
 
+  const handleResetGuide = async (): Promise<void> => {
+    try {
+      const ok = await window.api.guideReset();
+      setGuideResetStatus(ok ? 'success' : 'error');
+    } catch {
+      setGuideResetStatus('error');
+    }
+  };
+
   return {
     updateStatus,
     setUpdateStatus,
@@ -238,6 +248,8 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     handleCheckUpdate,
     handleDownloadUpdate,
     handleInstallUpdate,
+    handleResetGuide,
+    guideResetStatus,
     resolveUpdateSourceUrl,
   };
 }

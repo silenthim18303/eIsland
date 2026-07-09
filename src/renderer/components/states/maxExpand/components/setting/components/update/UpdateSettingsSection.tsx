@@ -61,6 +61,8 @@ interface UpdateSettingsSectionProps {
   onCheckUpdate: () => void;
   onDownloadUpdate: () => void;
   onInstallUpdate: () => void;
+  onResetGuide: () => void;
+  guideResetStatus: 'idle' | 'success' | 'error';
 }
 
 /**
@@ -86,6 +88,8 @@ export function UpdateSettingsSection({
   onCheckUpdate,
   onDownloadUpdate,
   onInstallUpdate,
+  onResetGuide,
+  guideResetStatus,
 }: UpdateSettingsSectionProps): ReactElement {
   const { t } = useTranslation();
 
@@ -193,16 +197,16 @@ export function UpdateSettingsSection({
           <div className="settings-about-update">
             <div className="settings-about-update-row">
               {updateStatus === 'idle' && (
-                <button className="settings-about-update-btn" type="button" onClick={onCheckUpdate}>{t('settings.update.actions.check', { defaultValue: '检查更新' })}</button>
+                <button className="settings-about-update-btn" style={{ width: '100%' }} type="button" onClick={onCheckUpdate}>{t('settings.update.actions.check', { defaultValue: '检查更新' })}</button>
               )}
               {updateStatus === 'checking' && (
-                <button className="settings-about-update-btn" type="button" disabled>{t('settings.update.actions.checking', { defaultValue: '检查中…' })}</button>
+                <button className="settings-about-update-btn" style={{ width: '100%' }} type="button" disabled>{t('settings.update.actions.checking', { defaultValue: '检查中…' })}</button>
               )}
               {updateStatus === 'latest' && (
-                <button className="settings-about-update-btn" type="button" onClick={onCheckUpdate}>{t('settings.update.actions.latest', { defaultValue: '已是最新版本' })}</button>
+                <button className="settings-about-update-btn" style={{ width: '100%' }} type="button" onClick={onCheckUpdate}>{t('settings.update.actions.latest', { defaultValue: '已是最新版本' })}</button>
               )}
               {updateStatus === 'available' && (
-                <button className="settings-about-update-btn update-available" type="button" onClick={onDownloadUpdate}>
+                <button className="settings-about-update-btn update-available" style={{ width: '100%' }} type="button" onClick={onDownloadUpdate}>
                   {t('settings.update.actions.download', { defaultValue: '下载更新' })}
                 </button>
               )}
@@ -225,18 +229,40 @@ export function UpdateSettingsSection({
                 </div>
               )}
               {updateStatus === 'ready' && (
-                <button className="settings-about-update-btn update-ready" type="button" onClick={onInstallUpdate}>
+                <button className="settings-about-update-btn update-ready" style={{ width: '100%' }} type="button" onClick={onInstallUpdate}>
                   {t('settings.update.actions.installRestart', { defaultValue: '安装并重启' })}
                 </button>
               )}
               {updateStatus === 'error' && (
-                <button className="settings-about-update-btn" type="button" onClick={onCheckUpdate}>{t('settings.update.actions.retry', { defaultValue: '重试' })}</button>
+                <button className="settings-about-update-btn" style={{ width: '100%' }} type="button" onClick={onCheckUpdate}>{t('settings.update.actions.retry', { defaultValue: '重试' })}</button>
               )}
             </div>
             {updateStatus === 'error' && updateError && (
               <div className="settings-about-update-error" style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{updateError.replace(/\\n/g, '\n')}</div>
             )}
           </div>
+        </div>
+
+        {/* 卡片 3:引导界面 */}
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-card-title">{t('settings.update.guideCardTitle', { defaultValue: '引导界面' })}</div>
+            <div className="settings-card-subtitle">{t('settings.update.guideCardHint', { defaultValue: '重新显示首次启动引导界面' })}</div>
+          </div>
+
+          <button className="settings-about-update-btn" type="button" onClick={onResetGuide}>
+            {t('settings.update.actions.resetGuide', { defaultValue: '下次启动显示引导' })}
+          </button>
+          {guideResetStatus === 'success' && (
+            <div className="settings-user-feedback settings-user-feedback--success" style={{ marginTop: 4 }}>
+              {t('settings.update.guideResetSuccess', { defaultValue: '设置成功，下次启动将显示引导界面' })}
+            </div>
+          )}
+          {guideResetStatus === 'error' && (
+            <div className="settings-user-feedback settings-user-feedback--error" style={{ marginTop: 4 }}>
+              {t('settings.update.guideResetError', { defaultValue: '设置失败，请稍后重试' })}
+            </div>
+          )}
         </div>
 
       </div>

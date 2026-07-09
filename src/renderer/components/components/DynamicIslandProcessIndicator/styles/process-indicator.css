@@ -1,0 +1,100 @@
+/*
+ * eIsland - A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.
+ * https://github.com/JNTMTMTM/eIsland
+ *
+ * Copyright (C) 2026 JNTMTMTM
+ * Copyright (C) 2026 pyisland.com
+ *
+ * Original author: JNTMTMTM[](https://github.com/JNTMTMTM)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/**
+ * @file process-indicator.css
+ * @description 分段进度条样式
+ * @author 鸡哥
+ */
+
+.process-indicator {
+  --process-indicator-duration: 620ms;
+  --process-indicator-easing: cubic-bezier(0.7, 0, 0.84, 0);
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.process-indicator-segment {
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.process-indicator-segment::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #ffffff;
+  opacity: 0;
+  transform: scale3d(0, 1, 1);
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+
+.process-indicator-segment.completed::before,
+.process-indicator-segment.active::before {
+  opacity: 1;
+  transform: scale3d(1, 1, 1);
+}
+
+.process-indicator-segment.enter::before {
+  animation: process-indicator-enter var(--process-indicator-duration) var(--process-indicator-easing) both;
+}
+
+.process-indicator-segment.exit::before {
+  animation: process-indicator-exit var(--process-indicator-duration) var(--process-indicator-easing) both;
+}
+
+@keyframes process-indicator-enter {
+  from {
+    opacity: 1;
+    transform: scale3d(0, 1, 1);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes process-indicator-exit {
+  from {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale3d(0, 1, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .process-indicator-segment.enter::before,
+  .process-indicator-segment.exit::before {
+    animation: none;
+  }
+}

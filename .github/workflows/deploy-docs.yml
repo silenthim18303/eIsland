@@ -44,7 +44,6 @@ jobs:
         with:
           path: web/eisland-web-docs/src/.vuepress/dist
 
-  # ── GitHub Pages ────────────────────────────────────────────────
   deploy-pages:
     needs: build
     runs-on: ubuntu-latest
@@ -56,7 +55,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
 
-  # ── Self-hosted Server (rsync over SSH) ──────────────────────────
   deploy-server:
     needs: build
     runs-on: ubuntu-latest
@@ -88,46 +86,64 @@ jobs:
         env:
           ESA_AK: ${{ secrets.ESA_ACCESS_KEY_ID }}
           ESA_SK: ${{ secrets.ESA_ACCESS_KEY_SECRET }}
-          ESA_ZONE: ${{ secrets.ESA_ZONE_ID }}
+          ESA_SITE_ID: ${{ secrets.ESA_ZONE_ID }}
         run: |
-          urlencode() {
-            local s="$1" out="" c
-            for (( i=0; i<${#s}; i++ )); do
-              c="${s:$i:1}"
-              case "$c" in
-                [a-zA-Z0-9._~-]) out+="$c" ;;
-                ' ') out+="%20" ;;
-                *) out+=$(printf '%%%02X' "'$c") ;;
-              esac
-            done
-            printf '%s' "$out"
-          }
-          percent_encode() { urlencode "$1" | sed 's/+/%20/g; s/\*/%2A/g'; }
+          echo "Starting ESA cache purge for eisland-dev.pyisland.com..."
 
-          now=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          nonce=$(openssl rand -hex 16)
-          content=$(percent_encode "eisland-dev.pyisland.com")
-          type_enc=$(percent_encode "flush")
-          zone_enc=$(percent_encode "$ESA_ZONE")
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          NONCE=$(openssl rand -hex 16)
 
-          params="Action=PurgeCaches"
-          params+="&Content=${content}"
-          params+="&Format=JSON"
-          params+="&AccessKeyId=${ESA_AK}"
-          params+="&Nonce=${nonce}"
-          params+="&RegionId=cn-hangzhou"
-          params+="&SignatureMethod=HMAC-SHA1"
-          params+="&SignatureNonce=${nonce}"
-          params+="&SignatureVersion=1.0"
-          params+="&Timestamp=$(percent_encode "$now")"
-          params+="&Type=${type_enc}"
-          params+="&Version=2024-09-10"
-          params+="&ZoneId=${zone_enc}"
+          # Build sorted query string for HMAC signing
+          PARAMS="Action=PurgeCaches"
+          PARAMS="${PARAMS}&AccessKeyId=$ESA_AK"
+          PARAMS="${PARAMS}&Format=JSON"
+          PARAMS="${PARAMS}&Force=true"
+          PARAMS="${PARAMS}&Hostnames.1=eisland-dev.pyisland.com"
+          PARAMS="${PARAMS}&RegionId=cn-hangzhou"
+          PARAMS="${PARAMS}&SignatureMethod=HMAC-SHA1"
+          PARAMS="${PARAMS}&SignatureNonce=$NONCE"
+          PARAMS="${PARAMS}&SignatureVersion=1.0"
+          PARAMS="${PARAMS}&SiteId=$ESA_SITE_ID"
+          PARAMS="${PARAMS}&Timestamp=$TIMESTAMP"
+          PARAMS="${PARAMS}&Type=hostname"
+          PARAMS="${PARAMS}&Version=2024-09-10"
 
-          sorted=$(echo "$params" | tr '&' '\n' | sort | tr '\n' '&' | sed 's/&$//')
-          to_sign="POST&$(percent_encode "/")&$(percent_encode "$sorted")"
-          sign=$(printf '%s' "$to_sign" | openssl dgst -sha1 -hmac "${ESA_SK}&" -binary | base64)
+          # Percent-encode per Alibaba Cloud specification
+          ENCODED=$(python3 -c "
+          import urllib.parse, sys
+          s = sys.argv[1]
+          parts = s.split('&')
+          encoded = '&'.join(
+            urllib.parse.quote(k, safe='') + '=' + urllib.parse.quote(v, safe='')
+            for k, v in (p.split('=', 1) for p in parts)
+          )
+          print(encoded)
+          " "$PARAMS")
 
-          curl -sS -X POST "https://esa.cn-hangzhou.aliyuncs.com" \
-            -d "${sorted}&Signature=$(percent_encode "$sign")"
-          echo
+          STRING_TO_SIGN="POST&%2F&$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$ENCODED")"
+          SIGNATURE=$(printf '%s' "$STRING_TO_SIGN" | openssl dgst -sha1 -hmac "$ESA_SK&" -binary | base64)
+
+          RESPONSE=$(curl -sS -X POST "https://esa.cn-hangzhou.aliyuncs.com" \
+            -d "Action=PurgeCaches" \
+            -d "Version=2024-09-10" \
+            -d "Format=JSON" \
+            -d "AccessKeyId=$ESA_AK" \
+            -d "SignatureVersion=1.0" \
+            -d "SignatureMethod=HMAC-SHA1" \
+            -d "Timestamp=$TIMESTAMP" \
+            -d "SignatureNonce=$NONCE" \
+            -d "Signature=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$SIGNATURE")" \
+            -d "RegionId=cn-hangzhou" \
+            -d "SiteId=$ESA_SITE_ID" \
+            -d "Type=hostname" \
+            -d "Hostnames.1=eisland-dev.pyisland.com" \
+            -d "Force=true")
+
+          echo "$RESPONSE" | jq || echo "$RESPONSE"
+          
+          if echo "$RESPONSE" | grep -q '"Code":"Success"'; then
+            echo "ESA cache purge succeeded!"
+          else
+            echo "ESA cache purge failed!"
+            exit 1
+          fi

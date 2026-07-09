@@ -41,3 +41,6 @@ export type { AgentIconKey } from './agent-icon';
 
 export { PlayerIcon } from './player-icon';
 export type { PlayerIconKey } from './player-icon';
+
+export { ServiceIcon } from './service-icon';
+export type { ServiceIconKey } from './service-icon';
