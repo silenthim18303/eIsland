@@ -112,7 +112,10 @@ export const SvgIcon = {
   FILTER: './svg/FILTER.svg',
   FIRE: './svg/FIRE.svg',
   STOCK_CHOOSE: './svg/STOCK_CHOOSE.svg',
-  SEARCH: './svg/SEARCH.svg'
+  SEARCH: './svg/SEARCH.svg',
+  WEBSITE: './svg/WEBSITE.svg',
+  DOCS: './svg/DOCS.svg',
+  DEVELOPER: './svg/DEVELOPER.svg'
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;
