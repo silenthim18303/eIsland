@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-08T05:53:09.483Z
+> 生成时间：2026-07-09T14:36:19.355Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,50 @@
 
 ## Unreleased
 
+- 2026-07-09 | 9a092a05 | 鸡哥 | Merge pull request #136 from JNTMTMTM/dev
+- 2026-07-09 | 81cbdd91 | 鸡哥 | feat: enhance caching mechanism and improve opacity settings in theme hooks
+- 2026-07-09 | fe5b4204 | 鸡哥 | feat: add module entry and type definitions for guide steps and process indicators
+- 2026-07-09 | 75d5f428 | 鸡哥 | feat: update language options to use CountryIcon for icons
+- 2026-07-09 | f58d2d35 | 鸡哥 | feat: add logic to control guide window display on startup
+- 2026-07-09 | 6203b904 | 鸡哥 | feat: implement guide reset functionality with success and error feedback
+- 2026-07-09 | 00fd29ef | 鸡哥 | feat: add guide reset functionality and update related UI components
+- 2026-07-09 | 9dcbff18 | 鸡哥 | feat: add license and dependencies section to GitHub guide and update styles
+- 2026-07-09 | 1eba9ddd | 鸡哥 | feat: refactor project links configuration and add ProjectLink interface
+- 2026-07-09 | 98f9974e | 鸡哥 | feat: update project links and enhance button styles for better usability
+- 2026-07-09 | 51ad28ad | 鸡哥 | feat: add SVG icons for DEVELOPER, DOCS, and WEBSITE and update SvgIcon references
+- 2026-07-09 | 5ca976f9 | 鸡哥 | feat: add devDocs link to GitHub step and update styles for better alignment
+- 2026-07-09 | e80f0d0c | 鸡哥 | feat: add GitHub information step to guide with corresponding translations and styles
+- 2026-07-09 | 09121a6a | 鸡哥 | feat: refactor update source option types and hook for improved structure and clarity
+- 2026-07-09 | df4aa6d8 | 鸡哥 | feat: add icons to update source options and style adjustments for better presentation
+- 2026-07-09 | 45012fe7 | 鸡哥 | feat: add service icons for CLOUDFLARE and ALIBABACLOUD with corresponding tests
+- 2026-07-09 | 07ae54e1 | 鸡哥 | feat: update update source handling in SettingsTab for improved source selection
+- 2026-07-09 | 36e754a7 | 鸡哥 | feat: add update source selection step to guide with corresponding translations and styles
+- 2026-07-09 | 5faee30a | 鸡哥 | feat: update theme mode button styles for improved layout
+- 2026-07-09 | f732d4f0 | 鸡哥 | feat: enhance theme selection with icons and update styles
+- 2026-07-09 | 8b10c370 | 鸡哥 | feat: add broadcast setting change mock to media IPC tests
+- 2026-07-09 | 3f1434c5 | 鸡哥 | feat: update SVG icon registration to include player icons and corresponding test files
+- 2026-07-09 | 15be6934 | 鸡哥 | feat: add new theme icons for dark, light, and follow system modes
+- 2026-07-09 | 5f7ab34a | 鸡哥 | fix: remove flex property from theme mode button for better layout control
+- 2026-07-09 | 11b08f08 | 鸡哥 | feat: add theme selection step with opacity adjustment to guide
+- 2026-07-08 | 3fefa8a0 | 鸡哥 | feat: add video component to welcome step and create corresponding styles
+- 2026-07-08 | fb13ddf3 | 鸡哥 | feat: add welcome step to guide with completion and navigation functionality
+- 2026-07-08 | 98dc5047 | 鸡哥 | fix: adjust position of guide process indicator for better alignment
+- 2026-07-08 | d90ff042 | 鸡哥 | feat: integrate ProcessIndicator into guide steps and update styles
+- 2026-07-08 | eb4f971d | 鸡哥 | feat: synchronize whitelist selection with real-time updates and improve state management
+- 2026-07-08 | 5a85ae22 | 鸡哥 | feat: add whitelist configuration step with player selection and styling
+- 2026-07-08 | 53f09473 | 鸡哥 | feat: implement dynamic process segment states with animation effects and testing
+- 2026-07-08 | 94a9ae16 | 鸡哥 | feat: enhance useProcessIndicator to support regressing animation and update segment status types
+- 2026-07-08 | f19d1f7b | 鸡哥 | feat: optimize progress indicator logic and improve CSS for segment states
+- 2026-07-08 | c725f685 | 鸡哥 | feat: refactor progress animation constants and types for better modularity
+- 2026-07-08 | 0000e1a1 | 鸡哥 | feat: implement useProcessIndicator hook for managing progress segment states
+- 2026-07-08 | b00cf4b7 | 鸡哥 | feat: enhance ProcessIndicator with animation effects for progress segments
+- 2026-07-08 | 405dedc4 | 鸡哥 | style: update process indicator styles for improved appearance
+- 2026-07-08 | e56fea12 | 鸡哥 | feat: enhance guide steps with ProcessIndicator and step tracking
+- 2026-07-08 | 86b37662 | 鸡哥 | feat: add ProcessIndicator component with styles and types
+- 2026-07-08 | 4cf3c8d1 | 鸡哥 | refactor: move GuideStep type to a new file and create additional type files
+- 2026-07-08 | 2ed67c52 | 鸡哥 | refactor: restructure SMTC module by creating a new test directory
+- 2026-07-08 | ff99dca0 | 鸡哥 | refactor: simplify ESA cache purge script and update variable names
+- 2026-07-08 | dffda8d9 | eislandBot | docs: auto update CHANGE_LOG.md for #135 by @JNTMTMTM [skip ci]
 - 2026-07-08 | 9f29037b | 鸡哥 | Merge pull request #135 from JNTMTMTM/dev
 - 2026-07-08 | 411b19d3 | 鸡哥 | fix: update native module names in package commands documentation
 - 2026-07-08 | 7f5e0134 | 鸡哥 | feat: update publish workflow to include GitHub Packages and additional plugins
