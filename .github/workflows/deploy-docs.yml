@@ -81,22 +81,3 @@ jobs:
           remote_port: ${{ secrets.DEPLOY_PORT }}
           remote_user: ${{ secrets.DEPLOY_USER }}
           remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      - name: Checkout for ESA purge script
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Purge ESA cache
-        env:
-          ESA_ACCESS_KEY_ID: ${{ secrets.ESA_ACCESS_KEY_ID }}
-          ESA_ACCESS_KEY_SECRET: ${{ secrets.ESA_ACCESS_KEY_SECRET }}
-          ESA_ZONE_ID: ${{ secrets.ESA_ZONE_ID }}
-          ESA_HOSTNAME: eisland-dev.pyisland.com
-        run: |
-          npm install --ignore-scripts
-          npm run esa:purge-hostname
