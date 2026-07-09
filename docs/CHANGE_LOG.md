@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-09T14:36:19.355Z
+> 生成时间：2026-07-09T15:47:25.368Z
 
 ## 26.6.3
 
@@ -2276,6 +2276,16 @@
 
 ## Unreleased
 
+- 2026-07-09 | 095f095a | 鸡哥 | Merge pull request #137 from JNTMTMTM/dev
+- 2026-07-09 | ff7dc101 | 鸡哥 | fix: update import paths for ESA client in purge cache scripts
+- 2026-07-09 | 31bc231f | 鸡哥 | feat: reorganize ESA cache scripts and update command references in package.json and documentation
+- 2026-07-09 | 7b33828a | 鸡哥 | feat: add scripts to purge ESA cache by URL and hostname
+- 2026-07-09 | 9298b8fb | 鸡哥 | feat: add ESA cache commands documentation and update related command references
+- 2026-07-09 | ed39c79e | 鸡哥 | refactor: remove redundant ESA cache purge steps from deployment workflow
+- 2026-07-09 | 81d44287 | 鸡哥 | feat: implement ESA cache purge script and update deployment workflow
+- 2026-07-09 | 254f7a4e | 鸡哥 | feat: update release upload scripts to include ESA cache purge
+- 2026-07-09 | c4bb5bd5 | 鸡哥 | feat: add script to purge ESA cache and update dependencies
+- 2026-07-09 | a11a5076 | eislandBot | docs: auto update CHANGE_LOG.md for #136 by @JNTMTMTM [skip ci]
 - 2026-07-09 | 9a092a05 | 鸡哥 | Merge pull request #136 from JNTMTMTM/dev
 - 2026-07-09 | 81cbdd91 | 鸡哥 | feat: enhance caching mechanism and improve opacity settings in theme hooks
 - 2026-07-09 | fe5b4204 | 鸡哥 | feat: add module entry and type definitions for guide steps and process indicators
