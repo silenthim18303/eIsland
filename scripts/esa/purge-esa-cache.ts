@@ -26,8 +26,8 @@
 
 import * as ESA20240910 from '@alicloud/esa20240910';
 import * as Util from '@alicloud/tea-util';
-import { createEsaClient, loadEnvFile } from './esa-env';
-import type { ESAClient } from './esa-env';
+import { createEsaClient, loadEnvFile } from './esa-env.ts';
+import type { ESAClient } from './esa-env.ts';
 
 async function purgeCaches(client: ESAClient, siteId: number, objectUrl: string): Promise<void> {
   const content = new ESA20240910.PurgeCachesRequestContent({
