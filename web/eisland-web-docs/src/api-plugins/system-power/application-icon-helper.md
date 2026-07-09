@@ -39,6 +39,10 @@ All icon functions return `IconResult | null`. The result contains PNG image dat
 | `npm run clean` | `dotnet clean` | Clean build artifacts |
 | `npm run rebuild` | `npm run clean && npm run build` | Clean and rebuild |
 
+:::tip
+This plugin is automatically built when running `npm run plugins:build` from the project root. You do not need to build it separately unless working on the plugin in isolation.
+:::
+
 :::warning
 The build requires .NET 10 SDK and Visual Studio Build Tools with C++ workload installed. The Windows SDK path must be correctly configured.
 :::
