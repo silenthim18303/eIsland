@@ -25,52 +25,11 @@
  */
 
 import * as ESA20240910 from '@alicloud/esa20240910';
-import * as OpenApi from '@alicloud/openapi-client';
 import * as Util from '@alicloud/tea-util';
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { createEsaClient, loadEnvFile } from './esa-env';
+import type { ESAClient } from './esa-env';
 
-function stripWrappedQuotes(value: string): string {
-  if (
-    (value.startsWith('"') && value.endsWith('"')) ||
-    (value.startsWith("'") && value.endsWith("'"))
-  ) {
-    return value.slice(1, -1);
-  }
-  return value;
-}
-
-function loadEnvFile(envFilePath = '.env'): void {
-  const absolutePath = resolve(process.cwd(), envFilePath);
-  if (!existsSync(absolutePath)) return;
-
-  const content = readFileSync(absolutePath, 'utf8');
-  for (const rawLine of content.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith('#')) continue;
-    const index = line.indexOf('=');
-    if (index <= 0) continue;
-    const key = line.slice(0, index).trim();
-    const rawValue = line.slice(index + 1).trim();
-    if (key && process.env[key] === undefined) {
-      process.env[key] = stripWrappedQuotes(rawValue);
-    }
-  }
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function createClient(accessKeyId: string, accessKeySecret: string): any {
-  const config = new OpenApi.Config({
-    accessKeyId,
-    accessKeySecret,
-    endpoint: 'esa.cn-hangzhou.aliyuncs.com',
-  });
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return new (ESA20240910.default as any).default(config);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function purgeCaches(client: any, siteId: number, objectUrl: string): Promise<void> {
+async function purgeCaches(client: ESAClient, siteId: number, objectUrl: string): Promise<void> {
   const content = new ESA20240910.PurgeCachesRequestContent({
     files: [objectUrl],
     purgeAll: false,
@@ -106,7 +65,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  const client = createClient(accessKeyId, accessKeySecret);
+  const client = createEsaClient(accessKeyId, accessKeySecret);
 
   console.log(`[ESA] Purging cache for ${objectUrl}...`);
   await purgeCaches(client, siteId, objectUrl);

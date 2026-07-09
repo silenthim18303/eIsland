@@ -43,7 +43,7 @@ Purges the cache for a **specific file URL** on ESA CDN.
 npm run esa:purge
 ```
 
-**Under the hood:** `node --experimental-strip-types scripts/purge-esa-cache.ts`
+**Under the hood:** `node --experimental-strip-types scripts/esa/purge-esa-cache.ts`
 
 **Reads:** `ESA_PURGE_URL`
 
@@ -63,7 +63,7 @@ Purges **all cached content** under a specific hostname on ESA CDN.
 npm run esa:purge-hostname
 ```
 
-**Under the hood:** `node --experimental-strip-types scripts/purge-esa-hostname.ts`
+**Under the hood:** `node --experimental-strip-types scripts/esa/purge-esa-hostname.ts`
 
 **Reads:** `ESA_HOSTNAME`
 
@@ -83,7 +83,7 @@ Purges **all cached content** for the entire ESA site (all hostnames, all files)
 npm run esa:purge-all
 ```
 
-**Under the hood:** `node --experimental-strip-types scripts/purge-esa-hostname.ts --purge-all`
+**Under the hood:** `node --experimental-strip-types scripts/esa/purge-esa-hostname.ts --purge-all`
 
 **Reads:** `ESA_ZONE_ID`, `ESA_ACCESS_KEY_ID`, `ESA_ACCESS_KEY_SECRET`
 
@@ -109,8 +109,9 @@ The automatic purge only clears the file URL specified in `ESA_PURGE_URL`. To cl
 
 | File | Responsibility |
 |------|---------------|
-| `scripts/purge-esa-cache.ts` | File-level cache purge via ESA SDK |
-| `scripts/purge-esa-hostname.ts` | Hostname/site-level cache purge via ESA SDK |
+| `scripts/esa/esa-env.ts` | Shared ESA utilities (env loading, client creation) |
+| `scripts/esa/purge-esa-cache.ts` | File-level cache purge via ESA SDK |
+| `scripts/esa/purge-esa-hostname.ts` | Hostname/site-level cache purge via ESA SDK |
 
 ## Troubleshooting
 
