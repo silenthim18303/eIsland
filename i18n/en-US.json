@@ -91,7 +91,9 @@
         "website": "Website",
         "docs": "Docs",
         "devDocs": "Dev Docs"
-      }
+      },
+      "license": "GPL-3.0 License",
+      "depsTitle": "Open Source Frameworks & Dependencies & Projects"
     },
     "welcome": {
       "title": "Welcome to eIsland",

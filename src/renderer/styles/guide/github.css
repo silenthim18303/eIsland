@@ -29,7 +29,8 @@
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  max-width: 400px;
+  max-width: 600px;
+  margin-top: 50px;
 }
 
 .guide-github-notice {
@@ -73,4 +74,55 @@
   width: 16px;
   height: 16px;
   object-fit: contain;
+}
+
+/* 许可证按钮 */
+.guide-github-license-btn {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.guide-github-license-btn:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* 开源依赖区域 */
+.guide-github-deps {
+  margin-top: 0px;
+  width: 100%;
+}
+
+.guide-github-deps-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.guide-github-deps-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.guide-github-dep {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a.guide-github-dep:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
 }

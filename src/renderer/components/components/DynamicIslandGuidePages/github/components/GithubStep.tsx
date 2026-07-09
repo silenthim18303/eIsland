@@ -27,6 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PROJECT_LINKS } from '../config/projectLinks';
+import { ALL_DEPENDENCIES } from '../../../../config/dependencies';
 import type { GithubStepProps } from '../types';
 
 /**
@@ -59,6 +60,32 @@ export function GithubStep({ onNext, onPrev }: GithubStepProps): ReactElement {
               <span>{t(`guide.github.links.${link.key}`, { defaultValue: link.key })}</span>
             </button>
           ))}
+        </div>
+        <div className="guide-github-deps">
+          <div className="guide-github-deps-title">
+            {t('guide.github.depsTitle', { defaultValue: '开源框架 & 依赖' })}
+          </div>
+          <div className="guide-github-deps-grid">
+            {ALL_DEPENDENCIES.map((dep) =>
+              dep.url ? (
+                <a
+                  className="guide-github-dep"
+                  href={dep.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  key={dep.name}
+                  onClick={(e): void => {
+                    e.preventDefault();
+                    handleOpenLink(dep.url!);
+                  }}
+                >
+                  {dep.name}
+                </a>
+              ) : (
+                <span className="guide-github-dep" key={dep.name}>{dep.name}</span>
+              ),
+            )}
+          </div>
         </div>
       </div>
       <div className="guide-step-footer">
