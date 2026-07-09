@@ -86,11 +86,11 @@
     "github": {
       "title": "Open Source",
       "subtitle": "eIsland is an open source project",
-      "notice": "This software is free and open source. Open source under GPL-3.0 License.",
       "links": {
         "repo": "GitHub",
         "website": "Website",
-        "docs": "Docs"
+        "docs": "Docs",
+        "devDocs": "Dev Docs"
       }
     },
     "welcome": {

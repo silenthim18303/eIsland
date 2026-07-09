@@ -34,6 +34,7 @@ const PROJECT_LINKS = [
   { key: 'repo', url: 'https://github.com/JNTMTMTM/eIsland', icon: SvgIcon.GITHUB },
   { key: 'website', url: 'https://pyisland.com', icon: SvgIcon.LINK },
   { key: 'docs', url: 'https://docs.pyisland.com', icon: SvgIcon.BOOKMARK },
+  { key: 'devDocs', url: 'https://dev.electronisland.com', icon: SvgIcon.ABOUT },
 ] as const;
 
 /**
@@ -66,9 +67,6 @@ export function GithubStep({ onNext, onPrev }: GithubStepProps): ReactElement {
               <span>{t(`guide.github.links.${link.key}`, { defaultValue: link.key })}</span>
             </button>
           ))}
-        </div>
-        <div className="guide-github-notice">
-          {t('guide.github.notice', { defaultValue: '本软件开源免费，如果你在任何地方付费购买了本软件，请立即退款并给差评。' })}
         </div>
       </div>
       <div className="guide-step-footer">
