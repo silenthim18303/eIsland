@@ -35,10 +35,12 @@ const {
   existsSyncMock,
   readFileSyncMock,
   writeFileSyncMock,
+  broadcastSettingChangeMock,
 } = vi.hoisted(() => ({
   existsSyncMock: vi.fn(),
   readFileSyncMock: vi.fn(),
   writeFileSyncMock: vi.fn(),
+  broadcastSettingChangeMock: vi.fn(),
 }));
 
 vi.mock('electron', () => ({
@@ -51,6 +53,10 @@ vi.mock('fs', () => ({
   existsSync: existsSyncMock,
   readFileSync: readFileSyncMock,
   writeFileSync: writeFileSyncMock,
+}));
+
+vi.mock('../../../utils/broadcast', () => ({
+  broadcastSettingChange: broadcastSettingChangeMock,
 }));
 
 import { registerMusicIpcHandlers } from '../music';
@@ -92,15 +98,18 @@ describe('registerMusicIpcHandlers', () => {
     existsSyncMock.mockReset();
     readFileSyncMock.mockReset();
     writeFileSyncMock.mockReset();
+    broadcastSettingChangeMock.mockReset();
 
     handleMock.mockImplementation((channel: string, handler: (...args: unknown[]) => unknown) => {
       handlers.set(channel, handler);
     });
   });
 
+  const event = { sender: { id: 42 } };
+
   /** Convenience: call a captured handler by channel name. */
   function call(channel: string, ...args: unknown[]) {
-    return handlers.get(channel)?.({}, ...args);
+    return handlers.get(channel)?.(event, ...args);
   }
 
   // ---------------------------------------------------------------
