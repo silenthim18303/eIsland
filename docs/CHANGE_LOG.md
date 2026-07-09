@@ -1,7 +1,486 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-09T15:47:25.368Z
+> 生成时间：2026-07-09T16:30:49.695Z
+
+## 26.6.4
+
+- 2026-07-09 | 9868bb21 | 鸡哥 | chore: update version to 26.6.4 in package.json and package-lock.json
+- 2026-07-09 | f91f3c56 | 鸡哥 | docs(announcement): update release version to V26.6.4 in announcement document
+- 2026-07-09 | 682bc0b1 | 鸡哥 | docs(announcement): add V26.6.4 release notes
+- 2026-07-09 | 299264de | eislandBot | docs: auto update CHANGE_LOG.md for #137 by @JNTMTMTM [skip ci]
+- 2026-07-09 | 095f095a | 鸡哥 | Merge pull request #137 from JNTMTMTM/dev
+- 2026-07-09 | ff7dc101 | 鸡哥 | fix: update import paths for ESA client in purge cache scripts
+- 2026-07-09 | 31bc231f | 鸡哥 | feat: reorganize ESA cache scripts and update command references in package.json and documentation
+- 2026-07-09 | 7b33828a | 鸡哥 | feat: add scripts to purge ESA cache by URL and hostname
+- 2026-07-09 | 9298b8fb | 鸡哥 | feat: add ESA cache commands documentation and update related command references
+- 2026-07-09 | ed39c79e | 鸡哥 | refactor: remove redundant ESA cache purge steps from deployment workflow
+- 2026-07-09 | 81d44287 | 鸡哥 | feat: implement ESA cache purge script and update deployment workflow
+- 2026-07-09 | 254f7a4e | 鸡哥 | feat: update release upload scripts to include ESA cache purge
+- 2026-07-09 | c4bb5bd5 | 鸡哥 | feat: add script to purge ESA cache and update dependencies
+- 2026-07-09 | a11a5076 | eislandBot | docs: auto update CHANGE_LOG.md for #136 by @JNTMTMTM [skip ci]
+- 2026-07-09 | 9a092a05 | 鸡哥 | Merge pull request #136 from JNTMTMTM/dev
+- 2026-07-09 | 81cbdd91 | 鸡哥 | feat: enhance caching mechanism and improve opacity settings in theme hooks
+- 2026-07-09 | fe5b4204 | 鸡哥 | feat: add module entry and type definitions for guide steps and process indicators
+- 2026-07-09 | 75d5f428 | 鸡哥 | feat: update language options to use CountryIcon for icons
+- 2026-07-09 | f58d2d35 | 鸡哥 | feat: add logic to control guide window display on startup
+- 2026-07-09 | 6203b904 | 鸡哥 | feat: implement guide reset functionality with success and error feedback
+- 2026-07-09 | 00fd29ef | 鸡哥 | feat: add guide reset functionality and update related UI components
+- 2026-07-09 | 9dcbff18 | 鸡哥 | feat: add license and dependencies section to GitHub guide and update styles
+- 2026-07-09 | 1eba9ddd | 鸡哥 | feat: refactor project links configuration and add ProjectLink interface
+- 2026-07-09 | 98f9974e | 鸡哥 | feat: update project links and enhance button styles for better usability
+- 2026-07-09 | 51ad28ad | 鸡哥 | feat: add SVG icons for DEVELOPER, DOCS, and WEBSITE and update SvgIcon references
+- 2026-07-09 | 5ca976f9 | 鸡哥 | feat: add devDocs link to GitHub step and update styles for better alignment
+- 2026-07-09 | e80f0d0c | 鸡哥 | feat: add GitHub information step to guide with corresponding translations and styles
+- 2026-07-09 | 09121a6a | 鸡哥 | feat: refactor update source option types and hook for improved structure and clarity
+- 2026-07-09 | df4aa6d8 | 鸡哥 | feat: add icons to update source options and style adjustments for better presentation
+- 2026-07-09 | 45012fe7 | 鸡哥 | feat: add service icons for CLOUDFLARE and ALIBABACLOUD with corresponding tests
+- 2026-07-09 | 07ae54e1 | 鸡哥 | feat: update update source handling in SettingsTab for improved source selection
+- 2026-07-09 | 36e754a7 | 鸡哥 | feat: add update source selection step to guide with corresponding translations and styles
+- 2026-07-09 | 5faee30a | 鸡哥 | feat: update theme mode button styles for improved layout
+- 2026-07-09 | f732d4f0 | 鸡哥 | feat: enhance theme selection with icons and update styles
+- 2026-07-09 | 8b10c370 | 鸡哥 | feat: add broadcast setting change mock to media IPC tests
+- 2026-07-09 | 3f1434c5 | 鸡哥 | feat: update SVG icon registration to include player icons and corresponding test files
+- 2026-07-09 | 15be6934 | 鸡哥 | feat: add new theme icons for dark, light, and follow system modes
+- 2026-07-09 | 5f7ab34a | 鸡哥 | fix: remove flex property from theme mode button for better layout control
+- 2026-07-09 | 11b08f08 | 鸡哥 | feat: add theme selection step with opacity adjustment to guide
+- 2026-07-08 | 3fefa8a0 | 鸡哥 | feat: add video component to welcome step and create corresponding styles
+- 2026-07-08 | fb13ddf3 | 鸡哥 | feat: add welcome step to guide with completion and navigation functionality
+- 2026-07-08 | 98dc5047 | 鸡哥 | fix: adjust position of guide process indicator for better alignment
+- 2026-07-08 | d90ff042 | 鸡哥 | feat: integrate ProcessIndicator into guide steps and update styles
+- 2026-07-08 | eb4f971d | 鸡哥 | feat: synchronize whitelist selection with real-time updates and improve state management
+- 2026-07-08 | 5a85ae22 | 鸡哥 | feat: add whitelist configuration step with player selection and styling
+- 2026-07-08 | 53f09473 | 鸡哥 | feat: implement dynamic process segment states with animation effects and testing
+- 2026-07-08 | 94a9ae16 | 鸡哥 | feat: enhance useProcessIndicator to support regressing animation and update segment status types
+- 2026-07-08 | f19d1f7b | 鸡哥 | feat: optimize progress indicator logic and improve CSS for segment states
+- 2026-07-08 | c725f685 | 鸡哥 | feat: refactor progress animation constants and types for better modularity
+- 2026-07-08 | 0000e1a1 | 鸡哥 | feat: implement useProcessIndicator hook for managing progress segment states
+- 2026-07-08 | b00cf4b7 | 鸡哥 | feat: enhance ProcessIndicator with animation effects for progress segments
+- 2026-07-08 | 405dedc4 | 鸡哥 | style: update process indicator styles for improved appearance
+- 2026-07-08 | e56fea12 | 鸡哥 | feat: enhance guide steps with ProcessIndicator and step tracking
+- 2026-07-08 | 86b37662 | 鸡哥 | feat: add ProcessIndicator component with styles and types
+- 2026-07-08 | 4cf3c8d1 | 鸡哥 | refactor: move GuideStep type to a new file and create additional type files
+- 2026-07-08 | 2ed67c52 | 鸡哥 | refactor: restructure SMTC module by creating a new test directory
+- 2026-07-08 | ff99dca0 | 鸡哥 | refactor: simplify ESA cache purge script and update variable names
+- 2026-07-08 | dffda8d9 | eislandBot | docs: auto update CHANGE_LOG.md for #135 by @JNTMTMTM [skip ci]
+- 2026-07-08 | 9f29037b | 鸡哥 | Merge pull request #135 from JNTMTMTM/dev
+- 2026-07-08 | 411b19d3 | 鸡哥 | fix: update native module names in package commands documentation
+- 2026-07-08 | 7f5e0134 | 鸡哥 | feat: update publish workflow to include GitHub Packages and additional plugins
+- 2026-07-08 | 5d4e82f4 | 鸡哥 | feat: add postinstall scripts and GitHub workflow for publishing plugins to npm
+- 2026-07-08 | 5876970c | 鸡哥 | fix: update plugin paths and documentation for fullscreen detector and performance monitor
+- 2026-07-08 | cca10505 | 鸡哥 | fix: update plugin paths for fullscreen and performance monitor in package.json
+- 2026-07-08 | 0fd31960 | 鸡哥 | feat: add Windows performance monitor plugin with CPU, memory, and temperature snapshots
+- 2026-07-08 | 5291f65c | 鸡哥 | feat: Add artifact extraction and ESA cache purge steps to deployment workflow
+- 2026-07-07 | 24a40915 | eislandBot | docs: auto update CHANGE_LOG.md for #133 by @JNTMTMTM [skip ci]
+- 2026-07-08 | 015f9fe2 | 鸡哥 | Merge pull request #133 from JNTMTMTM/dev
+- 2026-07-08 | 35210db2 | 鸡哥 | fix: Enhance rsync deployment configuration with additional options
+- 2026-07-07 | 29f2bc70 | eislandBot | docs: auto update CHANGE_LOG.md for #132 by @JNTMTMTM [skip ci]
+- 2026-07-08 | 82b61618 | 鸡哥 | Merge pull request #132 from JNTMTMTM/dev
+- 2026-07-08 | a49d4e97 | 鸡哥 | fix: Correct title casing in Electron Windows documentation
+- 2026-07-08 | 8debe7f1 | 鸡哥 | feat: Add documentation for new configurations and APIs
+- 2026-07-08 | b115c221 | 鸡哥 | feat: Add services and configurations for identity verification, static asset URL rewriting, toolbox software management, TOTP security, user banning, and wallpaper marketplace
+- 2026-07-08 | bd53beba | 鸡哥 | docs: update API endpoint paths in README files for consistency
+- 2026-07-08 | 654e4002 | 鸡哥 | docs: update sidebar icons and remove obsolete configuration link
+- 2026-07-07 | 011aa581 | 鸡哥 | docs: fix sidebar abbreviations to module-specific names
+- 2026-07-07 | b2e3f576 | 鸡哥 | docs: restructure sidebar with eASS naming convention
+- 2026-07-07 | 7159412b | 鸡哥 | Revert "docs: add sidebar configuration for all API backend modules"
+- 2026-07-07 | 4c329639 | 鸡哥 | docs: add sidebar configuration for all API backend modules
+- 2026-07-07 | 2a9d4daa | 鸡哥 | docs: update API backend README with all modules
+- 2026-07-07 | 7a5c9536 | 鸡哥 | docs: add server-app and server-common documentation
+- 2026-07-07 | cd6a9a93 | 鸡哥 | docs: add server-version and server-weather documentation
+- 2026-07-07 | 3a4c4967 | 鸡哥 | docs: add server-mini-game, server-service-status, server-upload documentation
+- 2026-07-07 | 422db866 | 鸡哥 | docs: add server-user module documentation
+- 2026-07-07 | fac06a40 | 鸡哥 | docs: add server-payment module documentation
+- 2026-07-07 | 4973c89e | 鸡哥 | docs: add server-auth module documentation
+- 2026-07-07 | 35465531 | 鸡哥 | fix: update main window URL and script source for Dynamic Island integration
+- 2026-07-07 | c9805de9 | 鸡哥 | Remove deprecated configuration and data type documentation for various agent components, including STT WebSocket, Redis usage, prompt builders, and translation services. This cleanup enhances the clarity and maintainability of the documentation by eliminating obsolete references and files.
+- 2026-07-07 | cb95a2cf | 鸡哥 | feat: update sidebar structure and enhance eisland Agent Services documentation
+- 2026-07-07 | eecf4d77 | 鸡哥 | Add documentation for Mihtnelis agent properties, prompt builders, and data types
+- 2026-07-07 | 4561a632 | 鸡哥 | feat: add API Backend and Frontend documentation with navigation updates
+- 2026-07-07 | 4f05e96b | 鸡哥 | feat: add Electron Windows documentation and update state machine details
+- 2026-07-07 | fed7b509 | 鸡哥 | refactor: restructure renderer components and HTML files
+- 2026-07-07 | 6a6d79ae | eislandBot | docs: auto update CHANGE_LOG.md for #131 by @JNTMTMTM [skip ci]
+- 2026-07-07 | d9491a89 | 鸡哥 | Merge pull request #131 from JNTMTMTM/dev
+- 2026-07-07 | 06c2ab60 | 鸡哥 | feat: add Dynamic Island wave effect components and utilities
+- 2026-07-07 | 169590e4 | 鸡哥 | feat: refactor WaveEffect component and hooks; improve color handling and WebGL initialization
+- 2026-07-07 | 56baa0d1 | 鸡哥 | feat: implement wave rendering functions and refactor useWaveRenderer hook
+- 2026-07-07 | e0820e5a | 鸡哥 | feat: refactor SMTC module types and improve WebGL context initialization
+- 2026-07-07 | 751189cb | 鸡哥 | feat: add unknown player label and improve player name extraction; update accent color handling
+- 2026-07-07 | 8f403fa6 | 鸡哥 | feat: mock windows application icon helper in appHelpers tests
+- 2026-07-07 | 2abdf350 | 鸡哥 | feat: refactor player icon handling and add PlayerIcon utility
+- 2026-07-07 | 01a36355 | 鸡哥 | feat: add player icons and update SmtcStep component to display them
+- 2026-07-07 | 48bfb479 | 鸡哥 | Add SVG icons for various music players
+- 2026-07-07 | 75741764 | 鸡哥 | fix: remove unnecessary await from showGuideWindow call
+- 2026-07-07 | 4db33ea5 | 鸡哥 | feat: add media control buttons and update layout for SmtcStep component
+- 2026-07-07 | c1c4418b | 鸡哥 | feat: implement useMarqueeOverflow hook for overflow detection and refactor MarqueeText component
+- 2026-07-07 | 92495d87 | 鸡哥 | feat: add MarqueeText component for scrolling text and update styles for title, artist, and album
+- 2026-07-07 | c50fbe71 | 鸡哥 | feat: add accent color support to WaveEffect and related hooks
+- 2026-07-07 | 8d8db9b9 | 鸡哥 | feat: remove retry functionality from SMTC media test and update related styles and hooks
+- 2026-07-07 | 11f715c0 | 鸡哥 | feat: refactor SMTC media test by removing unused time formatting and updating related hooks and types
+- 2026-07-07 | e17f51c1 | 鸡哥 | feat: refactor SMTC media test by moving utility functions to a new module and updating imports
+- 2026-07-07 | 1287c2d3 | 鸡哥 | feat: refactor SMTC check to SMTC media test with enhanced UI and functionality
+- 2026-07-06 | 943fb2a4 | 鸡哥 | feat: update skill name for guide step creation to reflect new functionality
+- 2026-07-06 | c82a7c4c | 鸡哥 | feat: add guide step creation documentation and structure
+- 2026-07-06 | f5df2a67 | 鸡哥 | feat: add guide step creation documentation and structure
+- 2026-07-06 | cbe11874 | 鸡哥 | feat: add base, step, language, and smtc styles for guide configuration window
+- 2026-07-06 | 8223c84f | 鸡哥 | feat: add SMTC check step to guide with localization support and enhance styles
+- 2026-07-06 | 3922e5f9 | 鸡哥 | feat: enhance guide next button styles for improved usability
+- 2026-07-06 | 1bb4ccf2 | 鸡哥 | feat: add multiple language options to language selection step and enhance styles
+- 2026-07-06 | 0c4afc95 | 鸡哥 | feat: add subtitle to language selection step and enhance layout styles
+- 2026-07-06 | 04d3e306 | 鸡哥 | feat: add language selection step to guide with localization support
+- 2026-07-06 | fdd21e73 | 鸡哥 | refactor: replace SplashWaveEffect with WaveEffect and restructure related files
+- 2026-07-06 | ef8325cf | 鸡哥 | feat: enhance guide window with new styles and splash wave effect
+- 2026-07-06 | 4b764b16 | 鸡哥 | feat: add guide window for initial configuration and related components
+- 2026-07-06 | eea743e0 | 鸡哥 | Merge commit '3586e7c9c52c10b57ccaf6fb7414dccdd1e01a7d' into dev
+- 2026-07-06 | 3586e7c9 | eislandBot | docs: auto update CHANGE_LOG.md for #130 by @JNTMTMTM [skip ci]
+- 2026-07-06 | c86228a6 | 鸡哥 | Merge pull request #130 from JNTMTMTM/dev
+- 2026-07-06 | bd56f396 | 鸡哥 | feat: implement isCurrentLyricIdenticalToTranslation utility and refactor related components
+- 2026-07-06 | 4d0cff37 | 鸡哥 | feat: add new Windows helper plugins for Bluetooth, brightness, power, processes, and WiFi
+- 2026-07-06 | 1603c324 | 鸡哥 | fix: fallback to GITHUB_TOKEN when BOT_PAT is unavailable in workflow files
+- 2026-07-06 | a0bc7cc7 | 鸡哥 | Refactor preload types into separate modules
+- 2026-07-06 | 76c3cb22 | 鸡哥 | feat(preload): enhance API with type definitions and improve return types
+- 2026-07-06 | 19dcf802 | 鸡哥 | feat: enhance lyrics translation handling by checking for identical original and translated lyrics
+- 2026-07-06 | 7bab1fec | 鸡哥 | fix: update license link to point to the GNU General Public License v3.0
+- 2026-07-06 | 75edcba3 | 鸡哥 | fix: update depsTitle in English and Chinese localizations for clarity
+- 2026-07-06 | 2db77d0a | 鸡哥 | feat: add configuration and type definitions for download, image compression, mail, net, and updater modules
+- 2026-07-06 | b892a02f | 鸡哥 | feat: add windows application icon helper for improved file icon retrieval
+- 2026-07-06 | 20b7e147 | eislandBot | docs: auto update CHANGE_LOG.md for #129 by @JNTMTMTM [skip ci]
+- 2026-07-06 | 4f6b6a08 | 鸡哥 | Merge pull request #129 from JNTMTMTM/dev
+- 2026-07-06 | b8cea4d3 | 鸡哥 | fix: update workflows to fall back to GITHUB_TOKEN when BOT_PAT is unavailable
+- 2026-07-06 | ed41cdd9 | 鸡哥 | fix: update workflows to enhance changelog updates and fallback token handling
+- 2026-07-06 | 91d3de95 | 鸡哥 | fix: update issue templates to improve clarity and consistency in descriptions and labels
+- 2026-07-06 | b653b1cd | 鸡哥 | fix: update comments and labels in workflow files to improve clarity and consistency
+- 2026-07-06 | dbe6063f | 鸡哥 | fix: update GitHub token to use BOT_PAT in workflow files
+- 2026-07-06 | ff71ace0 | 鸡哥 | fix: update GitHub token to use BOT_PAT for release build and upload
+- 2026-07-06 | 21f6aa09 | 鸡哥 | fix: update bot configuration for CHANGE_LOG.md commits
+- 2026-07-06 | 688a3fef | 鸡哥 | fix: update download action in deploy workflow to use actions/download-artifact@v4
+- 2026-07-06 | 6b54a00d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #128 by @JNTMTMTM [skip ci]
+- 2026-07-06 | 2e32cea7 | 鸡哥 | Merge pull request #128 from JNTMTMTM/dev
+- 2026-07-06 | 6f4c1c0d | 鸡哥 | fix: update artifact download action in deploy workflow
+- 2026-07-06 | f870d46f | 鸡哥 | feat: add GitHub Actions workflow for deploying documentation
+- 2026-07-06 | a3898881 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #127 by @JNTMTMTM [skip ci]
+- 2026-07-06 | 575a400b | 鸡哥 | Merge pull request #127 from JNTMTMTM/dev
+- 2026-07-06 | 3433d380 | 鸡哥 | fix: update icon retrieval functions to return IconResult structure and improve documentation
+- 2026-07-06 | e06cb76e | 鸡哥 | fix: update return type in README for icon functions to reflect correct data structure
+- 2026-07-06 | f52102a7 | 鸡哥 | fix: ensure proper COM initialization and uninitialization in IconExtractor
+- 2026-07-06 | 987870ac | 鸡哥 | fix: update return type annotations in icon retrieval functions for clarity
+- 2026-07-06 | 852e3fd5 | 鸡哥 | feat: add detailed file headers and descriptions to test files and configuration
+- 2026-07-06 | 60458f52 | 鸡哥 | fix: update links in documentation for consistency and accuracy
+- 2026-07-06 | 7bc609d1 | 鸡哥 | feat: enhance API plugin documentation with sidebar badge registration guidelines
+- 2026-07-06 | d5d04111 | 鸡哥 | feat: add IconResult interface to badge mapping in SidebarBadges.vue
+- 2026-07-06 | f750c929 | 鸡哥 | feat: enhance icon retrieval functions to return structured IconResult and add documentation for new interface
+- 2026-07-06 | dbc5b261 | 鸡哥 | feat: update icon retrieval functions to return structured IconResult with size and format
+- 2026-07-06 | a6c55f56 | 鸡哥 | feat: add Windows Application Icon Helper plugin and documentation
+- 2026-07-06 | 5a2dabc2 | 鸡哥 | feat: add support for extracting icons from shortcut files
+- 2026-07-06 | 943f5cd6 | 鸡哥 | feat(tests): add smoke tests for icon extraction by process name, PID, and path
+- 2026-07-06 | f3c5c608 | 鸡哥 | feat: add Windows application icon helper plugin with icon extraction capabilities
+- 2026-07-06 | c0091f6e | github-actions[bot] | docs: auto update CHANGE_LOG.md for #126 by @JNTMTMTM [skip ci]
+- 2026-07-06 | df8f6f29 | 鸡哥 | Merge pull request #126 from JNTMTMTM/dev
+- 2026-07-06 | 6e991025 | 鸡哥 | chore(workflows): remove MiMo summary and review workflows
+- 2026-07-06 | 94f9acfb | 鸡哥 | fix(api): improve sidebar badge injection and observation logic
+- 2026-07-06 | cebf9be6 | 鸡哥 | docs(api): update constructor signatures for BluetoothMonitor, WifiMonitor, SmtcMonitor, and PowerMonitor
+- 2026-07-06 | 0ef73d0c | 鸡哥 | docs(api): rewrite toast-listener API docs
+- 2026-07-06 | afbbcef7 | 鸡哥 | docs(api): rewrite smtc-helper API docs
+- 2026-07-06 | aed6ae1d | 鸡哥 | docs(api): rewrite processes-attacker API docs
+- 2026-07-06 | 49f62cfe | 鸡哥 | docs(api): rewrite performance-monitor API docs
+- 2026-07-06 | 69634ae4 | 鸡哥 | docs(api): rewrite power-helper API docs
+- 2026-07-06 | 50f48dec | 鸡哥 | docs(api): rewrite wifi-helper API docs
+- 2026-07-06 | 8615c67e | 鸡哥 | docs(api): rewrite bluetooth-helper API docs
+- 2026-07-06 | 7570ceff | 鸡哥 | docs(api): rewrite fullscreen-detector API docs
+- 2026-07-06 | cfc19c23 | 鸡哥 | docs(api): rewrite brightness-helper API docs
+- 2026-07-06 | d945a7a3 | 鸡哥 | fix: enable codeTabs in markdown configuration
+- 2026-07-06 | 3e175973 | 鸡哥 | fix: enhance sidebar badge injection with MutationObserver and click event handling
+- 2026-07-05 | 43d60987 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #124 by @JNTMTMTM [skip ci]
+- 2026-07-06 | 01803adc | 鸡哥 | Merge pull request #124 from JNTMTMTM/dev
+- 2026-07-06 | 4d205e9b | 鸡哥 | fix: update MiMo API endpoint to token-plan-cn.xiaomimimo.com
+- 2026-07-06 | fdd67d43 | 鸡哥 | refactor(renderer/api/ai/ollamaLocalAgent): remove unused import from MihtnelisAgentStreamEvent
+- 2026-07-06 | 41ee161d | 鸡哥 | refactor(renderer/api/site): move interfaces to co-located types/ folder
+- 2026-07-06 | b091044c | 鸡哥 | refactor(renderer/api/weather): move interfaces to co-located types/ folder
+- 2026-07-06 | 6d85a74e | 鸡哥 | refactor(renderer/api/user): move interfaces to co-located types/ folder
+- 2026-07-05 | 7a0058df | 鸡哥 | refactor(renderer/api/update): move interfaces to co-located types/ folder
+- 2026-07-05 | ab5a1c0c | 鸡哥 | refactor(renderer/api/tools): move interfaces to co-located types/ folder
+- 2026-07-05 | ea0e3fbf | 鸡哥 | refactor(renderer/api/miniGame): move interfaces to co-located types/ folder
+- 2026-07-05 | 83d12d91 | 鸡哥 | refactor(renderer/api/announcement): move interfaces to co-located types/ folder
+- 2026-07-05 | b57c7e98 | 鸡哥 | fix: remove unused MihtnelisAgentStreamEvent import
+- 2026-07-05 | e8d8d57a | 鸡哥 | fix: update type imports and ensure correct buffer type in Tencent STT
+- 2026-07-05 | 37223965 | 鸡哥 | refactor(renderer/api/ai): move interfaces to co-located types/ folder
+- 2026-07-05 | e6ad4c60 | 鸡哥 | revert: undo renderer centralized types migration
+- 2026-07-05 | d3950bcb | 鸡哥 | fix: remove duplicate FetchAgentPrompt interface definitions in mihtnelisAgentStream.ts
+- 2026-07-05 | 5e739018 | 鸡哥 | refactor(renderer/api): move exported interfaces to types/api/ folder
+- 2026-07-05 | c6d3f9e5 | 鸡哥 | refactor(main): move interfaces to types/ folder for architectural compliance
+- 2026-07-05 | 31ff4325 | 鸡哥 | refactor(agent): move interfaces to types/ folder for architectural compliance
+- 2026-07-05 | 832559a1 | 鸡哥 | feat: add first launch configuration handling
+- 2026-07-05 | e7957d6b | github-actions[bot] | docs: auto update CHANGE_LOG.md for #123 by @JNTMTMTM [skip ci]
+- 2026-07-05 | 1e1ee963 | 鸡哥 | Merge pull request #123 from JNTMTMTM/dev
+- 2026-07-05 | 0592f562 | 鸡哥 | docs: update documentation to reflect addition of splash screen and its lifecycle
+- 2026-07-05 | ffef3150 | 鸡哥 | feat: enhance splash screen video handling with IPC readiness notification
+- 2026-07-05 | c2bb9ef1 | 鸡哥 | fix: correct splash video source path for proper loading
+- 2026-07-05 | 69c6c225 | 鸡哥 | feat: update ffi-loader to use unpacked DLL paths for better compatibility
+- 2026-07-05 | 10f0c377 | 鸡哥 | ci: add workflows for deploying frpc config and summarizing issues with MiMo
+- 2026-07-05 | 2762276d | 鸡哥 | refactor: remove push trigger from test workflow for cleaner PR handling
+- 2026-07-05 | 464c8a55 | 鸡哥 | feat: update release workflow to include .NET SDK setup and build plugins step
+- 2026-07-05 | 1e76b086 | 鸡哥 | feat: add bulk operations for building and cleaning all plugins
+- 2026-07-05 | 45ce047e | 鸡哥 | feat: add plugin build and clean scripts for various components
+- 2026-07-05 | 8bea6ae4 | 鸡哥 | docs: update plugin commands and setup documentation for NativeAOT build requirements
+- 2026-07-05 | 5ea5a9f9 | 鸡哥 | feat: enable self-contained and static ICU for Bluetooth, Power, SMTC, and WiFi helpers
+- 2026-07-05 | 4f397708 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #122 by @JNTMTMTM [skip ci]
+- 2026-07-05 | cf70b90e | 鸡哥 | Merge pull request #122 from JNTMTMTM/dev
+- 2026-07-05 | e89faf97 | 鸡哥 | feat: add hover animation for lyrics translation state in CSS
+- 2026-07-05 | 1b78833e | 鸡哥 | fix: update import path for TranslationLyricsResult in useIslandStateBridges hook
+- 2026-07-05 | eb8f12b6 | 鸡哥 | feat: add lyrics and translation settings with event dispatch for state updates
+- 2026-07-05 | a78611d1 | 鸡哥 | feat: add translation lyrics feature with settings and IPC handlers
+- 2026-07-05 | 6b92c365 | 鸡哥 | feat: implement lyrics feature toggle with settings and IPC handlers
+- 2026-07-05 | adcca088 | 鸡哥 | refactor: enhance translation result functions with additional status descriptions
+- 2026-07-05 | 315d9941 | 鸡哥 | refactor: simplify filter and improve translation extraction logic in SodaMusic provider
+- 2026-07-05 | 5cd90337 | 鸡哥 | feat: enhance session emission logic to handle resuming from pause state
+- 2026-07-05 | 5ae68787 | 鸡哥 | feat: add lyricsTranslation state for displaying synchronized lyrics with translation
+- 2026-07-05 | 704f63ca | 鸡哥 | refactor: implement lyrics translation feature with new components and hooks
+- 2026-07-05 | 7bc5e233 | 鸡哥 | feat: add lyrics translation support with new component and state handling
+- 2026-07-05 | 17e06a6e | 鸡哥 | feat: add support for lyrics translation with dynamic window resizing and styling
+- 2026-07-05 | 0ab90670 | 鸡哥 | feat: update hover tab and related translations from 'o3ics' to 'lyrics'
+- 2026-07-05 | 07a11256 | 鸡哥 | feat: enhance translation lyrics handling in fetchLyricsWithTranslationFromSodaMusic
+- 2026-07-05 | d05ed856 | 鸡哥 | feat: add translation lyrics support and refactor related functions
+- 2026-07-05 | 89c2296d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #121 by @JNTMTMTM [skip ci]
+- 2026-07-05 | 87569abf | 鸡哥 | Merge pull request #121 from JNTMTMTM/dev
+- 2026-07-05 | 5d420707 | 鸡哥 | feat: set default bvid in fetchCurrentAnnouncement function
+- 2026-07-05 | b8cfc7ea | 鸡哥 | refactor: remove default bvid and simplify AnnouncementVideo rendering logic
+- 2026-07-05 | 056ac3ba | 鸡哥 | feat: enhance AnnouncementVideo styling with border radius and alignment adjustments
+- 2026-07-05 | 4a8e8561 | 鸡哥 | feat: add AnnouncementVideo component and integrate bvid support in announcements
+- 2026-07-05 | ce3b5ed9 | 鸡哥 | chore: revert version to 26.6.3 in package.json
+- 2026-07-05 | a0df81be | 鸡哥 | feat: update startupUpdateSource to include 'esa-cdn' in NotificationData interface
+- 2026-07-05 | 19c4cc64 | 鸡哥 | chore: update version to 26.6.4 and remove guide references from settings
+- 2026-07-05 | c2156b90 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #120 by @JNTMTMTM [skip ci]
+- 2026-07-05 | f778efd9 | 鸡哥 | Merge pull request #120 from JNTMTMTM/dev
+- 2026-07-05 | 2c44be66 | 鸡哥 | feat: update window mode settings and notifications for standalone mode in English and Chinese translations
+- 2026-07-05 | 76d50f11 | 鸡哥 | feat: add frame rate limit toggle in performance settings and update related configurations
+- 2026-07-04 | 113ded9a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #119 by @JNTMTMTM [skip ci]
+- 2026-07-05 | 4e797011 | 鸡哥 | Merge pull request #119 from JNTMTMTM/dev
+- 2026-07-05 | de84d038 | 鸡哥 | feat: add color prop to SplashWaveEffect for dynamic background color and update styling for splash video
+- 2026-07-04 | 306dfc58 | 鸡哥 | feat: add playing prop to SplashWaveEffect for controlled rendering
+- 2026-07-04 | 3e8a1bcc | 鸡哥 | feat: adjust splash preview container size and maintain aspect ratio
+- 2026-07-04 | 9ec01985 | 鸡哥 | feat: update splash screen preview controls and styling
+- 2026-07-04 | 57a86e1e | 鸡哥 | feat: add preview controls for splash animation in settings
+- 2026-07-04 | d1f016b3 | 鸡哥 | feat: enhance splash background color input styling in animation settings
+- 2026-07-04 | 32f05d72 | 鸡哥 | feat: add reset default option for splash background color in animation settings
+- 2026-07-04 | 74af80e9 | 鸡哥 | feat: implement dynamic background color for splash wave effect
+- 2026-07-04 | 969579fa | 鸡哥 | feat: add splash screen background color customization to animation settings
+- 2026-07-04 | 8ec73dc2 | 鸡哥 | feat: add startup animation settings to animation configuration
+- 2026-07-04 | 8ab05f86 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #118 by @JNTMTMTM [skip ci]
+- 2026-07-04 | 6da37593 | 鸡哥 | Merge pull request #118 from JNTMTMTM/dev
+- 2026-07-04 | 08deb75c | 鸡哥 | feat: enhance lyric synchronization with improved calibration timer management
+- 2026-07-04 | af30cadd | 鸡哥 | feat: enhance hover effects and transitions for improved UI responsiveness
+- 2026-07-04 | 2b1d7edb | github-actions[bot] | docs: auto update CHANGE_LOG.md for #117 by @JNTMTMTM [skip ci]
+- 2026-07-04 | 8f50d7bc | 鸡哥 | Merge pull request #117 from JNTMTMTM/dev
+- 2026-07-04 | 13ceb37b | 鸡哥 | feat: restructure SplashWaveEffect component and related shaders for improved organization and maintainability
+- 2026-07-04 | f542a0ef | 鸡哥 | feat: add startup animation settings and functionality
+- 2026-07-04 | dcc7073a | 鸡哥 | feat: add SplashWaveEffect component and update splash screen styles
+- 2026-07-04 | c9f33d33 | 鸡哥 | feat: increase splash window dimensions for improved visibility
+- 2026-07-04 | a7bd8a63 | 鸡哥 | Refactor code structure for improved readability and maintainability
+- 2026-07-04 | 3073f2d6 | 鸡哥 | feat: update splash screen post-video delay to align with renderer configuration
+- 2026-07-04 | 1cf0f436 | 鸡哥 | feat: refactor useSplash hook by extracting video and fade-out logic into separate hooks
+- 2026-07-04 | a4c395a6 | 鸡哥 | feat: refactor SplashScreen component and extract video logic into useSplash hook
+- 2026-07-04 | d054fcd6 | 鸡哥 | feat: enhance splash screen with video playback and improve layout styles
+- 2026-07-04 | 7ef83e4e | 鸡哥 | feat: add TypeScript declaration for .mp4 file imports
+- 2026-07-04 | 30c7131f | 鸡哥 | feat: update splash window behavior to show inactive state for improved user experience
+- 2026-07-04 | 7ebd6902 | 鸡哥 | feat: update splash container styles for improved visual consistency
+- 2026-07-04 | 66ffa37e | 鸡哥 | feat: simplify SplashScreen component and remove unused elements
+- 2026-07-04 | 27ea8822 | 鸡哥 | feat: add sign.mp4 video file for enhanced visual content
+- 2026-07-04 | d79dad23 | 鸡哥 | feat: add splash screen configuration constants and improve fade-out logic
+- 2026-07-04 | 205507bd | 鸡哥 | feat: refactor SplashScreen to use custom useSplash hook for improved state management
+- 2026-07-04 | e08954bd | 鸡哥 | feat: implement splash screen component and styles
+- 2026-07-04 | 05e72c4a | 鸡哥 | Merge pull request #116 from silenthim18303/dev
+- 2026-07-04 | 28bfb08f | 鸡哥 | refactor: update thumbnail handling in SMTC service and related interfaces
+- 2026-07-04 | f19cbb43 | 鸡哥 | refactor: optimize BuildSessionInfo and BuildMediaMetadata to control thumbnail refresh
+- 2026-07-04 | 9cd9f049 | silenthim | Merge branch 'JNTMTMTM:dev' into dev
+- 2026-07-04 | ef89f093 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #115 by @JNTMTMTM [skip ci]
+- 2026-07-04 | f54accbb | 鸡哥 | Merge pull request #115 from JNTMTMTM/dev
+- 2026-07-04 | d562ba79 | 鸡哥 | ci: update workflows to use pull_request_target for i18n and test checks
+- 2026-07-04 | 8aecedec | silenthim18303 | feat(ui): 添加Electron splash启动窗口
+- 2026-07-03 | 2126a40a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #113 by @JNTMTMTM [skip ci]
+- 2026-07-04 | b5b7c85b | 鸡哥 | Merge pull request #113 from JNTMTMTM/dev
+- 2026-07-04 | f831c3ca | 鸡哥 | ci: upgrade upload and download artifact actions to v5
+- 2026-07-04 | db97005d | 鸡哥 | docs: update i18n-check workflow permissions and upgrade download-artifact action to v5
+- 2026-07-03 | d7303d80 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #111 by @JNTMTMTM [skip ci]
+- 2026-07-03 | 5d328d40 | 鸡哥 | Merge pull request #111 from JNTMTMTM/dev
+- 2026-07-03 | 3929127d | 鸡哥 | docs(api-plugins): add return value examples to toast-listener documentation
+- 2026-07-03 | e5897b09 | 鸡哥 | docs(api-plugins): add return value examples to smtc-helper documentation
+- 2026-07-03 | 4313540c | 鸡哥 | docs(api-plugins): add return value examples to processes-attacker documentation
+- 2026-07-03 | ade368ff | 鸡哥 | docs(api-plugins): add return value examples to performance-monitor documentation
+- 2026-07-03 | 0acb714b | 鸡哥 | docs(api-plugins): add return value examples to power-helper documentation
+- 2026-07-03 | a6ffde41 | 鸡哥 | docs(api-plugins): add return value examples to fullscreen-detector documentation
+- 2026-07-03 | c8245eca | 鸡哥 | docs(api-plugins): add return value examples to brightness-helper documentation
+- 2026-07-03 | 90515d00 | 鸡哥 | docs(api-plugins): add return value examples to wifi-helper documentation
+- 2026-07-03 | cefba8df | 鸡哥 | docs(api-plugins): add return value examples to bluetooth-helper documentation
+- 2026-07-03 | 0ac4c1ee | 鸡哥 | docs(api-plugins): add code examples to toast-listener documentation
+- 2026-07-03 | 2e603211 | 鸡哥 | docs(api-plugins): add code examples to smtc-helper documentation
+- 2026-07-03 | a94cd461 | 鸡哥 | docs(api-plugins): add code examples to processes-attacker documentation
+- 2026-07-03 | 5efd29b9 | 鸡哥 | docs(api-plugins): add code examples to performance-monitor documentation
+- 2026-07-03 | 3411c2fa | 鸡哥 | docs(api-plugins): add code examples to power-helper documentation
+- 2026-07-03 | 073192c8 | 鸡哥 | docs(api-plugins): add code examples to fullscreen-detector documentation
+- 2026-07-03 | 5b625e6f | 鸡哥 | docs(api-plugins): add code examples to brightness-helper documentation
+- 2026-07-03 | 999f5b80 | 鸡哥 | docs(api-plugins): add code examples to wifi-helper documentation
+- 2026-07-03 | 16c088bf | 鸡哥 | docs(api-plugins): add code examples to bluetooth-helper documentation
+- 2026-07-03 | 635fa223 | 鸡哥 | docs(api-plugins): complete toast-listener API documentation
+- 2026-07-03 | a8f51aed | 鸡哥 | docs(api-plugins): complete smtc-helper API documentation
+- 2026-07-03 | 0c3227c5 | 鸡哥 | docs(api-plugins): complete processes-attacker API documentation
+- 2026-07-03 | 010d4bad | 鸡哥 | docs(api-plugins): complete performance-monitor API documentation
+- 2026-07-03 | e60e6861 | 鸡哥 | docs(api-plugins): complete power-helper API documentation
+- 2026-07-03 | 39011a04 | 鸡哥 | docs(api-plugins): complete fullscreen-detector API documentation
+- 2026-07-03 | 809bba46 | 鸡哥 | docs(api-plugins): complete brightness-helper API documentation
+- 2026-07-03 | a1f326e0 | 鸡哥 | docs(api-plugins): complete wifi-helper API documentation
+- 2026-07-03 | 54a1a9f5 | 鸡哥 | docs(api-plugins): complete bluetooth-helper API documentation
+- 2026-07-03 | 4115a803 | 鸡哥 | feat: add SidebarBadges component for automatic badge injection in sidebar API documentation
+- 2026-07-03 | 2925bd63 | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with additional device type classifications for robots, displays, keyboards, and more
+- 2026-07-03 | 17f9c5db | 鸡哥 | feat: enhance device type mappings in DeviceTypeMapper with additional classifications for peripherals and imaging devices
+- 2026-07-03 | 8f26fb36 | 鸡哥 | feat: add code quality documentation and standards for the eIsland project
+- 2026-07-03 | 33b36524 | 鸡哥 | feat: add DeviceTypeMapper for improved device type inference in BluetoothController
+- 2026-07-03 | 7b9f922a | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with additional device type classifications and clarifications
+- 2026-07-03 | 5584c8da | 鸡哥 | feat: enhance device type inference in DeriveDeviceType with additional BLE and classic Bluetooth classifications
+- 2026-07-03 | 46691a08 | 鸡哥 | feat: update device type descriptions in BluetoothDeviceInfo for audio/video devices
+- 2026-07-03 | ef34a3e5 | 鸡哥 | feat: enhance audio/video device classification in BluetoothController with detailed minor class descriptions
+- 2026-07-03 | e2e66de7 | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with detailed interface and device type derivation
+- 2026-07-03 | 5f84bf44 | 鸡哥 | feat: enhance device type description in BluetoothDeviceInfo and improve device type inference logic
+- 2026-07-02 | b04fa4ed | 鸡哥 | feat: refactor DLL paths and build scripts for SMTC and WiFi helpers, add AOT support, and implement JSON serialization context
+- 2026-07-02 | 50599a84 | 鸡哥 | feat: update power helper to use new DLL, improve serialization, and add AOT publishing support
+- 2026-07-02 | 0cd0b052 | 鸡哥 | feat: update Bluetooth helper to use new DLL and improve serialization with source generation
+- 2026-07-02 | e7b74a22 | 鸡哥 | feat: enhance Bluetooth device information retrieval by adding support for Appearance and Service UUIDs
+- 2026-07-01 | 80bde8c5 | 鸡哥 | feat: add deviceType and batteryLevel properties to BluetoothDeviceInfo and update related functionality
+- 2026-07-01 | 1365dc11 | 鸡哥 | Update icons for various API documentation pages to enhance visual representation
+- 2026-07-01 | 9a61bdc3 | 鸡哥 | Add watermark metadata to documentation files and create new README files for various plugins
+- 2026-07-01 | f1b8a040 | 鸡哥 | feat: update icon for Windows Bluetooth Helper in sidebar
+- 2026-07-01 | 0b1b91ff | 鸡哥 | feat: enable vertical scrolling for sidebar and restrict navbar overflow
+- 2026-06-30 | 58cf8f12 | 鸡哥 | feat: add sidebar width variable to root styles
+- 2026-06-30 | d4618363 | 鸡哥 | feat: enhance sidebar with new Windows helpers and reorganize sections
+- 2026-06-30 | 926d8e71 | 鸡哥 | Add documentation for media notifications and system power plugins
+- 2026-06-30 | 1ed2d825 | 鸡哥 | feat: update navbar to include [API] PLUGINS link and add .gitkeep for api-plugins directory
+- 2026-06-30 | 138d7229 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #110 by @JNTMTMTM [skip ci]
+- 2026-06-30 | f25fbe20 | 鸡哥 | Merge pull request #110 from JNTMTMTM/dev
+- 2026-06-30 | 9f63e421 | 鸡哥 | docs: remove reference to full testing strategy in testing commands documentation
+- 2026-06-30 | 66906efb | 鸡哥 | docs: update documentation for Windows Brightness Helper plugin
+- 2026-06-30 | 890f5c5a | 鸡哥 | fix: correct package name for Windows brightness helper plugin
+- 2026-06-30 | 84ed4211 | 鸡哥 | refactor: restructure brightness helper plugin to use standalone executable for brightness control and monitoring - Removed FFI and related files - Added new executable for brightness operations - Updated documentation and tests accordingly
+- 2026-06-30 | ab895443 | 鸡哥 | feat: add Windows brightness helper plugin with brightness control and monitoring
+- 2026-06-29 | 1c76a8da | github-actions[bot] | docs: auto update CHANGE_LOG.md for #109 by @JNTMTMTM [skip ci]
+- 2026-06-30 | d2833d3b | 鸡哥 | Merge pull request #109 from JNTMTMTM/dev
+- 2026-06-30 | bdf9245c | 鸡哥 | feat: add lyrics calibration settings and update search registration rules for settings UI
+- 2026-06-29 | 8969f07c | 鸡哥 | feat: add lightweight timestamp tests and update documentation for getTimestamp functionality
+- 2026-06-29 | 5057e132 | 鸡哥 | feat: add lyrics calibration settings and hints for improved timing accuracy
+- 2026-06-29 | 25cc0e03 | 鸡哥 | feat: add lyrics calibration settings and IPC handlers for enabling and delay
+- 2026-06-29 | 83cbeb10 | 鸡哥 | feat: implement lightweight timestamp retrieval for SMTC playback synchronization
+- 2026-06-29 | 3a629c22 | 鸡哥 | feat: add lightweight timestamp retrieval for media playback status and timeline
+- 2026-06-29 | 8ca7e2f9 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #108 by @JNTMTMTM [skip ci]
+- 2026-06-29 | b3059d72 | 鸡哥 | Merge pull request #108 from JNTMTMTM/dev
+- 2026-06-29 | e9323391 | 鸡哥 | feat: add TypeScript configuration files for Bluetooth, Power, and WiFi helper plugins
+- 2026-06-29 | 25ee379b | 鸡哥 | chore: update dependencies and improve test documentation
+- 2026-06-29 | d078f0ca | 鸡哥 | refactor: remove unused event handlers and optimize session management in SmtcSessionMonitor
+- 2026-06-29 | 7d836ce9 | 鸡哥 | refactor: optimize track matching and search logic in karaoke and lyrics providers
+- 2026-06-29 | c791ca73 | 鸡哥 | feat: add Windows WiFi Helper plugin documentation and commands
+- 2026-06-29 | d563cba8 | 鸡哥 | feat: add Windows WiFi helper plugin
+- 2026-06-29 | bc3df620 | 鸡哥 | feat: add Windows Power Helper plugin documentation and commands
+- 2026-06-29 | 90b30e70 | 鸡哥 | feat: improve logging messages in power monitoring tests for clarity
+- 2026-06-29 | 4a6ec5c1 | 鸡哥 | feat: add Windows power helper plugin with power monitoring capabilities
+- 2026-06-29 | 2a5cfd20 | 鸡哥 | feat: add Bluetooth Helper plugin documentation and update tech stack overview
+- 2026-06-29 | f3967d19 | 鸡哥 | feat: add Windows Bluetooth helper plugin with device monitoring capabilities
+- 2026-06-29 | 14488049 | 鸡哥 | feat: add searchWithScoring mock for improved lyric and media fetching tests
+- 2026-06-29 | 3e1ab5fb | 鸡哥 | feat: enhance session management with event unsubscription and thumbnail caching
+- 2026-06-29 | 92d9c367 | 鸡哥 | feat: comment out frame rate limit switch in Chromium performance flags
+- 2026-06-29 | ccb16037 | 鸡哥 | feat: integrate media control functions from @eisland/windows-smtc-helper and remove legacy virtual key handling
+- 2026-06-28 | a677e3e1 | 鸡哥 | feat: replace @coooookies/windows-smtc-monitor with @eisland/windows-smtc-helper and update related code
+- 2026-06-28 | d9c27863 | 鸡哥 | feat: enhance SMTC Helper documentation with new commands and monitoring features
+- 2026-06-28 | 893a2d98 | 鸡哥 | feat: add smoke tests for session monitoring and seeking functionality
+- 2026-06-28 | c9874b2c | 鸡哥 | feat: remove debug session count functions and streamline media status normalization
+- 2026-06-28 | 06ea59d5 | 鸡哥 | feat: Implement session monitoring and control commands
+- 2026-06-28 | ce38a685 | 鸡哥 | feat: add CodeGraph documentation and MCP server configuration
+- 2026-06-28 | 49bcc4ed | 鸡哥 | feat: add documentation skill for eIsland VuePress updates and establish core rules
+- 2026-06-28 | 2b0dbe25 | 鸡哥 | feat: enhance SMTC helper documentation with NativeAOT DLL details and build instructions
+- 2026-06-28 | a3d5ca81 | 鸡哥 | feat: add SMTC ctypes support with new DLL integration and testing framework
+- 2026-06-28 | f38cdd52 | 鸡哥 | feat: update plugin commands documentation with detailed tables and improved structure
+- 2026-06-28 | be82f0ea | 鸡哥 | feat: add plugin commands documentation and update sidebar
+- 2026-06-28 | 5d4b074a | 鸡哥 | feat: update documentation to include SMTC helper plugin and its functionalities
+- 2026-06-28 | 092d518e | 鸡哥 | feat: add smoke test for SMTC status functionality
+- 2026-06-28 | 03b2de89 | 鸡哥 | feat: enhance media status and playback controls with detailed properties and methods
+- 2026-06-28 | 276efec8 | 鸡哥 | feat: add Windows SMTC helper plugin to package.json and package-lock.json
+- 2026-06-28 | 3cfd84b3 | 鸡哥 | feat: add comprehensive testing and smoke tests for SMTC play, pause, next, and previous functionalities
+- 2026-06-28 | aabd04ab | 鸡哥 | feat: add Windows SMTC helper with core functionality and tests
+- 2026-06-28 | 4958c6e4 | 鸡哥 | feat: enhance lyrics fetching with multi-strategy search and scoring
+- 2026-06-28 | 80554d2b | 鸡哥 | feat: add support for fetching lyrics from MoeKoe Music via WebSocket
+- 2026-06-27 | d4bd77e0 | 鸡哥 | feat: reorganize and enhance documentation for development, testing, packaging, quality, and release commands
+- 2026-06-27 | 792ecd19 | 鸡哥 | feat: add Development Commands documentation and NPM Scripts reference
+- 2026-06-27 | b68aedd2 | 鸡哥 | feat: expand GitHub operations documentation with detailed workflows, prerequisites, and pull request guidelines
+- 2026-06-26 | f7c274a8 | 鸡哥 | feat: enhance local Git operations documentation with detailed commands and workflows
+- 2026-06-25 | d0a4c6c9 | 鸡哥 | feat: add Git operations documentation and update README with links to local and GitHub workflows
+- 2026-06-25 | c44b73db | 鸡哥 | feat: add LTO configuration details and explanation to plugin setup documentation
+- 2026-06-25 | 6bd40bf7 | 鸡哥 | feat: enhance plugin setup documentation with detailed installation instructions and component requirements
+- 2026-06-25 | 2a2ec51c | 鸡哥 | feat: update frontend setup documentation with additional prerequisites and installation instructions for build tools
+- 2026-06-24 | 0171a517 | 鸡哥 | feat: enhance backend setup documentation with comprehensive environment configuration details
+- 2026-06-24 | b5e9e9de | 鸡哥 | feat: add JSON processing section and module details to backend dependencies documentation
+- 2026-06-24 | 78d4682c | 鸡哥 | feat: add backend dependencies documentation and update sidebar links
+- 2026-06-24 | d4dc99da | 鸡哥 | feat: update project dependencies documentation with comprehensive descriptions and new libraries
+- 2026-06-24 | ec4bdc39 | 鸡哥 | feat: add project dependencies documentation and enforce admonition syntax in all files
+- 2026-06-23 | 83647a43 | 鸡哥 | feat: enhance suppression functionality in toast listener
+- 2026-06-23 | 3ca7cef1 | 鸡哥 | feat: add suppression functionality to toast listener
+- 2026-06-23 | 6855a1c6 | 鸡哥 | feat: update frontend setup documentation with forking and cloning instructions
+- 2026-06-23 | e20264b5 | 鸡哥 | feat: enhance toast listener with polling mechanism and event-driven testing
+- 2026-06-23 | fabb0316 | 鸡哥 | chore: update .gitignore and package files for coverage tools
+- 2026-06-23 | b0bbbe3c | 鸡哥 | feat: enhance frontend setup documentation with detailed command usage
+- 2026-06-23 | 93393dfc | 鸡哥 | feat: expand frontend setup documentation for eIsland development
+- 2026-06-23 | 87a01e31 | 鸡哥 | feat: reorganize developer documentation for improved clarity and structure
+- 2026-06-23 | 5eb201e0 | 鸡哥 | feat: introduce developer documentation section with comprehensive guides
+- 2026-06-23 | 5b0184a6 | 鸡哥 | chore: remove commit message rules file
+- 2026-06-23 | 38f9a427 | 鸡哥 | feat: extend toast listener functionality with additional source files
+- 2026-06-23 | 85740c24 | 鸡哥 | feat: enhance toast listener functionality with notification retrieval improvements
+- 2026-06-23 | eef02d9b | 鸡哥 | feat: add common.gypi files for multiple Windows plugins
+- 2026-06-23 | 999df193 | 鸡哥 | chore: enhance testing scripts for eisland-windows-toast-listener plugin
+- 2026-06-23 | c898d4d7 | 鸡哥 | chore: update binding.gyp files for Windows plugins to disable link-time code generation
+- 2026-06-23 | 5101543b | 鸡哥 | chore: update package-lock.json to remove unused dependencies and add new ones
+- 2026-06-23 | 95928792 | 鸡哥 | feat: add testing framework and configuration for windows-toast-listener plugin
+- 2026-06-23 | 2233fed3 | 鸡哥 | refactor: simplify toast listener implementation and improve memory management
+- 2026-06-23 | 9937e39a | 鸡哥 | feat: add windows-toast-listener plugin to package configuration
+- 2026-06-23 | 11ed89df | 鸡哥 | feat: enhance documentation with additional references and links for clarity
+- 2026-06-22 | fd34752f | 鸡哥 | feat: expand CLAUDE.md with comprehensive documentation structure and standards
+- 2026-06-22 | 31390b91 | 鸡哥 | feat: update README title and restructure introduction for clarity
+- 2026-06-22 | df2cb0ed | 鸡哥 | feat: reorganize sidebar and remove outdated documents for improved navigation
+- 2026-06-22 | 6eff4e5a | 鸡哥 | feat: refine sidebar structure by adding Frontend and Backend Architecture sections
+- 2026-06-22 | 2f2c4cc6 | 鸡哥 | feat: add "rabbitmq-schema.md" to sidebar for improved documentation navigation
+- 2026-06-22 | e92e9280 | 鸡哥 | feat: enhance redis-schema.md with detailed Lua scripts and parameters
+- 2026-06-22 | c60f7e7f | 鸡哥 | feat: add "redis-schema.md" to sidebar for improved documentation navigation
+- 2026-06-22 | 492380d1 | 鸡哥 | feat: add "mysql-schema.md" to sidebar for improved documentation navigation
+- 2026-06-22 | 44321aa0 | 鸡哥 | feat: add "server-model.md" to sidebar for improved documentation navigation
+- 2026-06-22 | c653cd21 | 鸡哥 | feat: update titles in documentation for consistency and clarity
+- 2026-06-22 | fe22b93f | 鸡哥 | feat: add "process-model" to sidebar for enhanced documentation navigation
+- 2026-06-22 | 4d6dd9a7 | 鸡哥 | feat: expand state machine documentation with detailed state definitions and configurations
+- 2026-06-22 | 88a4e8c4 | 鸡哥 | feat: add Architecture section to sidebar for improved documentation structure
+- 2026-06-22 | c94b3ee2 | 鸡哥 | feat: update navbar and theme configuration for enhanced accessibility and branding
+- 2026-06-22 | e20363b6 | 鸡哥 | feat: add @vuepress/plugin-git for enhanced version control in documentation
+- 2026-06-22 | ac733898 | 鸡哥 | feat: add watermark feature and update theme configuration for improved documentation aesthetics
+- 2026-06-22 | 98c22f06 | 鸡哥 | feat: add docsBranch property to theme configuration for better version control
+- 2026-06-22 | 8570c1a8 | 鸡哥 | feat: update theme configuration for documentation repository and edit link
+- 2026-06-22 | 7ead3b60 | 鸡哥 | feat: add slimsearch and watermark plugins to enhance search and watermarking capabilities
+- 2026-06-22 | b02f104c | 鸡哥 | fix: update testing documentation with accurate test file and test count
+- 2026-06-22 | 84fd6156 | 鸡哥 | feat: enhance documentation across multiple tech stack sections with improved clarity and security guidelines
+- 2026-06-22 | 964a88c2 | 鸡哥 | feat: enhance styling for navbar, sidebar, and footer with frosted glass effect
+- 2026-06-22 | 1cab848e | 鸡哥 | feat: update navbar and sidebar icons for improved clarity and organization
+- 2026-06-21 | 849bf837 | 鸡哥 | feat: enhance documentation for .NET Temperature Helper and hardware enumeration
+- 2026-06-21 | 59a79bec | 鸡哥 | feat: add comprehensive documentation for eIsland's native Node.js addon plugins
+- 2026-06-21 | e9ca3734 | 鸡哥 | feat: update frontend tech stack documentation with detailed architecture and key dependencies
+- 2026-06-21 | a4642c56 | 鸡哥 | feat: enhance backend tech stack documentation with Alipay integration details
+- 2026-06-21 | a018ce41 | 鸡哥 | feat: enhance AI integration documentation with detailed architecture and tool execution overview
+- 2026-06-21 | dd01c2a7 | 鸡哥 | feat: enhance backend tech stack documentation with detailed JWT authentication implementation
+- 2026-06-21 | fbf1050c | 鸡哥 | feat: enhance backend tech stack documentation with detailed MySQL and MyBatis configurations
+- 2026-06-21 | d4ba5312 | 鸡哥 | feat: update backend tech stack documentation with Redis integration details and caching strategies
+- 2026-06-21 | eaf9d5b5 | 鸡哥 | fix: update API link in navbar for accurate navigation
+- 2026-06-21 | 148baed7 | 鸡哥 | feat: update navbar and sidebar for improved navigation and documentation clarity
+- 2026-06-20 | 12ae4b56 | 鸡哥 | feat: add Code of Conduct link to sidebar for improved community guidelines
+- 2026-06-20 | 81ae4aed | 鸡哥 | style: enable dark mode and enhance active link styles
+- 2026-06-20 | dd8e5383 | 鸡哥 | style: enhance sidebar link styles for improved visibility
+- 2026-06-20 | 7d3fc29d | 鸡哥 | feat: enhance navigation with introduction section in navbar and sidebar
+- 2026-06-20 | c5bfa305 | 鸡哥 | style: update navbar text and enhance page styles
+- 2026-06-20 | 9800fe6a | 鸡哥 | refactor: update navbar and theme hostname in VuePress configuration
+- 2026-06-20 | e001db57 | 鸡哥 | fix: update footer configuration in VuePress theme
+- 2026-06-20 | e25c2353 | 鸡哥 | refactor: update documentation site configuration and styles
+- 2026-06-20 | 29026003 | 鸡哥 | chore: update project metadata and remove unused files
+- 2026-06-20 | a27b1e42 | 鸡哥 | feat: initialize eisland-web-docs with essential files and configurations
+- 2026-06-20 | 08b54fdc | 鸡哥 | feat: initialize eisland-web project with core files and configurations
 
 ## 26.6.3
 
@@ -2276,475 +2755,9 @@
 
 ## Unreleased
 
-- 2026-07-09 | 095f095a | 鸡哥 | Merge pull request #137 from JNTMTMTM/dev
-- 2026-07-09 | ff7dc101 | 鸡哥 | fix: update import paths for ESA client in purge cache scripts
-- 2026-07-09 | 31bc231f | 鸡哥 | feat: reorganize ESA cache scripts and update command references in package.json and documentation
-- 2026-07-09 | 7b33828a | 鸡哥 | feat: add scripts to purge ESA cache by URL and hostname
-- 2026-07-09 | 9298b8fb | 鸡哥 | feat: add ESA cache commands documentation and update related command references
-- 2026-07-09 | ed39c79e | 鸡哥 | refactor: remove redundant ESA cache purge steps from deployment workflow
-- 2026-07-09 | 81d44287 | 鸡哥 | feat: implement ESA cache purge script and update deployment workflow
-- 2026-07-09 | 254f7a4e | 鸡哥 | feat: update release upload scripts to include ESA cache purge
-- 2026-07-09 | c4bb5bd5 | 鸡哥 | feat: add script to purge ESA cache and update dependencies
-- 2026-07-09 | a11a5076 | eislandBot | docs: auto update CHANGE_LOG.md for #136 by @JNTMTMTM [skip ci]
-- 2026-07-09 | 9a092a05 | 鸡哥 | Merge pull request #136 from JNTMTMTM/dev
-- 2026-07-09 | 81cbdd91 | 鸡哥 | feat: enhance caching mechanism and improve opacity settings in theme hooks
-- 2026-07-09 | fe5b4204 | 鸡哥 | feat: add module entry and type definitions for guide steps and process indicators
-- 2026-07-09 | 75d5f428 | 鸡哥 | feat: update language options to use CountryIcon for icons
-- 2026-07-09 | f58d2d35 | 鸡哥 | feat: add logic to control guide window display on startup
-- 2026-07-09 | 6203b904 | 鸡哥 | feat: implement guide reset functionality with success and error feedback
-- 2026-07-09 | 00fd29ef | 鸡哥 | feat: add guide reset functionality and update related UI components
-- 2026-07-09 | 9dcbff18 | 鸡哥 | feat: add license and dependencies section to GitHub guide and update styles
-- 2026-07-09 | 1eba9ddd | 鸡哥 | feat: refactor project links configuration and add ProjectLink interface
-- 2026-07-09 | 98f9974e | 鸡哥 | feat: update project links and enhance button styles for better usability
-- 2026-07-09 | 51ad28ad | 鸡哥 | feat: add SVG icons for DEVELOPER, DOCS, and WEBSITE and update SvgIcon references
-- 2026-07-09 | 5ca976f9 | 鸡哥 | feat: add devDocs link to GitHub step and update styles for better alignment
-- 2026-07-09 | e80f0d0c | 鸡哥 | feat: add GitHub information step to guide with corresponding translations and styles
-- 2026-07-09 | 09121a6a | 鸡哥 | feat: refactor update source option types and hook for improved structure and clarity
-- 2026-07-09 | df4aa6d8 | 鸡哥 | feat: add icons to update source options and style adjustments for better presentation
-- 2026-07-09 | 45012fe7 | 鸡哥 | feat: add service icons for CLOUDFLARE and ALIBABACLOUD with corresponding tests
-- 2026-07-09 | 07ae54e1 | 鸡哥 | feat: update update source handling in SettingsTab for improved source selection
-- 2026-07-09 | 36e754a7 | 鸡哥 | feat: add update source selection step to guide with corresponding translations and styles
-- 2026-07-09 | 5faee30a | 鸡哥 | feat: update theme mode button styles for improved layout
-- 2026-07-09 | f732d4f0 | 鸡哥 | feat: enhance theme selection with icons and update styles
-- 2026-07-09 | 8b10c370 | 鸡哥 | feat: add broadcast setting change mock to media IPC tests
-- 2026-07-09 | 3f1434c5 | 鸡哥 | feat: update SVG icon registration to include player icons and corresponding test files
-- 2026-07-09 | 15be6934 | 鸡哥 | feat: add new theme icons for dark, light, and follow system modes
-- 2026-07-09 | 5f7ab34a | 鸡哥 | fix: remove flex property from theme mode button for better layout control
-- 2026-07-09 | 11b08f08 | 鸡哥 | feat: add theme selection step with opacity adjustment to guide
-- 2026-07-08 | 3fefa8a0 | 鸡哥 | feat: add video component to welcome step and create corresponding styles
-- 2026-07-08 | fb13ddf3 | 鸡哥 | feat: add welcome step to guide with completion and navigation functionality
-- 2026-07-08 | 98dc5047 | 鸡哥 | fix: adjust position of guide process indicator for better alignment
-- 2026-07-08 | d90ff042 | 鸡哥 | feat: integrate ProcessIndicator into guide steps and update styles
-- 2026-07-08 | eb4f971d | 鸡哥 | feat: synchronize whitelist selection with real-time updates and improve state management
-- 2026-07-08 | 5a85ae22 | 鸡哥 | feat: add whitelist configuration step with player selection and styling
-- 2026-07-08 | 53f09473 | 鸡哥 | feat: implement dynamic process segment states with animation effects and testing
-- 2026-07-08 | 94a9ae16 | 鸡哥 | feat: enhance useProcessIndicator to support regressing animation and update segment status types
-- 2026-07-08 | f19d1f7b | 鸡哥 | feat: optimize progress indicator logic and improve CSS for segment states
-- 2026-07-08 | c725f685 | 鸡哥 | feat: refactor progress animation constants and types for better modularity
-- 2026-07-08 | 0000e1a1 | 鸡哥 | feat: implement useProcessIndicator hook for managing progress segment states
-- 2026-07-08 | b00cf4b7 | 鸡哥 | feat: enhance ProcessIndicator with animation effects for progress segments
-- 2026-07-08 | 405dedc4 | 鸡哥 | style: update process indicator styles for improved appearance
-- 2026-07-08 | e56fea12 | 鸡哥 | feat: enhance guide steps with ProcessIndicator and step tracking
-- 2026-07-08 | 86b37662 | 鸡哥 | feat: add ProcessIndicator component with styles and types
-- 2026-07-08 | 4cf3c8d1 | 鸡哥 | refactor: move GuideStep type to a new file and create additional type files
-- 2026-07-08 | 2ed67c52 | 鸡哥 | refactor: restructure SMTC module by creating a new test directory
-- 2026-07-08 | ff99dca0 | 鸡哥 | refactor: simplify ESA cache purge script and update variable names
-- 2026-07-08 | dffda8d9 | eislandBot | docs: auto update CHANGE_LOG.md for #135 by @JNTMTMTM [skip ci]
-- 2026-07-08 | 9f29037b | 鸡哥 | Merge pull request #135 from JNTMTMTM/dev
-- 2026-07-08 | 411b19d3 | 鸡哥 | fix: update native module names in package commands documentation
-- 2026-07-08 | 7f5e0134 | 鸡哥 | feat: update publish workflow to include GitHub Packages and additional plugins
-- 2026-07-08 | 5d4e82f4 | 鸡哥 | feat: add postinstall scripts and GitHub workflow for publishing plugins to npm
-- 2026-07-08 | 5876970c | 鸡哥 | fix: update plugin paths and documentation for fullscreen detector and performance monitor
-- 2026-07-08 | cca10505 | 鸡哥 | fix: update plugin paths for fullscreen and performance monitor in package.json
-- 2026-07-08 | 0fd31960 | 鸡哥 | feat: add Windows performance monitor plugin with CPU, memory, and temperature snapshots
-- 2026-07-08 | 5291f65c | 鸡哥 | feat: Add artifact extraction and ESA cache purge steps to deployment workflow
-- 2026-07-07 | 24a40915 | eislandBot | docs: auto update CHANGE_LOG.md for #133 by @JNTMTMTM [skip ci]
-- 2026-07-08 | 015f9fe2 | 鸡哥 | Merge pull request #133 from JNTMTMTM/dev
-- 2026-07-08 | 35210db2 | 鸡哥 | fix: Enhance rsync deployment configuration with additional options
-- 2026-07-07 | 29f2bc70 | eislandBot | docs: auto update CHANGE_LOG.md for #132 by @JNTMTMTM [skip ci]
-- 2026-07-08 | 82b61618 | 鸡哥 | Merge pull request #132 from JNTMTMTM/dev
-- 2026-07-08 | a49d4e97 | 鸡哥 | fix: Correct title casing in Electron Windows documentation
-- 2026-07-08 | 8debe7f1 | 鸡哥 | feat: Add documentation for new configurations and APIs
-- 2026-07-08 | b115c221 | 鸡哥 | feat: Add services and configurations for identity verification, static asset URL rewriting, toolbox software management, TOTP security, user banning, and wallpaper marketplace
-- 2026-07-08 | bd53beba | 鸡哥 | docs: update API endpoint paths in README files for consistency
-- 2026-07-08 | 654e4002 | 鸡哥 | docs: update sidebar icons and remove obsolete configuration link
-- 2026-07-07 | 011aa581 | 鸡哥 | docs: fix sidebar abbreviations to module-specific names
-- 2026-07-07 | b2e3f576 | 鸡哥 | docs: restructure sidebar with eASS naming convention
-- 2026-07-07 | 7159412b | 鸡哥 | Revert "docs: add sidebar configuration for all API backend modules"
-- 2026-07-07 | 4c329639 | 鸡哥 | docs: add sidebar configuration for all API backend modules
-- 2026-07-07 | 2a9d4daa | 鸡哥 | docs: update API backend README with all modules
-- 2026-07-07 | 7a5c9536 | 鸡哥 | docs: add server-app and server-common documentation
-- 2026-07-07 | cd6a9a93 | 鸡哥 | docs: add server-version and server-weather documentation
-- 2026-07-07 | 3a4c4967 | 鸡哥 | docs: add server-mini-game, server-service-status, server-upload documentation
-- 2026-07-07 | 422db866 | 鸡哥 | docs: add server-user module documentation
-- 2026-07-07 | fac06a40 | 鸡哥 | docs: add server-payment module documentation
-- 2026-07-07 | 4973c89e | 鸡哥 | docs: add server-auth module documentation
-- 2026-07-07 | 35465531 | 鸡哥 | fix: update main window URL and script source for Dynamic Island integration
-- 2026-07-07 | c9805de9 | 鸡哥 | Remove deprecated configuration and data type documentation for various agent components, including STT WebSocket, Redis usage, prompt builders, and translation services. This cleanup enhances the clarity and maintainability of the documentation by eliminating obsolete references and files.
-- 2026-07-07 | cb95a2cf | 鸡哥 | feat: update sidebar structure and enhance eisland Agent Services documentation
-- 2026-07-07 | eecf4d77 | 鸡哥 | Add documentation for Mihtnelis agent properties, prompt builders, and data types
-- 2026-07-07 | 4561a632 | 鸡哥 | feat: add API Backend and Frontend documentation with navigation updates
-- 2026-07-07 | 4f05e96b | 鸡哥 | feat: add Electron Windows documentation and update state machine details
-- 2026-07-07 | fed7b509 | 鸡哥 | refactor: restructure renderer components and HTML files
-- 2026-07-07 | 6a6d79ae | eislandBot | docs: auto update CHANGE_LOG.md for #131 by @JNTMTMTM [skip ci]
-- 2026-07-07 | d9491a89 | 鸡哥 | Merge pull request #131 from JNTMTMTM/dev
-- 2026-07-07 | 06c2ab60 | 鸡哥 | feat: add Dynamic Island wave effect components and utilities
-- 2026-07-07 | 169590e4 | 鸡哥 | feat: refactor WaveEffect component and hooks; improve color handling and WebGL initialization
-- 2026-07-07 | 56baa0d1 | 鸡哥 | feat: implement wave rendering functions and refactor useWaveRenderer hook
-- 2026-07-07 | e0820e5a | 鸡哥 | feat: refactor SMTC module types and improve WebGL context initialization
-- 2026-07-07 | 751189cb | 鸡哥 | feat: add unknown player label and improve player name extraction; update accent color handling
-- 2026-07-07 | 8f403fa6 | 鸡哥 | feat: mock windows application icon helper in appHelpers tests
-- 2026-07-07 | 2abdf350 | 鸡哥 | feat: refactor player icon handling and add PlayerIcon utility
-- 2026-07-07 | 01a36355 | 鸡哥 | feat: add player icons and update SmtcStep component to display them
-- 2026-07-07 | 48bfb479 | 鸡哥 | Add SVG icons for various music players
-- 2026-07-07 | 75741764 | 鸡哥 | fix: remove unnecessary await from showGuideWindow call
-- 2026-07-07 | 4db33ea5 | 鸡哥 | feat: add media control buttons and update layout for SmtcStep component
-- 2026-07-07 | c1c4418b | 鸡哥 | feat: implement useMarqueeOverflow hook for overflow detection and refactor MarqueeText component
-- 2026-07-07 | 92495d87 | 鸡哥 | feat: add MarqueeText component for scrolling text and update styles for title, artist, and album
-- 2026-07-07 | c50fbe71 | 鸡哥 | feat: add accent color support to WaveEffect and related hooks
-- 2026-07-07 | 8d8db9b9 | 鸡哥 | feat: remove retry functionality from SMTC media test and update related styles and hooks
-- 2026-07-07 | 11f715c0 | 鸡哥 | feat: refactor SMTC media test by removing unused time formatting and updating related hooks and types
-- 2026-07-07 | e17f51c1 | 鸡哥 | feat: refactor SMTC media test by moving utility functions to a new module and updating imports
-- 2026-07-07 | 1287c2d3 | 鸡哥 | feat: refactor SMTC check to SMTC media test with enhanced UI and functionality
-- 2026-07-06 | 943fb2a4 | 鸡哥 | feat: update skill name for guide step creation to reflect new functionality
-- 2026-07-06 | c82a7c4c | 鸡哥 | feat: add guide step creation documentation and structure
-- 2026-07-06 | f5df2a67 | 鸡哥 | feat: add guide step creation documentation and structure
-- 2026-07-06 | cbe11874 | 鸡哥 | feat: add base, step, language, and smtc styles for guide configuration window
-- 2026-07-06 | 8223c84f | 鸡哥 | feat: add SMTC check step to guide with localization support and enhance styles
-- 2026-07-06 | 3922e5f9 | 鸡哥 | feat: enhance guide next button styles for improved usability
-- 2026-07-06 | 1bb4ccf2 | 鸡哥 | feat: add multiple language options to language selection step and enhance styles
-- 2026-07-06 | 0c4afc95 | 鸡哥 | feat: add subtitle to language selection step and enhance layout styles
-- 2026-07-06 | 04d3e306 | 鸡哥 | feat: add language selection step to guide with localization support
-- 2026-07-06 | fdd21e73 | 鸡哥 | refactor: replace SplashWaveEffect with WaveEffect and restructure related files
-- 2026-07-06 | ef8325cf | 鸡哥 | feat: enhance guide window with new styles and splash wave effect
-- 2026-07-06 | 4b764b16 | 鸡哥 | feat: add guide window for initial configuration and related components
-- 2026-07-06 | eea743e0 | 鸡哥 | Merge commit '3586e7c9c52c10b57ccaf6fb7414dccdd1e01a7d' into dev
-- 2026-07-06 | 3586e7c9 | eislandBot | docs: auto update CHANGE_LOG.md for #130 by @JNTMTMTM [skip ci]
-- 2026-07-06 | c86228a6 | 鸡哥 | Merge pull request #130 from JNTMTMTM/dev
-- 2026-07-06 | bd56f396 | 鸡哥 | feat: implement isCurrentLyricIdenticalToTranslation utility and refactor related components
-- 2026-07-06 | 4d0cff37 | 鸡哥 | feat: add new Windows helper plugins for Bluetooth, brightness, power, processes, and WiFi
-- 2026-07-06 | 1603c324 | 鸡哥 | fix: fallback to GITHUB_TOKEN when BOT_PAT is unavailable in workflow files
-- 2026-07-06 | a0bc7cc7 | 鸡哥 | Refactor preload types into separate modules
-- 2026-07-06 | 76c3cb22 | 鸡哥 | feat(preload): enhance API with type definitions and improve return types
-- 2026-07-06 | 19dcf802 | 鸡哥 | feat: enhance lyrics translation handling by checking for identical original and translated lyrics
-- 2026-07-06 | 7bab1fec | 鸡哥 | fix: update license link to point to the GNU General Public License v3.0
-- 2026-07-06 | 75edcba3 | 鸡哥 | fix: update depsTitle in English and Chinese localizations for clarity
-- 2026-07-06 | 2db77d0a | 鸡哥 | feat: add configuration and type definitions for download, image compression, mail, net, and updater modules
-- 2026-07-06 | b892a02f | 鸡哥 | feat: add windows application icon helper for improved file icon retrieval
-- 2026-07-06 | 20b7e147 | eislandBot | docs: auto update CHANGE_LOG.md for #129 by @JNTMTMTM [skip ci]
-- 2026-07-06 | 4f6b6a08 | 鸡哥 | Merge pull request #129 from JNTMTMTM/dev
-- 2026-07-06 | b8cea4d3 | 鸡哥 | fix: update workflows to fall back to GITHUB_TOKEN when BOT_PAT is unavailable
-- 2026-07-06 | ed41cdd9 | 鸡哥 | fix: update workflows to enhance changelog updates and fallback token handling
-- 2026-07-06 | 91d3de95 | 鸡哥 | fix: update issue templates to improve clarity and consistency in descriptions and labels
-- 2026-07-06 | b653b1cd | 鸡哥 | fix: update comments and labels in workflow files to improve clarity and consistency
-- 2026-07-06 | dbe6063f | 鸡哥 | fix: update GitHub token to use BOT_PAT in workflow files
-- 2026-07-06 | ff71ace0 | 鸡哥 | fix: update GitHub token to use BOT_PAT for release build and upload
-- 2026-07-06 | 21f6aa09 | 鸡哥 | fix: update bot configuration for CHANGE_LOG.md commits
-- 2026-07-06 | 688a3fef | 鸡哥 | fix: update download action in deploy workflow to use actions/download-artifact@v4
-- 2026-07-06 | 6b54a00d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #128 by @JNTMTMTM [skip ci]
-- 2026-07-06 | 2e32cea7 | 鸡哥 | Merge pull request #128 from JNTMTMTM/dev
-- 2026-07-06 | 6f4c1c0d | 鸡哥 | fix: update artifact download action in deploy workflow
-- 2026-07-06 | f870d46f | 鸡哥 | feat: add GitHub Actions workflow for deploying documentation
-- 2026-07-06 | a3898881 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #127 by @JNTMTMTM [skip ci]
-- 2026-07-06 | 575a400b | 鸡哥 | Merge pull request #127 from JNTMTMTM/dev
-- 2026-07-06 | 3433d380 | 鸡哥 | fix: update icon retrieval functions to return IconResult structure and improve documentation
-- 2026-07-06 | e06cb76e | 鸡哥 | fix: update return type in README for icon functions to reflect correct data structure
-- 2026-07-06 | f52102a7 | 鸡哥 | fix: ensure proper COM initialization and uninitialization in IconExtractor
-- 2026-07-06 | 987870ac | 鸡哥 | fix: update return type annotations in icon retrieval functions for clarity
-- 2026-07-06 | 852e3fd5 | 鸡哥 | feat: add detailed file headers and descriptions to test files and configuration
-- 2026-07-06 | 60458f52 | 鸡哥 | fix: update links in documentation for consistency and accuracy
-- 2026-07-06 | 7bc609d1 | 鸡哥 | feat: enhance API plugin documentation with sidebar badge registration guidelines
-- 2026-07-06 | d5d04111 | 鸡哥 | feat: add IconResult interface to badge mapping in SidebarBadges.vue
-- 2026-07-06 | f750c929 | 鸡哥 | feat: enhance icon retrieval functions to return structured IconResult and add documentation for new interface
-- 2026-07-06 | dbc5b261 | 鸡哥 | feat: update icon retrieval functions to return structured IconResult with size and format
-- 2026-07-06 | a6c55f56 | 鸡哥 | feat: add Windows Application Icon Helper plugin and documentation
-- 2026-07-06 | 5a2dabc2 | 鸡哥 | feat: add support for extracting icons from shortcut files
-- 2026-07-06 | 943f5cd6 | 鸡哥 | feat(tests): add smoke tests for icon extraction by process name, PID, and path
-- 2026-07-06 | f3c5c608 | 鸡哥 | feat: add Windows application icon helper plugin with icon extraction capabilities
-- 2026-07-06 | c0091f6e | github-actions[bot] | docs: auto update CHANGE_LOG.md for #126 by @JNTMTMTM [skip ci]
-- 2026-07-06 | df8f6f29 | 鸡哥 | Merge pull request #126 from JNTMTMTM/dev
-- 2026-07-06 | 6e991025 | 鸡哥 | chore(workflows): remove MiMo summary and review workflows
-- 2026-07-06 | 94f9acfb | 鸡哥 | fix(api): improve sidebar badge injection and observation logic
-- 2026-07-06 | cebf9be6 | 鸡哥 | docs(api): update constructor signatures for BluetoothMonitor, WifiMonitor, SmtcMonitor, and PowerMonitor
-- 2026-07-06 | 0ef73d0c | 鸡哥 | docs(api): rewrite toast-listener API docs
-- 2026-07-06 | afbbcef7 | 鸡哥 | docs(api): rewrite smtc-helper API docs
-- 2026-07-06 | aed6ae1d | 鸡哥 | docs(api): rewrite processes-attacker API docs
-- 2026-07-06 | 49f62cfe | 鸡哥 | docs(api): rewrite performance-monitor API docs
-- 2026-07-06 | 69634ae4 | 鸡哥 | docs(api): rewrite power-helper API docs
-- 2026-07-06 | 50f48dec | 鸡哥 | docs(api): rewrite wifi-helper API docs
-- 2026-07-06 | 8615c67e | 鸡哥 | docs(api): rewrite bluetooth-helper API docs
-- 2026-07-06 | 7570ceff | 鸡哥 | docs(api): rewrite fullscreen-detector API docs
-- 2026-07-06 | cfc19c23 | 鸡哥 | docs(api): rewrite brightness-helper API docs
-- 2026-07-06 | d945a7a3 | 鸡哥 | fix: enable codeTabs in markdown configuration
-- 2026-07-06 | 3e175973 | 鸡哥 | fix: enhance sidebar badge injection with MutationObserver and click event handling
-- 2026-07-05 | 43d60987 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #124 by @JNTMTMTM [skip ci]
-- 2026-07-06 | 01803adc | 鸡哥 | Merge pull request #124 from JNTMTMTM/dev
-- 2026-07-06 | 4d205e9b | 鸡哥 | fix: update MiMo API endpoint to token-plan-cn.xiaomimimo.com
-- 2026-07-06 | fdd67d43 | 鸡哥 | refactor(renderer/api/ai/ollamaLocalAgent): remove unused import from MihtnelisAgentStreamEvent
-- 2026-07-06 | 41ee161d | 鸡哥 | refactor(renderer/api/site): move interfaces to co-located types/ folder
-- 2026-07-06 | b091044c | 鸡哥 | refactor(renderer/api/weather): move interfaces to co-located types/ folder
-- 2026-07-06 | 6d85a74e | 鸡哥 | refactor(renderer/api/user): move interfaces to co-located types/ folder
-- 2026-07-05 | 7a0058df | 鸡哥 | refactor(renderer/api/update): move interfaces to co-located types/ folder
-- 2026-07-05 | ab5a1c0c | 鸡哥 | refactor(renderer/api/tools): move interfaces to co-located types/ folder
-- 2026-07-05 | ea0e3fbf | 鸡哥 | refactor(renderer/api/miniGame): move interfaces to co-located types/ folder
-- 2026-07-05 | 83d12d91 | 鸡哥 | refactor(renderer/api/announcement): move interfaces to co-located types/ folder
-- 2026-07-05 | b57c7e98 | 鸡哥 | fix: remove unused MihtnelisAgentStreamEvent import
-- 2026-07-05 | e8d8d57a | 鸡哥 | fix: update type imports and ensure correct buffer type in Tencent STT
-- 2026-07-05 | 37223965 | 鸡哥 | refactor(renderer/api/ai): move interfaces to co-located types/ folder
-- 2026-07-05 | e6ad4c60 | 鸡哥 | revert: undo renderer centralized types migration
-- 2026-07-05 | d3950bcb | 鸡哥 | fix: remove duplicate FetchAgentPrompt interface definitions in mihtnelisAgentStream.ts
-- 2026-07-05 | 5e739018 | 鸡哥 | refactor(renderer/api): move exported interfaces to types/api/ folder
-- 2026-07-05 | c6d3f9e5 | 鸡哥 | refactor(main): move interfaces to types/ folder for architectural compliance
-- 2026-07-05 | 31ff4325 | 鸡哥 | refactor(agent): move interfaces to types/ folder for architectural compliance
-- 2026-07-05 | 832559a1 | 鸡哥 | feat: add first launch configuration handling
-- 2026-07-05 | e7957d6b | github-actions[bot] | docs: auto update CHANGE_LOG.md for #123 by @JNTMTMTM [skip ci]
-- 2026-07-05 | 1e1ee963 | 鸡哥 | Merge pull request #123 from JNTMTMTM/dev
-- 2026-07-05 | 0592f562 | 鸡哥 | docs: update documentation to reflect addition of splash screen and its lifecycle
-- 2026-07-05 | ffef3150 | 鸡哥 | feat: enhance splash screen video handling with IPC readiness notification
-- 2026-07-05 | c2bb9ef1 | 鸡哥 | fix: correct splash video source path for proper loading
-- 2026-07-05 | 69c6c225 | 鸡哥 | feat: update ffi-loader to use unpacked DLL paths for better compatibility
-- 2026-07-05 | 10f0c377 | 鸡哥 | ci: add workflows for deploying frpc config and summarizing issues with MiMo
-- 2026-07-05 | 2762276d | 鸡哥 | refactor: remove push trigger from test workflow for cleaner PR handling
-- 2026-07-05 | 464c8a55 | 鸡哥 | feat: update release workflow to include .NET SDK setup and build plugins step
-- 2026-07-05 | 1e76b086 | 鸡哥 | feat: add bulk operations for building and cleaning all plugins
-- 2026-07-05 | 45ce047e | 鸡哥 | feat: add plugin build and clean scripts for various components
-- 2026-07-05 | 8bea6ae4 | 鸡哥 | docs: update plugin commands and setup documentation for NativeAOT build requirements
-- 2026-07-05 | 5ea5a9f9 | 鸡哥 | feat: enable self-contained and static ICU for Bluetooth, Power, SMTC, and WiFi helpers
-- 2026-07-05 | 4f397708 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #122 by @JNTMTMTM [skip ci]
-- 2026-07-05 | cf70b90e | 鸡哥 | Merge pull request #122 from JNTMTMTM/dev
-- 2026-07-05 | e89faf97 | 鸡哥 | feat: add hover animation for lyrics translation state in CSS
-- 2026-07-05 | 1b78833e | 鸡哥 | fix: update import path for TranslationLyricsResult in useIslandStateBridges hook
-- 2026-07-05 | eb8f12b6 | 鸡哥 | feat: add lyrics and translation settings with event dispatch for state updates
-- 2026-07-05 | a78611d1 | 鸡哥 | feat: add translation lyrics feature with settings and IPC handlers
-- 2026-07-05 | 6b92c365 | 鸡哥 | feat: implement lyrics feature toggle with settings and IPC handlers
-- 2026-07-05 | adcca088 | 鸡哥 | refactor: enhance translation result functions with additional status descriptions
-- 2026-07-05 | 315d9941 | 鸡哥 | refactor: simplify filter and improve translation extraction logic in SodaMusic provider
-- 2026-07-05 | 5cd90337 | 鸡哥 | feat: enhance session emission logic to handle resuming from pause state
-- 2026-07-05 | 5ae68787 | 鸡哥 | feat: add lyricsTranslation state for displaying synchronized lyrics with translation
-- 2026-07-05 | 704f63ca | 鸡哥 | refactor: implement lyrics translation feature with new components and hooks
-- 2026-07-05 | 7bc5e233 | 鸡哥 | feat: add lyrics translation support with new component and state handling
-- 2026-07-05 | 17e06a6e | 鸡哥 | feat: add support for lyrics translation with dynamic window resizing and styling
-- 2026-07-05 | 0ab90670 | 鸡哥 | feat: update hover tab and related translations from 'o3ics' to 'lyrics'
-- 2026-07-05 | 07a11256 | 鸡哥 | feat: enhance translation lyrics handling in fetchLyricsWithTranslationFromSodaMusic
-- 2026-07-05 | d05ed856 | 鸡哥 | feat: add translation lyrics support and refactor related functions
-- 2026-07-05 | 89c2296d | github-actions[bot] | docs: auto update CHANGE_LOG.md for #121 by @JNTMTMTM [skip ci]
-- 2026-07-05 | 87569abf | 鸡哥 | Merge pull request #121 from JNTMTMTM/dev
-- 2026-07-05 | 5d420707 | 鸡哥 | feat: set default bvid in fetchCurrentAnnouncement function
-- 2026-07-05 | b8cfc7ea | 鸡哥 | refactor: remove default bvid and simplify AnnouncementVideo rendering logic
-- 2026-07-05 | 056ac3ba | 鸡哥 | feat: enhance AnnouncementVideo styling with border radius and alignment adjustments
-- 2026-07-05 | 4a8e8561 | 鸡哥 | feat: add AnnouncementVideo component and integrate bvid support in announcements
-- 2026-07-05 | ce3b5ed9 | 鸡哥 | chore: revert version to 26.6.3 in package.json
-- 2026-07-05 | a0df81be | 鸡哥 | feat: update startupUpdateSource to include 'esa-cdn' in NotificationData interface
-- 2026-07-05 | 19c4cc64 | 鸡哥 | chore: update version to 26.6.4 and remove guide references from settings
-- 2026-07-05 | c2156b90 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #120 by @JNTMTMTM [skip ci]
-- 2026-07-05 | f778efd9 | 鸡哥 | Merge pull request #120 from JNTMTMTM/dev
-- 2026-07-05 | 2c44be66 | 鸡哥 | feat: update window mode settings and notifications for standalone mode in English and Chinese translations
-- 2026-07-05 | 76d50f11 | 鸡哥 | feat: add frame rate limit toggle in performance settings and update related configurations
-- 2026-07-04 | 113ded9a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #119 by @JNTMTMTM [skip ci]
-- 2026-07-05 | 4e797011 | 鸡哥 | Merge pull request #119 from JNTMTMTM/dev
-- 2026-07-05 | de84d038 | 鸡哥 | feat: add color prop to SplashWaveEffect for dynamic background color and update styling for splash video
-- 2026-07-04 | 306dfc58 | 鸡哥 | feat: add playing prop to SplashWaveEffect for controlled rendering
-- 2026-07-04 | 3e8a1bcc | 鸡哥 | feat: adjust splash preview container size and maintain aspect ratio
-- 2026-07-04 | 9ec01985 | 鸡哥 | feat: update splash screen preview controls and styling
-- 2026-07-04 | 57a86e1e | 鸡哥 | feat: add preview controls for splash animation in settings
-- 2026-07-04 | d1f016b3 | 鸡哥 | feat: enhance splash background color input styling in animation settings
-- 2026-07-04 | 32f05d72 | 鸡哥 | feat: add reset default option for splash background color in animation settings
-- 2026-07-04 | 74af80e9 | 鸡哥 | feat: implement dynamic background color for splash wave effect
-- 2026-07-04 | 969579fa | 鸡哥 | feat: add splash screen background color customization to animation settings
-- 2026-07-04 | 8ec73dc2 | 鸡哥 | feat: add startup animation settings to animation configuration
-- 2026-07-04 | 8ab05f86 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #118 by @JNTMTMTM [skip ci]
-- 2026-07-04 | 6da37593 | 鸡哥 | Merge pull request #118 from JNTMTMTM/dev
-- 2026-07-04 | 08deb75c | 鸡哥 | feat: enhance lyric synchronization with improved calibration timer management
-- 2026-07-04 | af30cadd | 鸡哥 | feat: enhance hover effects and transitions for improved UI responsiveness
-- 2026-07-04 | 2b1d7edb | github-actions[bot] | docs: auto update CHANGE_LOG.md for #117 by @JNTMTMTM [skip ci]
-- 2026-07-04 | 8f50d7bc | 鸡哥 | Merge pull request #117 from JNTMTMTM/dev
-- 2026-07-04 | 13ceb37b | 鸡哥 | feat: restructure SplashWaveEffect component and related shaders for improved organization and maintainability
-- 2026-07-04 | f542a0ef | 鸡哥 | feat: add startup animation settings and functionality
-- 2026-07-04 | dcc7073a | 鸡哥 | feat: add SplashWaveEffect component and update splash screen styles
-- 2026-07-04 | c9f33d33 | 鸡哥 | feat: increase splash window dimensions for improved visibility
-- 2026-07-04 | a7bd8a63 | 鸡哥 | Refactor code structure for improved readability and maintainability
-- 2026-07-04 | 3073f2d6 | 鸡哥 | feat: update splash screen post-video delay to align with renderer configuration
-- 2026-07-04 | 1cf0f436 | 鸡哥 | feat: refactor useSplash hook by extracting video and fade-out logic into separate hooks
-- 2026-07-04 | a4c395a6 | 鸡哥 | feat: refactor SplashScreen component and extract video logic into useSplash hook
-- 2026-07-04 | d054fcd6 | 鸡哥 | feat: enhance splash screen with video playback and improve layout styles
-- 2026-07-04 | 7ef83e4e | 鸡哥 | feat: add TypeScript declaration for .mp4 file imports
-- 2026-07-04 | 30c7131f | 鸡哥 | feat: update splash window behavior to show inactive state for improved user experience
-- 2026-07-04 | 7ebd6902 | 鸡哥 | feat: update splash container styles for improved visual consistency
-- 2026-07-04 | 66ffa37e | 鸡哥 | feat: simplify SplashScreen component and remove unused elements
-- 2026-07-04 | 27ea8822 | 鸡哥 | feat: add sign.mp4 video file for enhanced visual content
-- 2026-07-04 | d79dad23 | 鸡哥 | feat: add splash screen configuration constants and improve fade-out logic
-- 2026-07-04 | 205507bd | 鸡哥 | feat: refactor SplashScreen to use custom useSplash hook for improved state management
-- 2026-07-04 | e08954bd | 鸡哥 | feat: implement splash screen component and styles
-- 2026-07-04 | 05e72c4a | 鸡哥 | Merge pull request #116 from silenthim18303/dev
-- 2026-07-04 | 28bfb08f | 鸡哥 | refactor: update thumbnail handling in SMTC service and related interfaces
-- 2026-07-04 | f19cbb43 | 鸡哥 | refactor: optimize BuildSessionInfo and BuildMediaMetadata to control thumbnail refresh
-- 2026-07-04 | 9cd9f049 | silenthim | Merge branch 'JNTMTMTM:dev' into dev
-- 2026-07-04 | ef89f093 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #115 by @JNTMTMTM [skip ci]
-- 2026-07-04 | f54accbb | 鸡哥 | Merge pull request #115 from JNTMTMTM/dev
-- 2026-07-04 | d562ba79 | 鸡哥 | ci: update workflows to use pull_request_target for i18n and test checks
-- 2026-07-04 | 8aecedec | silenthim18303 | feat(ui): 添加Electron splash启动窗口
-- 2026-07-03 | 2126a40a | github-actions[bot] | docs: auto update CHANGE_LOG.md for #113 by @JNTMTMTM [skip ci]
-- 2026-07-04 | b5b7c85b | 鸡哥 | Merge pull request #113 from JNTMTMTM/dev
-- 2026-07-04 | f831c3ca | 鸡哥 | ci: upgrade upload and download artifact actions to v5
-- 2026-07-04 | db97005d | 鸡哥 | docs: update i18n-check workflow permissions and upgrade download-artifact action to v5
-- 2026-07-03 | d7303d80 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #111 by @JNTMTMTM [skip ci]
-- 2026-07-03 | 5d328d40 | 鸡哥 | Merge pull request #111 from JNTMTMTM/dev
-- 2026-07-03 | 3929127d | 鸡哥 | docs(api-plugins): add return value examples to toast-listener documentation
-- 2026-07-03 | e5897b09 | 鸡哥 | docs(api-plugins): add return value examples to smtc-helper documentation
-- 2026-07-03 | 4313540c | 鸡哥 | docs(api-plugins): add return value examples to processes-attacker documentation
-- 2026-07-03 | ade368ff | 鸡哥 | docs(api-plugins): add return value examples to performance-monitor documentation
-- 2026-07-03 | 0acb714b | 鸡哥 | docs(api-plugins): add return value examples to power-helper documentation
-- 2026-07-03 | a6ffde41 | 鸡哥 | docs(api-plugins): add return value examples to fullscreen-detector documentation
-- 2026-07-03 | c8245eca | 鸡哥 | docs(api-plugins): add return value examples to brightness-helper documentation
-- 2026-07-03 | 90515d00 | 鸡哥 | docs(api-plugins): add return value examples to wifi-helper documentation
-- 2026-07-03 | cefba8df | 鸡哥 | docs(api-plugins): add return value examples to bluetooth-helper documentation
-- 2026-07-03 | 0ac4c1ee | 鸡哥 | docs(api-plugins): add code examples to toast-listener documentation
-- 2026-07-03 | 2e603211 | 鸡哥 | docs(api-plugins): add code examples to smtc-helper documentation
-- 2026-07-03 | a94cd461 | 鸡哥 | docs(api-plugins): add code examples to processes-attacker documentation
-- 2026-07-03 | 5efd29b9 | 鸡哥 | docs(api-plugins): add code examples to performance-monitor documentation
-- 2026-07-03 | 3411c2fa | 鸡哥 | docs(api-plugins): add code examples to power-helper documentation
-- 2026-07-03 | 073192c8 | 鸡哥 | docs(api-plugins): add code examples to fullscreen-detector documentation
-- 2026-07-03 | 5b625e6f | 鸡哥 | docs(api-plugins): add code examples to brightness-helper documentation
-- 2026-07-03 | 999f5b80 | 鸡哥 | docs(api-plugins): add code examples to wifi-helper documentation
-- 2026-07-03 | 16c088bf | 鸡哥 | docs(api-plugins): add code examples to bluetooth-helper documentation
-- 2026-07-03 | 635fa223 | 鸡哥 | docs(api-plugins): complete toast-listener API documentation
-- 2026-07-03 | a8f51aed | 鸡哥 | docs(api-plugins): complete smtc-helper API documentation
-- 2026-07-03 | 0c3227c5 | 鸡哥 | docs(api-plugins): complete processes-attacker API documentation
-- 2026-07-03 | 010d4bad | 鸡哥 | docs(api-plugins): complete performance-monitor API documentation
-- 2026-07-03 | e60e6861 | 鸡哥 | docs(api-plugins): complete power-helper API documentation
-- 2026-07-03 | 39011a04 | 鸡哥 | docs(api-plugins): complete fullscreen-detector API documentation
-- 2026-07-03 | 809bba46 | 鸡哥 | docs(api-plugins): complete brightness-helper API documentation
-- 2026-07-03 | a1f326e0 | 鸡哥 | docs(api-plugins): complete wifi-helper API documentation
-- 2026-07-03 | 54a1a9f5 | 鸡哥 | docs(api-plugins): complete bluetooth-helper API documentation
-- 2026-07-03 | 4115a803 | 鸡哥 | feat: add SidebarBadges component for automatic badge injection in sidebar API documentation
-- 2026-07-03 | 2925bd63 | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with additional device type classifications for robots, displays, keyboards, and more
-- 2026-07-03 | 17f9c5db | 鸡哥 | feat: enhance device type mappings in DeviceTypeMapper with additional classifications for peripherals and imaging devices
-- 2026-07-03 | 8f26fb36 | 鸡哥 | feat: add code quality documentation and standards for the eIsland project
-- 2026-07-03 | 33b36524 | 鸡哥 | feat: add DeviceTypeMapper for improved device type inference in BluetoothController
-- 2026-07-03 | 7b9f922a | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with additional device type classifications and clarifications
-- 2026-07-03 | 5584c8da | 鸡哥 | feat: enhance device type inference in DeriveDeviceType with additional BLE and classic Bluetooth classifications
-- 2026-07-03 | 46691a08 | 鸡哥 | feat: update device type descriptions in BluetoothDeviceInfo for audio/video devices
-- 2026-07-03 | ef34a3e5 | 鸡哥 | feat: enhance audio/video device classification in BluetoothController with detailed minor class descriptions
-- 2026-07-03 | e2e66de7 | 鸡哥 | feat: enhance BluetoothDeviceInfo documentation with detailed interface and device type derivation
-- 2026-07-03 | 5f84bf44 | 鸡哥 | feat: enhance device type description in BluetoothDeviceInfo and improve device type inference logic
-- 2026-07-02 | b04fa4ed | 鸡哥 | feat: refactor DLL paths and build scripts for SMTC and WiFi helpers, add AOT support, and implement JSON serialization context
-- 2026-07-02 | 50599a84 | 鸡哥 | feat: update power helper to use new DLL, improve serialization, and add AOT publishing support
-- 2026-07-02 | 0cd0b052 | 鸡哥 | feat: update Bluetooth helper to use new DLL and improve serialization with source generation
-- 2026-07-02 | e7b74a22 | 鸡哥 | feat: enhance Bluetooth device information retrieval by adding support for Appearance and Service UUIDs
-- 2026-07-01 | 80bde8c5 | 鸡哥 | feat: add deviceType and batteryLevel properties to BluetoothDeviceInfo and update related functionality
-- 2026-07-01 | 1365dc11 | 鸡哥 | Update icons for various API documentation pages to enhance visual representation
-- 2026-07-01 | 9a61bdc3 | 鸡哥 | Add watermark metadata to documentation files and create new README files for various plugins
-- 2026-07-01 | f1b8a040 | 鸡哥 | feat: update icon for Windows Bluetooth Helper in sidebar
-- 2026-07-01 | 0b1b91ff | 鸡哥 | feat: enable vertical scrolling for sidebar and restrict navbar overflow
-- 2026-06-30 | 58cf8f12 | 鸡哥 | feat: add sidebar width variable to root styles
-- 2026-06-30 | d4618363 | 鸡哥 | feat: enhance sidebar with new Windows helpers and reorganize sections
-- 2026-06-30 | 926d8e71 | 鸡哥 | Add documentation for media notifications and system power plugins
-- 2026-06-30 | 1ed2d825 | 鸡哥 | feat: update navbar to include [API] PLUGINS link and add .gitkeep for api-plugins directory
-- 2026-06-30 | 138d7229 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #110 by @JNTMTMTM [skip ci]
-- 2026-06-30 | f25fbe20 | 鸡哥 | Merge pull request #110 from JNTMTMTM/dev
-- 2026-06-30 | 9f63e421 | 鸡哥 | docs: remove reference to full testing strategy in testing commands documentation
-- 2026-06-30 | 66906efb | 鸡哥 | docs: update documentation for Windows Brightness Helper plugin
-- 2026-06-30 | 890f5c5a | 鸡哥 | fix: correct package name for Windows brightness helper plugin
-- 2026-06-30 | 84ed4211 | 鸡哥 | refactor: restructure brightness helper plugin to use standalone executable for brightness control and monitoring - Removed FFI and related files - Added new executable for brightness operations - Updated documentation and tests accordingly
-- 2026-06-30 | ab895443 | 鸡哥 | feat: add Windows brightness helper plugin with brightness control and monitoring
-- 2026-06-29 | 1c76a8da | github-actions[bot] | docs: auto update CHANGE_LOG.md for #109 by @JNTMTMTM [skip ci]
-- 2026-06-30 | d2833d3b | 鸡哥 | Merge pull request #109 from JNTMTMTM/dev
-- 2026-06-30 | bdf9245c | 鸡哥 | feat: add lyrics calibration settings and update search registration rules for settings UI
-- 2026-06-29 | 8969f07c | 鸡哥 | feat: add lightweight timestamp tests and update documentation for getTimestamp functionality
-- 2026-06-29 | 5057e132 | 鸡哥 | feat: add lyrics calibration settings and hints for improved timing accuracy
-- 2026-06-29 | 25cc0e03 | 鸡哥 | feat: add lyrics calibration settings and IPC handlers for enabling and delay
-- 2026-06-29 | 83cbeb10 | 鸡哥 | feat: implement lightweight timestamp retrieval for SMTC playback synchronization
-- 2026-06-29 | 3a629c22 | 鸡哥 | feat: add lightweight timestamp retrieval for media playback status and timeline
-- 2026-06-29 | 8ca7e2f9 | github-actions[bot] | docs: auto update CHANGE_LOG.md for #108 by @JNTMTMTM [skip ci]
-- 2026-06-29 | b3059d72 | 鸡哥 | Merge pull request #108 from JNTMTMTM/dev
-- 2026-06-29 | e9323391 | 鸡哥 | feat: add TypeScript configuration files for Bluetooth, Power, and WiFi helper plugins
-- 2026-06-29 | 25ee379b | 鸡哥 | chore: update dependencies and improve test documentation
-- 2026-06-29 | d078f0ca | 鸡哥 | refactor: remove unused event handlers and optimize session management in SmtcSessionMonitor
-- 2026-06-29 | 7d836ce9 | 鸡哥 | refactor: optimize track matching and search logic in karaoke and lyrics providers
-- 2026-06-29 | c791ca73 | 鸡哥 | feat: add Windows WiFi Helper plugin documentation and commands
-- 2026-06-29 | d563cba8 | 鸡哥 | feat: add Windows WiFi helper plugin
-- 2026-06-29 | bc3df620 | 鸡哥 | feat: add Windows Power Helper plugin documentation and commands
-- 2026-06-29 | 90b30e70 | 鸡哥 | feat: improve logging messages in power monitoring tests for clarity
-- 2026-06-29 | 4a6ec5c1 | 鸡哥 | feat: add Windows power helper plugin with power monitoring capabilities
-- 2026-06-29 | 2a5cfd20 | 鸡哥 | feat: add Bluetooth Helper plugin documentation and update tech stack overview
-- 2026-06-29 | f3967d19 | 鸡哥 | feat: add Windows Bluetooth helper plugin with device monitoring capabilities
-- 2026-06-29 | 14488049 | 鸡哥 | feat: add searchWithScoring mock for improved lyric and media fetching tests
-- 2026-06-29 | 3e1ab5fb | 鸡哥 | feat: enhance session management with event unsubscription and thumbnail caching
-- 2026-06-29 | 92d9c367 | 鸡哥 | feat: comment out frame rate limit switch in Chromium performance flags
-- 2026-06-29 | ccb16037 | 鸡哥 | feat: integrate media control functions from @eisland/windows-smtc-helper and remove legacy virtual key handling
-- 2026-06-28 | a677e3e1 | 鸡哥 | feat: replace @coooookies/windows-smtc-monitor with @eisland/windows-smtc-helper and update related code
-- 2026-06-28 | d9c27863 | 鸡哥 | feat: enhance SMTC Helper documentation with new commands and monitoring features
-- 2026-06-28 | 893a2d98 | 鸡哥 | feat: add smoke tests for session monitoring and seeking functionality
-- 2026-06-28 | c9874b2c | 鸡哥 | feat: remove debug session count functions and streamline media status normalization
-- 2026-06-28 | 06ea59d5 | 鸡哥 | feat: Implement session monitoring and control commands
-- 2026-06-28 | ce38a685 | 鸡哥 | feat: add CodeGraph documentation and MCP server configuration
-- 2026-06-28 | 49bcc4ed | 鸡哥 | feat: add documentation skill for eIsland VuePress updates and establish core rules
-- 2026-06-28 | 2b0dbe25 | 鸡哥 | feat: enhance SMTC helper documentation with NativeAOT DLL details and build instructions
-- 2026-06-28 | a3d5ca81 | 鸡哥 | feat: add SMTC ctypes support with new DLL integration and testing framework
-- 2026-06-28 | f38cdd52 | 鸡哥 | feat: update plugin commands documentation with detailed tables and improved structure
-- 2026-06-28 | be82f0ea | 鸡哥 | feat: add plugin commands documentation and update sidebar
-- 2026-06-28 | 5d4b074a | 鸡哥 | feat: update documentation to include SMTC helper plugin and its functionalities
-- 2026-06-28 | 092d518e | 鸡哥 | feat: add smoke test for SMTC status functionality
-- 2026-06-28 | 03b2de89 | 鸡哥 | feat: enhance media status and playback controls with detailed properties and methods
-- 2026-06-28 | 276efec8 | 鸡哥 | feat: add Windows SMTC helper plugin to package.json and package-lock.json
-- 2026-06-28 | 3cfd84b3 | 鸡哥 | feat: add comprehensive testing and smoke tests for SMTC play, pause, next, and previous functionalities
-- 2026-06-28 | aabd04ab | 鸡哥 | feat: add Windows SMTC helper with core functionality and tests
-- 2026-06-28 | 4958c6e4 | 鸡哥 | feat: enhance lyrics fetching with multi-strategy search and scoring
-- 2026-06-28 | 80554d2b | 鸡哥 | feat: add support for fetching lyrics from MoeKoe Music via WebSocket
-- 2026-06-27 | d4bd77e0 | 鸡哥 | feat: reorganize and enhance documentation for development, testing, packaging, quality, and release commands
-- 2026-06-27 | 792ecd19 | 鸡哥 | feat: add Development Commands documentation and NPM Scripts reference
-- 2026-06-27 | b68aedd2 | 鸡哥 | feat: expand GitHub operations documentation with detailed workflows, prerequisites, and pull request guidelines
-- 2026-06-26 | f7c274a8 | 鸡哥 | feat: enhance local Git operations documentation with detailed commands and workflows
-- 2026-06-25 | d0a4c6c9 | 鸡哥 | feat: add Git operations documentation and update README with links to local and GitHub workflows
-- 2026-06-25 | c44b73db | 鸡哥 | feat: add LTO configuration details and explanation to plugin setup documentation
-- 2026-06-25 | 6bd40bf7 | 鸡哥 | feat: enhance plugin setup documentation with detailed installation instructions and component requirements
-- 2026-06-25 | 2a2ec51c | 鸡哥 | feat: update frontend setup documentation with additional prerequisites and installation instructions for build tools
-- 2026-06-24 | 0171a517 | 鸡哥 | feat: enhance backend setup documentation with comprehensive environment configuration details
-- 2026-06-24 | b5e9e9de | 鸡哥 | feat: add JSON processing section and module details to backend dependencies documentation
-- 2026-06-24 | 78d4682c | 鸡哥 | feat: add backend dependencies documentation and update sidebar links
-- 2026-06-24 | d4dc99da | 鸡哥 | feat: update project dependencies documentation with comprehensive descriptions and new libraries
-- 2026-06-24 | ec4bdc39 | 鸡哥 | feat: add project dependencies documentation and enforce admonition syntax in all files
-- 2026-06-23 | 83647a43 | 鸡哥 | feat: enhance suppression functionality in toast listener
-- 2026-06-23 | 3ca7cef1 | 鸡哥 | feat: add suppression functionality to toast listener
-- 2026-06-23 | 6855a1c6 | 鸡哥 | feat: update frontend setup documentation with forking and cloning instructions
-- 2026-06-23 | e20264b5 | 鸡哥 | feat: enhance toast listener with polling mechanism and event-driven testing
-- 2026-06-23 | fabb0316 | 鸡哥 | chore: update .gitignore and package files for coverage tools
-- 2026-06-23 | b0bbbe3c | 鸡哥 | feat: enhance frontend setup documentation with detailed command usage
-- 2026-06-23 | 93393dfc | 鸡哥 | feat: expand frontend setup documentation for eIsland development
-- 2026-06-23 | 87a01e31 | 鸡哥 | feat: reorganize developer documentation for improved clarity and structure
-- 2026-06-23 | 5eb201e0 | 鸡哥 | feat: introduce developer documentation section with comprehensive guides
-- 2026-06-23 | 5b0184a6 | 鸡哥 | chore: remove commit message rules file
-- 2026-06-23 | 38f9a427 | 鸡哥 | feat: extend toast listener functionality with additional source files
-- 2026-06-23 | 85740c24 | 鸡哥 | feat: enhance toast listener functionality with notification retrieval improvements
-- 2026-06-23 | eef02d9b | 鸡哥 | feat: add common.gypi files for multiple Windows plugins
-- 2026-06-23 | 999df193 | 鸡哥 | chore: enhance testing scripts for eisland-windows-toast-listener plugin
-- 2026-06-23 | c898d4d7 | 鸡哥 | chore: update binding.gyp files for Windows plugins to disable link-time code generation
-- 2026-06-23 | 5101543b | 鸡哥 | chore: update package-lock.json to remove unused dependencies and add new ones
-- 2026-06-23 | 95928792 | 鸡哥 | feat: add testing framework and configuration for windows-toast-listener plugin
-- 2026-06-23 | 2233fed3 | 鸡哥 | refactor: simplify toast listener implementation and improve memory management
-- 2026-06-23 | 9937e39a | 鸡哥 | feat: add windows-toast-listener plugin to package configuration
-- 2026-06-23 | 11ed89df | 鸡哥 | feat: enhance documentation with additional references and links for clarity
-- 2026-06-22 | fd34752f | 鸡哥 | feat: expand CLAUDE.md with comprehensive documentation structure and standards
-- 2026-06-22 | 31390b91 | 鸡哥 | feat: update README title and restructure introduction for clarity
-- 2026-06-22 | df2cb0ed | 鸡哥 | feat: reorganize sidebar and remove outdated documents for improved navigation
-- 2026-06-22 | 6eff4e5a | 鸡哥 | feat: refine sidebar structure by adding Frontend and Backend Architecture sections
-- 2026-06-22 | 2f2c4cc6 | 鸡哥 | feat: add "rabbitmq-schema.md" to sidebar for improved documentation navigation
-- 2026-06-22 | e92e9280 | 鸡哥 | feat: enhance redis-schema.md with detailed Lua scripts and parameters
-- 2026-06-22 | c60f7e7f | 鸡哥 | feat: add "redis-schema.md" to sidebar for improved documentation navigation
-- 2026-06-22 | 492380d1 | 鸡哥 | feat: add "mysql-schema.md" to sidebar for improved documentation navigation
-- 2026-06-22 | 44321aa0 | 鸡哥 | feat: add "server-model.md" to sidebar for improved documentation navigation
-- 2026-06-22 | c653cd21 | 鸡哥 | feat: update titles in documentation for consistency and clarity
-- 2026-06-22 | fe22b93f | 鸡哥 | feat: add "process-model" to sidebar for enhanced documentation navigation
-- 2026-06-22 | 4d6dd9a7 | 鸡哥 | feat: expand state machine documentation with detailed state definitions and configurations
-- 2026-06-22 | 88a4e8c4 | 鸡哥 | feat: add Architecture section to sidebar for improved documentation structure
-- 2026-06-22 | c94b3ee2 | 鸡哥 | feat: update navbar and theme configuration for enhanced accessibility and branding
-- 2026-06-22 | e20363b6 | 鸡哥 | feat: add @vuepress/plugin-git for enhanced version control in documentation
-- 2026-06-22 | ac733898 | 鸡哥 | feat: add watermark feature and update theme configuration for improved documentation aesthetics
-- 2026-06-22 | 98c22f06 | 鸡哥 | feat: add docsBranch property to theme configuration for better version control
-- 2026-06-22 | 8570c1a8 | 鸡哥 | feat: update theme configuration for documentation repository and edit link
-- 2026-06-22 | 7ead3b60 | 鸡哥 | feat: add slimsearch and watermark plugins to enhance search and watermarking capabilities
-- 2026-06-22 | b02f104c | 鸡哥 | fix: update testing documentation with accurate test file and test count
-- 2026-06-22 | 84fd6156 | 鸡哥 | feat: enhance documentation across multiple tech stack sections with improved clarity and security guidelines
-- 2026-06-22 | 964a88c2 | 鸡哥 | feat: enhance styling for navbar, sidebar, and footer with frosted glass effect
-- 2026-06-22 | 1cab848e | 鸡哥 | feat: update navbar and sidebar icons for improved clarity and organization
-- 2026-06-21 | 849bf837 | 鸡哥 | feat: enhance documentation for .NET Temperature Helper and hardware enumeration
-- 2026-06-21 | 59a79bec | 鸡哥 | feat: add comprehensive documentation for eIsland's native Node.js addon plugins
-- 2026-06-21 | e9ca3734 | 鸡哥 | feat: update frontend tech stack documentation with detailed architecture and key dependencies
-- 2026-06-21 | a4642c56 | 鸡哥 | feat: enhance backend tech stack documentation with Alipay integration details
-- 2026-06-21 | a018ce41 | 鸡哥 | feat: enhance AI integration documentation with detailed architecture and tool execution overview
-- 2026-06-21 | dd01c2a7 | 鸡哥 | feat: enhance backend tech stack documentation with detailed JWT authentication implementation
-- 2026-06-21 | fbf1050c | 鸡哥 | feat: enhance backend tech stack documentation with detailed MySQL and MyBatis configurations
-- 2026-06-21 | d4ba5312 | 鸡哥 | feat: update backend tech stack documentation with Redis integration details and caching strategies
-- 2026-06-21 | eaf9d5b5 | 鸡哥 | fix: update API link in navbar for accurate navigation
-- 2026-06-21 | 148baed7 | 鸡哥 | feat: update navbar and sidebar for improved navigation and documentation clarity
-- 2026-06-20 | 12ae4b56 | 鸡哥 | feat: add Code of Conduct link to sidebar for improved community guidelines
-- 2026-06-20 | 81ae4aed | 鸡哥 | style: enable dark mode and enhance active link styles
-- 2026-06-20 | dd8e5383 | 鸡哥 | style: enhance sidebar link styles for improved visibility
-- 2026-06-20 | 7d3fc29d | 鸡哥 | feat: enhance navigation with introduction section in navbar and sidebar
-- 2026-06-20 | c5bfa305 | 鸡哥 | style: update navbar text and enhance page styles
-- 2026-06-20 | 9800fe6a | 鸡哥 | refactor: update navbar and theme hostname in VuePress configuration
-- 2026-06-20 | e001db57 | 鸡哥 | fix: update footer configuration in VuePress theme
-- 2026-06-20 | e25c2353 | 鸡哥 | refactor: update documentation site configuration and styles
-- 2026-06-20 | 29026003 | 鸡哥 | chore: update project metadata and remove unused files
-- 2026-06-20 | a27b1e42 | 鸡哥 | feat: initialize eisland-web-docs with essential files and configurations
-- 2026-06-20 | 08b54fdc | 鸡哥 | feat: initialize eisland-web project with core files and configurations
+- 2026-07-10 | 49814160 | 鸡哥 | Merge pull request #138 from JNTMTMTM/dev
+- 2026-07-10 | cde4dc16 | 鸡哥 | feat: add Application Icon Helper plugin and update plugin count in setup documentation
+- 2026-07-10 | c779a7a8 | 鸡哥 | docs: add build instructions for automatic plugin building
+- 2026-07-10 | 7141f629 | 鸡哥 | Merge commit '6c9bdb6d6d53cb876b7904dff8526f65fad9e876' into dev
+- 2026-07-10 | 6c9bdb6d | 鸡哥 | feat: add build and clean scripts for application icon helper plugin
+- 2026-07-09 | d5702790 | 鸡哥 | docs(announcement): add v26.4.4 release notes
