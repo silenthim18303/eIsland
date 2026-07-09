@@ -68,10 +68,14 @@ Packages the application and uploads release artifacts to COS (Cloud Object Stor
 npm run release:upload
 ```
 
-**Under the hood:** `npm run package && node --experimental-strip-types scripts/upload-release-to-cos-oss.ts`
+**Under the hood:** `npm run package && node --experimental-strip-types scripts/upload-release-to-cos-oss.ts && npm run esa:purge`
 
 **When to use:**
 - **Maintainer only** — publish a new release to CDN
+
+:::note
+After a successful upload, this command automatically purges the ESA CDN file cache for the URL configured in `ESA_PURGE_URL`. See [ESA Cache Commands](esa-commands.md) for details.
+:::
 
 ### `release:upload-only`
 
@@ -81,7 +85,7 @@ Uploads existing build artifacts to COS without rebuilding.
 npm run release:upload-only
 ```
 
-**Under the hood:** `node --experimental-strip-types scripts/upload-release-to-cos-oss.ts`
+**Under the hood:** `node --experimental-strip-types scripts/upload-release-to-cos-oss.ts && npm run esa:purge`
 
 **When to use:**
 - **Maintainer only** — re-upload a previously built package (e.g., after a CDN issue)
@@ -98,7 +102,7 @@ Uploads artifacts to MinIO storage for internal/self-hosted distribution.
 npm run release:upload-minio
 ```
 
-**Under the hood:** `node --experimental-strip-types scripts/upload-release-to-cos-oss.ts --minio-only`
+**Under the hood:** `node --experimental-strip-types scripts/upload-release-to-cos-oss.ts --minio-only && npm run esa:purge`
 
 **When to use:**
 - **Maintainer only** — internal/self-hosted release distribution

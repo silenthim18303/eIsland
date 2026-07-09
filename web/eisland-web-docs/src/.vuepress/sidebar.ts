@@ -907,6 +907,7 @@ export default sidebar({
         "commands/package-commands.md",
         "commands/quality-commands.md",
         "commands/release-commands.md",
+        "commands/esa-commands.md",
         "commands/plugin-commands.md",
       ],
     },

@@ -26,4 +26,5 @@ For a quick reference of all commands, see [Frontend Setup — Development Comma
 | [Package Commands](package-commands.md) | `package`, `postinstall` — building installers and managing native modules |
 | [Code Quality Commands](quality-commands.md) | `comment:check`, `i18n:check` — validating comment standards and i18n completeness |
 | [Release Commands](release-commands.md) | `release:notes`, `changelog:generate`, `release:upload*` — changelogs and artifact uploads |
+| [ESA Cache Commands](esa-commands.md) | `esa:purge`, `esa:purge-hostname`, `esa:purge-all` — CDN cache purging for ESA |
 | [Plugin Commands](plugin-commands.md) | `build`, `test`, `smoke` — building, testing, and smoke-testing all native plugins |
