@@ -21,6 +21,7 @@
     "release:upload-minio": "node --experimental-strip-types scripts/upload-release-to-cos-oss.ts --minio-only",
     "comment:check": "node --experimental-strip-types scripts/check-comment-standards.ts",
     "i18n:check": "node --experimental-strip-types scripts/check-i18n-completeness.ts",
+    "esa:purge": "node --experimental-strip-types scripts/purge-esa-cache.ts",
     "plugin:build:bluetooth": "cd plugins/eisland-windows-bluetooth-helper && npm run build:all",
     "plugin:build:brightness": "cd plugins/eisland-windows-brightness-helper && npm run build",
     "plugin:build:power": "cd plugins/eisland-windows-power-helper && npm run build:all",
@@ -80,6 +81,10 @@
     "zustand": "^5.0.4"
   },
   "devDependencies": {
+    "@alicloud/credentials": "^2.4.5",
+    "@alicloud/esa20240910": "^3.5.0",
+    "@alicloud/openapi-client": "^0.4.15",
+    "@alicloud/tea-util": "^1.4.11",
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@electron-toolkit/utils": "^4.0.0",
