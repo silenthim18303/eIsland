@@ -144,6 +144,11 @@ describe('registerMusicIpcHandlers', () => {
         JSON.stringify(['new-app'], null, 2),
         'utf-8',
       );
+      expect(broadcastSettingChangeMock).toHaveBeenCalledWith(
+        event.sender.id,
+        'store:music-whitelist',
+        ['new-app'],
+      );
     });
 
     it('returns false and logs error when write fails', () => {

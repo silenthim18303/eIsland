@@ -93,6 +93,36 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           NONCE=$(openssl rand -hex 16)
 
+          # Build sorted query string for HMAC signing
+          PARAMS="Action=PurgeCaches"
+          PARAMS="${PARAMS}&AccessKeyId=$ESA_AK"
+          PARAMS="${PARAMS}&Format=JSON"
+          PARAMS="${PARAMS}&Force=true"
+          PARAMS="${PARAMS}&Hostnames.1=eisland-dev.pyisland.com"
+          PARAMS="${PARAMS}&RegionId=cn-hangzhou"
+          PARAMS="${PARAMS}&SignatureMethod=HMAC-SHA1"
+          PARAMS="${PARAMS}&SignatureNonce=$NONCE"
+          PARAMS="${PARAMS}&SignatureVersion=1.0"
+          PARAMS="${PARAMS}&SiteId=$ESA_SITE_ID"
+          PARAMS="${PARAMS}&Timestamp=$TIMESTAMP"
+          PARAMS="${PARAMS}&Type=hostname"
+          PARAMS="${PARAMS}&Version=2024-09-10"
+
+          # Percent-encode per Alibaba Cloud specification
+          ENCODED=$(python3 -c "
+          import urllib.parse, sys
+          s = sys.argv[1]
+          parts = s.split('&')
+          encoded = '&'.join(
+            urllib.parse.quote(k, safe='') + '=' + urllib.parse.quote(v, safe='')
+            for k, v in (p.split('=', 1) for p in parts)
+          )
+          print(encoded)
+          " "$PARAMS")
+
+          STRING_TO_SIGN="POST&%2F&$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$ENCODED")"
+          SIGNATURE=$(printf '%s' "$STRING_TO_SIGN" | openssl dgst -sha1 -hmac "$ESA_SK&" -binary | base64)
+
           RESPONSE=$(curl -sS -X POST "https://esa.cn-hangzhou.aliyuncs.com" \
             -d "Action=PurgeCaches" \
             -d "Version=2024-09-10" \
@@ -102,6 +132,7 @@ jobs:
             -d "SignatureMethod=HMAC-SHA1" \
             -d "Timestamp=$TIMESTAMP" \
             -d "SignatureNonce=$NONCE" \
+            -d "Signature=$(python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1], safe=''))" "$SIGNATURE")" \
             -d "RegionId=cn-hangzhou" \
             -d "SiteId=$ESA_SITE_ID" \
             -d "Type=hostname" \

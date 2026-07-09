@@ -219,6 +219,11 @@ describe('media ipc handlers', () => {
     expect(handlers.get('music:whitelist:set')?.(event, ['C'])).toBe(true);
     expect(setWhitelist).toHaveBeenCalledWith(['C']);
     expect(writeFileSyncMock).toHaveBeenCalled();
+    expect(broadcastSettingChangeMock).toHaveBeenCalledWith(
+      event.sender.id,
+      'store:music-whitelist',
+      ['C'],
+    );
 
     writeFileSyncMock.mockImplementationOnce(() => {
       throw new Error('disk full');

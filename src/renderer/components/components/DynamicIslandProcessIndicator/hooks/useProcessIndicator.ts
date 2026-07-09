@@ -28,21 +28,17 @@ import { useLayoutEffect, useRef } from 'react';
 import type { ProcessSegment, RenderedProgress } from '../types';
 import { createProcessSegments } from '../utils/processIndicatorSegments';
 
-let lastSettledProgress: RenderedProgress | null = null;
-
 /**
  * 分段进度条状态管理
  * @description 追踪进度变化，生成各分段状态，支持前进/后退动画
  */
 export function useProcessIndicator(total: number, current: number): ProcessSegment[] {
-  const previousRef = useRef<RenderedProgress | null>(lastSettledProgress);
+  const previousRef = useRef<RenderedProgress | null>(null);
   const previousProgress = previousRef.current?.total === total ? previousRef.current : null;
   const segments = createProcessSegments(total, current, previousProgress);
 
   useLayoutEffect(() => {
-    const nextProgress = { current, total };
-    previousRef.current = nextProgress;
-    lastSettledProgress = nextProgress;
+    previousRef.current = { current, total };
   }, [current, total]);
 
   return segments;

@@ -129,7 +129,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     let cancelled = false;
     window.api.storeRead(UPDATE_SOURCE_STORE_KEY).then((value) => {
       if (cancelled) return;
-      setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : value === 'esa-cdn' ? 'esa-cdn' : 'cloudflare-r2');
+      setUpdateSource(UPDATE_SOURCES.some(s => s.key === value) ? value as UpdateSourceKey : 'cloudflare-r2');
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);

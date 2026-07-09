@@ -27,7 +27,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import type { ThemeMode } from '../../../../../utils/theme';
 import { setThemeMode } from '../../../../../utils/theme';
-import { OPACITY_DEFAULT } from '../config/themeOptions';
+import { OPACITY_DEFAULT, OPACITY_MIN, OPACITY_MAX } from '../config/themeOptions';
 
 interface UseThemeSettingReturn {
   /** 当前主题模式 */
@@ -69,7 +69,7 @@ export function useThemeSetting(): UseThemeSettingReturn {
   }, []);
 
   const setOpacity = useCallback((value: number): void => {
-    const safe = Math.max(10, Math.min(100, Math.round(value)));
+    const safe = Math.max(OPACITY_MIN, Math.min(OPACITY_MAX, Math.round(value)));
     setOpacityState(safe);
     window.api.islandOpacitySet(safe).catch(() => {});
   }, []);

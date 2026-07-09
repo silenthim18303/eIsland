@@ -116,6 +116,7 @@ import {
   type MailAccountConfig,
   type RunningWindowItem,
   type PluginMarketPageKey,
+  type UpdateSourceKey,
 } from './setting/config/settingsTabConfig';
 import { useSettingsSidebarTabState, useUserSessionState } from './setting/hooks/useSettingsTabState';
 import useUpdateSettingsState from './setting/hooks/useUpdateSettingsState';
@@ -998,7 +999,8 @@ export function SettingsTab(): ReactElement {
         setWhitelist(value);
       }
       if (channel === 'store:update-source' && typeof value === 'string' && value) {
-        setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : value === 'esa-cdn' ? 'esa-cdn' : 'cloudflare-r2');
+        const nextSource: UpdateSourceKey = UPDATE_SOURCES.some(s => s.key === value) ? value as UpdateSourceKey : 'cloudflare-r2';
+        setUpdateSource(nextSource);
       }
     });
     return () => {
@@ -1223,7 +1225,7 @@ export function SettingsTab(): ReactElement {
     let cancelled = false;
     window.api.storeRead(UPDATE_SOURCE_STORE_KEY).then((value) => {
       if (cancelled) return;
-      setUpdateSource(value === 'github' ? 'github' : value === 'tencent-cos' ? 'tencent-cos' : value === 'aliyun-oss' ? 'aliyun-oss' : value === 'esa-cdn' ? 'esa-cdn' : 'cloudflare-r2');
+      setUpdateSource(UPDATE_SOURCES.some(s => s.key === value) ? value as UpdateSourceKey : 'cloudflare-r2');
     }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
