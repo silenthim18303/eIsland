@@ -75,6 +75,12 @@
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
+.guide-theme-mode-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
 /* ===== Opacity Slider ===== */
 
 .guide-theme-opacity {

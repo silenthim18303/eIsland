@@ -18,7 +18,8 @@
  * GNU General Public License for more details.
  */
 
-import type { ThemeMode } from '../../../../../../utils/theme';
+import type { ThemeMode } from '../../../../../utils/theme';
+import { SvgIcon } from '../../../../../utils/SvgIcon';
 
 /** 主题模式选项条目 */
 export interface ThemeModeOption {
@@ -26,13 +27,15 @@ export interface ThemeModeOption {
   value: ThemeMode;
   /** 显示名称 i18n key */
   labelKey: string;
+  /** 图标路径 */
+  icon: string;
 }
 
 /** 主题模式选项列表 */
 export const THEME_MODE_OPTIONS: ThemeModeOption[] = [
-  { value: 'dark', labelKey: 'guide.theme.dark' },
-  { value: 'light', labelKey: 'guide.theme.light' },
-  { value: 'system', labelKey: 'guide.theme.system' },
+  { value: 'dark', labelKey: 'guide.theme.dark', icon: SvgIcon.THEME_DARK },
+  { value: 'light', labelKey: 'guide.theme.light', icon: SvgIcon.THEME_LIGHT },
+  { value: 'system', labelKey: 'guide.theme.system', icon: SvgIcon.THEME_FOLLOW_SYSTEM },
 ];
 
 /** 透明度最小值 */

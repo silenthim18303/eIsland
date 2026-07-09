@@ -56,7 +56,8 @@ export function ThemeStep({ onNext, onPrev }: ThemeStepProps): ReactElement {
                 className={`guide-theme-mode-btn${mode === opt.value ? ' selected' : ''}`}
                 onClick={(): void => { setMode(opt.value); }}
               >
-                {t(opt.labelKey, { defaultValue: opt.value })}
+                <img className="guide-theme-mode-icon" src={opt.icon} alt="" />
+                <span>{t(opt.labelKey, { defaultValue: opt.value })}</span>
               </button>
             ))}
           </div>
