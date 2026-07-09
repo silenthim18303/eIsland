@@ -216,6 +216,10 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     window.api.updaterInstall().catch(() => {});
   };
 
+  const handleResetGuide = (): void => {
+    window.api.guideReset().catch(() => {});
+  };
+
   return {
     updateStatus,
     setUpdateStatus,
@@ -238,6 +242,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     handleCheckUpdate,
     handleDownloadUpdate,
     handleInstallUpdate,
+    handleResetGuide,
     resolveUpdateSourceUrl,
   };
 }

@@ -29,6 +29,7 @@ import { ipcMain } from 'electron';
 import type { AppUpdater } from 'electron-updater';
 import type { UpdateSourceKey, RegisterUpdaterIpcHandlersOptions } from './types';
 import { DEFAULT_UPDATE_SOURCE, R2_UPDATE_URL, ESA_CDN_URL, GITHUB_OWNER, GITHUB_REPO } from './config/updater';
+import { deleteFirstLaunchConfig } from '../../config/storeConfig';
 
 function normalizeUpdateSource(value: unknown): UpdateSourceKey {
   if (value === 'github') return 'github';
@@ -139,5 +140,9 @@ export function registerUpdaterIpcHandlers(options: RegisterUpdaterIpcHandlersOp
 
   ipcMain.handle('updater:version', () => {
     return options.getVersion();
+  });
+
+  ipcMain.handle('guide:reset', () => {
+    return deleteFirstLaunchConfig();
   });
 }

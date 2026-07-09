@@ -61,6 +61,7 @@ interface UpdateSettingsSectionProps {
   onCheckUpdate: () => void;
   onDownloadUpdate: () => void;
   onInstallUpdate: () => void;
+  onResetGuide: () => void;
 }
 
 /**
@@ -86,6 +87,7 @@ export function UpdateSettingsSection({
   onCheckUpdate,
   onDownloadUpdate,
   onInstallUpdate,
+  onResetGuide,
 }: UpdateSettingsSectionProps): ReactElement {
   const { t } = useTranslation();
 
@@ -236,6 +238,13 @@ export function UpdateSettingsSection({
             {updateStatus === 'error' && updateError && (
               <div className="settings-about-update-error" style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>{updateError.replace(/\\n/g, '\n')}</div>
             )}
+          </div>
+
+          <div className="settings-card-subgroup">
+            <div className="settings-card-subgroup-title">{t('settings.update.guideTitle', { defaultValue: '引导界面' })}</div>
+            <button className="settings-about-update-btn" type="button" onClick={onResetGuide}>
+              {t('settings.update.actions.resetGuide', { defaultValue: '下次启动显示引导' })}
+            </button>
           </div>
         </div>
 

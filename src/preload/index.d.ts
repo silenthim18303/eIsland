@@ -286,6 +286,7 @@ declare global {
       updaterDownload: (source?: string, resolvedUrl?: string) => Promise<boolean>;
       updaterInstall: () => Promise<boolean>;
       updaterVersion: () => Promise<string>;
+      guideReset: () => Promise<boolean>;
       onUpdaterProgress: (callback: (progress: UpdaterProgress) => void) => () => void;
       onUpdaterDownloaded: (callback: (data: UpdaterDownloadedData) => void) => () => void;
       onUpdaterAvailable: (callback: (data: UpdaterAvailableData) => void) => () => void;

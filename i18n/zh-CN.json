@@ -2717,8 +2717,10 @@
         "latest": "已是最新版本",
         "download": "下载更新",
         "installRestart": "安装并重启",
-        "retry": "重试"
-      }
+        "retry": "重试",
+        "resetGuide": "下次启动显示引导"
+      },
+      "guideTitle": "引导界面"
     },
     "pluginMarket": {
       "search": {

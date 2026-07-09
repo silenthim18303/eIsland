@@ -2717,8 +2717,10 @@
         "latest": "Already Latest",
         "download": "Download Update",
         "installRestart": "Install & Restart",
-        "retry": "Retry"
-      }
+        "retry": "Retry",
+        "resetGuide": "Show Guide on Next Launch"
+      },
+      "guideTitle": "Guide"
     },
     "pluginMarket": {
       "search": {

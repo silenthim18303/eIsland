@@ -452,6 +452,7 @@ export function SettingsTab(): ReactElement {
     handleCheckUpdate,
     handleDownloadUpdate,
     handleInstallUpdate,
+    handleResetGuide,
   } = useUpdateSettingsState({
     t,
     isProUser,
@@ -2744,6 +2745,7 @@ export function SettingsTab(): ReactElement {
               onCheckUpdate={handleCheckUpdate}
               onDownloadUpdate={handleDownloadUpdate}
               onInstallUpdate={handleInstallUpdate}
+              onResetGuide={handleResetGuide}
             />
           )}
 
