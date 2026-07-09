@@ -2720,7 +2720,10 @@
         "retry": "重试",
         "resetGuide": "下次启动显示引导"
       },
-      "guideTitle": "引导界面"
+      "guideCardTitle": "引导界面",
+      "guideCardHint": "重新显示首次启动引导界面",
+      "guideResetSuccess": "设置成功，下次启动将显示引导界面",
+      "guideResetError": "设置失败，请稍后重试"
     },
     "pluginMarket": {
       "search": {

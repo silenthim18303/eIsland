@@ -2720,7 +2720,10 @@
         "retry": "Retry",
         "resetGuide": "Show Guide on Next Launch"
       },
-      "guideTitle": "Guide"
+      "guideCardTitle": "Guide",
+      "guideCardHint": "Show the first-launch guide again",
+      "guideResetSuccess": "Success! Guide will show on next launch",
+      "guideResetError": "Failed. Please try again later"
     },
     "pluginMarket": {
       "search": {

@@ -64,6 +64,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
   const [updateAutoPromptEnabled, setUpdateAutoPromptEnabled] = useState<boolean>(true);
   const [announcementShowMode, setAnnouncementShowMode] = useState<AnnouncementShowMode>('version-update-only');
   const [updateSource, setUpdateSource] = useState<UpdateSourceKey>('cloudflare-r2');
+  const [guideResetStatus, setGuideResetStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const currentSourceLabel = UPDATE_SOURCES.find((s) => s.key === updateSource)?.label ?? updateSource;
 
@@ -216,8 +217,13 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     window.api.updaterInstall().catch(() => {});
   };
 
-  const handleResetGuide = (): void => {
-    window.api.guideReset().catch(() => {});
+  const handleResetGuide = async (): Promise<void> => {
+    try {
+      const ok = await window.api.guideReset();
+      setGuideResetStatus(ok ? 'success' : 'error');
+    } catch {
+      setGuideResetStatus('error');
+    }
   };
 
   return {
@@ -243,6 +249,7 @@ export default function useUpdateSettingsState({ t, isProUser, sessionToken }: U
     handleDownloadUpdate,
     handleInstallUpdate,
     handleResetGuide,
+    guideResetStatus,
     resolveUpdateSourceUrl,
   };
 }
