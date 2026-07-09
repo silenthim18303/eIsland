@@ -1,6 +1,6 @@
 {
   "name": "eisland",
-  "version": "26.6.3",
+  "version": "26.6.4",
   "description": "A sleek, Apple Dynamic Island inspired floating widget for Windows, built with Electron.",
   "main": "./out/main/index.js",
   "author": "JNTMTMTM",
@@ -33,6 +33,7 @@
     "plugin:build:wifi": "cd plugins/eisland-windows-wifi-helper && npm run build:all",
     "plugin:build:fullscreen": "cd plugins/eisland-windows-fullscreen-detector && npm run build",
     "plugin:build:perfmon": "cd plugins/eisland-windows-performance-monitor && npm run build",
+    "plugin:build:icon-helper": "cd plugins/eisland-windows-application-icon-helper && npm run build",
     "plugin:clean:bluetooth": "cd plugins/eisland-windows-bluetooth-helper && npm run clean",
     "plugin:clean:brightness": "cd plugins/eisland-windows-brightness-helper && npm run clean",
     "plugin:clean:power": "cd plugins/eisland-windows-power-helper && npm run clean",
@@ -42,8 +43,9 @@
     "plugin:clean:wifi": "cd plugins/eisland-windows-wifi-helper && npm run clean",
     "plugin:clean:fullscreen": "cd plugins/eisland-windows-fullscreen-detector && npm run clean",
     "plugin:clean:perfmon": "cd plugins/eisland-windows-performance-monitor && npm run clean",
-    "plugins:build": "run-s plugin:build:bluetooth plugin:build:brightness plugin:build:power plugin:build:processes plugin:build:smtc plugin:build:toast plugin:build:wifi plugin:build:fullscreen plugin:build:perfmon",
-    "plugins:clean": "run-p plugin:clean:bluetooth plugin:clean:brightness plugin:clean:power plugin:clean:processes plugin:clean:smtc plugin:clean:toast plugin:clean:wifi plugin:clean:fullscreen plugin:clean:perfmon"
+    "plugin:clean:icon-helper": "cd plugins/eisland-windows-application-icon-helper && npm run clean",
+    "plugins:build": "run-s plugin:build:bluetooth plugin:build:brightness plugin:build:power plugin:build:processes plugin:build:smtc plugin:build:toast plugin:build:wifi plugin:build:fullscreen plugin:build:perfmon plugin:build:icon-helper",
+    "plugins:clean": "run-p plugin:clean:bluetooth plugin:clean:brightness plugin:clean:power plugin:clean:processes plugin:clean:smtc plugin:clean:toast plugin:clean:wifi plugin:clean:fullscreen plugin:clean:perfmon plugin:clean:icon-helper"
   },
   "dependencies": {
     "@eisland/windows-application-icon-helper": "file:plugins/eisland-windows-application-icon-helper",
