@@ -32,9 +32,9 @@ import type { GithubStepProps } from '../types';
 /** 项目链接配置 */
 const PROJECT_LINKS = [
   { key: 'repo', url: 'https://github.com/JNTMTMTM/eIsland', icon: SvgIcon.GITHUB },
-  { key: 'website', url: 'https://pyisland.com', icon: SvgIcon.LINK },
-  { key: 'docs', url: 'https://docs.pyisland.com', icon: SvgIcon.BOOKMARK },
-  { key: 'devDocs', url: 'https://dev.electronisland.com', icon: SvgIcon.ABOUT },
+  { key: 'website', url: 'https://pyisland.com', icon: SvgIcon.WEBSITE },
+  { key: 'docs', url: 'https://docs.pyisland.com', icon: SvgIcon.DOCS },
+  { key: 'devDocs', url: 'https://dev.electronisland.com', icon: SvgIcon.DEVELOPER },
 ] as const;
 
 /**
