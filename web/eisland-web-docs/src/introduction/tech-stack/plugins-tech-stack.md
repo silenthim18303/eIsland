@@ -6,12 +6,12 @@ icon: toolbox
 # Plugins Tech Stack
 
 :::warning
-This document provides an overview of the native Node.js addon plugins used in the eIsland application. Plugins are **Windows-only**. Most are built with **C** and **Node-API (N-API)** via **node-gyp**, while the SMTC, Bluetooth, Power, WiFi, and Brightness Helpers use **C# .NET** with **koffi FFI** or **child process** integration.
+This document provides an overview of the native Node.js addon plugins used in the eIsland application. Plugins are **Windows-only**. Two plugins (Processes Attacker, Fullscreen Detector) use **C + N-API** via **node-gyp**, one (Toast Listener) uses **C++ + N-API**, and the remaining six use **C# .NET** with **koffi FFI** (NativeAOT DLL) or **child process** integration.
 :::
 
 ## Overview
 
-The eIsland plugin system consists of five native addons that provide low-level Windows system capabilities unavailable through standard Node.js APIs:
+The eIsland plugin system consists of nine native addons that provide low-level Windows system capabilities unavailable through standard Node.js APIs:
 
 | Plugin | Package | Purpose |
 |--------|---------|---------|
@@ -20,16 +20,26 @@ The eIsland plugin system consists of five native addons that provide low-level 
 | **Performance Monitor** | `@eisland/windows-performance-monitor` | CPU, memory, and temperature snapshots |
 | **SMTC Helper** | `@eisland/windows-smtc-helper` | System Media Transport Controls (play, pause, next, previous, status) |
 | **Bluetooth Helper** | `@eisland/windows-bluetooth-helper` | Bluetooth device enumeration and real-time connection monitoring |
+| **Power Helper** | `@eisland/windows-power-helper` | Battery status and power event monitoring |
+| **WiFi Helper** | `@eisland/windows-wifi-helper` | WiFi connection status and event monitoring |
 | **Brightness Helper** | `@eisland/windows-brightness-helper` | Screen brightness query, control, and real-time WMI event monitoring |
+| **Application Icon Helper** | `@eisland/windows-application-icon-helper` | Application icon extraction by process name, PID, path, or shortcut |
+| **Toast Listener** | `@eisland/windows-toast-listener` | Windows toast notification listening and suppression |
+
+**Architecture Categories:**
+
+| Category | Plugins | Build System | Runtime |
+|----------|---------|-------------|---------|
+| **C + N-API** | Processes Attacker, Fullscreen Detector | `node-gyp` | Native `.node` addon loaded by Node.js |
+| **C + .NET helper (spawnSync)** | Performance Monitor (temperature) | `node-gyp` + `dotnet build` | C addon + spawned .NET EXE |
+| **C# NativeAOT + koffi FFI** | SMTC, Bluetooth, Power, WiFi, Application Icon Helper | `dotnet publish` (NativeAOT) | Self-contained DLL loaded via koffi |
+| **C# .NET EXE (spawnSync/spawn)** | Brightness Helper | `dotnet build` | Spawned .NET console EXE |
+| **C++ + N-API** | Toast Listener | `node-gyp` | Native `.node` addon loaded by Node.js |
 
 **Common Characteristics:**
 
-- **Language**: C (core logic) + Node-API binding layer
-- **Build System**: `node-gyp` with `binding.gyp` configuration
 - **Platform**: Windows only (`"os": ["win32"]`)
-- **Architecture**: x64, arm64, ia32
 - **License**: GPL-3.0
-- **Module Format**: Synchronous N-API exports (no async callbacks)
 - **TypeScript**: `.d.ts` type declarations provided
 
 ## Build System
@@ -1610,6 +1620,158 @@ Output: `src/bin/Release/net10.0/eIslandBrightnessReader.exe`
 Query and set operations spawn a new .NET process each time, incurring ~100ms startup overhead. For frequent polling, consider using the `BrightnessMonitor` event-driven approach instead of repeated `getBrightness()` calls.
 :::
 
+## Plugin: Windows Toast Listener
+
+### Package
+
+```
+@eisland/windows-toast-listener
+```
+
+### Purpose
+
+Provides Windows toast notification listening and suppression capabilities. Used by eIsland to monitor notification center changes in real-time and optionally suppress (hide) toast notifications from other applications.
+
+:::info
+This plugin is a **C++ N-API native addon** that wraps the Windows `Windows.UI.Notifications` WinRT APIs via COM interop. Unlike the .NET-based plugins, it compiles to a standard `.node` binary loaded directly by Node.js.
+:::
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  JavaScript Layer (index.js)                                │
+│  Queries: getNotifications() / getAccessStatus()            │
+│  Monitor: startListening(callback) / stopListening()        │
+│  Suppression: enableSuppression() / disableSuppression()    │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ N-API
+┌──────────────────────────▼──────────────────────────────────┐
+│  windows_toast_listener.cpp                                 │
+│  N-API binding + WinRT COM interop                          │
+├─────────────────────────────────────────────────────────────┤
+│  ToastManager         — Notification enumeration & access   │
+│  ToastListener        — Event-driven notification watcher   │
+│  ToastSuppression     — Toast popup suppression             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Exported Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `requestAccess` | `() → ToastAccessStatus` | Request access to user notifications |
+| `getAccessStatus` | `() → ToastAccessStatus` | Check current notification access status |
+| `getNotifications` | `() → ToastNotificationSnapshot[]` | Get all current toast notifications |
+| `startListening` | `(callback) → boolean` | Start listening for notification changes |
+| `stopListening` | `() → boolean` | Stop listening for notification changes |
+| `isListening` | `() → boolean` | Check if currently listening |
+| `enableSuppression` | `() → boolean` | Enable toast popup suppression |
+| `disableSuppression` | `() → boolean` | Disable toast popup suppression |
+| `isSuppressionEnabled` | `() → boolean` | Check if suppression is enabled |
+
+### Result Structures
+
+```ts
+type ToastAccessStatus = 'unspecified' | 'allowed' | 'denied' | 'unknown';
+type ToastNotificationChangeKind = 'added' | 'removed' | 'unknown';
+
+interface ToastNotificationChangedEvent {
+  kind: ToastNotificationChangeKind;
+  notificationId: number;
+}
+
+interface ToastNotificationSnapshot {
+  id: number;
+  appUserModelId: string;
+  appDisplayName: string;
+  title: string;
+  body: string;
+  texts: string[];
+  createdAt: number;
+}
+```
+
+### Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `src/windows_toast_listener.cpp` | N-API binding, WinRT COM interop, toast enumeration and monitoring |
+| `binding.gyp` | Build configuration — links `runtimeobject.lib` |
+| `index.js` | Public API — exports all functions |
+| `index.d.ts` | TypeScript type declarations |
+
+## Plugin: Windows Application Icon Helper
+
+### Package
+
+```
+@eisland/windows-application-icon-helper
+```
+
+### Purpose
+
+Extracts Windows application and process icons as PNG buffers. Supports lookup by process name, PID, executable path, or shortcut (.lnk) path. Used by eIsland to display application icons in the process manager and AI agent tool results.
+
+:::info
+This plugin uses **koffi FFI + .NET NativeAOT DLL** architecture. It wraps Windows Shell32 APIs (`ExtractAssociatedIconW`) and COM `IShellLink` for shortcut resolution.
+:::
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  JavaScript Layer (index.js + ffi-loader.js)                │
+│  getIconByProcessName / getIconByPid / getIconByPath /      │
+│  getIconByShortcutPath                                      │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ koffi FFI (direct DLL calls)
+┌──────────────────────────▼──────────────────────────────────┐
+│  eIslandAppIconHelper.dll (NativeAOT)                       │
+│  .NET 10 + Shell32 APIs                                     │
+├─────────────────────────────────────────────────────────────┤
+│  IconExtractor.cs       — Core icon extraction logic        │
+│  Exports.cs             — C-style exported functions        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Exported Functions
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `getIconByProcessName` | `(processName: string) → IconResult \| null` | Get icon by running process name |
+| `getIconByPid` | `(pid: number) → IconResult \| null` | Get icon by process ID |
+| `getIconByPath` | `(exePath: string) → IconResult \| null` | Get icon by executable file path |
+| `getIconByShortcutPath` | `(lnkPath: string) → IconResult \| null` | Get icon by shortcut (.lnk) path |
+
+### Result Structure
+
+```ts
+interface IconResult {
+  data: Buffer;      // PNG icon data
+  size: number;      // Icon data size in bytes
+  format: 'png';     // Image format (always 'png')
+}
+```
+
+### Source Files
+
+| File | Responsibility |
+|------|---------------|
+| `src/IconExtractor.cs` | Core icon extraction using `ExtractAssociatedIconW` and `IShellLink` |
+| `src/Exports.cs` | C-style exported functions for koffi FFI |
+| `src/eIslandAppIconHelper.csproj` | .NET 10 Native AOT project |
+| `ffi-loader.js` | koffi FFI loader — defines all DLL function signatures |
+| `index.js` | Public API — exports all icon functions |
+| `index.d.ts` | TypeScript type declarations |
+
+### Dependencies
+
+| Dependency | Version | Purpose |
+|------------|---------|---------|
+| **.NET** | 10.0 | Build-time only (self-contained DLL) |
+| **koffi** | ^2.9.1 | FFI library for calling DLL from Node.js |
+
 ## Testing
 
 ### Test Framework
@@ -1685,9 +1847,13 @@ expect(foreground === null || typeof foreground === 'object').toBe(true);
 | **Processes Attacker** | _(manual testing)_ | — |
 | **Fullscreen Detector** | `fullscreen-detector.test.ts`, `fullscreen-detector.polling.test.ts` | Shape validation, export verification |
 | **Performance Monitor** | `performance-monitor.test.ts` | Shape validation, range checks |
-| **SMTC Helper** | `smtc-helper.test.ts`, `smtc-helper.play.test.ts`, `smtc-helper.pause.test.ts`, `smtc-helper.next.test.ts`, `smtc-helper.previous.test.ts` | Shape validation, export verification, command tests |
+| **SMTC Helper** | `smtc-helper.test.ts`, `smtc-helper.play.test.ts`, `smtc-helper.pause.test.ts`, `smtc-helper.next.test.ts`, `smtc-helper.previous.test.ts`, `smtc-helper.timestamp.test.ts` | Shape validation, export verification, command tests |
 | **Bluetooth Helper** | `bluetooth.test.ts`, `bluetooth.monitor.test.ts` | Shape validation, export verification, monitor state management |
+| **Power Helper** | `power.test.ts`, `power.monitor.test.ts` | Shape validation, consistency, monitor tests |
+| **WiFi Helper** | `wifi.test.ts`, `wifi.monitor.test.ts` | Shape validation, consistency, monitor tests |
 | **Brightness Helper** | `brightness.test.ts`, `brightness.monitor.test.ts` | Shape validation, export verification, boundary value tests, monitor state management |
+| **Application Icon Helper** | `icon.test.ts` | Shape validation, export verification |
+| **Toast Listener** | `windows-toast-listener.test.ts`, `windows-toast-listener.polling.test.ts` | Shape validation, export verification, polling tests |
 
 ## Integration with Electron
 
@@ -1731,6 +1897,10 @@ Plugins power several AI agent tools:
 | `win.list` | Fullscreen Detector | `getFullscreenWindows()` |
 | `monitor.cpu` | Performance Monitor | `getCpu()` |
 | `monitor.memory` | Performance Monitor | `getMemory()` |
+| `monitor.temperature` | Performance Monitor | `getTemperature()` |
+| `monitor.gpu` | Performance Monitor | `getHardwareList()` |
+| `brightness.get` | Brightness Helper | `getBrightness()` |
+| `brightness.set` | Brightness Helper | `setBrightness(level)` |
 
 ## Performance Characteristics
 
@@ -1746,8 +1916,13 @@ Performance characteristics and optimization recommendations for each plugin:
 | **Performance Monitor (Memory)** | <0.1ms | `GlobalMemoryStatusEx` is a single kernel call |
 | **Performance Monitor (Temperature)** | ~500–2000ms | Spawns a .NET process; includes process startup + WMI queries |
 | **SMTC Helper** | ~50–200ms | Spawns a .NET process; WinRT session manager + media property reads |
+| **SMTC Helper (FFI)** | ~1–5ms | Direct DLL call via koffi FFI; no process spawn |
 | **Bluetooth Helper** | ~10–50ms | WinRT `FindAllAsync` + `FromIdAsync`; event-driven monitoring |
+| **Power Helper** | ~1ms | In-memory `PowerManager` property reads; event-driven monitoring |
+| **WiFi Helper** | ~1ms | In-memory `NetworkInformation` profile reads; event-driven monitoring |
 | **Brightness Helper** | ~100–300ms | Process spawn + WMI query; event-driven monitoring |
+| **Application Icon Helper** | ~5–20ms | Shell32 `ExtractAssociatedIconW`; direct DLL call via koffi FFI |
+| **Toast Listener** | ~1–3ms | WinRT COM interop; event-driven monitoring |
 
 **Optimization Notes:**
 
@@ -1755,6 +1930,9 @@ Performance characteristics and optimization recommendations for each plugin:
 - Temperature queries are expensive due to the .NET helper process — recommended at 5–10 second intervals
 - The fullscreen detector avoids COM/WMI — pure Win32 window API calls
 - SMTC commands are direct DLL calls (~1-5ms via koffi FFI); monitoring is event-driven (zero polling)
+- Power and WiFi helpers use in-memory WinRT property reads (~1ms) — suitable for frequent polling
+- Application icon queries are fast (~5-20ms) but should be cached to avoid repeated Shell32 calls
+- Brightness queries spawn a .NET process each time — use the `BrightnessMonitor` event-driven approach for frequent updates
 
 :::warning
 Temperature queries involve .NET process startup and WMI queries, resulting in high latency (500–2000ms). Recommended polling interval is 5–10 seconds to avoid frequent calls impacting performance.
