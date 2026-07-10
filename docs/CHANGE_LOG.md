@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-09T16:30:49.695Z
+> 生成时间：2026-07-10T15:42:31.795Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,9 @@
 
 ## Unreleased
 
+- 2026-07-10 | f22823fc | 鸡哥 | Merge pull request #140 from JNTMTMTM/dev
+- 2026-07-10 | 3710af9a | 鸡哥 | feat: add MCP configuration files for CodeGraph integration
+- 2026-07-09 | a18ddef7 | eislandBot | docs: auto update CHANGE_LOG.md for #138 by @JNTMTMTM [skip ci]
 - 2026-07-10 | 49814160 | 鸡哥 | Merge pull request #138 from JNTMTMTM/dev
 - 2026-07-10 | cde4dc16 | 鸡哥 | feat: add Application Icon Helper plugin and update plugin count in setup documentation
 - 2026-07-10 | c779a7a8 | 鸡哥 | docs: add build instructions for automatic plugin building
