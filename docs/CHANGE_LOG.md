@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-11T14:05:54.475Z
+> 生成时间：2026-07-11T15:07:14.091Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,12 @@
 
 ## Unreleased
 
+- 2026-07-11 | 2d93ed22 | 鸡哥 | Merge pull request #143 from JNTMTMTM/dev
+- 2026-07-11 | d3d9434c | 鸡哥 | feat: add documentation for getVisibleWindows function in screenshotHelper.ts
+- 2026-07-11 | 84e8ed2f | 鸡哥 | fix: update version to 26.0.1 in package.json and package-lock.json
+- 2026-07-11 | 21f55f4b | 鸡哥 | feat: add visible window enumeration functionality and related documentation
+- 2026-07-11 | 5a6e8bf7 | 鸡哥 | feat: add functionality to retrieve visible window bounds and update related interfaces and tests
+- 2026-07-11 | c1326b33 | eislandBot | docs: auto update CHANGE_LOG.md for #142 by @JNTMTMTM [skip ci]
 - 2026-07-11 | fcdd3e02 | 鸡哥 | Merge pull request #142 from JNTMTMTM/dev
 - 2026-07-11 | 430dafa7 | 鸡哥 | refactor: remove unused changes section from pull request template
 - 2026-07-11 | 9ee19b33 | 鸡哥 | fix: restrict publish trigger to package.json changes and enhance version check logic
