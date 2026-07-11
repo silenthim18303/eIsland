@@ -104,6 +104,11 @@ export function capturePrimaryDisplayPng(): Buffer | null {
   }
 }
 
+/**
+ * 获取所有可见窗口的位置和尺寸信息
+ * @description 枚举桌面上所有可见的顶层窗口，返回其边界矩形和元数据，用于截图选区的窗口识别
+ * @returns 可见窗口边界数组，插件不可用时返回空数组
+ */
 export function getVisibleWindows(): VisibleWindowBounds[] {
   const helper = loadWindowsScreenshotHelper();
   if (!helper?.getVisibleWindows) return [];
