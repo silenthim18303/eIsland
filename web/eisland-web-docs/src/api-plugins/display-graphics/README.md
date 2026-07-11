@@ -12,3 +12,4 @@ Plugins for screen display management and graphics detection.
 |--------|-------------|
 | [Windows Brightness Helper](brightness-helper.md) | Screen brightness monitoring and control |
 | [Windows Fullscreen Detector](fullscreen-detector.md) | Fullscreen window detection |
+| [Windows Screenshot Helper](screenshot-helper.md) | Primary display screen capture |
