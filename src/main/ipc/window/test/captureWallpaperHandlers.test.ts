@@ -71,8 +71,9 @@ const {
   copyFileSyncMock: vi.fn(),
 }));
 
-const { execFileMock } = vi.hoisted(() => ({
+const { execFileMock, capturePrimaryDisplayPngMock } = vi.hoisted(() => ({
   execFileMock: vi.fn(),
+  capturePrimaryDisplayPngMock: vi.fn(),
 }));
 
 vi.mock('electron', () => ({
@@ -119,6 +120,10 @@ vi.mock('child_process', () => ({
   execFile: execFileMock,
 }));
 
+vi.mock('../../../window/screenshotHelper', () => ({
+  capturePrimaryDisplayPng: capturePrimaryDisplayPngMock,
+}));
+
 import { registerCaptureIpcHandlers } from '../capture';
 import { registerWallpaperIpcHandlers } from '../wallpaper';
 
@@ -151,6 +156,8 @@ describe('capture and wallpaper ipc handlers', () => {
     copyFileSyncMock.mockReset();
 
     execFileMock.mockReset();
+    capturePrimaryDisplayPngMock.mockReset();
+    capturePrimaryDisplayPngMock.mockReturnValue(null);
 
     appGetPathMock.mockImplementation((name: string) => {
       if (name === 'pictures') return 'C:/Pictures';

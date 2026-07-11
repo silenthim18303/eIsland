@@ -29,7 +29,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 const isWindows = process.platform === 'win32';
-const nativeDllPath = path.join(__dirname, '..', 'src', 'bin', 'Release', 'net10.0-windows10.0.19041.0', 'win-x64', 'native', 'eIslandScreenshotHelper.dll');
+/** Target framework moniker — keep in sync with eIslandScreenshotHelper.csproj */
+const TFM = 'net10.0-windows10.0.19041.0';
+const nativeDllPath = path.join(__dirname, '..', 'src', 'bin', 'Release', TFM, 'win-x64', 'native', 'eIslandScreenshotHelper.dll');
 const hasNativeDll = fs.existsSync(nativeDllPath);
 
 interface ScreenshotResult {
@@ -73,5 +75,12 @@ describe.skipIf(!isWindows || !hasNativeDll)('@eisland/windows-screenshot-helper
   it('does not throw on repeated capture', () => {
     expect(() => mod.capturePrimaryDisplayPng()).not.toThrow();
     expect(() => mod.capturePrimaryDisplayPng()).not.toThrow();
+  });
+
+  it('returns empty error string after successful capture', () => {
+    const result = mod.capturePrimaryDisplayPng();
+    if (result) {
+      expect(mod.getLastError()).toBe('');
+    }
   });
 });

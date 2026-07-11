@@ -22,6 +22,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const koffi = require('koffi');
 
+/** Target framework moniker — keep in sync with eIslandScreenshotHelper.csproj */
 const TFM = 'net10.0-windows10.0.19041.0';
 
 const dllCandidates = [
@@ -66,4 +67,4 @@ function callPng(fnName) {
   return { data, size: data.length, format: 'png' };
 }
 
-module.exports = { sc, callPng, getLastError, dllPath };
+module.exports = { sc, callPng, getLastError, dllPath, TFM };

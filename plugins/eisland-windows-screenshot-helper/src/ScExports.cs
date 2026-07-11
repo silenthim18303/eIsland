@@ -5,7 +5,7 @@ namespace eIslandScreenshotHelper;
 
 public static class ScExports
 {
-    private static string lastError = "";
+    private static string _lastError = "";
 
     [UnmanagedCallersOnly(EntryPoint = "sc_free_string")]
     public static void FreeString(IntPtr ptr)
@@ -19,12 +19,18 @@ public static class ScExports
     [UnmanagedCallersOnly(EntryPoint = "sc_get_last_error")]
     public static IntPtr GetLastError()
     {
-        return StringToCoTaskMem(lastError);
+        var error = _lastError;
+        if (string.IsNullOrEmpty(error))
+        {
+            error = ScreenCapture.GetLastError();
+        }
+        return StringToCoTaskMem(error);
     }
 
     [UnmanagedCallersOnly(EntryPoint = "sc_capture_primary_display_png")]
     public static IntPtr CapturePrimaryDisplayPng()
     {
+        _lastError = "";
         try
         {
             var png = ScreenCapture.CapturePrimaryDisplayPng();
@@ -32,7 +38,7 @@ public static class ScExports
         }
         catch (Exception ex)
         {
-            lastError = ex.ToString();
+            _lastError = ex.ToString();
             return IntPtr.Zero;
         }
     }

@@ -27,7 +27,9 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const dllPath = path.join(__dirname, '..', 'src', 'bin', 'Release', 'net10.0-windows10.0.19041.0', 'win-x64', 'native', 'eIslandScreenshotHelper.dll');
+/** Target framework moniker — keep in sync with eIslandScreenshotHelper.csproj */
+const TFM = 'net10.0-windows10.0.19041.0';
+const dllPath = path.join(__dirname, '..', 'src', 'bin', 'Release', TFM, 'win-x64', 'native', 'eIslandScreenshotHelper.dll');
 if (!fs.existsSync(dllPath)) {
   throw new Error('Native DLL not found. Run npm run build first.');
 }

@@ -49,19 +49,22 @@ function loadWindowsScreenshotHelper(): WindowsScreenshotHelper | null {
     join(process.cwd(), 'plugins', 'eisland-windows-screenshot-helper'),
   ];
 
-  const lastCandidate = candidates[candidates.length - 1];
+  const errors: string[] = [];
   const loaded = candidates.some((candidate) => {
     try {
       cachedHelper = require(candidate) as WindowsScreenshotHelper;
       return true;
     } catch (err) {
-      if (!hasLoggedLoadFailure && candidate === lastCandidate) {
-        hasLoggedLoadFailure = true;
-        console.warn('[ScreenshotHelper] native helper unavailable, fallback to desktopCapturer:', err);
-      }
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(`  ${candidate}: ${msg}`);
       return false;
     }
   });
+
+  if (!loaded && !hasLoggedLoadFailure) {
+    hasLoggedLoadFailure = true;
+    console.warn('[ScreenshotHelper] native helper unavailable, fallback to desktopCapturer:\n' + errors.join('\n'));
+  }
 
   if (!loaded) cachedHelper = null;
   return cachedHelper ?? null;

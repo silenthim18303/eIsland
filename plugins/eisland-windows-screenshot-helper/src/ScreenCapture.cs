@@ -11,18 +11,29 @@ internal static class ScreenCapture
     private const int SRCCOPY = 0x00CC0020;
     private const int CAPTUREBLT = 0x40000000;
 
+    private static string _lastError = "";
+
+    /// <summary>
+    /// 获取最后一次截屏失败的错误信息
+    /// </summary>
+    public static string GetLastError() => _lastError;
+
     public static byte[] CapturePrimaryDisplayPng()
     {
+        _lastError = "";
+
         var width = GetSystemMetrics(SM_CXSCREEN);
         var height = GetSystemMetrics(SM_CYSCREEN);
         if (width <= 0 || height <= 0)
         {
+            _lastError = $"invalid primary display dimensions ({width}x{height})";
             return Array.Empty<byte>();
         }
 
         var screenDc = GetDC(IntPtr.Zero);
         if (screenDc == IntPtr.Zero)
         {
+            _lastError = "GetDC failed for primary display";
             return Array.Empty<byte>();
         }
 
@@ -35,18 +46,21 @@ internal static class ScreenCapture
             memoryDc = CreateCompatibleDC(screenDc);
             if (memoryDc == IntPtr.Zero)
             {
+                _lastError = "CreateCompatibleDC failed";
                 return Array.Empty<byte>();
             }
 
             bitmap = CreateCompatibleBitmap(screenDc, width, height);
             if (bitmap == IntPtr.Zero)
             {
+                _lastError = "CreateCompatibleBitmap failed";
                 return Array.Empty<byte>();
             }
 
             oldObject = SelectObject(memoryDc, bitmap);
             if (!BitBlt(memoryDc, 0, 0, width, height, screenDc, 0, 0, SRCCOPY | CAPTUREBLT))
             {
+                _lastError = "BitBlt failed";
                 return Array.Empty<byte>();
             }
 
