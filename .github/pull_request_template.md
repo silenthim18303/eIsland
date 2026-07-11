@@ -1,7 +1,3 @@
-## Changes
-
-- 
-
 ## Verification
 
 - [ ] Verified locally (features / build / regression)
