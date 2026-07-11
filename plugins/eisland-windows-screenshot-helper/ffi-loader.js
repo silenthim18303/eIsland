@@ -54,6 +54,7 @@ const sc = {
   sc_free_string: lib.func('void sc_free_string(void*)'),
   sc_get_last_error: lib.func('str sc_get_last_error()'),
   sc_capture_primary_display_png: lib.func('str sc_capture_primary_display_png()'),
+  sc_get_visible_windows: lib.func('str sc_get_visible_windows()'),
 };
 
 function getLastError() {
@@ -67,4 +68,10 @@ function callPng(fnName) {
   return { data, size: data.length, format: 'png' };
 }
 
-module.exports = { sc, callPng, getLastError, dllPath, TFM };
+function callJson(fnName) {
+  const raw = sc[fnName]();
+  if (!raw) return null;
+  return JSON.parse(raw);
+}
+
+module.exports = { sc, callPng, callJson, getLastError, dllPath, TFM };

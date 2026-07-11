@@ -24,6 +24,10 @@ public static class ScExports
         {
             error = ScreenCapture.GetLastError();
         }
+        if (string.IsNullOrEmpty(error))
+        {
+            error = WindowBounds.GetLastError();
+        }
         return StringToCoTaskMem(error);
     }
 
@@ -35,6 +39,21 @@ public static class ScExports
         {
             var png = ScreenCapture.CapturePrimaryDisplayPng();
             return png.Length == 0 ? IntPtr.Zero : StringToCoTaskMem(Convert.ToBase64String(png));
+        }
+        catch (Exception ex)
+        {
+            _lastError = ex.ToString();
+            return IntPtr.Zero;
+        }
+    }
+
+    [UnmanagedCallersOnly(EntryPoint = "sc_get_visible_windows")]
+    public static IntPtr GetVisibleWindows()
+    {
+        _lastError = "";
+        try
+        {
+            return StringToCoTaskMem(WindowBounds.GetVisibleWindowsJson());
         }
         catch (Exception ex)
         {

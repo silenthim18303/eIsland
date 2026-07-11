@@ -9,7 +9,7 @@ icon: camera
 `@eisland/windows-screenshot-helper` · v26.0.0
 
 :::info
-Capture the primary display as PNG via .NET Native AOT DLL (koffi FFI). This plugin provides a lightweight, high-performance screen capture function using Windows GDI APIs (`BitBlt` with `SRCCOPY | CAPTUREBLT`).
+Capture the primary display as PNG and enumerate visible windows via .NET Native AOT DLL (koffi FFI). This plugin provides lightweight, high-performance screen capture using Windows GDI APIs (`BitBlt` with `SRCCOPY | CAPTUREBLT`) and window enumeration using `EnumWindows` with DWM extended frame bounds.
 :::
 
 ## Interfaces
@@ -17,16 +17,18 @@ Capture the primary display as PNG via .NET Native AOT DLL (koffi FFI). This plu
 | Interface | Description |
 |-----------|-------------|
 | [ScreenshotResult](screenshot-helper/screenshot-result.md) | Screenshot data structure |
+| [VisibleWindowBounds](screenshot-helper/visible-window-bounds.md) | Visible window bounding rectangle and metadata |
 
 ## Functions
 
 | Function | Description |
 |----------|-------------|
 | [capturePrimaryDisplayPng](screenshot-helper/capture-primary-display-png.md) | Capture the primary display as PNG |
+| [getVisibleWindows](screenshot-helper/get-visible-windows.md) | Enumerate visible windows and return their bounds |
 | [getLastError](screenshot-helper/get-last-error.md) | Get the last error message from the DLL |
 
 :::tip
-`capturePrimaryDisplayPng` returns `ScreenshotResult | null`. The result contains a PNG buffer with the full primary display content. Returns `null` when the capture fails — use `getLastError` to retrieve the error message. The DLL reports specific GDI failure reasons (e.g., `GetDC failed`, `BitBlt failed`, `invalid primary display dimensions`) through `getLastError`, not just exceptions.
+`capturePrimaryDisplayPng` returns `ScreenshotResult | null`. The result contains a PNG buffer with the full primary display content. Returns `null` when the capture fails — use `getLastError` to retrieve the error message. `getVisibleWindows` returns `VisibleWindowBounds[]` with the position and size of every visible application window, enabling window-aware screenshot selection.
 :::
 
 ## Build
@@ -65,10 +67,11 @@ Smoke tests require manual execution and display results in the console. Unit te
 | `index.d.ts` | TypeScript type declarations |
 | `ffi-loader.js` | koffi FFI bridge to Native AOT DLL |
 | `src/ScreenCapture.cs` | Core screen capture logic (Win32 GDI APIs) |
+| `src/WindowBounds.cs` | Visible window enumeration (EnumWindows + DWM) |
 | `src/ScExports.cs` | C ABI exports for FFI |
 | `src/Program.cs` | Native AOT library entry point |
 | `src/eIslandScreenshotHelper.csproj` | .NET 10 Native AOT project |
 
 :::important
-The DLL uses Win32 GDI `BitBlt` with `SRCCOPY | CAPTUREBLT` flags to capture the primary display. The result is returned as a base64-encoded PNG string through the FFI boundary, then decoded into a Node.js `Buffer`.
+The DLL uses Win32 GDI `BitBlt` with `SRCCOPY | CAPTUREBLT` flags to capture the primary display. The result is returned as a base64-encoded PNG string through the FFI boundary, then decoded into a Node.js `Buffer`. Window enumeration uses `EnumWindows` with `DwmGetWindowAttribute` for accurate bounds and cloaking detection.
 :::

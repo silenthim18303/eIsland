@@ -32,8 +32,19 @@ interface ScreenshotResult {
   format: 'png';
 }
 
+export interface VisibleWindowBounds {
+  hwnd: string;
+  title: string;
+  processId: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface WindowsScreenshotHelper {
   capturePrimaryDisplayPng: () => ScreenshotResult | null;
+  getVisibleWindows?: () => VisibleWindowBounds[];
   getLastError?: () => string;
 }
 
@@ -90,5 +101,23 @@ export function capturePrimaryDisplayPng(): Buffer | null {
   } catch (err) {
     console.warn('[ScreenshotHelper] capture error, fallback to desktopCapturer:', err);
     return null;
+  }
+}
+
+/**
+ * 获取所有可见窗口的位置和尺寸信息
+ * @description 枚举桌面上所有可见的顶层窗口，返回其边界矩形和元数据，用于截图选区的窗口识别
+ * @returns 可见窗口边界数组，插件不可用时返回空数组
+ */
+export function getVisibleWindows(): VisibleWindowBounds[] {
+  const helper = loadWindowsScreenshotHelper();
+  if (!helper?.getVisibleWindows) return [];
+
+  try {
+    const windows = helper.getVisibleWindows();
+    return Array.isArray(windows) ? windows : [];
+  } catch (err) {
+    console.warn('[ScreenshotHelper] window bounds unavailable:', err);
+    return [];
   }
 }

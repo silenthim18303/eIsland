@@ -22,13 +22,18 @@ if (process.platform !== 'win32') {
   throw new Error('@eisland/windows-screenshot-helper only supports Windows.');
 }
 
-const { callPng, getLastError } = require('./ffi-loader');
+const { callPng, callJson, getLastError } = require('./ffi-loader');
 
 function capturePrimaryDisplayPng() {
   return callPng('sc_capture_primary_display_png');
 }
 
+function getVisibleWindows() {
+  return callJson('sc_get_visible_windows') || [];
+}
+
 module.exports = {
   capturePrimaryDisplayPng,
+  getVisibleWindows,
   getLastError,
 };

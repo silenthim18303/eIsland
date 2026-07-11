@@ -82,6 +82,7 @@ const BADGE_MAP: Record<string, string> = {
   IconResult: 'interface',
   // Screenshot Helper
   ScreenshotResult: 'interface',
+  VisibleWindowBounds: 'interface',
 }
 
 // ── badge label text ─────────────────────────────────────────────
