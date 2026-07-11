@@ -155,7 +155,7 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
         }
       }).catch(() => {});
 
-      window.api?.onSettingsChanged?.((channel: string, value: unknown) => {
+      const unsubscribeSettings = window.api?.onSettingsChanged?.((channel: string, value: unknown) => {
         if (channel === 'shortcut:open-clipboard-history') {
           const store = useIslandStore.getState();
           store.setMaxExpandTab('clipboardHistory');
@@ -304,6 +304,13 @@ export function useIslandSettingsSync(options: UseIslandSettingsSyncOptions): vo
         }
       };
       window.addEventListener('island-auto-dim-local-sync', autoDimLocalHandler as EventListener);
+
+      // cleanup: 释放所有监听器，防止组件卸载后残留
+      return () => {
+        unsubscribeSettings?.();
+        window.removeEventListener(LOCAL_ISLAND_BG_SYNC_EVENT, localBgSyncHandler as EventListener);
+        window.removeEventListener('island-auto-dim-local-sync', autoDimLocalHandler as EventListener);
+      };
     }
   }, [
     language,

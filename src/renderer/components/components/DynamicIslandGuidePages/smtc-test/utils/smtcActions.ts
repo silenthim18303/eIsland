@@ -103,3 +103,16 @@ export function ensureInitialized(): void {
   window.api.mediaCurrentInfoGet().then(handleNowPlaying).catch(() => {});
   runtime.unsubscribe = window.api.onNowPlayingInfo(handleNowPlaying);
 }
+
+/** 释放 SMTC 订阅与状态，允许下次 ensureInitialized 重新创建 */
+export function dispose(): void {
+  if (!runtime.initialized) return;
+  runtime.initialized = false;
+  runtime.unsubscribe?.();
+  runtime.unsubscribe = null;
+  runtime.status = 'loading';
+  runtime.meta = null;
+  runtime.coverImage = null;
+  runtime.dominantColor = [0, 0, 0];
+  runtime.sourceAppId = '';
+}

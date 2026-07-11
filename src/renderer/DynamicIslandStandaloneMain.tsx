@@ -49,8 +49,12 @@ async function bootstrap(): Promise<void> {
   const handleNowPlayingUpdate = useIslandStore.getState().handleNowPlayingUpdate;
   const initialInfo = await window.api.mediaCurrentInfoGet().catch(() => null);
   handleNowPlayingUpdate(initialInfo as NowPlayingInfo | null);
-  window.api.onNowPlayingInfo((info: NowPlayingInfo | null) => {
+  const unsubscribeNowPlaying = window.api.onNowPlayingInfo((info: NowPlayingInfo | null) => {
     handleNowPlayingUpdate(info);
+  });
+
+  window.addEventListener('beforeunload', () => {
+    unsubscribeNowPlaying();
   });
 
   createRoot(rootEl).render(

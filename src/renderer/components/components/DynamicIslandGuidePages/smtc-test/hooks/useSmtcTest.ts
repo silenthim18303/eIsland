@@ -27,7 +27,7 @@
 import { useState, useEffect } from 'react';
 import type { UseSmtcTestReturn } from '../types';
 import { runtime } from '../utils/smtcStore';
-import { ensureInitialized } from '../utils/smtcActions';
+import { ensureInitialized, dispose } from '../utils/smtcActions';
 
 /**
  * SMTC 媒体测试 Hook
@@ -40,7 +40,13 @@ export function useSmtcTest(): UseSmtcTestReturn {
     const listener = (): void => forceUpdate((n) => n + 1);
     runtime.listeners.add(listener);
     ensureInitialized();
-    return () => { runtime.listeners.delete(listener); };
+    return () => {
+      runtime.listeners.delete(listener);
+      // 最后一个订阅者离开时释放 IPC 订阅
+      if (runtime.listeners.size === 0) {
+        dispose();
+      }
+    };
   }, []);
 
   return { status: runtime.status, meta: runtime.meta };
