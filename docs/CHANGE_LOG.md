@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-10T15:42:31.795Z
+> 生成时间：2026-07-11T13:43:20.395Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,22 @@
 
 ## Unreleased
 
+- 2026-07-11 | 6a9da232 | 鸡哥 | Merge pull request #141 from JNTMTMTM/dev
+- 2026-07-11 | e95aed1e | 鸡哥 | docs: update test coverage numbers and enhance error message descriptions in screenshot helper documentation
+- 2026-07-11 | 7991e819 | 鸡哥 | feat: enhance error handling and add TFM constant for screenshot helper
+- 2026-07-11 | 0ba42201 | 鸡哥 | feat: add documentation and descriptions for Windows Screenshot Helper module and tests
+- 2026-07-11 | bc332d9d | 鸡哥 | fix: improve loading logic for Windows Screenshot Helper and enhance error handling
+- 2026-07-11 | e25f3f0c | 鸡哥 | feat: add internationalization support for capture tools and update UI elements
+- 2026-07-11 | 9bf331ab | 鸡哥 | feat: add Windows Screenshot Helper plugin documentation and commands
+- 2026-07-11 | 16caab44 | 鸡哥 | feat: add Windows Screenshot Helper plugin with capture and error handling functions
+- 2026-07-11 | 91609051 | 鸡哥 | feat: enhance capture window service with opacity and mouse event handling
+- 2026-07-11 | 4beebf9e | 鸡哥 | feat: add windows screenshot helper plugin
+- 2026-07-11 | 19ad1f73 | 鸡哥 | feat: add setHoverTab function to useDynamicIslandCoordinator and useIslandHoverInteraction hooks
+- 2026-07-11 | 7d521d42 | 鸡哥 | feat: enhance event handling and cleanup in various components
+- 2026-07-11 | 449362e7 | 鸡哥 | docs: update tech stack documentation for plugins and architecture details
+- 2026-07-11 | c6c137d4 | 鸡哥 | feat: add Windows Application Icon Helper plugin to README.md
+- 2026-07-11 | 812276b5 | 鸡哥 | feat: add CLAUDE.md with behavioral guidelines for LLM coding practices
+- 2026-07-10 | 4431b075 | eislandBot | docs: auto update CHANGE_LOG.md for #140 by @JNTMTMTM [skip ci]
 - 2026-07-10 | f22823fc | 鸡哥 | Merge pull request #140 from JNTMTMTM/dev
 - 2026-07-10 | 3710af9a | 鸡哥 | feat: add MCP configuration files for CodeGraph integration
 - 2026-07-09 | a18ddef7 | eislandBot | docs: auto update CHANGE_LOG.md for #138 by @JNTMTMTM [skip ci]
