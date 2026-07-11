@@ -37,6 +37,7 @@ import { SmtcStep } from './components/components/DynamicIslandGuidePages/smtc-t
 import { ThemeStep } from './components/components/DynamicIslandGuidePages/theme';
 import { UpdateStep } from './components/components/DynamicIslandGuidePages/update';
 import { GithubStep } from './components/components/DynamicIslandGuidePages/github';
+import { SponsorStep } from './components/components/DynamicIslandGuidePages/sponsors';
 import { WelcomeStep } from './components/components/DynamicIslandGuidePages/welcome';
 import { ProcessIndicator } from './components/components/DynamicIslandProcessIndicator';
 import { useSmtcAccentColor } from './components/components/DynamicIslandGuidePages/smtc-test/hooks/useSmtcAccentColor';
@@ -98,9 +99,9 @@ function GuideApp(): ReactElement {
     setStep('theme');
   }, []);
 
-  /** 开源信息完成，进入欢迎页 */
+  /** 开源信息完成，进入赞助商页 */
   const handleGithubNext = useCallback((): void => {
-    setStep('welcome');
+    setStep('sponsors');
   }, []);
 
   /** 开源信息返回更新源配置 */
@@ -108,9 +109,19 @@ function GuideApp(): ReactElement {
     setStep('update');
   }, []);
 
-  /** 欢迎页返回开源信息 */
-  const handleWelcomePrev = useCallback((): void => {
+  /** 赞助商页完成，进入欢迎页 */
+  const handleSponsorsNext = useCallback((): void => {
+    setStep('welcome');
+  }, []);
+
+  /** 赞助商页返回开源信息 */
+  const handleSponsorsPrev = useCallback((): void => {
     setStep('github');
+  }, []);
+
+  /** 欢迎页返回赞助商页 */
+  const handleWelcomePrev = useCallback((): void => {
+    setStep('sponsors');
   }, []);
 
   return (
@@ -153,6 +164,12 @@ function GuideApp(): ReactElement {
           <GithubStep
             onNext={handleGithubNext}
             onPrev={handleGithubPrev}
+          />
+        )}
+        {step === 'sponsors' && (
+          <SponsorStep
+            onNext={handleSponsorsNext}
+            onPrev={handleSponsorsPrev}
           />
         )}
         {step === 'welcome' && (

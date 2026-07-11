@@ -19,18 +19,10 @@
  */
 
 /**
- * @file guide.css
- * @description 引导配置窗口样式入口（聚合子模块）
+ * @file sponsorConfig.ts
+ * @description 赞助商步骤配置常量
  * @author 鸡哥
  */
 
-@import './guide/base.css';
-@import './guide/step.css';
-@import './guide/language.css';
-@import './guide/whitelist.css';
-@import './guide/smtc.css';
-@import './guide/theme.css';
-@import './guide/update.css';
-@import './guide/github.css';
-@import './guide/sponsors.css';
-@import './guide/welcome.css';
+/** 赞助商图片路径（public 目录） */
+export const SPONSOR_IMG_SRC = './logo/signpath.png';

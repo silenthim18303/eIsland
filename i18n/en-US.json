@@ -114,6 +114,10 @@
       "license": "GPL-3.0 License",
       "depsTitle": "Open Source Frameworks & Dependencies & Projects"
     },
+    "sponsors": {
+      "title": "Sponsors",
+      "subtitle": "Thanks to our sponsors for their support"
+    },
     "welcome": {
       "title": "Welcome to eIsland",
       "subtitle": "Setup complete, start your Dynamic Island experience",
