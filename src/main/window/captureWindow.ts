@@ -118,6 +118,7 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
         x: primaryDisplay.bounds.x,
         y: primaryDisplay.bounds.y,
         show: false,
+        opacity: 0,
         fullscreen: true,
         transparent: true,
         frame: false,
@@ -134,6 +135,8 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
       });
 
       captureWindow.setAlwaysOnTop(true, 'screen-saver');
+      captureWindow.setIgnoreMouseEvents(true);
+      captureWindow.showInactive();
 
       captureWindow.on('closed', () => {
         captureWindow = null;
@@ -171,7 +174,8 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
           scaleFactor: sf,
           captureSource: nativeScreenshot ? 'plugin' : 'js',
         });
-        captureWindow.show();
+        captureWindow.setIgnoreMouseEvents(false);
+        captureWindow.setOpacity(1);
         captureWindow.focus();
       }
     } catch (err) {
