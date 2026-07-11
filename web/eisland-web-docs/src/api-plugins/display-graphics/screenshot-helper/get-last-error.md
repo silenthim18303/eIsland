@@ -7,7 +7,7 @@ icon: fa6-solid:code
 # getLastError
 
 :::info
-Retrieves the last error message from the Native AOT DLL. This function calls `sc_get_last_error` via koffi FFI to return a human-readable error string describing why the most recent capture operation failed. Returns an empty string if no error has occurred.
+Retrieves the last error message from the Native AOT DLL. This function calls `sc_get_last_error` via koffi FFI to return a human-readable error string describing why the most recent capture operation failed. Returns an empty string if no error has occurred. Error messages cover both GDI failures (e.g., `GetDC failed`, `BitBlt failed`, `invalid primary display dimensions`) and unexpected exceptions.
 :::
 
 ## Signature
@@ -31,7 +31,7 @@ Typical workflow:
 3. Log or display the error message for debugging.
 
 :::note
-The error message is set internally by the DLL when `sc_capture_primary_display_png` encounters an exception. It is stored in a static field and persists until the next capture attempt.
+The error message is set internally by the DLL on each failure path in `CapturePrimaryDisplayPng` — including invalid display dimensions, `GetDC` failure, `CreateCompatibleDC` failure, `CreateCompatibleBitmap` failure, `BitBlt` failure, and unexpected exceptions. It is stored in a static field and persists until the next capture attempt.
 :::
 
 :::tip
@@ -89,7 +89,7 @@ if (!result) {
 ## Notes
 
 :::note
-This function calls `sc_get_last_error` via koffi FFI, which returns the content of a static `lastError` string field inside the DLL. The field is set when `sc_capture_primary_display_png` catches an exception.
+This function calls `sc_get_last_error` via koffi FFI, which returns the content of a static error field inside the DLL. The field is set by `ScreenCapture.GetLastError()` for GDI failures and by `ScExports` for unexpected exceptions.
 :::
 
 :::tip

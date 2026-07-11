@@ -26,7 +26,7 @@ Capture the primary display as PNG via .NET Native AOT DLL (koffi FFI). This plu
 | [getLastError](screenshot-helper/get-last-error.md) | Get the last error message from the DLL |
 
 :::tip
-`capturePrimaryDisplayPng` returns `ScreenshotResult | null`. The result contains a PNG buffer with the full primary display content. Returns `null` when the capture fails — use `getLastError` to retrieve the error message.
+`capturePrimaryDisplayPng` returns `ScreenshotResult | null`. The result contains a PNG buffer with the full primary display content. Returns `null` when the capture fails — use `getLastError` to retrieve the error message. The DLL reports specific GDI failure reasons (e.g., `GetDC failed`, `BitBlt failed`, `invalid primary display dimensions`) through `getLastError`, not just exceptions.
 :::
 
 ## Build

@@ -145,8 +145,8 @@ All documentation content must be written in **English**. No Chinese text is all
 
 When documenting test coverage, use accurate numbers from the latest test run:
 
-- **125 test files**
-- **2068 tests**
+- **128 test files**
+- **2076 tests**
 
 Update these numbers when new test results show different counts.
 
