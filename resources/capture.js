@@ -77,6 +77,9 @@ const MAX_HISTORY = 10;
 const historyStack = [];
 let currentCaptureObjectUrl = '';
 let captureLanguage = 'zh-CN';
+let captureWindowRects = [];
+let hoverWindowRect = null;
+let pendingWindowClickRect = null;
 
 const CAPTURE_I18N = {
   'zh-CN': {
@@ -176,7 +179,17 @@ function drawMask() {
   maskCtx.clearRect(0, 0, W, H);
   if (state === STATE.IDLE) {
     maskCtx.fillStyle = 'rgba(0,0,0,0.35)';
-    maskCtx.fillRect(0, 0, W, H);
+    if (!hoverWindowRect) {
+      maskCtx.fillRect(0, 0, W, H);
+      return;
+    }
+    maskCtx.fillRect(0, 0, W, hoverWindowRect.y);
+    maskCtx.fillRect(0, hoverWindowRect.y + hoverWindowRect.height, W, H - hoverWindowRect.y - hoverWindowRect.height);
+    maskCtx.fillRect(0, hoverWindowRect.y, hoverWindowRect.x, hoverWindowRect.height);
+    maskCtx.fillRect(hoverWindowRect.x + hoverWindowRect.width, hoverWindowRect.y, W - hoverWindowRect.x - hoverWindowRect.width, hoverWindowRect.height);
+    maskCtx.strokeStyle = '#409cff';
+    maskCtx.lineWidth = 2;
+    maskCtx.strokeRect(hoverWindowRect.x, hoverWindowRect.y, hoverWindowRect.width, hoverWindowRect.height);
     return;
   }
 
@@ -225,6 +238,45 @@ function hitTestHandle(mx, my) {
 
 function isInsideSelection(mx, my) {
   return mx >= selX && mx <= selX + selW && my >= selY && my <= selY + selH;
+}
+
+function setVisibleWindowRects(windows, display) {
+  const displayBounds = display?.bounds || { x: 0, y: 0, width: window.innerWidth, height: window.innerHeight };
+  captureWindowRects = Array.isArray(windows)
+    ? windows.map((item) => {
+      const left = Math.max(item.x, displayBounds.x);
+      const top = Math.max(item.y, displayBounds.y);
+      const right = Math.min(item.x + item.width, displayBounds.x + displayBounds.width);
+      const bottom = Math.min(item.y + item.height, displayBounds.y + displayBounds.height);
+      return {
+        x: Math.max(0, Math.round(left - displayBounds.x)),
+        y: Math.max(0, Math.round(top - displayBounds.y)),
+        width: Math.round(right - left),
+        height: Math.round(bottom - top),
+        title: item.title || '',
+      };
+    }).filter((item) => item.width >= 40 && item.height >= 40)
+    : [];
+}
+
+function findWindowRectAt(mx, my) {
+  return captureWindowRects.find((item) => (
+    mx >= item.x && mx <= item.x + item.width && my >= item.y && my <= item.y + item.height
+  )) || null;
+}
+
+function selectWindowRect(rect) {
+  selX = rect.x;
+  selY = rect.y;
+  selW = rect.width;
+  selH = rect.height;
+  hoverWindowRect = null;
+  state = STATE.SELECTED;
+  historyStack.length = 0;
+  drawCtx.clearRect(0, 0, W, H);
+  showToolbar();
+  drawMask();
+  updateSizeInfo(selX, selY);
 }
 
 function clipToSelection(ctx) {
@@ -409,6 +461,7 @@ function drawRect(ctx, x1, y1, x2, y2) {
 }
 
 function finishSelection(mx, my) {
+  hoverWindowRect = null;
   selX = Math.min(startX, mx);
   selY = Math.min(startY, my);
   selW = Math.abs(mx - startX);
@@ -485,6 +538,7 @@ function releaseCaptureResources() {
 ipcRenderer.on('capture-image', (_e, data) => {
   scaleFactor = data.scaleFactor || 1;
   setCaptureSource(data.captureSource);
+  setVisibleWindowRects(data.visibleWindows, data.display);
 
   if (currentCaptureObjectUrl) {
     URL.revokeObjectURL(currentCaptureObjectUrl);
@@ -528,10 +582,12 @@ tempCanvas.addEventListener('mousedown', (e) => {
   const mx = e.clientX;
   const my = e.clientY;
 
-  if (state === STATE.IDLE || state === STATE.DRAWING) {
+  if (state === STATE.IDLE) {
+    pendingWindowClickRect = hoverWindowRect;
     state = STATE.DRAWING;
     startX = mx;
     startY = my;
+    hoverWindowRect = null;
     hideToolbar();
     drawMask();
     return;
@@ -587,6 +643,16 @@ tempCanvas.addEventListener('mousedown', (e) => {
 tempCanvas.addEventListener('mousemove', (e) => {
   const mx = e.clientX;
   const my = e.clientY;
+
+  if (state === STATE.IDLE) {
+    const nextHoverWindow = findWindowRectAt(mx, my);
+    if (nextHoverWindow !== hoverWindowRect) {
+      hoverWindowRect = nextHoverWindow;
+      drawMask();
+    }
+    document.body.style.cursor = 'crosshair';
+    return;
+  }
 
   if (state === STATE.DRAWING) {
     selX = Math.min(startX, mx);
@@ -677,6 +743,13 @@ tempCanvas.addEventListener('mouseup', (e) => {
   const my = e.clientY;
 
   if (state === STATE.DRAWING) {
+    const moved = Math.abs(mx - startX) >= 3 || Math.abs(my - startY) >= 3;
+    if (!moved && pendingWindowClickRect) {
+      selectWindowRect(pendingWindowClickRect);
+      pendingWindowClickRect = null;
+      return;
+    }
+    pendingWindowClickRect = null;
     finishSelection(mx, my);
     return;
   }

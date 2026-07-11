@@ -32,8 +32,19 @@ interface ScreenshotResult {
   format: 'png';
 }
 
+export interface VisibleWindowBounds {
+  hwnd: string;
+  title: string;
+  processId: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 interface WindowsScreenshotHelper {
   capturePrimaryDisplayPng: () => ScreenshotResult | null;
+  getVisibleWindows?: () => VisibleWindowBounds[];
   getLastError?: () => string;
 }
 
@@ -90,5 +101,18 @@ export function capturePrimaryDisplayPng(): Buffer | null {
   } catch (err) {
     console.warn('[ScreenshotHelper] capture error, fallback to desktopCapturer:', err);
     return null;
+  }
+}
+
+export function getVisibleWindows(): VisibleWindowBounds[] {
+  const helper = loadWindowsScreenshotHelper();
+  if (!helper?.getVisibleWindows) return [];
+
+  try {
+    const windows = helper.getVisibleWindows();
+    return Array.isArray(windows) ? windows : [];
+  } catch (err) {
+    console.warn('[ScreenshotHelper] window bounds unavailable:', err);
+    return [];
   }
 }

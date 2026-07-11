@@ -43,6 +43,15 @@ interface ScreenshotResult {
 const screenshot = isWindows && hasNativeDll
   ? (require('../') as {
       capturePrimaryDisplayPng(): ScreenshotResult | null;
+      getVisibleWindows(): Array<{
+        hwnd: string;
+        title: string;
+        processId: number;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+      }>;
       getLastError(): string;
     })
   : null;
@@ -63,6 +72,7 @@ describe.skipIf(!isWindows || !hasNativeDll)('@eisland/windows-screenshot-helper
 
   it('exports expected functions', () => {
     expect(typeof mod.capturePrimaryDisplayPng).toBe('function');
+    expect(typeof mod.getVisibleWindows).toBe('function');
     expect(typeof mod.getLastError).toBe('function');
   });
 
@@ -70,6 +80,20 @@ describe.skipIf(!isWindows || !hasNativeDll)('@eisland/windows-screenshot-helper
     const result = mod.capturePrimaryDisplayPng();
     expect(result).not.toBeNull();
     if (result) expectValidPng(result);
+  });
+
+  it('returns visible window bounds list', () => {
+    const windows = mod.getVisibleWindows();
+    expect(Array.isArray(windows)).toBe(true);
+    windows.forEach((item) => {
+      expect(typeof item.hwnd).toBe('string');
+      expect(typeof item.title).toBe('string');
+      expect(typeof item.processId).toBe('number');
+      expect(typeof item.x).toBe('number');
+      expect(typeof item.y).toBe('number');
+      expect(item.width).toBeGreaterThan(0);
+      expect(item.height).toBeGreaterThan(0);
+    });
   });
 
   it('does not throw on repeated capture', () => {

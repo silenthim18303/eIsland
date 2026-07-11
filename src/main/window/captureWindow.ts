@@ -29,7 +29,7 @@ import { app, BrowserWindow, desktopCapturer, screen } from 'electron';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { is } from '@electron-toolkit/utils';
-import { capturePrimaryDisplayPng } from './screenshotHelper';
+import { capturePrimaryDisplayPng, getVisibleWindows } from './screenshotHelper';
 
 interface CreateCaptureWindowServiceOptions {
   getMainWindow: () => BrowserWindow | null;
@@ -105,6 +105,7 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
       await waitForMainWindowHidden();
 
       const nativeScreenshot = capturePrimaryDisplayPng();
+      const visibleWindows = getVisibleWindows();
       const sourcesPromise = nativeScreenshot
         ? null
         : desktopCapturer.getSources({
@@ -173,6 +174,7 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
           display: primaryDisplay,
           scaleFactor: sf,
           captureSource: nativeScreenshot ? 'plugin' : 'js',
+          visibleWindows,
         });
         captureWindow.setIgnoreMouseEvents(false);
         captureWindow.setOpacity(1);
