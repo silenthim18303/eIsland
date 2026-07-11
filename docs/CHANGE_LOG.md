@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-11T13:43:20.395Z
+> 生成时间：2026-07-11T14:05:54.475Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,10 @@
 
 ## Unreleased
 
+- 2026-07-11 | fcdd3e02 | 鸡哥 | Merge pull request #142 from JNTMTMTM/dev
+- 2026-07-11 | 430dafa7 | 鸡哥 | refactor: remove unused changes section from pull request template
+- 2026-07-11 | 9ee19b33 | 鸡哥 | fix: restrict publish trigger to package.json changes and enhance version check logic
+- 2026-07-11 | ad703a45 | eislandBot | docs: auto update CHANGE_LOG.md for #141 by @JNTMTMTM [skip ci]
 - 2026-07-11 | 6a9da232 | 鸡哥 | Merge pull request #141 from JNTMTMTM/dev
 - 2026-07-11 | e95aed1e | 鸡哥 | docs: update test coverage numbers and enhance error message descriptions in screenshot helper documentation
 - 2026-07-11 | 7991e819 | 鸡哥 | feat: enhance error handling and add TFM constant for screenshot helper
