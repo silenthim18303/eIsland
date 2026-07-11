@@ -37,6 +37,7 @@ const maskCtx = maskCanvas.getContext('2d');
 
 const sizeInfo = document.getElementById('size-info');
 const toolbar = document.getElementById('toolbar');
+const captureSourceBadge = document.getElementById('captureSourceBadge');
 const colorPicker = document.getElementById('colorPicker');
 const sizePicker = document.getElementById('sizePicker');
 const btnUndo = document.getElementById('btnUndo');
@@ -75,6 +76,72 @@ const HANDLE_HIT = 8;
 const MAX_HISTORY = 10;
 const historyStack = [];
 let currentCaptureObjectUrl = '';
+let captureLanguage = 'zh-CN';
+
+const CAPTURE_I18N = {
+  'zh-CN': {
+    source: { plugin: '使用插件', js: '使用js' },
+    tools: {
+      select: '选区',
+      mosaic: '马赛克',
+      line: '直线',
+      rect: '矩形',
+      pen: '画笔',
+      undo: '撤销',
+      color: '颜色',
+      size: '粗细',
+      save: '保存',
+      cancel: '取消',
+      done: '完成',
+    },
+  },
+  'en-US': {
+    source: { plugin: 'Using plugin', js: 'Using JS' },
+    tools: {
+      select: 'Select',
+      mosaic: 'Mosaic',
+      line: 'Line',
+      rect: 'Rectangle',
+      pen: 'Pen',
+      undo: 'Undo',
+      color: 'Color',
+      size: 'Size',
+      save: 'Save',
+      cancel: 'Cancel',
+      done: 'Done',
+    },
+  },
+};
+
+function normalizeCaptureLanguage(raw) {
+  if (typeof raw !== 'string') return 'zh-CN';
+  if (raw === 'en' || raw === 'en-US' || raw.startsWith('en-')) return 'en-US';
+  return 'zh-CN';
+}
+
+function tCapture(key) {
+  return CAPTURE_I18N[captureLanguage].tools[key] || CAPTURE_I18N['zh-CN'].tools[key] || key;
+}
+
+function applyCaptureLanguage(language) {
+  captureLanguage = normalizeCaptureLanguage(language);
+  document.documentElement.lang = captureLanguage;
+  Array.from(document.querySelectorAll('[data-i18n]')).forEach((el) => {
+    el.textContent = tCapture(el.dataset.i18n);
+  });
+  setCaptureSource(captureSourceBadge?.dataset.captureSource || 'js');
+}
+
+async function initCaptureLanguage() {
+  try {
+    const stored = await ipcRenderer.invoke('store:read', 'i18n-language');
+    applyCaptureLanguage(stored);
+  } catch {
+    applyCaptureLanguage(navigator.language);
+  }
+}
+
+void initCaptureLanguage();
 
 /**
  * 初始化各层画布尺寸
@@ -223,6 +290,13 @@ function updateSizeInfo(mx, my) {
   sizeInfo.textContent = `${mx}, ${my}`;
   sizeInfo.style.left = `${Math.min(mx + 12, W - 80)}px`;
   sizeInfo.style.top = `${Math.min(my + 12, H - 28)}px`;
+}
+
+function setCaptureSource(source) {
+  if (!captureSourceBadge) return;
+  const safeSource = source === 'plugin' ? 'plugin' : 'js';
+  captureSourceBadge.dataset.captureSource = safeSource;
+  captureSourceBadge.textContent = CAPTURE_I18N[captureLanguage].source[safeSource];
 }
 
 function showToolbar() {
@@ -410,6 +484,7 @@ function releaseCaptureResources() {
 
 ipcRenderer.on('capture-image', (_e, data) => {
   scaleFactor = data.scaleFactor || 1;
+  setCaptureSource(data.captureSource);
 
   if (currentCaptureObjectUrl) {
     URL.revokeObjectURL(currentCaptureObjectUrl);

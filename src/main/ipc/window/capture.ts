@@ -28,6 +28,7 @@
 import { app, clipboard, desktopCapturer, dialog, ipcMain, nativeImage, type BrowserWindow } from 'electron';
 import { join } from 'path';
 import { writeFileSync } from 'fs';
+import { capturePrimaryDisplayPng } from '../../window/screenshotHelper';
 
 interface RegisterCaptureIpcHandlersOptions {
   getCaptureWindow: () => BrowserWindow | null;
@@ -53,6 +54,11 @@ export function registerCaptureIpcHandlers(options: RegisterCaptureIpcHandlersOp
 
   ipcMain.handle('system:screenshot', async () => {
     try {
+      const nativeScreenshot = capturePrimaryDisplayPng();
+      if (nativeScreenshot) {
+        return nativeScreenshot.toString('base64');
+      }
+
       const sources = await desktopCapturer.getSources({
         types: ['screen'],
         thumbnailSize: { width: 1920, height: 1080 },

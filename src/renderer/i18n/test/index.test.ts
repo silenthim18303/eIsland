@@ -36,7 +36,7 @@ const { localStorageMock } = vi.hoisted(() => {
 
   Object.defineProperty(globalThis, 'window', {
     value: {
-      api: { onSettingsChanged: vi.fn() },
+      api: { onSettingsChanged: vi.fn(), storeWrite: vi.fn().mockResolvedValue(true) },
       location: { pathname: '/index.html' },
     },
     configurable: true,
@@ -106,6 +106,7 @@ describe('i18n normalizeLanguage (tested via getLanguage / setLanguage)', () => 
     localStorageMock.clear();
     localStorageMock.setItem.mockClear();
     localStorageMock.getItem.mockClear();
+    (window.api.storeWrite as ReturnType<typeof vi.fn>).mockClear();
   });
 
   describe('getLanguage — returns normalized language from i18n.language', () => {
@@ -156,14 +157,21 @@ describe('i18n normalizeLanguage (tested via getLanguage / setLanguage)', () => 
   });
 
   describe('setLanguage — normalizes then persists', () => {
-    it('persists zh-CN to localStorage', async () => {
+    it('persists zh-CN to localStorage and storeWrite', async () => {
       await setLanguage('zh-CN');
       expect(localStorageMock.setItem).toHaveBeenCalledWith('i18n-language', 'zh-CN');
+      expect(window.api.storeWrite).toHaveBeenCalledWith('i18n-language', 'zh-CN');
     });
 
-    it('persists en-US to localStorage', async () => {
+    it('persists en-US to localStorage and storeWrite', async () => {
       await setLanguage('en-US');
       expect(localStorageMock.setItem).toHaveBeenCalledWith('i18n-language', 'en-US');
+      expect(window.api.storeWrite).toHaveBeenCalledWith('i18n-language', 'en-US');
+    });
+
+    it('normalizes unsupported locale before persisting', async () => {
+      await setLanguage('fr-FR');
+      expect(window.api.storeWrite).toHaveBeenCalledWith('i18n-language', 'zh-CN');
     });
   });
 });

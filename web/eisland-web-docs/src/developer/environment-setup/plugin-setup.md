@@ -25,6 +25,7 @@ eIsland uses ten native plugins to access Windows features that web technologies
 | **eisland-windows-wifi-helper** | C# (.NET) | — | WiFi connection status and event monitoring |
 | **eisland-windows-brightness-helper** | C# (.NET) | — | Screen brightness query, control, and WMI event monitoring |
 | **eisland-windows-application-icon-helper** | C# (.NET) | Shell32 | Application icon extraction by process name, PID, path, or shortcut |
+| **eisland-windows-screenshot-helper** | C# (.NET) | GDI32 | Primary display screen capture as PNG |
 
 :::important
 All plugins are compiled using **node-gyp** or **dotnet publish**, which requires Visual Studio Build Tools 2022 as the native compiler. The `npm run plugins:build` command in the root project automatically triggers these builds.
@@ -577,6 +578,22 @@ npm run smoke:monitor           # Monitor smoke test — WMI event tracking for 
 
 :::tip
 The Brightness Helper smoke tests require a display that supports WMI brightness control (most laptop built-in displays). On desktops without a backlight, `getBrightness()` returns `null` and `setBrightness()` returns `false`.
+:::
+
+### Screenshot Helper Tests
+
+The `eisland-windows-screenshot-helper` plugin has screenshot capture test files:
+
+```bash
+cd plugins/eisland-windows-screenshot-helper
+
+npm run test                    # All tests
+npm run test:screenshot         # Screenshot capture and PNG validation tests
+npm run smoke                   # Smoke test — capture and validate primary display
+```
+
+:::tip
+The Screenshot Helper smoke test captures the actual primary display and validates the PNG header bytes. It requires a display connected to the system. On headless or remote desktop environments without a physical display, the capture may fail.
 :::
 
 ## IDE Configuration

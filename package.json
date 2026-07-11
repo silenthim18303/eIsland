@@ -34,6 +34,7 @@
     "plugin:build:fullscreen": "cd plugins/eisland-windows-fullscreen-detector && npm run build",
     "plugin:build:perfmon": "cd plugins/eisland-windows-performance-monitor && npm run build",
     "plugin:build:icon-helper": "cd plugins/eisland-windows-application-icon-helper && npm run build",
+    "plugin:build:screenshot-helper": "cd plugins/eisland-windows-screenshot-helper && npm run build",
     "plugin:clean:bluetooth": "cd plugins/eisland-windows-bluetooth-helper && npm run clean",
     "plugin:clean:brightness": "cd plugins/eisland-windows-brightness-helper && npm run clean",
     "plugin:clean:power": "cd plugins/eisland-windows-power-helper && npm run clean",
@@ -44,8 +45,9 @@
     "plugin:clean:fullscreen": "cd plugins/eisland-windows-fullscreen-detector && npm run clean",
     "plugin:clean:perfmon": "cd plugins/eisland-windows-performance-monitor && npm run clean",
     "plugin:clean:icon-helper": "cd plugins/eisland-windows-application-icon-helper && npm run clean",
-    "plugins:build": "run-s plugin:build:bluetooth plugin:build:brightness plugin:build:power plugin:build:processes plugin:build:smtc plugin:build:toast plugin:build:wifi plugin:build:fullscreen plugin:build:perfmon plugin:build:icon-helper",
-    "plugins:clean": "run-p plugin:clean:bluetooth plugin:clean:brightness plugin:clean:power plugin:clean:processes plugin:clean:smtc plugin:clean:toast plugin:clean:wifi plugin:clean:fullscreen plugin:clean:perfmon plugin:clean:icon-helper"
+    "plugin:clean:screenshot-helper": "cd plugins/eisland-windows-screenshot-helper && npm run clean",
+    "plugins:build": "run-s plugin:build:bluetooth plugin:build:brightness plugin:build:power plugin:build:processes plugin:build:smtc plugin:build:toast plugin:build:wifi plugin:build:fullscreen plugin:build:perfmon plugin:build:icon-helper plugin:build:screenshot-helper",
+    "plugins:clean": "run-p plugin:clean:bluetooth plugin:clean:brightness plugin:clean:power plugin:clean:processes plugin:clean:smtc plugin:clean:toast plugin:clean:wifi plugin:clean:fullscreen plugin:clean:perfmon plugin:clean:icon-helper plugin:clean:screenshot-helper"
   },
   "dependencies": {
     "@eisland/windows-application-icon-helper": "file:plugins/eisland-windows-application-icon-helper",
@@ -56,6 +58,7 @@
     "@eisland/windows-power-helper": "file:plugins/eisland-windows-power-helper",
     "@eisland/windows-processes-attacker": "file:plugins/eisland-windows-processes-attacker",
     "@eisland/windows-smtc-helper": "file:plugins/eisland-windows-smtc-helper",
+    "@eisland/windows-screenshot-helper": "file:plugins/eisland-windows-screenshot-helper",
     "@eisland/windows-toast-listener": "file:plugins/eisland-windows-toast-listener",
     "@eisland/windows-wifi-helper": "file:plugins/eisland-windows-wifi-helper",
     "@gsap/react": "^2.1.2",

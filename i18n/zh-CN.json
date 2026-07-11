@@ -25,6 +25,25 @@
       "close": "关闭"
     }
   },
+  "capture": {
+    "source": {
+      "plugin": "使用插件",
+      "js": "使用js"
+    },
+    "tools": {
+      "select": "选区",
+      "mosaic": "马赛克",
+      "line": "直线",
+      "rect": "矩形",
+      "pen": "画笔",
+      "undo": "撤销",
+      "color": "颜色",
+      "size": "粗细",
+      "save": "保存",
+      "cancel": "取消",
+      "done": "完成"
+    }
+  },
   "guide": {
     "actions": {
       "skip": "一键跳过",

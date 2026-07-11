@@ -100,6 +100,16 @@ export default sidebar({
       ],
     },
     {
+      text: "Windows Screenshot Helper",
+      icon: "camera",
+      collapsible: true,
+      children: [
+        "display-graphics/screenshot-helper/screenshot-result.md",
+        "display-graphics/screenshot-helper/capture-primary-display-png.md",
+        "display-graphics/screenshot-helper/get-last-error.md",
+      ],
+    },
+    {
       text: "Windows Bluetooth Helper",
       icon: "server",
       collapsible: true,

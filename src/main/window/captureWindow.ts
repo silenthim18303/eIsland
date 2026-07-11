@@ -29,6 +29,7 @@ import { app, BrowserWindow, desktopCapturer, screen } from 'electron';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import { is } from '@electron-toolkit/utils';
+import { capturePrimaryDisplayPng } from './screenshotHelper';
 
 interface CreateCaptureWindowServiceOptions {
   getMainWindow: () => BrowserWindow | null;
@@ -103,10 +104,13 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
 
       await waitForMainWindowHidden();
 
-      const sourcesPromise = desktopCapturer.getSources({
-        types: ['screen'],
-        thumbnailSize: { width: Math.round(sw * sf), height: Math.round(sh * sf) },
-      });
+      const nativeScreenshot = capturePrimaryDisplayPng();
+      const sourcesPromise = nativeScreenshot
+        ? null
+        : desktopCapturer.getSources({
+          types: ['screen'],
+          thumbnailSize: { width: Math.round(sw * sf), height: Math.round(sh * sf) },
+        });
 
       captureWindow = new BrowserWindow({
         width: sw,
@@ -114,6 +118,7 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
         x: primaryDisplay.bounds.x,
         y: primaryDisplay.bounds.y,
         show: false,
+        opacity: 0,
         fullscreen: true,
         transparent: true,
         frame: false,
@@ -130,6 +135,8 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
       });
 
       captureWindow.setAlwaysOnTop(true, 'screen-saver');
+      captureWindow.setIgnoreMouseEvents(true);
+      captureWindow.showInactive();
 
       captureWindow.on('closed', () => {
         captureWindow = null;
@@ -142,19 +149,21 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
 
       const pageLoadPromise = captureWindow.loadFile(getCaptureHtmlPath());
 
-      const sources = await sourcesPromise;
-      if (sources.length === 0) {
-        closeCaptureWindow();
-        const mainWindow = options.getMainWindow();
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.show();
-          mainWindow.setAlwaysOnTop(true, 'screen-saver');
+      let imageBytes = nativeScreenshot;
+      if (!imageBytes) {
+        const sources = await sourcesPromise;
+        if (!sources || sources.length === 0) {
+          closeCaptureWindow();
+          const mainWindow = options.getMainWindow();
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.show();
+            mainWindow.setAlwaysOnTop(true, 'screen-saver');
+          }
+          return;
         }
-        return;
-      }
 
-      const screenshot = sources[0].thumbnail;
-      const imageBytes = screenshot.toPNG();
+        imageBytes = sources[0].thumbnail.toPNG();
+      }
 
       await pageLoadPromise;
 
@@ -163,8 +172,10 @@ export function createCaptureWindowService(options: CreateCaptureWindowServiceOp
           imageBytes,
           display: primaryDisplay,
           scaleFactor: sf,
+          captureSource: nativeScreenshot ? 'plugin' : 'js',
         });
-        captureWindow.show();
+        captureWindow.setIgnoreMouseEvents(false);
+        captureWindow.setOpacity(1);
         captureWindow.focus();
       }
     } catch (err) {

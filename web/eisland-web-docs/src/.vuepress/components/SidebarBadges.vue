@@ -80,6 +80,8 @@ const BADGE_MAP: Record<string, string> = {
   ToastNotificationSnapshot: 'interface',
   // Application Icon Helper
   IconResult: 'interface',
+  // Screenshot Helper
+  ScreenshotResult: 'interface',
 }
 
 // ── badge label text ─────────────────────────────────────────────
@@ -97,7 +99,7 @@ function inferTypeFromLink(link: string): string | null {
   // monitor files
   if (file.endsWith('-monitor')) return 'monitor'
   // get/set/close/start/stop/is/enable/disable/request = function
-  if (/^(get|set|close|start|stop|is|enable|disable|request|play|pause|next|previous|seek)\b/.test(file))
+  if (/^(get|set|close|start|stop|is|enable|disable|request|play|pause|next|previous|seek|capture)\b/.test(file))
     return 'function'
   return null
 }

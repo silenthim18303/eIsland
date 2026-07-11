@@ -32,6 +32,9 @@ const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
 /** 当前生效的模式（存储用户选择，非最终视觉主题） */
 let currentMode: ThemeMode = 'dark';
 
+/** 幂等标记：防止 initTheme 重复注册监听器 */
+let initialized = false;
+
 /**
  * 根据模式解析最终视觉主题并设置 data-theme
  */
@@ -61,6 +64,11 @@ export async function initTheme(): Promise<void> {
     currentMode = 'dark';
   }
   applyVisualTheme(currentMode);
+
+  // 幂等保护：防止重复注册监听器
+  if (initialized) return;
+  initialized = true;
+
   darkMq.addEventListener('change', onSystemThemeChange);
 
   window.api.onSettingsChanged((channel: string, value: unknown) => {

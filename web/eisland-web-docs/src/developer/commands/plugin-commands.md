@@ -28,6 +28,7 @@ npm run <script>
 | **Bluetooth Helper** | `eisland-windows-bluetooth-helper` | C# | dotnet | ✅ | ✅ |
 | **Brightness Helper** | `eisland-windows-brightness-helper` | C# | dotnet | ✅ | ✅ |
 | **Application Icon Helper** | `eisland-windows-application-icon-helper` | C# | dotnet | ✅ | ✅ |
+| **Screenshot Helper** | `eisland-windows-screenshot-helper` | C# | dotnet | ✅ | ✅ |
 
 ## Common Commands
 
@@ -72,6 +73,7 @@ Each plugin also has a dedicated root-level command for targeted builds and clea
 | Fullscreen Detector | `npm run plugin:build:fullscreen` | `npm run plugin:clean:fullscreen` |
 | Performance Monitor | `npm run plugin:build:perfmon` | `npm run plugin:clean:perfmon` |
 | Application Icon Helper | `npm run plugin:build:icon-helper` | `npm run plugin:clean:icon-helper` |
+| Screenshot Helper | `npm run plugin:build:screenshot-helper` | `npm run plugin:clean:screenshot-helper` |
 
 :::info NativeAOT Build Requirement
 Building NativeAOT DLLs (`npm run build:ctypes` for SMTC, Bluetooth, Power, WiFi helpers) requires `vswhere.exe` in PATH. If the build fails with `'vswhere.exe' is not recognized`, add it:
@@ -414,6 +416,37 @@ This is a pure .NET NativeAOT plugin that extracts Windows application icons usi
 
 ---
 
+## Windows Screenshot Helper
+
+**Directory:** `plugins/eisland-windows-screenshot-helper` &nbsp;|&nbsp; **Language:** C# (.NET) &nbsp;|&nbsp; **Build:** `dotnet publish`
+
+:::info
+This is a pure .NET NativeAOT plugin that captures the primary display as PNG using Win32 GDI APIs. It uses koffi FFI to call the native DLL from Node.js.
+:::
+
+### Build
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run build` | `dotnet publish src/eIslandScreenshotHelper.csproj -c Release -r win-x64` | Build NativeAOT DLL |
+| `npm run clean` | `dotnet clean src/eIslandScreenshotHelper.csproj` | Remove build artifacts |
+| `npm run rebuild` | `npm run clean && npm run build` | Full clean build |
+
+### Test
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm test` | `vitest run` | All unit tests |
+| `npm run test:screenshot` | `vitest run test/screenshot.test.ts` | Screenshot function tests only |
+
+### Smoke
+
+| Command | Script | Description |
+|---------|--------|-------------|
+| `npm run smoke` | `node --experimental-strip-types test/screenshot.smoke.ts` | Full smoke — capture and validate PNG |
+
+---
+
 ## Quick Reference
 
 ### All Build Commands
@@ -438,6 +471,7 @@ This is a pure .NET NativeAOT plugin that extracts Windows application icons usi
 | WiFi Helper (all) | `cd plugins/eisland-windows-wifi-helper && npm run build:all` |
 | Brightness Helper | `cd plugins/eisland-windows-brightness-helper && npm run build` |
 | Application Icon Helper | `cd plugins/eisland-windows-application-icon-helper && npm run build` |
+| Screenshot Helper | `cd plugins/eisland-windows-screenshot-helper && npm run build` |
 | **All plugins** | `npm run plugins:build` (from root — builds all 10 plugins) |
 
 ### All Test Commands
@@ -454,6 +488,7 @@ This is a pure .NET NativeAOT plugin that extracts Windows application icons usi
 | WiFi Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | Brightness Helper | `npm test` · `npm run test:query` · `npm run test:monitor` |
 | Application Icon Helper | `npm test` · `npm run test:icon` |
+| Screenshot Helper | `npm test` · `npm run test:screenshot` |
 
 ### All Smoke Commands
 
@@ -469,3 +504,4 @@ This is a pure .NET NativeAOT plugin that extracts Windows application icons usi
 | WiFi Helper | `npm run smoke` · `npm run smoke:monitor` |
 | Brightness Helper | `npm run smoke` · `npm run smoke:monitor` |
 | Application Icon Helper | `npm run smoke` · `npm run smoke:process-name` · `npm run smoke:pid` · `npm run smoke:path` · `npm run smoke:shortcut` |
+| Screenshot Helper | `npm run smoke` |

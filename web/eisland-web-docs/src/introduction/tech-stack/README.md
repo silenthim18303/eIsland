@@ -23,4 +23,4 @@ The eIsland project spans three major technology domains:
 |----------|-------------|
 | [Frontend Tech Stack](frontend-tech-stack.md) | React 19, TypeScript, Vite, Electron, Framer Motion, and frontend tooling |
 | [Backend Tech Stack](backend-tech-stack.md) | Java 25, Spring Boot 4.0.5, MyBatis, MySQL, Redis, RabbitMQ, and backend tooling |
-| [Plugins Tech Stack](plugins-tech-stack.md) | Plugin system architecture, IPC bridge, bundling, and tool integration |
+| [Plugins Tech Stack](plugins-tech-stack.md) | Native plugin architecture, build systems, Win32/WinRT APIs, and integration patterns |
