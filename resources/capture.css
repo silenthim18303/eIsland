@@ -134,6 +134,18 @@ body {
   color: rgba(255, 255, 255, .85);
 }
 
+.capture-source-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font: 12px/1.2 system-ui, sans-serif;
+  color: #d8ecff;
+  white-space: nowrap;
+  background: rgba(64, 156, 255, .18);
+}
+
 .capture-btn-icon {
   width: 13px;
   height: 13px;

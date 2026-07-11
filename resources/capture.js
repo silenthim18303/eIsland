@@ -37,6 +37,7 @@ const maskCtx = maskCanvas.getContext('2d');
 
 const sizeInfo = document.getElementById('size-info');
 const toolbar = document.getElementById('toolbar');
+const captureSourceBadge = document.getElementById('captureSourceBadge');
 const colorPicker = document.getElementById('colorPicker');
 const sizePicker = document.getElementById('sizePicker');
 const btnUndo = document.getElementById('btnUndo');
@@ -225,6 +226,11 @@ function updateSizeInfo(mx, my) {
   sizeInfo.style.top = `${Math.min(my + 12, H - 28)}px`;
 }
 
+function setCaptureSource(source) {
+  if (!captureSourceBadge) return;
+  captureSourceBadge.textContent = source === 'plugin' ? '使用插件' : '使用js';
+}
+
 function showToolbar() {
   toolbar.style.display = 'flex';
   const tbW = toolbar.offsetWidth || 520;
@@ -410,6 +416,7 @@ function releaseCaptureResources() {
 
 ipcRenderer.on('capture-image', (_e, data) => {
   scaleFactor = data.scaleFactor || 1;
+  setCaptureSource(data.captureSource);
 
   if (currentCaptureObjectUrl) {
     URL.revokeObjectURL(currentCaptureObjectUrl);
