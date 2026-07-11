@@ -25,6 +25,25 @@
       "close": "Close"
     }
   },
+  "capture": {
+    "source": {
+      "plugin": "Using plugin",
+      "js": "Using JS"
+    },
+    "tools": {
+      "select": "Select",
+      "mosaic": "Mosaic",
+      "line": "Line",
+      "rect": "Rectangle",
+      "pen": "Pen",
+      "undo": "Undo",
+      "color": "Color",
+      "size": "Size",
+      "save": "Save",
+      "cancel": "Cancel",
+      "done": "Done"
+    }
+  },
   "guide": {
     "actions": {
       "skip": "Skip Guide",

@@ -79,6 +79,11 @@ export async function setLanguage(language: AppLanguage): Promise<void> {
   } catch {
     // ignore storage errors
   }
+  try {
+    await window.api?.storeWrite?.(I18N_LANGUAGE_STORE_KEY, safeLanguage);
+  } catch {
+    // ignore store errors
+  }
 }
 
 i18n

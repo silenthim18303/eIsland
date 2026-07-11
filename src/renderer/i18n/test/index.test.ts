@@ -36,7 +36,7 @@ const { localStorageMock } = vi.hoisted(() => {
 
   Object.defineProperty(globalThis, 'window', {
     value: {
-      api: { onSettingsChanged: vi.fn() },
+      api: { onSettingsChanged: vi.fn(), storeWrite: vi.fn().mockResolvedValue(true) },
       location: { pathname: '/index.html' },
     },
     configurable: true,

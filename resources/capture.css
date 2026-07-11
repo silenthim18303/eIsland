@@ -77,7 +77,7 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  max-width: min(96vw, 900px);
+  max-width: min(98vw, 1280px);
   padding: 6px;
   border-radius: 8px;
   background: rgba(30, 30, 30, .92);
