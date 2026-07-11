@@ -18,6 +18,12 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file screenshotHelper.ts
+ * @description Windows 主屏幕截图辅助模块，优先加载原生插件，失败时回退到 desktopCapturer
+ * @author 鸡哥
+ */
+
 import { join } from 'path';
 
 interface ScreenshotResult {
@@ -61,6 +67,11 @@ function loadWindowsScreenshotHelper(): WindowsScreenshotHelper | null {
   return cachedHelper ?? null;
 }
 
+/**
+ * 截取主显示器画面并返回 PNG Buffer
+ * @description 优先使用原生插件截屏，插件不可用时返回 null 以触发 desktopCapturer 回退
+ * @returns PNG 格式的 Buffer，截屏失败或插件不可用时返回 null
+ */
 export function capturePrimaryDisplayPng(): Buffer | null {
   const helper = loadWindowsScreenshotHelper();
   if (!helper) return null;
