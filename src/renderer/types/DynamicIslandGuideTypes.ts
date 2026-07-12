@@ -25,7 +25,7 @@
  */
 
 /** 引导步骤 */
-export type GuideStep = 'language' | 'whitelist' | 'smtc' | 'theme' | 'update' | 'github' | 'welcome';
+export type GuideStep = 'language' | 'whitelist' | 'smtc' | 'theme' | 'update' | 'github' | 'sponsors' | 'welcome';
 
 /** 引导步骤索引映射 */
 export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
@@ -35,8 +35,9 @@ export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
   theme: 3,
   update: 4,
   github: 5,
-  welcome: 6,
+  sponsors: 6,
+  welcome: 7,
 };
 
-/** 引导步骤总数 */
-export const GUIDE_STEP_TOTAL = 7;
+/** 引导步骤总数（从索引映射自动推导，避免遗漏） */
+export const GUIDE_STEP_TOTAL = Object.keys(GUIDE_STEP_INDEX).length;

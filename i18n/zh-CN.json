@@ -114,6 +114,10 @@
       "license": "GPL-3.0 许可证",
       "depsTitle": "开源框架 & 依赖 & 项目"
     },
+    "sponsors": {
+      "title": "赞助商",
+      "subtitle": "感谢赞助商的支持"
+    },
     "welcome": {
       "title": "欢迎使用 eIsland",
       "subtitle": "配置完成，开始体验灵动岛吧",
