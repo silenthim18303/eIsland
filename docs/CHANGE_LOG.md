@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-11T15:07:14.091Z
+> 生成时间：2026-07-12T16:22:28.004Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,12 @@
 
 ## Unreleased
 
+- 2026-07-13 | 0fb81520 | 鸡哥 | Merge pull request #144 from JNTMTMTM/dev
+- 2026-07-12 | 8037941c | 鸡哥 | feat: update sponsor images to include names and improve layout responsiveness
+- 2026-07-12 | 054b0437 | 鸡哥 | Refactor code structure for improved readability and maintainability
+- 2026-07-12 | 43823051 | 鸡哥 | feat: add sponsors step to the guide with localization and styling
+- 2026-07-12 | 53d87836 | 鸡哥 | feat: add signpath logo image to the public assets
+- 2026-07-11 | 04461ec1 | eislandBot | docs: auto update CHANGE_LOG.md for #143 by @JNTMTMTM [skip ci]
 - 2026-07-11 | 2d93ed22 | 鸡哥 | Merge pull request #143 from JNTMTMTM/dev
 - 2026-07-11 | d3d9434c | 鸡哥 | feat: add documentation for getVisibleWindows function in screenshotHelper.ts
 - 2026-07-11 | 84e8ed2f | 鸡哥 | fix: update version to 26.0.1 in package.json and package-lock.json
