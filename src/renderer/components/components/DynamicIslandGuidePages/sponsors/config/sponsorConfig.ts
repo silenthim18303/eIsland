@@ -24,5 +24,8 @@
  * @author 鸡哥
  */
 
-/** 赞助商图片路径（public 目录） */
-export const SPONSOR_IMG_SRC = './logo/signpath.png';
+/** 赞助商图片路径列表（public 目录） */
+export const SPONSOR_IMG_LIST: string[] = [
+  './logo/signpath.png',
+  './logo/cloudflare.png',
+];

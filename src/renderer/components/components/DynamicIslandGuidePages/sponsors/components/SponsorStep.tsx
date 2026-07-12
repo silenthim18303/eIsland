@@ -26,7 +26,7 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SPONSOR_IMG_SRC } from '../config/sponsorConfig';
+import { SPONSOR_IMG_LIST } from '../config/sponsorConfig';
 import type { SponsorStepProps } from '../types';
 
 /**
@@ -43,11 +43,14 @@ export function SponsorStep({ onNext, onPrev }: SponsorStepProps): ReactElement 
         <p>{t('guide.sponsors.subtitle', { defaultValue: '感谢赞助商的支持' })}</p>
       </div>
       <div className="guide-sponsors-content">
-        <img
-          className="guide-sponsors-img"
-          src={SPONSOR_IMG_SRC}
-          alt="Sponsor"
-        />
+        {SPONSOR_IMG_LIST.map((src) => (
+          <img
+            key={src}
+            className="guide-sponsors-img"
+            src={src}
+            alt="Sponsor"
+          />
+        ))}
       </div>
       <div className="guide-step-footer">
         <button className="guide-prev-btn" onClick={onPrev}>
