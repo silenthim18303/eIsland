@@ -39,5 +39,5 @@ export const GUIDE_STEP_INDEX: Record<GuideStep, number> = {
   welcome: 7,
 };
 
-/** 引导步骤总数 */
-export const GUIDE_STEP_TOTAL = 8;
+/** 引导步骤总数（从索引映射自动推导，避免遗漏） */
+export const GUIDE_STEP_TOTAL = Object.keys(GUIDE_STEP_INDEX).length;

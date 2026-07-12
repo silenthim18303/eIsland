@@ -43,12 +43,12 @@ export function SponsorStep({ onNext, onPrev }: SponsorStepProps): ReactElement 
         <p>{t('guide.sponsors.subtitle', { defaultValue: '感谢赞助商的支持' })}</p>
       </div>
       <div className="guide-sponsors-content">
-        {SPONSOR_IMG_LIST.map((src) => (
+        {SPONSOR_IMG_LIST.map(({ src, name }) => (
           <img
             key={src}
             className="guide-sponsors-img"
             src={src}
-            alt="Sponsor"
+            alt={name}
           />
         ))}
       </div>
