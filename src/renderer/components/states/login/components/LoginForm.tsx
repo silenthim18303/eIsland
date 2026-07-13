@@ -27,6 +27,7 @@
 import type { ReactElement } from 'react';
 import type { useLogin } from '../hooks/useLogin';
 import { renderFeedback } from '../utils/renderFeedback';
+import { SvgIcon } from '../../../../utils/SvgIcon';
 
 type LoginFormProps = ReturnType<typeof useLogin>;
 
@@ -205,12 +206,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             onClick={() => void handleMicrosoftLogin()}
             disabled={true}
           >
-            <svg className="auth-oauth-icon" viewBox="0 0 21 21" width="18" height="18">
-              <rect x="1" y="1" width="9" height="9" fill="#f25022" />
-              <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
-              <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
-              <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
-            </svg>
+            <img className="auth-oauth-icon" src={SvgIcon.MICROSOFT} alt="" width={18} height={18} />
             {microsoftLoading
               ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
               : t('oauth.microsoft.login', { defaultValue: '使用 Microsoft 登录' })}
