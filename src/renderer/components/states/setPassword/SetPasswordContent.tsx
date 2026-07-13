@@ -43,6 +43,8 @@ export function SetPasswordContent(): ReactElement {
       setConfirmPassword={sp.setConfirmPassword}
       passwordVisible={sp.passwordVisible}
       setPasswordVisible={sp.setPasswordVisible}
+      confirmPasswordVisible={sp.confirmPasswordVisible}
+      setConfirmPasswordVisible={sp.setConfirmPasswordVisible}
       submitting={sp.submitting}
       feedback={sp.feedback}
       handleSubmit={sp.handleSubmit}
