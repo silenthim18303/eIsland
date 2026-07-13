@@ -55,6 +55,8 @@ export function LoginForm(props: LoginFormProps): ReactElement {
     returnFromAuth,
     githubLoading,
     handleGitHubLogin,
+    microsoftLoading,
+    handleMicrosoftLogin,
     t,
   } = props;
 
@@ -196,6 +198,22 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             {githubLoading
               ? t('oauth.github.loading', { defaultValue: '连接中…' })
               : t('oauth.github.login', { defaultValue: '使用 GitHub 登录' })}
+          </button>
+          <button
+            type="button"
+            className="auth-oauth-btn auth-oauth-btn--microsoft"
+            onClick={() => void handleMicrosoftLogin()}
+            disabled={submitting || microsoftLoading}
+          >
+            <svg className="auth-oauth-icon" viewBox="0 0 21 21" width="18" height="18">
+              <rect x="1" y="1" width="9" height="9" fill="#f25022" />
+              <rect x="11" y="1" width="9" height="9" fill="#7fba00" />
+              <rect x="1" y="11" width="9" height="9" fill="#00a4ef" />
+              <rect x="11" y="11" width="9" height="9" fill="#ffb900" />
+            </svg>
+            {microsoftLoading
+              ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
+              : t('oauth.microsoft.login', { defaultValue: '使用 Microsoft 登录' })}
           </button>
         </div>
       </div>

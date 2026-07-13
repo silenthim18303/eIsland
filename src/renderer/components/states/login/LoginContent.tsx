@@ -58,6 +58,8 @@ export function LoginContent(): ReactElement {
       returnFromAuth={login.returnFromAuth}
       githubLoading={login.githubLoading}
       handleGitHubLogin={login.handleGitHubLogin}
+      microsoftLoading={login.microsoftLoading}
+      handleMicrosoftLogin={login.handleMicrosoftLogin}
       t={login.t}
     />
   );
