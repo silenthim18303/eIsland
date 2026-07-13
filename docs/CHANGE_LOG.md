@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-12T16:22:28.004Z
+> 生成时间：2026-07-13T09:39:30.268Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,19 @@
 
 ## Unreleased
 
+- 2026-07-13 | ea5237d1 | 鸡哥 | Merge pull request #145 from JNTMTMTM/dev
+- 2026-07-13 | 4c95cedf | 鸡哥 | refactor: remove OAuth IPC handlers and related code, streamline user account API requests
+- 2026-07-13 | 81559519 | 鸡哥 | feat: add module entry documentation for OAuth binding and password setting components
+- 2026-07-13 | fe25cc74 | 鸡哥 | feat: refactor GitHub OAuth requests to use dedicated githubRequest function
+- 2026-07-13 | 961b886e | 鸡哥 | feat: add confirm password visibility handling to SetPasswordContent component
+- 2026-07-13 | 139ada2f | 鸡哥 | feat: add confirm password visibility toggle to SetPasswordForm component
+- 2026-07-13 | 027a7bf3 | 鸡哥 | feat: create SetPasswordFormProps interface for type safety in SetPasswordForm component
+- 2026-07-13 | 9ff7d79c | 鸡哥 | feat: define BindOAuthFormProps interface for improved type safety in OAuth form component
+- 2026-07-13 | fa6e2ff3 | 鸡哥 | feat: update documentation for OAuth integration, including state machine and MySQL schema
+- 2026-07-13 | 2592972f | 鸡哥 | feat: enhance hover interaction and login state handling with new CSS classes
+- 2026-07-13 | ce0d5886 | 鸡哥 | feat: add OAuth functionality for user account binding and password setting
+- 2026-07-13 | 80b97357 | 鸡哥 | fix: simplify cancel login message in English and Chinese translations
+- 2026-07-12 | 93882ffc | eislandBot | docs: auto update CHANGE_LOG.md for #144 by @JNTMTMTM [skip ci]
 - 2026-07-13 | 0fb81520 | 鸡哥 | Merge pull request #144 from JNTMTMTM/dev
 - 2026-07-12 | 8037941c | 鸡哥 | feat: update sponsor images to include names and improve layout responsiveness
 - 2026-07-12 | 054b0437 | 鸡哥 | Refactor code structure for improved readability and maintainability
