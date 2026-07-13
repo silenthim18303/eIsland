@@ -19,7 +19,7 @@ Charset:  utf8mb4 / utf8mb4_unicode_ci
 
 | Domain | Tables | Purpose |
 |--------|--------|---------|
-| **User** | `user_account`, `user_active_daily` | Unified user profiles, authentication, role management, activity tracking |
+| **User** | `user_account`, `user_active_daily`, `user_oauth_binding` | Unified user profiles, authentication, role management, activity tracking, OAuth bindings |
 | **Identity** | `identity_verification` | Real-name identity verification via Alipay face authentication |
 | **Auth** | `email_dispatch_dlq_log` | Email dispatch dead letter queue logging |
 | **Payment** | `payment_order`, `payment_transaction`, `payment_notify_log`, `payment_reconcile_record`, `payment_dlq_log`, `payment_pricing_config` | WeChat/Alipay payment processing, order lifecycle, reconciliation |
@@ -95,6 +95,38 @@ Tracks daily user activity for analytics and DAU (Daily Active Users) reporting.
 | PRIMARY | `id` | Clustered | Row identifier |
 | `uk_user_active_daily_user_role_date` | `username`, `role`, `active_date` | UNIQUE | Prevent duplicate entries per user per day per role |
 | `idx_user_active_daily_date_role` | `active_date`, `role` | Non-unique | Aggregate DAU queries grouped by date and role |
+
+---
+
+### user_oauth_binding
+
+:::tip
+Stores OAuth provider bindings (GitHub, Microsoft, etc.) linked to user accounts. Each row represents one third-party account linked to one eIsland user. A user can have multiple OAuth bindings (one per provider). For the OAuth login flow, see [State Machine — login](../frontend-arch/states.md#github-oauth-login-flow).
+:::
+
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| `id` | BIGINT | NO | AUTO_INCREMENT | Primary key |
+| `user_id` | BIGINT | NO | — | FK to `user_account.id`. CASCADE on delete |
+| `provider` | VARCHAR(20) | NO | — | OAuth provider identifier (`github`, `microsoft`) |
+| `provider_user_id` | VARCHAR(100) | NO | — | Third-party platform unique user ID |
+| `provider_username` | VARCHAR(100) | YES | NULL | Third-party platform display username |
+| `provider_email` | VARCHAR(150) | YES | NULL | Third-party platform email address |
+| `access_token` | VARCHAR(500) | YES | NULL | Third-party access token (encrypted at rest) |
+| `created_at` | DATETIME | NO | `CURRENT_TIMESTAMP` | Binding creation timestamp |
+
+**Indexes:**
+
+| Name | Columns | Type | Purpose |
+|------|---------|------|---------|
+| PRIMARY | `id` | Clustered | Row identifier |
+| `uk_oauth_provider_user` | `provider`, `provider_user_id` | UNIQUE | One binding per provider per third-party user |
+| `idx_oauth_user_id` | `user_id` | Non-unique | Look up all bindings for a user |
+| `fk_oauth_user` | `user_id` | Foreign key | Referential integrity to `user_account.id` |
+
+:::warning
+The `access_token` column stores the raw OAuth token. In production, ensure the database connection uses TLS and consider application-level encryption for this column.
+:::
 
 ---
 

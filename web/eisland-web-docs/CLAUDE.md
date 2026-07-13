@@ -11,22 +11,23 @@ src/
 │   ├── intro/                   # Project introduction
 │   │   ├── README.md            # Category index
 │   │   ├── project-overview.md  # eIsland project overview
-│   │   └── coc.md               # Code of Conduct
+│   │   ├── coc.md               # Code of Conduct
+│   │   └── backend-dependencies.md
 │   ├── tech-stack/              # Technology stack
 │   │   ├── README.md            # Category index
 │   │   ├── frontend-tech-stack.md
-│   │   ├── backend-tech-stack.md
-│   │   └── plugins-tech-stack.md
+│   │   └── backend-tech-stack.md
 │   ├── frontend-arch/           # Frontend architecture
 │   │   ├── README.md            # Category index
-│   │   ├── process-model.md
-│   │   └── states.md
+│   │   ├── process-model.md     # Electron multi-process model
+│   │   ├── states.md            # 19-state state machine (incl. OAuth states)
+│   │   └── electron-windows.md  # BrowserWindow instances
 │   └── backend-arch/            # Backend architecture
 │       ├── README.md            # Category index
-│       ├── server-model.md
-│       ├── mysql-schema.md
-│       ├── redis-schema.md
-│       └── rabbitmq-schema.md
+│       ├── server-model.md      # Server module architecture
+│       ├── mysql-schema.md      # Database schema (incl. user_oauth_binding)
+│       ├── redis-schema.md      # Redis key patterns
+│       └── rabbitmq-schema.md   # Message queue topology
 └── developer/                   # Developer guide
     ├── README.md                # Top-level developer index
     ├── environment-setup/       # Environment configuration
@@ -34,25 +35,23 @@ src/
     │   ├── frontend-setup.md
     │   ├── backend-setup.md
     │   └── plugin-setup.md
-    ├── guides/                  # Development workflows and practices
+    ├── commands/                # npm/Maven script reference
     │   ├── README.md            # Category index
-    │   ├── development-workflow.md
-    │   ├── plugin-development.md
-    │   └── debugging-guide.md
-    ├── standards/               # Coding and documentation standards
-    │   ├── README.md            # Category index
-    │   ├── coding-standards.md
-    │   ├── documentation-standards.md
-    │   └── commit-conventions.md
+    │   ├── dev-commands.md
+    │   ├── test-commands.md
+    │   ├── quality-commands.md
+    │   ├── release-commands.md
+    │   ├── package-commands.md
+    │   ├── plugin-commands.md
+    │   └── esa-commands.md
     ├── code-quality/            # Coding and comment quality standards
     │   ├── README.md            # Category index
     │   ├── code-review.md       # Frontend coding standards
     │   └── comment-quality.md   # JSDoc comment standards
-    └── testing/                 # Testing strategies and frameworks
+    └── git-operations/          # Git workflows
         ├── README.md            # Category index
-        ├── testing-overview.md
-        ├── frontend-testing.md
-        └── backend-testing.md
+        ├── local-operations.md
+        └── github-operations.md
 ```
 
 ### Sidebar Rules
@@ -158,3 +157,13 @@ When documenting database, cache, or message queue schemas:
 - **Redis**: Document every key pattern with Data Structure, TTL, and Purpose. Embed Lua scripts inline with `:::details` blocks at the corresponding key section.
 - **RabbitMQ**: Document all exchanges, queues, bindings, and message types. Include producer/consumer flow tables.
 - Cross-reference Java entity classes, mapper XMLs, and service classes as source of truth.
+
+## State Machine Documentation
+
+When documenting island states in `states.md`:
+
+- Each state must have a dedicated section with: Property table, Entry Conditions, Exit Conditions, UI Components Rendered, Behavior Details.
+- Use **Mermaid sequence diagrams** for multi-step flows (e.g., OAuth login, payment processing).
+- Dimensions must match `STATE_AREA` in `src/renderer/components/config/dynamicIslandStateConfig.ts`.
+- State count in the header must match the total entries in `STATE_CONFIGS`.
+- Auth-related states (`login`, `register`, `resetPassword`, `setPassword`, `bindOAuth`, `payment`) all use **860×400 px** dimensions.
