@@ -38,6 +38,8 @@ export interface SetPasswordFormProps {
   setConfirmPassword: Dispatch<SetStateAction<string>>;
   passwordVisible: boolean;
   setPasswordVisible: Dispatch<SetStateAction<boolean>>;
+  confirmPasswordVisible: boolean;
+  setConfirmPasswordVisible: Dispatch<SetStateAction<boolean>>;
   submitting: boolean;
   feedback: Feedback | null;
   handleSubmit: () => Promise<void>;

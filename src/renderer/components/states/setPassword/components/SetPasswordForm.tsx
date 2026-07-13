@@ -39,6 +39,8 @@ export function SetPasswordForm(props: SetPasswordFormProps): ReactElement {
     setConfirmPassword,
     passwordVisible,
     setPasswordVisible,
+    confirmPasswordVisible,
+    setConfirmPasswordVisible,
     submitting,
     feedback,
     handleSubmit,
@@ -104,13 +106,27 @@ export function SetPasswordForm(props: SetPasswordFormProps): ReactElement {
 
         <label className="settings-field">
           <span className="settings-field-label">{t('settings.user.fields.confirmPassword', { defaultValue: '确认密码' })}</span>
-          <input
-            className="settings-field-input"
-            type={passwordVisible ? 'text' : 'password'}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder={t('settings.user.fields.confirmPasswordPlaceholder', { defaultValue: '请再次输入密码' })}
-          />
+          <div className="auth-password-input-wrap">
+            <input
+              className="settings-field-input"
+              type={confirmPasswordVisible ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder={t('settings.user.fields.confirmPasswordPlaceholder', { defaultValue: '请再次输入密码' })}
+            />
+            <button
+              type="button"
+              className="auth-password-toggle"
+              onClick={() => setConfirmPasswordVisible((v) => !v)}
+              aria-label={confirmPasswordVisible
+                ? t('settings.user.actions.hidePassword', { defaultValue: '隐藏密码' })
+                : t('settings.user.actions.showPassword', { defaultValue: '显示密码' })}
+            >
+              {confirmPasswordVisible
+                ? t('settings.user.actions.hide', { defaultValue: '隐藏' })
+                : t('settings.user.actions.show', { defaultValue: '显示' })}
+            </button>
+          </div>
         </label>
 
         {renderFeedback(feedback)}

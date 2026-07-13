@@ -40,6 +40,7 @@ export function useSetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
@@ -102,6 +103,8 @@ export function useSetPassword() {
     setConfirmPassword,
     passwordVisible,
     setPasswordVisible,
+    confirmPasswordVisible,
+    setConfirmPasswordVisible,
     submitting,
     feedback,
     handleSubmit,
