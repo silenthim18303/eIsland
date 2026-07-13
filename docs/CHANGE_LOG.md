@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-13T09:39:30.268Z
+> 生成时间：2026-07-13T14:39:50.416Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,16 @@
 
 ## Unreleased
 
+- 2026-07-13 | af754cb6 | 鸡哥 | Merge pull request #146 from JNTMTMTM/dev
+- 2026-07-13 | 38db027b | 鸡哥 | feat: update skip button text to include default value for better localization
+- 2026-07-13 | e5c43284 | 鸡哥 | feat: add skip functionality to LanguageStep component
+- 2026-07-13 | 9b863ac4 | 鸡哥 | feat: replace Microsoft login SVG with SvgIcon component
+- 2026-07-13 | a42d054b | 鸡哥 | feat: add Microsoft SVG icon and update SvgIcon utility
+- 2026-07-13 | 1346c97c | 鸡哥 | feat: enhance authentication documentation to include Microsoft OAuth support
+- 2026-07-13 | 389a43c7 | 鸡哥 | fix: disable Microsoft login button during submission and loading states
+- 2026-07-13 | 57e16646 | 鸡哥 | feat: add Microsoft OAuth login functionality and update related UI components
+- 2026-07-13 | 025dfab8 | 鸡哥 | feat: add SVG resources to electron-builder configuration
+- 2026-07-13 | a11a5011 | eislandBot | docs: auto update CHANGE_LOG.md for #145 by @JNTMTMTM [skip ci]
 - 2026-07-13 | ea5237d1 | 鸡哥 | Merge pull request #145 from JNTMTMTM/dev
 - 2026-07-13 | 4c95cedf | 鸡哥 | refactor: remove OAuth IPC handlers and related code, streamline user account API requests
 - 2026-07-13 | 81559519 | 鸡哥 | feat: add module entry documentation for OAuth binding and password setting components
