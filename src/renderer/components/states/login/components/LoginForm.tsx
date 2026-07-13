@@ -203,7 +203,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             type="button"
             className="auth-oauth-btn auth-oauth-btn--microsoft"
             onClick={() => void handleMicrosoftLogin()}
-            disabled={submitting || microsoftLoading}
+            disabled={true}
           >
             <svg className="auth-oauth-icon" viewBox="0 0 21 21" width="18" height="18">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
