@@ -186,21 +186,6 @@ export async function buildUploadHeaders(token?: string | null): Promise<Record<
  * @returns 统一结果对象。
  */
 export async function request<T>(path: string, init: InternalRequestInit = {}): Promise<UserAccountResult<T>> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    [APP_NAME_HEADER]: APP_NAME_VALUE,
-  };
-  const clientVersion = await resolveClientVersion();
-  if (clientVersion) {
-    headers[CLIENT_VERSION_HEADER] = clientVersion;
-  }
-  if (init.auth) {
-    headers.Authorization = `Bearer ${init.auth}`;
-    headers[STATIC_ASSET_NODE_HEADER] = resolveStaticAssetNodeHeaderValue(init.auth);
-  }
-  if (shouldAttachReplayHeaders(path, init.method, init.auth)) {
-    Object.assign(headers, buildReplayHeaders());
-  }
   return rawRequest<T>(USER_ACCOUNT_API_BASE, path, init);
 }
 

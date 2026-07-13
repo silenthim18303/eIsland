@@ -34,14 +34,10 @@ const POLL_MAX_ATTEMPTS = 150; // 最多 5 分钟
 
 /**
  * 生成随机 sessionId（用于轮询 OAuth 结果）。
+ * 注意：此 ID 仅作为客户端轮询关联标识，不作为安全凭据使用。
  */
 function generateSessionId(): string {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-  for (let i = 0; i < 32; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
+  return crypto.randomUUID();
 }
 
 /**

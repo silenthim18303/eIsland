@@ -30,6 +30,9 @@ import type { IslandState } from './useDynamicIslandShell';
 import { STATE_CONFIGS, isMouseInWindow } from '../config/dynamicIslandConfig';
 import { isCurrentLyricIdenticalToTranslation } from '../states/lyrics/utils/isCurrentLyricIdenticalToTranslation';
 
+/** 不自动离开悬停状态的面板状态集合 */
+const AUTH_STATES = new Set(['login', 'register', 'resetPassword', 'setPassword', 'bindOAuth', 'payment']);
+
 interface UseIslandHoverInteractionOptions {
   state: IslandState;
   setHover: () => void;
@@ -171,8 +174,7 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
         }
 
         if (isHoveringRef.current && leaveTimerRef.current === null) {
-          const authStates = new Set(['login', 'register', 'resetPassword', 'setPassword', 'bindOAuth', 'payment']);
-          const shouldLeave = authStates.has(state)
+          const shouldLeave = AUTH_STATES.has(state)
             ? false
             : state === 'expanded' ? expandLeaveIdleRef.current
               : state === 'maxExpand' ? maxExpandLeaveIdleRef.current

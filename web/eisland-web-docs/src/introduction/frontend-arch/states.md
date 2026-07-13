@@ -864,7 +864,7 @@ The `setPassword` state handles OAuth new user registration — when a user logs
 ### bindOAuth
 
 :::info
-The `bindOAuth` state handles linking a GitHub account to an existing email account — when a user logsins via GitHub and a matching email account already exists, they must enter their password to bind the accounts.
+The `bindOAuth` state handles linking a GitHub account to an existing email account — when a user logs in via GitHub and a matching email account already exists, they must enter their password to bind the accounts.
 :::
 
 | Property | Value |
