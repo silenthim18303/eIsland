@@ -134,6 +134,7 @@ function GuideApp(): ReactElement {
         {step === 'language' && (
           <LanguageStep
             onNext={handleLanguageNext}
+            onSkip={handleComplete}
           />
         )}
         {step === 'whitelist' && (
