@@ -1,14 +1,17 @@
 ---
 title: Auth API
+icon: shield-halved
 ---
 
 # Auth API
 
 :::info
-Authentication endpoints under `/auth/`. Handles user/admin login, registration, password reset, and token refresh.
+Authentication endpoints under `/auth/`. Handles user/admin login, registration, password reset, OAuth (GitHub, Microsoft), and token refresh.
 :::
 
 ## Endpoints
+
+### Authentication
 
 | Method | Path | Description |
 |---|---|---|
@@ -21,6 +24,23 @@ Authentication endpoints under `/auth/`. Handles user/admin login, registration,
 | POST | /auth/user/register | User registration |
 | POST | /auth/user/password/reset | Reset user password |
 
+### OAuth
+
+| Method | Path | Description |
+|---|---|---|
+| GET | /auth/oauth/github/authorize | Get GitHub authorization URL |
+| GET | /auth/oauth/github/callback | GitHub OAuth callback |
+| GET | /auth/oauth/microsoft/authorize | Get Microsoft authorization URL |
+| GET | /auth/oauth/microsoft/callback | Microsoft OAuth callback |
+| GET | /auth/oauth/poll | Poll for OAuth result readiness |
+| GET | /auth/oauth/consume | Consume OAuth result (one-time read) |
+| POST | /auth/oauth/set-password | Set password for new OAuth user |
+| POST | /auth/oauth/bind | Bind OAuth to existing account |
+
 :::warning
 Admin registration is restricted and requires proper authorization.
+:::
+
+:::tip
+OAuth uses a polling flow: the client opens the provider's authorization URL in the default browser, then polls `/auth/oauth/poll` until the callback completes. The result is consumed via `/auth/oauth/consume`.
 :::

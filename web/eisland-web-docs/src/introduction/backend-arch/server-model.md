@@ -69,7 +69,7 @@ server/
 | Module | Domain | Key Features |
 |--------|--------|--------------|
 | **server-common** | Shared | Utilities, constants, exception handling, base entities |
-| **server-auth** | Authentication | JWT, login, register, password reset, email verification, CAPTCHA |
+| **server-auth** | Authentication | JWT, login, register, password reset, email verification, CAPTCHA, OAuth (GitHub, Microsoft) |
 | **server-user** | User Management | Profile, settings, balance, identity verification |
 | **server-agent** | AI Agent | LLM integration, tool calling, billing, streaming |
 | **server-weather** | Weather | QWeather API integration, caching, location services |
@@ -112,7 +112,7 @@ server-app
 
 | Domain | Tables | Purpose |
 |--------|--------|---------|
-| **User** | `user_account`, `user_active_daily` | User profiles, authentication, activity tracking |
+| **User** | `user_account`, `user_active_daily`, `user_oauth_binding` | User profiles, authentication, activity tracking, OAuth bindings |
 | **Mini Game** | `mini_game_score`, `mini_game_score_dlq_log` | Game scores, leaderboards, dead letter queue logs |
 | **Payment** | `payment_order`, `payment_transaction`, `payment_notify_log`, `payment_pricing_config`, `payment_dlq_log` | Payment processing, order management |
 | **Version** | `app_version` | Application version management |
@@ -523,6 +523,8 @@ The application is packaged as a **WAR** file for deployment to external Tomcat 
 | `REDIS_HOST`, `REDIS_PORT` | Redis connection |
 | `RABBITMQ_HOST`, `RABBITMQ_PORT` | RabbitMQ connection |
 | `ALIPAY_APP_ID`, `ALIPAY_PRIVATE_KEY_PATH` | Alipay credentials |
+| `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth credentials |
+| `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` | Microsoft OAuth credentials |
 | `RESEND_API_KEY` | Email service key |
 
 **Deployment Architecture:**
