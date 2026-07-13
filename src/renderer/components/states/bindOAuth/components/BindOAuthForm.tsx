@@ -25,10 +25,8 @@
  */
 
 import type { ReactElement } from 'react';
-import type { useBindOAuth } from '../hooks/useBindOAuth';
+import type { BindOAuthFormProps } from '../types';
 import { renderFeedback } from '../../login/utils/renderFeedback';
-
-type BindOAuthFormProps = ReturnType<typeof useBindOAuth>;
 
 /** 绑定 OAuth 表单组件 */
 export function BindOAuthForm(props: BindOAuthFormProps): ReactElement {
