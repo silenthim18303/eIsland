@@ -25,10 +25,8 @@
  */
 
 import type { ReactElement } from 'react';
-import type { useSetPassword } from '../hooks/useSetPassword';
+import type { SetPasswordFormProps } from '../types';
 import { renderFeedback } from '../../login/utils/renderFeedback';
-
-type SetPasswordFormProps = ReturnType<typeof useSetPassword>;
 
 /** 设置密码表单组件 */
 export function SetPasswordForm(props: SetPasswordFormProps): ReactElement {
