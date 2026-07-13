@@ -3536,6 +3536,10 @@
       "login": "使用 GitHub 登录",
       "loading": "连接中…"
     },
+    "microsoft": {
+      "login": "使用 Microsoft 登录",
+      "loading": "连接中…"
+    },
     "setPassword": {
       "title": "设置密码",
       "hint": "OAuth 登录成功，请设置密码以完成注册",
@@ -3543,13 +3547,13 @@
     },
     "bindOAuth": {
       "title": "绑定账号",
-      "hint": "该邮箱已注册，请输入密码将 GitHub 账号绑定到已有账号",
+      "hint": "该邮箱已注册，请输入密码将第三方账号绑定到已有账号",
       "submit": "绑定并登录",
       "bindSuccess": "绑定成功",
       "bindFailed": "绑定失败"
     },
     "feedback": {
-      "loginCancelled": "GitHub 登录已取消"
+      "loginCancelled": "登录已取消或超时"
     }
   }
 }

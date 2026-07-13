@@ -28,4 +28,6 @@
 export interface LanguageStepProps {
   /** 语言确认后进入下一步的回调 */
   onNext: () => void;
+  /** 跳过整个引导流程的回调 */
+  onSkip: () => void;
 }

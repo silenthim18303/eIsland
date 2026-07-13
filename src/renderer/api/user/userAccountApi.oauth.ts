@@ -52,6 +52,16 @@ export function getGitHubAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUr
 }
 
 /**
+ * 获取 Microsoft 授权 URL。
+ * @returns 授权 URL。
+ */
+export function getMicrosoftAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUrl: string }>> {
+  return githubRequest<{ authorizeUrl: string }>('/auth/oauth/microsoft/authorize', {
+    method: 'GET',
+  });
+}
+
+/**
  * 处理 GitHub OAuth 回调。
  * @param code - 授权码。
  * @returns 回调结果。

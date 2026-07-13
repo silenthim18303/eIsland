@@ -27,6 +27,7 @@
 import type { ReactElement } from 'react';
 import type { useLogin } from '../hooks/useLogin';
 import { renderFeedback } from '../utils/renderFeedback';
+import { SvgIcon } from '../../../../utils/SvgIcon';
 
 type LoginFormProps = ReturnType<typeof useLogin>;
 
@@ -55,6 +56,8 @@ export function LoginForm(props: LoginFormProps): ReactElement {
     returnFromAuth,
     githubLoading,
     handleGitHubLogin,
+    microsoftLoading,
+    handleMicrosoftLogin,
     t,
   } = props;
 
@@ -196,6 +199,17 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             {githubLoading
               ? t('oauth.github.loading', { defaultValue: '连接中…' })
               : t('oauth.github.login', { defaultValue: '使用 GitHub 登录' })}
+          </button>
+          <button
+            type="button"
+            className="auth-oauth-btn auth-oauth-btn--microsoft"
+            onClick={() => void handleMicrosoftLogin()}
+            disabled={true}
+          >
+            <img className="auth-oauth-icon" src={SvgIcon.MICROSOFT} alt="" width={18} height={18} />
+            {microsoftLoading
+              ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
+              : t('oauth.microsoft.login', { defaultValue: '使用 Microsoft 登录' })}
           </button>
         </div>
       </div>

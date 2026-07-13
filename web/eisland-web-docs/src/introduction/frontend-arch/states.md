@@ -643,7 +643,7 @@ The `guide` state provides an interactive first-run tutorial for new users.
 ### login
 
 :::info
-The `login` state provides user authentication interface, including email/password login and GitHub OAuth login. For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
+The `login` state provides user authentication interface, including email/password login and OAuth login (GitHub, Microsoft). For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
 :::
 
 | Property | Value |
@@ -664,7 +664,7 @@ The `login` state provides user authentication interface, including email/passwo
 - Cancel → previous state
 - Register link → `register`
 - Reset password link → `resetPassword`
-- GitHub OAuth → `setPassword` (new user) or `bindOAuth` (existing email)
+- OAuth (GitHub / Microsoft) → `setPassword` (new user) or `bindOAuth` (existing email)
 
 **UI Components Rendered:**
 - Username/email input
@@ -673,6 +673,7 @@ The `login` state provides user authentication interface, including email/passwo
 - Register link
 - Forgot password link
 - GitHub OAuth button (with divider)
+- Microsoft OAuth button (disabled, pending Azure app registration)
 - Error messages
 
 **Behavior Details:**
@@ -683,10 +684,10 @@ The `login` state provides user authentication interface, including email/passwo
 - Session token management
 - Single device enforcement
 
-#### GitHub OAuth Login Flow
+#### OAuth Login Flow (GitHub / Microsoft)
 
 :::important
-GitHub OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result.
+OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. Both GitHub and Microsoft follow the same flow.
 :::
 
 ```mermaid
@@ -694,18 +695,18 @@ sequenceDiagram
     participant U as User
     participant E as eIsland (Renderer)
     participant B as System Browser
-    participant GH as GitHub
+    participant P as OAuth Provider
     participant S as Backend Server
 
-    U->>E: Click GitHub login
-    E->>S: GET /auth/oauth/github/authorize
+    U->>E: Click OAuth login button
+    E->>S: GET /auth/oauth/{provider}/authorize
     S-->>E: authorizeUrl (no state)
-    E->>E: Generate random sessionId (32-char)
+    E->>E: Generate random sessionId (UUID)
     E->>B: shell.openExternal(authorizeUrl + state=sessionId)
-    B->>GH: User authorizes
-    GH->>S: Redirect to callback?code=xxx&state=sessionId
+    B->>P: User authorizes
+    P->>S: Redirect to callback?code=xxx&state=sessionId
     S->>S: Exchange code for access_token
-    S->>S: Fetch /user + fallback /user/emails
+    S->>S: Fetch user info from provider API
     S->>S: Store result by sessionId
     S-->>B: 302 redirect to configured URL
     loop Poll every 2s (max 5 min)
@@ -721,12 +722,12 @@ sequenceDiagram
 
 | Condition | Result | Next State |
 |-----------|--------|------------|
-| GitHub account already bound | `LOGIN` with JWT token | → saved state or `idle` |
-| GitHub email matches registered email | `BIND_OAUTH` with tempToken | → `bindOAuth` |
+| OAuth account already bound | `LOGIN` with JWT token | → saved state or `idle` |
+| OAuth email matches registered email | `BIND_OAUTH` with tempToken | → `bindOAuth` |
 | No matching email found | `SET_PASSWORD` with tempToken | → `setPassword` |
 
 :::tip
-If GitHub returns a null email (privacy settings), the backend falls back to the `/user/emails` API to fetch the user's verified primary email address.
+If the OAuth provider returns a null email (e.g., GitHub privacy settings), the backend falls back to the provider's email API to fetch the user's verified primary email address.
 :::
 
 **Environment Variables:**
@@ -735,8 +736,15 @@ If GitHub returns a null email (privacy settings), the backend falls back to the
 |----------|-------------|---------|
 | `GITHUB_CLIENT_ID` | GitHub OAuth App client ID | `Ov23li...` |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth App client secret | `4e41d3...` |
-| `GITHUB_REDIRECT_URI` | OAuth callback URL | `https://server.example.com/api/auth/oauth/github/callback` |
+| `GITHUB_REDIRECT_URI` | GitHub OAuth callback URL | `https://server.example.com/api/auth/oauth/github/callback` |
+| `MICROSOFT_CLIENT_ID` | Microsoft Azure app client ID | `abc123...` |
+| `MICROSOFT_CLIENT_SECRET` | Microsoft Azure app client secret | `xyz789...` |
+| `MICROSOFT_REDIRECT_URI` | Microsoft OAuth callback URL | `https://server.example.com/api/auth/oauth/microsoft/callback` |
 | `OAUTH_CALLBACK_REDIRECT_URL` | Browser redirect after callback | `https://www.pyisland.com` |
+
+:::note
+Microsoft OAuth requires an Azure AD app registration with a valid MPN ID if personal Microsoft accounts are supported. See [Azure App Registration](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) for setup instructions.
+:::
 
 ---
 
@@ -825,7 +833,7 @@ The `resetPassword` state provides password recovery workflow.
 ### setPassword
 
 :::info
-The `setPassword` state handles OAuth new user registration — when a user logs in via GitHub for the first time and no matching email account exists, they must set a password to complete registration.
+The `setPassword` state handles OAuth new user registration — when a user logs in via GitHub or Microsoft for the first time and no matching email account exists, they must set a password to complete registration.
 :::
 
 | Property | Value |
@@ -837,15 +845,15 @@ The `setPassword` state handles OAuth new user registration — when a user logs
 | **Leave Delay** | 0ms |
 
 **Entry Conditions:**
-- GitHub OAuth callback returns `SET_PASSWORD` status
-- No existing email account matches the GitHub email
+- OAuth callback returns `SET_PASSWORD` status (GitHub or Microsoft)
+- No existing email account matches the OAuth provider email
 
 **Exit Conditions:**
 - Password set successfully → login + redirect to saved state
 - Cancel → `login`
 
 **UI Components Rendered:**
-- Username input (editable, pre-filled from GitHub)
+- Username input (editable, pre-filled from OAuth provider)
 - Email input (read-only, pre-filled if available)
 - Password input with show/hide toggle
 - Confirm password input
@@ -864,7 +872,7 @@ The `setPassword` state handles OAuth new user registration — when a user logs
 ### bindOAuth
 
 :::info
-The `bindOAuth` state handles linking a GitHub account to an existing email account — when a user logs in via GitHub and a matching email account already exists, they must enter their password to bind the accounts.
+The `bindOAuth` state handles linking a third-party OAuth account to an existing email account — when a user logs in via GitHub (or Microsoft, when enabled) and a matching email account already exists, they must enter their password to bind the accounts.
 :::
 
 | Property | Value |
@@ -876,8 +884,8 @@ The `bindOAuth` state handles linking a GitHub account to an existing email acco
 | **Leave Delay** | 0ms |
 
 **Entry Conditions:**
-- GitHub OAuth callback returns `BIND_OAUTH` status
-- GitHub email matches an existing registered email account
+- OAuth callback returns `BIND_OAUTH` status (GitHub or Microsoft)
+- OAuth provider email matches an existing registered email account
 
 **Exit Conditions:**
 - Password verified → OAuth binding created → login + redirect to saved state

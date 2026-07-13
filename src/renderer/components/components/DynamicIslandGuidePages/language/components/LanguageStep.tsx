@@ -35,7 +35,7 @@ import type { AppLanguage } from '../../../../../i18n';
  * 语言选择步骤组件
  * @description 展示可选语言列表，用户选择后切换语言并进入下一步
  */
-export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
+export function LanguageStep({ onNext, onSkip }: LanguageStepProps): ReactElement {
   const { t } = useTranslation();
   const { selected, handleSelect } = useLanguageSelect();
 
@@ -59,6 +59,9 @@ export function LanguageStep({ onNext }: LanguageStepProps): ReactElement {
         ))}
       </div>
       <div className="guide-step-footer">
+        <button className="guide-prev-btn" onClick={onSkip}>
+          {t('guide.actions.skip', { defaultValue: '跳过' })}
+        </button>
         <button className="guide-next-btn" onClick={onNext}>
           {t('guide.actions.next', { defaultValue: '下一步' })}
         </button>

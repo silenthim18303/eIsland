@@ -3536,6 +3536,10 @@
       "login": "Sign in with GitHub",
       "loading": "Connecting…"
     },
+    "microsoft": {
+      "login": "Sign in with Microsoft",
+      "loading": "Connecting…"
+    },
     "setPassword": {
       "title": "Set Password",
       "hint": "OAuth login successful. Please set a password to complete registration.",
@@ -3543,13 +3547,13 @@
     },
     "bindOAuth": {
       "title": "Bind Account",
-      "hint": "This email is already registered. Enter your password to link your GitHub account.",
+      "hint": "This email is already registered. Enter your password to link your account.",
       "submit": "Bind & Sign In",
       "bindSuccess": "Account bound successfully",
       "bindFailed": "Binding failed"
     },
     "feedback": {
-      "loginCancelled": "GitHub login cancelled"
+      "loginCancelled": "Login cancelled or timed out"
     }
   }
 }
