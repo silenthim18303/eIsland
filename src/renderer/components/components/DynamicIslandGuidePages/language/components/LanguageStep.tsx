@@ -60,7 +60,7 @@ export function LanguageStep({ onNext, onSkip }: LanguageStepProps): ReactElemen
       </div>
       <div className="guide-step-footer">
         <button className="guide-prev-btn" onClick={onSkip}>
-          {t('guide.actions.skip')}
+          {t('guide.actions.skip', { defaultValue: '跳过' })}
         </button>
         <button className="guide-next-btn" onClick={onNext}>
           {t('guide.actions.next', { defaultValue: '下一步' })}
