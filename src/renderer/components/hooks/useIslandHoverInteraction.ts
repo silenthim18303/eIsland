@@ -171,8 +171,10 @@ export function useIslandHoverInteraction(options: UseIslandHoverInteractionOpti
         }
 
         if (isHoveringRef.current && leaveTimerRef.current === null) {
-          const shouldLeave =
-            state === 'expanded' ? expandLeaveIdleRef.current
+          const authStates = new Set(['login', 'register', 'resetPassword', 'setPassword', 'bindOAuth', 'payment']);
+          const shouldLeave = authStates.has(state)
+            ? false
+            : state === 'expanded' ? expandLeaveIdleRef.current
               : state === 'maxExpand' ? maxExpandLeaveIdleRef.current
                 : true;
 

@@ -37,6 +37,7 @@ export function LoginContent(): ReactElement {
     <LoginForm
       account={login.account}
       setAccount={login.setAccount}
+      verificationEmail={login.verificationEmail}
       maskedVerificationEmail={login.maskedVerificationEmail}
       emailCode={login.emailCode}
       setEmailCode={login.setEmailCode}
