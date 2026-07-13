@@ -36,6 +36,9 @@ export const USER_ACCOUNT_API_BASE = IS_DEV_RENDERER
   ? 'https://test.server.pyisland.com/api'
   : 'https://server.pyisland.com/api';
 
+/** GitHub OAuth 固定使用生产域名 */
+export const GITHUB_API_BASE = 'https://server.pyisland.com/api';
+
 const DEFAULT_TIMEOUT_MS = 10000;
 const APP_NAME_HEADER = 'X-App-Name';
 const APP_NAME_VALUE = 'eisland';
@@ -198,8 +201,37 @@ export async function request<T>(path: string, init: InternalRequestInit = {}): 
   if (shouldAttachReplayHeaders(path, init.method, init.auth)) {
     Object.assign(headers, buildReplayHeaders());
   }
+  return rawRequest<T>(USER_ACCOUNT_API_BASE, path, init);
+}
+
+/**
+ * 执行 GitHub OAuth 相关请求（固定使用生产域名）。
+ * @param path - 接口路径。
+ * @param init - 请求配置。
+ * @returns 统一结果对象。
+ */
+export async function githubRequest<T>(path: string, init: InternalRequestInit = {}): Promise<UserAccountResult<T>> {
+  return rawRequest<T>(GITHUB_API_BASE, path, init);
+}
+
+async function rawRequest<T>(base: string, path: string, init: InternalRequestInit): Promise<UserAccountResult<T>> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    [APP_NAME_HEADER]: APP_NAME_VALUE,
+  };
+  const clientVersion = await resolveClientVersion();
+  if (clientVersion) {
+    headers[CLIENT_VERSION_HEADER] = clientVersion;
+  }
+  if (init.auth) {
+    headers.Authorization = `Bearer ${init.auth}`;
+    headers[STATIC_ASSET_NODE_HEADER] = resolveStaticAssetNodeHeaderValue(init.auth);
+  }
+  if (shouldAttachReplayHeaders(path, init.method, init.auth)) {
+    Object.assign(headers, buildReplayHeaders());
+  }
   try {
-    const resp = await window.api.netFetch(`${USER_ACCOUNT_API_BASE}${path}`, {
+    const resp = await window.api.netFetch(`${base}${path}`, {
       method: init.method ?? 'GET',
       headers,
       body: init.body ? JSON.stringify(init.body) : undefined,

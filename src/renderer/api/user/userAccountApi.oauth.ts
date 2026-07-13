@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { request } from './userAccountApi.client';
+import { githubRequest } from './userAccountApi.client';
 import type { UserAccountLoginData, UserAccountResult } from './userAccountApi.types';
 
 /** OAuth 回调状态 */
@@ -46,7 +46,7 @@ export interface OAuthCallbackData {
  * @returns 授权 URL。
  */
 export function getGitHubAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUrl: string }>> {
-  return request<{ authorizeUrl: string }>('/auth/oauth/github/authorize', {
+  return githubRequest<{ authorizeUrl: string }>('/auth/oauth/github/authorize', {
     method: 'GET',
   });
 }
@@ -57,7 +57,7 @@ export function getGitHubAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUr
  * @returns 回调结果。
  */
 export function handleGitHubCallback(code: string): Promise<UserAccountResult<OAuthCallbackData>> {
-  return request<OAuthCallbackData>(`/auth/oauth/github/callback?code=${encodeURIComponent(code)}`, {
+  return githubRequest<OAuthCallbackData>(`/auth/oauth/github/callback?code=${encodeURIComponent(code)}`, {
     method: 'GET',
     timeoutMs: 15000,
   });
@@ -69,7 +69,7 @@ export function handleGitHubCallback(code: string): Promise<UserAccountResult<OA
  * @returns 是否就绪。
  */
 export function pollOAuthResult(sessionId: string): Promise<UserAccountResult<{ ready: boolean }>> {
-  return request<{ ready: boolean }>(`/auth/oauth/poll?sessionId=${encodeURIComponent(sessionId)}`, {
+  return githubRequest<{ ready: boolean }>(`/auth/oauth/poll?sessionId=${encodeURIComponent(sessionId)}`, {
     method: 'GET',
     timeoutMs: 5000,
   });
@@ -81,7 +81,7 @@ export function pollOAuthResult(sessionId: string): Promise<UserAccountResult<{ 
  * @returns OAuth 回调结果。
  */
 export function consumeOAuthResult(sessionId: string): Promise<UserAccountResult<OAuthCallbackData>> {
-  return request<OAuthCallbackData>(`/auth/oauth/consume?sessionId=${encodeURIComponent(sessionId)}`, {
+  return githubRequest<OAuthCallbackData>(`/auth/oauth/consume?sessionId=${encodeURIComponent(sessionId)}`, {
     method: 'GET',
     timeoutMs: 5000,
   });
@@ -101,7 +101,7 @@ export function oauthSetPassword(
   password: string,
   email?: string,
 ): Promise<UserAccountResult<UserAccountLoginData>> {
-  return request<UserAccountLoginData>('/auth/oauth/set-password', {
+  return githubRequest<UserAccountLoginData>('/auth/oauth/set-password', {
     method: 'POST',
     body: { tempToken, username, password, email: email || undefined },
     timeoutMs: 15000,
@@ -118,7 +118,7 @@ export function oauthBindAccount(
   tempToken: string,
   password: string,
 ): Promise<UserAccountResult<UserAccountLoginData>> {
-  return request<UserAccountLoginData>('/auth/oauth/bind', {
+  return githubRequest<UserAccountLoginData>('/auth/oauth/bind', {
     method: 'POST',
     body: { tempToken, password },
     timeoutMs: 15000,
