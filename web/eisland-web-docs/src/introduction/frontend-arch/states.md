@@ -6,7 +6,7 @@ icon: diagram-project
 # eIsland State Machine
 
 :::info
-The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **17 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
+The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **19 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
 :::
 
 ## State Categories
@@ -35,10 +35,12 @@ The eIsland state machine is the core architecture that controls the island's ap
 | State | Description | Mouse Passthrough | Dimensions (W×H) |
 |-------|-------------|-------------------|------------------|
 | `guide` | First-run tutorial | No | 860×400 px |
-| `login` | Authentication screen | No | 500×88 px |
-| `register` | Account creation | No | 500×88 px |
-| `resetPassword` | Password recovery | No | 500×88 px |
-| `payment` | Payment processing | No | 500×88 px |
+| `login` | Authentication screen | No | 860×400 px |
+| `register` | Account creation | No | 860×400 px |
+| `resetPassword` | Password recovery | No | 860×400 px |
+| `setPassword` | OAuth new user password setup | No | 860×400 px |
+| `bindOAuth` | Bind OAuth to existing account | No | 860×400 px |
+| `payment` | Payment processing | No | 860×400 px |
 
 ### AI & Input States
 
@@ -79,6 +81,8 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   login:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   register:       { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   resetPassword:  { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  setPassword:    { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  bindOAuth:      { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   payment:        { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   guide:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   announcement:   { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
@@ -105,10 +109,12 @@ export const STATE_AREA: Record<string, number> = {
   minimal: 260 * 42,        // 10,920 px²
   agent: 500 * 88,          // 44,000 px²
   agentVoiceInput: 500 * 88,// 44,000 px²
-  login: 500 * 88,          // 44,000 px²
-  register: 500 * 88,       // 44,000 px²
-  resetPassword: 500 * 88,  // 44,000 px²
-  payment: 500 * 88,        // 44,000 px²
+  login: 860 * 400,         // 344,000 px²
+  register: 860 * 400,      // 344,000 px²
+  resetPassword: 860 * 400, // 344,000 px²
+  setPassword: 860 * 400,   // 344,000 px²
+  bindOAuth: 860 * 400,     // 344,000 px²
+  payment: 860 * 400,       // 344,000 px²
   guide: 860 * 400,         // 344,000 px²
   announcement: 860 * 400,  // 344,000 px²
   stt: 500 * 88,            // 44,000 px²
@@ -637,12 +643,12 @@ The `guide` state provides an interactive first-run tutorial for new users.
 ### login
 
 :::info
-The `login` state provides user authentication interface. For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
+The `login` state provides user authentication interface, including email/password login and GitHub OAuth login. For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
 :::
 
 | Property | Value |
 |----------|-------|
-| **Dimensions** | 500×88 px |
+| **Dimensions** | 860×400 px |
 | **Mouse** | Interactive |
 | **Expanded** | Yes |
 | **Enter Delay** | 0ms |
@@ -658,14 +664,15 @@ The `login` state provides user authentication interface. For the JWT authentica
 - Cancel → previous state
 - Register link → `register`
 - Reset password link → `resetPassword`
+- GitHub OAuth → `setPassword` (new user) or `bindOAuth` (existing email)
 
 **UI Components Rendered:**
 - Username/email input
 - Password input
 - Login button
-- Remember me checkbox
 - Register link
 - Forgot password link
+- GitHub OAuth button (with divider)
 - Error messages
 
 **Behavior Details:**
@@ -675,6 +682,61 @@ The `login` state provides user authentication interface. For the JWT authentica
 - Account lockout protection
 - Session token management
 - Single device enforcement
+
+#### GitHub OAuth Login Flow
+
+:::important
+GitHub OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result.
+:::
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant E as eIsland (Renderer)
+    participant B as System Browser
+    participant GH as GitHub
+    participant S as Backend Server
+
+    U->>E: Click GitHub login
+    E->>S: GET /auth/oauth/github/authorize
+    S-->>E: authorizeUrl (no state)
+    E->>E: Generate random sessionId (32-char)
+    E->>B: shell.openExternal(authorizeUrl + state=sessionId)
+    B->>GH: User authorizes
+    GH->>S: Redirect to callback?code=xxx&state=sessionId
+    S->>S: Exchange code for access_token
+    S->>S: Fetch /user + fallback /user/emails
+    S->>S: Store result by sessionId
+    S-->>B: 302 redirect to configured URL
+    loop Poll every 2s (max 5 min)
+        E->>S: GET /auth/oauth/poll?sessionId=xxx
+        S-->>E: { ready: true }
+    end
+    E->>S: GET /auth/oauth/consume?sessionId=xxx
+    S-->>E: OAuth result (LOGIN / SET_PASSWORD / BIND_OAUTH)
+    E->>E: Route to appropriate state
+```
+
+**Backend Decision Logic:**
+
+| Condition | Result | Next State |
+|-----------|--------|------------|
+| GitHub account already bound | `LOGIN` with JWT token | → saved state or `idle` |
+| GitHub email matches registered email | `BIND_OAUTH` with tempToken | → `bindOAuth` |
+| No matching email found | `SET_PASSWORD` with tempToken | → `setPassword` |
+
+:::tip
+If GitHub returns a null email (privacy settings), the backend falls back to the `/user/emails` API to fetch the user's verified primary email address.
+:::
+
+**Environment Variables:**
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `GITHUB_CLIENT_ID` | GitHub OAuth App client ID | `Ov23li...` |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth App client secret | `4e41d3...` |
+| `GITHUB_REDIRECT_URI` | OAuth callback URL | `https://server.example.com/api/auth/oauth/github/callback` |
+| `OAUTH_CALLBACK_REDIRECT_URL` | Browser redirect after callback | `https://www.pyisland.com` |
 
 ---
 
@@ -686,7 +748,7 @@ The `register` state provides new account creation interface. For email verifica
 
 | Property | Value |
 |----------|-------|
-| **Dimensions** | 500×88 px |
+| **Dimensions** | 860×400 px |
 | **Mouse** | Interactive |
 | **Expanded** | Yes |
 | **Enter Delay** | 0ms |
@@ -728,7 +790,7 @@ The `resetPassword` state provides password recovery workflow.
 
 | Property | Value |
 |----------|-------|
-| **Dimensions** | 500×88 px |
+| **Dimensions** | 860×400 px |
 | **Mouse** | Interactive |
 | **Expanded** | Yes |
 | **Enter Delay** | 0ms |
@@ -760,6 +822,83 @@ The `resetPassword` state provides password recovery workflow.
 
 ---
 
+### setPassword
+
+:::info
+The `setPassword` state handles OAuth new user registration — when a user logs in via GitHub for the first time and no matching email account exists, they must set a password to complete registration.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- GitHub OAuth callback returns `SET_PASSWORD` status
+- No existing email account matches the GitHub email
+
+**Exit Conditions:**
+- Password set successfully → login + redirect to saved state
+- Cancel → `login`
+
+**UI Components Rendered:**
+- Username input (editable, pre-filled from GitHub)
+- Email input (read-only, pre-filled if available)
+- Password input with show/hide toggle
+- Confirm password input
+- Submit button ("Set Password and Register")
+- Cancel button ("Cancel Login")
+
+**Behavior Details:**
+- Temporary JWT token (`purpose=set_password`) carries OAuth context (provider, providerUserId, accessToken)
+- Password strength validation (min 8 chars, letters + numbers)
+- Username pattern validation (2-32 chars, alphanumeric/CJK/underscore)
+- On success: creates user account + OAuth binding, returns JWT token
+- Self-handled navigation (does not follow standard click flow)
+
+---
+
+### bindOAuth
+
+:::info
+The `bindOAuth` state handles linking a GitHub account to an existing email account — when a user logs in via GitHub and a matching email account already exists, they must enter their password to bind the accounts.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- GitHub OAuth callback returns `BIND_OAUTH` status
+- GitHub email matches an existing registered email account
+
+**Exit Conditions:**
+- Password verified → OAuth binding created → login + redirect to saved state
+- Cancel → `login`
+
+**UI Components Rendered:**
+- Username input (read-only, from existing account)
+- Email input (read-only, from existing account)
+- Password input with show/hide toggle
+- Submit button ("Bind and Login")
+- Cancel button ("Cancel Login")
+
+**Behavior Details:**
+- Temporary JWT token (`purpose=bind_oauth`) carries OAuth context
+- Password verification against existing account
+- On success: creates OAuth binding record in `user_oauth_binding` table, returns JWT token
+- Account must be enabled (not banned)
+- Self-handled navigation (does not follow standard click flow)
+
+---
+
 ### payment
 
 :::info
@@ -768,7 +907,7 @@ The `payment` state handles subscription and payment processing. For the Alipay/
 
 | Property | Value |
 |----------|-------|
-| **Dimensions** | 500×88 px |
+| **Dimensions** | 860×400 px |
 | **Mouse** | Interactive |
 | **Expanded** | Yes |
 | **Enter Delay** | 0ms |

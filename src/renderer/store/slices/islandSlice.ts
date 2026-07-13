@@ -48,6 +48,8 @@ export const createIslandSlice: StateCreator<
   authReturnState: null,
   uiStateLocked: false,
   paymentContext: { type: 'pro' },
+  setPasswordContext: { tempToken: '', suggestedUsername: '', email: '' },
+  bindOAuthContext: { tempToken: '', username: '', email: '' },
   hoverTab: 'time',
   expandTab: 'overview',
   maxExpandTab: 'todo',
@@ -59,7 +61,7 @@ export const createIslandSlice: StateCreator<
 
   setIdle: (force?: boolean) => set((prev) => {
     if (prev.uiStateLocked && prev.state !== 'idle') return prev;
-    if (!force && (prev.state === 'expanded' || prev.state === 'maxExpand' || prev.state === 'guide' || prev.state === 'login' || prev.state === 'register' || prev.state === 'payment' || prev.state === 'announcement')) return prev;
+    if (!force && (prev.state === 'expanded' || prev.state === 'maxExpand' || prev.state === 'guide' || prev.state === 'login' || prev.state === 'register' || prev.state === 'resetPassword' || prev.state === 'setPassword' || prev.state === 'bindOAuth' || prev.state === 'payment' || prev.state === 'announcement')) return prev;
     window.api?.collapseWindow();
     window.api?.enableMousePassthrough();
     return { state: 'idle' as const, authReturnState: null };
@@ -119,10 +121,36 @@ export const createIslandSlice: StateCreator<
       window.api?.expandWindowSettings();
       window.api?.disableMousePassthrough();
     }
-    const nextAuthReturnState = (prev.state === 'login' || prev.state === 'register' || prev.state === 'payment')
+    const nextAuthReturnState = (prev.state === 'login' || prev.state === 'register' || prev.state === 'payment' || prev.state === 'setPassword' || prev.state === 'bindOAuth')
       ? prev.authReturnState
       : (standalone ? 'maxExpand' : prev.state);
     return { state: 'payment', authReturnState: nextAuthReturnState, paymentContext: context ?? { type: 'pro' } };
+  }),
+
+  setSetPassword: (context) => set((prev) => {
+    if (prev.uiStateLocked && prev.state !== 'setPassword') return prev;
+    const standalone = isStandaloneRenderer();
+    if (!standalone) {
+      window.api?.expandWindowSettings();
+      window.api?.disableMousePassthrough();
+    }
+    const nextAuthReturnState = (prev.state === 'login' || prev.state === 'register' || prev.state === 'payment' || prev.state === 'setPassword' || prev.state === 'bindOAuth')
+      ? prev.authReturnState
+      : (standalone ? 'maxExpand' : prev.state);
+    return { state: 'setPassword' as never, authReturnState: nextAuthReturnState, setPasswordContext: context };
+  }),
+
+  setBindOAuth: (context) => set((prev) => {
+    if (prev.uiStateLocked && prev.state !== 'bindOAuth') return prev;
+    const standalone = isStandaloneRenderer();
+    if (!standalone) {
+      window.api?.expandWindowSettings();
+      window.api?.disableMousePassthrough();
+    }
+    const nextAuthReturnState = (prev.state === 'login' || prev.state === 'register' || prev.state === 'payment' || prev.state === 'setPassword' || prev.state === 'bindOAuth')
+      ? prev.authReturnState
+      : (standalone ? 'maxExpand' : prev.state);
+    return { state: 'bindOAuth' as never, authReturnState: nextAuthReturnState, bindOAuthContext: context };
   }),
 
   returnFromAuth: () => set((prev) => {
@@ -155,7 +183,8 @@ export const createIslandSlice: StateCreator<
         window.api?.disableMousePassthrough();
       }
     }
-    return { state: target === 'login' || target === 'register' || target === 'payment' ? 'maxExpand' : target, authReturnState: null };
+    const authStates = ['login', 'register', 'payment', 'setPassword', 'bindOAuth', 'resetPassword'];
+    return { state: authStates.includes(target) ? 'maxExpand' : target, authReturnState: null };
   }),
 
   setLyrics: () => set((prev) => {

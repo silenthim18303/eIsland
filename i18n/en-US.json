@@ -3319,7 +3319,7 @@
         "logout": "Sign out",
         "loggingOut": "Signing out…",
         "backToCenter": "Back to Previous Page",
-        "cancelLogin": "Cancel Login",
+        "cancelLogin": "Cancel",
         "cancelRegister": "Cancel Registration",
         "unregister": "Delete account",
         "confirmUnregister": "Confirm delete",
@@ -3367,6 +3367,8 @@
         "avatarUploadFailed": "Avatar upload failed",
         "avatarUploadTooFrequent": "Avatar uploads are too frequent. Please try again later.",
         "passwordTooShort": "Password must be at least 8 chars with letters and digits",
+        "usernameInvalid": "Invalid username format",
+        "passwordMismatch": "Passwords do not match",
         "passwordConfirmNeedsPassword": "Please enter a new password first",
         "passwordConfirmRequired": "Please confirm your new password",
         "passwordConfirmMismatch": "The two new passwords do not match",
@@ -3526,6 +3528,28 @@
   "idle": {
     "pomodoro": {
       "label": "Pomodoro"
+    }
+  },
+  "oauth": {
+    "divider": "or",
+    "github": {
+      "login": "Sign in with GitHub",
+      "loading": "Connecting…"
+    },
+    "setPassword": {
+      "title": "Set Password",
+      "hint": "OAuth login successful. Please set a password to complete registration.",
+      "submit": "Set Password & Register"
+    },
+    "bindOAuth": {
+      "title": "Bind Account",
+      "hint": "This email is already registered. Enter your password to link your GitHub account.",
+      "submit": "Bind & Sign In",
+      "bindSuccess": "Account bound successfully",
+      "bindFailed": "Binding failed"
+    },
+    "feedback": {
+      "loginCancelled": "GitHub login cancelled"
     }
   }
 }

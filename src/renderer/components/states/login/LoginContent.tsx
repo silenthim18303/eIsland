@@ -37,6 +37,7 @@ export function LoginContent(): ReactElement {
     <LoginForm
       account={login.account}
       setAccount={login.setAccount}
+      verificationEmail={login.verificationEmail}
       maskedVerificationEmail={login.maskedVerificationEmail}
       emailCode={login.emailCode}
       setEmailCode={login.setEmailCode}
@@ -55,6 +56,8 @@ export function LoginContent(): ReactElement {
       setRegister={login.setRegister}
       setResetPassword={login.setResetPassword}
       returnFromAuth={login.returnFromAuth}
+      githubLoading={login.githubLoading}
+      handleGitHubLogin={login.handleGitHubLogin}
       t={login.t}
     />
   );
