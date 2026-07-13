@@ -47,6 +47,7 @@ import { registerWallpaperIpcHandlers } from './ipc/window/wallpaper';
 import { registerWallpaperVideoIpcHandlers } from './ipc/media/wallpaperVideo';
 import { registerFormatFactoryIpcHandlers } from './ipc/app/formatFactory';
 import { registerNetIpcHandlers } from './ipc/app/net';
+import { registerOAuthIpcHandlers } from './ipc/app/oauth';
 import { registerMailIpcHandlers } from './ipc/app/mail';
 import { registerStoreIpcHandlers } from './ipc/app/store';
 import { registerLogIpcHandlers } from './ipc/app/log';
@@ -534,6 +535,7 @@ function registerIpcHandlers(): void {
   const writeMainLog = createSessionMainLogger();
 
   registerNetIpcHandlers({ writeMainLog });
+  registerOAuthIpcHandlers();
 
   // ===== 文件存储 IPC =====
   const storeDir = join(app.getPath('userData'), 'eIsland_store');

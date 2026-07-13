@@ -393,43 +393,66 @@
 .island-shell.resetPassword .auth-panel-subtitle,
 .island-shell.resetPassword .auth-panel .settings-field,
 .island-shell.resetPassword .auth-panel .settings-user-feedback,
-.island-shell.resetPassword .auth-panel-actions > button {
+.island-shell.resetPassword .auth-panel-actions > button,
+.island-shell.setPassword .auth-panel-title,
+.island-shell.setPassword .auth-panel-subtitle,
+.island-shell.setPassword .auth-panel .settings-field,
+.island-shell.setPassword .auth-panel .settings-user-feedback,
+.island-shell.setPassword .auth-panel-actions > button,
+.island-shell.bindOAuth .auth-panel-title,
+.island-shell.bindOAuth .auth-panel-subtitle,
+.island-shell.bindOAuth .auth-panel .settings-field,
+.island-shell.bindOAuth .auth-panel .settings-user-feedback,
+.island-shell.bindOAuth .auth-panel-actions > button {
   opacity: 0;
   animation: auth-control-enter 0.26s ease-out forwards;
 }
 
 .island-shell.login .auth-panel-title,
 .island-shell.register .auth-panel-title,
-.island-shell.resetPassword .auth-panel-title {
+.island-shell.resetPassword .auth-panel-title,
+.island-shell.setPassword .auth-panel-title,
+.island-shell.bindOAuth .auth-panel-title {
   animation-delay: 0.02s;
 }
 
 .island-shell.login .auth-panel-subtitle,
 .island-shell.register .auth-panel-subtitle,
-.island-shell.resetPassword .auth-panel-subtitle {
+.island-shell.resetPassword .auth-panel-subtitle,
+.island-shell.setPassword .auth-panel-subtitle,
+.island-shell.bindOAuth .auth-panel-subtitle {
   animation-delay: 0.05s;
 }
 
 .island-shell.login .auth-panel .settings-field,
 .island-shell.register .auth-panel .settings-field,
-.island-shell.resetPassword .auth-panel .settings-field {
+.island-shell.resetPassword .auth-panel .settings-field,
+.island-shell.setPassword .auth-panel .settings-field,
+.island-shell.bindOAuth .auth-panel .settings-field {
   animation-delay: 0.08s;
 }
 
 .island-shell.login .auth-panel .settings-user-feedback,
 .island-shell.register .auth-panel .settings-user-feedback,
-.island-shell.resetPassword .auth-panel .settings-user-feedback {
+.island-shell.resetPassword .auth-panel .settings-user-feedback,
+.island-shell.setPassword .auth-panel .settings-user-feedback,
+.island-shell.bindOAuth .auth-panel .settings-user-feedback {
   animation-delay: 0.12s;
 }
 
 .island-shell.login .auth-panel-actions > button,
 .island-shell.register .auth-panel-actions > button,
-.island-shell.resetPassword .auth-panel-actions > button {
+.island-shell.resetPassword .auth-panel-actions > button,
+.island-shell.setPassword .auth-panel-actions > button,
+.island-shell.bindOAuth .auth-panel-actions > button {
   animation-delay: 0.15s;
 }
 
 .island-shell.login .auth-state-content,
 .island-shell.register .auth-state-content,
+.island-shell.resetPassword .auth-state-content,
+.island-shell.setPassword .auth-state-content,
+.island-shell.bindOAuth .auth-state-content,
 .island-shell.payment .auth-state-content {
   align-items: center;
   padding: 14px 22px;
@@ -437,6 +460,9 @@
 
 .island-shell.login .auth-panel,
 .island-shell.register .auth-panel,
+.island-shell.resetPassword .auth-panel,
+.island-shell.setPassword .auth-panel,
+.island-shell.bindOAuth .auth-panel,
 .island-shell.payment .auth-panel {
   max-height: 100%;
   padding: 16px;
@@ -520,4 +546,68 @@
     rgba(var(--color-text-rgb), 0.38),
     rgba(var(--color-text-rgb), 0.5)
   );
+}
+
+/* ===== OAuth 分隔线与按钮 ===== */
+
+.auth-oauth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.auth-oauth-divider::before,
+.auth-oauth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(var(--color-text-rgb), 0.12);
+}
+
+.auth-oauth-divider span {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.46);
+  flex-shrink: 0;
+}
+
+.auth-oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auth-oauth-btn {
+  appearance: none;
+  border: 1px solid rgba(var(--color-text-rgb), 0.16);
+  background: rgba(var(--color-text-rgb), 0.06);
+  color: rgba(var(--color-text-rgb), 0.88);
+  border-radius: 10px;
+  padding: 8px 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.auth-oauth-btn:hover {
+  background: rgba(var(--color-text-rgb), 0.1);
+  border-color: rgba(var(--color-text-rgb), 0.24);
+}
+
+.auth-oauth-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.auth-oauth-btn--github:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+}
+
+.auth-oauth-icon {
+  flex-shrink: 0;
 }

@@ -55,6 +55,8 @@ export function LoginContent(): ReactElement {
       setRegister={login.setRegister}
       setResetPassword={login.setResetPassword}
       returnFromAuth={login.returnFromAuth}
+      githubLoading={login.githubLoading}
+      handleGitHubLogin={login.handleGitHubLogin}
       t={login.t}
     />
   );

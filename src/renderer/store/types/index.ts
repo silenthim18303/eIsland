@@ -31,7 +31,7 @@ import type { TranslationLyricsResult } from '../../api/lyrics/lrcApi';
 export type { WeatherApiConfig };
 
 /** 灵动岛 UI 状态枚举 */
-export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'lyrics' | 'lyricsTranslation' | 'guide' | 'login' | 'register' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
+export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'lyrics' | 'lyricsTranslation' | 'guide' | 'login' | 'register' | 'resetPassword' | 'setPassword' | 'bindOAuth' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
 
 /** 灵动岛动画速度档位 */
 export type AnimationSpeed = 'slow' | 'medium' | 'fast';
@@ -303,6 +303,20 @@ export type PaymentContext =
   | { type: 'pro' }
   | { type: 'recharge'; amountFen: number };
 
+/** 设置密码上下文（OAuth 新用户注册） */
+export interface SetPasswordContext {
+  tempToken: string;
+  suggestedUsername: string;
+  email: string;
+}
+
+/** 绑定 OAuth 上下文（已有邮箱账号绑定第三方登录） */
+export interface BindOAuthContext {
+  tempToken: string;
+  username: string;
+  email: string;
+}
+
 /** 岛屿状态 Slice */
 export interface IslandSlice {
   state: IslandState;
@@ -325,6 +339,10 @@ export interface IslandSlice {
   setRegister: () => void;
   paymentContext: PaymentContext;
   setPayment: (context?: PaymentContext) => void;
+  setPasswordContext: SetPasswordContext;
+  setSetPassword: (context: SetPasswordContext) => void;
+  bindOAuthContext: BindOAuthContext;
+  setBindOAuth: (context: BindOAuthContext) => void;
   returnFromAuth: () => void;
   setLyrics: () => void;
   setLyricsTranslation: () => void;

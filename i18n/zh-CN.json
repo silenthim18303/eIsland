@@ -3364,6 +3364,8 @@
         "avatarUploadFailed": "头像上传失败",
         "avatarUploadTooFrequent": "头像上传过于频繁，请稍后再试",
         "passwordTooShort": "密码至少 8 位且包含字母与数字",
+        "usernameInvalid": "用户名格式不正确",
+        "passwordMismatch": "两次密码不一致",
         "passwordConfirmRequired": "请再次输入新密码进行确认",
         "passwordConfirmMismatch": "两次输入的新密码不一致",
         "saveFailed": "保存失败",
@@ -3526,6 +3528,28 @@
   "idle": {
     "pomodoro": {
       "label": "番茄钟"
+    }
+  },
+  "oauth": {
+    "divider": "或",
+    "github": {
+      "login": "使用 GitHub 登录",
+      "loading": "连接中…"
+    },
+    "setPassword": {
+      "title": "设置密码",
+      "hint": "OAuth 登录成功，请设置密码以完成注册",
+      "submit": "设置密码并注册"
+    },
+    "bindOAuth": {
+      "title": "绑定账号",
+      "hint": "该邮箱已注册，请输入密码将 GitHub 账号绑定到已有账号",
+      "submit": "绑定并登录",
+      "bindSuccess": "绑定成功",
+      "bindFailed": "绑定失败"
+    },
+    "feedback": {
+      "loginCancelled": "GitHub 登录已取消"
     }
   }
 }

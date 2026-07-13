@@ -30,13 +30,14 @@ import useIslandStore from '../../../../store/slices';
 import { loginUserByAccount, loginUserByEmailWithCode, sendUserEmailCode } from '../../../../api/user/userAccountApi';
 import { updateSessionToken } from '../../../../utils/authSession';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
+import { openGitHubOAuth } from '../../../../utils/oauthWindow';
 import { EMAIL_PATTERN, type Feedback, type LoginStepUpData } from '../config/loginConfig';
 import { readStandaloneWindowMode } from '../utils/readStandaloneWindowMode';
 
 /** 登录状态交互逻辑 Hook */
 export function useLogin() {
   const { t } = useTranslation();
-  const { setRegister, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
+  const { setRegister, setSetPassword, setBindOAuth, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
   const setResetPassword = (): void => {
     useIslandStore.setState((prev) => {
       const prevState = prev.state as string;
@@ -197,6 +198,50 @@ export function useLogin() {
     await navigateToUserCenter();
   };
 
+  const [githubLoading, setGithubLoading] = useState(false);
+
+  const handleGitHubLogin = async (): Promise<void> => {
+    if (githubLoading) return;
+    setGithubLoading(true);
+    setFeedback(null);
+
+    try {
+      // 打开默认浏览器并轮询服务端获取结果
+      const data = await openGitHubOAuth();
+      setGithubLoading(false);
+
+      if (!data) {
+        setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: 'GitHub 登录已取消或超时' }) });
+        return;
+      }
+
+      const { status, token, tempToken, username, email } = data;
+
+      if (status === 'LOGIN' && token) {
+        updateSessionToken(token);
+        setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
+        await navigateToUserCenter();
+      } else if (status === 'SET_PASSWORD' && tempToken) {
+        setSetPassword({
+          tempToken,
+          suggestedUsername: username || '',
+          email: email || '',
+        });
+      } else if (status === 'BIND_OAUTH' && tempToken) {
+        setBindOAuth({
+          tempToken,
+          username: username || '',
+          email: email || '',
+        });
+      } else {
+        setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+      }
+    } catch {
+      setGithubLoading(false);
+      setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+    }
+  };
+
   return {
     account,
     setAccount,
@@ -219,6 +264,8 @@ export function useLogin() {
     setRegister,
     setResetPassword,
     returnFromAuth,
+    githubLoading,
+    handleGitHubLogin,
     t,
   };
 }
