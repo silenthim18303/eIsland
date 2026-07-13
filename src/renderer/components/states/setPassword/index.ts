@@ -18,4 +18,10 @@
  * GNU General Public License for more details.
  */
 
+/**
+ * @file index.ts
+ * @description 设置密码状态模块入口
+ * @author 鸡哥
+ */
+
 export { SetPasswordContent } from './SetPasswordContent';
