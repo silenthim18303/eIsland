@@ -3186,6 +3186,19 @@
         "oauth": "Third-party App Binding",
         "switchTo": "Switch to {{label}}"
       },
+      "oauth": {
+        "subtitle": "Manage linked third-party login accounts",
+        "loading": "Loading…",
+        "empty": "No third-party bindings",
+        "provider": {
+          "wechat": "WeChat"
+        },
+        "fields": {
+          "username": "Username",
+          "email": "Email",
+          "boundAt": "Bound at"
+        }
+      },
       "recharge": {
         "title": "Recharge Balance",
         "subtitle": "Top up your balance for AI assistant conversations",

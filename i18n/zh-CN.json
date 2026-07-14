@@ -3186,6 +3186,19 @@
         "oauth": "第三方应用绑定",
         "switchTo": "切换到{{label}}"
       },
+      "oauth": {
+        "subtitle": "管理已绑定的第三方登录账号",
+        "loading": "加载中…",
+        "empty": "暂无第三方绑定",
+        "provider": {
+          "wechat": "微信"
+        },
+        "fields": {
+          "username": "用户名",
+          "email": "邮箱",
+          "boundAt": "绑定时间"
+        }
+      },
       "recharge": {
         "title": "余额充值",
         "subtitle": "充值后可用于 AI 助手对话消耗",

@@ -24,8 +24,18 @@
  * @author 鸡哥
  */
 
-import { githubRequest } from './userAccountApi.client';
+import { githubRequest, request } from './userAccountApi.client';
 import type { UserAccountLoginData, UserAccountResult } from './userAccountApi.types';
+
+/** OAuth 绑定记录 */
+export interface OAuthBindingItem {
+  id: number;
+  provider: string;
+  providerUserId: string;
+  providerUsername: string | null;
+  providerEmail: string | null;
+  createdAt: string | null;
+}
 
 /** OAuth 回调状态 */
 export type OAuthCallbackStatus = 'LOGIN' | 'SET_PASSWORD' | 'BIND_OAUTH' | 'ERROR';
@@ -161,5 +171,17 @@ export function oauthBindAccount(
     method: 'POST',
     body: { tempToken, password },
     timeoutMs: 15000,
+  });
+}
+
+/**
+ * 查询当前用户的第三方应用绑定信息。
+ * @param token - 用户 token。
+ * @returns 绑定列表。
+ */
+export function fetchOAuthBindings(token: string): Promise<UserAccountResult<OAuthBindingItem[]>> {
+  return request<OAuthBindingItem[]>('/v1/user/oauth-bindings', {
+    method: 'GET',
+    auth: token,
   });
 }

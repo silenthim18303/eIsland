@@ -32,6 +32,7 @@ import {
   fetchUserPaymentOrders,
   fetchProMonthPricing,
   fetchAgentBalance,
+  fetchOAuthBindings,
   fetchUserProfile,
   logoutUser,
   refreshUserToken,
@@ -40,6 +41,7 @@ import {
   updateUserPassword,
   updateUserProfile,
   uploadUserAvatar,
+  type OAuthBindingItem,
   type UserPaymentOrderData,
 } from '../../../../../../../api/user/userAccountApi';
 import { runSliderCaptcha } from '../../../../../../../utils/sliderCaptcha';
@@ -182,6 +184,10 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
   const [rechargeCustomValue, setRechargeCustomValue] = useState('');
   const [rechargeFeedback, setRechargeFeedback] = useState<Feedback | null>(null);
   const [userBalance, setUserBalance] = useState<string | null>(null);
+
+  /** 第三方应用绑定列表 */
+  const [oauthBindings, setOauthBindings] = useState<OAuthBindingItem[]>([]);
+  const [loadingOAuthBindings, setLoadingOAuthBindings] = useState(false);
 
   /** 用户中心登录天数热力图：记录并展示当前用户每个自然日是否登录 */
   const [loginDays, setLoginDays] = useState<Set<string>>(() => readLoginDays(profile?.username));
@@ -545,6 +551,24 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
     }
     void loadUserOrders();
   }, [loadUserOrders, token, userProfilePage]);
+
+  useEffect(() => {
+    if (userProfilePage !== 'oauth' || !token) {
+      return;
+    }
+    let cancelled = false;
+    const loadOAuthBindings = async (): Promise<void> => {
+      setLoadingOAuthBindings(true);
+      const result = await fetchOAuthBindings(token);
+      if (cancelled) return;
+      setLoadingOAuthBindings(false);
+      if (result.ok && Array.isArray(result.data)) {
+        setOauthBindings(result.data);
+      }
+    };
+    void loadOAuthBindings();
+    return () => { cancelled = true; };
+  }, [token, userProfilePage]);
 
   const handleSaveProfile = async (): Promise<void> => {
     if (!token || savingProfile || savingPassword) return;
@@ -1617,8 +1641,70 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
 
     const RECHARGE_PRESETS = [1, 10, 30, 50, 100];
 
+    const getProviderIcon = (provider: string): string => {
+      const p = provider.toLowerCase();
+      if (p === 'github') return SvgIcon.GITHUB;
+      if (p === 'microsoft') return SvgIcon.MICROSOFT;
+      if (p === 'wechat') return SvgIcon.WECHAT;
+      return SvgIcon.LINK;
+    };
+
+    const getProviderLabel = (provider: string): string => {
+      const p = provider.toLowerCase();
+      if (p === 'github') return 'GitHub';
+      if (p === 'microsoft') return 'Microsoft';
+      if (p === 'wechat') return t('settings.user.oauth.provider.wechat', { defaultValue: '微信' });
+      return provider;
+    };
+
     const renderOAuthPage = (): ReactElement => (
       <div className="settings-user-page-panel settings-user-oauth-panel">
+        <div className="settings-user-card settings-user-oauth-head-card">
+          <div className="settings-user-form-title">{t('settings.user.pages.oauth', { defaultValue: '第三方应用绑定' })}</div>
+          <div className="settings-user-card-title-hint">
+            {t('settings.user.oauth.subtitle', { defaultValue: '管理已绑定的第三方登录账号' })}
+          </div>
+        </div>
+
+        {loadingOAuthBindings && oauthBindings.length === 0 ? (
+          <div className="settings-user-card settings-user-oauth-empty">
+            <span className="settings-user-orders-inline-spinner" aria-hidden="true" />
+            <span>{t('settings.user.oauth.loading', { defaultValue: '加载中…' })}</span>
+          </div>
+        ) : null}
+
+        {!loadingOAuthBindings && oauthBindings.length === 0 ? (
+          <div className="settings-user-card settings-user-oauth-empty">
+            {t('settings.user.oauth.empty', { defaultValue: '暂无第三方绑定' })}
+          </div>
+        ) : null}
+
+        {oauthBindings.map((binding) => (
+          <div key={binding.id} className="settings-user-card settings-user-oauth-item-card">
+            <div className="settings-user-oauth-item-header">
+              <img
+                className="settings-user-oauth-provider-icon"
+                src={getProviderIcon(binding.provider)}
+                alt={binding.provider}
+              />
+              <span className="settings-user-oauth-provider-name">{getProviderLabel(binding.provider)}</span>
+            </div>
+            <div className="settings-user-oauth-item-detail">
+              <div className="settings-user-oauth-item-row">
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.username', { defaultValue: '用户名' })}</span>
+                <span className="settings-user-oauth-item-value">{binding.providerUsername ?? '—'}</span>
+              </div>
+              <div className="settings-user-oauth-item-row">
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.email', { defaultValue: '邮箱' })}</span>
+                <span className="settings-user-oauth-item-value">{binding.providerEmail ?? '—'}</span>
+              </div>
+              <div className="settings-user-oauth-item-row">
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.boundAt', { defaultValue: '绑定时间' })}</span>
+                <span className="settings-user-oauth-item-value">{formatDateTime(binding.createdAt)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     );
 
