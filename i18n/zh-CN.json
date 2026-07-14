@@ -3132,6 +3132,7 @@
         "accountPlaceholder": "请输入用户名或邮箱",
         "boundEmail": "绑定邮箱",
         "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱地址",
         "emailCode": "邮箱验证码",
         "emailCodePlaceholder": "请输入邮箱验证码",
         "password": "密码",

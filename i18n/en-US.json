@@ -3132,6 +3132,7 @@
         "accountPlaceholder": "Enter username or email",
         "boundEmail": "Bound Email",
         "email": "Email",
+        "emailPlaceholder": "Enter email address",
         "emailCode": "Email Code",
         "emailCodePlaceholder": "Enter email code",
         "password": "Password",
