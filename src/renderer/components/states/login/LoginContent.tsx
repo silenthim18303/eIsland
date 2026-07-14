@@ -62,6 +62,7 @@ export function LoginContent(): ReactElement {
       handleMicrosoftLogin={login.handleMicrosoftLogin}
       wechatLoading={login.wechatLoading}
       handleWechatLogin={login.handleWechatLogin}
+      disabledProviders={login.disabledProviders}
       t={login.t}
     />
   );

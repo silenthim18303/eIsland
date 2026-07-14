@@ -32,14 +32,17 @@ import {
   fetchUserPaymentOrders,
   fetchProMonthPricing,
   fetchAgentBalance,
+  fetchOAuthBindings,
   fetchUserProfile,
   logoutUser,
   refreshUserToken,
   sendUserEmailCode,
+  unbindOAuth,
   unregisterUser,
   updateUserPassword,
   updateUserProfile,
   uploadUserAvatar,
+  type OAuthBindingItem,
   type UserPaymentOrderData,
 } from '../../../../../../../api/user/userAccountApi';
 import { runSliderCaptcha } from '../../../../../../../utils/sliderCaptcha';
@@ -60,7 +63,7 @@ import { readLoginDays, recordLoginDay } from './utils/loginHeatmapStorage';
 import '../../../../../../../styles/settings/modules/cli.css';
 
 type FeedbackType = 'success' | 'error' | 'info';
-type UserProfilePage = 'info' | 'edit' | 'password' | 'pro' | 'recharge' | 'orders' | 'account';
+type UserProfilePage = 'info' | 'edit' | 'password' | 'pro' | 'recharge' | 'orders' | 'account' | 'oauth';
 
 interface Feedback {
   type: FeedbackType;
@@ -74,7 +77,7 @@ interface UserSettingsSectionProps {
 }
 
 const GENDER_VALUES: UserAccountGender[] = ['male', 'female', 'custom', 'undisclosed'];
-const USER_PROFILE_PAGES: UserProfilePage[] = ['info', 'edit', 'password', 'pro', 'recharge', 'orders', 'account'];
+const USER_PROFILE_PAGES: UserProfilePage[] = ['info', 'edit', 'password', 'pro', 'recharge', 'orders', 'account', 'oauth'];
 const EMAIL_PATTERN = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
 const getGenderIcon = (gender: UserAccountGender | null | undefined): string => {
@@ -183,6 +186,12 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
   const [rechargeFeedback, setRechargeFeedback] = useState<Feedback | null>(null);
   const [userBalance, setUserBalance] = useState<string | null>(null);
 
+  /** 第三方应用绑定列表 */
+  const [oauthBindings, setOauthBindings] = useState<OAuthBindingItem[]>([]);
+  const [loadingOAuthBindings, setLoadingOAuthBindings] = useState(false);
+  const [oauthUnbindingId, setOauthUnbindingId] = useState<number | null>(null);
+  const [oauthFeedback, setOauthFeedback] = useState<{ bindingId: number; feedback: Feedback } | null>(null);
+
   /** 用户中心登录天数热力图：记录并展示当前用户每个自然日是否登录 */
   const [loginDays, setLoginDays] = useState<Set<string>>(() => readLoginDays(profile?.username));
   /** 登录热力图是否展开（默认收起，点击右侧统计卡内的图标按钮切换） */
@@ -201,7 +210,9 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
               ? '余额充值'
               : userProfilePage === 'orders'
                 ? '我的订单'
-                : '关于账户',
+                : userProfilePage === 'account'
+                  ? '关于账户'
+                  : '第三方应用绑定',
   });
 
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
@@ -543,6 +554,42 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
     }
     void loadUserOrders();
   }, [loadUserOrders, token, userProfilePage]);
+
+  useEffect(() => {
+    if (userProfilePage !== 'oauth' || !token) {
+      return;
+    }
+    let cancelled = false;
+    const loadOAuthBindings = async (): Promise<void> => {
+      setLoadingOAuthBindings(true);
+      const result = await fetchOAuthBindings(token);
+      if (cancelled) return;
+      setLoadingOAuthBindings(false);
+      if (result.ok && Array.isArray(result.data)) {
+        setOauthBindings(result.data);
+      }
+    };
+    void loadOAuthBindings();
+    return () => { cancelled = true; };
+  }, [token, userProfilePage]);
+
+  const handleUnbindOAuth = async (bindingId: number): Promise<void> => {
+    if (!token || oauthUnbindingId !== null) return;
+    setOauthUnbindingId(bindingId);
+    setOauthFeedback(null);
+    const result = await unbindOAuth(token, bindingId);
+    setOauthUnbindingId(null);
+    if (!result.ok) {
+      if (result.code === 401 || result.code === 4011) {
+        resetToLoggedOut();
+        return;
+      }
+      setOauthFeedback({ bindingId, feedback: { type: 'error', text: result.message || t('settings.user.oauth.feedback.unbindFailed', { defaultValue: '解除绑定失败' }) } });
+      return;
+    }
+    setOauthBindings((prev) => prev.filter((b) => b.id !== bindingId));
+    setOauthFeedback(null);
+  };
 
   const handleSaveProfile = async (): Promise<void> => {
     if (!token || savingProfile || savingPassword) return;
@@ -1043,6 +1090,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
       { id: 'recharge', label: t('settings.user.pages.recharge', { defaultValue: '余额充值' }) },
       { id: 'orders', label: t('settings.user.pages.orders', { defaultValue: '我的订单' }) },
       { id: 'account', label: t('settings.user.pages.account', { defaultValue: '关于账户' }) },
+      { id: 'oauth', label: t('settings.user.pages.oauth', { defaultValue: '第三方应用绑定' }) },
     ];
     const profileRole = (profile as { role?: unknown } | null)?.role;
     const normalizedProfileRole = typeof profileRole === 'string' ? normalizeRoleValue(profileRole) : null;
@@ -1178,6 +1226,11 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
               <span className="settings-index-card-title">{t('settings.user.pages.password', { defaultValue: '修改密码' })}</span>
               <span className="settings-index-card-desc">{t('settings.user.infoNav.passwordDesc', { defaultValue: '通过邮箱验证码修改登录密码' })}</span>
               <img className="settings-index-card-layout-icon" src={SvgIcon.SHORTCUT_KEY} alt="" aria-hidden="true" />
+            </button>
+            <button type="button" className="settings-index-card" onClick={() => setUserProfilePage('oauth')}>
+              <span className="settings-index-card-title">{t('settings.user.pages.oauth', { defaultValue: '第三方应用绑定' })}</span>
+              <span className="settings-index-card-desc">{t('settings.user.infoNav.oauthDesc', { defaultValue: '查看已绑定的第三方登录账号' })}</span>
+              <img className="settings-index-card-layout-icon" src={SvgIcon.LINK} alt="" aria-hidden="true" />
             </button>
             <button
               type="button"
@@ -1614,6 +1667,86 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
 
     const RECHARGE_PRESETS = [1, 10, 30, 50, 100];
 
+    const getProviderIcon = (provider: string): string => {
+      const p = provider.toLowerCase();
+      if (p === 'github') return SvgIcon.GITHUB;
+      if (p === 'microsoft') return SvgIcon.MICROSOFT;
+      if (p === 'wechat') return SvgIcon.WECHAT;
+      return SvgIcon.LINK;
+    };
+
+    const getProviderLabel = (provider: string): string => {
+      const p = provider.toLowerCase();
+      if (p === 'github') return 'GitHub';
+      if (p === 'microsoft') return 'Microsoft';
+      if (p === 'wechat') return t('settings.user.oauth.provider.wechat', { defaultValue: '微信' });
+      return provider;
+    };
+
+    const renderOAuthPage = (): ReactElement => (
+      <div className="settings-user-page-panel settings-user-oauth-panel">
+        <div className="settings-user-card settings-user-oauth-head-card">
+          <div className="settings-user-form-title">{t('settings.user.pages.oauth', { defaultValue: '第三方应用绑定' })}</div>
+          <div className="settings-user-card-title-hint">
+            {t('settings.user.oauth.subtitle', { defaultValue: '管理已绑定的第三方登录账号' })}
+          </div>
+        </div>
+
+        {loadingOAuthBindings && oauthBindings.length === 0 ? (
+          <div className="settings-user-card settings-user-oauth-empty">
+            <span className="settings-user-orders-inline-spinner" aria-hidden="true" />
+            <span>{t('settings.user.oauth.loading', { defaultValue: '加载中…' })}</span>
+          </div>
+        ) : null}
+
+        {!loadingOAuthBindings && oauthBindings.length === 0 ? (
+          <div className="settings-user-card settings-user-oauth-empty">
+            {t('settings.user.oauth.empty', { defaultValue: '暂无第三方绑定' })}
+          </div>
+        ) : null}
+
+        {oauthBindings.map((binding) => (
+          <div key={binding.id} className="settings-user-card settings-user-oauth-item-card">
+            <div className="settings-user-oauth-item-header">
+              <img
+                className="settings-user-oauth-provider-icon"
+                src={getProviderIcon(binding.provider)}
+                alt={binding.provider}
+              />
+              <span className="settings-user-oauth-provider-name">{getProviderLabel(binding.provider)}</span>
+            </div>
+            <div className="settings-user-oauth-item-detail">
+              <div className="settings-user-oauth-item-row">
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.username', { defaultValue: '用户名' })}</span>
+                <span className="settings-user-oauth-item-value">{binding.providerUsername ?? '—'}</span>
+              </div>
+              <div className="settings-user-oauth-item-row">
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.providerUserId', { defaultValue: '第三方用户ID' })}</span>
+                <span className="settings-user-oauth-item-value">{binding.providerUserId ?? '—'}</span>
+              </div>
+              <div className="settings-user-oauth-item-row">
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.boundAt', { defaultValue: '绑定时间' })}</span>
+                <span className="settings-user-oauth-item-value">{formatDateTime(binding.createdAt)}</span>
+              </div>
+            </div>
+            {oauthFeedback?.bindingId === binding.id ? renderFeedback(oauthFeedback.feedback) : null}
+            <div className="settings-user-oauth-item-actions">
+              <button
+                type="button"
+                className="settings-user-danger-btn"
+                disabled={oauthUnbindingId === binding.id}
+                onClick={() => void handleUnbindOAuth(binding.id)}
+              >
+                {oauthUnbindingId === binding.id
+                  ? t('settings.user.oauth.actions.unbinding', { defaultValue: '解除中…' })
+                  : t('settings.user.oauth.actions.unbind', { defaultValue: '解除绑定' })}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+
     const rechargeAmountYuan = rechargeSelected !== null && rechargeSelected !== undefined
       ? rechargeSelected
       : (rechargeCustomValue.trim() !== '' ? parseFloat(rechargeCustomValue) : NaN);
@@ -1703,6 +1836,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
           {userProfilePage === 'recharge' && renderRechargePage()}
           {userProfilePage === 'orders' && renderOrdersPage()}
           {userProfilePage === 'account' && renderAccountPage()}
+          {userProfilePage === 'oauth' && renderOAuthPage()}
         </div>
 
         <div className="settings-user-page-dots">

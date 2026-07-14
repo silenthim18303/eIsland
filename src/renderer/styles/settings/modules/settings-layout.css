@@ -5262,6 +5262,94 @@
   justify-content: center;
 }
 
+/* ── OAuth Bindings Page ── */
+
+.settings-user-oauth-panel {
+  gap: 10px;
+}
+
+.settings-user-oauth-head-card {
+  gap: 8px;
+}
+
+.settings-user-oauth-empty {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.56);
+}
+
+.settings-user-oauth-item-card {
+  gap: 0;
+}
+
+.settings-user-oauth-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 10px;
+}
+
+.settings-user-oauth-provider-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.settings-user-oauth-provider-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(var(--color-text-rgb), 0.92);
+}
+
+.settings-user-oauth-item-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(var(--color-text-rgb), 0.04);
+}
+
+.settings-user-oauth-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.settings-user-oauth-item-label {
+  font-size: 11px;
+  color: rgba(var(--color-text-rgb), 0.56);
+}
+
+.settings-user-oauth-item-value {
+  font-size: 12px;
+  color: rgba(var(--color-text-rgb), 0.86);
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-user-oauth-item-card .settings-user-feedback {
+  margin-top: 8px;
+}
+
+.settings-user-oauth-item-actions {
+  display: flex;
+  margin-top: 10px;
+}
+
+.settings-user-oauth-item-actions .settings-user-danger-btn {
+  flex: 1;
+  justify-content: center;
+}
+
 @media (max-width: 760px) {
   .settings-user-avatar-row {
     grid-template-columns: 1fr;

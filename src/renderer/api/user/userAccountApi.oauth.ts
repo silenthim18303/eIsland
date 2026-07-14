@@ -24,8 +24,18 @@
  * @author 鸡哥
  */
 
-import { githubRequest } from './userAccountApi.client';
+import { githubRequest, request } from './userAccountApi.client';
 import type { UserAccountLoginData, UserAccountResult } from './userAccountApi.types';
+
+/** OAuth 绑定记录 */
+export interface OAuthBindingItem {
+  id: number;
+  provider: string;
+  providerUserId: string;
+  providerUsername: string | null;
+  providerEmail: string | null;
+  createdAt: string | null;
+}
 
 /** OAuth 回调状态 */
 export type OAuthCallbackStatus = 'LOGIN' | 'SET_PASSWORD' | 'BIND_OAUTH' | 'ERROR';
@@ -162,4 +172,43 @@ export function oauthBindAccount(
     body: { tempToken, password },
     timeoutMs: 15000,
   });
+}
+
+/**
+ * 查询当前用户的第三方应用绑定信息。
+ * @param token - 用户 token。
+ * @returns 绑定列表。
+ */
+export function fetchOAuthBindings(token: string): Promise<UserAccountResult<OAuthBindingItem[]>> {
+  return request<OAuthBindingItem[]>('/v1/user/oauth-bindings', {
+    method: 'GET',
+    auth: token,
+  });
+}
+
+/**
+ * 解除当前用户的指定第三方应用绑定。
+ * @param token - 用户 token。
+ * @param bindingId - 绑定记录 ID。
+ * @returns 操作结果。
+ */
+export function unbindOAuth(token: string, bindingId: number): Promise<UserAccountResult<unknown>> {
+  return request(`/v1/user/oauth-bindings/${bindingId}`, {
+    method: 'DELETE',
+    auth: token,
+  });
+}
+
+/** OAuth 登录方式项 */
+export interface OAuthProviderItem {
+  provider: string;
+  displayName: string;
+}
+
+/**
+ * 获取可用的 OAuth 登录方式列表。
+ * @returns 可用的提供商列表。
+ */
+export function fetchOAuthProviders(): Promise<UserAccountResult<OAuthProviderItem[]>> {
+  return request<OAuthProviderItem[]>('/auth/oauth/providers');
 }

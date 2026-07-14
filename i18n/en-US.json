@@ -3173,7 +3173,8 @@
         "proDesc": "View Pro plan benefits plus current subscription pricing",
         "rechargeDesc": "Top up your balance for AI assistant conversations",
         "ordersDesc": "Check order status, continue payment, or close pending orders",
-        "logoutDesc": "Sign out or delete your account"
+        "logoutDesc": "Sign out or delete your account",
+        "oauthDesc": "View linked third-party login accounts"
       },
       "pages": {
         "info": "Profile",
@@ -3183,7 +3184,29 @@
         "recharge": "Recharge",
         "orders": "My Orders",
         "account": "Account",
+        "oauth": "Third-party App Binding",
         "switchTo": "Switch to {{label}}"
+      },
+      "oauth": {
+        "subtitle": "Manage linked third-party login accounts",
+        "loading": "Loading…",
+        "empty": "No third-party bindings",
+        "provider": {
+          "wechat": "WeChat"
+        },
+        "fields": {
+          "username": "Username",
+          "providerUserId": "Third-party User ID",
+          "boundAt": "Bound at"
+        },
+        "actions": {
+          "unbind": "Unbind",
+          "unbinding": "Unbinding…"
+        },
+        "feedback": {
+          "unbindSuccess": "Unbound successfully",
+          "unbindFailed": "Failed to unbind"
+        }
       },
       "recharge": {
         "title": "Recharge Balance",

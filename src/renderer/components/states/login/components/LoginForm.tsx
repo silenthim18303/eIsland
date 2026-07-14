@@ -58,10 +58,14 @@ export function LoginForm(props: LoginFormProps): ReactElement {
     handleMicrosoftLogin,
     wechatLoading,
     handleWechatLogin,
+    disabledProviders,
     t,
   } = props;
 
   const oauthBusy = submitting || githubLoading || microsoftLoading || wechatLoading;
+  const githubDisabled = disabledProviders.has('github');
+  const microsoftDisabled = disabledProviders.has('microsoft');
+  const wechatDisabled = disabledProviders.has('wechat');
 
   return (
     <div className="auth-state-content" onClick={(e) => e.stopPropagation()}>
@@ -193,7 +197,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             type="button"
             className="auth-oauth-btn auth-oauth-btn--github"
             onClick={() => void handleGitHubLogin()}
-            disabled={oauthBusy}
+            disabled={oauthBusy || githubDisabled}
           >
             <img className="auth-oauth-icon" src={SvgIcon.GITHUB} alt="" width={18} height={18} />
             {githubLoading
@@ -204,7 +208,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             type="button"
             className="auth-oauth-btn auth-oauth-btn--microsoft"
             onClick={() => void handleMicrosoftLogin()}
-            disabled={oauthBusy}
+            disabled={oauthBusy || microsoftDisabled}
           >
             <img className="auth-oauth-icon" src={SvgIcon.MICROSOFT} alt="" width={18} height={18} />
             {microsoftLoading
@@ -215,7 +219,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             type="button"
             className="auth-oauth-btn auth-oauth-btn--wechat"
             onClick={() => void handleWechatLogin()}
-            disabled={oauthBusy}
+            disabled={oauthBusy || wechatDisabled}
           >
             <img className="auth-oauth-icon" src={SvgIcon.WECHAT} alt="" width={18} height={18} />
             {wechatLoading

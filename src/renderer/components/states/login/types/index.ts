@@ -32,6 +32,7 @@ import type { Feedback } from '../config/loginConfig';
 export interface LoginFormProps {
   account: string;
   setAccount: Dispatch<SetStateAction<string>>;
+  verificationEmail: string;
   maskedVerificationEmail: string;
   emailCode: string;
   setEmailCode: Dispatch<SetStateAction<string>>;
@@ -56,5 +57,6 @@ export interface LoginFormProps {
   handleMicrosoftLogin: () => Promise<void>;
   wechatLoading: boolean;
   handleWechatLogin: () => Promise<void>;
+  disabledProviders: Set<string>;
   t: TFunction;
 }
