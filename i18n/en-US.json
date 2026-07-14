@@ -3534,15 +3534,15 @@
   "oauth": {
     "divider": "or",
     "github": {
-      "login": "Sign in with GitHub",
+      "login": "GitHub",
       "loading": "Connecting…"
     },
     "microsoft": {
-      "login": "Sign in with Microsoft",
+      "login": "Microsoft",
       "loading": "Connecting…"
     },
     "wechat": {
-      "login": "Sign in with WeChat",
+      "login": "WeChat",
       "loading": "Connecting…"
     },
     "setPassword": {

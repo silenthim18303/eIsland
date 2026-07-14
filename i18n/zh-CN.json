@@ -3534,15 +3534,15 @@
   "oauth": {
     "divider": "或",
     "github": {
-      "login": "使用 GitHub 登录",
+      "login": "GitHub",
       "loading": "连接中…"
     },
     "microsoft": {
-      "login": "使用 Microsoft 登录",
+      "login": "Microsoft",
       "loading": "连接中…"
     },
     "wechat": {
-      "login": "使用微信登录",
+      "login": "WeChat",
       "loading": "连接中…"
     },
     "setPassword": {

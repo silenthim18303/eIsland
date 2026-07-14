@@ -585,7 +585,7 @@
 
 .auth-oauth-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
 }
 
@@ -604,6 +604,7 @@
   font-family: inherit;
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease;
+  flex: 1;
 }
 
 .auth-oauth-btn:hover {

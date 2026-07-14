@@ -200,7 +200,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             </svg>
             {githubLoading
               ? t('oauth.github.loading', { defaultValue: '连接中…' })
-              : t('oauth.github.login', { defaultValue: '使用 GitHub 登录' })}
+              : t('oauth.github.login', { defaultValue: 'GitHub' })}
           </button>
           <button
             type="button"
@@ -211,7 +211,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             <img className="auth-oauth-icon" src={SvgIcon.MICROSOFT} alt="" width={18} height={18} />
             {microsoftLoading
               ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
-              : t('oauth.microsoft.login', { defaultValue: '使用 Microsoft 登录' })}
+              : t('oauth.microsoft.login', { defaultValue: 'Microsoft' })}
           </button>
           <button
             type="button"
@@ -222,7 +222,7 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             <img className="auth-oauth-icon" src={SvgIcon.WECHAT} alt="" width={18} height={18} />
             {wechatLoading
               ? t('oauth.wechat.loading', { defaultValue: '连接中…' })
-              : t('oauth.wechat.login', { defaultValue: '使用微信登录' })}
+              : t('oauth.wechat.login', { defaultValue: 'WeChat' })}
           </button>
         </div>
       </div>
