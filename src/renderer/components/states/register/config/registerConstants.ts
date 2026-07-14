@@ -42,4 +42,4 @@ export interface Feedback {
 /** 用户名允许字符正则（中文、英文、数字） */
 export const USERNAME_ALLOWED_PATTERN = /^[A-Za-z0-9一-鿿]+$/;
 
-export { EMAIL_PATTERN } from '../../../config/patterns';
+export { EMAIL_PATTERN } from '../../../config/dynamicIslandPatterns';

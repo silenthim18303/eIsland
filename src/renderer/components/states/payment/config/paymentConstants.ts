@@ -30,4 +30,4 @@ export type PaymentMethod = 'wechat' | 'alipay' | null;
 /** 设置页 Tab 存储键 */
 export const SETTINGS_OPEN_TAB_STORE_KEY = 'settings-open-tab';
 
-export { EMAIL_PATTERN } from '../../../config/patterns';
+export { EMAIL_PATTERN } from '../../../config/dynamicIslandPatterns';

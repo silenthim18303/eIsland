@@ -31,4 +31,4 @@ export interface Feedback {
   text: string;
 }
 
-export { EMAIL_PATTERN } from '../../../config/patterns';
+export { EMAIL_PATTERN } from '../../../config/dynamicIslandPatterns';

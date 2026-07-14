@@ -24,4 +24,4 @@
  * @author 鸡哥
  */
 
-export { EMAIL_PATTERN } from '../../../config/patterns';
+export { EMAIL_PATTERN } from '../../../config/dynamicIslandPatterns';

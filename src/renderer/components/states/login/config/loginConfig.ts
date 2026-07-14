@@ -40,4 +40,4 @@ export interface LoginStepUpData {
   verificationEmail?: string;
 }
 
-export { EMAIL_PATTERN } from '../../../config/patterns';
+export { EMAIL_PATTERN } from '../../../config/dynamicIslandPatterns';
