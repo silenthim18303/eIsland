@@ -3183,6 +3183,7 @@
         "recharge": "Recharge",
         "orders": "My Orders",
         "account": "Account",
+        "oauth": "Third-party App Binding",
         "switchTo": "Switch to {{label}}"
       },
       "recharge": {

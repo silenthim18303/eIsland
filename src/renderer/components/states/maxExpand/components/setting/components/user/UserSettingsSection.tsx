@@ -60,7 +60,7 @@ import { readLoginDays, recordLoginDay } from './utils/loginHeatmapStorage';
 import '../../../../../../../styles/settings/modules/cli.css';
 
 type FeedbackType = 'success' | 'error' | 'info';
-type UserProfilePage = 'info' | 'edit' | 'password' | 'pro' | 'recharge' | 'orders' | 'account';
+type UserProfilePage = 'info' | 'edit' | 'password' | 'pro' | 'recharge' | 'orders' | 'account' | 'oauth';
 
 interface Feedback {
   type: FeedbackType;
@@ -74,7 +74,7 @@ interface UserSettingsSectionProps {
 }
 
 const GENDER_VALUES: UserAccountGender[] = ['male', 'female', 'custom', 'undisclosed'];
-const USER_PROFILE_PAGES: UserProfilePage[] = ['info', 'edit', 'password', 'pro', 'recharge', 'orders', 'account'];
+const USER_PROFILE_PAGES: UserProfilePage[] = ['info', 'edit', 'password', 'pro', 'recharge', 'orders', 'account', 'oauth'];
 const EMAIL_PATTERN = /^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
 const getGenderIcon = (gender: UserAccountGender | null | undefined): string => {
@@ -201,7 +201,9 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
               ? '余额充值'
               : userProfilePage === 'orders'
                 ? '我的订单'
-                : '关于账户',
+                : userProfilePage === 'account'
+                  ? '关于账户'
+                  : '第三方应用绑定',
   });
 
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
@@ -1043,6 +1045,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
       { id: 'recharge', label: t('settings.user.pages.recharge', { defaultValue: '余额充值' }) },
       { id: 'orders', label: t('settings.user.pages.orders', { defaultValue: '我的订单' }) },
       { id: 'account', label: t('settings.user.pages.account', { defaultValue: '关于账户' }) },
+      { id: 'oauth', label: t('settings.user.pages.oauth', { defaultValue: '第三方应用绑定' }) },
     ];
     const profileRole = (profile as { role?: unknown } | null)?.role;
     const normalizedProfileRole = typeof profileRole === 'string' ? normalizeRoleValue(profileRole) : null;
@@ -1614,6 +1617,11 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
 
     const RECHARGE_PRESETS = [1, 10, 30, 50, 100];
 
+    const renderOAuthPage = (): ReactElement => (
+      <div className="settings-user-page-panel settings-user-oauth-panel">
+      </div>
+    );
+
     const rechargeAmountYuan = rechargeSelected !== null && rechargeSelected !== undefined
       ? rechargeSelected
       : (rechargeCustomValue.trim() !== '' ? parseFloat(rechargeCustomValue) : NaN);
@@ -1703,6 +1711,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
           {userProfilePage === 'recharge' && renderRechargePage()}
           {userProfilePage === 'orders' && renderOrdersPage()}
           {userProfilePage === 'account' && renderAccountPage()}
+          {userProfilePage === 'oauth' && renderOAuthPage()}
         </div>
 
         <div className="settings-user-page-dots">

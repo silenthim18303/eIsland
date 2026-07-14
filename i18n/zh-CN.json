@@ -3183,6 +3183,7 @@
         "recharge": "余额充值",
         "orders": "我的订单",
         "account": "关于账户",
+        "oauth": "第三方应用绑定",
         "switchTo": "切换到{{label}}"
       },
       "recharge": {
