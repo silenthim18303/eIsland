@@ -27,7 +27,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
-import { sendUserEmailCode, verifyUserEmailCode } from '../../../../api/user/userAccountApi';
+import { sendUserEmailCode } from '../../../../api/user/userAccountApi';
 import { wechatBindEmail } from '../../../../api/user/userAccountApi.oauth';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
 import { EMAIL_PATTERN } from '../config/bindEmailConfig';
@@ -70,7 +70,7 @@ export function useBindEmail() {
         setFeedback({ type: 'error', text: t('settings.user.feedback.captchaCancelled', { defaultValue: '请完成滑块验证后再发送验证码' }) });
         return;
       }
-      const result = await sendUserEmailCode(trimmedEmail, 'REGISTER', captcha);
+      const result = await sendUserEmailCode(trimmedEmail, 'BIND_EMAIL', captcha);
       setSendingCode(false);
       if (!result.ok) {
         setFeedback({ type: 'error', text: result.message || t('settings.user.feedback.emailCodeSendFailed', { defaultValue: '验证码发送失败' }) });
@@ -103,20 +103,8 @@ export function useBindEmail() {
     setSubmitting(true);
     setFeedback(null);
     try {
-      const captcha = await runSliderCaptcha(trimmedEmail);
-      if (!captcha) {
-        setSubmitting(false);
-        setFeedback({ type: 'error', text: t('settings.user.feedback.captchaCancelled', { defaultValue: '请完成滑块验证后再发送验证码' }) });
-        return;
-      }
-      const result = await verifyUserEmailCode(trimmedEmail, 'REGISTER', emailCode.trim(), captcha);
-      if (!result.ok) {
-        setSubmitting(false);
-        setFeedback({ type: 'error', text: result.message || t('oauth.bindEmail.verifyFailed', { defaultValue: '验证码错误' }) });
-        return;
-      }
-      // 验证通过，调用后端检查邮箱是否已注册
-      const revalResult = await wechatBindEmail(bindEmailContext.tempToken, trimmedEmail);
+      // 调用后端验证验证码 + 检查邮箱是否已注册
+      const revalResult = await wechatBindEmail(bindEmailContext.tempToken, trimmedEmail, emailCode.trim());
       setSubmitting(false);
       if (!revalResult.ok || !revalResult.data) {
         setFeedback({ type: 'error', text: revalResult.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
