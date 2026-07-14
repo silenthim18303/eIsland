@@ -25,11 +25,9 @@
  */
 
 import type { ReactElement } from 'react';
-import type { useLogin } from '../hooks/useLogin';
+import type { LoginFormProps } from '../types';
 import { renderFeedback } from '../utils/renderFeedback';
 import { SvgIcon } from '../../../../utils/SvgIcon';
-
-type LoginFormProps = ReturnType<typeof useLogin>;
 
 /** 登录表单组件 */
 export function LoginForm(props: LoginFormProps): ReactElement {
