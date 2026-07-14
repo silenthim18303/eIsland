@@ -28,6 +28,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
 import { sendUserEmailCode, verifyUserEmailCode } from '../../../../api/user/userAccountApi';
+import { wechatBindEmail } from '../../../../api/user/userAccountApi.oauth';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
 import { EMAIL_PATTERN } from '../config/bindEmailConfig';
 import type { Feedback } from '../../login/config/loginConfig';
@@ -35,7 +36,7 @@ import type { Feedback } from '../../login/config/loginConfig';
 /** 绑定邮箱状态交互逻辑 Hook */
 export function useBindEmail() {
   const { t } = useTranslation();
-  const { bindEmailContext, setSetPassword, setLogin } = useIslandStore();
+  const { bindEmailContext, setSetPassword, setBindOAuth, setLogin } = useIslandStore();
   const [email, setEmail] = useState('');
   const [emailCode, setEmailCode] = useState('');
   const [sendingCode, setSendingCode] = useState(false);
@@ -109,17 +110,34 @@ export function useBindEmail() {
         return;
       }
       const result = await verifyUserEmailCode(trimmedEmail, 'REGISTER', emailCode.trim(), captcha);
-      setSubmitting(false);
       if (!result.ok) {
+        setSubmitting(false);
         setFeedback({ type: 'error', text: result.message || t('oauth.bindEmail.verifyFailed', { defaultValue: '验证码错误' }) });
         return;
       }
-      // 验证通过，携带邮箱跳转到设置密码界面
-      setSetPassword({
-        tempToken: bindEmailContext.tempToken,
-        suggestedUsername: bindEmailContext.suggestedUsername,
-        email: trimmedEmail,
-      });
+      // 验证通过，调用后端检查邮箱是否已注册
+      const revalResult = await wechatBindEmail(bindEmailContext.tempToken, trimmedEmail);
+      setSubmitting(false);
+      if (!revalResult.ok || !revalResult.data) {
+        setFeedback({ type: 'error', text: revalResult.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+        return;
+      }
+      const { status, tempToken, username, email: revalEmail } = revalResult.data;
+      if (status === 'BIND_OAUTH' && tempToken) {
+        // 邮箱已注册 → 绑定已有账号
+        setBindOAuth({
+          tempToken,
+          username: username || '',
+          email: revalEmail || trimmedEmail,
+        });
+      } else {
+        // 邮箱未注册 → 设置密码
+        setSetPassword({
+          tempToken: tempToken || bindEmailContext.tempToken,
+          suggestedUsername: username || bindEmailContext.suggestedUsername,
+          email: revalEmail || trimmedEmail,
+        });
+      }
     } catch (err) {
       setSubmitting(false);
       const msg = err instanceof Error ? err.message : t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' });
