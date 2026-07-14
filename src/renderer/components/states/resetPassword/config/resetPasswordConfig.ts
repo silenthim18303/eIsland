@@ -31,4 +31,4 @@ export interface Feedback {
   text: string;
 }
 
-export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export { EMAIL_PATTERN } from '../../../config/patterns';

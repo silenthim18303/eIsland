@@ -19,25 +19,10 @@
  */
 
 /**
- * @file loginConfig.ts
- * @description 登录状态配置与类型定义
+ * @file patterns.ts
+ * @description 共享输入验证正则表达式
  * @author 鸡哥
  */
 
-export const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
-export const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
-
-export type FeedbackType = 'success' | 'error' | 'info';
-
-export interface Feedback {
-  type: FeedbackType;
-  text: string;
-}
-
-export interface LoginStepUpData {
-  requireEmailVerification?: boolean;
-  maskedEmail?: string;
-  verificationEmail?: string;
-}
-
-export { EMAIL_PATTERN } from '../../../config/patterns';
+/** 邮箱格式正则 */
+export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
