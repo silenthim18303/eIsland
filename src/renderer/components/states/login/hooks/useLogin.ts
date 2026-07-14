@@ -27,7 +27,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
-import { loginUserByAccount, loginUserByEmailWithCode, sendUserEmailCode } from '../../../../api/user/userAccountApi';
+import { loginUserByAccount, loginUserByEmailWithCode, sendUserEmailCode, fetchOAuthProviders } from '../../../../api/user/userAccountApi';
 import { updateSessionToken } from '../../../../utils/authSession';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
 import { openGitHubOAuth, openMicrosoftOAuth, openWechatOAuth } from '../../../../utils/oauthWindow';
@@ -201,6 +201,21 @@ export function useLogin() {
   const [githubLoading, setGithubLoading] = useState(false);
   const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [wechatLoading, setWechatLoading] = useState(false);
+  const [disabledProviders, setDisabledProviders] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchOAuthProviders().then((res) => {
+      if (cancelled || !res.ok || !Array.isArray(res.data)) return;
+      const enabled = new Set(res.data.map((p) => p.provider));
+      const disabled = new Set<string>();
+      for (const name of ['github', 'microsoft', 'wechat']) {
+        if (!enabled.has(name)) disabled.add(name);
+      }
+      setDisabledProviders(disabled);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   const handleGitHubLogin = async (): Promise<void> => {
     if (githubLoading) return;
@@ -362,6 +377,7 @@ export function useLogin() {
     handleMicrosoftLogin,
     wechatLoading,
     handleWechatLogin,
+    disabledProviders,
     t,
   };
 }

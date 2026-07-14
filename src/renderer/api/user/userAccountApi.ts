@@ -38,5 +38,5 @@ export * from './userAccountApi.profile';
 export * from './userAccountApi.feedback';
 export * from './userAccountApi.wallpaper';
 export * from './userAccountApi.payment';
-export { fetchOAuthBindings, unbindOAuth } from './userAccountApi.oauth';
-export type { OAuthBindingItem } from './userAccountApi.oauth';
+export { fetchOAuthBindings, unbindOAuth, fetchOAuthProviders } from './userAccountApi.oauth';
+export type { OAuthBindingItem, OAuthProviderItem } from './userAccountApi.oauth';

@@ -198,3 +198,17 @@ export function unbindOAuth(token: string, bindingId: number): Promise<UserAccou
     auth: token,
   });
 }
+
+/** OAuth 登录方式项 */
+export interface OAuthProviderItem {
+  provider: string;
+  displayName: string;
+}
+
+/**
+ * 获取可用的 OAuth 登录方式列表。
+ * @returns 可用的提供商列表。
+ */
+export function fetchOAuthProviders(): Promise<UserAccountResult<OAuthProviderItem[]>> {
+  return request<OAuthProviderItem[]>('/auth/oauth/providers');
+}
