@@ -208,11 +208,8 @@ export function useLogin() {
     void fetchOAuthProviders().then((res) => {
       if (cancelled || !res.ok || !Array.isArray(res.data)) return;
       const enabled = new Set(res.data.map((p) => p.provider));
-      const disabled = new Set<string>();
-      for (const name of ['github', 'microsoft', 'wechat']) {
-        if (!enabled.has(name)) disabled.add(name);
-      }
-      setDisabledProviders(disabled);
+      const allProviders = ['github', 'microsoft', 'wechat'] as const;
+      setDisabledProviders(new Set(allProviders.filter((name) => !enabled.has(name))));
     });
     return () => { cancelled = true; };
   }, []);
