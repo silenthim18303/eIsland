@@ -60,6 +60,8 @@ export function LoginContent(): ReactElement {
       handleGitHubLogin={login.handleGitHubLogin}
       microsoftLoading={login.microsoftLoading}
       handleMicrosoftLogin={login.handleMicrosoftLogin}
+      wechatLoading={login.wechatLoading}
+      handleWechatLogin={login.handleWechatLogin}
       t={login.t}
     />
   );
