@@ -1206,6 +1206,11 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
               <span className="settings-index-card-desc">{t('settings.user.infoNav.passwordDesc', { defaultValue: '通过邮箱验证码修改登录密码' })}</span>
               <img className="settings-index-card-layout-icon" src={SvgIcon.SHORTCUT_KEY} alt="" aria-hidden="true" />
             </button>
+            <button type="button" className="settings-index-card" onClick={() => setUserProfilePage('oauth')}>
+              <span className="settings-index-card-title">{t('settings.user.pages.oauth', { defaultValue: '第三方应用绑定' })}</span>
+              <span className="settings-index-card-desc">{t('settings.user.infoNav.oauthDesc', { defaultValue: '查看已绑定的第三方登录账号' })}</span>
+              <img className="settings-index-card-layout-icon" src={SvgIcon.LINK} alt="" aria-hidden="true" />
+            </button>
             <button
               type="button"
               className="settings-index-card"
@@ -1695,8 +1700,8 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
                 <span className="settings-user-oauth-item-value">{binding.providerUsername ?? '—'}</span>
               </div>
               <div className="settings-user-oauth-item-row">
-                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.email', { defaultValue: '邮箱' })}</span>
-                <span className="settings-user-oauth-item-value">{binding.providerEmail ?? '—'}</span>
+                <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.providerUserId', { defaultValue: '第三方用户ID' })}</span>
+                <span className="settings-user-oauth-item-value">{binding.providerUserId ?? '—'}</span>
               </div>
               <div className="settings-user-oauth-item-row">
                 <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.boundAt', { defaultValue: '绑定时间' })}</span>

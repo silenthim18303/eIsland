@@ -3173,7 +3173,8 @@
         "proDesc": "View Pro plan benefits plus current subscription pricing",
         "rechargeDesc": "Top up your balance for AI assistant conversations",
         "ordersDesc": "Check order status, continue payment, or close pending orders",
-        "logoutDesc": "Sign out or delete your account"
+        "logoutDesc": "Sign out or delete your account",
+        "oauthDesc": "View linked third-party login accounts"
       },
       "pages": {
         "info": "Profile",
@@ -3195,7 +3196,7 @@
         },
         "fields": {
           "username": "Username",
-          "email": "Email",
+          "providerUserId": "Third-party User ID",
           "boundAt": "Bound at"
         }
       },

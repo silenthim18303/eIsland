@@ -3173,7 +3173,8 @@
         "proDesc": "查看 Pro 计划权益及当前订阅价格",
         "rechargeDesc": "为 AI 助手对话余额充值",
         "ordersDesc": "查看订单状态、继续支付或主动关闭待支付订单",
-        "logoutDesc": "退出当前账号或注销"
+        "logoutDesc": "退出当前账号或注销",
+        "oauthDesc": "查看已绑定的第三方登录账号"
       },
       "pages": {
         "info": "用户信息",
@@ -3195,7 +3196,7 @@
         },
         "fields": {
           "username": "用户名",
-          "email": "邮箱",
+          "providerUserId": "第三方用户ID",
           "boundAt": "绑定时间"
         }
       },
