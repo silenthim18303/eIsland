@@ -47,7 +47,7 @@ import {
   type AboutSettingsPageKey,
 } from './components/AboutSettingsPageDots';
 import { SvgIcon } from '../../../../../../../utils/SvgIcon';
-import { ALL_DEPENDENCIES } from '../../../../../../../components/config/dependencies';
+import { ALL_DEPENDENCIES } from '../../../../../../config/dynamicIslandDependencies';
 
 const WALLPAPER_SOURCES = [
   {

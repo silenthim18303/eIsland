@@ -27,7 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PROJECT_LINKS } from '../config/projectLinks';
-import { ALL_DEPENDENCIES } from '../../../../config/dependencies';
+import { ALL_DEPENDENCIES } from '../../../../config/dynamicIslandDependencies';
 import type { GithubStepProps } from '../types';
 
 /**
