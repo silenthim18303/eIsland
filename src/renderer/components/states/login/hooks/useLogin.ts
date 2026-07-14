@@ -37,7 +37,7 @@ import { readStandaloneWindowMode } from '../utils/readStandaloneWindowMode';
 /** 登录状态交互逻辑 Hook */
 export function useLogin() {
   const { t } = useTranslation();
-  const { setRegister, setSetPassword, setBindOAuth, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
+  const { setRegister, setSetPassword, setBindOAuth, setBindEmail, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
   const setResetPassword = (): void => {
     useIslandStore.setState((prev) => {
       const prevState = prev.state as string;
@@ -306,11 +306,19 @@ export function useLogin() {
         setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
         await navigateToUserCenter();
       } else if (status === 'SET_PASSWORD' && tempToken) {
-        setSetPassword({
-          tempToken,
-          suggestedUsername: username || '',
-          email: email || '',
-        });
+        // 微信不返回邮箱，先走绑定邮箱流程
+        if (!email) {
+          setBindEmail({
+            tempToken,
+            suggestedUsername: username || '',
+          });
+        } else {
+          setSetPassword({
+            tempToken,
+            suggestedUsername: username || '',
+            email: email || '',
+          });
+        }
       } else if (status === 'BIND_OAUTH' && tempToken) {
         setBindOAuth({
           tempToken,

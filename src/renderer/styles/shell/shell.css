@@ -357,6 +357,7 @@
 .island-shell.resetPassword,
 .island-shell.setPassword,
 .island-shell.bindOAuth,
+.island-shell.bindEmail,
 .island-shell.payment,
 .island-shell.announcement {
   width: 860px;
@@ -371,6 +372,7 @@
 .island-shell.resetPassword::before,
 .island-shell.setPassword::before,
 .island-shell.bindOAuth::before,
+.island-shell.bindEmail::before,
 .island-shell.payment::before,
 .island-shell.announcement::before {
   opacity: 0;

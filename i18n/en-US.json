@@ -3556,6 +3556,12 @@
       "bindSuccess": "Account bound successfully",
       "bindFailed": "Binding failed"
     },
+    "bindEmail": {
+      "title": "Bind Email",
+      "hint": "Please bind your email to complete registration",
+      "submit": "Verify & Continue",
+      "verifyFailed": "Verification code incorrect"
+    },
     "feedback": {
       "loginCancelled": "Login cancelled or timed out"
     }

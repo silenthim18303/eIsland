@@ -31,7 +31,7 @@ import { STATE_CONFIGS, isMouseInWindow } from '../config/dynamicIslandConfig';
 import { isCurrentLyricIdenticalToTranslation } from '../states/lyrics/utils/isCurrentLyricIdenticalToTranslation';
 
 /** 不自动离开悬停状态的面板状态集合 */
-const AUTH_STATES = new Set(['login', 'register', 'resetPassword', 'setPassword', 'bindOAuth', 'payment']);
+const AUTH_STATES = new Set(['login', 'register', 'resetPassword', 'setPassword', 'bindOAuth', 'bindEmail', 'payment']);
 
 interface UseIslandHoverInteractionOptions {
   state: IslandState;
