@@ -117,7 +117,7 @@ export const SvgIcon = {
   DOCS: './svg/DOCS.svg',
   DEVELOPER: './svg/DEVELOPER.svg',
   MICROSOFT: './svg/MICROSOFT.svg',
-  WECHAT: './svg/WECHATPAY.svg'
+  WECHAT: './svg/WECHAT.svg'
 } as const;
 
 export type SvgIconKey = keyof typeof SvgIcon;
