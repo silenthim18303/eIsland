@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-13T14:39:50.416Z
+> 生成时间：2026-07-14T10:46:07.104Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,26 @@
 
 ## Unreleased
 
+- 2026-07-14 | 797b8a83 | 鸡哥 | Merge pull request #147 from JNTMTMTM/dev
+- 2026-07-14 | 08f422bd | 鸡哥 | feat: replace GitHub OAuth SVG icon with image component for improved rendering
+- 2026-07-14 | 5984f429 | 鸡哥 | feat: update EMAIL_PATTERN import path and refactor oauth button rendering in LoginForm
+- 2026-07-14 | 9697a14e | 鸡哥 | feat: migrate splash configuration to splashWindowConfig and update imports
+- 2026-07-14 | b3b661bd | 鸡哥 | feat: migrate EMAIL_PATTERN to dynamicIslandPatterns and update imports across components
+- 2026-07-14 | eb9bf320 | 鸡哥 | feat: migrate ALL_DEPENDENCIES to dynamicIslandDependencies and update imports
+- 2026-07-14 | 566bacef | 鸡哥 | feat: centralize EMAIL_PATTERN regex in patterns.ts and update imports across components
+- 2026-07-14 | d6e18297 | 鸡哥 | feat: define LoginFormProps interface for improved type safety and component props management
+- 2026-07-14 | dc87b621 | 鸡哥 | feat: refactor OAuth buttons to consolidate loading state management
+- 2026-07-14 | 2c8cd211 | 鸡哥 | feat: update WECHAT icon file path and add new SVG file
+- 2026-07-14 | ad1ae87c | 鸡哥 | feat: update OAuth login button labels for consistency and adjust layout to row
+- 2026-07-14 | d2168d7c | 鸡哥 | feat: enhance OAuth support by adding WeChat email binding functionality and updating state machine documentation
+- 2026-07-14 | aae61863 | 鸡哥 | feat: add emailPlaceholder for email input in English and Chinese localization
+- 2026-07-14 | 51f80056 | 鸡哥 | feat: update wechatBindEmail function to include emailCode parameter and adjust useBindEmail hook for email binding
+- 2026-07-14 | 6ff7406f | 鸡哥 | feat: add BIND_EMAIL type to UserEmailCodeScene for email binding functionality
+- 2026-07-14 | 5f7cffc5 | 鸡哥 | feat: implement wechatBindEmail function and integrate it into useBindEmail hook for OAuth email binding
+- 2026-07-14 | 8bb36549 | 鸡哥 | feat: add email binding functionality for new OAuth users
+- 2026-07-14 | 2bc928ff | 鸡哥 | feat: add WeChat login handling to LoginContent component
+- 2026-07-14 | 586d5c96 | 鸡哥 | feat: add WeChat OAuth login functionality and localization support
+- 2026-07-13 | f5e85b97 | eislandBot | docs: auto update CHANGE_LOG.md for #146 by @JNTMTMTM [skip ci]
 - 2026-07-13 | af754cb6 | 鸡哥 | Merge pull request #146 from JNTMTMTM/dev
 - 2026-07-13 | 38db027b | 鸡哥 | feat: update skip button text to include default value for better localization
 - 2026-07-13 | e5c43284 | 鸡哥 | feat: add skip functionality to LanguageStep component
