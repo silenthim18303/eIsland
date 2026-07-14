@@ -25,4 +25,4 @@
  */
 
 /** 邮箱验证码场景 */
-export type UserEmailCodeScene = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'CHANGE_EMAIL' | 'UNREGISTER';
+export type UserEmailCodeScene = 'REGISTER' | 'LOGIN' | 'RESET_PASSWORD' | 'CHANGE_EMAIL' | 'BIND_EMAIL' | 'UNREGISTER';

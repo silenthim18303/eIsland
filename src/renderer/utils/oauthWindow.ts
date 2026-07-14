@@ -26,7 +26,7 @@
 
 import { pollOAuthResult, consumeOAuthResult } from '../api/user/userAccountApi.oauth';
 import type { OAuthCallbackData } from '../api/user/userAccountApi.oauth';
-import { getGitHubAuthorizeUrl, getMicrosoftAuthorizeUrl } from '../api/user/userAccountApi.oauth';
+import { getGitHubAuthorizeUrl, getMicrosoftAuthorizeUrl, getWechatAuthorizeUrl } from '../api/user/userAccountApi.oauth';
 
 /** 轮询配置 */
 const POLL_INTERVAL_MS = 2000;
@@ -88,6 +88,43 @@ export async function openGitHubOAuth(): Promise<OAuthCallbackData | null> {
  */
 export async function openMicrosoftOAuth(): Promise<OAuthCallbackData | null> {
   const urlResult = await getMicrosoftAuthorizeUrl();
+  if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
+    return null;
+  }
+
+  const sessionId = generateSessionId();
+  const authorizeUrl = urlResult.data.authorizeUrl;
+  const separator = authorizeUrl.includes('?') ? '&' : '?';
+  const urlWithState = `${authorizeUrl}${separator}state=${sessionId}`;
+
+  await window.api.clipboardOpenUrl(urlWithState);
+
+  for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
+    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+
+    try {
+      const pollRes = await pollOAuthResult(sessionId);
+      if (pollRes.code === 200 && pollRes.data?.ready) {
+        const consumeRes = await consumeOAuthResult(sessionId);
+        if (consumeRes.code === 200 && consumeRes.data) {
+          return consumeRes.data;
+        }
+        return null;
+      }
+    } catch {
+      // 网络错误，继续重试
+    }
+  }
+
+  return null;
+}
+
+/**
+ * 使用默认浏览器打开微信 OAuth 登录（网站应用扫码），轮询服务端获取结果。
+ * @returns OAuth 回调结果；超时或失败返回 null。
+ */
+export async function openWechatOAuth(): Promise<OAuthCallbackData | null> {
+  const urlResult = await getWechatAuthorizeUrl();
   if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
     return null;
   }

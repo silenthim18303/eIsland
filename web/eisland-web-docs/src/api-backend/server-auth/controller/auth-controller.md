@@ -6,7 +6,7 @@ icon: shield-halved
 # Auth API
 
 :::info
-Authentication endpoints under `/auth/`. Handles user/admin login, registration, password reset, OAuth (GitHub, Microsoft), and token refresh.
+Authentication endpoints under `/auth/`. Handles user/admin login, registration, password reset, OAuth (GitHub, Microsoft, WeChat), and token refresh.
 :::
 
 ## Endpoints
@@ -32,6 +32,9 @@ Authentication endpoints under `/auth/`. Handles user/admin login, registration,
 | GET | /auth/oauth/github/callback | GitHub OAuth callback |
 | GET | /auth/oauth/microsoft/authorize | Get Microsoft authorization URL |
 | GET | /auth/oauth/microsoft/callback | Microsoft OAuth callback |
+| GET | /auth/oauth/wechat/authorize | Get WeChat authorization URL |
+| GET | /auth/oauth/wechat/callback | WeChat OAuth callback |
+| POST | /auth/oauth/wechat/bind-email | Bind email for WeChat user (with internal email code verification) |
 | GET | /auth/oauth/poll | Poll for OAuth result readiness |
 | GET | /auth/oauth/consume | Consume OAuth result (one-time read) |
 | POST | /auth/oauth/set-password | Set password for new OAuth user |

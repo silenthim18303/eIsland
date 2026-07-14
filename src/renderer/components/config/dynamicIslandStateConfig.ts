@@ -41,6 +41,7 @@ export const STATE_AREA: Record<string, number> = {
   resetPassword: 860 * 400,
   setPassword: 860 * 400,
   bindOAuth: 860 * 400,
+  bindEmail: 860 * 400,
   payment: 860 * 400,
   announcement: 860 * 400,
   agentVoiceInput: 500 * 42,
@@ -151,6 +152,13 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   },
   bindOAuth: {
     name: 'bindOAuth',
+    mousePassthrough: false,
+    expanded: true,
+    enterDelay: 0,
+    leaveDelay: 0,
+  },
+  bindEmail: {
+    name: 'bindEmail',
     mousePassthrough: false,
     expanded: true,
     enterDelay: 0,

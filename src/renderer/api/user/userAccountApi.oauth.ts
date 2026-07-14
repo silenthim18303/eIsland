@@ -62,6 +62,35 @@ export function getMicrosoftAuthorizeUrl(): Promise<UserAccountResult<{ authoriz
 }
 
 /**
+ * 获取微信授权 URL（网站应用扫码登录）。
+ * @returns 授权 URL。
+ */
+export function getWechatAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUrl: string }>> {
+  return githubRequest<{ authorizeUrl: string }>('/auth/oauth/wechat/authorize', {
+    method: 'GET',
+  });
+}
+
+/**
+ * 微信 OAuth 用户补充邮箱后重新判断。
+ * @param tempToken - 原始 OAuth 回调生成的临时 token。
+ * @param email - 用户填写的邮箱。
+ * @param emailCode - 邮箱验证码。
+ * @returns 回调结果（SET_PASSWORD / BIND_OAUTH）。
+ */
+export function wechatBindEmail(
+  tempToken: string,
+  email: string,
+  emailCode: string,
+): Promise<UserAccountResult<OAuthCallbackData>> {
+  return githubRequest<OAuthCallbackData>('/auth/oauth/wechat/bind-email', {
+    method: 'POST',
+    body: { tempToken, email, emailCode },
+    timeoutMs: 15000,
+  });
+}
+
+/**
  * 处理 GitHub OAuth 回调。
  * @param code - 授权码。
  * @returns 回调结果。

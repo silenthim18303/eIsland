@@ -3132,6 +3132,7 @@
         "accountPlaceholder": "请输入用户名或邮箱",
         "boundEmail": "绑定邮箱",
         "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱地址",
         "emailCode": "邮箱验证码",
         "emailCodePlaceholder": "请输入邮箱验证码",
         "password": "密码",
@@ -3533,11 +3534,15 @@
   "oauth": {
     "divider": "或",
     "github": {
-      "login": "使用 GitHub 登录",
+      "login": "GitHub",
       "loading": "连接中…"
     },
     "microsoft": {
-      "login": "使用 Microsoft 登录",
+      "login": "Microsoft",
+      "loading": "连接中…"
+    },
+    "wechat": {
+      "login": "WeChat",
       "loading": "连接中…"
     },
     "setPassword": {
@@ -3551,6 +3556,12 @@
       "submit": "绑定并登录",
       "bindSuccess": "绑定成功",
       "bindFailed": "绑定失败"
+    },
+    "bindEmail": {
+      "title": "绑定邮箱",
+      "hint": "请绑定邮箱以完成注册",
+      "submit": "验证并继续",
+      "verifyFailed": "验证码错误"
     },
     "feedback": {
       "loginCancelled": "登录已取消或超时"

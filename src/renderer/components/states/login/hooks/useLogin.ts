@@ -30,14 +30,14 @@ import useIslandStore from '../../../../store/slices';
 import { loginUserByAccount, loginUserByEmailWithCode, sendUserEmailCode } from '../../../../api/user/userAccountApi';
 import { updateSessionToken } from '../../../../utils/authSession';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
-import { openGitHubOAuth, openMicrosoftOAuth } from '../../../../utils/oauthWindow';
+import { openGitHubOAuth, openMicrosoftOAuth, openWechatOAuth } from '../../../../utils/oauthWindow';
 import { EMAIL_PATTERN, type Feedback, type LoginStepUpData } from '../config/loginConfig';
 import { readStandaloneWindowMode } from '../utils/readStandaloneWindowMode';
 
 /** 登录状态交互逻辑 Hook */
 export function useLogin() {
   const { t } = useTranslation();
-  const { setRegister, setSetPassword, setBindOAuth, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
+  const { setRegister, setSetPassword, setBindOAuth, setBindEmail, setMaxExpand, setMaxExpandTab, returnFromAuth } = useIslandStore();
   const setResetPassword = (): void => {
     useIslandStore.setState((prev) => {
       const prevState = prev.state as string;
@@ -200,6 +200,7 @@ export function useLogin() {
 
   const [githubLoading, setGithubLoading] = useState(false);
   const [microsoftLoading, setMicrosoftLoading] = useState(false);
+  const [wechatLoading, setWechatLoading] = useState(false);
 
   const handleGitHubLogin = async (): Promise<void> => {
     if (githubLoading) return;
@@ -284,6 +285,55 @@ export function useLogin() {
     }
   };
 
+  const handleWechatLogin = async (): Promise<void> => {
+    if (wechatLoading) return;
+    setWechatLoading(true);
+    setFeedback(null);
+
+    try {
+      const data = await openWechatOAuth();
+      setWechatLoading(false);
+
+      if (!data) {
+        setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: '登录已取消或超时' }) });
+        return;
+      }
+
+      const { status, token, tempToken, username, email } = data;
+
+      if (status === 'LOGIN' && token) {
+        updateSessionToken(token);
+        setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
+        await navigateToUserCenter();
+      } else if (status === 'SET_PASSWORD' && tempToken) {
+        // 微信不返回邮箱，先走绑定邮箱流程
+        if (!email) {
+          setBindEmail({
+            tempToken,
+            suggestedUsername: username || '',
+          });
+        } else {
+          setSetPassword({
+            tempToken,
+            suggestedUsername: username || '',
+            email: email || '',
+          });
+        }
+      } else if (status === 'BIND_OAUTH' && tempToken) {
+        setBindOAuth({
+          tempToken,
+          username: username || '',
+          email: email || '',
+        });
+      } else {
+        setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+      }
+    } catch {
+      setWechatLoading(false);
+      setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+    }
+  };
+
   return {
     account,
     setAccount,
@@ -310,6 +360,8 @@ export function useLogin() {
     handleGitHubLogin,
     microsoftLoading,
     handleMicrosoftLogin,
+    wechatLoading,
+    handleWechatLogin,
     t,
   };
 }

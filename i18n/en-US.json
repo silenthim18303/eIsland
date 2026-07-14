@@ -3132,6 +3132,7 @@
         "accountPlaceholder": "Enter username or email",
         "boundEmail": "Bound Email",
         "email": "Email",
+        "emailPlaceholder": "Enter email address",
         "emailCode": "Email Code",
         "emailCodePlaceholder": "Enter email code",
         "password": "Password",
@@ -3533,11 +3534,15 @@
   "oauth": {
     "divider": "or",
     "github": {
-      "login": "Sign in with GitHub",
+      "login": "GitHub",
       "loading": "Connecting…"
     },
     "microsoft": {
-      "login": "Sign in with Microsoft",
+      "login": "Microsoft",
+      "loading": "Connecting…"
+    },
+    "wechat": {
+      "login": "WeChat",
       "loading": "Connecting…"
     },
     "setPassword": {
@@ -3551,6 +3556,12 @@
       "submit": "Bind & Sign In",
       "bindSuccess": "Account bound successfully",
       "bindFailed": "Binding failed"
+    },
+    "bindEmail": {
+      "title": "Bind Email",
+      "hint": "Please bind your email to complete registration",
+      "submit": "Verify & Continue",
+      "verifyFailed": "Verification code incorrect"
     },
     "feedback": {
       "loginCancelled": "Login cancelled or timed out"

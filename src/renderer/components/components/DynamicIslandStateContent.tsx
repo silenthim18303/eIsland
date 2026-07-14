@@ -45,6 +45,7 @@ import { SttContent } from '../states/stt/SttContent';
 import { CliContent } from '../states/cli/CliContent';
 import { SetPasswordContent } from '../states/setPassword';
 import { BindOAuthContent } from '../states/bindOAuth';
+import { BindEmailContent } from '../states/bindEmail';
 import type { IslandState } from '../hooks/useDynamicIslandShell';
 
 interface DynamicIslandStateContentProps {
@@ -133,6 +134,7 @@ export function DynamicIslandStateContent({
   if (state === 'resetPassword') return <ResetPasswordContent />;
   if (state === 'setPassword') return <SetPasswordContent />;
   if (state === 'bindOAuth') return <BindOAuthContent />;
+  if (state === 'bindEmail') return <BindEmailContent />;
   if (state === 'payment') return <PaymentContent />;
   if (state === 'announcement') return <AnnouncementContent />;
   if (state === 'agentVoiceInput') return <AgentVoiceInputContent />;

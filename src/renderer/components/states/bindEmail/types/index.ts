@@ -19,25 +19,27 @@
  */
 
 /**
- * @file loginConfig.ts
- * @description 登录状态配置与类型定义
+ * @file types.ts
+ * @description 绑定邮箱状态组件类型定义
  * @author 鸡哥
  */
 
-export const STANDALONE_WINDOW_MODE_STORE_KEY = 'standalone-window-mode';
-export const LEGACY_COUNTDOWN_WINDOW_MODE_STORE_KEY = 'countdown-window-mode';
+import type { Dispatch, SetStateAction } from 'react';
+import type { TFunction } from 'i18next';
+import type { Feedback } from '../../login/config/loginConfig';
 
-export type FeedbackType = 'success' | 'error' | 'info';
-
-export interface Feedback {
-  type: FeedbackType;
-  text: string;
+/** BindEmailForm 组件 Props */
+export interface BindEmailFormProps {
+  email: string;
+  setEmail: Dispatch<SetStateAction<string>>;
+  emailCode: string;
+  setEmailCode: Dispatch<SetStateAction<string>>;
+  sendingCode: boolean;
+  sendCooldownSeconds: number;
+  submitting: boolean;
+  feedback: Feedback | null;
+  handleSendCode: () => Promise<void>;
+  handleSubmit: () => Promise<void>;
+  setLogin: () => void;
+  t: TFunction;
 }
-
-export interface LoginStepUpData {
-  requireEmailVerification?: boolean;
-  maskedEmail?: string;
-  verificationEmail?: string;
-}
-
-export { EMAIL_PATTERN } from '../../../config/dynamicIslandPatterns';

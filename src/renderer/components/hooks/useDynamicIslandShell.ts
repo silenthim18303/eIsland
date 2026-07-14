@@ -26,10 +26,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import useIslandStore from '../../store/isLandStore';
+import type { IslandState } from '../../store/types';
 
 const MUSIC_OUTER_GLOW_EFFECT_STORE_KEY = 'music-outer-glow-effect-enabled';
 
-export type IslandState = 'idle' | 'hover' | 'expanded' | 'notification' | 'maxExpand' | 'minimal' | 'lyrics' | 'lyricsTranslation' | 'guide' | 'login' | 'register' | 'resetPassword' | 'setPassword' | 'bindOAuth' | 'payment' | 'announcement' | 'agentVoiceInput' | 'agent' | 'stt' | 'cli';
+export type { IslandState };
 
 const MORPH_DURATION_BY_SPEED: Record<string, number> = { slow: 1100, medium: 550, fast: 280 };
 
