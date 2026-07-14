@@ -211,11 +211,9 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             disabled={oauthBusy || microsoftDisabled}
           >
             <img className="auth-oauth-icon" src={SvgIcon.MICROSOFT} alt="" width={18} height={18} />
-            {microsoftDisabled
-              ? t('oauth.microsoft.disabled', { defaultValue: 'Microsoft 暂不可用' })
-              : microsoftLoading
-                ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
-                : t('oauth.microsoft.login', { defaultValue: 'Microsoft' })}
+            {microsoftLoading
+              ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
+              : t('oauth.microsoft.login', { defaultValue: 'Microsoft' })}
           </button>
           <button
             type="button"
@@ -224,11 +222,9 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             disabled={oauthBusy || wechatDisabled}
           >
             <img className="auth-oauth-icon" src={SvgIcon.WECHAT} alt="" width={18} height={18} />
-            {wechatDisabled
-              ? t('oauth.wechat.disabled', { defaultValue: '微信登录暂不可用' })
-              : wechatLoading
-                ? t('oauth.wechat.loading', { defaultValue: '连接中…' })
-                : t('oauth.wechat.login', { defaultValue: 'WeChat' })}
+            {wechatLoading
+              ? t('oauth.wechat.loading', { defaultValue: '连接中…' })
+              : t('oauth.wechat.login', { defaultValue: 'WeChat' })}
           </button>
         </div>
       </div>
