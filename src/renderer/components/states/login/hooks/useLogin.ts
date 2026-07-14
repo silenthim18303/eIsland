@@ -207,7 +207,7 @@ export function useLogin() {
     let cancelled = false;
     void fetchOAuthProviders().then((res) => {
       if (cancelled || !res.ok || !Array.isArray(res.data)) return;
-      const enabled = new Set(res.data.map((p) => p.provider));
+      const enabled = new Set(res.data.map((p) => p.provider.toLowerCase()));
       const allProviders = ['github', 'microsoft', 'wechat'] as const;
       setDisabledProviders(new Set(allProviders.filter((name) => !enabled.has(name))));
     });

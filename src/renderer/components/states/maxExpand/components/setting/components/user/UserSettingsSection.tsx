@@ -1734,7 +1734,7 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
               <button
                 type="button"
                 className="settings-user-danger-btn"
-                disabled={oauthUnbindingId !== null}
+                disabled={oauthUnbindingId === binding.id}
                 onClick={() => void handleUnbindOAuth(binding.id)}
               >
                 {oauthUnbindingId === binding.id
