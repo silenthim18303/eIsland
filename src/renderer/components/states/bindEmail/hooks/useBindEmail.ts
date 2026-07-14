@@ -30,7 +30,8 @@ import useIslandStore from '../../../../store/slices';
 import { sendUserEmailCode } from '../../../../api/user/userAccountApi';
 import { wechatBindEmail } from '../../../../api/user/userAccountApi.oauth';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
-import { EMAIL_PATTERN, type Feedback } from '../../login/config/loginConfig';
+import { EMAIL_PATTERN } from '../config/bindEmailConfig';
+import type { Feedback } from '../../login/config/loginConfig';
 
 /** 绑定邮箱状态交互逻辑 Hook */
 export function useBindEmail() {
