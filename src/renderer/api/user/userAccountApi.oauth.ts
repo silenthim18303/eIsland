@@ -185,3 +185,16 @@ export function fetchOAuthBindings(token: string): Promise<UserAccountResult<OAu
     auth: token,
   });
 }
+
+/**
+ * 解除当前用户的指定第三方应用绑定。
+ * @param token - 用户 token。
+ * @param bindingId - 绑定记录 ID。
+ * @returns 操作结果。
+ */
+export function unbindOAuth(token: string, bindingId: number): Promise<UserAccountResult<unknown>> {
+  return request(`/v1/user/oauth-bindings/${bindingId}`, {
+    method: 'DELETE',
+    auth: token,
+  });
+}

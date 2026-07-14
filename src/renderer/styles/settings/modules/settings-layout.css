@@ -5336,6 +5336,20 @@
   white-space: nowrap;
 }
 
+.settings-user-oauth-item-card .settings-user-feedback {
+  margin-top: 8px;
+}
+
+.settings-user-oauth-item-actions {
+  display: flex;
+  margin-top: 10px;
+}
+
+.settings-user-oauth-item-actions .settings-user-danger-btn {
+  flex: 1;
+  justify-content: center;
+}
+
 @media (max-width: 760px) {
   .settings-user-avatar-row {
     grid-template-columns: 1fr;

@@ -37,6 +37,7 @@ import {
   logoutUser,
   refreshUserToken,
   sendUserEmailCode,
+  unbindOAuth,
   unregisterUser,
   updateUserPassword,
   updateUserProfile,
@@ -188,6 +189,8 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
   /** 第三方应用绑定列表 */
   const [oauthBindings, setOauthBindings] = useState<OAuthBindingItem[]>([]);
   const [loadingOAuthBindings, setLoadingOAuthBindings] = useState(false);
+  const [oauthUnbindingId, setOauthUnbindingId] = useState<number | null>(null);
+  const [oauthFeedback, setOauthFeedback] = useState<{ bindingId: number; feedback: Feedback } | null>(null);
 
   /** 用户中心登录天数热力图：记录并展示当前用户每个自然日是否登录 */
   const [loginDays, setLoginDays] = useState<Set<string>>(() => readLoginDays(profile?.username));
@@ -569,6 +572,24 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
     void loadOAuthBindings();
     return () => { cancelled = true; };
   }, [token, userProfilePage]);
+
+  const handleUnbindOAuth = async (bindingId: number): Promise<void> => {
+    if (!token || oauthUnbindingId !== null) return;
+    setOauthUnbindingId(bindingId);
+    setOauthFeedback(null);
+    const result = await unbindOAuth(token, bindingId);
+    setOauthUnbindingId(null);
+    if (!result.ok) {
+      if (result.code === 401 || result.code === 4011) {
+        resetToLoggedOut();
+        return;
+      }
+      setOauthFeedback({ bindingId, feedback: { type: 'error', text: result.message || t('settings.user.oauth.feedback.unbindFailed', { defaultValue: '解除绑定失败' }) } });
+      return;
+    }
+    setOauthBindings((prev) => prev.filter((b) => b.id !== bindingId));
+    setOauthFeedback(null);
+  };
 
   const handleSaveProfile = async (): Promise<void> => {
     if (!token || savingProfile || savingPassword) return;
@@ -1707,6 +1728,19 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
                 <span className="settings-user-oauth-item-label">{t('settings.user.oauth.fields.boundAt', { defaultValue: '绑定时间' })}</span>
                 <span className="settings-user-oauth-item-value">{formatDateTime(binding.createdAt)}</span>
               </div>
+            </div>
+            {oauthFeedback?.bindingId === binding.id ? renderFeedback(oauthFeedback.feedback) : null}
+            <div className="settings-user-oauth-item-actions">
+              <button
+                type="button"
+                className="settings-user-danger-btn"
+                disabled={oauthUnbindingId !== null}
+                onClick={() => void handleUnbindOAuth(binding.id)}
+              >
+                {oauthUnbindingId === binding.id
+                  ? t('settings.user.oauth.actions.unbinding', { defaultValue: '解除中…' })
+                  : t('settings.user.oauth.actions.unbind', { defaultValue: '解除绑定' })}
+              </button>
             </div>
           </div>
         ))}

@@ -3198,6 +3198,14 @@
           "username": "用户名",
           "providerUserId": "第三方用户ID",
           "boundAt": "绑定时间"
+        },
+        "actions": {
+          "unbind": "解除绑定",
+          "unbinding": "解除中…"
+        },
+        "feedback": {
+          "unbindSuccess": "已解除绑定",
+          "unbindFailed": "解除绑定失败"
         }
       },
       "recharge": {

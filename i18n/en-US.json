@@ -3198,6 +3198,14 @@
           "username": "Username",
           "providerUserId": "Third-party User ID",
           "boundAt": "Bound at"
+        },
+        "actions": {
+          "unbind": "Unbind",
+          "unbinding": "Unbinding…"
+        },
+        "feedback": {
+          "unbindSuccess": "Unbound successfully",
+          "unbindFailed": "Failed to unbind"
         }
       },
       "recharge": {
