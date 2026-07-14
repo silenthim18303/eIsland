@@ -62,6 +62,16 @@ export function getMicrosoftAuthorizeUrl(): Promise<UserAccountResult<{ authoriz
 }
 
 /**
+ * 获取微信授权 URL（网站应用扫码登录）。
+ * @returns 授权 URL。
+ */
+export function getWechatAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUrl: string }>> {
+  return githubRequest<{ authorizeUrl: string }>('/auth/oauth/wechat/authorize', {
+    method: 'GET',
+  });
+}
+
+/**
  * 处理 GitHub OAuth 回调。
  * @param code - 授权码。
  * @returns 回调结果。

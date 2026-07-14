@@ -3540,6 +3540,10 @@
       "login": "使用 Microsoft 登录",
       "loading": "连接中…"
     },
+    "wechat": {
+      "login": "使用微信登录",
+      "loading": "连接中…"
+    },
     "setPassword": {
       "title": "设置密码",
       "hint": "OAuth 登录成功，请设置密码以完成注册",

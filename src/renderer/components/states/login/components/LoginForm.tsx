@@ -58,6 +58,8 @@ export function LoginForm(props: LoginFormProps): ReactElement {
     handleGitHubLogin,
     microsoftLoading,
     handleMicrosoftLogin,
+    wechatLoading,
+    handleWechatLogin,
     t,
   } = props;
 
@@ -210,6 +212,17 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             {microsoftLoading
               ? t('oauth.microsoft.loading', { defaultValue: '连接中…' })
               : t('oauth.microsoft.login', { defaultValue: '使用 Microsoft 登录' })}
+          </button>
+          <button
+            type="button"
+            className="auth-oauth-btn auth-oauth-btn--wechat"
+            onClick={() => void handleWechatLogin()}
+            disabled={submitting || wechatLoading}
+          >
+            <img className="auth-oauth-icon" src={SvgIcon.WECHAT} alt="" width={18} height={18} />
+            {wechatLoading
+              ? t('oauth.wechat.loading', { defaultValue: '连接中…' })
+              : t('oauth.wechat.login', { defaultValue: '使用微信登录' })}
           </button>
         </div>
       </div>

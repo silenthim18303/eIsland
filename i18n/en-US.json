@@ -3540,6 +3540,10 @@
       "login": "Sign in with Microsoft",
       "loading": "Connecting…"
     },
+    "wechat": {
+      "login": "Sign in with WeChat",
+      "loading": "Connecting…"
+    },
     "setPassword": {
       "title": "Set Password",
       "hint": "OAuth login successful. Please set a password to complete registration.",
