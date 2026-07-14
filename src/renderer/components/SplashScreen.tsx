@@ -27,7 +27,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactElement } from 'react';
 import { useSplash } from './hooks/useSplash';
-import { SPLASH_VIDEO_SRC } from './config/splashConfig';
+import { SPLASH_VIDEO_SRC } from './config/splashWindowConfig';
 import { WaveEffect } from './components/DynamicIslandSharedWaveEffect';
 
 /** 启动画面默认背景颜色 */

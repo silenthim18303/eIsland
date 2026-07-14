@@ -29,7 +29,7 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../../../../../store/slices';
 import { SvgIcon } from '../../../../../../../../utils/SvgIcon';
-import { SPLASH_VIDEO_SRC } from '../../../../../../../config/splashConfig';
+import { SPLASH_VIDEO_SRC } from '../../../../../../../config/splashWindowConfig';
 import { WaveEffect } from '../../../../../../../components/DynamicIslandSharedWaveEffect';
 
 const MAXEXPAND_TAB_ANIMATION_KEY = 'maxexpand-tab-animation';
