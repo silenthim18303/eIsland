@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-14T10:46:07.104Z
+> 生成时间：2026-07-14T16:02:28.079Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,16 @@
 
 ## Unreleased
 
+- 2026-07-15 | ca878eb3 | 鸡哥 | Merge pull request #148 from JNTMTMTM/dev
+- 2026-07-14 | 646ac5a5 | 鸡哥 | feat: normalize provider names to lowercase in useLogin hook and update unbinding button logic in UserSettingsSection
+- 2026-07-14 | 5f7a9fec | 鸡哥 | feat: streamline disabled providers logic by using filter method
+- 2026-07-14 | b96623b1 | 鸡哥 | feat: simplify Microsoft login button text handling by removing disabled state message
+- 2026-07-14 | bee56f8f | 鸡哥 | feat: add fetchOAuthProviders function and integrate disabled providers logic in login components
+- 2026-07-14 | 4aff3324 | 鸡哥 | feat: add unbind functionality for OAuth bindings in user settings
+- 2026-07-14 | 48da9c3a | 鸡哥 | feat: update OAuth fields in user settings to use providerUserId instead of email
+- 2026-07-14 | 7f7ecf74 | 鸡哥 | feat: implement OAuth bindings management in user settings
+- 2026-07-14 | 53546f98 | 鸡哥 | feat: add OAuth page binding to user settings and update translations
+- 2026-07-14 | 408de939 | eislandBot | docs: auto update CHANGE_LOG.md for #147 by @JNTMTMTM [skip ci]
 - 2026-07-14 | 797b8a83 | 鸡哥 | Merge pull request #147 from JNTMTMTM/dev
 - 2026-07-14 | 08f422bd | 鸡哥 | feat: replace GitHub OAuth SVG icon with image component for improved rendering
 - 2026-07-14 | 5984f429 | 鸡哥 | feat: update EMAIL_PATTERN import path and refactor oauth button rendering in LoginForm
