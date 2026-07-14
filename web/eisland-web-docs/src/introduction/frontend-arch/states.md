@@ -6,7 +6,7 @@ icon: diagram-project
 # eIsland State Machine
 
 :::info
-The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **19 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
+The eIsland state machine is the core architecture that controls the island's appearance, behavior, and interactions. It manages **20 distinct states**, each with defined pixel dimensions, mouse behavior, and transition rules.
 :::
 
 ## State Categories
@@ -40,6 +40,7 @@ The eIsland state machine is the core architecture that controls the island's ap
 | `resetPassword` | Password recovery | No | 860×400 px |
 | `setPassword` | OAuth new user password setup | No | 860×400 px |
 | `bindOAuth` | Bind OAuth to existing account | No | 860×400 px |
+| `bindEmail` | Bind email for OAuth (WeChat) | No | 860×400 px |
 | `payment` | Payment processing | No | 860×400 px |
 
 ### AI & Input States
@@ -83,6 +84,7 @@ export const STATE_CONFIGS: Record<IslandState, StateConfig> = {
   resetPassword:  { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   setPassword:    { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   bindOAuth:      { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
+  bindEmail:      { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   payment:        { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   guide:          { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
   announcement:   { mousePassthrough: false, expanded: true,  enterDelay: 0,   leaveDelay: 0   },
@@ -114,6 +116,7 @@ export const STATE_AREA: Record<string, number> = {
   resetPassword: 860 * 400, // 344,000 px²
   setPassword: 860 * 400,   // 344,000 px²
   bindOAuth: 860 * 400,     // 344,000 px²
+  bindEmail: 860 * 400,     // 344,000 px²
   payment: 860 * 400,       // 344,000 px²
   guide: 860 * 400,         // 344,000 px²
   announcement: 860 * 400,  // 344,000 px²
@@ -665,6 +668,7 @@ The `login` state provides user authentication interface, including email/passwo
 - Register link → `register`
 - Reset password link → `resetPassword`
 - OAuth (GitHub / Microsoft) → `setPassword` (new user) or `bindOAuth` (existing email)
+- OAuth (WeChat) → `bindEmail` (no email returned by WeChat)
 
 **UI Components Rendered:**
 - Username/email input
@@ -673,7 +677,8 @@ The `login` state provides user authentication interface, including email/passwo
 - Register link
 - Forgot password link
 - GitHub OAuth button (with divider)
-- Microsoft OAuth button (disabled, pending Azure app registration)
+- Microsoft OAuth button
+- WeChat OAuth button
 - Error messages
 
 **Behavior Details:**
@@ -684,10 +689,10 @@ The `login` state provides user authentication interface, including email/passwo
 - Session token management
 - Single device enforcement
 
-#### OAuth Login Flow (GitHub / Microsoft)
+#### OAuth Login Flow (GitHub / Microsoft / WeChat)
 
 :::important
-OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. Both GitHub and Microsoft follow the same flow.
+OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. GitHub, Microsoft, and WeChat all follow the same polling flow. WeChat adds an extra email binding step since it does not return the user's email.
 :::
 
 ```mermaid
@@ -725,6 +730,7 @@ sequenceDiagram
 | OAuth account already bound | `LOGIN` with JWT token | → saved state or `idle` |
 | OAuth email matches registered email | `BIND_OAUTH` with tempToken | → `bindOAuth` |
 | No matching email found | `SET_PASSWORD` with tempToken | → `setPassword` |
+| WeChat (no email returned) | `SET_PASSWORD` with tempToken (null email) | → `bindEmail` |
 
 :::tip
 If the OAuth provider returns a null email (e.g., GitHub privacy settings), the backend falls back to the provider's email API to fetch the user's verified primary email address.
@@ -740,6 +746,9 @@ If the OAuth provider returns a null email (e.g., GitHub privacy settings), the 
 | `MICROSOFT_CLIENT_ID` | Microsoft Azure app client ID | `abc123...` |
 | `MICROSOFT_CLIENT_SECRET` | Microsoft Azure app client secret | `xyz789...` |
 | `MICROSOFT_REDIRECT_URI` | Microsoft OAuth callback URL | `https://server.example.com/api/auth/oauth/microsoft/callback` |
+| `WECHAT_APP_ID` | WeChat website application AppID | `wx1234567890abcdef` |
+| `WECHAT_APP_SECRET` | WeChat website application AppSecret | `4e41d3...` |
+| `WECHAT_REDIRECT_URI` | WeChat OAuth callback URL | `https://server.example.com/api/auth/oauth/wechat/callback` |
 | `OAUTH_CALLBACK_REDIRECT_URL` | Browser redirect after callback | `https://www.pyisland.com` |
 
 :::note
@@ -904,6 +913,94 @@ The `bindOAuth` state handles linking a third-party OAuth account to an existing
 - On success: creates OAuth binding record in `user_oauth_binding` table, returns JWT token
 - Account must be enabled (not banned)
 - Self-handled navigation (does not follow standard click flow)
+
+---
+
+### bindEmail
+
+:::info
+The `bindEmail` state handles email binding for OAuth providers that do not return an email address — currently WeChat. When a user logs in via WeChat and no email is associated, they must bind an email to complete registration.
+:::
+
+| Property | Value |
+|----------|-------|
+| **Dimensions** | 860×400 px |
+| **Mouse** | Interactive |
+| **Expanded** | Yes |
+| **Enter Delay** | 0ms |
+| **Leave Delay** | 0ms |
+
+**Entry Conditions:**
+- OAuth callback returns `SET_PASSWORD` status with a null email (WeChat)
+- WeChat OAuth login without a bound email address
+
+**Exit Conditions:**
+- Email bound + password set → `setPassword` (new email) or `bindOAuth` (existing email)
+- Cancel → `login`
+
+**UI Components Rendered:**
+- Email input
+- Verification code input
+- Send verification code button (with slider CAPTCHA)
+- Submit button ("Verify and Continue")
+- Cancel button ("Cancel Login")
+
+**Behavior Details:**
+- Slider CAPTCHA required before sending verification code (once per session)
+- Email verification code sent via `BIND_EMAIL` scene
+- Backend verifies the code internally (no separate verify endpoint call)
+- If the email is already registered → routes to `bindOAuth`
+- If the email is new → routes to `setPassword` with email and username context
+- Temporary JWT token (`tempToken`) carries WeChat OAuth context across states
+
+#### WeChat OAuth Flow
+
+:::important
+WeChat OAuth uses the **qrconnect** flow for website applications. Unlike GitHub/Microsoft, WeChat does not return the user's email, requiring an additional email binding step.
+:::
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant E as eIsland (Renderer)
+    participant B as System Browser
+    participant W as WeChat Open Platform
+    participant S as Backend Server
+
+    U->>E: Click WeChat login button
+    E->>S: GET /auth/oauth/wechat/authorize
+    S-->>E: authorizeUrl (no state)
+    E->>E: Generate random sessionId (UUID)
+    E->>B: shell.openExternal(authorizeUrl + state=sessionId)
+    B->>W: User scans QR code
+    W->>S: Redirect to callback?code=xxx&state=sessionId
+    S->>S: Exchange code for access_token
+    S->>S: Fetch user info (nickname, avatar, openid)
+    S->>S: Store result by sessionId
+    S-->>B: 302 redirect to configured URL
+    loop Poll every 2s (max 5 min)
+        E->>S: GET /auth/oauth/poll?sessionId=xxx
+        S-->>E: { ready: true }
+    end
+    E->>S: GET /auth/oauth/consume?sessionId=xxx
+    S-->>E: OAuth result (null email)
+    E->>E: Route to bindEmail state
+    U->>E: Enter email + verification code
+    E->>S: POST /auth/oauth/wechat/bind-email
+    S-->>E: Result (SET_PASSWORD or BIND_OAUTH)
+    E->>E: Route to setPassword or bindOAuth
+```
+
+**Backend Decision Logic (bind-email):**
+
+| Condition | Result | Next State |
+|-----------|--------|------------|
+| Email already registered | `BIND_OAUTH` with tempToken | → `bindOAuth` |
+| Email not registered | `SET_PASSWORD` with tempToken | → `setPassword` |
+
+:::note
+WeChat website applications use `https://open.weixin.qq.com/connect/qrconnect` as the authorization endpoint. The `appid` parameter is used instead of `client_id`, and the response uses `openid` (not `id`) as the unique identifier.
+:::
 
 ---
 
