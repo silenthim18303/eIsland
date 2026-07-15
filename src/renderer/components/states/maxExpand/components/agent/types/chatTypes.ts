@@ -20,9 +20,13 @@
 
 /**
  * @file chatTypes.ts
- * @description AI 对话 SSE 事件负载类型定义。
+ * @description AI 对话相关类型定义。
  * @author 鸡哥
  */
+
+export type AgentMode = 'mihtnelis' | 'r1pxc' | 'edoc';
+
+export type SessionCardState = 'idle' | 'running' | 'awaiting' | 'success' | 'failed';
 
 export interface ThinkEventPayload {
   text?: unknown;

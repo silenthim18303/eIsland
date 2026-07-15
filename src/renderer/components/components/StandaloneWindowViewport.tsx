@@ -34,7 +34,7 @@ import { LocalFileSearchTab } from '../states/maxExpand/components/LocalFileSear
 import { ClipboardHistoryTab } from '../states/maxExpand/components/ClipboardHistoryTab';
 import { SettingsTab } from '../states/maxExpand/components/SettingsTab';
 import { MemoTab } from '../states/maxExpand/components/MemoTab';
-import { AlarmTab } from '../states/maxExpand/components/AlarmTab';
+import { AlarmTab } from '../states/maxExpand/components/alarm/components/AlarmTab';
 import { ToolboxTab } from '../states/maxExpand/components/ToolboxTab';
 import { LoginContent } from '../states/login';
 import { RegisterContent } from '../states/register/RegisterContent';

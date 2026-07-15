@@ -25,9 +25,9 @@
  */
 
 import type { AiChatSession, AiWebAccessPrompt } from '../../../../../../store/types';
-import type { AiLocalToolAccessPrompt } from './chatTypes';
+import type { AiLocalToolAccessPrompt, SessionCardState } from '../types/chatTypes';
 
-export type SessionCardState = 'idle' | 'running' | 'awaiting' | 'success' | 'failed';
+export type { SessionCardState } from '../types/chatTypes';
 
 /** 根据会话、流状态、工具授权等信息推断会话卡片的显示状态。 */
 export function resolveSessionCardState(params: {

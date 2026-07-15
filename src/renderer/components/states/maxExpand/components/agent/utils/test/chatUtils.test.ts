@@ -25,7 +25,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { AiChatMessage } from '../../../../../../store/types';
+import type { AiChatMessage } from '../../../../../../../store/types';
 
 /* ------------------------------------------------------------------ */
 /*  helpers                                                           */
