@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
 import { EVENT_FILTERS } from '../config/cliFilters';
+import { EVENTS_PER_PAGE, STOP_EVENTS, PERMISSION_EVENTS } from '../config/cliConstants';
 import type { CliHookEvent } from '../types/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
@@ -40,15 +41,6 @@ import { ActivityHeatmap } from './ActivityHeatmap';
 import '../../../../../../styles/settings/modules/cli.css';
 
 gsap.registerPlugin(useGSAP);
-
-/** 每页显示的流事件数量 */
-const EVENTS_PER_PAGE = 3;
-
-/** 流结束事件名 */
-const STOP_EVENTS = new Set(['Stop', 'StopFailure', 'SubagentStop', 'SessionEnd']);
-
-/** 等待授权事件名 */
-const PERMISSION_EVENTS = new Set(['PermissionRequest', 'PermissionDenied']);
 
 function EventRow({ event, t, showPermission }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string; showPermission: boolean }): ReactElement {
   const [expanded, setExpanded] = useState(false);
