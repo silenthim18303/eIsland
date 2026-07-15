@@ -27,20 +27,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import type { AlarmItem, Weekday } from '../types/alarmTypes';
+import type { AlarmCardProps } from '../types/alarmCardTypes';
 import { formatTime } from '../utils/alarmUtils';
-
-/** AlarmCard 组件 Props */
-interface AlarmCardProps {
-  alarm: AlarmItem;
-  isActive: boolean;
-  weekdayLabel: (d: Weekday) => string;
-  repeatSummary: (repeat: Weekday[]) => string;
-  nextRingDesc: (alarm: AlarmItem) => string;
-  onStartEdit: (alarm: AlarmItem) => void;
-  onDelete: (id: number) => void;
-  onToggle: (id: number) => void;
-}
 
 /** 闹钟卡片 */
 export function AlarmCard({
