@@ -20,7 +20,7 @@
 
 /**
  * @file chatConstants.ts
- * @description AI 对话配置常量与纯校验函数。
+ * @description AI 对话配置常量。
  * @author 鸡哥
  */
 
@@ -48,13 +48,6 @@ export const ATTACHMENT_MAX_SIZE_BYTES = 102400;
 export const ATTACHMENT_MAX_COUNT = 5;
 export const ATTACHMENT_ACCEPT_EXTENSIONS = '.txt,.md,.json,.log,.csv,.xml,.yaml,.yml,.toml,.ini,.cfg,.conf,.env,.sh,.bat,.ps1,.py,.js,.ts,.jsx,.tsx,.html,.css,.scss,.less,.sql,.c,.cpp,.h,.hpp,.java,.kt,.swift,.go,.rs,.rb,.php,.lua,.diff,.patch';
 
-const ATTACHMENT_ACCEPT_EXT_SET = new Set(
-  ATTACHMENT_ACCEPT_EXTENSIONS
-    .split(',')
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean),
-);
-
 export const EMPTY_GREETING_DEFAULTS = [
   '你好呀，今天想一起处理点什么？',
   '嗨，我在这儿，随时可以帮你。',
@@ -77,99 +70,11 @@ export const AGENT_MODES: ReadonlyArray<{
   { id: 'edoc', label: 'edoc', desc: 'coding', icon: SvgIcon.CODING },
 ] as const;
 
-const AGENT_MODE_STORAGE_KEY = 'eIsland_agentMode';
-
-/** 读取本地 agent 模式，异常时回退默认模式。 */
-export function loadAgentMode(): AgentMode {
-  try {
-    const raw = localStorage.getItem(AGENT_MODE_STORAGE_KEY);
-    if (raw && AGENT_MODES.some((m) => m.id === raw)) return raw as AgentMode;
-  } catch { /* ignore */ }
-  return 'mihtnelis';
-}
-
-/** 持久化当前 agent 模式。 */
-export function saveAgentMode(mode: AgentMode): void {
-  try { localStorage.setItem(AGENT_MODE_STORAGE_KEY, mode); } catch { /* ignore */ }
-}
-
-const CLIENT_LOCAL_TOOL_PREFIXES = [
-  'file.',
-  'cmd.',
-  'sys.',
-  'win.',
-  'clipboard.',
-  'notification.',
-  'net.',
-  'monitor.',
-  'volume.',
-  'brightness.',
-  'display.',
-  'power.',
-  'wifi.',
-  'registry.',
-  'service.',
-  'schedule.',
-  'firewall.',
-  'defender.',
-  'island.',
-  'alarm.',
-  'todolist.',
-] as const;
-
-const CLIENT_LOCAL_TOOL_EXACT_NAMES = new Set(['web.search']);
-
-const HIGH_RISK_LOCAL_TOOL_PREFIXES = [
-  'file.delete',
-  'file.rename',
-  'file.trash',
-  'cmd.exec',
-  'cmd.powershell',
-  'win.close',
-  'win.minimize',
-  'win.maximize',
-  'win.restore',
-  'power.',
-  'registry.write',
-  'registry.delete',
-  'service.start',
-  'service.stop',
-  'service.restart',
-  'schedule.task.create',
-  'net.proxy',
-  'net.hosts',
-  'defender.scan',
-  'island.settings.write',
-  'island.theme.set',
-  'island.opacity.set',
-  'island.restart',
-  'alarm.delete',
-  'todolist.delete',
-] as const;
-
-/** 判断工具名是否属于客户端本地工具。 */
-export function isClientLocalToolName(tool: string): boolean {
-  const normalized = tool.trim().toLowerCase();
-  return CLIENT_LOCAL_TOOL_EXACT_NAMES.has(normalized)
-    || CLIENT_LOCAL_TOOL_PREFIXES.some(prefix => normalized.startsWith(prefix));
-}
-
-/** 判断工具名是否属于高风险本地工具。 */
-export function isHighRiskLocalToolName(tool: string): boolean {
-  const normalized = tool.trim().toLowerCase();
-  return HIGH_RISK_LOCAL_TOOL_PREFIXES.some(prefix => normalized.startsWith(prefix));
-}
-
-/** 判断模型名是否属于 MiniMax 系列。 */
-export function isMinimaxModel(modelName: string): boolean {
-  return modelName.toLowerCase().startsWith('minimax-');
-}
-
-/** 判断附件扩展名是否在允许列表中。 */
-export function isAcceptedAttachmentFile(fileName: string): boolean {
-  const lowerName = (fileName ?? '').toLowerCase();
-  if (!lowerName) {
-    return false;
-  }
-  return Array.from(ATTACHMENT_ACCEPT_EXT_SET).some((ext) => lowerName.endsWith(ext));
-}
+export {
+  loadAgentMode,
+  saveAgentMode,
+  isClientLocalToolName,
+  isHighRiskLocalToolName,
+  isMinimaxModel,
+  isAcceptedAttachmentFile,
+} from '../utils/chatHelpers';

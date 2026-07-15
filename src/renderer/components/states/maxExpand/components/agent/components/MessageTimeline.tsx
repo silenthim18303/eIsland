@@ -27,7 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import { isMinimaxModel } from '../config/chatConstants';
+import { isMinimaxModel } from '../utils/chatHelpers';
 import type { AiChatMessage, AiTodoSnapshot } from '../../../../../../store/types';
 import { normalizeMarkdownCodeFences, toPrettyJson } from '../utils/chatUtils';
 import { AssistantMarkdown } from './AssistantMarkdown';

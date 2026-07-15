@@ -28,7 +28,7 @@ import useIslandStore from '../../../../store/isLandStore';
 import { getRoleFromToken } from '../../../../utils/userAccount';
 import { loadLocationFromStorage } from '../../../../store/utils/storage';
 import { buildMihtnelisContext } from '../../../states/maxExpand/components/agent/utils/chatUtils';
-import { isMinimaxModel } from '../../../states/maxExpand/components/agent/config/chatConstants';
+import { isMinimaxModel } from '../../../states/maxExpand/components/agent/utils/chatHelpers';
 import { loadAgentMode } from './agentMode';
 
 type AiConfig = ReturnType<typeof useIslandStore.getState>['aiConfig'];

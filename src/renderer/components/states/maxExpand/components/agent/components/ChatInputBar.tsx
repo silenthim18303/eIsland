@@ -34,10 +34,12 @@ import {
   ATTACHMENT_MAX_COUNT,
   ATTACHMENT_MAX_SIZE_BYTES,
   CONTEXT_LIMIT_OPTIONS,
-  isAcceptedAttachmentFile,
-  isMinimaxModel,
   type AgentMode,
 } from '../config/chatConstants';
+import {
+  isAcceptedAttachmentFile,
+  isMinimaxModel,
+} from '../utils/chatHelpers';
 
 /** ChatInputBar 组件 Props */
 interface ChatInputBarProps {

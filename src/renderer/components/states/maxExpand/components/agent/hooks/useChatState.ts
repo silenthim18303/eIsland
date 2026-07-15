@@ -41,11 +41,13 @@ import {
   VISIBLE_CHAT_WINDOW_SIZE_R1PXC,
   VISIBLE_CHAT_WINDOW_STEP_DEFAULT,
   VISIBLE_CHAT_WINDOW_STEP_R1PXC,
+  type AgentMode,
+} from '../config/chatConstants';
+import {
   isMinimaxModel,
   loadAgentMode,
   saveAgentMode,
-  type AgentMode,
-} from '../config/chatConstants';
+} from '../utils/chatHelpers';
 import { useClickOutside } from './useClickOutside';
 
 /** 流式请求的 AbortController 映射（模块级，跨渲染保持） */

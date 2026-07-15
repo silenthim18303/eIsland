@@ -62,9 +62,11 @@ import {
 import {
   ATTACHMENT_MAX_COUNT,
   ATTACHMENT_MAX_SIZE_BYTES,
+} from '../config/chatConstants';
+import {
   isClientLocalToolName,
   isHighRiskLocalToolName,
-} from '../config/chatConstants';
+} from '../utils/chatHelpers';
 import {
   SESSION_ABORT_CONTROLLERS,
   SESSION_STREAMING_IDS,
