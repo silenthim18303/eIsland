@@ -25,7 +25,7 @@
  */
 
 import type { AiChatSession, AiWebAccessPrompt } from '../../../../../../store/types';
-import type { AiLocalToolAccessPrompt } from './chatTypes';
+import type { AiLocalToolAccessPrompt } from '../types/chatTypes';
 
 export type SessionCardState = 'idle' | 'running' | 'awaiting' | 'success' | 'failed';
 
