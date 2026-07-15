@@ -37,7 +37,7 @@ import { MailTab } from './components/MailTab';
 import { SettingsTab } from './components/SettingsTab';
 import { CountdownTab } from './components/CountdownTab';
 import { MemoTab } from './components/MemoTab';
-import { AlarmTab } from './components/AlarmTab';
+import { AlarmTab } from './components/alarm/components/AlarmTab';
 import { ToolboxTab } from './components/ToolboxTab';
 import { MiniGameTab } from './components/MiniGameTab';
 import { StockTab } from './components/stock';

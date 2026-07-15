@@ -26,7 +26,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SvgIcon } from '../../../../utils/SvgIcon';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import {
   DEFAULT_SYSTEM_ALARM_RINGTONE,
   normalizeSystemAlarmRingtone,
@@ -35,7 +35,7 @@ import {
   subscribePreviewAlarmSoundState,
   SYSTEM_ALARM_RINGTONE_OPTIONS,
   type SystemAlarmRingtone,
-} from '../../../../utils/audio/alarmSound';
+} from '../../../../../../utils/audio/alarmSound';
 
 /** 星期几 0=周日 ... 6=周六 */
 type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;

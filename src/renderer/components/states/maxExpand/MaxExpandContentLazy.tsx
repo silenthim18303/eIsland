@@ -39,7 +39,7 @@ const MailTab = lazy(() => import('./components/MailTab').then((module) => ({ de
 const SettingsTab = lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
 const CountdownTab = lazy(() => import('./components/CountdownTab').then((module) => ({ default: module.CountdownTab })));
 const MemoTab = lazy(() => import('./components/MemoTab').then((module) => ({ default: module.MemoTab })));
-const AlarmTab = lazy(() => import('./components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
+const AlarmTab = lazy(() => import('./components/alarm/components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
 const ToolboxTab = lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));
 const MiniGameTab = lazy(() => import('./components/MiniGameTab').then((module) => ({ default: module.MiniGameTab })));
 const StockTab = lazy(() => import('./components/stock').then((module) => ({ default: module.StockTab })));
