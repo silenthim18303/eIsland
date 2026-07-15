@@ -24,19 +24,15 @@
  * @author 鸡哥
  */
 
-import { useState, type ReactElement } from 'react';
+import { type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
 import { useBulkSelect } from '../hooks/useBulkSelect';
 import { useEventPagination } from '../hooks/useEventPagination';
 import { usePendingPermissions } from '../hooks/usePendingPermissions';
-import { EVENT_FILTERS } from '../config/cliFilters';
-import { filterLabel } from '../utils/cliFormatters';
-import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import useIslandStore from '../../../../../../store/isLandStore';
-import { ActivityHeatmap } from './ActivityHeatmap';
-import { EventRow } from './EventRow';
+import { EventStreamPanel } from './EventStreamPanel';
 import { SessionSidebar } from './SessionSidebar';
 import '../../../../../../styles/settings/modules/cli.css';
 
@@ -57,8 +53,6 @@ export function CliTab(): ReactElement {
     activeSessions,
     filteredEvents,
   } = useCliEvents(snapshot);
-  const [filtersVisible, setFiltersVisible] = useState(false);
-  const [heatmapVisible, setHeatmapVisible] = useState(false);
   const {
     bulkSelectMode,
     selectedSessionIds,
@@ -67,7 +61,7 @@ export function CliTab(): ReactElement {
     handleToggleSessionSelection,
     handleDeleteSelectedSessions,
   } = useBulkSelect(snapshot.sessions, deleteSessions, selectedSessionId, setSelectedSessionId);
-  const { page, setPage, totalPages, currentPage, pagedEvents } = useEventPagination(filteredEvents, eventFilter, selectedSessionId);
+  const { setPage, totalPages, currentPage, pagedEvents } = useEventPagination(filteredEvents, eventFilter, selectedSessionId);
   const pendingPermissionEventIds = usePendingPermissions(snapshot.sessions);
 
   return (
@@ -84,115 +78,24 @@ export function CliTab(): ReactElement {
         selectedSessionCount={selectedSessionCount}
         handleDeleteSelectedSessions={handleDeleteSelectedSessions}
       />
-
-      {/* 右侧：事件流 + 控制 */}
-      <div className="cli-tab-main">
-        <div className="cli-tab-main-header">
-          <div className="cli-tab-stream-title">
-            <span className={`cli-tab-hook-badge ${snapshot.enabled ? 'enabled' : 'disabled'}`}>
-              {snapshot.enabled ? t('maxExpand.cli.enabled', { defaultValue: '已启用' }) : t('maxExpand.cli.disabled', { defaultValue: '未启用' })}
-            </span>
-            {totalPages > 1 && (
-              <span className="cli-tab-phase cli-tab-page-indicator">{currentPage + 1}/{totalPages}</span>
-            )}
-            <span className="cli-tab-stream-session">
-              {selectedSession?.title ?? t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}
-            </span>
-          </div>
-          <div className="cli-tab-actions">
-            {totalPages > 1 && (
-              <div className="cli-tab-page-switch">
-                <button
-                  className="cli-tab-page-btn"
-                  type="button"
-                  disabled={currentPage === 0}
-                  onClick={() => setPage(currentPage - 1)}
-                  title={t('maxExpand.cli.prevPage', { defaultValue: '上一页' })}
-                >
-                  <img src={SvgIcon.PREVIOUS} alt="" width="12" height="12" draggable={false} />
-                </button>
-                <button
-                  className="cli-tab-page-btn"
-                  type="button"
-                  disabled={currentPage >= totalPages - 1}
-                  onClick={() => setPage(currentPage + 1)}
-                  title={t('maxExpand.cli.nextPage', { defaultValue: '下一页' })}
-                >
-                  <img src={SvgIcon.NEXT} alt="" width="12" height="12" draggable={false} />
-                </button>
-              </div>
-            )}
-            <button
-              className="cli-tab-action-btn"
-              type="button"
-              title={snapshot.enabled ? t('maxExpand.cli.disableHook', { defaultValue: '关闭 Hook' }) : t('maxExpand.cli.enableHook', { defaultValue: '启用 Hook' })}
-              onClick={snapshot.enabled ? disableHook : enableHook}
-            >
-              <img src={snapshot.enabled ? SvgIcon.PAUSE : SvgIcon.CONTINUE} alt="" width="14" height="14" draggable={false} />
-            </button>
-            <button
-              className="cli-tab-action-btn cli-tab-action-btn--secondary"
-              type="button"
-              title={t('maxExpand.cli.clear', { defaultValue: '清空' })}
-              onClick={clearEvents}
-              disabled={snapshot.events.length === 0}
-            >
-              <img src={SvgIcon.DELETE} alt="" width="14" height="14" draggable={false} />
-            </button>
-            <button
-              className={`cli-tab-action-btn ${filtersVisible ? 'cli-tab-action-btn--active' : ''}`}
-              type="button"
-              title={t('maxExpand.cli.filterAria', { defaultValue: '事件筛选' })}
-              onClick={() => { setFiltersVisible((v) => !v); setHeatmapVisible(false); }}
-            >
-              <img src={SvgIcon.FILTER} alt="" width="14" height="14" draggable={false} />
-            </button>
-            <button
-              className={`cli-tab-action-btn ${heatmapVisible ? 'cli-tab-action-btn--active' : ''}`}
-              type="button"
-              title={t('maxExpand.cli.heatmapAria', { defaultValue: '活动热力图' })}
-              onClick={() => { setHeatmapVisible((v) => !v); setFiltersVisible(false); }}
-            >
-              <img src={SvgIcon.FIRE} alt="" width="14" height="14" draggable={false} />
-            </button>
-            <button
-              className="cli-tab-action-btn"
-              type="button"
-              title={t('maxExpand.cli.enterCliState', { defaultValue: '进入实时流' })}
-              onClick={() => setCli()}
-              disabled={activeSessions.length === 0}
-            >
-              <img src={SvgIcon.AI} alt="" width="14" height="14" draggable={false} />
-            </button>
-          </div>
-        </div>
-
-        <div className={`cli-tab-event-filters ${filtersVisible ? 'open' : ''}`} role="tablist" aria-label={t('maxExpand.cli.filterAria', { defaultValue: '事件筛选' })}>
-          {EVENT_FILTERS.map((filter) => (
-            <button
-              className={`cli-tab-filter-btn ${eventFilter === filter ? 'active' : ''}`}
-              type="button"
-              role="tab"
-              aria-selected={eventFilter === filter}
-              key={filter}
-              onClick={() => setEventFilter(filter)}
-            >
-              {filterLabel(filter, t)}
-            </button>
-          ))}
-        </div>
-
-        <div className={`cli-tab-heatmap ${heatmapVisible ? 'open' : ''}`}>
-          <ActivityHeatmap heatmap={snapshot.heatmap} visible={heatmapVisible} />
-        </div>
-
-        <div className="cli-tab-event-list">
-          {filteredEvents.length === 0 && (
-            <div className="cli-tab-empty">{t('maxExpand.cli.emptyEvents', { defaultValue: '暂无事件' })}</div>
-          )}
-          {pagedEvents.map((event) => <EventRow key={event.id} event={event} t={t} showPermission={pendingPermissionEventIds.has(event.id)} />)}
-        </div>
-      </div>
+      <EventStreamPanel
+        t={t}
+        snapshot={snapshot}
+        eventFilter={eventFilter}
+        setEventFilter={setEventFilter}
+        selectedSessionTitle={selectedSession?.title}
+        filteredEvents={filteredEvents}
+        pagedEvents={pagedEvents}
+        pendingPermissionEventIds={pendingPermissionEventIds}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        setPage={setPage}
+        enableHook={enableHook}
+        disableHook={disableHook}
+        clearEvents={clearEvents}
+        setCli={setCli}
+        activeSessionCount={activeSessions.length}
+      />
     </div>
   );
 }

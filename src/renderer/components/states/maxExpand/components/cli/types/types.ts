@@ -26,6 +26,7 @@
 
 import type { RefObject } from 'react';
 import type { HeatmapGrid } from '../utils/heatmapGrid';
+import type { CliEventFilter } from '../config/cliFilters';
 
 export type CliStatusSnapshot = Awaited<ReturnType<typeof window.api.claudeCodeStatusGet>>;
 export type CliSessionSnapshot = CliStatusSnapshot['sessions'][number];
@@ -72,6 +73,26 @@ export interface SessionSidebarProps {
   handleToggleSessionSelection: (id: string) => void;
   selectedSessionCount: number;
   handleDeleteSelectedSessions: () => void;
+}
+
+/** EventStreamPanel 组件属性 */
+export interface EventStreamPanelProps {
+  t: TFunction;
+  snapshot: CliStatusSnapshot;
+  eventFilter: CliEventFilter;
+  setEventFilter: (filter: CliEventFilter) => void;
+  selectedSessionTitle: string | undefined;
+  filteredEvents: CliHookEvent[];
+  pagedEvents: CliHookEvent[];
+  pendingPermissionEventIds: Set<string>;
+  totalPages: number;
+  currentPage: number;
+  setPage: (page: number) => void;
+  enableHook: () => Promise<void>;
+  disableHook: () => Promise<void>;
+  clearEvents: () => Promise<void>;
+  setCli: () => void;
+  activeSessionCount: number;
 }
 
 /** 热力图滚动引用 */
