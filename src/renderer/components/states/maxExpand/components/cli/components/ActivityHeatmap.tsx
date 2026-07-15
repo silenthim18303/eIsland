@@ -26,19 +26,8 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { CliHeatmapDaily } from '../types/types';
+import type { ActivityHeatmapProps, HeatmapMetric } from '../types/types';
 import { buildHeatmapMonths, HEATMAP_MONTH_KEYS } from '../utils/heatmapGrid';
-
-type HeatmapMetric = 'session' | 'tool' | 'prompt';
-
-interface ActivityHeatmapProps {
-  /** 按天累计的指标数据，键为 `年-月-日` */
-  heatmap: CliHeatmapDaily;
-  /** 紧凑模式：在用户中心等空间受限处显示更小的格子 */
-  compact?: boolean;
-  /** 可见性：折叠面板从隐藏切换为显示时，重新把今日滚动到水平居中 */
-  visible?: boolean;
-}
 
 /**
  * Claude Code 活动热力图组件

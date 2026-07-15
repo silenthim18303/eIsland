@@ -29,6 +29,17 @@ export type CliSessionSnapshot = CliStatusSnapshot['sessions'][number];
 export type CliHookEvent = CliStatusSnapshot['events'][number];
 export type CliHeatmapDaily = CliStatusSnapshot['heatmap'];
 
+export type HeatmapMetric = 'session' | 'tool' | 'prompt';
+
+export interface ActivityHeatmapProps {
+  /** 按天累计的指标数据，键为 `年-月-日` */
+  heatmap: CliHeatmapDaily;
+  /** 紧凑模式：在用户中心等空间受限处显示更小的格子 */
+  compact?: boolean;
+  /** 可见性：折叠面板从隐藏切换为显示时，重新把今日滚动到水平居中 */
+  visible?: boolean;
+}
+
 export const EMPTY_CLI_STATUS: CliStatusSnapshot = {
   enabled: false,
   receiverRunning: false,
