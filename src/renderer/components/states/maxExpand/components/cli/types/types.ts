@@ -50,6 +50,30 @@ export interface HeatmapGridResult extends HeatmapGrid {
   levelOf: (count: number) => number;
 }
 
+/** i18n 翻译函数签名 */
+export type TFunction = (key: string, opts?: Record<string, unknown>) => string;
+
+/** EventRow 组件属性 */
+export interface EventRowProps {
+  event: CliHookEvent;
+  t: TFunction;
+  showPermission: boolean;
+}
+
+/** SessionSidebar 组件属性 */
+export interface SessionSidebarProps {
+  t: TFunction;
+  sessions: CliSessionSnapshot[];
+  selectedSessionId: string | null;
+  setSelectedSessionId: (id: string | null) => void;
+  bulkSelectMode: boolean;
+  handleToggleBulkSelect: () => void;
+  selectedSessionIds: Set<string>;
+  handleToggleSessionSelection: (id: string) => void;
+  selectedSessionCount: number;
+  handleDeleteSelectedSessions: () => void;
+}
+
 /** 热力图滚动引用 */
 export interface HeatmapScrollRefs {
   scrollRef: RefObject<HTMLDivElement | null>;

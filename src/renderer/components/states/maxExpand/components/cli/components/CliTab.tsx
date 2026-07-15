@@ -24,99 +24,21 @@
  * @author 鸡哥
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo, type ReactElement } from 'react';
-import ReactMarkdown from 'react-markdown';
-import { gsap } from 'gsap';
-import { useGSAP } from '@gsap/react';
+import { useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
+import { useBulkSelect } from '../hooks/useBulkSelect';
+import { useEventPagination } from '../hooks/useEventPagination';
+import { usePendingPermissions } from '../hooks/usePendingPermissions';
 import { EVENT_FILTERS } from '../config/cliFilters';
-import { EVENTS_PER_PAGE, STOP_EVENTS, PERMISSION_EVENTS } from '../config/cliConstants';
-import type { CliHookEvent } from '../types/types';
-import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
-import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
+import { filterLabel } from '../utils/cliFormatters';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import useIslandStore from '../../../../../../store/isLandStore';
 import { ActivityHeatmap } from './ActivityHeatmap';
+import { EventRow } from './EventRow';
+import { SessionSidebar } from './SessionSidebar';
 import '../../../../../../styles/settings/modules/cli.css';
-
-gsap.registerPlugin(useGSAP);
-
-function EventRow({ event, t, showPermission }: { event: CliHookEvent; t: (key: string, opts?: Record<string, unknown>) => string; showPermission: boolean }): ReactElement {
-  const [expanded, setExpanded] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const visibleDetails = (event.detailItems ?? []).filter((item) => item.value);
-  const hasExtra = visibleDetails.length > 0 || event.toolName || event.toolInputPreview;
-  const handleToggle = useCallback(() => {
-    setExpanded((v) => !v);
-  }, []);
-
-  useGSAP(() => {
-    const card = cardRef.current;
-    if (!card) return;
-    gsap.fromTo(
-      card,
-      { autoAlpha: 0, y: 10, scale: 0.985 },
-      { autoAlpha: 1, y: 0, scale: 1, duration: 0.28, ease: 'power2.out' },
-    );
-  }, { scope: cardRef });
-
-  return (
-    <div ref={cardRef} className={`cli-event-card${STOP_EVENTS.has(event.eventName) ? ' cli-event-card--stop' : ''}${PERMISSION_EVENTS.has(event.eventName) ? ' cli-event-card--permission' : ''}`}>
-      <div className="cli-event-card-header">
-        <span className="cli-event-card-name">{event.eventName}</span>
-        <div className="cli-event-card-header-right">
-          {event.toolName && <span className="cli-event-card-tool-tag">{event.toolName}</span>}
-          <span className="cli-event-card-time">{formatTime(event.createdAt)}</span>
-        </div>
-      </div>
-      <div className="cli-event-card-body"><ReactMarkdown>{event.summary}</ReactMarkdown></div>
-      {showPermission && (
-        <div className="cli-event-card-permission">
-          <button
-            type="button"
-            className="cli-event-card-permission-btn cli-event-card-permission-deny"
-            onClick={() => { void window.api.claudeCodePermissionResolve(event.sessionId, 'deny'); }}
-          >
-            {t('cli.permission.deny', { defaultValue: '拒绝' })}
-          </button>
-          <button
-            type="button"
-            className="cli-event-card-permission-btn cli-event-card-permission-allow"
-            onClick={() => { void window.api.claudeCodePermissionResolve(event.sessionId, 'allow'); }}
-          >
-            {t('cli.permission.allow', { defaultValue: '批准' })}
-          </button>
-          <button
-            type="button"
-            className="cli-event-card-permission-btn cli-event-card-permission-always"
-            onClick={() => { void window.api.claudeCodePermissionResolve(event.sessionId, 'always'); }}
-          >
-            {t('cli.permission.always', { defaultValue: '永久批准' })}
-          </button>
-        </div>
-      )}
-      {hasExtra && (
-        <div className="cli-event-card-details">
-          <button type="button" className="cli-event-card-details-toggle" onClick={handleToggle}>
-            <span className="cli-event-card-details-label">{expanded ? t('maxExpand.cli.collapse', { defaultValue: '收起' }) : t('maxExpand.cli.expand', { defaultValue: '展开' })}</span>
-            {event.toolInputPreview && <code onClick={(e) => e.stopPropagation()}>{event.toolInputPreview}</code>}
-          </button>
-          <div className={`cli-event-card-details-content${expanded ? ' is-open' : ''}`}>
-            <div className="cli-event-card-details-inner">
-              {visibleDetails.map((item) => (
-                <div className="cli-event-card-detail-item" key={item.label}>
-                  <span>{detailLabel(item.label, t)}</span>
-                  <pre>{item.value}</pre>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 /**
  * Claude Code CLI 状态控制面板主组件
@@ -137,152 +59,31 @@ export function CliTab(): ReactElement {
   } = useCliEvents(snapshot);
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [heatmapVisible, setHeatmapVisible] = useState(false);
-  const [bulkSelectMode, setBulkSelectMode] = useState(false);
-  const [selectedSessionIds, setSelectedSessionIds] = useState<Set<string>>(() => new Set());
-
-  /* ── 分页 ── */
-  const [page, setPage] = useState(0);
-  const prevFilterRef = useRef(eventFilter);
-  const prevSessionRef = useRef(selectedSessionId);
-
-  // 筛选条件变化时重置页码
-  useEffect(() => {
-    if (prevFilterRef.current !== eventFilter || prevSessionRef.current !== selectedSessionId) {
-      prevFilterRef.current = eventFilter;
-      prevSessionRef.current = selectedSessionId;
-      setPage(0);
-    }
-  }, [eventFilter, selectedSessionId]);
-
-  const handleToggleBulkSelect = useCallback((): void => {
-    setBulkSelectMode((enabled) => {
-      if (enabled) setSelectedSessionIds(new Set());
-      return !enabled;
-    });
-  }, []);
-
-  const handleToggleSessionSelection = useCallback((id: string): void => {
-    setSelectedSessionIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }, []);
-
-  const handleDeleteSelectedSessions = useCallback((): void => {
-    if (selectedSessionIds.size === 0) return;
-    const deletedIds = Array.from(selectedSessionIds);
-    deleteSessions(deletedIds).catch(() => {});
-    if (selectedSessionId && selectedSessionIds.has(selectedSessionId)) setSelectedSessionId(null);
-    setSelectedSessionIds(new Set());
-    setBulkSelectMode(false);
-  }, [deleteSessions, selectedSessionId, selectedSessionIds, setSelectedSessionId]);
-
-  useEffect(() => {
-    const sessionIds = new Set(snapshot.sessions.map((session) => session.id));
-    setSelectedSessionIds((prev) => {
-      const next = new Set(Array.from(prev).filter((id) => sessionIds.has(id)));
-      return next.size === prev.size ? prev : next;
-    });
-    if (snapshot.sessions.length === 0) setBulkSelectMode(false);
-  }, [snapshot.sessions]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / EVENTS_PER_PAGE));
-  const currentPage = Math.min(page, totalPages - 1);
-  const pagedEvents = filteredEvents.slice(currentPage * EVENTS_PER_PAGE, currentPage * EVENTS_PER_PAGE + EVENTS_PER_PAGE);
-  const selectedSessionCount = selectedSessionIds.size;
-  // 仍在等待授权的会话，其待授权事件 id —— 仅这些事件卡片显示授权按钮
-  const pendingPermissionEventIds = useMemo(() => {
-    return new Set<string>(
-      snapshot.sessions
-        .filter((session) => session.phase === 'waiting_permission' && session.pendingPermission)
-        .map((session) => session.pendingPermission!.id),
-    );
-  }, [snapshot.sessions]);
+  const {
+    bulkSelectMode,
+    selectedSessionIds,
+    selectedSessionCount,
+    handleToggleBulkSelect,
+    handleToggleSessionSelection,
+    handleDeleteSelectedSessions,
+  } = useBulkSelect(snapshot.sessions, deleteSessions, selectedSessionId, setSelectedSessionId);
+  const { page, setPage, totalPages, currentPage, pagedEvents } = useEventPagination(filteredEvents, eventFilter, selectedSessionId);
+  const pendingPermissionEventIds = usePendingPermissions(snapshot.sessions);
 
   return (
     <div className="cli-tab" onClick={(e) => e.stopPropagation()}>
-      {/* 左侧：会话列表 */}
-      <div className="cli-tab-sidebar">
-        <div className="cli-tab-sidebar-header">
-          <button
-            className={`cli-tab-bulk-select-toggle ${bulkSelectMode ? 'cli-tab-bulk-select-toggle--active' : ''}`}
-            type="button"
-            onClick={handleToggleBulkSelect}
-            title={bulkSelectMode ? t('maxExpand.cli.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.cli.bulkSelect', { defaultValue: '批量选择' })}
-            aria-label={bulkSelectMode ? t('maxExpand.cli.cancelSelection', { defaultValue: '取消选择' }) : t('maxExpand.cli.bulkSelect', { defaultValue: '批量选择' })}
-          >
-            <img className="cli-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="14" height="14" draggable={false} />
-          </button>
-          <span className="cli-tab-sidebar-title">{t('maxExpand.cli.sessions', { defaultValue: '会话' })}</span>
-          <button
-            className={`cli-tab-sidebar-count ${selectedSessionId === null ? 'active' : ''}`}
-            type="button"
-            title={t('maxExpand.cli.allSessions', { defaultValue: '全部会话' })}
-            onClick={() => setSelectedSessionId(null)}
-          >
-            {t('maxExpand.cli.allLabel', { defaultValue: 'all' })}
-          </button>
-        </div>
-        <div className={`cli-tab-bulk-actions ${bulkSelectMode ? 'cli-tab-bulk-actions--open' : ''}`} aria-hidden={!bulkSelectMode}>
-          <span className="cli-tab-bulk-selected-count">
-            {t('maxExpand.cli.selectedCount', { defaultValue: '已选 {{count}} 项', count: selectedSessionCount })}
-          </span>
-          <button
-            className="cli-tab-bulk-delete"
-            type="button"
-            onClick={handleDeleteSelectedSessions}
-            disabled={!bulkSelectMode || selectedSessionCount === 0}
-            tabIndex={bulkSelectMode ? 0 : -1}
-          >
-            {t('maxExpand.cli.deleteSelected', { defaultValue: '删除所选' })}
-          </button>
-          <button className="cli-tab-bulk-cancel" type="button" onClick={handleToggleBulkSelect} tabIndex={bulkSelectMode ? 0 : -1}>
-            {t('maxExpand.cli.cancelSelection', { defaultValue: '取消选择' })}
-          </button>
-        </div>
-        <div className="cli-tab-session-list">
-          {snapshot.sessions.length === 0 && (
-            <div className="cli-tab-empty">{t('maxExpand.cli.emptySessions', { defaultValue: '暂无会话' })}</div>
-          )}
-          {snapshot.sessions.map((session) => {
-            const sessionSelected = selectedSessionIds.has(session.id);
-            return (
-              <button
-                key={session.id}
-                className={`cli-tab-session-item ${selectedSessionId === session.id ? 'active' : ''} ${bulkSelectMode ? 'cli-tab-session-item--selectable' : ''} ${sessionSelected ? 'cli-tab-session-item--selected' : ''}`}
-                type="button"
-                onClick={() => {
-                  if (bulkSelectMode) {
-                    handleToggleSessionSelection(session.id);
-                    return;
-                  }
-                  setSelectedSessionId(session.id);
-                }}
-              >
-                <span className={`cli-tab-session-item-check ${sessionSelected ? 'cli-tab-session-item-check--checked' : ''}`} aria-hidden="true">
-                  {sessionSelected && <img className="cli-tab-checked-icon-img" src={SvgIcon.CHECKED} alt="" width="10" height="10" draggable={false} />}
-                </span>
-                <div className="cli-tab-session-top">
-                  <img className="cli-tab-session-icon" src={AgentIcon.CLAUDE} alt="" width="18" height="18" draggable={false} />
-                  <span className="cli-tab-session-title">{session.title}</span>
-                  <span className={`cli-tab-phase ${session.phase}`}>{phaseLabel(session.phase, t)}</span>
-                </div>
-                <div className="cli-tab-session-path">{session.cwd ?? session.transcriptPath ?? session.id}</div>
-                {session.pendingPermission && (
-                  <div className="cli-tab-permission" title={session.pendingPermission.summary}>
-                    <span className="cli-tab-permission-text">{permissionProjectLabel(session.pendingPermission, t)}</span>
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <SessionSidebar
+        t={t}
+        sessions={snapshot.sessions}
+        selectedSessionId={selectedSessionId}
+        setSelectedSessionId={setSelectedSessionId}
+        bulkSelectMode={bulkSelectMode}
+        handleToggleBulkSelect={handleToggleBulkSelect}
+        selectedSessionIds={selectedSessionIds}
+        handleToggleSessionSelection={handleToggleSessionSelection}
+        selectedSessionCount={selectedSessionCount}
+        handleDeleteSelectedSessions={handleDeleteSelectedSessions}
+      />
 
       {/* 右侧：事件流 + 控制 */}
       <div className="cli-tab-main">
