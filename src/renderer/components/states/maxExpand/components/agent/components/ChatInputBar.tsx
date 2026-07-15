@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { Dispatch, DragEvent, KeyboardEvent, MutableRefObject, ReactElement, RefObject, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon, resolveDevIconByFileName } from '../../../../../../utils/SvgIcon';
 import type { AiConfig } from '../../../../../../store/types';
@@ -77,17 +77,17 @@ interface ChatInputBarProps {
   setShowModelCard: (v: boolean | ((prev: boolean) => boolean)) => void;
   showModelDropdown: boolean;
   setShowModelDropdown: (v: boolean | ((prev: boolean) => boolean)) => void;
-  modelDropdownRef: React.RefObject<HTMLDivElement | null>;
+  modelDropdownRef: RefObject<HTMLDivElement | null>;
   /** 上下文下拉 */
   showContextDropdown: boolean;
   setShowContextDropdown: (v: boolean | ((prev: boolean) => boolean)) => void;
-  contextDropdownRef: React.RefObject<HTMLDivElement | null>;
+  contextDropdownRef: RefObject<HTMLDivElement | null>;
   /** Agent 模式下拉 */
   showAgentModeDropdown: boolean;
   toggleAgentModeDropdown: () => void;
   setAgentMode: (mode: AgentMode) => void;
-  agentModeDropdownRef: React.RefObject<HTMLDivElement | null>;
-  agentModeTriggerRef: React.RefObject<HTMLButtonElement | null>;
+  agentModeDropdownRef: RefObject<HTMLDivElement | null>;
+  agentModeTriggerRef: RefObject<HTMLButtonElement | null>;
   agentModeDropdownPos: { left: number; bottom: number } | null;
   /** 会话历史 */
   showSessionSidebar: boolean;
@@ -95,33 +95,33 @@ interface ChatInputBarProps {
   /** 附件 */
   pendingAttachments: Array<{ name: string; size: number; content: string }>;
   setPendingAttachments: (v: Array<{ name: string; size: number; content: string }> | ((prev: Array<{ name: string; size: number; content: string }>) => Array<{ name: string; size: number; content: string }>)) => void;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
   attachmentDragOver: boolean;
   attachmentDropInvalid: boolean;
-  handleAttachmentDragEnter: (e: React.DragEvent<HTMLDivElement>) => void;
-  handleAttachmentDragOver: (e: React.DragEvent<HTMLDivElement>) => void;
-  handleAttachmentDragLeave: (e: React.DragEvent<HTMLDivElement>) => void;
-  handleAttachmentDropEvent: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleAttachmentDragEnter: (e: DragEvent<HTMLDivElement>) => void;
+  handleAttachmentDragOver: (e: DragEvent<HTMLDivElement>) => void;
+  handleAttachmentDragLeave: (e: DragEvent<HTMLDivElement>) => void;
+  handleAttachmentDropEvent: (e: DragEvent<HTMLDivElement>) => void;
   handleAttachFiles: (files: FileList | File[]) => void;
   /** Skills 拖放 */
   skillDragOver: boolean;
-  setSkillDragOver: React.Dispatch<React.SetStateAction<boolean>>;
-  skillDragDepthRef: React.MutableRefObject<number>;
+  setSkillDragOver: Dispatch<SetStateAction<boolean>>;
+  skillDragDepthRef: MutableRefObject<number>;
   /** 引用 */
   pendingQuote: string | null;
   setPendingQuote: (quote: string | null) => void;
   /** 操作 */
   handleSend: () => void;
   handleStop: () => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  handleKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void;
   /** refs */
-  inputRef: React.RefObject<HTMLTextAreaElement | null>;
+  inputRef: RefObject<HTMLTextAreaElement | null>;
   /** Provider 信息 */
   selectedProvider: string;
 }
 
 /** AI 对话输入栏 */
-export function ChatInputBar(props: ChatInputBarProps): React.ReactElement {
+export function ChatInputBar(props: ChatInputBarProps): ReactElement {
   const { t } = useTranslation();
   const {
     input, setInput,
