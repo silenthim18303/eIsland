@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-14T16:02:28.079Z
+> 生成时间：2026-07-15T16:27:33.341Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,19 @@
 
 ## Unreleased
 
+- 2026-07-16 | cb6160af | 鸡哥 | Merge pull request #149 from JNTMTMTM/dev
+- 2026-07-16 | 1cbcb4f2 | 鸡哥 | refactor: update type imports in ChatInputBar for improved clarity and consistency
+- 2026-07-16 | 18ab0b2c | 鸡哥 | refactor: update props in AiChatTab and ChatInputBar, remove unused sessionId in WebAccessPanel, enhance attachment validation in useChatSend
+- 2026-07-16 | 6bf860e6 | 鸡哥 | refactor: reorganize AgentMode and SessionCardState types, streamline imports in chat-related files
+- 2026-07-16 | d9a0a026 | 鸡哥 | feat: refactor chat-related functions and constants into chatHelpers utility file
+- 2026-07-16 | 5563c828 | 鸡哥 | feat: centralize isMinimaxModel function and remove duplicates from components
+- 2026-07-15 | d1adc3a4 | 鸡哥 | refactor: replace React.ReactElement with ReactElement type in multiple components
+- 2026-07-15 | b8a871f0 | 鸡哥 | feat: refactor AlarmCard component props and move type definitions to a new file
+- 2026-07-15 | 1f3f06e4 | 鸡哥 | feat: add alarm management components and hooks
+- 2026-07-15 | 66de19dc | 鸡哥 | feat: add AlarmTab component for managing multiple alarms with create, edit, delete, and repeat functionality
+- 2026-07-15 | c2e8e129 | 鸡哥 | feat: refactor AiChatTab import paths and relocate component to agent directory
+- 2026-07-15 | d3d19b81 | 鸡哥 | feat: add centralized chat state management hook and related types
+- 2026-07-14 | 8d0c9023 | eislandBot | docs: auto update CHANGE_LOG.md for #148 by @JNTMTMTM [skip ci]
 - 2026-07-15 | ca878eb3 | 鸡哥 | Merge pull request #148 from JNTMTMTM/dev
 - 2026-07-14 | 646ac5a5 | 鸡哥 | feat: normalize provider names to lowercase in useLogin hook and update unbinding button logic in UserSettingsSection
 - 2026-07-14 | 5f7a9fec | 鸡哥 | feat: streamline disabled providers logic by using filter method
