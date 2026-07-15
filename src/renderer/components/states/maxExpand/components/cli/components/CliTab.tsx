@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useClaudeCodeStatus } from '../hooks/useClaudeCodeStatus';
 import { useCliEvents } from '../hooks/useCliEvents';
 import { EVENT_FILTERS } from '../config/cliFilters';
-import type { CliHookEvent } from '../config/types';
+import type { CliHookEvent } from '../types/types';
 import { formatTime, phaseLabel, detailLabel, filterLabel, permissionProjectLabel } from '../utils/cliFormatters';
 import { SvgIcon, AgentIcon } from '../../../../../../utils/SvgIcon';
 import useIslandStore from '../../../../../../store/isLandStore';

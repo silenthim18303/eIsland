@@ -26,7 +26,7 @@
 
 import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { CliHeatmapDaily } from '../config/types';
+import type { CliHeatmapDaily } from '../types/types';
 import { buildHeatmapMonths, HEATMAP_MONTH_KEYS } from '../utils/heatmapGrid';
 
 type HeatmapMetric = 'session' | 'tool' | 'prompt';
