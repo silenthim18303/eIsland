@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   previewAlarmSound,
@@ -72,7 +72,7 @@ export function AlarmEditor({
   setHour, setMinute, setSecond,
   setLabel, setRepeat, setRingtone, setLoop,
   onCancel, onSave,
-}: AlarmEditorProps): React.ReactElement {
+}: AlarmEditorProps): ReactElement {
   const { t } = useTranslation();
 
   return (

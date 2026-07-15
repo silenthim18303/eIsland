@@ -24,7 +24,8 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import { memo } from 'react';
+import type { ReactElement } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MarkdownCodeBlock } from './MarkdownCodeBlock';
@@ -57,7 +58,7 @@ const MARKDOWN_COMPONENTS: import('react-markdown').Components = {
 };
 
 /** 助手消息 Markdown 渲染器（memo 优化，避免父组件重渲染时不必要的更新） */
-export const AssistantMarkdown = React.memo(function AssistantMarkdown({ content }: { content: string }): React.ReactElement {
+export const AssistantMarkdown = memo(function AssistantMarkdown({ content }: { content: string }): ReactElement {
   return (
     <ReactMarkdown remarkPlugins={MARKDOWN_REMARK_PLUGINS} components={MARKDOWN_COMPONENTS}>
       {content}

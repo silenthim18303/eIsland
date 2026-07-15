@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import type { AlarmCardProps } from '../types/alarmCardTypes';
@@ -39,12 +39,12 @@ export function AlarmCard({
   onStartEdit,
   onDelete,
   onToggle,
-}: AlarmCardProps): React.ReactElement {
+}: AlarmCardProps): ReactElement {
   const { t } = useTranslation();
 
   /** 构建 meta 片段（label · repeat · next），用圆点分隔 */
-  const buildMetaFragments = (): React.ReactNode[] => {
-    const parts: React.ReactNode[] = [];
+  const buildMetaFragments = (): ReactNode[] => {
+    const parts: ReactNode[] = [];
     if (alarm.label) {
       parts.push(<span key="label" className="alarm-card-label">{alarm.label}</span>);
     }

@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SiteAuthorizationPolicy } from '../../../../../../api/site/siteMetaApi';
 import { toPrettyJson } from '../utils/chatUtils';
@@ -58,7 +58,7 @@ export function WebAccessPanel({
   resolveError,
   onResolve,
   onPolicyChange,
-}: WebAccessPanelProps): React.ReactElement {
+}: WebAccessPanelProps): ReactElement {
   const { t } = useTranslation();
   return (
     <div className="max-expand-chat-web-access-panel">
@@ -152,7 +152,7 @@ export function LocalToolAccessPanel({
   resolving,
   resolveError,
   onResolve,
-}: LocalToolAccessPanelProps): React.ReactElement {
+}: LocalToolAccessPanelProps): ReactElement {
   const { t } = useTranslation();
   return (
     <div className="max-expand-chat-web-access-panel max-expand-chat-local-tool-access-panel">

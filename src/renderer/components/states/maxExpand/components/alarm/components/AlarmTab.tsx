@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { useAlarmState } from '../hooks/useAlarmState';
@@ -35,7 +35,7 @@ import { AlarmEditor } from './AlarmEditor';
  * Alarm Tab
  * @description 最大展开模式下的闹钟管理面板
  */
-export function AlarmTab(): React.ReactElement {
+export function AlarmTab(): ReactElement {
   const { t } = useTranslation();
   const state = useAlarmState();
 

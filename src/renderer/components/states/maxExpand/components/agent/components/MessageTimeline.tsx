@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import type { AiChatMessage, AiTodoSnapshot } from '../../../../../../store/types';
@@ -67,7 +67,7 @@ export function MessageTimeline({
   isStreaming,
   showThinking,
   onReportIssue,
-}: MessageTimelineProps): React.ReactElement {
+}: MessageTimelineProps): ReactElement {
   const { t } = useTranslation();
   const isLatestAssistantMsg = absoluteIndex === totalMessages - 1;
 
@@ -95,7 +95,7 @@ export function MessageTimeline({
   const showFinalTraceMeta = Boolean(msg.finalized);
   const normalizedMarkdownContent = normalizeMarkdownCodeFences(msg.content);
 
-  const timelineNodes: React.ReactElement[] = [];
+  const timelineNodes: ReactElement[] = [];
 
   /** turn=0 的 todoSnapshot 放在时间线最前面 */
   const unturnedTodoSnapshots = todoSnapshots.filter((snap) => !(snap.turn > 0));
