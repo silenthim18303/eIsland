@@ -25,6 +25,7 @@
  */
 
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import type { AgentMode } from '../types/chatTypes';
 
 export const CONTEXT_LIMIT_OPTIONS = [
   { value: 200_000 as const, label: '200K', proOnly: false },
@@ -55,7 +56,7 @@ export const EMPTY_GREETING_DEFAULTS = [
   '今天也一起高效一点，你想从哪件事开始？',
 ] as const;
 
-export type AgentMode = 'mihtnelis' | 'r1pxc' | 'edoc';
+export type { AgentMode } from '../types/chatTypes';
 
 export const AGENT_MODES: ReadonlyArray<{
   id: AgentMode;

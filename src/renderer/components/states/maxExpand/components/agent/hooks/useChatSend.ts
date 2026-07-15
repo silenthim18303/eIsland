@@ -107,11 +107,10 @@ export function useChatSend({ state }: UseChatSendParams): UseChatSendResult {
 
   const {
     input, setInput,
-    visibleWindowStart, setVisibleWindowStart,
+    setVisibleWindowStart,
     agentMode,
     pendingAttachments, setPendingAttachments,
     attachmentDragDepthRef, attachmentInvalidTimerRef,
-    pendingAssistantChunkRef, pendingThinkChunksRef,
     pendingMessageFlushRafRef,
     setResolvingWebAccessDecision,
     aiLocalToolAccessPrompt, setAiLocalToolAccessPrompt,

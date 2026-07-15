@@ -24,7 +24,8 @@
  * @author 鸡哥
  */
 
-import { AGENT_MODES, ATTACHMENT_ACCEPT_EXTENSIONS, type AgentMode } from '../config/chatConstants';
+import { AGENT_MODES, ATTACHMENT_ACCEPT_EXTENSIONS } from '../config/chatConstants';
+import type { AgentMode } from '../types/chatTypes';
 
 const AGENT_MODE_STORAGE_KEY = 'eIsland_agentMode';
 
