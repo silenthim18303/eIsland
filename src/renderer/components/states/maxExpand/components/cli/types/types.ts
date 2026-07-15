@@ -24,6 +24,9 @@
  * @author 鸡哥
  */
 
+import type { RefObject } from 'react';
+import type { HeatmapGrid } from '../utils/heatmapGrid';
+
 export type CliStatusSnapshot = Awaited<ReturnType<typeof window.api.claudeCodeStatusGet>>;
 export type CliSessionSnapshot = CliStatusSnapshot['sessions'][number];
 export type CliHookEvent = CliStatusSnapshot['events'][number];
@@ -38,6 +41,19 @@ export interface ActivityHeatmapProps {
   compact?: boolean;
   /** 可见性：折叠面板从隐藏切换为显示时，重新把今日滚动到水平居中 */
   visible?: boolean;
+}
+
+/** 热力图网格计算结果 */
+export interface HeatmapGridResult extends HeatmapGrid {
+  totals: { session: number; tool: number; prompt: number };
+  /** 把数量映射到 0-4 档色阶强度 */
+  levelOf: (count: number) => number;
+}
+
+/** 热力图滚动引用 */
+export interface HeatmapScrollRefs {
+  scrollRef: RefObject<HTMLDivElement | null>;
+  todayRef: RefObject<HTMLSpanElement | null>;
 }
 
 export const EMPTY_CLI_STATUS: CliStatusSnapshot = {
