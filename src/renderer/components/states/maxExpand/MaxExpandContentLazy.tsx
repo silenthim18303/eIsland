@@ -29,7 +29,7 @@ import type { ReactElement } from 'react';
 import type { MaxExpandTab } from '../../../store/types';
 import { MaxExpandContentShell } from './MaxExpandContentShell';
 
-const AiChatTab = lazy(() => import('./components/AiChatTab').then((module) => ({ default: module.AiChatTab })));
+const AiChatTab = lazy(() => import('./components/agent/components/AiChatTab').then((module) => ({ default: module.AiChatTab })));
 const TodoTab = lazy(() => import('./components/TodoTab').then((module) => ({ default: module.TodoTab })));
 const UrlFavoritesTab = lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
 const LocalFileSearchTab = lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));

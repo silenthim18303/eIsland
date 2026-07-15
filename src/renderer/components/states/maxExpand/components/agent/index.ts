@@ -24,4 +24,4 @@
  * @author 鸡哥
  */
 
-export { AiChatTab } from '../AiChatTab';
+export { AiChatTab } from './components/AiChatTab';

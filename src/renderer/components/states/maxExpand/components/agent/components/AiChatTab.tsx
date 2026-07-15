@@ -26,15 +26,15 @@
 
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SvgIcon, resolveDevIconByFileName } from '../../../../utils/SvgIcon';
-import { SESSION_STREAMING_IDS } from './agent/hooks/useChatState';
-import { useChatState } from './agent/hooks/useChatState';
-import { useChatSend } from './agent/hooks/useChatSend';
-import { AssistantMarkdown } from './agent/components/AssistantMarkdown';
-import { MessageTimeline } from './agent/components/MessageTimeline';
-import { WebAccessPanel, LocalToolAccessPanel } from './agent/components/WebAccessPanel';
-import { ChatInputBar } from './agent/components/ChatInputBar';
-import { normalizeMarkdownCodeFences } from './agent/utils/chatUtils';
+import { SvgIcon, resolveDevIconByFileName } from '../../../../../../utils/SvgIcon';
+import { SESSION_STREAMING_IDS } from '../hooks/useChatState';
+import { useChatState } from '../hooks/useChatState';
+import { useChatSend } from '../hooks/useChatSend';
+import { AssistantMarkdown } from './AssistantMarkdown';
+import { MessageTimeline } from './MessageTimeline';
+import { WebAccessPanel, LocalToolAccessPanel } from './WebAccessPanel';
+import { ChatInputBar } from './ChatInputBar';
+import { normalizeMarkdownCodeFences } from '../utils/chatUtils';
 
 /**
  * AI 对话 Tab

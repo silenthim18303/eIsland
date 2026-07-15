@@ -27,7 +27,7 @@
 import type { ReactElement } from 'react';
 import type { MaxExpandTab } from '../../../store/types';
 import { MaxExpandContentShell } from './MaxExpandContentShell';
-import { AiChatTab } from './components/AiChatTab';
+import { AiChatTab } from './components/agent/components/AiChatTab';
 import { TodoTab } from './components/TodoTab';
 import { UrlFavoritesTab } from './components/UrlFavoritesTab';
 import { LocalFileSearchTab } from './components/LocalFileSearchTab';
