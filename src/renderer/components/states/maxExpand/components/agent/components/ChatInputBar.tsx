@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import React, { useCallback, useRef, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon, resolveDevIconByFileName } from '../../../../../../utils/SvgIcon';
 import type { AiConfig } from '../../../../../../store/types';
@@ -32,12 +32,10 @@ import {
   AGENT_MODES,
   ATTACHMENT_ACCEPT_EXTENSIONS,
   ATTACHMENT_MAX_COUNT,
-  ATTACHMENT_MAX_SIZE_BYTES,
   CONTEXT_LIMIT_OPTIONS,
   type AgentMode,
 } from '../config/chatConstants';
 import {
-  isAcceptedAttachmentFile,
   isMinimaxModel,
 } from '../utils/chatHelpers';
 
@@ -107,6 +105,7 @@ interface ChatInputBarProps {
   handleAttachFiles: (files: FileList | File[]) => void;
   /** Skills 拖放 */
   skillDragOver: boolean;
+  setSkillDragOver: React.Dispatch<React.SetStateAction<boolean>>;
   skillDragDepthRef: React.MutableRefObject<number>;
   /** 引用 */
   pendingQuote: string | null;
@@ -158,7 +157,7 @@ export function ChatInputBar(props: ChatInputBarProps): React.ReactElement {
     attachmentDragOver, attachmentDropInvalid,
     handleAttachmentDragEnter, handleAttachmentDragOver, handleAttachmentDragLeave, handleAttachmentDropEvent,
     handleAttachFiles,
-    skillDragOver, skillDragDepthRef,
+    skillDragOver, setSkillDragOver, skillDragDepthRef,
     pendingQuote, setPendingQuote,
     handleSend, handleStop, handleKeyDown,
     inputRef,
@@ -346,6 +345,7 @@ export function ChatInputBar(props: ChatInputBarProps): React.ReactElement {
                 e.preventDefault();
                 e.stopPropagation();
                 skillDragDepthRef.current += 1;
+                setSkillDragOver(true);
               }}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -355,11 +355,13 @@ export function ChatInputBar(props: ChatInputBarProps): React.ReactElement {
                 e.preventDefault();
                 e.stopPropagation();
                 skillDragDepthRef.current = Math.max(0, skillDragDepthRef.current - 1);
+                if (skillDragDepthRef.current === 0) setSkillDragOver(false);
               }}
               onDrop={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 skillDragDepthRef.current = 0;
+                setSkillDragOver(false);
                 const files = Array.from(e.dataTransfer.files);
                 const mdFiles = files.filter((f) => f.name.toLowerCase().endsWith('.md'));
                 if (mdFiles.length === 0) return;

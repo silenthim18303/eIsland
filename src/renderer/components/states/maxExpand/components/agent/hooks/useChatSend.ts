@@ -64,6 +64,7 @@ import {
   ATTACHMENT_MAX_SIZE_BYTES,
 } from '../config/chatConstants';
 import {
+  isAcceptedAttachmentFile,
   isClientLocalToolName,
   isHighRiskLocalToolName,
 } from '../utils/chatHelpers';
@@ -1068,6 +1069,7 @@ export function useChatSend({ state }: UseChatSendParams): UseChatSendResult {
     fileArray.forEach((file) => {
       if (pendingAttachments.length >= ATTACHMENT_MAX_COUNT) return;
       if (file.size > ATTACHMENT_MAX_SIZE_BYTES) return;
+      if (!isAcceptedAttachmentFile(file.name)) return;
       if (pendingAttachments.some((a) => a.name === file.name)) return;
       const reader = new FileReader();
       reader.onload = () => {
@@ -1088,11 +1090,13 @@ export function useChatSend({ state }: UseChatSendParams): UseChatSendResult {
   const handleAttachmentDrop = useCallback((files: FileList | File[]) => {
     if (aiChatStreaming) return;
     const fileArray = Array.from(files);
-    if (pendingAttachments.length >= 5) {
+    if (pendingAttachments.length >= ATTACHMENT_MAX_COUNT) {
       markAttachmentDropInvalid();
       return;
     }
-    const hasInvalid = fileArray.some((file) => file.size > 102400);
+    const hasInvalid = fileArray.some(
+      (file) => file.size > ATTACHMENT_MAX_SIZE_BYTES || !isAcceptedAttachmentFile(file.name),
+    );
     if (hasInvalid) {
       markAttachmentDropInvalid();
     }

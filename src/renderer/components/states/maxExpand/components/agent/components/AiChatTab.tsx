@@ -355,7 +355,6 @@ export function AiChatTab(): React.ReactElement {
           {/* 网页访问授权面板 */}
           {aiWebAccessPrompt?.sessionId === activeAiChatSessionId && (
             <WebAccessPanel
-              sessionId={activeAiChatSessionId}
               iconUrl={aiWebAccessPrompt.iconUrl}
               siteName={aiWebAccessPrompt.siteName}
               hostname={aiWebAccessPrompt.hostname}
@@ -430,6 +429,7 @@ export function AiChatTab(): React.ReactElement {
         handleAttachmentDropEvent={handleAttachmentDropEvent}
         handleAttachFiles={handleAttachFiles}
         skillDragOver={state.skillDragOver}
+        setSkillDragOver={state.setSkillDragOver}
         skillDragDepthRef={state.skillDragDepthRef}
         pendingQuote={state.pendingQuote}
         setPendingQuote={state.setPendingQuote}

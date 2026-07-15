@@ -32,7 +32,6 @@ import type { AiLocalToolAccessPrompt } from '../types/chatTypes';
 
 /** 网页访问授权面板 Props */
 interface WebAccessPanelProps {
-  sessionId?: string;
   iconUrl?: string;
   siteName?: string;
   hostname?: string;
@@ -47,7 +46,6 @@ interface WebAccessPanelProps {
 
 /** 网页访问授权面板 */
 export function WebAccessPanel({
-  sessionId,
   iconUrl,
   siteName,
   hostname,
