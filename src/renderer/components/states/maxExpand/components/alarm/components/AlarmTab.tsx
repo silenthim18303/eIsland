@@ -26,10 +26,9 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { useAlarmState } from '../hooks/useAlarmState';
-import { AlarmCard } from './AlarmCard';
 import { AlarmEditor } from './AlarmEditor';
+import { AlarmSidebar } from './AlarmSidebar';
 
 /**
  * Alarm Tab
@@ -70,47 +69,25 @@ export function AlarmTab(): ReactElement {
 
   return (
     <div className={`alarm-tab-container${showEditor ? ' alarm-tab-container--split' : ''}`}>
-      {/* ── 左侧：闹钟列表（编辑时为侧边栏） ── */}
-      <div className={`alarm-tab-sidebar${showEditor ? ' alarm-tab-sidebar--compact' : ''}`}>
-        <div className="alarm-tab-header">
-          <div className="alarm-tab-title">{t('maxExpand.alarm.title', { defaultValue: '闹钟' })}</div>
-          <button
-            className={`alarm-tab-add-btn${adding ? ' alarm-tab-add-btn--active' : ''}`}
-            type="button"
-            onClick={() => {
-              if (adding) { closeEditor(); }
-              else { const _now = new Date(); setNewHour(_now.getHours()); setNewMinute(_now.getMinutes()); setNewSecond(_now.getSeconds()); setAdding(true); }
-            }}
-            title={t('maxExpand.alarm.add', { defaultValue: '新建闹钟' })}
-          >
-            <img src={adding ? SvgIcon.CANCEL : SvgIcon.PLUS} alt="" className="alarm-tab-btn-icon" />
-          </button>
-        </div>
-
-        <div className="alarm-tab-list">
-          {!loaded && <div className="alarm-tab-loading">{t('maxExpand.alarm.loading', { defaultValue: '加载中…' })}</div>}
-          {loaded && sortedAlarms.length === 0 && (
-            <div className="alarm-tab-empty">
-              <span className="alarm-tab-empty-text">{t('maxExpand.alarm.empty', { defaultValue: '暂无闹钟，点击 + 新建' })}</span>
-            </div>
-          )}
-          {sortedAlarms.map((alarm) => (
-            <AlarmCard
-              key={alarm.id}
-              alarm={alarm}
-              isActive={editingId === alarm.id}
-              weekdayLabel={weekdayLabel}
-              repeatSummary={repeatSummary}
-              nextRingDesc={nextRingDesc}
-              onStartEdit={startEdit}
-              onDelete={deleteAlarm}
-              onToggle={toggleEnabled}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* ── 右侧：编辑面板（始终渲染，通过 CSS 类控制展开） ── */}
+      <AlarmSidebar
+        t={t}
+        showEditor={showEditor}
+        adding={adding}
+        setAdding={setAdding}
+        closeEditor={closeEditor}
+        loaded={loaded}
+        sortedAlarms={sortedAlarms}
+        editingId={editingId}
+        weekdayLabel={weekdayLabel}
+        repeatSummary={repeatSummary}
+        nextRingDesc={nextRingDesc}
+        startEdit={startEdit}
+        deleteAlarm={deleteAlarm}
+        toggleEnabled={toggleEnabled}
+        setNewHour={setNewHour}
+        setNewMinute={setNewMinute}
+        setNewSecond={setNewSecond}
+      />
       <AlarmEditor
         adding={adding}
         visible={showEditor}

@@ -48,3 +48,24 @@ export const STORE_KEY = 'alarms';
 
 /** 全部星期（周一到周日顺序） */
 export const ALL_WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5, 6, 0];
+
+/** AlarmSidebar 组件属性 */
+export interface AlarmSidebarProps {
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  showEditor: boolean;
+  adding: boolean;
+  setAdding: (v: boolean) => void;
+  closeEditor: () => void;
+  loaded: boolean;
+  sortedAlarms: AlarmItem[];
+  editingId: number | null;
+  weekdayLabel: (d: Weekday) => string;
+  repeatSummary: (repeat: Weekday[]) => string;
+  nextRingDesc: (alarm: AlarmItem) => string;
+  startEdit: (alarm: AlarmItem) => void;
+  deleteAlarm: (id: number) => void;
+  toggleEnabled: (id: number) => void;
+  setNewHour: (v: number) => void;
+  setNewMinute: (v: number) => void;
+  setNewSecond: (v: number) => void;
+}
