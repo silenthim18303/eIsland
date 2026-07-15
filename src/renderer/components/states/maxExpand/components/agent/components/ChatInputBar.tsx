@@ -35,6 +35,7 @@ import {
   ATTACHMENT_MAX_SIZE_BYTES,
   CONTEXT_LIMIT_OPTIONS,
   isAcceptedAttachmentFile,
+  isMinimaxModel,
   type AgentMode,
 } from '../config/chatConstants';
 
@@ -161,10 +162,6 @@ export function ChatInputBar(props: ChatInputBarProps): React.ReactElement {
     inputRef,
     selectedProvider,
   } = props;
-
-  const isMinimaxModel = useCallback((modelName: string): boolean => {
-    return modelName.toLowerCase().startsWith('minimax-');
-  }, []);
 
   return (
     <div>

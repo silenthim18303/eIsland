@@ -28,6 +28,7 @@ import useIslandStore from '../../../../store/isLandStore';
 import { getRoleFromToken } from '../../../../utils/userAccount';
 import { loadLocationFromStorage } from '../../../../store/utils/storage';
 import { buildMihtnelisContext } from '../../../states/maxExpand/components/agent/utils/chatUtils';
+import { isMinimaxModel } from '../../../states/maxExpand/components/agent/config/chatConstants';
 import { loadAgentMode } from './agentMode';
 
 type AiConfig = ReturnType<typeof useIslandStore.getState>['aiConfig'];
@@ -72,11 +73,6 @@ export function resolveAgentRouting(aiConfig: AiConfig, token: string): AgentRou
     || selectedModelBase === 'MiniMax-M2.7-highspeed'
     || selectedModelBase === 'MiniMax-M2.5-highspeed'
   )) ? 'deepseek-v4-flash' : selectedModelBase;
-
-  const isMinimaxModel = (modelName: string): boolean => {
-    const normalized = modelName.toLowerCase();
-    return normalized.startsWith('minimax-');
-  };
 
   const selectedProvider: AgentRouting['selectedProvider'] = isOllama
     ? 'ollama'

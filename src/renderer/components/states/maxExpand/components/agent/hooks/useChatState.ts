@@ -41,6 +41,7 @@ import {
   VISIBLE_CHAT_WINDOW_SIZE_R1PXC,
   VISIBLE_CHAT_WINDOW_STEP_DEFAULT,
   VISIBLE_CHAT_WINDOW_STEP_R1PXC,
+  isMinimaxModel,
   loadAgentMode,
   saveAgentMode,
   type AgentMode,
@@ -268,10 +269,6 @@ export function useChatState(): ChatState {
   const customApiDisplayLabel = aiConfig.customApiModel
     ? `custom-api (${aiConfig.customApiModel})`
     : 'custom-api';
-  const isMinimaxModel = (modelName: string): boolean => {
-    const normalized = modelName.toLowerCase();
-    return normalized.startsWith('minimax-');
-  };
   const selectedProvider = isCustomApiModel
     ? 'custom'
     : (isOllamaModel

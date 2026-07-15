@@ -160,6 +160,11 @@ export function isHighRiskLocalToolName(tool: string): boolean {
   return HIGH_RISK_LOCAL_TOOL_PREFIXES.some(prefix => normalized.startsWith(prefix));
 }
 
+/** 判断模型名是否属于 MiniMax 系列。 */
+export function isMinimaxModel(modelName: string): boolean {
+  return modelName.toLowerCase().startsWith('minimax-');
+}
+
 /** 判断附件扩展名是否在允许列表中。 */
 export function isAcceptedAttachmentFile(fileName: string): boolean {
   const lowerName = (fileName ?? '').toLowerCase();

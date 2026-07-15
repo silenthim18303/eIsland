@@ -48,12 +48,10 @@ import { readLocalToken } from '../../../../../../utils/userAccount';
 import { loadLocationFromStorage } from '../../../../../../store/utils/storage';
 import {
   buildMihtnelisContext,
-  normalizeMarkdownCodeFences,
   streamChatCompletion,
   unwrapJsonEnvelope,
 } from '../utils/chatUtils';
 import {
-  type AiLocalToolAccessPrompt,
   type FinalEventPayload,
   type MetaEventPayload,
   type ThinkEventPayload,
@@ -62,6 +60,8 @@ import {
   type ToolEventPayload,
 } from '../types/chatTypes';
 import {
+  ATTACHMENT_MAX_COUNT,
+  ATTACHMENT_MAX_SIZE_BYTES,
   isClientLocalToolName,
   isHighRiskLocalToolName,
 } from '../config/chatConstants';
@@ -131,10 +131,6 @@ export function useChatSend({ state }: UseChatSendParams): UseChatSendResult {
     contextUsageTokens, selectedContextLimit,
     setAttachmentDragOver, setAttachmentDropInvalid,
   } = state;
-
-  const isMinimaxModel = (modelName: string): boolean => {
-    return modelName.toLowerCase().startsWith('minimax-');
-  };
 
   /** 执行本地工具并提交结果 */
   const executeAndSubmitLocalToolResult = useCallback(async (params: {
@@ -1069,15 +1065,15 @@ export function useChatSend({ state }: UseChatSendParams): UseChatSendResult {
   const handleAttachFiles = useCallback((files: FileList | File[]) => {
     const fileArray = Array.from(files);
     fileArray.forEach((file) => {
-      if (pendingAttachments.length >= 5) return;
-      if (file.size > 102400) return;
+      if (pendingAttachments.length >= ATTACHMENT_MAX_COUNT) return;
+      if (file.size > ATTACHMENT_MAX_SIZE_BYTES) return;
       if (pendingAttachments.some((a) => a.name === file.name)) return;
       const reader = new FileReader();
       reader.onload = () => {
         const content = typeof reader.result === 'string' ? reader.result : '';
         if (!content) return;
         setPendingAttachments((prev) => {
-          if (prev.length >= 5) return prev;
+          if (prev.length >= ATTACHMENT_MAX_COUNT) return prev;
           if (prev.some((a) => a.name === file.name)) return prev;
           return [...prev, { name: file.name, size: file.size, content }];
         });

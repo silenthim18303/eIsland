@@ -27,6 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import { isMinimaxModel } from '../config/chatConstants';
 import type { AiChatMessage, AiTodoSnapshot } from '../../../../../../store/types';
 import { normalizeMarkdownCodeFences, toPrettyJson } from '../utils/chatUtils';
 import { AssistantMarkdown } from './AssistantMarkdown';
@@ -39,13 +40,6 @@ interface MessageTimelineProps {
   isStreaming: boolean;
   showThinking: boolean;
   onReportIssue: (traceId: string, finalAnswer: string) => void;
-}
-
-/**
- * 判断模型名称是否为 MiniMax 系列
- */
-function isMinimaxModel(modelName: string): boolean {
-  return modelName.toLowerCase().startsWith('minimax-');
 }
 
 /**
