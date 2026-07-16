@@ -26,40 +26,11 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  previewAlarmSound,
-  SYSTEM_ALARM_RINGTONE_OPTIONS,
-  type SystemAlarmRingtone,
-} from '../../../../../../utils/audio/alarmSound';
-import type { Weekday } from '../types/alarmTypes';
+import { previewAlarmSound, SYSTEM_ALARM_RINGTONE_OPTIONS } from '../../../../../../utils/audio/alarmSound';
 import { ALL_WEEKDAYS } from '../types/alarmTypes';
+import type { AlarmEditorProps } from '../types/alarmEditorTypes';
 import { toggleWeekday } from '../utils/alarmUtils';
 import { WheelPicker } from './WheelPicker';
-
-/** AlarmEditor 组件 Props */
-interface AlarmEditorProps {
-  adding: boolean;
-  visible: boolean;
-  hour: number;
-  minute: number;
-  second: number;
-  label: string;
-  repeat: Weekday[];
-  ringtone: SystemAlarmRingtone;
-  loop: boolean;
-  previewPlaying: boolean;
-  repeatSummary: (repeat: Weekday[]) => string;
-  weekdayLabel: (d: Weekday) => string;
-  setHour: (v: number) => void;
-  setMinute: (v: number) => void;
-  setSecond: (v: number) => void;
-  setLabel: (v: string) => void;
-  setRepeat: (v: Weekday[]) => void;
-  setRingtone: (v: SystemAlarmRingtone) => void;
-  setLoop: (v: boolean) => void;
-  onCancel: () => void;
-  onSave: () => void;
-}
 
 /** 闹钟编辑面板 */
 export function AlarmEditor({
