@@ -732,7 +732,7 @@ sequenceDiagram
 | OAuth account already bound | `LOGIN` with JWT token | → saved state or `idle` |
 | OAuth email matches registered email | `BIND_OAUTH` with tempToken | → `bindOAuth` |
 | No matching email found | `SET_PASSWORD` with tempToken | → `setPassword` |
-| WeChat (no email returned) | `SET_PASSWORD` with tempToken (null email) | → `bindEmail` |
+| WeChat / KOOK (no email returned) | `SET_PASSWORD` with tempToken (null email) | → `bindEmail` |
 
 :::tip
 If the OAuth provider returns a null email (e.g., GitHub privacy settings), the backend falls back to the provider's email API to fetch the user's verified primary email address.
@@ -921,7 +921,7 @@ The `bindOAuth` state handles linking a third-party OAuth account to an existing
 ### bindEmail
 
 :::info
-The `bindEmail` state handles email binding for OAuth providers that do not return an email address — currently WeChat. When a user logs in via WeChat and no email is associated, they must bind an email to complete registration.
+The `bindEmail` state handles email binding for OAuth providers that do not return an email address — currently WeChat and KOOK. When a user logs in via WeChat or KOOK and no email is associated, they must bind an email to complete registration.
 :::
 
 | Property | Value |
@@ -933,8 +933,8 @@ The `bindEmail` state handles email binding for OAuth providers that do not retu
 | **Leave Delay** | 0ms |
 
 **Entry Conditions:**
-- OAuth callback returns `SET_PASSWORD` status with a null email (WeChat)
-- WeChat OAuth login without a bound email address
+- OAuth callback returns `SET_PASSWORD` status with a null email (WeChat or KOOK)
+- WeChat or KOOK OAuth login without a bound email address
 
 **Exit Conditions:**
 - Email bound + password set → `setPassword` (new email) or `bindOAuth` (existing email)

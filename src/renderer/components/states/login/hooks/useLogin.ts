@@ -224,6 +224,13 @@ export function useLogin() {
    * @param openOAuth - 打开 OAuth 授权窗口的函数。
    * @param mayReturnEmail - OAuth 提供商可能不返回邮箱，缺失时走绑定邮箱流程。
    */
+  /**
+   * 通用 OAuth 登录处理流程。
+   * @param loading - 当前加载状态。
+   * @param setLoading - 设置加载状态。
+   * @param openOAuth - 打开 OAuth 授权窗口的函数。
+   * @param mayReturnEmail - OAuth 提供商可能不返回邮箱，缺失时走绑定邮箱流程（仅 WeChat/KOOK）。
+   */
   const handleOAuthLogin = async (
     loading: boolean,
     setLoading: (v: boolean) => void,
@@ -236,7 +243,6 @@ export function useLogin() {
 
     try {
       const data = await openOAuth();
-      setLoading(false);
 
       if (!data) {
         setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: '登录已取消或超时' }) });
@@ -261,8 +267,9 @@ export function useLogin() {
         setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
       }
     } catch {
-      setLoading(false);
       setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -276,7 +283,7 @@ export function useLogin() {
     handleOAuthLogin(wechatLoading, setWechatLoading, openWechatOAuth, true);
 
   const handleGiteeLogin = (): Promise<void> =>
-    handleOAuthLogin(giteeLoading, setGiteeLoading, openGiteeOAuth, true);
+    handleOAuthLogin(giteeLoading, setGiteeLoading, openGiteeOAuth);
 
   const handleKookLogin = (): Promise<void> =>
     handleOAuthLogin(kookLoading, setKookLoading, openKookOAuth, true);
