@@ -69,7 +69,7 @@ server/
 | Module | Domain | Key Features |
 |--------|--------|--------------|
 | **server-common** | Shared | Utilities, constants, exception handling, base entities |
-| **server-auth** | Authentication | JWT, login, register, password reset, email verification, CAPTCHA, OAuth (GitHub, Microsoft) |
+| **server-auth** | Authentication | JWT, login, register, password reset, email verification, CAPTCHA, OAuth (GitHub, Microsoft, WeChat, Gitee, KOOK) |
 | **server-user** | User Management | Profile, settings, balance, identity verification |
 | **server-agent** | AI Agent | LLM integration, tool calling, billing, streaming |
 | **server-weather** | Weather | QWeather API integration, caching, location services |
@@ -525,6 +525,9 @@ The application is packaged as a **WAR** file for deployment to external Tomcat 
 | `ALIPAY_APP_ID`, `ALIPAY_PRIVATE_KEY_PATH` | Alipay credentials |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth credentials |
 | `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` | Microsoft OAuth credentials |
+| `WECHAT_APP_ID`, `WECHAT_APP_SECRET` | WeChat OAuth credentials |
+| `GITEE_CLIENT_ID`, `GITEE_CLIENT_SECRET` | Gitee OAuth credentials |
+| `KOOK_CLIENT_ID`, `KOOK_CLIENT_SECRET` | KOOK OAuth credentials |
 | `RESEND_API_KEY` | Email service key |
 
 **Deployment Architecture:**

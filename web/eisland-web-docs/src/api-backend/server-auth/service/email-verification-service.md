@@ -21,7 +21,7 @@ Manages the full email verification lifecycle: code generation with cryptographi
 | `RESET_PASSWORD` | Password reset |
 | `CHANGE_EMAIL` | Email address change |
 | `UNREGISTER` | Account deletion |
-| `BIND_EMAIL` | Email binding for OAuth (WeChat) |
+| `BIND_EMAIL` | Email binding for OAuth (WeChat, KOOK, etc.) |
 
 ## Key Methods
 

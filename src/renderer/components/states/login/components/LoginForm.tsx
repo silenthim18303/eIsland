@@ -58,14 +58,20 @@ export function LoginForm(props: LoginFormProps): ReactElement {
     handleMicrosoftLogin,
     wechatLoading,
     handleWechatLogin,
+    giteeLoading,
+    handleGiteeLogin,
+    kookLoading,
+    handleKookLogin,
     disabledProviders,
     t,
   } = props;
 
-  const oauthBusy = submitting || githubLoading || microsoftLoading || wechatLoading;
+  const oauthBusy = submitting || githubLoading || microsoftLoading || wechatLoading || giteeLoading || kookLoading;
   const githubDisabled = disabledProviders.has('github');
   const microsoftDisabled = disabledProviders.has('microsoft');
   const wechatDisabled = disabledProviders.has('wechat');
+  const giteeDisabled = disabledProviders.has('gitee');
+  const kookDisabled = disabledProviders.has('kook');
 
   return (
     <div className="auth-state-content" onClick={(e) => e.stopPropagation()}>
@@ -225,6 +231,28 @@ export function LoginForm(props: LoginFormProps): ReactElement {
             {wechatLoading
               ? t('oauth.wechat.loading', { defaultValue: '连接中…' })
               : t('oauth.wechat.login', { defaultValue: 'WeChat' })}
+          </button>
+          <button
+            type="button"
+            className="auth-oauth-btn auth-oauth-btn--gitee"
+            onClick={() => void handleGiteeLogin()}
+            disabled={oauthBusy || giteeDisabled}
+          >
+            <img className="auth-oauth-icon" src={SvgIcon.GITEE} alt="" width={18} height={18} />
+            {giteeLoading
+              ? t('oauth.gitee.loading', { defaultValue: '连接中…' })
+              : t('oauth.gitee.login', { defaultValue: 'Gitee' })}
+          </button>
+          <button
+            type="button"
+            className="auth-oauth-btn auth-oauth-btn--kook"
+            onClick={() => void handleKookLogin()}
+            disabled={oauthBusy || kookDisabled}
+          >
+            <img className="auth-oauth-icon" src={SvgIcon.KOOK} alt="" width={18} height={18} />
+            {kookLoading
+              ? t('oauth.kook.loading', { defaultValue: '连接中…' })
+              : t('oauth.kook.login', { defaultValue: 'KOOK' })}
           </button>
         </div>
       </div>

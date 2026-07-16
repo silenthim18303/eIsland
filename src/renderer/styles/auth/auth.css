@@ -30,7 +30,7 @@
 }
 
 .auth-panel {
-  width: min(100%, 430px);
+  width: min(100%, 550px);
   padding: 20px;
   border-radius: 14px;
   border: 1px solid rgba(var(--color-text-rgb), 0.1);
@@ -617,15 +617,11 @@
   cursor: not-allowed;
 }
 
-.auth-oauth-btn--github:hover {
-  background: rgba(var(--color-text-rgb), 0.14);
-}
-
-.auth-oauth-btn--microsoft:hover {
-  background: rgba(var(--color-text-rgb), 0.14);
-}
-
-.auth-oauth-btn--wechat:hover {
+.auth-oauth-btn--github:hover,
+.auth-oauth-btn--microsoft:hover,
+.auth-oauth-btn--wechat:hover,
+.auth-oauth-btn--gitee:hover,
+.auth-oauth-btn--kook:hover {
   background: rgba(var(--color-text-rgb), 0.14);
 }
 

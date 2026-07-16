@@ -1672,6 +1672,8 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
       if (p === 'github') return SvgIcon.GITHUB;
       if (p === 'microsoft') return SvgIcon.MICROSOFT;
       if (p === 'wechat') return SvgIcon.WECHAT;
+      if (p === 'gitee') return SvgIcon.GITEE;
+      if (p === 'kook') return SvgIcon.KOOK;
       return SvgIcon.LINK;
     };
 
@@ -1680,6 +1682,8 @@ export function UserSettingsSection({ initialProfilePage = 'info' }: UserSetting
       if (p === 'github') return 'GitHub';
       if (p === 'microsoft') return 'Microsoft';
       if (p === 'wechat') return t('settings.user.oauth.provider.wechat', { defaultValue: '微信' });
+      if (p === 'gitee') return 'Gitee';
+      if (p === 'kook') return 'KOOK';
       return provider;
     };
 

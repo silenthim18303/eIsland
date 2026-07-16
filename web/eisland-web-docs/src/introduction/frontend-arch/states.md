@@ -40,7 +40,7 @@ The eIsland state machine is the core architecture that controls the island's ap
 | `resetPassword` | Password recovery | No | 860×400 px |
 | `setPassword` | OAuth new user password setup | No | 860×400 px |
 | `bindOAuth` | Bind OAuth to existing account | No | 860×400 px |
-| `bindEmail` | Bind email for OAuth (WeChat) | No | 860×400 px |
+| `bindEmail` | Bind email for OAuth (WeChat, KOOK) | No | 860×400 px |
 | `payment` | Payment processing | No | 860×400 px |
 
 ### AI & Input States
@@ -646,7 +646,7 @@ The `guide` state provides an interactive first-run tutorial for new users.
 ### login
 
 :::info
-The `login` state provides user authentication interface, including email/password login and OAuth login (GitHub, Microsoft). For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
+The `login` state provides user authentication interface, including email/password login and OAuth login (GitHub, Microsoft, WeChat, Gitee, KOOK). For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
 :::
 
 | Property | Value |
@@ -667,8 +667,8 @@ The `login` state provides user authentication interface, including email/passwo
 - Cancel → previous state
 - Register link → `register`
 - Reset password link → `resetPassword`
-- OAuth (GitHub / Microsoft) → `setPassword` (new user) or `bindOAuth` (existing email)
-- OAuth (WeChat) → `bindEmail` (no email returned by WeChat)
+- OAuth (GitHub / Microsoft / Gitee) → `setPassword` (new user) or `bindOAuth` (existing email)
+- OAuth (WeChat / KOOK) → `bindEmail` (no email returned) or `setPassword` / `bindOAuth` (if email available)
 
 **UI Components Rendered:**
 - Username/email input
@@ -679,6 +679,8 @@ The `login` state provides user authentication interface, including email/passwo
 - GitHub OAuth button (with divider)
 - Microsoft OAuth button
 - WeChat OAuth button
+- Gitee OAuth button
+- KOOK OAuth button
 - Error messages
 
 **Behavior Details:**
@@ -689,10 +691,10 @@ The `login` state provides user authentication interface, including email/passwo
 - Session token management
 - Single device enforcement
 
-#### OAuth Login Flow (GitHub / Microsoft / WeChat)
+#### OAuth Login Flow (GitHub / Microsoft / WeChat / Gitee / KOOK)
 
 :::important
-OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. GitHub, Microsoft, and WeChat all follow the same polling flow. WeChat adds an extra email binding step since it does not return the user's email.
+OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. All providers follow the same polling flow. WeChat and KOOK add an extra email binding step since they do not return the user's email.
 :::
 
 ```mermaid
@@ -730,7 +732,7 @@ sequenceDiagram
 | OAuth account already bound | `LOGIN` with JWT token | → saved state or `idle` |
 | OAuth email matches registered email | `BIND_OAUTH` with tempToken | → `bindOAuth` |
 | No matching email found | `SET_PASSWORD` with tempToken | → `setPassword` |
-| WeChat (no email returned) | `SET_PASSWORD` with tempToken (null email) | → `bindEmail` |
+| WeChat / KOOK (no email returned) | `SET_PASSWORD` with tempToken (null email) | → `bindEmail` |
 
 :::tip
 If the OAuth provider returns a null email (e.g., GitHub privacy settings), the backend falls back to the provider's email API to fetch the user's verified primary email address.
@@ -919,7 +921,7 @@ The `bindOAuth` state handles linking a third-party OAuth account to an existing
 ### bindEmail
 
 :::info
-The `bindEmail` state handles email binding for OAuth providers that do not return an email address — currently WeChat. When a user logs in via WeChat and no email is associated, they must bind an email to complete registration.
+The `bindEmail` state handles email binding for OAuth providers that do not return an email address — currently WeChat and KOOK. When a user logs in via WeChat or KOOK and no email is associated, they must bind an email to complete registration.
 :::
 
 | Property | Value |
@@ -931,8 +933,8 @@ The `bindEmail` state handles email binding for OAuth providers that do not retu
 | **Leave Delay** | 0ms |
 
 **Entry Conditions:**
-- OAuth callback returns `SET_PASSWORD` status with a null email (WeChat)
-- WeChat OAuth login without a bound email address
+- OAuth callback returns `SET_PASSWORD` status with a null email (WeChat or KOOK)
+- WeChat or KOOK OAuth login without a bound email address
 
 **Exit Conditions:**
 - Email bound + password set → `setPassword` (new email) or `bindOAuth` (existing email)

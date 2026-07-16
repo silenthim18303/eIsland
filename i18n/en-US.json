@@ -3568,6 +3568,14 @@
       "login": "WeChat",
       "loading": "Connecting…"
     },
+    "gitee": {
+      "login": "Gitee",
+      "loading": "Connecting…"
+    },
+    "kook": {
+      "login": "KOOK",
+      "loading": "Connecting…"
+    },
     "setPassword": {
       "title": "Set Password",
       "hint": "OAuth login successful. Please set a password to complete registration.",

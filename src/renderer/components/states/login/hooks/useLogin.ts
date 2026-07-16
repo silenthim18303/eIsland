@@ -30,7 +30,8 @@ import useIslandStore from '../../../../store/slices';
 import { loginUserByAccount, loginUserByEmailWithCode, sendUserEmailCode, fetchOAuthProviders } from '../../../../api/user/userAccountApi';
 import { updateSessionToken } from '../../../../utils/authSession';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
-import { openGitHubOAuth, openMicrosoftOAuth, openWechatOAuth } from '../../../../utils/oauthWindow';
+import { openGitHubOAuth, openMicrosoftOAuth, openWechatOAuth, openGiteeOAuth, openKookOAuth } from '../../../../utils/oauthWindow';
+import type { OAuthCallbackData } from '../../../../api/user/userAccountApi.oauth';
 import { EMAIL_PATTERN, type Feedback, type LoginStepUpData } from '../config/loginConfig';
 import { readStandaloneWindowMode } from '../utils/readStandaloneWindowMode';
 
@@ -201,6 +202,8 @@ export function useLogin() {
   const [githubLoading, setGithubLoading] = useState(false);
   const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [wechatLoading, setWechatLoading] = useState(false);
+  const [giteeLoading, setGiteeLoading] = useState(false);
+  const [kookLoading, setKookLoading] = useState(false);
   const [disabledProviders, setDisabledProviders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -208,21 +211,38 @@ export function useLogin() {
     void fetchOAuthProviders().then((res) => {
       if (cancelled || !res.ok || !Array.isArray(res.data)) return;
       const enabled = new Set(res.data.map((p) => p.provider.toLowerCase()));
-      const allProviders = ['github', 'microsoft', 'wechat'] as const;
+      const allProviders = ['github', 'microsoft', 'wechat', 'gitee', 'kook'] as const;
       setDisabledProviders(new Set(allProviders.filter((name) => !enabled.has(name))));
     });
     return () => { cancelled = true; };
   }, []);
 
-  const handleGitHubLogin = async (): Promise<void> => {
-    if (githubLoading) return;
-    setGithubLoading(true);
+  /**
+   * 通用 OAuth 登录处理流程。
+   * @param loading - 当前加载状态。
+   * @param setLoading - 设置加载状态。
+   * @param openOAuth - 打开 OAuth 授权窗口的函数。
+   * @param mayReturnEmail - OAuth 提供商可能不返回邮箱，缺失时走绑定邮箱流程。
+   */
+  /**
+   * 通用 OAuth 登录处理流程。
+   * @param loading - 当前加载状态。
+   * @param setLoading - 设置加载状态。
+   * @param openOAuth - 打开 OAuth 授权窗口的函数。
+   * @param mayReturnEmail - OAuth 提供商可能不返回邮箱，缺失时走绑定邮箱流程（仅 WeChat/KOOK）。
+   */
+  const handleOAuthLogin = async (
+    loading: boolean,
+    setLoading: (v: boolean) => void,
+    openOAuth: () => Promise<OAuthCallbackData | null>,
+    mayReturnEmail = false,
+  ): Promise<void> => {
+    if (loading) return;
+    setLoading(true);
     setFeedback(null);
 
     try {
-      // 打开默认浏览器并轮询服务端获取结果
-      const data = await openGitHubOAuth();
-      setGithubLoading(false);
+      const data = await openOAuth();
 
       if (!data) {
         setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: '登录已取消或超时' }) });
@@ -236,115 +256,37 @@ export function useLogin() {
         setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
         await navigateToUserCenter();
       } else if (status === 'SET_PASSWORD' && tempToken) {
-        setSetPassword({
-          tempToken,
-          suggestedUsername: username || '',
-          email: email || '',
-        });
-      } else if (status === 'BIND_OAUTH' && tempToken) {
-        setBindOAuth({
-          tempToken,
-          username: username || '',
-          email: email || '',
-        });
-      } else {
-        setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
-      }
-    } catch {
-      setGithubLoading(false);
-      setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
-    }
-  };
-
-  const handleMicrosoftLogin = async (): Promise<void> => {
-    if (microsoftLoading) return;
-    setMicrosoftLoading(true);
-    setFeedback(null);
-
-    try {
-      const data = await openMicrosoftOAuth();
-      setMicrosoftLoading(false);
-
-      if (!data) {
-        setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: '登录已取消或超时' }) });
-        return;
-      }
-
-      const { status, token, tempToken, username, email } = data;
-
-      if (status === 'LOGIN' && token) {
-        updateSessionToken(token);
-        setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
-        await navigateToUserCenter();
-      } else if (status === 'SET_PASSWORD' && tempToken) {
-        setSetPassword({
-          tempToken,
-          suggestedUsername: username || '',
-          email: email || '',
-        });
-      } else if (status === 'BIND_OAUTH' && tempToken) {
-        setBindOAuth({
-          tempToken,
-          username: username || '',
-          email: email || '',
-        });
-      } else {
-        setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
-      }
-    } catch {
-      setMicrosoftLoading(false);
-      setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
-    }
-  };
-
-  const handleWechatLogin = async (): Promise<void> => {
-    if (wechatLoading) return;
-    setWechatLoading(true);
-    setFeedback(null);
-
-    try {
-      const data = await openWechatOAuth();
-      setWechatLoading(false);
-
-      if (!data) {
-        setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: '登录已取消或超时' }) });
-        return;
-      }
-
-      const { status, token, tempToken, username, email } = data;
-
-      if (status === 'LOGIN' && token) {
-        updateSessionToken(token);
-        setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
-        await navigateToUserCenter();
-      } else if (status === 'SET_PASSWORD' && tempToken) {
-        // 微信不返回邮箱，先走绑定邮箱流程
-        if (!email) {
-          setBindEmail({
-            tempToken,
-            suggestedUsername: username || '',
-          });
+        if (mayReturnEmail && !email) {
+          setBindEmail({ tempToken, suggestedUsername: username || '' });
         } else {
-          setSetPassword({
-            tempToken,
-            suggestedUsername: username || '',
-            email: email || '',
-          });
+          setSetPassword({ tempToken, suggestedUsername: username || '', email: email || '' });
         }
       } else if (status === 'BIND_OAUTH' && tempToken) {
-        setBindOAuth({
-          tempToken,
-          username: username || '',
-          email: email || '',
-        });
+        setBindOAuth({ tempToken, username: username || '', email: email || '' });
       } else {
         setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
       }
     } catch {
-      setWechatLoading(false);
       setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const handleGitHubLogin = (): Promise<void> =>
+    handleOAuthLogin(githubLoading, setGithubLoading, openGitHubOAuth);
+
+  const handleMicrosoftLogin = (): Promise<void> =>
+    handleOAuthLogin(microsoftLoading, setMicrosoftLoading, openMicrosoftOAuth);
+
+  const handleWechatLogin = (): Promise<void> =>
+    handleOAuthLogin(wechatLoading, setWechatLoading, openWechatOAuth, true);
+
+  const handleGiteeLogin = (): Promise<void> =>
+    handleOAuthLogin(giteeLoading, setGiteeLoading, openGiteeOAuth);
+
+  const handleKookLogin = (): Promise<void> =>
+    handleOAuthLogin(kookLoading, setKookLoading, openKookOAuth, true);
 
   return {
     account,
@@ -374,6 +316,10 @@ export function useLogin() {
     handleMicrosoftLogin,
     wechatLoading,
     handleWechatLogin,
+    giteeLoading,
+    handleGiteeLogin,
+    kookLoading,
+    handleKookLogin,
     disabledProviders,
     t,
   };
