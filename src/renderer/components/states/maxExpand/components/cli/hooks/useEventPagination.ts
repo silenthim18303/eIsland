@@ -26,6 +26,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { CliHookEvent } from '../types/types';
+import type { CliEventFilter } from '../config/cliFilters';
 import { EVENTS_PER_PAGE } from '../config/cliConstants';
 
 /**
@@ -37,7 +38,7 @@ import { EVENTS_PER_PAGE } from '../config/cliConstants';
  */
 export function useEventPagination(
   filteredEvents: CliHookEvent[],
-  eventFilter: string,
+  eventFilter: CliEventFilter,
   selectedSessionId: string | null,
 ) {
   const [page, setPage] = useState(0);

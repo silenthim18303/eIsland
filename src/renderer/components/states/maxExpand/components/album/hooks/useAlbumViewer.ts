@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, WheelEvent } from 'react';
 import type { AlbumItem, AlbumMeta, UseAlbumViewerReturn } from '../types/albumTypes';
 import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../config/albumConfig';
@@ -96,6 +96,21 @@ export function useAlbumViewer(
     el.volume = Math.max(0, Math.min(1, videoVolume));
   }, [videoVolume]);
 
+  /**
+   * 在单图视图按方向切换图片
+   * @param delta - 步进方向（-1 上一张，1 下一张）
+   */
+  const navigateInViewer = useCallback((delta: number): void => {
+    if (activeId === null || filteredItems.length === 0) return;
+    const idx = filteredItems.findIndex((it) => it.id === activeId);
+    if (idx < 0) return;
+    const nextIdx = (idx + delta + filteredItems.length) % filteredItems.length;
+    setViewerSlideDir(delta < 0 ? 'prev' : 'next');
+    setActiveId(filteredItems[nextIdx].id);
+    setZoom(1);
+    setPan({ x: 0, y: 0 });
+  }, [activeId, filteredItems]);
+
   /** 单图视图的快捷键：ESC 退出，方向键切换 */
   useEffect(() => {
     if (activeId === null) return;
@@ -112,23 +127,7 @@ export function useAlbumViewer(
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeId, filteredItems]);
-
-  /**
-   * 在单图视图按方向切换图片
-   * @param delta - 步进方向（-1 上一张，1 下一张）
-   */
-  function navigateInViewer(delta: number): void {
-    if (activeId === null || filteredItems.length === 0) return;
-    const idx = filteredItems.findIndex((it) => it.id === activeId);
-    if (idx < 0) return;
-    const nextIdx = (idx + delta + filteredItems.length) % filteredItems.length;
-    setViewerSlideDir(delta < 0 ? 'prev' : 'next');
-    setActiveId(filteredItems[nextIdx].id);
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  }
+  }, [activeId, navigateInViewer]);
 
   /** 进入单图视图 */
   const handleOpenItem = (item: AlbumItem): void => {
