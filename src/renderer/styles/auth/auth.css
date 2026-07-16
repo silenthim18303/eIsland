@@ -30,7 +30,7 @@
 }
 
 .auth-panel {
-  width: min(100%, 430px);
+  width: min(100%, 490px);
   padding: 20px;
   border-radius: 14px;
   border: 1px solid rgba(var(--color-text-rgb), 0.1);
