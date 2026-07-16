@@ -26,7 +26,7 @@
 
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { resolveBgMediaPreviewUrl } from '../../../../../../config/dynamicIslandBackgroundMedia';
+import { resolveBgMediaPreviewUrl } from '../../../../../config/dynamicIslandBackgroundMedia';
 import type { AlbumItem, AlbumMeta, IslandBgMediaConfig } from '../types/albumTypes';
 import { ISLAND_BG_IMAGE_STORE_KEY, ISLAND_BG_MEDIA_STORE_KEY, LOCAL_ISLAND_BG_SYNC_EVENT } from '../types/albumTypes';
 
