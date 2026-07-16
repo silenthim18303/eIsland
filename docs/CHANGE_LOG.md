@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-16T09:26:44.938Z
+> 生成时间：2026-07-16T13:16:08.567Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,19 @@
 
 ## Unreleased
 
+- 2026-07-16 | 813250a7 | 鸡哥 | Merge pull request #151 from JNTMTMTM/dev
+- 2026-07-16 | a190ccb8 | 鸡哥 | feat(oauth): enhance OAuth login handling and update documentation for KOOK support
+- 2026-07-16 | 0a1a474e | 鸡哥 | feat(oauth): refactor OAuth login handling and add unit tests for OAuth functions
+- 2026-07-16 | d129025f | 鸡哥 | feat(docs): update OAuth references to include KOOK and Gitee across multiple documents
+- 2026-07-16 | d861a61a | 鸡哥 | feat(auth-api): update OAuth section to include Gitee and KOOK authorization endpoints
+- 2026-07-16 | 012d6b2e | 鸡哥 | fix(auth-panel): increase width from 490px to 550px for improved layout
+- 2026-07-16 | ae08d158 | 鸡哥 | feat(oauth): add KOOK login functionality and update related components
+- 2026-07-16 | 1c9142c2 | 鸡哥 | feat(svg): add KOOK icon and update SvgIcon references
+- 2026-07-16 | ac667458 | 鸡哥 | fix(auth-panel): increase width from 430px to 490px for better layout
+- 2026-07-16 | 98d59c0a | 鸡哥 | feat(user-settings): add Gitee as an OAuth provider in UserSettingsSection
+- 2026-07-16 | 48f1085d | 鸡哥 | feat(oauth): add Gitee login functionality and update related components
+- 2026-07-16 | 41df44a8 | 鸡哥 | feat(svg): add GITEE icon and update SvgIcon properties
+- 2026-07-16 | 1ef54d09 | eislandBot | docs: auto update CHANGE_LOG.md for #150 by @JNTMTMTM [skip ci]
 - 2026-07-16 | eefe6a5c | 鸡哥 | Merge pull request #150 from JNTMTMTM/dev
 - 2026-07-16 | db6c1f4b | 鸡哥 | refactor(cli): update eventFilter type to CliEventFilter for improved type safety
 - 2026-07-16 | bd9637fe | 鸡哥 | feat(album): add index file for Album module with export for AlarmTab component
