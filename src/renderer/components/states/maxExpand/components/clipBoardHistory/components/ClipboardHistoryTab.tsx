@@ -26,8 +26,8 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SvgIcon } from '../../../../utils/SvgIcon';
-import useIslandStore from '../../../../store/slices';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import useIslandStore from '../../../../../../store/slices';
 
 interface ClipboardHistoryItem {
   id: number;
