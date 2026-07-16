@@ -629,6 +629,10 @@
   background: rgba(var(--color-text-rgb), 0.14);
 }
 
+.auth-oauth-btn--gitee:hover {
+  background: rgba(var(--color-text-rgb), 0.14);
+}
+
 .auth-oauth-icon {
   flex-shrink: 0;
 }

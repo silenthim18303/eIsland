@@ -28,7 +28,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useIslandStore from '../../../../store/slices';
 import { sendUserEmailCode } from '../../../../api/user/userAccountApi';
-import { wechatBindEmail } from '../../../../api/user/userAccountApi.oauth';
+import { oauthBindEmail } from '../../../../api/user/userAccountApi.oauth';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
 import { EMAIL_PATTERN } from '../config/bindEmailConfig';
 import type { Feedback } from '../../login/config/loginConfig';
@@ -104,7 +104,7 @@ export function useBindEmail() {
     setFeedback(null);
     try {
       // 调用后端验证验证码 + 检查邮箱是否已注册
-      const revalResult = await wechatBindEmail(bindEmailContext.tempToken, trimmedEmail, emailCode.trim());
+      const revalResult = await oauthBindEmail(bindEmailContext.tempToken, trimmedEmail, emailCode.trim());
       setSubmitting(false);
       if (!revalResult.ok || !revalResult.data) {
         setFeedback({ type: 'error', text: revalResult.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });

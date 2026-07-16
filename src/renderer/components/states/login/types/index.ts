@@ -57,6 +57,8 @@ export interface LoginFormProps {
   handleMicrosoftLogin: () => Promise<void>;
   wechatLoading: boolean;
   handleWechatLogin: () => Promise<void>;
+  giteeLoading: boolean;
+  handleGiteeLogin: () => Promise<void>;
   disabledProviders: Set<string>;
   t: TFunction;
 }

@@ -30,7 +30,7 @@ import useIslandStore from '../../../../store/slices';
 import { loginUserByAccount, loginUserByEmailWithCode, sendUserEmailCode, fetchOAuthProviders } from '../../../../api/user/userAccountApi';
 import { updateSessionToken } from '../../../../utils/authSession';
 import { runSliderCaptcha } from '../../../../utils/sliderCaptcha';
-import { openGitHubOAuth, openMicrosoftOAuth, openWechatOAuth } from '../../../../utils/oauthWindow';
+import { openGitHubOAuth, openMicrosoftOAuth, openWechatOAuth, openGiteeOAuth } from '../../../../utils/oauthWindow';
 import { EMAIL_PATTERN, type Feedback, type LoginStepUpData } from '../config/loginConfig';
 import { readStandaloneWindowMode } from '../utils/readStandaloneWindowMode';
 
@@ -201,6 +201,7 @@ export function useLogin() {
   const [githubLoading, setGithubLoading] = useState(false);
   const [microsoftLoading, setMicrosoftLoading] = useState(false);
   const [wechatLoading, setWechatLoading] = useState(false);
+  const [giteeLoading, setGiteeLoading] = useState(false);
   const [disabledProviders, setDisabledProviders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -208,7 +209,7 @@ export function useLogin() {
     void fetchOAuthProviders().then((res) => {
       if (cancelled || !res.ok || !Array.isArray(res.data)) return;
       const enabled = new Set(res.data.map((p) => p.provider.toLowerCase()));
-      const allProviders = ['github', 'microsoft', 'wechat'] as const;
+      const allProviders = ['github', 'microsoft', 'wechat', 'gitee'] as const;
       setDisabledProviders(new Set(allProviders.filter((name) => !enabled.has(name))));
     });
     return () => { cancelled = true; };
@@ -346,6 +347,55 @@ export function useLogin() {
     }
   };
 
+  const handleGiteeLogin = async (): Promise<void> => {
+    if (giteeLoading) return;
+    setGiteeLoading(true);
+    setFeedback(null);
+
+    try {
+      const data = await openGiteeOAuth();
+      setGiteeLoading(false);
+
+      if (!data) {
+        setFeedback({ type: 'error', text: t('oauth.feedback.loginCancelled', { defaultValue: '登录已取消或超时' }) });
+        return;
+      }
+
+      const { status, token, tempToken, username, email } = data;
+
+      if (status === 'LOGIN' && token) {
+        updateSessionToken(token);
+        setFeedback({ type: 'success', text: t('settings.user.feedback.loginSuccess', { defaultValue: '登录成功' }) });
+        await navigateToUserCenter();
+      } else if (status === 'SET_PASSWORD' && tempToken) {
+        // Gitee 可能不返回邮箱，先走绑定邮箱流程
+        if (!email) {
+          setBindEmail({
+            tempToken,
+            suggestedUsername: username || '',
+          });
+        } else {
+          setSetPassword({
+            tempToken,
+            suggestedUsername: username || '',
+            email: email || '',
+          });
+        }
+      } else if (status === 'BIND_OAUTH' && tempToken) {
+        setBindOAuth({
+          tempToken,
+          username: username || '',
+          email: email || '',
+        });
+      } else {
+        setFeedback({ type: 'error', text: data.message || t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+      }
+    } catch {
+      setGiteeLoading(false);
+      setFeedback({ type: 'error', text: t('settings.user.feedback.operationFailed', { defaultValue: '操作失败' }) });
+    }
+  };
+
   return {
     account,
     setAccount,
@@ -374,6 +424,8 @@ export function useLogin() {
     handleMicrosoftLogin,
     wechatLoading,
     handleWechatLogin,
+    giteeLoading,
+    handleGiteeLogin,
     disabledProviders,
     t,
   };
