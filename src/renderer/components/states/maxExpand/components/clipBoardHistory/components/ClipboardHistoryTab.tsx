@@ -20,318 +20,56 @@
 
 /**
  * @file ClipboardHistoryTab.tsx
- * @description 最大展开模式剪贴板历史 Tab
+ * @description 最大展开模式剪贴板历史页主组件：仅负责 hook 调用与组件组合。
  * @author 鸡哥
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactElement } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import useIslandStore from '../../../../../../store/slices';
-
-interface ClipboardHistoryItem {
-  id: number;
-  text: string;
-  createdAt: number;
-}
-
-const STORE_KEY = 'clipboard-history-recent';
-const LOCAL_STORAGE_KEY = 'eIsland_clipboard_history_recent';
-const HISTORY_ENABLED_STORE_KEY = 'clipboard-history-enabled';
-const HISTORY_LIMIT_STORE_KEY = 'clipboard-history-limit';
-const EXIT_MAX_EXPAND_ON_COPY_STORE_KEY = 'clipboard-history-exit-max-expand-on-copy';
-const DEFAULT_HISTORY_LIMIT = 10;
-const POLL_INTERVAL_MS = 1000;
-const SELECTION_COLLAPSE_ANIMATION_MS = 180;
-const MS_PER_HOUR = 60 * 60 * 1000;
-const MS_PER_DAY = 24 * MS_PER_HOUR;
-
-type ClipboardCleanupRange = 'lastHour' | 'today' | 'last7Days' | 'last30Days' | 'olderThan30Days';
-type ClipboardHistoryFilter = 'all' | 'url' | 'text';
-
-const CLIPBOARD_HISTORY_FILTERS: ClipboardHistoryFilter[] = ['all', 'url', 'text'];
-const CLIPBOARD_HISTORY_FILTER_LABEL_KEYS: Record<ClipboardHistoryFilter, string> = {
-  all: 'clipboardHistoryTab.filters.all',
-  url: 'clipboardHistoryTab.filters.url',
-  text: 'clipboardHistoryTab.filters.text',
-};
-const CLIPBOARD_HISTORY_FILTER_DEFAULT_LABELS: Record<ClipboardHistoryFilter, string> = {
-  all: 'All',
-  url: 'URL',
-  text: 'Text',
-};
-
-function normalizeClipboardText(text: string): string {
-  return text.replace(/\r\n/g, '\n').trim();
-}
-
-function isLikelyUrl(text: string): boolean {
-  const value = text.trim();
-  if (/^https?:\/\/\S+$/i.test(value)) return true;
-  if (/^www\.[^\s]+\.[^\s]+$/i.test(value)) return true;
-  return /^[a-z0-9.-]+\.[a-z]{2,}(?:[/?#:]\S*)?$/i.test(value);
-}
-
-function isLikelyPassword(text: string): boolean {
-  const value = text.trim();
-  if (value.length < 8 || value.length > 128) return false;
-  if (/\s/.test(value) || isLikelyUrl(value) || /^\S+@\S+\.\S+$/.test(value)) return false;
-  const groups = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z\d]/].filter((rule) => rule.test(value)).length;
-  return groups >= 3;
-}
-
-function isRecordableClipboardText(text: string): boolean {
-  return Boolean(text) && !isLikelyPassword(text);
-}
-
-function matchesClipboardFilter(item: ClipboardHistoryItem, filter: ClipboardHistoryFilter): boolean {
-  if (filter === 'all') return true;
-  const isUrl = isLikelyUrl(item.text);
-  if (filter === 'url') return isUrl;
-  return !isUrl && !isLikelyPassword(item.text);
-}
-
-function sanitizeHistory(data: unknown, historyLimit: number): ClipboardHistoryItem[] {
-  if (!Array.isArray(data)) return [];
-  return data
-    .map((item) => {
-      const row = item as Partial<ClipboardHistoryItem>;
-      const text = typeof row.text === 'string' ? normalizeClipboardText(row.text) : '';
-      if (!isRecordableClipboardText(text)) return null;
-      const createdAt = typeof row.createdAt === 'number' && Number.isFinite(row.createdAt) ? row.createdAt : Date.now();
-      const id = typeof row.id === 'number' && Number.isFinite(row.id) ? row.id : createdAt;
-      return { id, text, createdAt };
-    })
-    .filter((item): item is ClipboardHistoryItem => Boolean(item))
-    .slice(0, historyLimit);
-}
-
-function persistHistory(items: ClipboardHistoryItem[]): void {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(items));
-  } catch {
-    // noop
-  }
-  window.api.storeWrite(STORE_KEY, items).catch(() => {});
-}
-
-function getPreviewText(text: string): string {
-  const oneLine = text.replace(/\s+/g, ' ').trim();
-  if (oneLine.length <= 72) return oneLine;
-  return `${oneLine.slice(0, 72)}…`;
-}
-
-function isSameLocalDay(left: Date, right: Date): boolean {
-  return left.getFullYear() === right.getFullYear()
-    && left.getMonth() === right.getMonth()
-    && left.getDate() === right.getDate();
-}
-
-function isItemInCleanupRange(item: ClipboardHistoryItem, range: ClipboardCleanupRange, now: number): boolean {
-  if (range === 'lastHour') return now - item.createdAt <= MS_PER_HOUR;
-  if (range === 'today') return isSameLocalDay(new Date(item.createdAt), new Date(now));
-  if (range === 'last7Days') return now - item.createdAt <= 7 * MS_PER_DAY;
-  if (range === 'last30Days') return now - item.createdAt <= 30 * MS_PER_DAY;
-  return now - item.createdAt > 30 * MS_PER_DAY;
-}
-
-function getClipboardHistoryExportFileName(now: Date): string {
-  const pad = (value: number): string => String(value).padStart(2, '0');
-  const date = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}`;
-  const time = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-  return `eIsland-clipboard-history-${date}-${time}.json`;
-}
-
-function buildClipboardHistoryExport(items: ClipboardHistoryItem[], exportedAt: Date): string {
-  return JSON.stringify({
-    app: 'eIsland',
-    type: 'clipboard-history',
-    exportedAt: exportedAt.toISOString(),
-    count: items.length,
-    items: items.map((item) => ({
-      id: item.id,
-      text: item.text,
-      createdAt: item.createdAt,
-      createdAtText: new Date(item.createdAt).toISOString(),
-    })),
-  }, null, 2);
-}
-
-function downloadTextFile(fileName: string, content: string): void {
-  const blob = new Blob([content], { type: 'application/json;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-}
+import { useClipboardHistoryFeedback } from '../hooks/useClipboardHistoryFeedback';
+import { useClipboardHistoryItems } from '../hooks/useClipboardHistoryItems';
+import { useClipboardHistorySelection } from '../hooks/useClipboardHistorySelection';
+import { buildClipboardHistoryExport, downloadTextFile, getClipboardHistoryExportFileName, matchesClipboardFilter } from '../utils/clipboardHistoryUtils';
+import { ClipboardHistoryBulkBar } from './ClipboardHistoryBulkBar';
+import { ClipboardHistoryHeader } from './ClipboardHistoryHeader';
+import { ClipboardHistoryItemRow } from './ClipboardHistoryItemRow';
 
 /**
- * 渲染最大展开态的剪贴板历史标签页
- * @returns 剪贴板历史标签页
+ * 剪贴板历史页主组件：hook 调用 → 组件组合。
  */
-export function ClipboardHistoryTab(): React.ReactElement {
+export function ClipboardHistoryTab(): ReactElement {
   const { t } = useTranslation();
-  const { setIdle, setLyrics } = useIslandStore();
-  const [items, setItems] = useState<ClipboardHistoryItem[]>([]);
-  const [historyEnabled, setHistoryEnabled] = useState<boolean>(true);
-  const [historyLimit, setHistoryLimit] = useState<number>(DEFAULT_HISTORY_LIMIT);
-  const [exitMaxExpandOnCopy, setExitMaxExpandOnCopy] = useState<boolean>(false);
-  const [copyFeedback, setCopyFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [loaded, setLoaded] = useState(false);
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [editText, setEditText] = useState('');
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectionCollapsing, setSelectionCollapsing] = useState(false);
-  const [cleanupRange, setCleanupRange] = useState<ClipboardCleanupRange>('today');
-  const [activeFilter, setActiveFilter] = useState<ClipboardHistoryFilter>('all');
-  const editTextareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const copyFeedbackTimerRef = useRef<number | null>(null);
-  const selectionCollapseTimerRef = useRef<number | null>(null);
 
-  const adjustTextareaHeight = useCallback((el: HTMLTextAreaElement | null): void => {
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
-  }, []);
+  /* ── Hook: 反馈提示 ── */
+  const { copyFeedback, showCopyFeedback } = useClipboardHistoryFeedback();
 
-  useEffect(() => {
-    let cancelled = false;
+  /* ── Hook: 条目管理 ── */
+  const {
+    items, setItems, expandedId, setExpandedId,
+    editText, setEditText, editTextareaRef, adjustTextareaHeight,
+    handleToggleExpand, handleSaveEdit, handleCopy,
+  } = useClipboardHistoryItems(showCopyFeedback);
 
-    Promise.all([
-      window.api.storeRead(HISTORY_ENABLED_STORE_KEY),
-      window.api.storeRead(HISTORY_LIMIT_STORE_KEY),
-      window.api.storeRead(EXIT_MAX_EXPAND_ON_COPY_STORE_KEY),
-    ]).then(([enabledRaw, limitRaw, exitRaw]) => {
-      if (cancelled) return;
-      const nextEnabled = typeof enabledRaw === 'boolean' ? enabledRaw : true;
-      const nextLimit = typeof limitRaw === 'number' && Number.isFinite(limitRaw)
-        ? Math.max(1, Math.min(50, Math.round(limitRaw)))
-        : DEFAULT_HISTORY_LIMIT;
-      const nextExitOnCopy = typeof exitRaw === 'boolean' ? exitRaw : false;
-      setHistoryEnabled(nextEnabled);
-      setHistoryLimit(nextLimit);
-      setExitMaxExpandOnCopy(nextExitOnCopy);
-    }).catch(() => {
-      if (cancelled) return;
-      setHistoryEnabled(true);
-      setHistoryLimit(DEFAULT_HISTORY_LIMIT);
-      setExitMaxExpandOnCopy(false);
-    });
+  /* ── Hook: 选择模式 ── */
+  const {
+    selectedIds, selectionMode, selectionCollapsing, cleanupRange,
+    activeFilter, selectedCount, selectedIdSet, allSelected,
+    cleanupMatchedCount, handleToggleSelectionMode,
+    handleToggleSelect, handleToggleSelectAll,
+    handleCleanupRangeChange, handleFilterChange,
+    handleRemoveSelected, handleClearByRange,
+  } = useClipboardHistorySelection(items, setItems, expandedId, setExpandedId, setEditText);
 
-    window.api.storeRead(STORE_KEY).then((data) => {
-      if (cancelled) return;
-      if (Array.isArray(data) && data.length > 0) {
-        setItems(sanitizeHistory(data, DEFAULT_HISTORY_LIMIT));
-      } else {
-        try {
-          const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-          if (raw) {
-            const parsed = sanitizeHistory(JSON.parse(raw) as unknown[], DEFAULT_HISTORY_LIMIT);
-            setItems(parsed);
-            window.api.storeWrite(STORE_KEY, parsed).catch(() => {});
-          }
-        } catch {
-          // noop
-        }
-      }
-      setLoaded(true);
-    }).catch(() => {
-      try {
-        const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (raw) setItems(sanitizeHistory(JSON.parse(raw) as unknown[], DEFAULT_HISTORY_LIMIT));
-      } catch {
-        // noop
-      }
-      if (!cancelled) setLoaded(true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    setItems((prev) => prev.slice(0, historyLimit));
-  }, [historyLimit]);
-
-  useEffect(() => {
-    const itemIds = new Set(items.map((item) => item.id));
-    setSelectedIds((prev) => prev.filter((id) => itemIds.has(id)));
-  }, [items]);
-
-  useEffect(() => {
-    if (!loaded) return;
-    persistHistory(items);
-  }, [items, loaded]);
-
-  useEffect(() => {
-    if (!historyEnabled) return;
-    let timerId: number | null = null;
-    let disposed = false;
-    let lastText = '';
-
-    const poll = async (): Promise<void> => {
-      try {
-        const rawText = await window.api.clipboardReadText();
-        if (disposed) return;
-        const normalized = normalizeClipboardText(rawText);
-        if (!isRecordableClipboardText(normalized) || normalized === lastText) return;
-        lastText = normalized;
-        setItems((prev) => {
-          if (prev[0]?.text === normalized) return prev;
-          const now = Date.now();
-          const next: ClipboardHistoryItem = {
-            id: now,
-            text: normalized,
-            createdAt: now,
-          };
-          return [next, ...prev.filter((row) => row.text !== normalized)].slice(0, historyLimit);
-        });
-      } catch {
-        // noop
-      }
-    };
-
-    void poll();
-    timerId = window.setInterval(() => {
-      void poll();
-    }, POLL_INTERVAL_MS);
-
-    return () => {
-      disposed = true;
-      if (timerId !== null) {
-        window.clearInterval(timerId);
-      }
-    };
-  }, [historyEnabled, historyLimit]);
-
-  const totalCount = items.length;
+  /* ── 筛选后可见条目 ── */
   const visibleItems = useMemo(
     () => items.filter((item) => matchesClipboardFilter(item, activeFilter)),
     [activeFilter, items],
   );
+  const totalCount = items.length;
   const visibleCount = visibleItems.length;
-  const selectedCount = selectedIds.length;
-  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
-  const visibleIdSet = useMemo(() => new Set(visibleItems.map((item) => item.id)), [visibleItems]);
-  const allSelected = visibleCount > 0 && visibleItems.every((item) => selectedIdSet.has(item.id));
-  const cleanupMatchedIdSet = useMemo(() => {
-    const now = Date.now();
-    return new Set(visibleItems.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
-  }, [visibleItems, cleanupRange]);
-  const cleanupMatchedCount = cleanupMatchedIdSet.size;
-  const exportItems = useMemo(() => {
-    if (!selectionMode || selectedIds.length === 0) return visibleItems;
-    return visibleItems.filter((item) => selectedIdSet.has(item.id));
-  }, [selectedIdSet, selectedIds.length, selectionMode, visibleItems]);
-  const exportCount = exportItems.length;
 
+  /* ── 计数标签 ── */
   const countLabel = useMemo(
     () => activeFilter === 'all'
       ? t('clipboardHistoryTab.count', { defaultValue: '{{count}} 条', count: totalCount })
@@ -343,120 +81,30 @@ export function ClipboardHistoryTab(): React.ReactElement {
     [activeFilter, t, totalCount, visibleCount],
   );
 
-  const collapseSelectionMode = (): void => {
-    if (!selectionMode || selectionCollapsing) return;
-    setSelectionCollapsing(true);
-    if (selectionCollapseTimerRef.current !== null) {
-      window.clearTimeout(selectionCollapseTimerRef.current);
-    }
-    selectionCollapseTimerRef.current = window.setTimeout(() => {
-      setSelectionMode(false);
-      setSelectionCollapsing(false);
-      setSelectedIds([]);
-      selectionCollapseTimerRef.current = null;
-    }, SELECTION_COLLAPSE_ANIMATION_MS);
-  };
+  /* ── 导出范围 ── */
+  const exportItems = useMemo(() => {
+    if (!selectionMode || selectedIds.length === 0) return visibleItems;
+    return visibleItems.filter((item) => selectedIdSet.has(item.id));
+  }, [selectedIdSet, selectedIds.length, selectionMode, visibleItems]);
+  const exportCount = exportItems.length;
 
-  const handleToggleSelectionMode = (): void => {
-    if (selectionMode) {
-      collapseSelectionMode();
-      return;
-    }
-    if (selectionCollapseTimerRef.current !== null) {
-      window.clearTimeout(selectionCollapseTimerRef.current);
-      selectionCollapseTimerRef.current = null;
-    }
-    setSelectionCollapsing(false);
-    setSelectionMode(true);
-    setSelectedIds(Array.from(cleanupMatchedIdSet));
-  };
-
+  /* ── 清空全部 ── */
   const handleClear = (): void => {
     setItems([]);
-    setSelectedIds([]);
-    setSelectionMode(false);
-    setSelectionCollapsing(false);
-    if (selectionCollapseTimerRef.current !== null) {
-      window.clearTimeout(selectionCollapseTimerRef.current);
-      selectionCollapseTimerRef.current = null;
-    }
     setExpandedId(null);
     setEditText('');
   };
 
+  /* ── 删除单条 ── */
   const handleRemove = (id: number): void => {
     setItems((prev) => prev.filter((item) => item.id !== id));
-    setSelectedIds((prev) => prev.filter((selectedId) => selectedId !== id));
     if (expandedId === id) {
       setExpandedId(null);
       setEditText('');
     }
   };
 
-  const handleToggleSelect = (id: number): void => {
-    setSelectedIds((prev) => (
-      prev.includes(id)
-        ? prev.filter((selectedId) => selectedId !== id)
-        : [...prev, id]
-    ));
-  };
-
-  const handleToggleSelectAll = (): void => {
-    if (allSelected) {
-      setSelectedIds((prev) => prev.filter((id) => !visibleIdSet.has(id)));
-      return;
-    }
-    setSelectedIds((prev) => Array.from(new Set([
-      ...prev,
-      ...visibleItems.map((item) => item.id),
-    ])));
-  };
-
-  const handleCleanupRangeChange = (range: ClipboardCleanupRange): void => {
-    const now = Date.now();
-    setCleanupRange(range);
-    setSelectedIds(visibleItems.filter((item) => isItemInCleanupRange(item, range, now)).map((item) => item.id));
-  };
-
-  const handleFilterChange = (filter: ClipboardHistoryFilter): void => {
-    setActiveFilter(filter);
-    setSelectedIds([]);
-    if (expandedId !== null) {
-      const expandedItem = items.find((item) => item.id === expandedId);
-      if (expandedItem && !matchesClipboardFilter(expandedItem, filter)) {
-        setExpandedId(null);
-        setEditText('');
-      }
-    }
-  };
-
-  const handleRemoveSelected = (): void => {
-    if (selectedIds.length === 0) return;
-    const nextSelectedIds = new Set(selectedIds);
-    setItems((prev) => prev.filter((item) => !nextSelectedIds.has(item.id)));
-    setSelectedIds([]);
-    setSelectionMode(false);
-    setSelectionCollapsing(false);
-    if (expandedId !== null && nextSelectedIds.has(expandedId)) {
-      setExpandedId(null);
-      setEditText('');
-    }
-  };
-
-  const handleClearByRange = (): void => {
-    const now = Date.now();
-    const removedIds = new Set(items.filter((item) => isItemInCleanupRange(item, cleanupRange, now)).map((item) => item.id));
-    if (removedIds.size === 0) return;
-    setItems((prev) => prev.filter((item) => !removedIds.has(item.id)));
-    setSelectedIds((prev) => prev.filter((id) => !removedIds.has(id)));
-    setSelectionMode(false);
-    setSelectionCollapsing(false);
-    if (expandedId !== null && removedIds.has(expandedId)) {
-      setExpandedId(null);
-      setEditText('');
-    }
-  };
-
+  /* ── 导出 ── */
   const handleExport = (): void => {
     if (exportItems.length === 0) return;
     try {
@@ -474,167 +122,35 @@ export function ClipboardHistoryTab(): React.ReactElement {
     }
   };
 
-  const handleToggleExpand = (item: ClipboardHistoryItem): void => {
-    if (expandedId === item.id) {
-      setExpandedId(null);
-      setEditText('');
-      return;
-    }
-    setExpandedId(item.id);
-    setEditText(item.text);
-  };
-
-  const handleSaveEdit = (id: number): void => {
-    const nextText = editText.replace(/\r\n/g, '\n').trim();
-    if (!nextText) return;
-    setItems((prev) => prev.map((item) => (
-      item.id === id
-        ? { ...item, text: nextText }
-        : item
-    )));
-  };
-
-  const handleCopy = (item: ClipboardHistoryItem): void => {
-    const text = expandedId === item.id ? editText : item.text;
-    window.api.clipboardWriteText(text)
-      .then(() => {
-        showCopyFeedback('success', t('clipboardHistoryTab.messages.copySuccess', { defaultValue: '已复制到剪贴板' }));
-        if (exitMaxExpandOnCopy) {
-          const store = useIslandStore.getState();
-          if (store.isMusicPlaying) {
-            setLyrics();
-          } else {
-            setIdle(true);
-          }
-        }
-      })
-      .catch(() => {
-        showCopyFeedback('error', t('clipboardHistoryTab.messages.copyFailed', { defaultValue: '复制失败，请稍后重试' }));
-      });
-  };
-
-  useEffect(() => {
-    if (expandedId === null) return;
-    adjustTextareaHeight(editTextareaRef.current);
-  }, [editText, expandedId, adjustTextareaHeight]);
-
-  useEffect(() => () => {
-    if (copyFeedbackTimerRef.current !== null) {
-      window.clearTimeout(copyFeedbackTimerRef.current);
-    }
-    if (selectionCollapseTimerRef.current !== null) {
-      window.clearTimeout(selectionCollapseTimerRef.current);
-    }
-  }, []);
-
-  const showCopyFeedback = (type: 'success' | 'error', text: string): void => {
-    setCopyFeedback({ type, text });
-    if (copyFeedbackTimerRef.current !== null) {
-      window.clearTimeout(copyFeedbackTimerRef.current);
-    }
-    copyFeedbackTimerRef.current = window.setTimeout(() => {
-      setCopyFeedback(null);
-      copyFeedbackTimerRef.current = null;
-    }, 1800);
-  };
-
   return (
     <div className="clipboard-history">
-      <div className="clipboard-history-header">
-        <span className="clipboard-history-title">{t('clipboardHistoryTab.title', { defaultValue: '剪贴板历史' })}</span>
-        <div className="clipboard-history-header-right">
-          <span className="clipboard-history-count">{countLabel}</span>
-          <div className="clipboard-history-filter-bar" role="tablist" aria-label={t('clipboardHistoryTab.filters.aria', { defaultValue: '剪贴板类型筛选' })}>
-            {CLIPBOARD_HISTORY_FILTERS.map((filter) => (
-              <button
-                key={filter}
-                className={`clipboard-history-filter${activeFilter === filter ? ' clipboard-history-filter--active' : ''}`}
-                type="button"
-                role="tab"
-                aria-selected={activeFilter === filter}
-                onClick={() => handleFilterChange(filter)}
-              >
-                {t(CLIPBOARD_HISTORY_FILTER_LABEL_KEYS[filter], {
-                  defaultValue: CLIPBOARD_HISTORY_FILTER_DEFAULT_LABELS[filter],
-                })}
-              </button>
-            ))}
-          </div>
-          <button
-            className="clipboard-history-clear"
-            type="button"
-            onClick={handleClear}
-            disabled={totalCount === 0}
-          >
-            {t('clipboardHistoryTab.actions.clear', { defaultValue: '清空' })}
-          </button>
-          <button
-            className="clipboard-history-export"
-            type="button"
-            onClick={handleExport}
-            disabled={exportCount === 0}
-            title={selectionMode && selectedCount > 0
-              ? t('clipboardHistoryTab.actions.exportSelectedTitle', { defaultValue: '导出已选记录' })
-              : t('clipboardHistoryTab.actions.exportAllTitle', { defaultValue: '导出全部记录' })}
-          >
-            {t('clipboardHistoryTab.actions.export', { defaultValue: '导出' })}
-            {selectionMode && selectedCount > 0 ? ` (${selectedCount})` : ''}
-          </button>
-          <button
-            className={`clipboard-history-select-toggle${selectionMode ? ' clipboard-history-select-toggle--active' : ''}`}
-            type="button"
-            onClick={handleToggleSelectionMode}
-            disabled={totalCount === 0}
-          >
-            {selectionMode
-              ? t('clipboardHistoryTab.actions.cancelSelect', { defaultValue: '取消' })
-              : t('clipboardHistoryTab.actions.select', { defaultValue: '选择' })}
-          </button>
-        </div>
-      </div>
+      <ClipboardHistoryHeader
+        totalCount={totalCount}
+        visibleCount={visibleCount}
+        activeFilter={activeFilter}
+        exportCount={exportCount}
+        selectionMode={selectionMode}
+        selectedCount={selectedCount}
+        countLabel={countLabel}
+        onFilterChange={handleFilterChange}
+        onClear={handleClear}
+        onExport={handleExport}
+        onToggleSelectionMode={handleToggleSelectionMode}
+      />
 
       {selectionMode ? (
-        <div className={`clipboard-history-bulk-bar${selectionCollapsing ? ' clipboard-history-bulk-bar--collapsing' : ''}`}>
-          <label className="clipboard-history-select-all">
-            <input
-              type="checkbox"
-              checked={allSelected}
-              disabled={totalCount === 0}
-              onChange={handleToggleSelectAll}
-            />
-            <span>{t('clipboardHistoryTab.actions.selectAll', { defaultValue: '全选' })}</span>
-          </label>
-          <button
-            className="clipboard-history-bulk-delete"
-            type="button"
-            onClick={handleRemoveSelected}
-            disabled={selectedCount === 0}
-          >
-            {t('clipboardHistoryTab.actions.deleteSelected', { defaultValue: '删除已选' })}
-            {selectedCount > 0 ? ` (${selectedCount})` : ''}
-          </button>
-          <select
-            className="clipboard-history-range-select"
-            value={cleanupRange}
-            onChange={(e) => handleCleanupRangeChange(e.target.value as ClipboardCleanupRange)}
-            aria-label={t('clipboardHistoryTab.actions.rangeAria', { defaultValue: '选择清理时间范围' })}
-          >
-            <option value="lastHour">{t('clipboardHistoryTab.ranges.lastHour', { defaultValue: '最近 1 小时' })}</option>
-            <option value="today">{t('clipboardHistoryTab.ranges.today', { defaultValue: '今天' })}</option>
-            <option value="last7Days">{t('clipboardHistoryTab.ranges.last7Days', { defaultValue: '最近 7 天' })}</option>
-            <option value="last30Days">{t('clipboardHistoryTab.ranges.last30Days', { defaultValue: '最近 30 天' })}</option>
-            <option value="olderThan30Days">{t('clipboardHistoryTab.ranges.olderThan30Days', { defaultValue: '30 天前' })}</option>
-          </select>
-          <button
-            className="clipboard-history-range-clear"
-            type="button"
-            onClick={handleClearByRange}
-            disabled={cleanupMatchedCount === 0}
-          >
-            {t('clipboardHistoryTab.actions.clearRange', { defaultValue: '清理范围' })}
-            {cleanupMatchedCount > 0 ? ` (${cleanupMatchedCount})` : ''}
-          </button>
-        </div>
+        <ClipboardHistoryBulkBar
+          selectionCollapsing={selectionCollapsing}
+          allSelected={allSelected}
+          totalCount={totalCount}
+          selectedCount={selectedCount}
+          cleanupRange={cleanupRange}
+          cleanupMatchedCount={cleanupMatchedCount}
+          onToggleSelectAll={handleToggleSelectAll}
+          onRemoveSelected={handleRemoveSelected}
+          onCleanupRangeChange={handleCleanupRangeChange}
+          onClearByRange={handleClearByRange}
+        />
       ) : null}
 
       {copyFeedback ? (
@@ -657,87 +173,25 @@ export function ClipboardHistoryTab(): React.ReactElement {
           <div className="clipboard-history-empty">
             {t('clipboardHistoryTab.emptyFiltered', { defaultValue: '当前类型下没有记录。' })}
           </div>
-        ) : visibleItems.map((item) => {
-          const expanded = expandedId === item.id;
-          const selected = selectedIdSet.has(item.id);
-          return (
-            <div key={item.id} className={`clipboard-history-item${selectionMode && !selectionCollapsing && selected ? ' clipboard-history-item--selected' : ''}`}>
-              <div className={`clipboard-history-summary-row${selectionMode ? ' clipboard-history-summary-row--selecting' : ''}${selectionCollapsing ? ' clipboard-history-summary-row--collapsing' : ''}`}>
-                {selectionMode ? (
-                  <label className="clipboard-history-item-check">
-                    <input
-                      type="checkbox"
-                      checked={selected}
-                      onChange={() => handleToggleSelect(item.id)}
-                      aria-label={t('clipboardHistoryTab.actions.selectItemAria', { defaultValue: '选择该剪贴板记录' })}
-                    />
-                  </label>
-                ) : null}
-                <button
-                  className="clipboard-history-copy"
-                  type="button"
-                  onClick={() => handleCopy(item)}
-                  aria-label={t('clipboardHistoryTab.actions.copyAria', { defaultValue: '复制该记录到剪贴板' })}
-                  title={t('clipboardHistoryTab.actions.copyTitle', { defaultValue: '复制到剪贴板' })}
-                >
-                  <img src={SvgIcon.COPY} alt="" aria-hidden="true" />
-                </button>
-                <button
-                  className="clipboard-history-summary"
-                  type="button"
-                  onClick={() => handleToggleExpand(item)}
-                  title={item.text}
-                >
-                  <span className="clipboard-history-preview">{getPreviewText(item.text)}</span>
-                  <span className="clipboard-history-time">{new Date(item.createdAt).toLocaleString()}</span>
-                  <span className="clipboard-history-expand-indicator">
-                    {expanded
-                      ? t('clipboardHistoryTab.actions.collapse', { defaultValue: '收起' })
-                      : t('clipboardHistoryTab.actions.expand', { defaultValue: '展开' })}
-                  </span>
-                </button>
-              </div>
-
-              {expanded ? (
-                <div className="clipboard-history-detail">
-                  <textarea
-                    className="clipboard-history-content"
-                    value={editText}
-                    ref={editTextareaRef}
-                    onChange={(e) => {
-                      setEditText(e.target.value);
-                      adjustTextareaHeight(e.currentTarget);
-                    }}
-                    onKeyDown={(e) => {
-                      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                        e.preventDefault();
-                        handleSaveEdit(item.id);
-                      }
-                    }}
-                  />
-                  <div className="clipboard-history-actions">
-                    <button
-                      className="clipboard-history-save"
-                      type="button"
-                      onClick={() => handleSaveEdit(item.id)}
-                      disabled={!editText.trim()}
-                    >
-                      {t('clipboardHistoryTab.actions.save', { defaultValue: '保存' })}
-                    </button>
-                    <button
-                      className="clipboard-history-remove"
-                      type="button"
-                      onClick={() => handleRemove(item.id)}
-                      aria-label={t('clipboardHistoryTab.actions.removeAria', { defaultValue: '删除该剪贴板记录' })}
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
+        ) : visibleItems.map((item) => (
+          <ClipboardHistoryItemRow
+            key={item.id}
+            item={item}
+            expanded={expandedId === item.id}
+            selected={selectedIdSet.has(item.id)}
+            selectionMode={selectionMode}
+            selectionCollapsing={selectionCollapsing}
+            editText={editText}
+            editTextareaRef={editTextareaRef}
+            onToggleSelect={handleToggleSelect}
+            onCopy={handleCopy}
+            onToggleExpand={handleToggleExpand}
+            onEditTextChange={setEditText}
+            onEditTextareaRef={adjustTextareaHeight}
+            onSaveEdit={handleSaveEdit}
+            onRemove={handleRemove}
+          />
+        ))}
       </div>
     </div>
   );
