@@ -18,7 +18,8 @@
  * GNU General Public License for more details.
  */
 
-import { UseAlbumViewerReturn } from "../hooks/useAlbumViewer";
+import type { RefObject } from 'react';
+import type { UseAlbumViewerReturn } from "../hooks/useAlbumViewer";
 
 /**
  * @file albumTypes.ts
@@ -149,4 +150,81 @@ export interface AlbumViewerProps {
   onSaveAs: (item: AlbumItem) => void;
   /** 设为灵动岛背景 */
   onSetAsIslandBackground: (item: AlbumItem) => void;
+}
+
+/** AlbumGridItem 组件入参 */
+export interface AlbumGridItemProps {
+  item: AlbumItem;
+  meta: AlbumMeta | undefined;
+  selected: boolean;
+  selectMode: boolean;
+  onToggleSelection: (id: number) => void;
+  onOpen: (item: AlbumItem) => void;
+  onRemove: (id: number) => void;
+  onMouseEnter: (item: AlbumItem) => void;
+  onMouseLeave: (item: AlbumItem) => void;
+  gridVideoRefs: RefObject<Record<number, HTMLVideoElement | null>>;
+}
+
+/** 分组数据结构 */
+export interface AlbumGroup {
+  key: string;
+  title: string;
+  subtitle?: string;
+  items: AlbumItem[];
+}
+
+/** AlbumOverview 组件入参 */
+export interface AlbumOverviewProps {
+  totalCount: number;
+  filteredCount: number;
+  columns: number;
+  groupMode: AlbumGroupMode;
+  groupedItems: AlbumGroup[];
+  metaCache: Record<number, AlbumMeta>;
+  selectedIds: Set<number>;
+  selectMode: boolean;
+  onToggleSelection: (id: number) => void;
+  onOpen: (item: AlbumItem) => void;
+  onRemove: (id: number) => void;
+  onMouseEnter: (item: AlbumItem) => void;
+  onMouseLeave: (item: AlbumItem) => void;
+  gridVideoRefs: RefObject<Record<number, HTMLVideoElement | null>>;
+  onPickFiles: () => void;
+}
+
+/** AlbumHeader 组件入参 */
+export interface AlbumHeaderProps {
+  totalCount: number;
+  sortMode: AlbumSortMode;
+  filterMode: AlbumFilterMode;
+  groupMode: AlbumGroupMode;
+  columns: number;
+  selectMode: boolean;
+  filteredCount: number;
+  onSortChange: (mode: string) => void;
+  onFilterModeChange: (mode: AlbumFilterMode) => void;
+  onGroupModeChange: (mode: AlbumGroupMode) => void;
+  onColumnsChange: (delta: number) => void;
+  onPickFiles: () => void;
+  onToggleSelectMode: () => void;
+}
+
+/** AlbumMetaPanel 组件入参 */
+export interface AlbumMetaPanelProps {
+  activeItem: AlbumItem;
+  activeMeta: AlbumMeta | undefined;
+  onSetAsIslandBackground: (item: AlbumItem) => void;
+}
+
+/** AlbumSelectionBar 组件入参 */
+export interface AlbumSelectionBarProps {
+  selectMode: boolean;
+  selectedCount: number;
+  filteredCount: number;
+  allVisibleSelected: boolean;
+  onSelectAllVisible: () => void;
+  onClearSelection: () => void;
+  onRemoveSelected: () => void;
+  onToggleSelectMode: () => void;
 }

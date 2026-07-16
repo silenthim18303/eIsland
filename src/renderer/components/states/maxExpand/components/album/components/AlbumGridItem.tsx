@@ -27,32 +27,8 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import type { AlbumItem, AlbumMeta } from '../types/albumTypes';
+import type { AlbumGridItemProps } from '../types/albumTypes';
 import { formatDuration } from '../utils/albumUtils';
-
-/** AlbumGridItem 组件入参 */
-interface AlbumGridItemProps {
-  /** 相册条目 */
-  item: AlbumItem;
-  /** 该条目已加载的元数据 */
-  meta: AlbumMeta | undefined;
-  /** 是否被选中 */
-  selected: boolean;
-  /** 是否处于多选模式 */
-  selectMode: boolean;
-  /** 切换选中态 */
-  onToggleSelection: (id: number) => void;
-  /** 非多选模式下单击打开 */
-  onOpen: (item: AlbumItem) => void;
-  /** 删除单条 */
-  onRemove: (id: number) => void;
-  /** 缩略图鼠标移入（视频预览用） */
-  onMouseEnter: (item: AlbumItem) => void;
-  /** 缩略图鼠标移出 */
-  onMouseLeave: (item: AlbumItem) => void;
-  /** 网格视频元素引用集合 */
-  gridVideoRefs: React.RefObject<Record<number, HTMLVideoElement | null>>;
-}
 
 /**
  * 控制按钮内部图标。

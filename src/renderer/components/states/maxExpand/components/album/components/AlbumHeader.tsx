@@ -28,37 +28,7 @@ import { useMemo } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MAX_COLUMNS, MIN_COLUMNS } from '../types/albumTypes';
-import type { AlbumFilterMode, AlbumGroupMode, AlbumSortMode } from '../types/albumTypes';
-
-/** AlbumHeader 组件入参 */
-interface AlbumHeaderProps {
-  /** 条目总数 */
-  totalCount: number;
-  /** 当前排序模式 */
-  sortMode: AlbumSortMode;
-  /** 筛选模式 */
-  filterMode: AlbumFilterMode;
-  /** 分组模式 */
-  groupMode: AlbumGroupMode;
-  /** 当前列数 */
-  columns: number;
-  /** 是否处于多选模式 */
-  selectMode: boolean;
-  /** 筛选后条目数（用于禁用多选按钮） */
-  filteredCount: number;
-  /** 排序变更 */
-  onSortChange: (mode: string) => void;
-  /** 筛选变更 */
-  onFilterModeChange: (mode: AlbumFilterMode) => void;
-  /** 分组变更 */
-  onGroupModeChange: (mode: AlbumGroupMode) => void;
-  /** 列数变更（+1 / -1） */
-  onColumnsChange: (delta: number) => void;
-  /** 打开文件选择器 */
-  onPickFiles: () => void;
-  /** 切换多选模式 */
-  onToggleSelectMode: () => void;
-}
+import type { AlbumHeaderProps } from '../types/albumTypes';
 
 /**
  * 相册页头部工具栏。

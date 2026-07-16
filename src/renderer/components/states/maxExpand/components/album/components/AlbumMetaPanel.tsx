@@ -26,18 +26,8 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AlbumItem, AlbumMeta } from '../types/albumTypes';
+import type { AlbumMetaPanelProps } from '../types/albumTypes';
 import { formatBytes, formatDuration, formatTimestamp } from '../utils/albumUtils';
-
-/** AlbumMetaPanel 组件入参 */
-interface AlbumMetaPanelProps {
-  /** 当前查看的条目 */
-  activeItem: AlbumItem;
-  /** 当前条目的元数据 */
-  activeMeta: AlbumMeta | undefined;
-  /** 设为灵动岛背景 */
-  onSetAsIslandBackground: (item: AlbumItem) => void;
-}
 
 /**
  * 查看器右侧元数据侧栏。

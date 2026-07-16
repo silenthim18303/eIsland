@@ -24,52 +24,10 @@
  * @author 鸡哥
  */
 
-import type { ReactElement, RefObject } from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AlbumGroupMode, AlbumItem, AlbumMeta } from '../types/albumTypes';
+import type { AlbumOverviewProps } from '../types/albumTypes';
 import { AlbumGridItem } from './AlbumGridItem';
-
-/** 分组数据结构 */
-interface AlbumGroup {
-  key: string;
-  title: string;
-  subtitle?: string;
-  items: AlbumItem[];
-}
-
-/** AlbumOverview 组件入参 */
-interface AlbumOverviewProps {
-  /** 条目总数 */
-  totalCount: number;
-  /** 筛选后条目数 */
-  filteredCount: number;
-  /** 列数 */
-  columns: number;
-  /** 分组模式 */
-  groupMode: AlbumGroupMode;
-  /** 分组后数据 */
-  groupedItems: AlbumGroup[];
-  /** 元数据缓存 */
-  metaCache: Record<number, AlbumMeta>;
-  /** 已选中 ID 集合 */
-  selectedIds: Set<number>;
-  /** 是否处于多选模式 */
-  selectMode: boolean;
-  /** 切换选中态 */
-  onToggleSelection: (id: number) => void;
-  /** 打开查看 */
-  onOpen: (item: AlbumItem) => void;
-  /** 删除单条 */
-  onRemove: (id: number) => void;
-  /** 缩略图鼠标移入 */
-  onMouseEnter: (item: AlbumItem) => void;
-  /** 缩略图鼠标移出 */
-  onMouseLeave: (item: AlbumItem) => void;
-  /** 网格视频元素引用集合 */
-  gridVideoRefs: RefObject<Record<number, HTMLVideoElement | null>>;
-  /** 打开文件选择器（空态按钮） */
-  onPickFiles: () => void;
-}
 
 /**
  * 相册总览网格。

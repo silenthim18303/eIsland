@@ -26,26 +26,7 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-
-/** AlbumSelectionBar 组件入参 */
-interface AlbumSelectionBarProps {
-  /** 是否处于多选模式 */
-  selectMode: boolean;
-  /** 已选中数量 */
-  selectedCount: number;
-  /** 当前筛选后可见条目总数 */
-  filteredCount: number;
-  /** 所有可见项是否全部选中 */
-  allVisibleSelected: boolean;
-  /** 全选/取消全选 */
-  onSelectAllVisible: () => void;
-  /** 清除选中 */
-  onClearSelection: () => void;
-  /** 删除选中 */
-  onRemoveSelected: () => void;
-  /** 退出多选模式 */
-  onToggleSelectMode: () => void;
-}
+import type { AlbumSelectionBarProps } from '../types/albumTypes';
 
 /**
  * 相册底部多选工具条。
