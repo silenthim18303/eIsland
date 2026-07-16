@@ -27,17 +27,8 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resolveBgMediaPreviewUrl } from '../../../../../config/dynamicIslandBackgroundMedia';
-import type { AlbumItem, AlbumMeta, IslandBgMediaConfig } from '../types/albumTypes';
+import type { AlbumItem, AlbumMeta, IslandBgMediaConfig, UseAlbumViewerActionsReturn } from '../types/albumTypes';
 import { ISLAND_BG_IMAGE_STORE_KEY, ISLAND_BG_MEDIA_STORE_KEY, LOCAL_ISLAND_BG_SYNC_EVENT } from '../config/albumConfig';
-
-/** useAlbumViewerActions 返回值类型 */
-export interface UseAlbumViewerActionsReturn {
-  handleOpenInExplorer: (item: AlbumItem) => void;
-  handleSaveAs: (item: AlbumItem) => void;
-  handleSetAsIslandBackground: (item: AlbumItem) => void;
-  /** 重置缩放至 1:1 并显示提示 */
-  handleOriginalZoom: () => void;
-}
 
 /** 查看器工具栏动作 hook */
 export function useAlbumViewerActions(

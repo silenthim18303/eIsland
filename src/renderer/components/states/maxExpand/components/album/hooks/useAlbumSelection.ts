@@ -25,23 +25,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import type { AlbumItem } from '../types/albumTypes';
-
-/** useAlbumSelection 返回值类型 */
-export interface UseAlbumSelectionReturn {
-  selectedIds: Set<number>;
-  setSelectedIds: React.Dispatch<React.SetStateAction<Set<number>>>;
-  selectMode: boolean;
-  selectedCount: number;
-  visibleSelectedCount: number;
-  allVisibleSelected: boolean;
-  handleToggleItemSelection: (id: number) => void;
-  handleSelectAllVisible: () => void;
-  handleClearSelection: () => void;
-  handleToggleSelectMode: () => void;
-  /** 批量删除选中条目（联动清除查看器 activeId） */
-  handleRemoveSelectedItems: () => void;
-}
+import type { AlbumItem, UseAlbumSelectionReturn } from '../types/albumTypes';
 
 /** 相册多选管理 hook */
 export function useAlbumSelection(

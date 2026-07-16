@@ -26,28 +26,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AlbumFilterMode, AlbumGroupMode, AlbumItem, AlbumMeta, AlbumSortMode } from '../types/albumTypes';
+import type { AlbumFilterMode, AlbumGroupMode, AlbumItem, AlbumMeta, AlbumSortMode, UseAlbumGridConfigReturn } from '../types/albumTypes';
 import { COLUMNS_STORE_KEY, GROUP_MODE_STORE_KEY, SORT_STORE_KEY } from '../config/albumConfig';
 import { clampColumns, formatDateGroup, getFolderName, getParentFolder, sortAlbumItems } from '../utils/albumUtils';
-
-/** useAlbumGridConfig 返回值类型 */
-export interface UseAlbumGridConfigReturn {
-  columns: number;
-  setColumns: React.Dispatch<React.SetStateAction<number>>;
-  sortMode: AlbumSortMode;
-  setSortMode: React.Dispatch<React.SetStateAction<AlbumSortMode>>;
-  filterMode: AlbumFilterMode;
-  setFilterMode: React.Dispatch<React.SetStateAction<AlbumFilterMode>>;
-  groupMode: AlbumGroupMode;
-  setGroupMode: React.Dispatch<React.SetStateAction<AlbumGroupMode>>;
-  sortedItems: AlbumItem[];
-  filteredItems: AlbumItem[];
-  groupedItems: Array<{ key: string; title: string; subtitle: string; items: AlbumItem[] }>;
-  handleColumnsChange: (delta: number) => void;
-  handleSortChange: (value: string) => void;
-  handleFilterModeChange: (mode: AlbumFilterMode) => void;
-  handleGroupModeChange: (mode: AlbumGroupMode) => void;
-}
 
 /** 相册网格配置 hook */
 export function useAlbumGridConfig(

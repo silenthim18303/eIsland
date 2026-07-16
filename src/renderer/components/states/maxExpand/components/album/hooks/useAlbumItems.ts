@@ -26,7 +26,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AlbumItem, AlbumMeta } from '../types/albumTypes';
+import type { AlbumItem, AlbumMeta, UseAlbumItemsReturn } from '../types/albumTypes';
 import {
   COLUMNS_STORE_KEY,
   GROUP_MODE_STORE_KEY,
@@ -48,33 +48,6 @@ import {
   revokeBlobUrl,
   sanitizeAlbumItems,
 } from '../utils/albumUtils';
-
-/** useAlbumItems 返回值类型 */
-export interface UseAlbumItemsReturn {
-  items: AlbumItem[];
-  setItems: React.Dispatch<React.SetStateAction<AlbumItem[]>>;
-  loaded: boolean;
-  mediaLoadReady: boolean;
-  metaCache: Record<number, AlbumMeta>;
-  statusMessage: string;
-  setStatusMessage: React.Dispatch<React.SetStateAction<string>>;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  gridVideoRefs: React.RefObject<Record<number, HTMLVideoElement | null>>;
-  /** 初次从 store 读取的列数 */
-  initColumns: number;
-  /** 初次从 store 读取的排序模式 */
-  initSortMode: AlbumSortMode;
-  /** 初次从 store 读取的分组模式 */
-  initGroupMode: AlbumGroupMode;
-  loadExifIfNeeded: (item: AlbumItem) => void;
-  handleAddFiles: (files: FileList | File[] | null) => void;
-  handleRemove: (id: number) => void;
-  handleRemoveSelected: (ids: Set<number>) => void;
-  handleThumbMouseEnter: (item: AlbumItem) => void;
-  handleThumbMouseLeave: (item: AlbumItem) => void;
-  handleFileInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handlePickFiles: () => void;
-}
 
 /** 相册条目管理 hook */
 export function useAlbumItems(): UseAlbumItemsReturn {

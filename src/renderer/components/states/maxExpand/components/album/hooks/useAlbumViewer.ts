@@ -26,47 +26,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, WheelEvent } from 'react';
-import type { AlbumItem, AlbumMeta } from '../types/albumTypes';
+import type { AlbumItem, AlbumMeta, UseAlbumViewerReturn } from '../types/albumTypes';
 import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../config/albumConfig';
-
-/** useAlbumViewer 返回值类型 */
-export interface UseAlbumViewerReturn {
-  activeId: number | null;
-  setActiveId: React.Dispatch<React.SetStateAction<number | null>>;
-  zoom: number;
-  setZoom: React.Dispatch<React.SetStateAction<number>>;
-  pan: { x: number; y: number };
-  setPan: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
-  isPanning: boolean;
-  viewerSlideDir: 'prev' | 'next';
-  videoPlaying: boolean;
-  videoMuted: boolean;
-  videoVolume: number;
-  videoCurrentTime: number;
-  videoDuration: number;
-  videoControlsCollapsed: boolean;
-  viewerVideoRef: React.RefObject<HTMLVideoElement | null>;
-  activeItem: AlbumItem | null;
-  activeMeta: AlbumMeta | undefined;
-  activeIsVideo: boolean;
-  activeVideoUrl: string | null;
-  navigateInViewer: (delta: number) => void;
-  handleOpenItem: (item: AlbumItem) => void;
-  handleViewerWheel: (event: WheelEvent<HTMLDivElement>) => void;
-  handleViewerMouseDown: (event: React.MouseEvent<HTMLDivElement>) => void;
-  handleViewerMouseMove: (event: React.MouseEvent<HTMLDivElement>) => void;
-  handleViewerMouseUp: () => void;
-  handleVideoLoadedMetadata: () => void;
-  handleVideoTimeUpdate: () => void;
-  handleToggleVideoPlay: () => void;
-  handleVideoSeek: (event: ChangeEvent<HTMLInputElement>) => void;
-  handleToggleVideoMute: () => void;
-  handleVideoVolumeChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  handleToggleVideoControls: () => void;
-  handleZoom: (delta: number) => void;
-  handleResetZoom: () => void;
-  handleVideoEnded: () => void;
-}
 
 /** 单图/视频查看器 hook */
 export function useAlbumViewer(

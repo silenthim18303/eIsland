@@ -18,8 +18,7 @@
  * GNU General Public License for more details.
  */
 
-import type { RefObject } from 'react';
-import type { UseAlbumViewerReturn } from "../hooks/useAlbumViewer";
+import type { ChangeEvent, DragEvent, MouseEvent, RefObject, WheelEvent } from 'react';
 
 /**
  * @file albumTypes.ts
@@ -191,4 +190,117 @@ export interface AlbumSelectionBarProps {
   onClearSelection: () => void;
   onRemoveSelected: () => void;
   onToggleSelectMode: () => void;
+}
+
+/** useAlbumGridConfig 返回值类型 */
+export interface UseAlbumGridConfigReturn {
+  columns: number;
+  setColumns: React.Dispatch<React.SetStateAction<number>>;
+  sortMode: AlbumSortMode;
+  setSortMode: React.Dispatch<React.SetStateAction<AlbumSortMode>>;
+  filterMode: AlbumFilterMode;
+  setFilterMode: React.Dispatch<React.SetStateAction<AlbumFilterMode>>;
+  groupMode: AlbumGroupMode;
+  setGroupMode: React.Dispatch<React.SetStateAction<AlbumGroupMode>>;
+  sortedItems: AlbumItem[];
+  filteredItems: AlbumItem[];
+  groupedItems: Array<{ key: string; title: string; subtitle: string; items: AlbumItem[] }>;
+  handleColumnsChange: (delta: number) => void;
+  handleSortChange: (value: string) => void;
+  handleFilterModeChange: (mode: AlbumFilterMode) => void;
+  handleGroupModeChange: (mode: AlbumGroupMode) => void;
+}
+
+/** useAlbumViewer 返回值类型 */
+export interface UseAlbumViewerReturn {
+  activeId: number | null;
+  setActiveId: React.Dispatch<React.SetStateAction<number | null>>;
+  zoom: number;
+  setZoom: React.Dispatch<React.SetStateAction<number>>;
+  pan: { x: number; y: number };
+  setPan: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  isPanning: boolean;
+  viewerSlideDir: 'prev' | 'next';
+  videoPlaying: boolean;
+  videoMuted: boolean;
+  videoVolume: number;
+  videoCurrentTime: number;
+  videoDuration: number;
+  videoControlsCollapsed: boolean;
+  viewerVideoRef: React.RefObject<HTMLVideoElement | null>;
+  activeItem: AlbumItem | null;
+  activeMeta: AlbumMeta | undefined;
+  activeIsVideo: boolean;
+  activeVideoUrl: string | null;
+  navigateInViewer: (delta: number) => void;
+  handleOpenItem: (item: AlbumItem) => void;
+  handleViewerWheel: (event: WheelEvent<HTMLDivElement>) => void;
+  handleViewerMouseDown: (event: MouseEvent<HTMLDivElement>) => void;
+  handleViewerMouseMove: (event: MouseEvent<HTMLDivElement>) => void;
+  handleViewerMouseUp: () => void;
+  handleVideoLoadedMetadata: () => void;
+  handleVideoTimeUpdate: () => void;
+  handleToggleVideoPlay: () => void;
+  handleVideoSeek: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleToggleVideoMute: () => void;
+  handleVideoVolumeChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handleToggleVideoControls: () => void;
+  handleZoom: (delta: number) => void;
+  handleResetZoom: () => void;
+  handleVideoEnded: () => void;
+}
+
+/** useAlbumItems 返回值类型 */
+export interface UseAlbumItemsReturn {
+  items: AlbumItem[];
+  setItems: React.Dispatch<React.SetStateAction<AlbumItem[]>>;
+  loaded: boolean;
+  mediaLoadReady: boolean;
+  metaCache: Record<number, AlbumMeta>;
+  statusMessage: string;
+  setStatusMessage: React.Dispatch<React.SetStateAction<string>>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  gridVideoRefs: React.RefObject<Record<number, HTMLVideoElement | null>>;
+  initColumns: number;
+  initSortMode: AlbumSortMode;
+  initGroupMode: AlbumGroupMode;
+  loadExifIfNeeded: (item: AlbumItem) => void;
+  handleAddFiles: (files: FileList | File[] | null) => void;
+  handleRemove: (id: number) => void;
+  handleRemoveSelected: (ids: Set<number>) => void;
+  handleThumbMouseEnter: (item: AlbumItem) => void;
+  handleThumbMouseLeave: (item: AlbumItem) => void;
+  handleFileInputChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  handlePickFiles: () => void;
+}
+
+/** useAlbumViewerActions 返回值类型 */
+export interface UseAlbumViewerActionsReturn {
+  handleOpenInExplorer: (item: AlbumItem) => void;
+  handleSaveAs: (item: AlbumItem) => void;
+  handleSetAsIslandBackground: (item: AlbumItem) => void;
+  handleOriginalZoom: () => void;
+}
+
+/** useAlbumSelection 返回值类型 */
+export interface UseAlbumSelectionReturn {
+  selectedIds: Set<number>;
+  setSelectedIds: React.Dispatch<React.SetStateAction<Set<number>>>;
+  selectMode: boolean;
+  selectedCount: number;
+  visibleSelectedCount: number;
+  allVisibleSelected: boolean;
+  handleToggleItemSelection: (id: number) => void;
+  handleSelectAllVisible: () => void;
+  handleClearSelection: () => void;
+  handleToggleSelectMode: () => void;
+  handleRemoveSelectedItems: () => void;
+}
+
+/** useAlbumDrag 返回值类型 */
+export interface UseAlbumDragReturn {
+  dragOverPage: boolean;
+  handleDragOver: (event: DragEvent<HTMLDivElement>) => void;
+  handleDragLeave: (event: DragEvent<HTMLDivElement>) => void;
+  handleDrop: (event: DragEvent<HTMLDivElement>) => void;
 }

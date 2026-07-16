@@ -26,14 +26,7 @@
 
 import { useState } from 'react';
 import type { DragEvent } from 'react';
-
-/** useAlbumDrag 返回值类型 */
-export interface UseAlbumDragReturn {
-  dragOverPage: boolean;
-  handleDragOver: (event: DragEvent<HTMLDivElement>) => void;
-  handleDragLeave: (event: DragEvent<HTMLDivElement>) => void;
-  handleDrop: (event: DragEvent<HTMLDivElement>) => void;
-}
+import type { UseAlbumDragReturn } from '../types/albumTypes';
 
 /** 相册拖拽导入 hook */
 export function useAlbumDrag(onDropFiles: (files: FileList | File[] | null) => void): UseAlbumDragReturn {
