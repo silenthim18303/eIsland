@@ -92,6 +92,16 @@ export function getGiteeAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUrl
 }
 
 /**
+ * 获取 KOOK 授权 URL。
+ * @returns 授权 URL。
+ */
+export function getKookAuthorizeUrl(): Promise<UserAccountResult<{ authorizeUrl: string }>> {
+  return githubRequest<{ authorizeUrl: string }>('/auth/oauth/kook/authorize', {
+    method: 'GET',
+  });
+}
+
+/**
  * 微信 OAuth 用户补充邮箱后重新判断。
  * @param tempToken - 原始 OAuth 回调生成的临时 token。
  * @param email - 用户填写的邮箱。

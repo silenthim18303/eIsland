@@ -3572,6 +3572,10 @@
       "login": "Gitee",
       "loading": "连接中…"
     },
+    "kook": {
+      "login": "KOOK",
+      "loading": "连接中…"
+    },
     "setPassword": {
       "title": "设置密码",
       "hint": "OAuth 登录成功，请设置密码以完成注册",
