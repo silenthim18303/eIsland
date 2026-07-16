@@ -32,7 +32,7 @@ import { TodoTab } from './components/TodoTab';
 import { UrlFavoritesTab } from './components/UrlFavoritesTab';
 import { LocalFileSearchTab } from './components/LocalFileSearchTab';
 import { ClipboardHistoryTab } from './components/ClipboardHistoryTab';
-import { AlbumTab } from './components/AlbumTab';
+import { AlbumTab } from './components/album/components/AlbumTab';
 import { MailTab } from './components/MailTab';
 import { SettingsTab } from './components/SettingsTab';
 import { CountdownTab } from './components/CountdownTab';

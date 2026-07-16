@@ -28,7 +28,7 @@ import type { JSX } from 'react';
 import { TodoTab } from '../states/maxExpand/components/TodoTab';
 import { CountdownTab } from '../states/maxExpand/components/CountdownTab';
 import { UrlFavoritesTab } from '../states/maxExpand/components/UrlFavoritesTab';
-import { AlbumTab } from '../states/maxExpand/components/AlbumTab';
+import { AlbumTab } from '../states/maxExpand/components/album/components/AlbumTab';
 import { MailTab } from '../states/maxExpand/components/MailTab';
 import { LocalFileSearchTab } from '../states/maxExpand/components/LocalFileSearchTab';
 import { ClipboardHistoryTab } from '../states/maxExpand/components/ClipboardHistoryTab';

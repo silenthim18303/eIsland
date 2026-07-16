@@ -29,8 +29,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent, ReactElement, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SvgIcon } from '../../../../utils/SvgIcon';
-import { resolveBgMediaPreviewUrl } from '../../../config/dynamicIslandBackgroundMedia';
+import { SvgIcon } from '../../../../../../utils/SvgIcon';
+import { resolveBgMediaPreviewUrl } from '../../../../../config/dynamicIslandBackgroundMedia';
 
 /** 持久化键（store） */
 const STORE_KEY = 'photo-album-items';

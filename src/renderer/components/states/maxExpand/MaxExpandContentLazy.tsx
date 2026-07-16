@@ -34,7 +34,7 @@ const TodoTab = lazy(() => import('./components/TodoTab').then((module) => ({ de
 const UrlFavoritesTab = lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
 const LocalFileSearchTab = lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
 const ClipboardHistoryTab = lazy(() => import('./components/ClipboardHistoryTab').then((module) => ({ default: module.ClipboardHistoryTab })));
-const AlbumTab = lazy(() => import('./components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
+const AlbumTab = lazy(() => import('./components/album/components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
 const MailTab = lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));
 const SettingsTab = lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
 const CountdownTab = lazy(() => import('./components/CountdownTab').then((module) => ({ default: module.CountdownTab })));
