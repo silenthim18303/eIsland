@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import type { CliHookEvent, CliSessionSnapshot } from '../config/types';
+import type { CliHookEvent, CliSessionSnapshot } from '../types/types';
 import type { CliEventFilter } from '../config/cliFilters';
 
 /** 将时间戳格式化为 HH:MM:SS */

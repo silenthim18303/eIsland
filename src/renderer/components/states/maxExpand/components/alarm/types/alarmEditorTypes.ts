@@ -19,53 +19,35 @@
  */
 
 /**
- * @file alarmTypes.ts
- * @description 闹钟模块类型定义与常量。
+ * @file alarmEditorTypes.ts
+ * @description 闹钟编辑面板组件类型定义。
  * @author 鸡哥
  */
 
 import type { SystemAlarmRingtone } from '../../../../../../utils/audio/alarmSound';
+import type { Weekday } from './alarmTypes';
 
-/** 星期几 0=周日 ... 6=周六 */
-export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
-
-/** 单条闹钟 */
-export interface AlarmItem {
-  id: number;
+/** AlarmEditor 组件 Props */
+export interface AlarmEditorProps {
+  adding: boolean;
+  visible: boolean;
   hour: number;
   minute: number;
   second: number;
   label: string;
-  enabled: boolean;
   repeat: Weekday[];
   ringtone: SystemAlarmRingtone;
   loop: boolean;
-  createdAt: number;
-}
-
-/** 持久化存储 key */
-export const STORE_KEY = 'alarms';
-
-/** 全部星期（周一到周日顺序） */
-export const ALL_WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5, 6, 0];
-
-/** AlarmSidebar 组件属性 */
-export interface AlarmSidebarProps {
-  t: (key: string, opts?: Record<string, unknown>) => string;
-  showEditor: boolean;
-  adding: boolean;
-  setAdding: (v: boolean) => void;
-  closeEditor: () => void;
-  loaded: boolean;
-  sortedAlarms: AlarmItem[];
-  editingId: number | null;
-  weekdayLabel: (d: Weekday) => string;
+  previewPlaying: boolean;
   repeatSummary: (repeat: Weekday[]) => string;
-  nextRingDesc: (alarm: AlarmItem) => string;
-  startEdit: (alarm: AlarmItem) => void;
-  deleteAlarm: (id: number) => void;
-  toggleEnabled: (id: number) => void;
-  setNewHour: (v: number) => void;
-  setNewMinute: (v: number) => void;
-  setNewSecond: (v: number) => void;
+  weekdayLabel: (d: Weekday) => string;
+  setHour: (v: number) => void;
+  setMinute: (v: number) => void;
+  setSecond: (v: number) => void;
+  setLabel: (v: string) => void;
+  setRepeat: (v: Weekday[]) => void;
+  setRingtone: (v: SystemAlarmRingtone) => void;
+  setLoop: (v: boolean) => void;
+  onCancel: () => void;
+  onSave: () => void;
 }

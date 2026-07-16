@@ -20,8 +20,8 @@
 
 /**
  * @file index.ts
- * @description Alarm 模块统一导出入口。
+ * @description Album 模块统一导出入口。
  * @author 鸡哥
  */
 
-export { AlarmTab } from './components/AlarmTab';
+export { AlbumTab } from './components/AlbumTab';

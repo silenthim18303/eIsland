@@ -25,7 +25,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import type { CliStatusSnapshot } from '../config/types';
+import type { CliStatusSnapshot } from '../types/types';
 import type { CliEventFilter } from '../config/cliFilters';
 import { matchesFilter } from '../utils/cliFormatters';
 

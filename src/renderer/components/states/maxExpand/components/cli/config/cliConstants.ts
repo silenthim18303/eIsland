@@ -19,9 +19,16 @@
  */
 
 /**
- * @file index.ts
- * @description Alarm 模块统一导出入口。
+ * @file cliConstants.ts
+ * @description CLI 面板常量配置
  * @author 鸡哥
  */
 
-export { AlarmTab } from './components/AlarmTab';
+/** 每页显示的流事件数量 */
+export const EVENTS_PER_PAGE = 3;
+
+/** 流结束事件名 */
+export const STOP_EVENTS = new Set(['Stop', 'StopFailure', 'SubagentStop', 'SessionEnd']);
+
+/** 等待授权事件名 */
+export const PERMISSION_EVENTS = new Set(['PermissionRequest', 'PermissionDenied']);

@@ -19,24 +19,25 @@
  */
 
 /**
- * @file types.ts
- * @description Claude Code CLI 面板类型。
+ * @file usePendingPermissions.ts
+ * @description 待授权事件 id 派生 Hook
  * @author 鸡哥
  */
 
-export type CliStatusSnapshot = Awaited<ReturnType<typeof window.api.claudeCodeStatusGet>>;
-export type CliSessionSnapshot = CliStatusSnapshot['sessions'][number];
-export type CliHookEvent = CliStatusSnapshot['events'][number];
-export type CliHeatmapDaily = CliStatusSnapshot['heatmap'];
+import { useMemo } from 'react';
+import type { CliSessionSnapshot } from '../types/types';
 
-export const EMPTY_CLI_STATUS: CliStatusSnapshot = {
-  enabled: false,
-  receiverRunning: false,
-  receiverUrl: null,
-  settingsPath: '',
-  hookScriptPath: '',
-  sessions: [],
-  events: [],
-  heatmap: {},
-  updatedAt: 0,
-};
+/**
+ * 从会话列表中派生仍在等待授权的事件 id 集合
+ * @param sessions - 当前会话列表
+ * @returns 待授权事件 id 集合
+ */
+export function usePendingPermissions(sessions: CliSessionSnapshot[]): Set<string> {
+  return useMemo(() => {
+    return new Set<string>(
+      sessions
+        .filter((session) => session.phase === 'waiting_permission' && session.pendingPermission)
+        .map((session) => session.pendingPermission!.id),
+    );
+  }, [sessions]);
+}
