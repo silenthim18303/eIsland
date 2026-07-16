@@ -26,7 +26,7 @@
 
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_EXTS } from '../types/albumTypes';
+import { SUPPORTED_EXTS } from '../config/albumConfig';
 import { useAlbumItems } from '../hooks/useAlbumItems';
 import { useAlbumViewer } from '../hooks/useAlbumViewer';
 import { useAlbumViewerActions } from '../hooks/useAlbumViewerActions';

@@ -33,7 +33,7 @@ import {
   STORE_KEY,
   SUPPORTED_EXTS,
   VIDEO_EXTS,
-} from '../types/albumTypes';
+} from '../config/albumConfig';
 import type { AlbumExifData, AlbumItem, AlbumMediaType, AlbumMeta, AlbumSortMode } from '../types/albumTypes';
 
 /** 时长格式化为 H:MM:SS 或 M:SS */

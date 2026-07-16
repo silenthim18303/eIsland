@@ -27,7 +27,7 @@
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../types/albumTypes';
+import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../config/albumConfig';
 import type { AlbumViewerProps } from '../types/albumTypes';
 import { formatDuration } from '../utils/albumUtils';
 import { AlbumMetaPanel } from './AlbumMetaPanel';

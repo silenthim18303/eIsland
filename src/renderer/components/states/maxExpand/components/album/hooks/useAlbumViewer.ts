@@ -27,7 +27,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent, WheelEvent } from 'react';
 import type { AlbumItem, AlbumMeta } from '../types/albumTypes';
-import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../types/albumTypes';
+import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../config/albumConfig';
 
 /** useAlbumViewer 返回值类型 */
 export interface UseAlbumViewerReturn {

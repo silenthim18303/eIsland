@@ -27,7 +27,7 @@
 import { useMemo } from 'react';
 import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MAX_COLUMNS, MIN_COLUMNS } from '../types/albumTypes';
+import { MAX_COLUMNS, MIN_COLUMNS } from '../config/albumConfig';
 import type { AlbumHeaderProps } from '../types/albumTypes';
 
 /**

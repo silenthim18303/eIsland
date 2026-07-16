@@ -35,7 +35,7 @@ import {
   SORT_STORE_KEY,
   STORE_KEY,
   SUPPORTED_EXTS,
-} from '../types/albumTypes';
+} from '../config/albumConfig';
 import type { AlbumGroupMode, AlbumSortMode } from '../types/albumTypes';
 import {
   clampColumns,

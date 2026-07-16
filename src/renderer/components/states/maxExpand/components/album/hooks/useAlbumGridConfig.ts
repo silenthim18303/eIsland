@@ -27,7 +27,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AlbumFilterMode, AlbumGroupMode, AlbumItem, AlbumMeta, AlbumSortMode } from '../types/albumTypes';
-import { COLUMNS_STORE_KEY, GROUP_MODE_STORE_KEY, SORT_STORE_KEY } from '../types/albumTypes';
+import { COLUMNS_STORE_KEY, GROUP_MODE_STORE_KEY, SORT_STORE_KEY } from '../config/albumConfig';
 import { clampColumns, formatDateGroup, getFolderName, getParentFolder, sortAlbumItems } from '../utils/albumUtils';
 
 /** useAlbumGridConfig 返回值类型 */
