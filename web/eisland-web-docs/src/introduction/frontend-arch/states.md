@@ -40,7 +40,7 @@ The eIsland state machine is the core architecture that controls the island's ap
 | `resetPassword` | Password recovery | No | 860×400 px |
 | `setPassword` | OAuth new user password setup | No | 860×400 px |
 | `bindOAuth` | Bind OAuth to existing account | No | 860×400 px |
-| `bindEmail` | Bind email for OAuth (WeChat) | No | 860×400 px |
+| `bindEmail` | Bind email for OAuth (WeChat, KOOK) | No | 860×400 px |
 | `payment` | Payment processing | No | 860×400 px |
 
 ### AI & Input States
@@ -646,7 +646,7 @@ The `guide` state provides an interactive first-run tutorial for new users.
 ### login
 
 :::info
-The `login` state provides user authentication interface, including email/password login and OAuth login (GitHub, Microsoft). For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
+The `login` state provides user authentication interface, including email/password login and OAuth login (GitHub, Microsoft, WeChat, Gitee, KOOK). For the JWT authentication flow, see [JWT Authentication](../tech-stack/backend-tech-stack.md#jwt-json-web-tokens). For the rate limiting, see [Redis — Auth Rate Limiting](../backend-arch/redis-schema.md#db-6--auth-rate-limiting--replay-protection).
 :::
 
 | Property | Value |
@@ -667,8 +667,8 @@ The `login` state provides user authentication interface, including email/passwo
 - Cancel → previous state
 - Register link → `register`
 - Reset password link → `resetPassword`
-- OAuth (GitHub / Microsoft) → `setPassword` (new user) or `bindOAuth` (existing email)
-- OAuth (WeChat) → `bindEmail` (no email returned by WeChat)
+- OAuth (GitHub / Microsoft / Gitee) → `setPassword` (new user) or `bindOAuth` (existing email)
+- OAuth (WeChat / KOOK) → `bindEmail` (no email returned) or `setPassword` / `bindOAuth` (if email available)
 
 **UI Components Rendered:**
 - Username/email input
@@ -679,6 +679,8 @@ The `login` state provides user authentication interface, including email/passwo
 - GitHub OAuth button (with divider)
 - Microsoft OAuth button
 - WeChat OAuth button
+- Gitee OAuth button
+- KOOK OAuth button
 - Error messages
 
 **Behavior Details:**
@@ -689,10 +691,10 @@ The `login` state provides user authentication interface, including email/passwo
 - Session token management
 - Single device enforcement
 
-#### OAuth Login Flow (GitHub / Microsoft / WeChat)
+#### OAuth Login Flow (GitHub / Microsoft / WeChat / Gitee / KOOK)
 
 :::important
-OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. GitHub, Microsoft, and WeChat all follow the same polling flow. WeChat adds an extra email binding step since it does not return the user's email.
+OAuth uses a **polling-based architecture**: eIsland opens the system default browser for authorization, then polls the backend for the result. All providers follow the same polling flow. WeChat and KOOK add an extra email binding step since they do not return the user's email.
 :::
 
 ```mermaid

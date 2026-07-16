@@ -101,14 +101,14 @@ Tracks daily user activity for analytics and DAU (Daily Active Users) reporting.
 ### user_oauth_binding
 
 :::tip
-Stores OAuth provider bindings (GitHub, Microsoft, etc.) linked to user accounts. Each row represents one third-party account linked to one eIsland user. A user can have multiple OAuth bindings (one per provider). For the OAuth login flow, see [State Machine — login](../frontend-arch/states.md#github-oauth-login-flow).
+Stores OAuth provider bindings (GitHub, Microsoft, WeChat, Gitee, KOOK) linked to user accounts. Each row represents one third-party account linked to one eIsland user. A user can have multiple OAuth bindings (one per provider). For the OAuth login flow, see [State Machine — login](../frontend-arch/states.md#github-oauth-login-flow).
 :::
 
 | Column | Type | Nullable | Default | Description |
 |--------|------|----------|---------|-------------|
 | `id` | BIGINT | NO | AUTO_INCREMENT | Primary key |
 | `user_id` | BIGINT | NO | — | FK to `user_account.id`. CASCADE on delete |
-| `provider` | VARCHAR(20) | NO | — | OAuth provider identifier (`github`, `microsoft`) |
+| `provider` | VARCHAR(20) | NO | — | OAuth provider identifier (`github`, `microsoft`, `wechat`, `gitee`, `kook`) |
 | `provider_user_id` | VARCHAR(100) | NO | — | Third-party platform unique user ID |
 | `provider_username` | VARCHAR(100) | YES | NULL | Third-party platform display username |
 | `provider_email` | VARCHAR(150) | YES | NULL | Third-party platform email address |
@@ -126,6 +126,34 @@ Stores OAuth provider bindings (GitHub, Microsoft, etc.) linked to user accounts
 
 :::warning
 The `access_token` column stores the raw OAuth token. In production, ensure the database connection uses TLS and consider application-level encryption for this column.
+:::
+
+---
+
+### oauth_provider_config
+
+:::info
+Database-driven OAuth provider availability configuration. Controls which providers are enabled on the login page and their display names. Managed via admin API.
+:::
+
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| `id` | BIGINT | NO | AUTO_INCREMENT | Primary key |
+| `provider` | VARCHAR(20) | NO | — | Provider identifier (`github`, `microsoft`, `wechat`, `gitee`, `kook`) |
+| `display_name` | VARCHAR(50) | NO | — | Display name shown on the login page |
+| `enabled` | TINYINT(1) | NO | `1` | Whether this provider is available |
+| `message` | VARCHAR(200) | YES | NULL | Custom message shown when provider is disabled |
+| `updated_at` | DATETIME | NO | `CURRENT_TIMESTAMP` | Last update timestamp (auto-updated) |
+
+**Indexes:**
+
+| Name | Columns | Type | Purpose |
+|------|---------|------|---------|
+| PRIMARY | `id` | Clustered | Row identifier |
+| `uk_oauth_provider_config_provider` | `provider` | UNIQUE | One config per provider |
+
+:::note
+When a new provider is added, insert a row with `enabled=1`. The admin can disable a provider at runtime via `PUT /v1/admin/oauth-providers` without code changes or redeployment.
 :::
 
 ---
