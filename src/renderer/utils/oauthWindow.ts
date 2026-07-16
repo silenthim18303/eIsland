@@ -27,6 +27,7 @@
 import { pollOAuthResult, consumeOAuthResult } from '../api/user/userAccountApi.oauth';
 import type { OAuthCallbackData } from '../api/user/userAccountApi.oauth';
 import { getGitHubAuthorizeUrl, getMicrosoftAuthorizeUrl, getWechatAuthorizeUrl, getGiteeAuthorizeUrl, getKookAuthorizeUrl } from '../api/user/userAccountApi.oauth';
+import type { UserAccountResult } from '../api/user/userAccountApi.types';
 
 /** 轮询配置 */
 const POLL_INTERVAL_MS = 2000;
@@ -41,12 +42,14 @@ function generateSessionId(): string {
 }
 
 /**
- * 使用默认浏览器打开 GitHub OAuth 登录，轮询服务端获取结果。
- * @returns OAuth 回调结果；超时或失败返回 null。
+ * 通用 OAuth 授权地址获取与 state 拼接逻辑。
+ * @param getAuthorizeUrl - 获取授权地址的函数。
+ * @returns 带 state 的完整 URL 和对应的 sessionId；失败返回 null。
  */
-export async function openGitHubOAuth(): Promise<OAuthCallbackData | null> {
-  // 获取授权 URL
-  const urlResult = await getGitHubAuthorizeUrl();
+async function prepareOAuthAuthorizeUrl(
+  getAuthorizeUrl: () => Promise<UserAccountResult<{ authorizeUrl: string }>>,
+): Promise<{ sessionId: string; urlWithState: string } | null> {
+  const urlResult = await getAuthorizeUrl();
   if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
     return null;
   }
@@ -55,6 +58,24 @@ export async function openGitHubOAuth(): Promise<OAuthCallbackData | null> {
   const authorizeUrl = urlResult.data.authorizeUrl;
   const separator = authorizeUrl.includes('?') ? '&' : '?';
   const urlWithState = `${authorizeUrl}${separator}state=${sessionId}`;
+
+  return { sessionId, urlWithState };
+}
+
+/**
+ * 通用 OAuth 流程：打开浏览器授权 → 轮询 → 获取结果。
+ * @param getAuthorizeUrl - 获取授权地址的函数。
+ * @returns OAuth 回调结果；超时或失败返回 null。
+ */
+async function openOAuthFlow(
+  getAuthorizeUrl: () => Promise<UserAccountResult<{ authorizeUrl: string }>>,
+): Promise<OAuthCallbackData | null> {
+  const prepared = await prepareOAuthAuthorizeUrl(getAuthorizeUrl);
+  if (!prepared) {
+    return null;
+  }
+
+  const { sessionId, urlWithState } = prepared;
 
   // 使用主进程 shell.openExternal 打开默认浏览器
   await window.api.clipboardOpenUrl(urlWithState);
@@ -83,149 +104,41 @@ export async function openGitHubOAuth(): Promise<OAuthCallbackData | null> {
 }
 
 /**
+ * 使用默认浏览器打开 GitHub OAuth 登录，轮询服务端获取结果。
+ * @returns OAuth 回调结果；超时或失败返回 null。
+ */
+export function openGitHubOAuth(): Promise<OAuthCallbackData | null> {
+  return openOAuthFlow(getGitHubAuthorizeUrl);
+}
+
+/**
  * 使用默认浏览器打开 Microsoft OAuth 登录，轮询服务端获取结果。
  * @returns OAuth 回调结果；超时或失败返回 null。
  */
-export async function openMicrosoftOAuth(): Promise<OAuthCallbackData | null> {
-  const urlResult = await getMicrosoftAuthorizeUrl();
-  if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
-    return null;
-  }
-
-  const sessionId = generateSessionId();
-  const authorizeUrl = urlResult.data.authorizeUrl;
-  const separator = authorizeUrl.includes('?') ? '&' : '?';
-  const urlWithState = `${authorizeUrl}${separator}state=${sessionId}`;
-
-  await window.api.clipboardOpenUrl(urlWithState);
-
-  for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-
-    try {
-      const pollRes = await pollOAuthResult(sessionId);
-      if (pollRes.code === 200 && pollRes.data?.ready) {
-        const consumeRes = await consumeOAuthResult(sessionId);
-        if (consumeRes.code === 200 && consumeRes.data) {
-          return consumeRes.data;
-        }
-        return null;
-      }
-    } catch {
-      // 网络错误，继续重试
-    }
-  }
-
-  return null;
+export function openMicrosoftOAuth(): Promise<OAuthCallbackData | null> {
+  return openOAuthFlow(getMicrosoftAuthorizeUrl);
 }
 
 /**
  * 使用默认浏览器打开微信 OAuth 登录（网站应用扫码），轮询服务端获取结果。
  * @returns OAuth 回调结果；超时或失败返回 null。
  */
-export async function openWechatOAuth(): Promise<OAuthCallbackData | null> {
-  const urlResult = await getWechatAuthorizeUrl();
-  if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
-    return null;
-  }
-
-  const sessionId = generateSessionId();
-  const authorizeUrl = urlResult.data.authorizeUrl;
-  const separator = authorizeUrl.includes('?') ? '&' : '?';
-  const urlWithState = `${authorizeUrl}${separator}state=${sessionId}`;
-
-  await window.api.clipboardOpenUrl(urlWithState);
-
-  for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-
-    try {
-      const pollRes = await pollOAuthResult(sessionId);
-      if (pollRes.code === 200 && pollRes.data?.ready) {
-        const consumeRes = await consumeOAuthResult(sessionId);
-        if (consumeRes.code === 200 && consumeRes.data) {
-          return consumeRes.data;
-        }
-        return null;
-      }
-    } catch {
-      // 网络错误，继续重试
-    }
-  }
-
-  return null;
+export function openWechatOAuth(): Promise<OAuthCallbackData | null> {
+  return openOAuthFlow(getWechatAuthorizeUrl);
 }
 
 /**
  * 使用默认浏览器打开 Gitee OAuth 登录，轮询服务端获取结果。
  * @returns OAuth 回调结果；超时或失败返回 null。
  */
-export async function openGiteeOAuth(): Promise<OAuthCallbackData | null> {
-  const urlResult = await getGiteeAuthorizeUrl();
-  if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
-    return null;
-  }
-
-  const sessionId = generateSessionId();
-  const authorizeUrl = urlResult.data.authorizeUrl;
-  const separator = authorizeUrl.includes('?') ? '&' : '?';
-  const urlWithState = `${authorizeUrl}${separator}state=${sessionId}`;
-
-  await window.api.clipboardOpenUrl(urlWithState);
-
-  for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-
-    try {
-      const pollRes = await pollOAuthResult(sessionId);
-      if (pollRes.code === 200 && pollRes.data?.ready) {
-        const consumeRes = await consumeOAuthResult(sessionId);
-        if (consumeRes.code === 200 && consumeRes.data) {
-          return consumeRes.data;
-        }
-        return null;
-      }
-    } catch {
-      // 网络错误，继续重试
-    }
-  }
-
-  return null;
+export function openGiteeOAuth(): Promise<OAuthCallbackData | null> {
+  return openOAuthFlow(getGiteeAuthorizeUrl);
 }
 
 /**
  * 使用默认浏览器打开 KOOK OAuth 登录，轮询服务端获取结果。
  * @returns OAuth 回调结果；超时或失败返回 null。
  */
-export async function openKookOAuth(): Promise<OAuthCallbackData | null> {
-  const urlResult = await getKookAuthorizeUrl();
-  if (!urlResult.ok || !urlResult.data?.authorizeUrl) {
-    return null;
-  }
-
-  const sessionId = generateSessionId();
-  const authorizeUrl = urlResult.data.authorizeUrl;
-  const separator = authorizeUrl.includes('?') ? '&' : '?';
-  const urlWithState = `${authorizeUrl}${separator}state=${sessionId}`;
-
-  await window.api.clipboardOpenUrl(urlWithState);
-
-  for (let i = 0; i < POLL_MAX_ATTEMPTS; i++) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-
-    try {
-      const pollRes = await pollOAuthResult(sessionId);
-      if (pollRes.code === 200 && pollRes.data?.ready) {
-        const consumeRes = await consumeOAuthResult(sessionId);
-        if (consumeRes.code === 200 && consumeRes.data) {
-          return consumeRes.data;
-        }
-        return null;
-      }
-    } catch {
-      // 网络错误，继续重试
-    }
-  }
-
-  return null;
+export function openKookOAuth(): Promise<OAuthCallbackData | null> {
+  return openOAuthFlow(getKookAuthorizeUrl);
 }
