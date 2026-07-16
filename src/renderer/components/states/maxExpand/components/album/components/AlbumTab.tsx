@@ -26,48 +26,19 @@
  * @author 鸡哥
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { ChangeEvent, DragEvent, ReactElement, WheelEvent } from 'react';
+import { useEffect, useMemo } from 'react';
+import type { ChangeEvent, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
-import { resolveBgMediaPreviewUrl } from '../../../../../config/dynamicIslandBackgroundMedia';
-import type { AlbumFilterMode, AlbumGroupMode, AlbumItem, AlbumMeta, AlbumSortMode, IslandBgMediaConfig } from '../types/albumTypes';
-import {
-  COLUMNS_STORE_KEY,
-  DEFAULT_COLUMNS,
-  GROUP_MODE_STORE_KEY,
-  ISLAND_BG_IMAGE_STORE_KEY,
-  ISLAND_BG_MEDIA_STORE_KEY,
-  LOCAL_ISLAND_BG_SYNC_EVENT,
-  LOCAL_STORAGE_KEY,
-  MEDIA_LOAD_DELAY_MS,
-  MAX_COLUMNS,
-  MIN_COLUMNS,
-  SORT_STORE_KEY,
-  STORE_KEY,
-  SUPPORTED_EXTS,
-  ZOOM_MAX,
-  ZOOM_MIN,
-  ZOOM_STEP,
-} from '../types/albumTypes';
-import {
-  clampColumns,
-  estimateBytesFromDataUrl,
-  formatBytes,
-  formatDateGroup,
-  formatDuration,
-  formatTimestamp,
-  getFolderName,
-  getMediaTypeByExt,
-  getParentFolder,
-  getVideoMimeByExt,
-  guessVideoCodecByExt,
-  parseJpegExif,
-  persistAlbumItems,
-  revokeBlobUrl,
-  sanitizeAlbumItems,
-  sortAlbumItems,
-} from '../utils/albumUtils';
+import { MAX_COLUMNS, MIN_COLUMNS, SUPPORTED_EXTS, ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../types/albumTypes';
+import type { AlbumItem } from '../types/albumTypes';
+import { formatBytes, formatDuration, formatTimestamp } from '../utils/albumUtils';
+import { useAlbumItems } from '../hooks/useAlbumItems';
+import { useAlbumViewer } from '../hooks/useAlbumViewer';
+import { useAlbumViewerActions } from '../hooks/useAlbumViewerActions';
+import { useAlbumSelection } from '../hooks/useAlbumSelection';
+import { useAlbumGridConfig } from '../hooks/useAlbumGridConfig';
+import { useAlbumDrag } from '../hooks/useAlbumDrag';
 
 function AlbumControlIcon({ src }: { src: string }): ReactElement {
   return <img className="album-svg-icon-img" src={src} alt="" aria-hidden="true" draggable={false} />;
@@ -78,749 +49,74 @@ function AlbumControlIcon({ src }: { src: string }): ReactElement {
  * @description 提供总览、单图放大、元数据侧栏与基础 EXIF 解析等能力。
  */
 export function AlbumTab(): ReactElement {
-  const { t, i18n } = useTranslation();
-  const [items, setItems] = useState<AlbumItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [mediaLoadReady, setMediaLoadReady] = useState(false);
-  const [columns, setColumns] = useState<number>(DEFAULT_COLUMNS);
-  const [sortMode, setSortMode] = useState<AlbumSortMode>('addedDesc');
-  const [filterMode, setFilterMode] = useState<AlbumFilterMode>('all');
-  const [groupMode, setGroupMode] = useState<AlbumGroupMode>('none');
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
-  const [selectMode, setSelectMode] = useState(false);
-  const [activeId, setActiveId] = useState<number | null>(null);
-  const [zoom, setZoom] = useState<number>(1);
-  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [dragOverPage, setDragOverPage] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string>('');
-  const [videoPlaying, setVideoPlaying] = useState<boolean>(true);
-  const [videoMuted, setVideoMuted] = useState<boolean>(true);
-  const [videoVolume, setVideoVolume] = useState<number>(0.6);
-  const [videoCurrentTime, setVideoCurrentTime] = useState<number>(0);
-  const [videoDuration, setVideoDuration] = useState<number>(0);
-  const [videoControlsCollapsed, setVideoControlsCollapsed] = useState<boolean>(false);
-  const [viewerSlideDir, setViewerSlideDir] = useState<'prev' | 'next'>('next');
-  const [metaCache, setMetaCache] = useState<Record<number, AlbumMeta>>({});
-  const metaCacheRef = useRef<Record<number, AlbumMeta>>({});
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const gridVideoRefs = useRef<Record<number, HTMLVideoElement | null>>({});
-  const viewerVideoRef = useRef<HTMLVideoElement | null>(null);
-  const metaLoadingRef = useRef<Set<number>>(new Set());
-  const exifLoadingRef = useRef<Set<number>>(new Set());
-  const panStartRef = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  const { t } = useTranslation();
 
-  /** 初次加载持久化数据 */
-  useEffect(() => {
-    let cancelled = false;
-    Promise.all([
-      window.api.storeRead(STORE_KEY).catch(() => null),
-      window.api.storeRead(COLUMNS_STORE_KEY).catch(() => null),
-      window.api.storeRead(SORT_STORE_KEY).catch(() => null),
-      window.api.storeRead(GROUP_MODE_STORE_KEY).catch(() => null),
-    ]).then(([rawItems, rawColumns, rawSort, rawGroupMode]) => {
-      if (cancelled) return;
-      let parsed: AlbumItem[] = [];
-      if (Array.isArray(rawItems) && rawItems.length > 0) {
-        parsed = sanitizeAlbumItems(rawItems);
-      } else {
-        try {
-          const local = localStorage.getItem(LOCAL_STORAGE_KEY);
-          if (local) parsed = sanitizeAlbumItems(JSON.parse(local) as unknown);
-        } catch { /* noop */ }
-      }
-      setItems(parsed);
-      setColumns(clampColumns(rawColumns));
-      if (rawSort === 'addedDesc' || rawSort === 'addedAsc' || rawSort === 'nameAsc' || rawSort === 'nameDesc' || rawSort === 'durationDesc' || rawSort === 'durationAsc') {
-        setSortMode(rawSort);
-      }
-      if (rawGroupMode === 'none' || rawGroupMode === 'folder' || rawGroupMode === 'date') {
-        setGroupMode(rawGroupMode);
-      }
-      setLoaded(true);
-    }).catch(() => {
-      if (cancelled) return;
-      setLoaded(true);
-    });
-    return () => { cancelled = true; };
-  }, []);
+  /* ── Hook: 条目管理（初始化加载 + CRUD + 元数据） ── */
+  const {
+    items, loaded, metaCache, statusMessage, setStatusMessage,
+    fileInputRef, gridVideoRefs, initColumns, initSortMode, initGroupMode,
+    loadExifIfNeeded, handleAddFiles, handleRemove, handleRemoveSelected,
+    handleThumbMouseEnter, handleThumbMouseLeave,
+  } = useAlbumItems();
 
-  /** 延迟触发媒体加载，避免从 Expand 切到 MaxExpand 时动画被 IO/解码阻塞 */
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setMediaLoadReady(true);
-    }, MEDIA_LOAD_DELAY_MS);
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, []);
+  /* ── Hook: 网格配置（列数、排序、筛选、分组 + 持久化） ── */
+  const {
+    columns, sortMode, filterMode, groupMode, filteredItems, groupedItems,
+    handleColumnsChange, handleSortChange, handleFilterModeChange, handleGroupModeChange,
+  } = useAlbumGridConfig(items, metaCache, loaded, initColumns, initSortMode, initGroupMode);
 
-  /** 持久化条目变更 */
-  useEffect(() => {
-    if (!loaded) return;
-    persistAlbumItems(items);
-  }, [items, loaded]);
+  /* ── Hook: 查看器（缩放、平移、视频播放、键盘导航） ── */
+  const viewer = useAlbumViewer(items, filteredItems, metaCache);
+  const {
+    activeId, setActiveId, zoom, pan, isPanning, viewerSlideDir,
+    videoPlaying, videoMuted, videoVolume, videoCurrentTime, videoDuration, videoControlsCollapsed,
+    viewerVideoRef, activeItem, activeMeta, activeIsVideo, activeVideoUrl,
+    navigateInViewer, handleOpenItem, handleViewerWheel, handleViewerMouseDown, handleViewerMouseMove, handleViewerMouseUp,
+    handleVideoLoadedMetadata, handleVideoTimeUpdate, handleToggleVideoPlay, handleVideoSeek,
+    handleToggleVideoMute, handleVideoVolumeChange, handleToggleVideoControls, handleZoom, handleResetZoom, handleVideoEnded,
+  } = viewer;
 
-  /** 持久化列数 */
-  useEffect(() => {
-    if (!loaded) return;
-    window.api.storeWrite(COLUMNS_STORE_KEY, columns).catch(() => { });
-  }, [columns, loaded]);
+  /* ── Hook: 查看器工具栏动作 ── */
+  const { handleOpenInExplorer, handleSaveAs, handleSetAsIslandBackground } = useAlbumViewerActions(activeMeta, setStatusMessage);
 
-  /** 持久化排序模式 */
-  useEffect(() => {
-    if (!loaded) return;
-    window.api.storeWrite(SORT_STORE_KEY, sortMode).catch(() => { });
-  }, [sortMode, loaded]);
+  /* ── Hook: 多选 ── */
+  const {
+    selectedIds, selectMode, selectedCount, allVisibleSelected,
+    handleToggleItemSelection, handleSelectAllVisible, handleClearSelection, handleToggleSelectMode,
+  } = useAlbumSelection(items, filteredItems);
 
-  /** 持久化浏览模式 */
-  useEffect(() => {
-    if (!loaded) return;
-    window.api.storeWrite(GROUP_MODE_STORE_KEY, groupMode).catch(() => { });
-  }, [groupMode, loaded]);
+  /* ── Hook: 拖拽导入 ── */
+  const { dragOverPage, handleDragOver, handleDragLeave, handleDrop } = useAlbumDrag(handleAddFiles);
 
-  useEffect(() => {
-    setSelectedIds((prev) => {
-      if (prev.size === 0) return prev;
-      const existing = new Set(items.map((item) => item.id));
-      const next = new Set<number>();
-      prev.forEach((id) => {
-        if (existing.has(id)) next.add(id);
-      });
-      return next.size === prev.size ? prev : next;
-    });
-  }, [items]);
-
-  /** 状态信息自动消失 */
-  useEffect(() => {
-    if (!statusMessage) return;
-    const timer = window.setTimeout(() => setStatusMessage(''), 2400);
-    return () => window.clearTimeout(timer);
-  }, [statusMessage]);
-
-  useEffect(() => {
-    metaCacheRef.current = metaCache;
-  }, [metaCache]);
-
-  useEffect(() => {
-    return () => {
-      Object.values(metaCacheRef.current).forEach((meta) => revokeBlobUrl(meta.videoUrl));
-    };
-  }, []);
-
-  useEffect(() => {
-    if (activeId === null) return;
-    const target = items.find((it) => it.id === activeId);
-    if (!target || target.mediaType !== 'video') return;
-    setVideoPlaying(true);
-    setVideoMuted(true);
-    setVideoVolume(0.6);
-    setVideoCurrentTime(0);
-    setVideoDuration(0);
-    setVideoControlsCollapsed(false);
-  }, [activeId, items]);
-
-  useEffect(() => {
-    const el = viewerVideoRef.current;
-    if (!el) return;
-    el.muted = videoMuted;
-  }, [videoMuted]);
-
-  useEffect(() => {
-    const el = viewerVideoRef.current;
-    if (!el) return;
-    el.volume = Math.max(0, Math.min(1, videoVolume));
-  }, [videoVolume]);
-
-  /** 主动加载媒体元数据（图像/视频） */
-  const loadItemMeta = useCallback((item: AlbumItem): void => {
-    if (metaLoadingRef.current.has(item.id)) return;
-    metaLoadingRef.current.add(item.id);
-    setMetaCache((prev) => ({ ...prev, [item.id]: { ...prev[item.id], loading: true } }));
-    if (item.mediaType === 'video') {
-      window.api.readLocalFileAsBuffer(item.path).then((buf) => {
-        if (!buf) throw new Error('video buffer read failed');
-        const mime = getVideoMimeByExt(item.ext);
-        const arrayBuffer = new ArrayBuffer(buf.byteLength);
-        new Uint8Array(arrayBuffer).set(buf);
-        const blobUrl = URL.createObjectURL(new Blob([arrayBuffer], { type: mime }));
-        const probe = document.createElement('video');
-        probe.preload = 'metadata';
-        probe.muted = true;
-        probe.playsInline = true;
-        probe.onloadedmetadata = () => {
-          setMetaCache((prev) => {
-            const previousVideoUrl = prev[item.id]?.videoUrl;
-            if (previousVideoUrl && previousVideoUrl !== blobUrl) {
-              revokeBlobUrl(previousVideoUrl);
-            }
-            return {
-              ...prev,
-              [item.id]: {
-                ...prev[item.id],
-                videoUrl: blobUrl,
-                width: probe.videoWidth,
-                height: probe.videoHeight,
-                durationSec: Number.isFinite(probe.duration) ? probe.duration : 0,
-                sizeBytes: buf.byteLength,
-                videoCodec: guessVideoCodecByExt(item.ext),
-                loading: false,
-                loadFailed: false,
-              },
-            };
-          });
-        };
-        probe.onerror = () => {
-          revokeBlobUrl(blobUrl);
-          setMetaCache((prev) => ({
-            ...prev,
-            [item.id]: {
-              ...prev[item.id],
-              loading: false,
-              loadFailed: true,
-            },
-          }));
-        };
-        probe.src = blobUrl;
-      }).catch(() => {
-        setMetaCache((prev) => ({
-          ...prev,
-          [item.id]: {
-            ...prev[item.id],
-            loading: false,
-            loadFailed: true,
-          },
-        }));
-      }).finally(() => {
-        metaLoadingRef.current.delete(item.id);
-      });
-      return;
-    }
-    window.api.loadWallpaperFile(item.path).then((dataUrl) => {
-      if (!dataUrl) {
-        setMetaCache((prev) => ({ ...prev, [item.id]: { ...prev[item.id], loading: false, loadFailed: true } }));
-        return;
-      }
-      const sizeBytes = estimateBytesFromDataUrl(dataUrl);
-      const probe = new Image();
-      probe.onload = () => {
-        setMetaCache((prev) => ({
-          ...prev,
-          [item.id]: {
-            ...prev[item.id],
-            dataUrl,
-            sizeBytes,
-            width: probe.naturalWidth,
-            height: probe.naturalHeight,
-            loading: false,
-            loadFailed: false,
-          },
-        }));
-      };
-      probe.onerror = () => {
-        setMetaCache((prev) => ({
-          ...prev,
-          [item.id]: {
-            ...prev[item.id],
-            dataUrl,
-            sizeBytes,
-            loading: false,
-            loadFailed: false,
-          },
-        }));
-      };
-      probe.src = dataUrl;
-    }).catch(() => {
-      setMetaCache((prev) => ({ ...prev, [item.id]: { ...prev[item.id], loading: false, loadFailed: true } }));
-    }).finally(() => {
-      metaLoadingRef.current.delete(item.id);
-    });
-  }, []);
-
-  /** 异步加载 JPEG 的 EXIF 信息（仅在单图视图时触发） */
-  const loadExifIfNeeded = useCallback((item: AlbumItem): void => {
-    if (item.mediaType !== 'image') return;
-    if (item.ext !== 'jpg' && item.ext !== 'jpeg') return;
-    if (exifLoadingRef.current.has(item.id)) return;
-    if (metaCache[item.id]?.exif) return;
-    exifLoadingRef.current.add(item.id);
-    window.api.readLocalFileAsBuffer(item.path).then((buf) => {
-      if (!buf) return;
-      const exif = parseJpegExif(buf);
-      if (exif) {
-        setMetaCache((prev) => ({
-          ...prev,
-          [item.id]: { ...prev[item.id], exif },
-        }));
-      }
-    }).catch(() => { }).finally(() => {
-      exifLoadingRef.current.delete(item.id);
-    });
-  }, [metaCache]);
-
-  /** 已排序的条目列表 */
-  const sortedItems = useMemo(() => sortAlbumItems(items, sortMode, metaCache), [items, sortMode, metaCache]);
-  const filteredItems = useMemo(() => {
-    if (filterMode === 'image') return sortedItems.filter((item) => item.mediaType === 'image');
-    if (filterMode === 'video') return sortedItems.filter((item) => item.mediaType === 'video');
-    return sortedItems;
-  }, [sortedItems, filterMode]);
-  const groupedItems = useMemo(() => {
-    if (groupMode === 'none') {
-      return [{ key: 'all', title: t('albumTab.group.all'), subtitle: '', items: filteredItems }];
-    }
-    const groups = new Map<string, { key: string; title: string; subtitle: string; items: AlbumItem[] }>();
-    filteredItems.forEach((item) => {
-      const key = groupMode === 'folder'
-        ? getParentFolder(item.path)
-        : formatDateGroup(item.addedAt, i18n.language || navigator.language || 'zh-CN');
-      const fallbackTitle = groupMode === 'folder' ? t('albumTab.group.unknownFolder') : t('albumTab.group.unknownDate');
-      const title = key === '-' ? fallbackTitle : (groupMode === 'folder' ? getFolderName(key) : key);
-      const subtitle = groupMode === 'folder' && key !== '-' ? key : '';
-      const existing = groups.get(key);
-      if (existing) {
-        existing.items.push(item);
-      } else {
-        groups.set(key, { key, title, subtitle, items: [item] });
-      }
-    });
-    return Array.from(groups.values());
-  }, [filteredItems, groupMode, i18n.language, t]);
-
-  /** 缩略图为可见时按需加载 dataUrl */
-  useEffect(() => {
-    if (!loaded || !mediaLoadReady || items.length === 0) return;
-    items.forEach((item) => {
-      const meta = metaCache[item.id];
-      const hasPreview = item.mediaType === 'video' ? Boolean(meta?.videoUrl) : Boolean(meta?.dataUrl);
-      if (!meta || (!hasPreview && !meta.loading && !meta.loadFailed)) {
-        loadItemMeta(item);
-      }
-    });
-  }, [items, metaCache, loaded, mediaLoadReady, loadItemMeta]);
-
-  /** 进入单图视图时加载对应 EXIF */
+  /* ── 进入单图视图时加载对应 EXIF ── */
   useEffect(() => {
     if (activeId === null) return;
     const target = items.find((it) => it.id === activeId);
     if (target) loadExifIfNeeded(target);
   }, [activeId, items, loadExifIfNeeded]);
 
-  /** 单图视图的快捷键：ESC 退出，方向键切换 */
-  useEffect(() => {
-    if (activeId === null) return;
-    const handler = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') {
-        setActiveId(null);
-        return;
-      }
-      if (event.key === 'ArrowLeft') {
-        navigateInViewer(-1);
-      } else if (event.key === 'ArrowRight') {
-        navigateInViewer(1);
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-    // navigateInViewer 不是依赖（在闭包中读取最新值通过 ref 不必要）
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeId, filteredItems]);
+  /* ── 编排：批量删除（联动 activeId 清理） ── */
+  const onRemoveSelected = (): void => {
+    if (selectedIds.size === 0) return;
+    if (activeId !== null && selectedIds.has(activeId)) setActiveId(null);
+    handleRemoveSelected(selectedIds);
+    handleClearSelection();
+  };
 
-  /**
-   * 在单图视图按方向切换图片
-   * @param delta - 步进方向（-1 上一张，1 下一张）
-   */
-  function navigateInViewer(delta: number): void {
-    if (activeId === null || filteredItems.length === 0) return;
-    const idx = filteredItems.findIndex((it) => it.id === activeId);
-    if (idx < 0) return;
-    const nextIdx = (idx + delta + filteredItems.length) % filteredItems.length;
-    setViewerSlideDir(delta < 0 ? 'prev' : 'next');
-    setActiveId(filteredItems[nextIdx].id);
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  }
-
-  /** 处理选择 / 拖拽进入的 File 列表 */
-  const handleAddFiles = useCallback((files: FileList | File[] | null): void => {
-    if (!files) return;
-    const list = Array.from(files);
-    if (list.length === 0) return;
-    const additions: AlbumItem[] = [];
-    list.forEach((file) => {
-      const path = window.api?.getPathForFile?.(file) || '';
-      if (!path) return;
-      const dotIdx = path.lastIndexOf('.');
-      const ext = (dotIdx >= 0 ? path.slice(dotIdx + 1) : '').toLowerCase();
-      if (!ext || !SUPPORTED_EXTS.includes(ext)) return;
-      const mediaType = getMediaTypeByExt(ext);
-      if (!mediaType) return;
-      const sepIdx = Math.max(path.lastIndexOf('\\'), path.lastIndexOf('/'));
-      const name = sepIdx >= 0 ? path.slice(sepIdx + 1) : path;
-      const addedAt = Date.now() + additions.length;
-      additions.push({ id: addedAt, path, name, ext, mediaType, addedAt });
-    });
-    if (additions.length === 0) {
-      setStatusMessage(t('albumTab.status.unsupportedOnly'));
-      return;
-    }
-    setItems((prev) => {
-      const existing = new Set(prev.map((it) => it.path.toLowerCase()));
-      const filtered = additions.filter((it) => !existing.has(it.path.toLowerCase()));
-      if (filtered.length === 0) {
-        setStatusMessage(t('albumTab.status.allDuplicated'));
-        return prev;
-      }
-      setStatusMessage(t('albumTab.status.added', { count: filtered.length }));
-      return [...filtered, ...prev];
-    });
-  }, [t]);
-
-  /** 选择按钮触发的 input change 处理 */
+  /* ── 简单 handler ── */
   const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
     handleAddFiles(event.target.files);
     event.target.value = '';
   };
-
-  /** 触发隐藏的 file input */
-  const handlePickFiles = (): void => {
-    fileInputRef.current?.click();
-  };
-
-  /** 拖拽进入提示 */
-  const handleDragOver = (event: DragEvent<HTMLDivElement>): void => {
-    event.preventDefault();
-    if (!dragOverPage) setDragOverPage(true);
-  };
-
-  /** 拖拽离开 */
-  const handleDragLeave = (event: DragEvent<HTMLDivElement>): void => {
-    if (event.currentTarget === event.target) {
-      setDragOverPage(false);
-    }
-  };
-
-  /** 拖拽放下，导入图片 */
-  const handleDrop = (event: DragEvent<HTMLDivElement>): void => {
-    event.preventDefault();
-    setDragOverPage(false);
-    const files = event.dataTransfer?.files;
-    if (files) handleAddFiles(files);
-  };
-
-  /** 调整每行列数（限制范围） */
-  const handleColumnsChange = (delta: number): void => {
-    setColumns((prev) => clampColumns(prev + delta));
-  };
-
-  /** 切换排序模式 */
-  const handleSortChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const value = event.target.value;
-    if (value === 'addedDesc' || value === 'addedAsc' || value === 'nameAsc' || value === 'nameDesc' || value === 'durationDesc' || value === 'durationAsc') {
-      setSortMode(value);
-    }
-  };
-
-  const handleFilterModeChange = (mode: AlbumFilterMode): void => {
-    setFilterMode(mode);
-  };
-
-  const handleGroupModeChange = (mode: AlbumGroupMode): void => {
-    setGroupMode(mode);
-  };
-
-  const selectedCount = selectedIds.size;
-  const visibleSelectedCount = filteredItems.filter((item) => selectedIds.has(item.id)).length;
-  const allVisibleSelected = filteredItems.length > 0 && visibleSelectedCount === filteredItems.length;
-
-  const handleToggleItemSelection = (id: number): void => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
-  const handleSelectAllVisible = (): void => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (allVisibleSelected) {
-        filteredItems.forEach((item) => next.delete(item.id));
-      } else {
-        filteredItems.forEach((item) => next.add(item.id));
-      }
-      return next;
-    });
-  };
-
-  const handleClearSelection = (): void => {
-    setSelectedIds(new Set());
-  };
-
-  const handleToggleSelectMode = (): void => {
-    setSelectMode((prev) => {
-      if (prev) setSelectedIds(new Set());
-      return !prev;
-    });
-  };
-
-  const handleRemoveSelected = (): void => {
-    if (selectedIds.size === 0) return;
-    const idsToRemove = new Set(selectedIds);
-    setItems((prev) => prev.filter((item) => !idsToRemove.has(item.id)));
-    setMetaCache((prev) => {
-      const next = { ...prev };
-      idsToRemove.forEach((id) => {
-        revokeBlobUrl(next[id]?.videoUrl);
-        delete next[id];
-      });
-      return next;
-    });
-    if (activeId !== null && idsToRemove.has(activeId)) setActiveId(null);
-    setSelectedIds(new Set());
-    setStatusMessage(t('albumTab.status.removedSelected', { count: idsToRemove.size }));
-  };
-
-  /** 删除单个条目 */
-  const handleRemove = (id: number): void => {
-    setItems((prev) => prev.filter((it) => it.id !== id));
-    setMetaCache((prev) => {
-      const next = { ...prev };
-      revokeBlobUrl(next[id]?.videoUrl);
-      delete next[id];
-      return next;
-    });
-    setSelectedIds((prev) => {
-      if (!prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
-    if (activeId === id) setActiveId(null);
-  };
-
-  /** 单图视图：滚轮缩放 */
-  const handleViewerWheel = (event: WheelEvent<HTMLDivElement>): void => {
-    if (!activeItem || activeItem.mediaType !== 'image') return;
-    event.stopPropagation();
-    event.preventDefault();
-    setZoom((prev) => {
-      const next = event.deltaY > 0 ? prev - ZOOM_STEP : prev + ZOOM_STEP;
-      return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(next.toFixed(3))));
-    });
-  };
-
-  /** 单图视图：开始拖动 */
-  const handleViewerMouseDown = (event: React.MouseEvent<HTMLDivElement>): void => {
-    if (!activeItem || activeItem.mediaType !== 'image') return;
-    if (zoom <= 1) return;
-    setIsPanning(true);
-    panStartRef.current = {x: event.clientX, y: event.clientY, px: pan.x, py: pan.y};
-  };
-
-  /** 单图视图：拖动中 */
-  const handleViewerMouseMove = (event: React.MouseEvent<HTMLDivElement>): void => {
-    if (!isPanning || !panStartRef.current) return;
-    const dx = event.clientX - panStartRef.current.x;
-    const dy = event.clientY - panStartRef.current.y;
-    setPan({ x: panStartRef.current.px + dx, y: panStartRef.current.py + dy });
-  };
-
-  /** 单图视图：拖动结束 */
-  const handleViewerMouseUp = (): void => {
-    setIsPanning(false);
-    panStartRef.current = null;
-  };
-
-  const handleVideoLoadedMetadata = (): void => {
-    const el = viewerVideoRef.current;
-    if (!el) return;
-    setVideoDuration(Number.isFinite(el.duration) ? el.duration : 0);
-    setVideoCurrentTime(Number.isFinite(el.currentTime) ? el.currentTime : 0);
-    el.muted = videoMuted;
-    el.volume = Math.max(0, Math.min(1, videoVolume));
-    el.play().then(() => {
-      setVideoPlaying(true);
-    }).catch(() => {
-      setVideoPlaying(false);
-    });
-  };
-
-  const handleVideoTimeUpdate = (): void => {
-    const el = viewerVideoRef.current;
-    if (!el) return;
-    setVideoCurrentTime(Number.isFinite(el.currentTime) ? el.currentTime : 0);
-  };
-
-  const handleToggleVideoPlay = (): void => {
-    const el = viewerVideoRef.current;
-    if (!el) return;
-    if (el.paused) {
-      el.play().then(() => {
-        setVideoPlaying(true);
-      }).catch(() => {
-        setVideoPlaying(false);
-      });
-      return;
-    }
-    el.pause();
-    setVideoPlaying(false);
-  };
-
-  const handleVideoSeek = (event: ChangeEvent<HTMLInputElement>): void => {
-    const el = viewerVideoRef.current;
-    if (!el) return;
-    const next = Number(event.target.value);
-    if (!Number.isFinite(next)) return;
-    el.currentTime = next;
-    setVideoCurrentTime(next);
-  };
-
-  const handleToggleVideoMute = (): void => {
-    setVideoMuted((prev) => !prev);
-  };
-
-  const handleVideoVolumeChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const next = Number(event.target.value);
-    if (!Number.isFinite(next)) return;
-    const safe = Math.max(0, Math.min(1, next));
-    setVideoVolume(safe);
-    if (safe > 0 && videoMuted) {
-      setVideoMuted(false);
-    }
-  };
-
-  const handleToggleVideoControls = (): void => {
-    setVideoControlsCollapsed((prev) => !prev);
-  };
-
-  /** 单图视图：缩放按钮 */
-  const handleZoom = (delta: number): void => {
-    setZoom((prev) => {
-      const next = prev + delta;
-      return Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Number(next.toFixed(3))));
-    });
-  };
-
-  /** 单图视图：重置缩放与位置 */
-  const handleResetZoom = (): void => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-
-  /** 单图视图：1:1 显示 */
+  const handlePickFiles = (): void => { fileInputRef.current?.click(); };
   const handleOriginalZoom = (): void => {
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
+    handleResetZoom();
     setStatusMessage(t('albumTab.status.zoomReset'));
   };
 
-  /** 在系统资源管理器中定位当前图片 */
-  const handleOpenInExplorer = (item: AlbumItem): void => {
-    window.api.openInExplorer(item.path).then((ok) => {
-      if (!ok) {
-        setStatusMessage(t('albumTab.status.openInExplorerFailed', { name: item.name }));
-      }
-    }).catch(() => {
-      setStatusMessage(t('albumTab.status.openInExplorerFailed', { name: item.name }));
-    });
-  };
-
-  /** 将当前图片另存到用户指定位置 */
-  const handleSaveAs = (item: AlbumItem): void => {
-    window.api.saveImageAs(item.path).then((result) => {
-      if (result.ok && result.filePath) {
-        setStatusMessage(t('albumTab.status.saveAsSuccess', { name: item.name }));
-        return;
-      }
-      if (result.canceled) {
-        setStatusMessage(t('albumTab.status.saveAsCanceled'));
-        return;
-      }
-      setStatusMessage(t('albumTab.status.saveAsFailed', { name: item.name }));
-    }).catch(() => {
-      setStatusMessage(t('albumTab.status.saveAsFailed', { name: item.name }));
-    });
-  };
-
-  /** 将当前图片设为灵动岛背景图（复用设置页同一存储与同步机制） */
-  const handleSetAsIslandBackground = (item: AlbumItem): void => {
-    const media: IslandBgMediaConfig = {
-      type: item.mediaType,
-      source: item.path,
-    };
-    const previewPromise = item.mediaType === 'video'
-      ? resolveBgMediaPreviewUrl(media)
-      : (activeMeta?.dataUrl ? Promise.resolve(activeMeta.dataUrl) : window.api.loadWallpaperFile(item.path));
-
-    previewPromise.then((previewUrl) => {
-      if (!previewUrl) {
-        setStatusMessage(t('albumTab.status.setIslandBackgroundFailed'));
-        return;
-      }
-
-      window.dispatchEvent(new CustomEvent(LOCAL_ISLAND_BG_SYNC_EVENT, {
-        detail: {
-          media,
-          previewUrl,
-          image: previewUrl,
-        },
-      }));
-
-      Promise.all([
-        window.api.storeWrite(ISLAND_BG_MEDIA_STORE_KEY, media),
-        window.api.storeWrite(ISLAND_BG_IMAGE_STORE_KEY, item.mediaType === 'image' ? item.path : null),
-        window.api.settingsPreview('store:island-bg-media', media),
-        window.api.settingsPreview('store:island-bg-image', item.mediaType === 'image' ? item.path : null),
-      ]).then(() => {
-        setStatusMessage(t('albumTab.status.setIslandBackgroundSuccess', { name: item.name }));
-      }).catch(() => {
-        setStatusMessage(t('albumTab.status.setIslandBackgroundFailed'));
-      });
-    }).catch(() => {
-      setStatusMessage(t('albumTab.status.setIslandBackgroundFailed'));
-    });
-  };
-
-  /** 进入单图视图 */
-  const handleOpenItem = (item: AlbumItem): void => {
-    setViewerSlideDir('next');
-    setActiveId(item.id);
-    setZoom(1);
-    setPan({ x: 0, y: 0 });
-  };
-
-  const handleThumbMouseEnter = (item: AlbumItem): void => {
-    if (item.mediaType !== 'video') return;
-    const el = gridVideoRefs.current[item.id];
-    if (!el) return;
-    el.play().catch(() => {});
-  };
-
-  const handleThumbMouseLeave = (item: AlbumItem): void => {
-    if (item.mediaType !== 'video') return;
-    const el = gridVideoRefs.current[item.id];
-    if (!el) return;
-    el.pause();
-    el.currentTime = 0;
-  };
-
   const totalCount = items.length;
-  const activeItem = useMemo(
-    () => (activeId === null ? null : items.find((it) => it.id === activeId) ?? null),
-    [activeId, items],
-  );
-  const activeMeta = activeItem ? metaCache[activeItem.id] : undefined;
-  const activeIsVideo = activeItem?.mediaType === 'video';
-  const activeVideoUrl = activeItem && activeIsVideo
-    ? (activeMeta?.videoUrl || null)
-    : null;
 
-  const sortOptions = useMemo<Array<{ value: AlbumSortMode; label: string }>>(() => ([
+  const sortOptions = useMemo<Array<{ value: string; label: string }>>(() => ([
     { value: 'addedDesc', label: t('albumTab.sort.addedDesc') },
     { value: 'addedAsc', label: t('albumTab.sort.addedAsc') },
     { value: 'nameAsc', label: t('albumTab.sort.nameAsc') },
@@ -915,7 +211,7 @@ export function AlbumTab(): ReactElement {
             <select
               className="album-sort-select"
               value={sortMode}
-              onChange={handleSortChange}
+              onChange={(e) => handleSortChange(e.target.value)}
               aria-label={t('albumTab.sort.label')}
             >
               {sortOptions.map((option) => (
@@ -1181,7 +477,7 @@ export function AlbumTab(): ReactElement {
                         preload="metadata"
                         onLoadedMetadata={handleVideoLoadedMetadata}
                         onTimeUpdate={handleVideoTimeUpdate}
-                        onEnded={() => setVideoPlaying(false)}
+                        onEnded={handleVideoEnded}
                       />
                       <div className={`album-video-controls${videoControlsCollapsed ? ' album-video-controls--collapsed' : ''}`}>
                         <button
@@ -1407,7 +703,7 @@ export function AlbumTab(): ReactElement {
         <button
           className="album-selection-bar-btn album-selection-bar-btn--danger"
           type="button"
-          onClick={handleRemoveSelected}
+          onClick={onRemoveSelected}
           disabled={selectedCount === 0}
           tabIndex={selectMode ? 0 : -1}
         >
