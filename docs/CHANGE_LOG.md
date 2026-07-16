@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-15T16:27:33.341Z
+> 生成时间：2026-07-16T09:26:44.938Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,28 @@
 
 ## Unreleased
 
+- 2026-07-16 | eefe6a5c | 鸡哥 | Merge pull request #150 from JNTMTMTM/dev
+- 2026-07-16 | db6c1f4b | 鸡哥 | refactor(cli): update eventFilter type to CliEventFilter for improved type safety
+- 2026-07-16 | bd9637fe | 鸡哥 | feat(album): add index file for Album module with export for AlarmTab component
+- 2026-07-16 | 601219b9 | 鸡哥 | refactor(album): consolidate hook return types and improve type imports for better clarity and organization
+- 2026-07-16 | 89e91f5e | 鸡哥 | refactor(album): migrate constants and types to albumConfig for better organization
+- 2026-07-16 | 0b28f4d6 | 鸡哥 | feat(album): enhance AlbumTab component with improved hooks and file handling functionality
+- 2026-07-16 | 55afc92b | 鸡哥 | refactor(album): streamline component props by consolidating types for AlbumGridItem, AlbumHeader, AlbumMetaPanel, AlbumOverview, and AlbumSelectionBar
+- 2026-07-16 | e291107c | 鸡哥 | feat(album): refactor AlbumTab component and add AlbumHeader and AlbumOverview components for improved structure and functionality
+- 2026-07-16 | bd521969 | 鸡哥 | feat(album): add album viewer, selection bar, grid item, and meta panel components
+- 2026-07-16 | 4168aefd | 鸡哥 | fix: update import path for resolveBgMediaPreviewUrl in useAlbumViewerActions hook
+- 2026-07-16 | c276f06a | 鸡哥 | feat(album): add hooks for album management and viewer functionality
+- 2026-07-16 | aa6674a9 | 鸡哥 | feat(album): refactor album module by creating separate types and utility functions for better organization and maintainability
+- 2026-07-16 | 62933357 | 鸡哥 | feat(album): add initial album component structure
+- 2026-07-16 | 349310c1 | 鸡哥 | refactor: move AlarmEditorProps interface to a new file for better organization
+- 2026-07-16 | dcbc0ee5 | 鸡哥 | refactor: create AlarmSidebar component to streamline AlarmTab structure and improve readability
+- 2026-07-16 | b77c34d5 | 鸡哥 | refactor: create EventStreamPanel component to enhance CLI tab structure and functionality
+- 2026-07-16 | 8ee6ce79 | 鸡哥 | refactor: restructure CLI components and hooks for improved organization and functionality
+- 2026-07-16 | 10ce34b5 | 鸡哥 | refactor: move event constants to cliConstants.ts for better organization
+- 2026-07-16 | 2b664394 | 鸡哥 | refactor: simplify ActivityHeatmap component by utilizing custom hooks for grid and scroll management
+- 2026-07-16 | fcdce5e8 | 鸡哥 | refactor: update ActivityHeatmap types and props for improved clarity and structure
+- 2026-07-16 | 91363604 | 鸡哥 | refactor: reorganize type imports and remove deprecated config/types.ts
+- 2026-07-15 | 6446d1ab | eislandBot | docs: auto update CHANGE_LOG.md for #149 by @JNTMTMTM [skip ci]
 - 2026-07-16 | cb6160af | 鸡哥 | Merge pull request #149 from JNTMTMTM/dev
 - 2026-07-16 | 1cbcb4f2 | 鸡哥 | refactor: update type imports in ChatInputBar for improved clarity and consistency
 - 2026-07-16 | 18ab0b2c | 鸡哥 | refactor: update props in AiChatTab and ChatInputBar, remove unused sessionId in WebAccessPanel, enhance attachment validation in useChatSend
