@@ -18,6 +18,8 @@
  * GNU General Public License for more details.
  */
 
+import { UseAlbumViewerReturn } from "../hooks/useAlbumViewer";
+
 /**
  * @file albumTypes.ts
  * @description 相册模块常量与类型定义。
@@ -130,4 +132,21 @@ export interface AlbumExifData {
   iso?: number;
   /** 焦距（mm） */
   focalLength?: number;
+}
+
+export interface AlbumViewerProps {
+  /** useAlbumViewer hook 返回值 */
+  viewer: UseAlbumViewerReturn;
+  /** 筛选后条目数（导航按钮禁用判断） */
+  filteredCount: number;
+  /** 返回总览 */
+  onBack: () => void;
+  /** 原始缩放 */
+  onOriginalZoom: () => void;
+  /** 资源管理器定位 */
+  onOpenInExplorer: (item: AlbumItem) => void;
+  /** 另存为 */
+  onSaveAs: (item: AlbumItem) => void;
+  /** 设为灵动岛背景 */
+  onSetAsIslandBackground: (item: AlbumItem) => void;
 }

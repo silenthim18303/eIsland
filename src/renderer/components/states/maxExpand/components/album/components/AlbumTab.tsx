@@ -20,29 +20,25 @@
 
 /**
  * @file AlbumTab.tsx
- * @description 最大展开模式相册页：支持本地图片导入、总览（每行列数可调）、
- *   单图放大查看、元数据侧栏与基础 EXIF 解析、清空与排序，预留资源管理器
- *   定位与另存为入口。
+ * @description 最大展开模式相册页主组件：仅负责 hook 调用、跨 hook 编排与组件组合。
  * @author 鸡哥
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import type { ChangeEvent, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MAX_COLUMNS, MIN_COLUMNS, SUPPORTED_EXTS } from '../types/albumTypes';
+import { SUPPORTED_EXTS } from '../types/albumTypes';
 import { useAlbumItems } from '../hooks/useAlbumItems';
 import { useAlbumViewer } from '../hooks/useAlbumViewer';
 import { useAlbumViewerActions } from '../hooks/useAlbumViewerActions';
 import { useAlbumSelection } from '../hooks/useAlbumSelection';
 import { useAlbumGridConfig } from '../hooks/useAlbumGridConfig';
 import { useAlbumDrag } from '../hooks/useAlbumDrag';
-import { AlbumGridItem } from './AlbumGridItem';
+import { AlbumHeader } from './AlbumHeader';
+import { AlbumOverview } from './AlbumOverview';
 import { AlbumViewer } from './AlbumViewer';
 import { AlbumSelectionBar } from './AlbumSelectionBar';
 
-/**
- * 相册页主组件。
- */
 export function AlbumTab(): ReactElement {
   const { t } = useTranslation();
 
@@ -64,7 +60,7 @@ export function AlbumTab(): ReactElement {
   const viewer = useAlbumViewer(items, filteredItems, metaCache);
   const { activeId, setActiveId } = viewer;
 
-  /* ── Hook: 查看器工具栏动作 ── */
+  /* ── Hook: 查看器动作 ── */
   const { handleOpenInExplorer, handleSaveAs, handleSetAsIslandBackground } = useAlbumViewerActions(viewer.activeMeta, setStatusMessage);
 
   /* ── Hook: 多选 ── */
@@ -76,14 +72,14 @@ export function AlbumTab(): ReactElement {
   /* ── Hook: 拖拽导入 ── */
   const { dragOverPage, handleDragOver, handleDragLeave, handleDrop } = useAlbumDrag(handleAddFiles);
 
-  /* ── 进入单图视图时加载对应 EXIF ── */
+  /* ── 进入单图视图时加载 EXIF ── */
   useEffect(() => {
     if (activeId === null) return;
     const target = items.find((it) => it.id === activeId);
     if (target) loadExifIfNeeded(target);
   }, [activeId, items, loadExifIfNeeded]);
 
-  /* ── 编排：批量删除 ── */
+  /* ── 编排：批量删除（联动 activeId 清理） ── */
   const onRemoveSelected = (): void => {
     if (selectedIds.size === 0) return;
     if (activeId !== null && selectedIds.has(activeId)) setActiveId(null);
@@ -102,17 +98,6 @@ export function AlbumTab(): ReactElement {
     setStatusMessage(t('albumTab.status.zoomReset'));
   };
 
-  const totalCount = items.length;
-
-  const sortOptions = useMemo<Array<{ value: string; label: string }>>(() => ([
-    { value: 'addedDesc', label: t('albumTab.sort.addedDesc') },
-    { value: 'addedAsc', label: t('albumTab.sort.addedAsc') },
-    { value: 'nameAsc', label: t('albumTab.sort.nameAsc') },
-    { value: 'nameDesc', label: t('albumTab.sort.nameDesc') },
-    { value: 'durationDesc', label: t('albumTab.sort.durationDesc') },
-    { value: 'durationAsc', label: t('albumTab.sort.durationAsc') },
-  ]), [t]);
-
   return (
     <div
       className={`album-tab${dragOverPage ? ' album-tab--drag-over' : ''}`}
@@ -120,121 +105,24 @@ export function AlbumTab(): ReactElement {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      {/* 头部 */}
-      <div className="album-header">
-        <div className="album-header-main">
-          <span className="album-title">{t('albumTab.title')}</span>
-          <span className="album-count">
-            {t('albumTab.count', { count: totalCount })}
-          </span>
-        </div>
-        <div className="album-header-actions">
-          <label className="album-sort">
-            <span className="album-sort-label">{t('albumTab.sort.label')}</span>
-            <select
-              className="album-sort-select"
-              value={sortMode}
-              onChange={(e) => handleSortChange(e.target.value)}
-              aria-label={t('albumTab.sort.label')}
-            >
-              {sortOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-          <div className="album-filter-group" role="group" aria-label={t('albumTab.filter.label')}>
-            <button
-              className={`album-filter-btn${filterMode === 'all' ? ' album-filter-btn--active' : ''}`}
-              type="button"
-              onClick={() => handleFilterModeChange('all')}
-            >
-              {t('albumTab.filter.all')}
-            </button>
-            <button
-              className={`album-filter-btn${filterMode === 'image' ? ' album-filter-btn--active' : ''}`}
-              type="button"
-              onClick={() => handleFilterModeChange('image')}
-            >
-              {t('albumTab.filter.image')}
-            </button>
-            <button
-              className={`album-filter-btn${filterMode === 'video' ? ' album-filter-btn--active' : ''}`}
-              type="button"
-              onClick={() => handleFilterModeChange('video')}
-            >
-              {t('albumTab.filter.video')}
-            </button>
-          </div>
-          <div className="album-filter-group" role="group" aria-label={t('albumTab.group.label')}>
-            <button
-              className={`album-filter-btn${groupMode === 'none' ? ' album-filter-btn--active' : ''}`}
-              type="button"
-              onClick={() => handleGroupModeChange('none')}
-            >
-              {t('albumTab.group.none')}
-            </button>
-            <button
-              className={`album-filter-btn${groupMode === 'folder' ? ' album-filter-btn--active' : ''}`}
-              type="button"
-              onClick={() => handleGroupModeChange('folder')}
-            >
-              {t('albumTab.group.folder')}
-            </button>
-            <button
-              className={`album-filter-btn${groupMode === 'date' ? ' album-filter-btn--active' : ''}`}
-              type="button"
-              onClick={() => handleGroupModeChange('date')}
-            >
-              {t('albumTab.group.date')}
-            </button>
-          </div>
-          <div className="album-columns" aria-label={t('albumTab.columns.aria')}>
-            <button
-              className="album-icon-btn"
-              type="button"
-              onClick={() => handleColumnsChange(-1)}
-              disabled={columns <= MIN_COLUMNS}
-              title={t('albumTab.columns.smaller')}
-              aria-label={t('albumTab.columns.smaller')}
-            >
-              −
-            </button>
-            <span className="album-columns-value">{columns}</span>
-            <button
-              className="album-icon-btn"
-              type="button"
-              onClick={() => handleColumnsChange(1)}
-              disabled={columns >= MAX_COLUMNS}
-              title={t('albumTab.columns.larger')}
-              aria-label={t('albumTab.columns.larger')}
-            >
-              +
-            </button>
-          </div>
-          <button
-            className="album-primary-btn"
-            type="button"
-            onClick={handlePickFiles}
-            title={t('albumTab.actions.add')}
-          >
-            {t('albumTab.actions.add')}
-          </button>
-          <button
-            className={`album-text-btn${selectMode ? ' album-text-btn--active' : ''}`}
-            type="button"
-            onClick={handleToggleSelectMode}
-            disabled={filteredItems.length === 0}
-            title={t('albumTab.actions.select')}
-          >
-            {t('albumTab.actions.select')}
-          </button>
-        </div>
-      </div>
+      <AlbumHeader
+        totalCount={items.length}
+        sortMode={sortMode}
+        filterMode={filterMode}
+        groupMode={groupMode}
+        columns={columns}
+        selectMode={selectMode}
+        filteredCount={filteredItems.length}
+        onSortChange={handleSortChange}
+        onFilterModeChange={handleFilterModeChange}
+        onGroupModeChange={handleGroupModeChange}
+        onColumnsChange={handleColumnsChange}
+        onPickFiles={handlePickFiles}
+        onToggleSelectMode={handleToggleSelectMode}
+      />
 
-      {/* 状态消息 */}
       {statusMessage ? <div className="album-status">{statusMessage}</div> : null}
 
-      {/* 隐藏的文件选择 input */}
       <input
         ref={fileInputRef}
         className="album-file-input"
@@ -244,62 +132,24 @@ export function AlbumTab(): ReactElement {
         onChange={handleFileInputChange}
       />
 
-      {/* 主内容区域 */}
       {activeId === null ? (
-        <div
-          className="album-overview"
-          style={{ ['--album-columns' as string]: String(columns) } as React.CSSProperties}
-        >
-          {totalCount === 0 ? (
-            <div className="album-empty">
-              <div className="album-empty-title">{t('albumTab.empty.title')}</div>
-              <div className="album-empty-desc">{t('albumTab.empty.desc')}</div>
-              <button className="album-primary-btn" type="button" onClick={handlePickFiles}>
-                {t('albumTab.actions.add')}
-              </button>
-            </div>
-          ) : filteredItems.length === 0 ? (
-            <div className="album-empty">
-              <div className="album-empty-title">{t('albumTab.empty.filteredTitle')}</div>
-              <div className="album-empty-desc">{t('albumTab.empty.filteredDesc')}</div>
-            </div>
-          ) : (
-            <div className="album-group-list" onWheelCapture={(event) => event.stopPropagation()}>
-              {groupedItems.map((group) => (
-                <section key={group.key} className="album-group-section">
-                  {groupMode !== 'none' ? (
-                    <div className="album-group-header">
-                      <div className="album-group-title-wrap">
-                        <span className="album-group-title" title={group.subtitle || group.title}>{group.title}</span>
-                        {group.subtitle ? <span className="album-group-subtitle" title={group.subtitle}>{group.subtitle}</span> : null}
-                      </div>
-                      <span className="album-group-count">
-                        {t('albumTab.group.count', { count: group.items.length })}
-                      </span>
-                    </div>
-                  ) : null}
-                  <div className="album-grid">
-                    {group.items.map((item) => (
-                      <AlbumGridItem
-                        key={item.id}
-                        item={item}
-                        meta={metaCache[item.id]}
-                        selected={selectedIds.has(item.id)}
-                        selectMode={selectMode}
-                        onToggleSelection={handleToggleItemSelection}
-                        onOpen={viewer.handleOpenItem}
-                        onRemove={handleRemove}
-                        onMouseEnter={handleThumbMouseEnter}
-                        onMouseLeave={handleThumbMouseLeave}
-                        gridVideoRefs={gridVideoRefs}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          )}
-        </div>
+        <AlbumOverview
+          totalCount={items.length}
+          filteredCount={filteredItems.length}
+          columns={columns}
+          groupMode={groupMode}
+          groupedItems={groupedItems}
+          metaCache={metaCache}
+          selectedIds={selectedIds}
+          selectMode={selectMode}
+          onToggleSelection={handleToggleItemSelection}
+          onOpen={viewer.handleOpenItem}
+          onRemove={handleRemove}
+          onMouseEnter={handleThumbMouseEnter}
+          onMouseLeave={handleThumbMouseLeave}
+          gridVideoRefs={gridVideoRefs}
+          onPickFiles={handlePickFiles}
+        />
       ) : (
         <AlbumViewer
           viewer={viewer}
@@ -312,7 +162,6 @@ export function AlbumTab(): ReactElement {
         />
       )}
 
-      {/* 底部选择工具条 */}
       <AlbumSelectionBar
         selectMode={selectMode}
         selectedCount={selectedCount}
@@ -324,7 +173,6 @@ export function AlbumTab(): ReactElement {
         onToggleSelectMode={handleToggleSelectMode}
       />
 
-      {/* 拖拽蒙层提示 */}
       {dragOverPage ? (
         <div className="album-drop-mask" aria-hidden="true">
           <span className="album-drop-mask-text">{t('albumTab.dropHint')}</span>

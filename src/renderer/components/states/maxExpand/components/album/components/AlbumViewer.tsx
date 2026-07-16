@@ -28,28 +28,9 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SvgIcon } from '../../../../../../utils/SvgIcon';
 import { ZOOM_MAX, ZOOM_MIN, ZOOM_STEP } from '../types/albumTypes';
-import type { AlbumItem, AlbumMeta } from '../types/albumTypes';
+import type { AlbumViewerProps } from '../types/albumTypes';
 import { formatDuration } from '../utils/albumUtils';
-import type { UseAlbumViewerReturn } from '../hooks/useAlbumViewer';
 import { AlbumMetaPanel } from './AlbumMetaPanel';
-
-/** AlbumViewer 组件入参 */
-interface AlbumViewerProps {
-  /** useAlbumViewer hook 返回值 */
-  viewer: UseAlbumViewerReturn;
-  /** 筛选后条目数（导航按钮禁用判断） */
-  filteredCount: number;
-  /** 返回总览 */
-  onBack: () => void;
-  /** 原始缩放 */
-  onOriginalZoom: () => void;
-  /** 资源管理器定位 */
-  onOpenInExplorer: (item: AlbumItem) => void;
-  /** 另存为 */
-  onSaveAs: (item: AlbumItem) => void;
-  /** 设为灵动岛背景 */
-  onSetAsIslandBackground: (item: AlbumItem) => void;
-}
 
 /**
  * 控制按钮内部图标。
