@@ -35,12 +35,16 @@ export interface UseAlbumViewerActionsReturn {
   handleOpenInExplorer: (item: AlbumItem) => void;
   handleSaveAs: (item: AlbumItem) => void;
   handleSetAsIslandBackground: (item: AlbumItem) => void;
+  /** 重置缩放至 1:1 并显示提示 */
+  handleOriginalZoom: () => void;
 }
 
 /** 查看器工具栏动作 hook */
 export function useAlbumViewerActions(
   activeMeta: AlbumMeta | undefined,
   setStatusMessage: React.Dispatch<React.SetStateAction<string>>,
+  /** 重置缩放（由 useAlbumViewer.handleResetZoom 提供） */
+  resetZoom: () => void,
 ): UseAlbumViewerActionsReturn {
   const { t } = useTranslation();
 
@@ -100,5 +104,11 @@ export function useAlbumViewerActions(
     });
   }, [t, setStatusMessage, activeMeta]);
 
-  return { handleOpenInExplorer, handleSaveAs, handleSetAsIslandBackground };
+  /** 重置缩放至 1:1 并显示提示 */
+  const handleOriginalZoom = useCallback((): void => {
+    resetZoom();
+    setStatusMessage(t('albumTab.status.zoomReset'));
+  }, [resetZoom, setStatusMessage, t]);
+
+  return { handleOpenInExplorer, handleSaveAs, handleSetAsIslandBackground, handleOriginalZoom };
 }

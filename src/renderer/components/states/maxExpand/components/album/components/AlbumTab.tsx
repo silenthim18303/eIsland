@@ -20,12 +20,11 @@
 
 /**
  * @file AlbumTab.tsx
- * @description 最大展开模式相册页主组件：仅负责 hook 调用、跨 hook 编排与组件组合。
+ * @description 最大展开模式相册页主组件：仅负责 hook 调用与组件组合。
  * @author 鸡哥
  */
 
-import { useEffect } from 'react';
-import type { ChangeEvent, ReactElement } from 'react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SUPPORTED_EXTS } from '../types/albumTypes';
 import { useAlbumItems } from '../hooks/useAlbumItems';
@@ -39,6 +38,9 @@ import { AlbumOverview } from './AlbumOverview';
 import { AlbumViewer } from './AlbumViewer';
 import { AlbumSelectionBar } from './AlbumSelectionBar';
 
+/**
+ * 相册页主组件：hook 调用 → 组件组合。
+ */
 export function AlbumTab(): ReactElement {
   const { t } = useTranslation();
 
@@ -48,6 +50,7 @@ export function AlbumTab(): ReactElement {
     fileInputRef, gridVideoRefs, initColumns, initSortMode, initGroupMode,
     loadExifIfNeeded, handleAddFiles, handleRemove, handleRemoveSelected,
     handleThumbMouseEnter, handleThumbMouseLeave,
+    handleFileInputChange, handlePickFiles,
   } = useAlbumItems();
 
   /* ── Hook: 网格配置 ── */
@@ -57,46 +60,22 @@ export function AlbumTab(): ReactElement {
   } = useAlbumGridConfig(items, metaCache, loaded, initColumns, initSortMode, initGroupMode);
 
   /* ── Hook: 查看器 ── */
-  const viewer = useAlbumViewer(items, filteredItems, metaCache);
+  const viewer = useAlbumViewer(items, filteredItems, metaCache, loadExifIfNeeded);
   const { activeId, setActiveId } = viewer;
 
   /* ── Hook: 查看器动作 ── */
-  const { handleOpenInExplorer, handleSaveAs, handleSetAsIslandBackground } = useAlbumViewerActions(viewer.activeMeta, setStatusMessage);
+  const { handleOpenInExplorer, handleSaveAs, handleSetAsIslandBackground, handleOriginalZoom } =
+    useAlbumViewerActions(viewer.activeMeta, setStatusMessage, viewer.handleResetZoom);
 
   /* ── Hook: 多选 ── */
   const {
     selectedIds, selectMode, selectedCount, allVisibleSelected,
     handleToggleItemSelection, handleSelectAllVisible, handleClearSelection, handleToggleSelectMode,
-  } = useAlbumSelection(items, filteredItems);
+    handleRemoveSelectedItems,
+  } = useAlbumSelection(items, filteredItems, activeId, setActiveId, handleRemoveSelected);
 
   /* ── Hook: 拖拽导入 ── */
   const { dragOverPage, handleDragOver, handleDragLeave, handleDrop } = useAlbumDrag(handleAddFiles);
-
-  /* ── 进入单图视图时加载 EXIF ── */
-  useEffect(() => {
-    if (activeId === null) return;
-    const target = items.find((it) => it.id === activeId);
-    if (target) loadExifIfNeeded(target);
-  }, [activeId, items, loadExifIfNeeded]);
-
-  /* ── 编排：批量删除（联动 activeId 清理） ── */
-  const onRemoveSelected = (): void => {
-    if (selectedIds.size === 0) return;
-    if (activeId !== null && selectedIds.has(activeId)) setActiveId(null);
-    handleRemoveSelected(selectedIds);
-    handleClearSelection();
-  };
-
-  /* ── 简单 handler ── */
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    handleAddFiles(event.target.files);
-    event.target.value = '';
-  };
-  const handlePickFiles = (): void => { fileInputRef.current?.click(); };
-  const handleOriginalZoom = (): void => {
-    viewer.handleResetZoom();
-    setStatusMessage(t('albumTab.status.zoomReset'));
-  };
 
   return (
     <div
@@ -169,7 +148,7 @@ export function AlbumTab(): ReactElement {
         allVisibleSelected={allVisibleSelected}
         onSelectAllVisible={handleSelectAllVisible}
         onClearSelection={handleClearSelection}
-        onRemoveSelected={onRemoveSelected}
+        onRemoveSelected={handleRemoveSelectedItems}
         onToggleSelectMode={handleToggleSelectMode}
       />
 

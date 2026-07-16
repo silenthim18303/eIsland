@@ -73,6 +73,8 @@ export function useAlbumViewer(
   items: AlbumItem[],
   filteredItems: AlbumItem[],
   metaCache: Record<number, AlbumMeta>,
+  /** 进入单图视图时按需加载 EXIF（由 useAlbumItems 提供） */
+  loadExifIfNeeded: (item: AlbumItem) => void,
 ): UseAlbumViewerReturn {
   const [activeId, setActiveId] = useState<number | null>(null);
   const [zoom, setZoom] = useState<number>(1);
@@ -111,6 +113,13 @@ export function useAlbumViewer(
     setVideoDuration(0);
     setVideoControlsCollapsed(false);
   }, [activeId, items]);
+
+  /** 进入单图视图时按需加载 EXIF */
+  useEffect(() => {
+    if (activeId === null) return;
+    const target = items.find((it) => it.id === activeId);
+    if (target) loadExifIfNeeded(target);
+  }, [activeId, items, loadExifIfNeeded]);
 
   /** 同步 video muted */
   useEffect(() => {

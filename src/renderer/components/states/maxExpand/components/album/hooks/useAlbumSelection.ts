@@ -39,12 +39,17 @@ export interface UseAlbumSelectionReturn {
   handleSelectAllVisible: () => void;
   handleClearSelection: () => void;
   handleToggleSelectMode: () => void;
+  /** 批量删除选中条目（联动清除查看器 activeId） */
+  handleRemoveSelectedItems: () => void;
 }
 
 /** 相册多选管理 hook */
 export function useAlbumSelection(
   items: AlbumItem[],
   filteredItems: AlbumItem[],
+  activeId: number | null,
+  setActiveId: React.Dispatch<React.SetStateAction<number | null>>,
+  removeItemsByIds: (ids: Set<number>) => void,
 ): UseAlbumSelectionReturn {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(() => new Set());
   const [selectMode, setSelectMode] = useState(false);
@@ -101,6 +106,14 @@ export function useAlbumSelection(
     });
   };
 
+  /** 批量删除选中条目（联动清除查看器 activeId） */
+  const handleRemoveSelectedItems = (): void => {
+    if (selectedIds.size === 0) return;
+    if (activeId !== null && selectedIds.has(activeId)) setActiveId(null);
+    removeItemsByIds(selectedIds);
+    handleClearSelection();
+  };
+
   return {
     selectedIds,
     setSelectedIds,
@@ -112,5 +125,6 @@ export function useAlbumSelection(
     handleSelectAllVisible,
     handleClearSelection,
     handleToggleSelectMode,
+    handleRemoveSelectedItems,
   };
 }

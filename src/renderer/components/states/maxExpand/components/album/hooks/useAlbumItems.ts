@@ -72,6 +72,8 @@ export interface UseAlbumItemsReturn {
   handleRemoveSelected: (ids: Set<number>) => void;
   handleThumbMouseEnter: (item: AlbumItem) => void;
   handleThumbMouseLeave: (item: AlbumItem) => void;
+  handleFileInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handlePickFiles: () => void;
 }
 
 /** 相册条目管理 hook */
@@ -355,6 +357,17 @@ export function useAlbumItems(): UseAlbumItemsReturn {
     el.currentTime = 0;
   }, []);
 
+  /** 文件选择后处理并重置 input */
+  const handleFileInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>): void => {
+    handleAddFiles(event.target.files);
+    event.target.value = '';
+  }, [handleAddFiles]);
+
+  /** 触发文件选择器 */
+  const handlePickFiles = useCallback((): void => {
+    fileInputRef.current?.click();
+  }, []);
+
   return {
     items,
     setItems,
@@ -374,5 +387,7 @@ export function useAlbumItems(): UseAlbumItemsReturn {
     handleRemoveSelected,
     handleThumbMouseEnter,
     handleThumbMouseLeave,
+    handleFileInputChange,
+    handlePickFiles,
   };
 }
