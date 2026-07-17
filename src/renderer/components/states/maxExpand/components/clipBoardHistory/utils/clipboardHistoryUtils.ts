@@ -40,13 +40,25 @@ export function isLikelyUrl(text: string): boolean {
   return /^[a-z0-9.-]+\.[a-z]{2,}(?:[/?#:]\S*)?$/i.test(value);
 }
 
-/** 判断文本是否可能是密码（不应记录） */
+/** 判断文本是否可能是密码或令牌（不应记录） */
 export function isLikelyPassword(text: string): boolean {
   const value = text.trim();
-  if (value.length < 8 || value.length > 128) return false;
-  if (/\s/.test(value) || isLikelyUrl(value) || /^\S+@\S+\.\S+$/.test(value)) return false;
+  if (!value) return false;
+  if (isLikelyUrl(value) || /^\S+@\S+\.\S+$/.test(value)) return false;
+
+  const len = value.length;
+
+  /* JWT：三段 base64url */
+  if (/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value)) return true;
+
+  /* 长随机令牌（hex / base64 / url-safe） */
+  if (len >= 32 && /^[A-Za-z0-9+/=_-]+$/.test(value)) return true;
+
+  /* 常规密码规则 */
+  if (len < 8 || len > 128) return false;
+  if (/\s/.test(value)) return false;
   const groups = [/[a-z]/, /[A-Z]/, /\d/, /[^a-zA-Z\d]/].filter((rule) => rule.test(value)).length;
-  return groups >= 3;
+  return groups >= 3 || (len >= 12 && groups >= 2);
 }
 
 /** 判断文本是否应该被记录 */

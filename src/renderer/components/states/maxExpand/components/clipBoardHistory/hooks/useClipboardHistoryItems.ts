@@ -187,8 +187,8 @@ export function useClipboardHistoryItems(
 
   /* ── 保存编辑 ── */
   const handleSaveEdit = useCallback((id: number): void => {
-    const nextText = editText.replace(/\r\n/g, '\n').trim();
-    if (!nextText) return;
+    const nextText = editText.replace(/\r\n/g, '\n');
+    if (!nextText.trim()) return;
     setItems((prev) => prev.map((item) => (
       item.id === id
         ? { ...item, text: nextText }
