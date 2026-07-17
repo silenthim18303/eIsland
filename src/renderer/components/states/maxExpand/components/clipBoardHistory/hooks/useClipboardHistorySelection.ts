@@ -186,7 +186,7 @@ export function useClipboardHistorySelection(
     selectedIds, setSelectedIds, selectionMode, setSelectionMode,
     selectionCollapsing, setSelectionCollapsing, cleanupRange,
     activeFilter, setActiveFilter,
-    selectedCount, selectedIdSet, visibleIdSet, allSelected,
+    selectedCount, selectedIdSet, visibleItems, visibleIdSet, allSelected,
     cleanupMatchedIdSet, cleanupMatchedCount,
     handleToggleSelectionMode, handleToggleSelect, handleToggleSelectAll,
     handleCleanupRangeChange, handleFilterChange,

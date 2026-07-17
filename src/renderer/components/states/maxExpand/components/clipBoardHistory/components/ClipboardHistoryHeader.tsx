@@ -51,14 +51,13 @@ export function ClipboardHistoryHeader({
       <span className="clipboard-history-title">{t('clipboardHistoryTab.title', { defaultValue: '剪贴板历史' })}</span>
       <div className="clipboard-history-header-right">
         <span className="clipboard-history-count">{countLabel}</span>
-        <div className="clipboard-history-filter-bar" role="tablist" aria-label={t('clipboardHistoryTab.filters.aria', { defaultValue: '剪贴板类型筛选' })}>
+        <div className="clipboard-history-filter-bar" aria-label={t('clipboardHistoryTab.filters.aria', { defaultValue: '剪贴板类型筛选' })}>
           {CLIPBOARD_HISTORY_FILTERS.map((filter) => (
             <button
               key={filter}
               className={`clipboard-history-filter${activeFilter === filter ? ' clipboard-history-filter--active' : ''}`}
               type="button"
-              role="tab"
-              aria-selected={activeFilter === filter}
+              aria-pressed={activeFilter === filter}
               onClick={() => onFilterChange(filter)}
             >
               {t(CLIPBOARD_HISTORY_FILTER_LABEL_KEYS[filter], {

@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useClipboardHistoryFeedback } from '../hooks/useClipboardHistoryFeedback';
 import { useClipboardHistoryItems } from '../hooks/useClipboardHistoryItems';
 import { useClipboardHistorySelection } from '../hooks/useClipboardHistorySelection';
-import { buildClipboardHistoryExport, downloadTextFile, getClipboardHistoryExportFileName, matchesClipboardFilter } from '../utils/clipboardHistoryUtils';
+import { buildClipboardHistoryExport, downloadTextFile, getClipboardHistoryExportFileName } from '../utils/clipboardHistoryUtils';
 import { ClipboardHistoryBulkBar } from './ClipboardHistoryBulkBar';
 import { ClipboardHistoryHeader } from './ClipboardHistoryHeader';
 import { ClipboardHistoryItemRow } from './ClipboardHistoryItemRow';
@@ -54,18 +54,13 @@ export function ClipboardHistoryTab(): ReactElement {
   /* ── Hook: 选择模式 ── */
   const {
     selectedIds, selectionMode, selectionCollapsing, cleanupRange,
-    activeFilter, selectedCount, selectedIdSet, allSelected,
+    activeFilter, selectedCount, selectedIdSet, visibleItems, allSelected,
     cleanupMatchedCount, handleToggleSelectionMode,
     handleToggleSelect, handleToggleSelectAll,
     handleCleanupRangeChange, handleFilterChange,
     handleRemoveSelected, handleClearByRange,
   } = useClipboardHistorySelection(items, setItems, expandedId, setExpandedId, setEditText);
 
-  /* ── 筛选后可见条目 ── */
-  const visibleItems = useMemo(
-    () => items.filter((item) => matchesClipboardFilter(item, activeFilter)),
-    [activeFilter, items],
-  );
   const totalCount = items.length;
   const visibleCount = visibleItems.length;
 

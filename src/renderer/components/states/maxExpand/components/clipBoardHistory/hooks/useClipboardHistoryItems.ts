@@ -59,6 +59,7 @@ export function useClipboardHistoryItems(
   useEffect(() => {
     let cancelled = false;
 
+    /* 先读取设置，再用解析后的 historyLimit 加载历史数据 */
     Promise.all([
       window.api.storeRead(HISTORY_ENABLED_STORE_KEY),
       window.api.storeRead(HISTORY_LIMIT_STORE_KEY),
@@ -73,38 +74,40 @@ export function useClipboardHistoryItems(
       setHistoryEnabled(nextEnabled);
       setHistoryLimit(nextLimit);
       setExitMaxExpandOnCopy(nextExitOnCopy);
+      return nextLimit;
+    }).then((resolvedLimit) => {
+      if (cancelled) return;
+      return window.api.storeRead(STORE_KEY).then((data) => {
+        if (cancelled) return;
+        const limit = resolvedLimit ?? DEFAULT_HISTORY_LIMIT;
+        if (Array.isArray(data) && data.length > 0) {
+          setItems(sanitizeHistory(data, limit));
+        } else {
+          try {
+            const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (raw) {
+              const parsed = sanitizeHistory(JSON.parse(raw) as unknown[], limit);
+              setItems(parsed);
+              window.api.storeWrite(STORE_KEY, parsed).catch(() => {});
+            }
+          } catch {
+            // noop
+          }
+        }
+        setLoaded(true);
+      });
     }).catch(() => {
       if (cancelled) return;
       setHistoryEnabled(true);
       setHistoryLimit(DEFAULT_HISTORY_LIMIT);
       setExitMaxExpandOnCopy(false);
-    });
-
-    window.api.storeRead(STORE_KEY).then((data) => {
-      if (cancelled) return;
-      if (Array.isArray(data) && data.length > 0) {
-        setItems(sanitizeHistory(data, DEFAULT_HISTORY_LIMIT));
-      } else {
-        try {
-          const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-          if (raw) {
-            const parsed = sanitizeHistory(JSON.parse(raw) as unknown[], DEFAULT_HISTORY_LIMIT);
-            setItems(parsed);
-            window.api.storeWrite(STORE_KEY, parsed).catch(() => {});
-          }
-        } catch {
-          // noop
-        }
-      }
-      setLoaded(true);
-    }).catch(() => {
       try {
         const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (raw) setItems(sanitizeHistory(JSON.parse(raw) as unknown[], DEFAULT_HISTORY_LIMIT));
       } catch {
         // noop
       }
-      if (!cancelled) setLoaded(true);
+      setLoaded(true);
     });
 
     return () => {

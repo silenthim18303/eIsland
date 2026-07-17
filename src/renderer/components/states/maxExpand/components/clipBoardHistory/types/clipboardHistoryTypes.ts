@@ -131,6 +131,7 @@ export interface UseClipboardHistorySelectionReturn {
   setActiveFilter: React.Dispatch<React.SetStateAction<ClipboardHistoryFilter>>;
   selectedCount: number;
   selectedIdSet: Set<number>;
+  visibleItems: ClipboardHistoryItem[];
   visibleIdSet: Set<number>;
   allSelected: boolean;
   cleanupMatchedIdSet: Set<number>;
