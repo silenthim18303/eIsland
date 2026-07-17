@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-17T08:00:45.594Z
+> 生成时间：2026-07-17T13:10:15.455Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,17 @@
 
 ## Unreleased
 
+- 2026-07-17 | d5e3f08f | 鸡哥 | Merge pull request #154 from JNTMTMTM/dev
+- 2026-07-17 | 1d185935 | 鸡哥 | refactor(todo): update type imports to use CSSProperties for style definitions
+- 2026-07-17 | 35f9362f | 鸡哥 | feat(localFileSearch): enhance config panel transition effects with margin adjustments
+- 2026-07-17 | ac22c492 | 鸡哥 | feat(localFileSearch): enhance configuration panel layout with transition effects
+- 2026-07-17 | 413f7ad3 | 鸡哥 | feat(localFileSearch): implement local file search module with configuration and results display
+- 2026-07-17 | ec12104b | 鸡哥 | feat(localFileSearch): restructure LocalFileSearchTab component and update import paths
+- 2026-07-17 | 7d85bf72 | 鸡哥 | feat(todo): implement Todo module with components for task management
+- 2026-07-17 | 168b15b4 | 鸡哥 | refactor: reorganize TodoTab component structure and update import paths
+- 2026-07-17 | 06576005 | 鸡哥 | feat(countdown): add countdown module with calendar, card, and form components
+- 2026-07-17 | 73f6fba6 | 鸡哥 | feat: add CountdownTab component for managing countdown events with calendar integration
+- 2026-07-17 | 3e14b42b | eislandBot | docs: auto update CHANGE_LOG.md for #153 by @JNTMTMTM [skip ci]
 - 2026-07-17 | d865d203 | 鸡哥 | Merge pull request #153 from JNTMTMTM/dev
 - 2026-07-17 | 7d5bd233 | 鸡哥 | refactor: improve password detection logic in isLikelyPassword function for better accuracy
 - 2026-07-17 | fea0eab9 | 鸡哥 | refactor: enhance clipboard history item row layout with new detail wrapper for improved expansion handling
