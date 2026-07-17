@@ -19,9 +19,26 @@
  */
 
 /**
- * @file index.ts
- * @description 本地文件搜索模块统一导出入口。
+ * @file LocalFileSearchHeader.tsx
+ * @description 本地文件搜索标题栏组件。
  * @author 鸡哥
  */
 
-export { LocalFileSearchTab } from './components/LocalFileSearchTab';
+import type { ReactElement } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { LocalFileSearchHeaderProps } from '../types/localFileSearchTypes';
+
+/**
+ * 本地文件搜索标题栏
+ * @description 显示标题和结果数量
+ */
+export function LocalFileSearchHeader({ countText }: LocalFileSearchHeaderProps): ReactElement {
+  const { t } = useTranslation();
+
+  return (
+    <div className="local-file-search-header">
+      <span className="local-file-search-title">{t('maxExpand.localFileSearch.title', { defaultValue: '本地文件查找' })}</span>
+      <span className="local-file-search-count">{countText}</span>
+    </div>
+  );
+}

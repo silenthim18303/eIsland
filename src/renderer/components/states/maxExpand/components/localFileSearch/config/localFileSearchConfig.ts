@@ -19,9 +19,10 @@
  */
 
 /**
- * @file index.ts
- * @description 本地文件搜索模块统一导出入口。
+ * @file localFileSearchConfig.ts
+ * @description 本地文件搜索模块常量定义。
  * @author 鸡哥
  */
 
-export { LocalFileSearchTab } from './components/LocalFileSearchTab';
+/** 搜索根目录持久化键 */
+export const SEARCH_ROOT_STORE_KEY = 'local-file-search-root';

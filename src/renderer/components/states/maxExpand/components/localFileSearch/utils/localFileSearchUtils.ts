@@ -19,9 +19,15 @@
  */
 
 /**
- * @file index.ts
- * @description 本地文件搜索模块统一导出入口。
+ * @file localFileSearchUtils.ts
+ * @description 本地文件搜索模块纯工具函数。
  * @author 鸡哥
  */
 
-export { LocalFileSearchTab } from './components/LocalFileSearchTab';
+/** 解析逗号分隔的输入值，去除空白并过滤空串 */
+export function parseCsvValues(input: string): string[] {
+  return input
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
