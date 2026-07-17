@@ -880,7 +880,8 @@
   .clipboard-history-clear,
   .clipboard-history-export,
   .clipboard-history-select-toggle,
-  .clipboard-history-summary-row {
+  .clipboard-history-summary-row,
+  .clipboard-history-detail-wrapper {
     transition: none;
   }
 
@@ -969,7 +970,6 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 6px;
   border-radius: 8px;
   background: rgba(var(--color-text-rgb), 0.04);
   border: 1px solid rgba(var(--color-text-rgb), 0.06);
@@ -1078,11 +1078,26 @@
   justify-self: end;
 }
 
+.clipboard-history-detail-wrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease-out;
+}
+
+.clipboard-history-detail-wrapper--expanded {
+  grid-template-rows: 1fr;
+}
+
+.clipboard-history-detail-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
 .clipboard-history-detail {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding-top: 2px;
+  padding-top: 6px;
 }
 
 .clipboard-history-content {

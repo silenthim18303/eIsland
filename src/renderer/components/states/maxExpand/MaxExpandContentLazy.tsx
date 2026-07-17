@@ -33,7 +33,7 @@ const AiChatTab = lazy(() => import('./components/agent/components/AiChatTab').t
 const TodoTab = lazy(() => import('./components/TodoTab').then((module) => ({ default: module.TodoTab })));
 const UrlFavoritesTab = lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
 const LocalFileSearchTab = lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
-const ClipboardHistoryTab = lazy(() => import('./components/ClipboardHistoryTab').then((module) => ({ default: module.ClipboardHistoryTab })));
+const ClipboardHistoryTab = lazy(() => import('./components/clipBoardHistory').then((module) => ({ default: module.ClipboardHistoryTab })));
 const AlbumTab = lazy(() => import('./components/album/components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
 const MailTab = lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));
 const SettingsTab = lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
