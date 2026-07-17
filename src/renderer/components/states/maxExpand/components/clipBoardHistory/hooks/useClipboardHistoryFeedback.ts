@@ -25,10 +25,8 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { FEEDBACK_DURATION_MS } from '../config/clipboardHistoryConfig';
 import type { UseClipboardHistoryFeedbackReturn } from '../types/clipboardHistoryTypes';
-
-/** 反馈提示显示时长（ms） */
-const FEEDBACK_DURATION_MS = 1800;
 
 /**
  * 管理复制/导出等操作的反馈提示状态

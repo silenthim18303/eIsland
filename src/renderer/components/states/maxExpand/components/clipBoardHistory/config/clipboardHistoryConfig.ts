@@ -44,3 +44,5 @@ export const SELECTION_COLLAPSE_ANIMATION_MS = 180;
 export const MS_PER_HOUR = 60 * 60 * 1000;
 /** 毫秒/天 */
 export const MS_PER_DAY = 24 * MS_PER_HOUR;
+/** 反馈提示显示时长（ms） */
+export const FEEDBACK_DURATION_MS = 1800;
