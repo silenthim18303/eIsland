@@ -89,43 +89,45 @@ export function ClipboardHistoryItemRow({
         </button>
       </div>
 
-      {expanded ? (
-        <div className="clipboard-history-detail">
-          <textarea
-            className="clipboard-history-content"
-            value={editText}
-            ref={editTextareaRef}
-            onChange={(e) => {
-              onEditTextChange(e.target.value);
-              onEditTextareaRef(e.currentTarget);
-            }}
-            onKeyDown={(e) => {
-              if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                e.preventDefault();
-                onSaveEdit(item.id);
-              }
-            }}
-          />
-          <div className="clipboard-history-actions">
-            <button
-              className="clipboard-history-save"
-              type="button"
-              onClick={() => onSaveEdit(item.id)}
-              disabled={!editText.trim()}
-            >
-              {t('clipboardHistoryTab.actions.save', { defaultValue: '保存' })}
-            </button>
-            <button
-              className="clipboard-history-remove"
-              type="button"
-              onClick={() => onRemove(item.id)}
-              aria-label={t('clipboardHistoryTab.actions.removeAria', { defaultValue: '删除该剪贴板记录' })}
-            >
-              ×
-            </button>
+      <div className={`clipboard-history-detail-wrapper${expanded ? ' clipboard-history-detail-wrapper--expanded' : ''}`}>
+        <div className="clipboard-history-detail-inner">
+          <div className="clipboard-history-detail">
+            <textarea
+              className="clipboard-history-content"
+              value={editText}
+              ref={editTextareaRef}
+              onChange={(e) => {
+                onEditTextChange(e.target.value);
+                onEditTextareaRef(e.currentTarget);
+              }}
+              onKeyDown={(e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                  e.preventDefault();
+                  onSaveEdit(item.id);
+                }
+              }}
+            />
+            <div className="clipboard-history-actions">
+              <button
+                className="clipboard-history-save"
+                type="button"
+                onClick={() => onSaveEdit(item.id)}
+                disabled={!editText.trim()}
+              >
+                {t('clipboardHistoryTab.actions.save', { defaultValue: '保存' })}
+              </button>
+              <button
+                className="clipboard-history-remove"
+                type="button"
+                onClick={() => onRemove(item.id)}
+                aria-label={t('clipboardHistoryTab.actions.removeAria', { defaultValue: '删除该剪贴板记录' })}
+              >
+                ×
+              </button>
+            </div>
           </div>
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }
