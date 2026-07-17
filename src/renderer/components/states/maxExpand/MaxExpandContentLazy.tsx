@@ -32,7 +32,7 @@ import { MaxExpandContentShell } from './MaxExpandContentShell';
 const AiChatTab = lazy(() => import('./components/agent/components/AiChatTab').then((module) => ({ default: module.AiChatTab })));
 const TodoTab = lazy(() => import('./components/todo/components/TodoTab').then((module) => ({ default: module.TodoTab })));
 const UrlFavoritesTab = lazy(() => import('./components/UrlFavoritesTab').then((module) => ({ default: module.UrlFavoritesTab })));
-const LocalFileSearchTab = lazy(() => import('./components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
+const LocalFileSearchTab = lazy(() => import('./components/localFileSearch/components/LocalFileSearchTab').then((module) => ({ default: module.LocalFileSearchTab })));
 const ClipboardHistoryTab = lazy(() => import('./components/clipBoardHistory').then((module) => ({ default: module.ClipboardHistoryTab })));
 const AlbumTab = lazy(() => import('./components/album/components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
 const MailTab = lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));

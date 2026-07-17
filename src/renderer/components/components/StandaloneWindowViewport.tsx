@@ -30,7 +30,7 @@ import { CountdownTab } from '../states/maxExpand/components/countdown';
 import { UrlFavoritesTab } from '../states/maxExpand/components/UrlFavoritesTab';
 import { AlbumTab } from '../states/maxExpand/components/album/components/AlbumTab';
 import { MailTab } from '../states/maxExpand/components/MailTab';
-import { LocalFileSearchTab } from '../states/maxExpand/components/LocalFileSearchTab';
+import { LocalFileSearchTab } from '../states/maxExpand/components/localFileSearch/components/LocalFileSearchTab';
 import { ClipboardHistoryTab } from '../states/maxExpand/components/clipBoardHistory';
 import { SettingsTab } from '../states/maxExpand/components/SettingsTab';
 import { MemoTab } from '../states/maxExpand/components/MemoTab';

@@ -30,7 +30,7 @@ import { MaxExpandContentShell } from './MaxExpandContentShell';
 import { AiChatTab } from './components/agent/components/AiChatTab';
 import { TodoTab } from './components/todo/components/TodoTab';
 import { UrlFavoritesTab } from './components/UrlFavoritesTab';
-import { LocalFileSearchTab } from './components/LocalFileSearchTab';
+import { LocalFileSearchTab } from './components/localFileSearch/components/LocalFileSearchTab';
 import { ClipboardHistoryTab } from './components/clipBoardHistory';
 import { AlbumTab } from './components/album/components/AlbumTab';
 import { MailTab } from './components/MailTab';
