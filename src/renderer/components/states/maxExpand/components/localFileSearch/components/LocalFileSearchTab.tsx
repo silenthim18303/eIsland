@@ -74,30 +74,32 @@ export function LocalFileSearchTab(): ReactElement {
         onSearch={handleSearch}
       />
 
-      {showConfig ? (
-        <LocalFileSearchConfigPanel
-          resultLimit={resultLimit}
-          setResultLimit={setResultLimit}
-          matchScope={matchScope}
-          setMatchScope={setMatchScope}
-          matchMode={matchMode}
-          setMatchMode={setMatchMode}
-          maxDepth={maxDepth}
-          setMaxDepth={setMaxDepth}
-          extensionsInput={extensionsInput}
-          setExtensionsInput={setExtensionsInput}
-          excludeDirsInput={excludeDirsInput}
-          setExcludeDirsInput={setExcludeDirsInput}
-          includeDirectories={includeDirectories}
-          setIncludeDirectories={setIncludeDirectories}
-          includeFiles={includeFiles}
-          setIncludeFiles={setIncludeFiles}
-          includeHidden={includeHidden}
-          setIncludeHidden={setIncludeHidden}
-          caseSensitive={caseSensitive}
-          setCaseSensitive={setCaseSensitive}
-        />
-      ) : null}
+      <div className={`local-file-search-config-wrap${showConfig ? ' open' : ''}`}>
+        <div className="local-file-search-config-inner">
+          <LocalFileSearchConfigPanel
+            resultLimit={resultLimit}
+            setResultLimit={setResultLimit}
+            matchScope={matchScope}
+            setMatchScope={setMatchScope}
+            matchMode={matchMode}
+            setMatchMode={setMatchMode}
+            maxDepth={maxDepth}
+            setMaxDepth={setMaxDepth}
+            extensionsInput={extensionsInput}
+            setExtensionsInput={setExtensionsInput}
+            excludeDirsInput={excludeDirsInput}
+            setExcludeDirsInput={setExcludeDirsInput}
+            includeDirectories={includeDirectories}
+            setIncludeDirectories={setIncludeDirectories}
+            includeFiles={includeFiles}
+            setIncludeFiles={setIncludeFiles}
+            includeHidden={includeHidden}
+            setIncludeHidden={setIncludeHidden}
+            caseSensitive={caseSensitive}
+            setCaseSensitive={setCaseSensitive}
+          />
+        </div>
+      </div>
 
       {loading ? (
         <div className="local-file-search-progress" aria-hidden="true">

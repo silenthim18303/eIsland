@@ -129,6 +129,21 @@
   color: var(--color-island-text);
 }
 
+.local-file-search-config-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+}
+
+.local-file-search-config-wrap.open {
+  grid-template-rows: 1fr;
+}
+
+.local-file-search-config-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .local-file-search-config-panel {
   display: flex;
   align-items: center;
