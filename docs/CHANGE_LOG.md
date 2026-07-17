@@ -1,7 +1,7 @@
 # CHANGE LOG
 
 > 基于 Git 提交记录自动生成，按版本号顺序排列（含哈希与贡献者）。
-> 生成时间：2026-07-16T13:16:08.567Z
+> 生成时间：2026-07-17T08:00:45.594Z
 
 ## 26.6.4
 
@@ -2755,6 +2755,14 @@
 
 ## Unreleased
 
+- 2026-07-17 | d865d203 | 鸡哥 | Merge pull request #153 from JNTMTMTM/dev
+- 2026-07-17 | 7d5bd233 | 鸡哥 | refactor: improve password detection logic in isLikelyPassword function for better accuracy
+- 2026-07-17 | fea0eab9 | 鸡哥 | refactor: enhance clipboard history item row layout with new detail wrapper for improved expansion handling
+- 2026-07-17 | 0fef1bd0 | 鸡哥 | refactor: update clipboard history components for improved state management and accessibility
+- 2026-07-17 | 3bc5a9ec | 鸡哥 | refactor: move FEEDBACK_DURATION_MS constant to config for better maintainability
+- 2026-07-16 | 7752fc4e | 鸡哥 | feat: add clipboard history module with header, item rows, hooks, and utilities
+- 2026-07-16 | 1933f9fb | 鸡哥 | feat: add ClipboardHistoryTab component for managing clipboard history in max expand mode
+- 2026-07-16 | 50c53553 | eislandBot | docs: auto update CHANGE_LOG.md for #151 by @JNTMTMTM [skip ci]
 - 2026-07-16 | 813250a7 | 鸡哥 | Merge pull request #151 from JNTMTMTM/dev
 - 2026-07-16 | a190ccb8 | 鸡哥 | feat(oauth): enhance OAuth login handling and update documentation for KOOK support
 - 2026-07-16 | 0a1a474e | 鸡哥 | feat(oauth): refactor OAuth login handling and add unit tests for OAuth functions
