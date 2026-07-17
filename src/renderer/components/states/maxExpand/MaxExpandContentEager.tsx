@@ -35,7 +35,7 @@ import { ClipboardHistoryTab } from './components/clipBoardHistory';
 import { AlbumTab } from './components/album/components/AlbumTab';
 import { MailTab } from './components/MailTab';
 import { SettingsTab } from './components/SettingsTab';
-import { CountdownTab } from './components/CountdownTab';
+import { CountdownTab } from './components/countdown/components/CountdownTab';
 import { MemoTab } from './components/MemoTab';
 import { AlarmTab } from './components/alarm/components/AlarmTab';
 import { ToolboxTab } from './components/ToolboxTab';

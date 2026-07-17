@@ -28,7 +28,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import { useTranslation } from 'react-i18next';
 import 'react-datepicker/dist/react-datepicker.css';
-import useIslandStore from '../../../../store/slices';
+import useIslandStore from '../../../../../../store/slices';
 
 /** 事件类型 */
 type EventType = 'countdown' | 'anniversary' | 'birthday' | 'holiday' | 'exam';
