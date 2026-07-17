@@ -50,9 +50,6 @@ export function LocalFileSearchResults({ loading, results, iconMap }: LocalFileS
             onDoubleClick={() => {
               void window.api.openFile(item.path);
             }}
-            onClick={() => {
-              void window.api.openFile(item.path);
-            }}
             title={item.path}
           >
             <span className="local-file-search-item-icon-wrap">

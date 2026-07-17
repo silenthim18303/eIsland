@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PRIORITIES, SIZES } from '../config/todoConfig';
 import type { TodoItemProps } from '../types/todoTypes';
@@ -63,7 +63,7 @@ export function TodoItem({
           {todo.priority && (
             <span
               className="expand-todo-priority-badge"
-              style={{ '--tag-color': PRIORITIES.find(p => p.value === todo.priority)?.color } as React.CSSProperties}
+              style={{ '--tag-color': PRIORITIES.find(p => p.value === todo.priority)?.color } as CSSProperties}
             >
               {todo.priority}
             </span>
@@ -71,7 +71,7 @@ export function TodoItem({
           {todo.size && (
             <span
               className="expand-todo-size-badge"
-              style={{ '--tag-color': SIZES.find(s => s.value === todo.size)?.color } as React.CSSProperties}
+              style={{ '--tag-color': SIZES.find(s => s.value === todo.size)?.color } as CSSProperties}
             >
               {todo.size}
             </span>
@@ -162,7 +162,7 @@ export function TodoItem({
                   <button
                     key={p.value}
                     className={`expand-todo-tag ${subPriority === p.value ? 'active' : ''}`}
-                    style={{ '--tag-color': p.color } as React.CSSProperties}
+                    style={{ '--tag-color': p.color } as CSSProperties}
                     onClick={() => setSubPriority(subPriority === p.value ? undefined : p.value)}
                     title={p.label}
                   >
@@ -175,7 +175,7 @@ export function TodoItem({
                   <button
                     key={s.value}
                     className={`expand-todo-tag size ${subSize === s.value ? 'active' : ''}`}
-                    style={{ '--tag-color': s.color } as React.CSSProperties}
+                    style={{ '--tag-color': s.color } as CSSProperties}
                     onClick={() => setSubSize(subSize === s.value ? undefined : s.value)}
                     title={s.label}
                   >

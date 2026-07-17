@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import { PRIORITIES, SIZES } from '../config/todoConfig';
 import type { TodoSubItemProps } from '../types/todoTypes';
 
@@ -45,7 +45,7 @@ export function TodoSubItem({ sub, parentId, onToggleSubDone, onRemoveSubTodo }:
       {sub.priority && (
         <span
           className="expand-todo-priority-badge"
-          style={{ '--tag-color': PRIORITIES.find(p => p.value === sub.priority)?.color } as React.CSSProperties}
+          style={{ '--tag-color': PRIORITIES.find(p => p.value === sub.priority)?.color } as CSSProperties}
         >
           {sub.priority}
         </span>
@@ -53,7 +53,7 @@ export function TodoSubItem({ sub, parentId, onToggleSubDone, onRemoveSubTodo }:
       {sub.size && (
         <span
           className="expand-todo-size-badge"
-          style={{ '--tag-color': SIZES.find(s => s.value === sub.size)?.color } as React.CSSProperties}
+          style={{ '--tag-color': SIZES.find(s => s.value === sub.size)?.color } as CSSProperties}
         >
           {sub.size}
         </span>

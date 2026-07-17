@@ -24,7 +24,7 @@
  * @author 鸡哥
  */
 
-import type { ReactElement } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PRIORITIES, SIZES } from '../config/todoConfig';
 import type { TodoInputBarProps } from '../types/todoTypes';
@@ -56,7 +56,7 @@ export function TodoInputBar({
           <button
             key={p.value}
             className={`expand-todo-tag ${priority === p.value ? 'active' : ''}`}
-            style={{ '--tag-color': p.color } as React.CSSProperties}
+            style={{ '--tag-color': p.color } as CSSProperties}
             onClick={() => setPriority(priority === p.value ? undefined : p.value)}
             title={t('todo.priorityTitle', { defaultValue: '紧急程度 {{label}}', label: p.label })}
           >
@@ -70,7 +70,7 @@ export function TodoInputBar({
           <button
             key={s.value}
             className={`expand-todo-tag size ${size === s.value ? 'active' : ''}`}
-            style={{ '--tag-color': s.color } as React.CSSProperties}
+            style={{ '--tag-color': s.color } as CSSProperties}
             onClick={() => setSize(size === s.value ? undefined : s.value)}
             title={t('todo.sizeTitle', { defaultValue: '事件大小 {{label}}', label: s.label })}
           >
