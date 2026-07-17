@@ -37,7 +37,7 @@ const ClipboardHistoryTab = lazy(() => import('./components/clipBoardHistory').t
 const AlbumTab = lazy(() => import('./components/album/components/AlbumTab').then((module) => ({ default: module.AlbumTab })));
 const MailTab = lazy(() => import('./components/MailTab').then((module) => ({ default: module.MailTab })));
 const SettingsTab = lazy(() => import('./components/SettingsTab').then((module) => ({ default: module.SettingsTab })));
-const CountdownTab = lazy(() => import('./components/countdown/components/CountdownTab').then((module) => ({ default: module.CountdownTab })));
+const CountdownTab = lazy(() => import('./components/countdown').then((module) => ({ default: module.CountdownTab })));
 const MemoTab = lazy(() => import('./components/MemoTab').then((module) => ({ default: module.MemoTab })));
 const AlarmTab = lazy(() => import('./components/alarm/components/AlarmTab').then((module) => ({ default: module.AlarmTab })));
 const ToolboxTab = lazy(() => import('./components/ToolboxTab').then((module) => ({ default: module.ToolboxTab })));

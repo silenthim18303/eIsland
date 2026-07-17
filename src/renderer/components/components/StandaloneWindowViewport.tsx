@@ -26,7 +26,7 @@
 
 import type { JSX } from 'react';
 import { TodoTab } from '../states/maxExpand/components/TodoTab';
-import { CountdownTab } from '../states/maxExpand/components/countdown/components/CountdownTab';
+import { CountdownTab } from '../states/maxExpand/components/countdown';
 import { UrlFavoritesTab } from '../states/maxExpand/components/UrlFavoritesTab';
 import { AlbumTab } from '../states/maxExpand/components/album/components/AlbumTab';
 import { MailTab } from '../states/maxExpand/components/MailTab';

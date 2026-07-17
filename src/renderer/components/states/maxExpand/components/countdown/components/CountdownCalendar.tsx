@@ -19,9 +19,27 @@
  */
 
 /**
- * @file index.ts
- * @description 倒数日模块统一导出入口。
+ * @file CountdownCalendar.tsx
+ * @description 倒数日日历选择器组件。
  * @author 鸡哥
  */
 
-export { CountdownTab } from './components/CountdownTab';
+import type { ReactElement } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import type { CountdownCalendarProps } from '../types/countdownTypes';
+
+/** 日历选择器，支持高亮已有事件日期 */
+export function CountdownCalendar({ selectedDate, onSelectDate, highlightDates }: CountdownCalendarProps): ReactElement {
+  return (
+    <div className="cd-calendar-wrap countdown-calendar-wrap">
+      <DatePicker
+        selected={selectedDate}
+        onChange={(date: Date | null) => onSelectDate(date)}
+        inline
+        highlightDates={highlightDates}
+        calendarClassName="countdown-calendar"
+      />
+    </div>
+  );
+}

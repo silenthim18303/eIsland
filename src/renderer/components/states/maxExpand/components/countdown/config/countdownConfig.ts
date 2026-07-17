@@ -19,9 +19,22 @@
  */
 
 /**
- * @file index.ts
- * @description 倒数日模块统一导出入口。
+ * @file countdownConfig.ts
+ * @description 倒数日模块常量定义。
  * @author 鸡哥
  */
 
-export { CountdownTab } from './components/CountdownTab';
+import type { EventType } from '../types/countdownTypes';
+
+/** 持久化键 */
+export const STORE_KEY = 'countdown-dates';
+
+/** 支持的事件类型列表 */
+export const EVENT_TYPES: EventType[] = ['countdown', 'anniversary', 'birthday', 'holiday', 'exam'];
+
+/** 预设颜色列表 */
+export const COLOR_PRESETS = [
+  '#ff5252', '#ff7043', '#ffab40', '#ffd740',
+  '#69f0ae', '#81c784', '#69c0ff', '#448aff',
+  '#7c4dff', '#ce93d8', '#f48fb1', '#80deea',
+];
